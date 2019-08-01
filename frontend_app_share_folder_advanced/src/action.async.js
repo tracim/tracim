@@ -19,7 +19,7 @@ export const getContentTypeList = apiUrl =>
     method: 'GET'
   })
 
-// export const putShareLinkList = (apiUrl, workspaceId, shareLinkList) =>
+// export const postShareLinksList = (apiUrl, workspaceId, shareLinkList) =>
 //   fetch(`${apiUrl}/workspaces/${workspaceId}/share_folder`, {
 //     credentials: 'include',
 //     headers: {
@@ -30,3 +30,12 @@ export const getContentTypeList = apiUrl =>
 //       share_link_list: shareLinkList
 //     })
 //   })
+
+export const getShareLinksList = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })

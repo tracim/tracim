@@ -58,9 +58,9 @@ class ShareDownloadManagement extends React.Component {
             ? props.shareLinkList.map(shareLink =>
                 <ShareLink
                   email={shareLink.email}
-                  link={shareLink.link}
-                  id={shareLink.id}
-                  isProtected={shareLink.isProtected}
+                  link={shareLink.url}
+                  id={shareLink.share_id}
+                  isProtected={shareLink.has_password}
                   onClickDeleteShareLink={props.onClickDeleteShareLink}
                   hexcolor={props.hexcolor}
                 />

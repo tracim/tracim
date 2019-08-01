@@ -155,17 +155,17 @@ export const displayFileSize = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
-export const parserStringtoList = string => string.split(' ').join(',').split('\n').join(',').split(',')
+export const parserStringToList = string => {
+  let list = string.split(' ').join(',').split('\n').join(',').split(',')
+  list = list.filter(notEmptyString => notEmptyString !== '')
+  return list
+}
 
-export const checkEmailValid = email => {
+// INFO - GB - 2019-07-31 - This function check if the email has three parts arranged like somethig@something.somethig
+export const checkEmailValidity = email => {
   const parts = email.split('@')
-  if (parts.length !== 2) {
-    return false
-  } else {
-    const domainParts = parts[1].split('.')
-    if (domainParts.length !== 2) {
-      return false
-    }
-  }
-  return true
+  if (parts.length !== 2) return false
+  
+  const domainParts = parts[1].split('.')
+  return domainParts.length === 2
 }

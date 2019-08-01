@@ -11,32 +11,33 @@ class NewShareDownload extends React.Component {
     super(props)
 
     this.state = {
-      passwordActive: false,
-      popoverOpen: false,
+      isPasswordActive: false,
+      popoverMultipleEmailsOpen: false,
       hidePassword: true
     }
   }
 
-  popoverToggle = () => {
-    this.setState({
-      popoverOpen: !this.state.popoverOpen
-    })
+  handleTogglePopoverMultipleEmails = () => {
+    this.setState(prevState => ({
+      popoverMultipleEmailsOpen: !prevState.popoverMultipleEmailsOpen
+    }))
   }
 
-  handleSeePassword = () => {
-    this.setState({hidePassword: !this.state.hidePassword})
+  handleTogglePasswordVisibility = () => {
+    this.setState(prevState => ({
+      hidePassword: !prevState.hidePassword
+    }))
   }
 
   handleRandomPassword = () => {
     this.props.onChangePassword({target: {value: generateRandomPassword()}})
-    const passwordInput = document.getElementsByClassName('shareDownload__password__input')[0]
-    if (passwordInput.type === 'password') {
-      this.handleSeePassword()
+    if (this.state.hidePassword) {
+      this.handleTogglePasswordVisibility()
     }
   }
 
-  handleSeePasswordInput = () => {
-    this.setState({passwordActive: true})
+  handleClickSeePasswordInput = () => {
+    this.setState({ isPasswordActive: true })
   }
 
   render () {
@@ -50,7 +51,6 @@ class NewShareDownload extends React.Component {
 
         <div className='shareDownload__email'>
           <textarea
-            type='text'
             className='shareDownload__email__input form-control'
             placeholder={props.t('Enter the email address of the recipient(s)')}
             rows='10'
@@ -58,66 +58,80 @@ class NewShareDownload extends React.Component {
             onChange={props.onChangeEmails}
             onKeyDown={props.onKeyDownEnter}
           />
+
           <button
             type='button'
             className='shareDownload__email__icon'
             id='popoverMultipleEmails'
             key='share_emails'
-            style={{':hover': {color: props.hexcolor}}}
+            style={{ ':hover': { color: props.hexcolor } }}
           >
             <i className='fa fa-fw fa-question-circle' />
           </button>
-          <Popover placement='bottom' isOpen={state.popoverOpen} target='popoverMultipleEmails' toggle={this.popoverToggle}>
+
+          <Popover
+            placement='bottom'
+            isOpen={state.popoverMultipleEmailsOpen}
+            target='popoverMultipleEmails'
+            toggle={this.handleTogglePopoverMultipleEmails}
+          >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
           </Popover>
         </div>
 
-        {state.passwordActive
-        ? <div className='shareDownload__password'>
-          <div className='shareDownload__password__wrapper'>
-            <i className='fa fa-fw fa-lock' />
-            <input
-              type={state.hidePassword ? 'password' : 'text'}
-              className='shareDownload__password__input form-control'
-              placeholder={props.t('Password to share link (optional)')}
-              value={props.sharePassword}
-              onChange={props.onChangePassword}
-              onFocus={props.onKeyDownEnter}
-            />
+        {state.isPasswordActive
+        ? (
+          <div className='shareDownload__password'>
+            <div className='shareDownload__password__wrapper'>
+              <i className='fa fa-fw fa-lock' />
+
+              <input
+                type={state.hidePassword ? 'password' : 'text'}
+                className='shareDownload__password__input form-control'
+                placeholder={props.t('Password to share link (optional)')}
+                value={props.sharePassword}
+                onChange={props.onChangePassword}
+                onFocus={props.onKeyDownEnter}
+              />
+
+              <button
+                type='button'
+                className='shareDownload__password__icon'
+                key='seeSharePassword'
+                title={props.t('Show password')}
+                style={{ ':hover': { color: props.hexcolor } }}
+                data-cy='seePassword'
+                onClick={this.handleTogglePasswordVisibility}
+              >
+                <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+              </button>
+            </div>
+
             <button
               type='button'
               className='shareDownload__password__icon'
-              key='seeSharePassword'
-              title={props.t('Show password')}
-              style={{':hover': {color: props.hexcolor}}}
-              data-cy='seePassword'
-              onClick={this.handleSeePassword}
+              key='randomSharePassword'
+              title={props.t('Generate random password')}
+              style={{ ':hover': { color: props.hexcolor } }}
+              onClick={this.handleRandomPassword}
             >
-              <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+              <i className='fa fa-fw fa-repeat' />
             </button>
           </div>
-          <button
-            type='button'
-            className='shareDownload__password__icon'
-            key='randomSharePassword'
-            title={props.t('Generate random password')}
-            style={{':hover': {color: props.hexcolor}}}
-            onClick={this.handleRandomPassword}
-          >
-            <i className='fa fa-fw fa-repeat' />
-          </button>
-        </div>
-        : <div className='shareDownload__password'>
-          <span className='shareDownload__password__link' onClick={this.handleSeePasswordInput}>
-            {props.t('Protect by password')}
-          </span>
-        </div>
-        }
+        )
+        : (
+          <div className='shareDownload__password'>
+            <span className='shareDownload__password__link' onClick={this.handleClickSeePasswordInput}>
+              {props.t('Protect by password')}
+            </span>
+          </div>
+        )}
+        
         <div className='d-flex mt-3'>
           <button
             className='shareDownload__cancel btn outlineTextBtn'
             key='cancelNewShare'
-            onClick={props.onClickReturnToManagement}
+            onClick={props.onClickCancelButton}
             style={{
               borderColor: props.hexcolor,
               ':hover': {

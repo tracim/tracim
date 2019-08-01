@@ -29,7 +29,7 @@ class GuestUpload extends React.Component {
       uploadFileList: [],
       uploadFilePreview: null,
       progressUpload: {
-        display: this.UPLOAD_STATUS.LOADING,
+        display: this.UPLOAD_STATUS.BEFORE_LOAD,
         percent: 0
       }
     }
@@ -51,11 +51,12 @@ class GuestUpload extends React.Component {
   handleAddFile = uploadFileList => {
     if (!uploadFileList || !uploadFileList[0]) return
 
-    uploadFileList.forEach(uploadFile => {
-      this.setState(previousState => ({
-        uploadFileList: [...previousState.uploadFileList, uploadFile]
-      }))
-    })
+    this.setState(previousState => ({
+      uploadFileList: [
+        ...previousState.uploadFileList,
+        ...uploadFileList
+      ]
+    }))
   }
 
   handleDeleteFile = deletedFile => {
@@ -78,7 +79,7 @@ class GuestUpload extends React.Component {
     xhr.upload.addEventListener('progress', uploadInProgress, false)
     xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: this.UPLOAD_STATUS.AFTER_LOAD, percent: 0 } }), false)
 
-    // TODO xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
+    // TODO - GB - 2019-07-31 - xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
     xhr.setRequestHeader('Accept', 'application/json')
     xhr.withCredentials = true
 
@@ -113,26 +114,34 @@ class GuestUpload extends React.Component {
           </CardHeader>
 
           <CardBody formClass='guestupload__card__form'>
-            {state.progressUpload.display === this.UPLOAD_STATUS.BEFORE_LOAD
-              ? <UploadForm
-                guestName={state.guestName}
-                onChangeFullName={this.handleChangeFullName}
-                guestPassword={state.guestPassword}
-                onChangePassword={this.handleChangePassword}
-                guestComment={state.guestComment}
-                onChangeComment={this.handleChangeComment}
-                onAddFile={this.handleAddFile}
-                onDeleteFile={this.handleDeleteFile}
-                onClickSend={this.handleClickSend}
-                uploadFileList={state.uploadFileList}
-                uploadFilePreview={state.uploadFilePreview}
-              />
-              : state.progressUpload.display === this.UPLOAD_STATUS.LOADING
-                ? <ProgressBar
-                  percent={state.progressUpload.percent}
-                />
-                : <ImportConfirmation />
-            }
+            {(() => {
+              switch (state.progressUpload.display) {
+                case this.UPLOAD_STATUS.BEFORE_LOAD:
+                  return (
+                    <UploadForm
+                      guestName={state.guestName}
+                      onChangeFullName={this.handleChangeFullName}
+                      guestPassword={state.guestPassword}
+                      onChangePassword={this.handleChangePassword}
+                      guestComment={state.guestComment}
+                      onChangeComment={this.handleChangeComment}
+                      onAddFile={this.handleAddFile}
+                      onDeleteFile={this.handleDeleteFile}
+                      onClickSend={this.handleClickSend}
+                      uploadFileList={state.uploadFileList}
+                      uploadFilePreview={state.uploadFilePreview}
+                    />
+                  )
+                case this.UPLOAD_STATUS.LOADING:
+                  return (
+                    <ProgressBar
+                      percent={state.progressUpload.percent}
+                    />
+                  )
+                default:
+                  return <ImportConfirmation />
+              }
+            })()}
           </CardBody>
         </Card>
 

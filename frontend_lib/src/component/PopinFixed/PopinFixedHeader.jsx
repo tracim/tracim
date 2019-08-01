@@ -51,19 +51,13 @@ class PopinFixedHeader extends React.Component {
   }
 
   render () {
-    const { isShared, customClass, customColor, faIcon, rawTitle, componentTitle, userRoleIdInWorkspace, onClickCloseBtn, disableChangeTitle, t } = this.props
+    const { customClass, customColor, faIcon, rawTitle, componentTitle, userRoleIdInWorkspace, onClickCloseBtn, disableChangeTitle, t } = this.props
     const { state } = this
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{ backgroundColor: customColor }}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-          {isShared
-            ? <ComposedIcon
-                mainIcon={faIcon}
-                smallIcon='share-alt'
-              />
-            : <i className={`fa fa-${faIcon}`} />
-          }
+          <i className={`fa fa-${faIcon}`} />
         </div>
 
         <div
@@ -124,8 +118,7 @@ PopinFixedHeader.propTypes = {
   componentTitle: PropTypes.element,
   userRoleIdInWorkspace: PropTypes.number,
   onValidateChangeTitle: PropTypes.func,
-  disableChangeTitle: PropTypes.bool,
-  isShared: PropTypes.bool
+  disableChangeTitle: PropTypes.bool
 }
 
 PopinFixedHeader.defaultProps = {
@@ -135,6 +128,5 @@ PopinFixedHeader.defaultProps = {
   componentTitle: <div />,
   userRoleIdInWorkspace: 1,
   onChangeTitle: () => {},
-  disableChangeTitle: false,
-  isShared: false
+  disableChangeTitle: false
 }

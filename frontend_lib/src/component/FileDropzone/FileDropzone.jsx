@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Dropzone from 'react-dropzone'
+import Dropzone from 'react-dropzone' // INFO - GB- 2019-07-31 - react-dropzone is in an older version because of a persistent problem with Hooks
 import { withTranslation } from 'react-i18next'
 
 export const FileDropzone = props => {

@@ -11,27 +11,28 @@ class NewUpload extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      popoverOpen: false,
+      popoverMultipleEmailsOpen: false,
       hidePassword: true
     }
   }
 
-  popoverToggle = () => {
-    this.setState({
-      popoverOpen: !this.state.popoverOpen
-    })
+  handleTogglePopoverMultipleEmails = () => {
+    this.setState(prevState => ({
+      popoverMultipleEmailsOpen: !prevState.popoverMultipleEmailsOpen
+    }))
   }
 
-  handleSeePassword = () => {
-    this.setState({ hidePassword: !this.state.hidePassword })
+  handleTogglePasswordVisibility = () => {
+    this.setState(prevState => ({
+      hidePassword: !prevState.hidePassword
+    }))
   }
 
   handleRandomPassword = () => {
     this.props.onChangeSharePassword({ target: { value: generateRandomPassword() } })
-    const passwordInput = document.getElementsByClassName('newUpload__password__input')[0]
 
-    if (passwordInput.type === 'password') {
-      this.handleSeePassword()
+    if (this.state.hidePassword) {
+      this.handleTogglePasswordVisibility()
     }
   }
 
@@ -64,7 +65,12 @@ class NewUpload extends React.Component {
           >
             <i className='fa fa-fw fa-question-circle' />
           </button>
-          <Popover placement='bottom' isOpen={state.popoverOpen} target='popoverMultipleEmails' toggle={this.popoverToggle}>
+          <Popover
+            placement='bottom'
+            isOpen={state.popoverMultipleEmailsOpen}
+            target='popoverMultipleEmails'
+            toggle={this.handleTogglePopoverMultipleEmails}
+          >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
           </Popover>
         </div>
@@ -86,7 +92,7 @@ class NewUpload extends React.Component {
               title={props.t('Show password')}
               style={{ ':hover': { color: customColor } }}
               data-cy='seePassword'
-              onClick={this.handleSeePassword}
+              onClick={this.handleTogglePasswordVisibility}
             >
               <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
             </button>
@@ -113,7 +119,7 @@ class NewUpload extends React.Component {
                 backgroundColor: customColor
               }
             }}
-            onClick={props.onClickReturnToManagement}
+            onClick={props.onClickCancelNewUpload}
           >
             {props.t('Cancel')}
             <i className='fa fa-fw fa-times' />
@@ -149,7 +155,7 @@ NewUpload.propTypes = {
   onKeyDownEnter: PropTypes.func,
   sharePassword: PropTypes.string,
   onChangeSharePassword: PropTypes.func,
-  onClickReturnToManagement: PropTypes.func,
+  onClickCancelNewUpload: PropTypes.func,
   onClickNewUpload: PropTypes.func
 }
 
@@ -160,6 +166,6 @@ NewUpload.defaultProps = {
   onKeyDownEnter: () => {},
   sharePassword: '',
   onChangeSharePassword: () => {},
-  onClickReturnToManagement: () => {},
+  onClickCancelNewUpload: () => {},
   onClickNewUpload: () => {}
 }

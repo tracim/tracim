@@ -10,8 +10,9 @@ import {
   addAllResourceI18n,
   handleFetchResult,
   CUSTOM_EVENT,
-  checkEmailValid,
-  parserStringtoList
+  checkEmailValidity,
+  parserStringToList,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
 import { debug } from '../debug'
 import {
@@ -57,16 +58,11 @@ class ShareFolderAdvanced extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) {
+          this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
+        }
         break
-      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
-        console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState({ isVisible: false })
-        break
-      // case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
-      //   console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-      //   this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
-      //   break
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
@@ -125,24 +121,22 @@ class ShareFolderAdvanced extends React.Component {
     }
   }
 
-  // loadShareLinkList = async () => {
-  //   const { content, config } = this.state
+  loadShareLinkList = async () => {
+    const { content, config } = this.state
 
-  //   const fetchResultShareLinkList = await handleFetchResult(await getShareLinkList(config.apiUrl, content.workspace_id, content.content_id))
+    const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
 
-  //   switch (fetchResultShareLinkList.apiResponse.status) {
-  //     case 200:
-  //       this.setState({
-  //         shareLinkList: fetchResultShareLinkList.links
-  //       })
-  //       break
-  //     default:
-  //       this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
-  //       return
-  //   }
-
-  //   GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {}}) // Needed?
-  // }
+    switch (fetchResultShareLinkList.apiResponse.status) {
+      case 200:
+        this.setState({
+          shareLinkList: fetchResultShareLinkList.json
+        })
+        break
+      default:
+        this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
+        return
+    }
+  }
 
   handleChangeEmails = e => this.setState({ shareEmails: e.target.value })
   handleChangePassword = e => this.setState({ sharePassword: e.target.value })
@@ -178,24 +172,31 @@ class ShareFolderAdvanced extends React.Component {
   handleClickNewUpload = () => { // = async () => {
     const { state } = this
 
-    const shareEmailList = parserStringtoList(state.shareEmails).filter(shareEmail => shareEmail !== '')
+    let shareEmailList = parserStringToList(state.shareEmails)
+    let invalidEmails = []
+
 
     shareEmailList.forEach(shareEmail => {
-      if (!checkEmailValid(shareEmail)) {
-        this.sendGlobalFlashMessage(this.props.t(`Error: ${shareEmail} are not valid`))
-      } else {
-        this.setState(previousState => ({
-          shareLinkList: [...previousState.shareLinkList,
-            {
-              email: shareEmail,
-              link: '?',
-              id: new Date(),
-              isProtected: state.sharePassword !== ''
-            }
-          ]
-        }))
-      }
+      if (!checkEmailValidity(shareEmail)) invalidEmails.push(shareEmail)
     })
+
+    shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
+
+    this.setState(previousState => ({
+      shareLinkList: [
+        ...previousState.shareLinkList,
+        {
+          emails: shareEmailList,
+          link: '?',
+          id: new Date(),
+          isProtected: state.sharePassword !== ''
+        }
+      ]
+    }))
+
+    if (invalidEmails.length > 0) {
+      this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+    }
     // console.log(shareEmailList)
     // this.setState({shareLinkList: newShareLinkList})
 
@@ -205,26 +206,36 @@ class ShareFolderAdvanced extends React.Component {
 
     // switch (fetchResultSaveNewShareLinkList.status) {
     //   case 204:
-         this.setState({ shareEmails: '', sharePassword: '' })
+        this.setState({
+          shareEmails: '',
+          sharePassword: '',
+          currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
+        })
     //     break
     //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
     // }
-
-    this.setState({ currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
   }
 
-  handleReturnToManagement = () => {
-    this.setState({ shareEmails: '', sharePassword: '' })
-    this.setState({ currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
+  handleClickCancelNewUpload = () => {
+    this.setState({
+      shareEmails: '',
+      sharePassword: '',
+      currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
+    })
   }
 
   handleKeyDownEnter = e => {
     if (e.key === 'Enter') {
-      let emailList = parserStringtoList(this.state.shareEmails)
+      let emailList = parserStringToList(this.state.shareEmails)
+      let invalidEmails = []
 
-      emailList = emailList.filter(email => email !== '')
-      emailList.forEach(email => !checkEmailValid(email) &&
-          this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
+      emailList.forEach(email => {
+        if (!checkEmailValidity(email)) invalidEmails.push(email)
+      })
+
+      if (invalidEmails.length > 0) {
+          this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+      }
 
       this.setState({ shareEmails: emailList.join('\n') })
     }
@@ -260,7 +271,7 @@ class ShareFolderAdvanced extends React.Component {
               customColor={customColor}
               onClickDeleteShareLink={this.handleClickDeleteShareLink}
               onClickNewUpload={this.handleClickNewUpload}
-              onClickReturnToManagement={this.handleReturnToManagement}
+              onClickCancelNewUpload={this.handleClickCancelNewUpload}
               shareEmails={state.shareEmails}
               onChangeShareEmails={this.handleChangeEmails}
               sharePassword={state.sharePassword}

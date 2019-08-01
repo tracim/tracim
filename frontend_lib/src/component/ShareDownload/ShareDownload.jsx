@@ -20,7 +20,7 @@ class ShareDownload extends React.Component {
     this.setState({currentPage: this.SHARE_STATUS.NEW_SHARE})
   }
 
-  handleReturnToManagement = () => {
+  handleClickCancelButton = () => {
     this.props.onChangeEmails({target: {value: ''}})
     this.props.onChangePassword({target: {value: ''}})
     this.setState({currentPage: this.SHARE_STATUS.SHARE_MANAGE})
@@ -28,7 +28,7 @@ class ShareDownload extends React.Component {
 
   handleNewShare = () => {
     this.props.onClickNewShare()
-    this.handleReturnToManagement()
+    this.setState({currentPage: this.SHARE_STATUS.SHARE_MANAGE})
   }
 
   render () {
@@ -47,7 +47,7 @@ class ShareDownload extends React.Component {
           />
           : <NewShareDownload
             hexcolor={props.hexcolor}
-            onClickReturnToManagement={this.handleReturnToManagement}
+            onClickCancelButton={this.handleClickCancelButton}
             shareEmails={props.shareEmails}
             onChangeEmails={props.onChangeEmails}
             onKeyDownEnter={props.onKeyDownEnter}

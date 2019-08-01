@@ -23,8 +23,8 @@ import {
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
-  checkEmailValid,
-  parserStringtoList
+  checkEmailValidity,
+  parserStringToList
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -35,7 +35,7 @@ import {
   getFileContent,
   getFileComment,
   getFileRevision,
-  // getShareLinkList,
+  getShareLinksList,
   // putShareLinkList,
   postFileNewComment,
   putFileContent,
@@ -267,24 +267,21 @@ class File extends React.Component {
     })
   }
 
-  // loadShareLinkList = async () => {
-  //   const { content, config } = this.state
+  loadShareLinkList = async () => {
+    const { content, config } = this.state
 
-  //   const fetchResultShareLinkList = await handleFetchResult(await getShareLinkList(config.apiUrl, content.workspace_id, content.content_id))
+    const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
 
-  //   switch (fetchResultShareLinkList.apiResponse.status) {
-  //     case 200:
-  //       this.setState({
-  //         shareLinkList: fetchResultShareLinkList.links
-  //       })
-  //       break
-  //     default:
-  //       this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
-  //       return
-  //   }
-
-  //   GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {}}) // Needed?
-  // }
+    switch (fetchResultShareLinkList.apiResponse.status) {
+      case 200:
+        this.setState({
+          shareLinkList: fetchResultShareLinkList.json
+        })
+        break
+      default:
+        this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
+    }
+  }
 
   buildBreadcrumbs = () => {
     const { state } = this
@@ -617,24 +614,30 @@ class File extends React.Component {
   handleClickNewShare = () => { // = async () => {
     const { state } = this
 
-    const shareEmailList = parserStringtoList(state.shareEmails).filter(shareEmail => shareEmail !== '')
+    let shareEmailList = parserStringToList(state.shareEmails)
+    let invalidEmails = []
 
     shareEmailList.forEach(shareEmail => {
-      if (!checkEmailValid(shareEmail)) {
-        this.sendGlobalFlashMessage(this.props.t(`Error: ${shareEmail} are not valid`))
-      } else {
-        this.setState(previousState => ({
-          shareLinkList: [...previousState.shareLinkList,
-            {
-              email: shareEmail,
-              link: '?',
-              id: new Date(),
-              isProtected: state.sharePassword !== ''
-            }
-          ]
-        }))
-      }
+      if (!checkEmailValidity(shareEmail)) invalidEmails.push(shareEmail)
     })
+
+    shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
+
+    this.setState(previousState => ({
+      shareLinkList: [
+        ...previousState.shareLinkList,
+        {
+          emails: shareEmailList,
+          url: '?',
+          share_id: new Date(),
+          has_password: state.sharePassword !== ''
+        }
+      ]
+    }))
+
+    if (invalidEmails.length > 0) {
+      this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+    }
     // console.log(shareEmailList)
     // this.setState({shareLinkList: newShareLinkList})
 
@@ -654,11 +657,16 @@ class File extends React.Component {
   handleChangePassword = e => this.setState({ sharePassword: e.target.value })
   handleKeyDownEnter = e => {
     if (e.key === 'Enter') {
-      let emailList = parserStringtoList(this.state.shareEmails)
+      const emailList = parserStringToList(this.state.shareEmails)
+      let invalidEmails = []
 
-      emailList = emailList.filter(email => email !== '')
-      emailList.forEach(email => !checkEmailValid(email) &&
-          this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
+      emailList.forEach(email => {
+        if (!checkEmailValidity(email)) invalidEmails.push(email)
+      })
+
+      if (invalidEmails.length > 0) {
+        this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+      }
 
       this.setState({ shareEmails: emailList.join('\n') })
     }
@@ -713,7 +721,6 @@ class File extends React.Component {
           customClass={`${state.config.slug}`}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          // isShared={state.config.isShared}
           rawTitle={state.content.label}
           componentTitle={<span>{state.content.label} <Badge text={state.content.file_extension} /></span>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}

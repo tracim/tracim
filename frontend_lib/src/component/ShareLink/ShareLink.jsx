@@ -40,34 +40,38 @@ class ShareLink extends React.Component {
           </div>
         </div>
 
-        <button
-          className='iconBtn'
-          key='copy_share_link'
-          style={{
-            ':hover': {
-              color: props.hexcolor
-            }
-          }}
-          title={props.t('Copy link')}
-          onClick={this.handleCopyToClipboard}
-        >
-          <i className='fa fa-fw fa-files-o'/>
-        </button>
-        <button
-          className='iconBtn'
-          key='deleteShareLink'
-          style={{
-            ':hover': {
-              color: props.hexcolor
-            }
-          }}
-          title={props.t('Delete link')}
-          onClick={() => props.onClickDeleteShareLink(props.id)}
-          data-cy='deleteShareLink'
-        >
-          <i className='fa fa-fw fa-trash-o'/>
-        </button>
+        {props.userRoleIdInWorkspace >= 4 &&
+          <button
+            className='iconBtn'
+            key='copy_share_link'
+            style={{
+              ':hover': {
+                color: props.hexcolor
+              }
+            }}
+            title={props.t('Copy link')}
+            onClick={this.handleCopyToClipboard}
+          >
+            <i className='fa fa-fw fa-files-o'/>
+          </button>
+        }
 
+        {props.userRoleIdInWorkspace >= 4 &&
+          <button
+            className='iconBtn'
+            key='deleteShareLink'
+            style={{
+              ':hover': {
+                color: props.hexcolor
+              }
+            }}
+            title={props.t('Delete link')}
+            onClick={() => props.onClickDeleteShareLink(props.id)}
+            data-cy='deleteShareLink'
+          >
+            <i className='fa fa-fw fa-trash-o'/>
+          </button>
+        }
       </div>
     )
   }

@@ -11,8 +11,8 @@ import {
   BREADCRUMBS_TYPE,
   FETCH_CONFIG,
   displayFileSize,
-  parserStringtoList,
-  checkEmailValid
+  parserStringToList,
+  checkEmailValidity
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -113,8 +113,8 @@ export {
   BREADCRUMBS_TYPE,
   FETCH_CONFIG,
   displayFileSize,
-  parserStringtoList,
-  checkEmailValid,
+  parserStringToList,
+  checkEmailValidity,
   defaultDebug,
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,

@@ -1,19 +1,16 @@
 import React from 'react'
 import { withTranslation } from 'react-i18next'
-import { Popover, PopoverBody } from 'reactstrap'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
-import Button from '../component/common/Input/Button.jsx'
-import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
+import DownloadForm from '../component/GuestPage/DownloadForm.jsx'
 
 class GuestDownload extends React.Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      popoverOpen: false,
       userName: '',
       file: {
         fileName: '',
@@ -24,12 +21,6 @@ class GuestDownload extends React.Component {
         isInvalid: false
       }
     }
-  }
-
-  popoverToggle = () => {
-    this.setState({
-      popoverOpen: !this.state.popoverOpen
-    })
   }
 
   handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })
@@ -47,50 +38,13 @@ class GuestDownload extends React.Component {
           </CardHeader>
 
           <CardBody formClass='guestdownload__card__form'>
-            <form>
-              <div className='guestdownload__card__form__text'>
-                {props.t('{{userName}} shared with you the file {{fileName}}',
-                  { userName: state.userName, fileName: state.file.fileName, interpolation: { escapeValue: false } }
-                )} ({state.file.fileSize})
-              </div>
-              <div className='d-flex'>
-                <InputGroupText
-                  parentClassName='guestdownload__card__form__groupepw'
-                  customClass=''
-                  icon='fa-lock'
-                  type='password'
-                  placeHolder={props.t('Password')}
-                  invalidMsg={props.t('Invalid password')}
-                  isInvalid={state.guestPassword.isInvalid}
-                  value={state.guestPassword.value}
-                  onChange={this.handleChangePassword}
-                />
-                <button
-                  type='button'
-                  className='guestdownload__card__form__groupepw__question'
-                  id='popoverQuestion'
-                >
-                  <i className='fa fa-fw fa-question-circle' />
-                </button>
-                <Popover
-                  placement='bottom'
-                  isOpen={this.state.popoverOpen}
-                  target='popoverQuestion'
-                  toggle={this.popoverToggle}
-                >
-                  <PopoverBody>{props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}</PopoverBody>
-                </Popover>
-              </div>
-              <div className='d-flex'>
-                <Button
-                  htmlType='button'
-                  bootstrapType=''
-                  customClass='guestdownload__card__form__right__btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
-                  label={props.t('Download')}
-                  onClick={this.handleClickDownload}
-                />
-              </div>
-            </form>
+            <DownloadForm
+              userName={state.userName}
+              file={state.file}
+              guestPassword={state.guestPassword}
+              onChangePassword={this.handleChangePassword}
+              onClickDownload={this.handleClickDownload}
+            />
           </CardBody>
         </Card>
 
