@@ -190,6 +190,7 @@ class WorkspaceAdvanced extends React.Component {
       case 200:
         this.sendGlobalFlashMessage(props.t('Save successful', 'info'))
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new description', 'warning'))
     }
