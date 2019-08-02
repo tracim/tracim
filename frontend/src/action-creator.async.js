@@ -77,7 +77,9 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
       if (status >= 200 && status <= 299) return fetchResult.json()
       if (status >= 300 && status <= 399) return fetchResult.json()
       if (status === 401) {
-        if (!unLoggedAllowedPageList.includes(document.location.pathname)) {
+        // FIME - GB - 2019-02-08 - Find a better way of handling the list of unLoggedAllowedPageList
+        // https://github.com/tracim/tracim/issues/2144
+        if (!unLoggedAllowedPageList.find(page => document.location.pathname.startsWith(page))) {
           dispatch(setRedirectLogin(document.location.pathname + document.location.search))
           dispatch(setUserDisconnected())
           history.push(`${PAGE.LOGIN}${Cookies.get(COOKIE_FRONTEND.LAST_CONNECTION) ? '?dc=1' : ''}`)
@@ -725,6 +727,20 @@ export const putContentItemMove = (source, destination) => dispatch => {
       })
     },
     actionName: WORKSPACE_CONTENT_MOVE,
+    dispatch
+  })
+}
+
+export const getFileInfos = (token) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/public/guest-download/${token}/`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
     dispatch
   })
 }

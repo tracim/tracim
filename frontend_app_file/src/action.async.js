@@ -162,7 +162,7 @@ export const postShareLinksList = (apiUrl, workspaceId, contentId, shareEmailsLi
     },
     method: 'POST',
     body: JSON.stringify({
-      emails: shareEmailsList
+      emails: shareEmailsList,
       password: sharePassword
     })
   })
@@ -170,8 +170,8 @@ export const postShareLinksList = (apiUrl, workspaceId, contentId, shareEmailsLi
 export const deleteShareLink = (apiUrl, workspaceId, contentId, shareId) =>
   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares/${shareId}`, {
     credentials: 'include',
-    headers: { 
-      ...FETCH_CONFIG.headers 
+    headers: {
+      ...FETCH_CONFIG.headers
     },
     method: 'DELETE'
   })

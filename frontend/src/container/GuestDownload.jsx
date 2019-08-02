@@ -5,6 +5,7 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import DownloadForm from '../component/GuestPage/DownloadForm.jsx'
+import { getFileInfos } from '../action-creator.async.js'
 
 class GuestDownload extends React.Component {
   constructor (props) {
@@ -14,12 +15,31 @@ class GuestDownload extends React.Component {
       userName: '',
       file: {
         fileName: '',
-        fileSize: 0
+        fileSize: 0,
+        fileId: 0
       },
       guestPassword: {
         value: '',
         isInvalid: false
       }
+    }
+  }
+
+  async componentDidMount () {
+    const { props } = this
+
+    const fetchResultFileInfos = getFileInfos(props.match.params.token)
+
+    switch (fetchResultFileInfos.status) {
+      case 204:
+        this.setState({
+          fileName: fetchResultFileInfos.json.file_name,
+          fileSize: fetchResultFileInfos.json.file_size,
+          fileId: fetchResultFileInfos.json.file_id,
+          userName: fetchResultFileInfos.json.user_name
+        })
+        break
+      default: this.sendGlobalFlashMsg(props.t('Error while loading file infos', 'warning'))
     }
   }
 

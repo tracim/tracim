@@ -32,7 +32,7 @@ const UploadFilesManagement = props => {
         ? props.shareLinkList.map(shareLink =>
           <ShareLink
             email={shareLink.email}
-            link={shareLink.url}
+            link={shareLink.direct_url}
             onClickDeleteShareLink={() => props.onClickDeleteShareLink(shareLink.share_id)}
             hexcolor={customColor}
             isProtected={shareLink.has_password}

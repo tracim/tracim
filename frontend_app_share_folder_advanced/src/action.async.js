@@ -19,23 +19,33 @@ export const getContentTypeList = apiUrl =>
     method: 'GET'
   })
 
-// export const postShareLinksList = (apiUrl, workspaceId, shareLinkList) =>
-//   fetch(`${apiUrl}/workspaces/${workspaceId}/share_folder`, {
+// export const getShareLinksList = (apiUrl, workspaceId, contentId) =>
+//   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
 //     credentials: 'include',
 //     headers: {
 //       ...FETCH_CONFIG.headers
 //     },
-//     method: 'PUT',
+//     method: 'GET'
+//   })
+
+// export const postShareLinksList = (apiUrl, workspaceId, contentId, shareEmailsList, sharePassword) =>
+//   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
+//     credentials: 'include',
+//     headers: {
+//       ...FETCH_CONFIG.headers
+//     },
+//     method: 'POST',
 //     body: JSON.stringify({
-//       share_link_list: shareLinkList
+//       emails: shareEmailsList
+//       password: sharePassword
 //     })
 //   })
 
-export const getShareLinksList = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
+// export const deleteShareLink = (apiUrl, workspaceId, contentId, shareId) =>
+//   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares/${shareId}`, {
+//     credentials: 'include',
+//     headers: { 
+//       ...FETCH_CONFIG.headers 
+//     },
+//     method: 'DELETE'
+//   })

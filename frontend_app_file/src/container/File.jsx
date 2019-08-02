@@ -32,6 +32,7 @@ import {
 } from '../helper.js'
 import { debug } from '../debug.js'
 import {
+  deleteShareLink,
   getFileContent,
   getFileComment,
   getFileRevision,
@@ -628,9 +629,9 @@ class File extends React.Component {
     }
 
     const fetchResultPostShareLinks = await postShareLinksList(
-      config.apiUrl, 
-      content.workspace_id, 
-      content.content_id, 
+      state.config.apiUrl,
+      state.content.workspace_id,
+      state.content.content_id,
       shareEmailList,
       state.sharePassword !== '' ? state.sharePassword : null
     )
@@ -638,7 +639,7 @@ class File extends React.Component {
     switch (fetchResultPostShareLinks.status) {
       case 204:
         this.setState({
-          shareLinkList: fetchResultShareLinkList.json,
+          shareLinkList: fetchResultPostShareLinks.json,
           shareEmails: '',
           sharePassword: ''
         })
@@ -670,7 +671,7 @@ class File extends React.Component {
     const { config, content } = this.state
 
     const fetchResultDeleteShareLink = await handleFetchResult(
-      await deleteShareLink(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.shareLinkList)
+      await deleteShareLink(config.apiUrl, content.workspace_id, content.content_id, this.state.shareLinkList)
     )
 
     switch (fetchResultDeleteShareLink.status) {
