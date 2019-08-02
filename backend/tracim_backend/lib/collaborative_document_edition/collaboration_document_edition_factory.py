@@ -10,7 +10,7 @@ from tracim_backend.models.auth import User
 
 class CollaborativeDocumentEditionFactory(object):
     """
-    Factory to get correct objects related to search engine activated
+    Factory to get correct objects related to collaborative software
     """
 
     @classmethod
