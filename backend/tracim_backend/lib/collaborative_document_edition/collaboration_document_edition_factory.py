@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import NoValidCollaborativeDocumentEditionSoftware
 from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition import (
-    CollaborativeDocumentEditionApi,
+    CollaborativeDocumentEditionLib,
 )
 from tracim_backend.lib.collaborative_document_edition.data import COLLABORA_DOCUMENT_EDITION_SLUG
 from tracim_backend.models.auth import User
@@ -37,15 +37,15 @@ class CollaborativeDocumentEditionFactory(object):
     @classmethod
     def get_lib(
         cls, session: Session, current_user: typing.Optional[User], config: "CFG"
-    ) -> CollaborativeDocumentEditionApi:
+    ) -> CollaborativeDocumentEditionLib:
 
         if config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import
             from tracim_backend.lib.collaborative_document_edition.collabora import (
-                CollaboraCollaborativeDocumentEditionApi,
+                CollaboraCollaborativeDocumentEditionLib,
             )
 
-            return CollaboraCollaborativeDocumentEditionApi(
+            return CollaboraCollaborativeDocumentEditionLib(
                 config=config, session=session, current_user=current_user
             )
         else:

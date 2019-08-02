@@ -10,7 +10,11 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.roles import WorkspaceRoles
 
 
-class WopiApi(object):
+class WopiLib(object):
+    """
+    Manager providing methods to allow support of WOPI protocol
+    """
+
     def __init__(self, current_user: typing.Optional[User], session: Session, config: CFG) -> None:
         self._session = session
         self._user = current_user

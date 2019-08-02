@@ -1,4 +1,4 @@
-from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_controller import (
+from tracim_backend.views.collaborative_document_edition_api.controller import (
     CollaborativeDocumentEditionController,
 )
 

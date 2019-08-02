@@ -30,7 +30,14 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 
 
-class CollaborativeDocumentEditionApi(ABC):
+class CollaborativeDocumentEditionLib(ABC):
+    """
+    Manager providing methods to support Collaborative Document Edition.
+    This contain all non-WOPI methods needed to support of Collaborative Document Edition
+    This is abstract as real Lib should be directly related to a specific software like
+    Collabora/LibreOfficeOnline.
+    """
+
     def __init__(
         self,
         config: CFG,
@@ -75,7 +82,7 @@ class CollaborativeDocumentEditionApi(ABC):
         return template_list
 
     def _get_file_template_path(self, template_filename: str) -> str:
-        template_path = "{}/{}".format(
+        template_path = os.path.join(
             self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, template_filename
         )
         try:
