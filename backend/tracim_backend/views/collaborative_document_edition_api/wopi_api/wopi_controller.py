@@ -22,7 +22,7 @@ from tracim_backend.lib.utils.authorization import is_current_content_reader
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.wopi.models import WopiCheckFileInfo
 from tracim_backend.lib.wopi.models import WopiLastModifiedTime
-from tracim_backend.lib.wopi.wopi import WopiApi
+from tracim_backend.lib.wopi.wopi import WopiLib
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.collaborative_document_edition_api.controller import (
     COLLABORATIVE_DOCUMENT_EDITION_BASE,
@@ -101,7 +101,7 @@ class WOPIController(Controller):
         https://wopi.readthedocs.io/projects/wopirest/en/latest/files/CheckFileInfo.html#checkfileinfo
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        return WopiApi(
+        return WopiLib(
             current_user=request.current_user, session=request.dbsession, config=app_config
         ).check_file_info(request.current_content)
 
@@ -155,7 +155,7 @@ class WOPIController(Controller):
             api.save(request.current_content)
             api.execute_update_content_actions(request.current_content)
 
-        return WopiApi(
+        return WopiLib(
             current_user=request.current_user, session=request.dbsession, config=app_config
         ).last_modified_time(request.current_content)
 

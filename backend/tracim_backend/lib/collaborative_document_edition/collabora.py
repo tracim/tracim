@@ -4,14 +4,18 @@ from defusedxml import ElementTree
 import requests
 
 from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition import (
-    CollaborativeDocumentEditionApi,
+    CollaborativeDocumentEditionLib,
 )
 from tracim_backend.lib.collaborative_document_edition.models import (
     CollaborativeDocumentEditionFileType,
 )
 
 
-class CollaboraCollaborativeDocumentEditionApi(CollaborativeDocumentEditionApi):
+class CollaboraCollaborativeDocumentEditionLib(CollaborativeDocumentEditionLib):
+    """
+    Collabora implementation of Collaborative Document Edition.
+    """
+
     def get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
         """
         Get list of supported file type for collaborative editions
