@@ -29,8 +29,8 @@ class CollaborativeDocumentEditionFactory(object):
             return CollaboraController()
         else:
             raise NoValidCollaborativeDocumentEditionSoftware(
-                "Can't provide search controller "
-                ' because search engine provided "{}"'
+                "Can't provide collaborative document edition controller "
+                ' because collaborative document edition software provided "{}"'
                 " is not valid".format(config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE)
             )
 
@@ -50,7 +50,7 @@ class CollaborativeDocumentEditionFactory(object):
             )
         else:
             raise NoValidCollaborativeDocumentEditionSoftware(
-                "Can't provide search controller "
-                ' because search engine provided "{}"'
+                "Can't provide collaborative document edition lib "
+                ' because collaborative document edition software provided "{}"'
                 " is not valid".format(config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE)
             )
