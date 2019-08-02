@@ -137,7 +137,6 @@ class CollaborativeDocumentEditionController(Controller):
         configurator.add_view(self.get_file_template_infos, route_name="file_template_info")
 
         # Create file from template
-
         configurator.add_route(
             "create_file_from_template",
             "/{}/".format(COLLABORATIVE_DOCUMENT_EDITION_BASE) + "workspaces/{workspace_id}/files",
