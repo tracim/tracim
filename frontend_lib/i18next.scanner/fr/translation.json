@@ -35,5 +35,9 @@
   "This content is archived": "Ce contenu est archivé",
   "This content is deleted": "Ce contenu est supprimé",
   "Status changed to {{status}}": "Statut changé en {{status}}",
-  "This content is deprecated": "Ce contenu est obsolète"
+  "This content is deprecated": "Ce contenu est obsolète",
+  "Content manager + add member and edit shared space": "__NOT_TRANSLATED__",
+  "Contributor + create folder and manage content": "__NOT_TRANSLATED__",
+  "Reader + create/modify content": "__NOT_TRANSLATED__",
+  "Just read content": "__NOT_TRANSLATED__"
 }

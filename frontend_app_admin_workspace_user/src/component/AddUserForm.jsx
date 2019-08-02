@@ -114,27 +114,32 @@ export class AddUserForm extends React.Component {
                   key={p.id}
                   data-cy={`profile__list__item__${p.slug}`}
                 >
-                  <input
-                    type='radio'
-                    name='newUserProfile'
-                    id={p.slug}
-                    value={p.slug}
-                    checked={state.newUserProfile === p.slug}
-                    onChange={this.handleChangeNewUserProfile}
-                  />
+                  <div className='d-flex align-items'>
+                    <div>
+                      <input
+                        type='radio'
+                        name='newUserProfile'
+                        id={p.slug}
+                        value={p.slug}
+                        checked={state.newUserProfile === p.slug}
+                        onChange={this.handleChangeNewUserProfile}
+                      />
+                    </div>
 
-                  <div className='d-flex align-items-center'>
                     <div className='userrole__role__icon mx-2' style={{ color: p.hexcolor }}>
                       <i className={`fa fa-fw fa-${p.faIcon}`} />
                     </div>
-                    {props.t(p.label) /* this trad key is declared in frontend/helper.js, object PROFILE */}
+
+                    <div className='profile__list__item__content'>
+                      <div>
+                        {props.t(p.label) /* this trad key is declared in frontend/helper.js, object PROFILE */}
+                      </div>
+                      <div className='profile__list__item__description' >
+                        {props.t(p.description) /* this trad key is declared in frontend/helper.js, object PROFILE */}
+                      </div>
+                    </div>
                   </div>
                 </label>
-
-                <div className='profile__list__item__description'>
-                  <i className='fa fa-lightbulb-o' />
-                  {p.description}
-                </div>
               </div>
             )}
           </div>

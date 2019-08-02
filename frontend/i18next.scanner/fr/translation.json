@@ -189,9 +189,6 @@
   "Path": "Chemin",
   "Last modification": "Dernière modification",
   "Search": "Rechercher",
-  "Thread": "Discussion",
-  "File": "Fichier",
-  "Text Document": "Document Texte",
   "Folder": "Dossier",
   "Actions": "Actions",
   "No results for the search terms": "Aucun résultat pour les termes de recherche ",
@@ -204,5 +201,12 @@
   "The destination folder doesn't allow this content type": "Le dossier de destination n'autorise pas ce type de contenu",
   ", create the first content of that type by clicking on the button 'Create'": ", créez le premier contenu de ce type en cliquant sur le bouton 'Créer'",
   "This shared space has no content of that type yet": "Cet espace partagé n'a pas encore de contenu de ce type",
-  "Insufficient rights": "Droits insuffisants"
+  "Insufficient rights": "Droits insuffisants",
+  "Content manager + add member and edit shared space": "__NOT_TRANSLATED__",
+  "Contributor + create folder and manage content": "__NOT_TRANSLATED__",
+  "Reader + create/modify content": "__NOT_TRANSLATED__",
+  "Just read content": "__NOT_TRANSLATED__",
+  "Create user, create shared space, administration of instance": "__NOT_TRANSLATED__",
+  "Create shared space, add member in shared space": "__NOT_TRANSLATED__",
+  "Access to shared space where user is member": "__NOT_TRANSLATED__"
 }

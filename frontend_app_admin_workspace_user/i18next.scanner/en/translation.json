@@ -45,5 +45,8 @@
   "Create a shared space": "Create a shared space",
   "Home": "Home",
   "Users": "Users",
-  "Administration": "Administration"
+  "Administration": "Administration",
+  "Create user, create shared space, administration of instance": "Create user, create shared space, administration of instance",
+  "Create shared space, add member in shared space": "Create shared space, add member in shared space",
+  "Access to shared space where user is member": "Access to shared space where user is member"
 }
