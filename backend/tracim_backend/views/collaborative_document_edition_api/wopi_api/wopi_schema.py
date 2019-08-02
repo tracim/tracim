@@ -16,7 +16,7 @@ class WopiPutHeadersSchema(marshmallow.Schema):
 
 
 class WopiPutHeaders(object):
-    def __init__(self, wopi_lool_timestamp: datetime = None):
+    def __init__(self, wopi_lool_timestamp: datetime = None) -> None:
         self.wopi_lool_timestamp = wopi_lool_timestamp
 
 
