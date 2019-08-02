@@ -2,7 +2,9 @@ import typing
 
 
 class CollaborativeDocumentEditionFileType(object):
-    def __init__(self, mimetype, extension, associated_action, url_source):
+    def __init__(
+        self, mimetype: str, extension: str, associated_action: str, url_source: str
+    ) -> None:
         self.mimetype = mimetype
         self.extension = extension
         self.associated_action = associated_action

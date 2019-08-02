@@ -20,15 +20,19 @@ from tracim_backend.lib.collaborative_document_edition.collaboration_document_ed
 from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
     CollaborativeDocumentEditionFactory,
 )
+from tracim_backend.lib.collaborative_document_edition.models import (
+    CollaborativeDocumentEditionToken,
+)
 from tracim_backend.lib.collaborative_document_edition.models import FileTemplateList
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_schema import (
-    CollaborativeDocumentEditionToken,
+    CollaborativeDocumentEditionTokenSchema,
 )
 from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_schema import (
     FileCreateFromTemplateSchema,
@@ -47,15 +51,15 @@ COLLABORATIVE_DOCUMENT_EDITION_BASE = "collaborative-document-edition"
 
 class CollaborativeDocumentEditionController(Controller):
     """
-    Endpoints for Collabora API
+    Endpoints for Collaborative Edition API
     """
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
     @check_right(is_user)
-    @hapic.output_body(CollaborativeDocumentEditionToken())
+    @hapic.output_body(CollaborativeDocumentEditionTokenSchema())
     def collaborative_document_edition_token(
         self, context, request: TracimRequest, hapic_data=None
-    ):
+    ) -> CollaborativeDocumentEditionToken:
         app_config = request.registry.settings["CFG"]  # type: CFG
         collabora_api = CollaborativeDocumentEditionApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
@@ -88,7 +92,9 @@ class CollaborativeDocumentEditionController(Controller):
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(ContentDigestSchema())
     @hapic.input_body(FileCreateFromTemplateSchema())
-    def create_file_from_template(self, context, request: TracimRequest, hapic_data=None):
+    def create_file_from_template(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
@@ -121,7 +127,7 @@ class CollaborativeDocumentEditionController(Controller):
         api.execute_created_content_actions(content)
         return api.get_content_in_context(content)
 
-    def bind(self, configurator: Configurator):
+    def bind(self, configurator: Configurator) -> None:
 
         # Get file template info
         configurator.add_route(

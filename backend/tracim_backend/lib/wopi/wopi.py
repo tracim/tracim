@@ -16,7 +16,7 @@ class WopiApi(object):
         self._user = current_user
         self._config = config
 
-    def check_file_info(self, content: Content):
+    def check_file_info(self, content: Content) -> WopiCheckFileInfo:
         size = 0
         if content.depot_file.file:
             size = content.depot_file.file.content_length
@@ -35,5 +35,5 @@ class WopiApi(object):
             user_can_not_write_relative=True,
         )
 
-    def last_modified_time(self, content: Content):
+    def last_modified_time(self, content: Content) -> WopiLastModifiedTime:
         return WopiLastModifiedTime(last_modified_time=content.updated)

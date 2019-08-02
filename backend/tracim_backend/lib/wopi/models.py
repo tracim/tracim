@@ -2,7 +2,7 @@ from datetime import datetime
 
 
 class WopiLastModifiedTime(object):
-    def __init__(self, last_modified_time: datetime):
+    def __init__(self, last_modified_time: datetime) -> None:
         self.last_modified_time = last_modified_time
 
 
@@ -18,7 +18,7 @@ class WopiCheckFileInfo(object):
         user_can_write: bool,
         user_can_not_write_relative: bool,
         version: int,
-    ):
+    ) -> None:
         self.last_modified_time = last_modified_time
         self.base_file_name = base_file_name
         self.size = size
