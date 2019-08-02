@@ -22,7 +22,7 @@ class PopupCreateOfficeDocument extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'office_document', // must remain 'html-document' because it is the name of the react built app (which contains HtmlDocument and PopupCreateHtmlDocument)
+      appName: 'office_document',
       config: props.data.config,
       loggedUser: props.data.loggedUser,
       workspaceId: props.data.workspaceId,

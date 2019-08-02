@@ -14,7 +14,7 @@ const FORM_ID = 'loleafletform'
 const IFRAME_ID = 'loleafletframe'
 const ACTION_EDIT = 'edit'
 
-class CollaboraFrame extends React.Component {
+class CollaborativeEditionFrame extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -155,4 +155,4 @@ class CollaboraFrame extends React.Component {
   }
 }
 
-export default withTranslation()(CollaboraFrame)
+export default withTranslation()(CollaborativeEditionFrame)

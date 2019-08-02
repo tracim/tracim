@@ -73,8 +73,7 @@ class File extends React.Component {
         display: false,
         percent: 0
       },
-      isEditable: false,
-      editUrl: ''
+      isOnlineEditable: false
     }
 
     // i18n has been init, add resources from frontend
@@ -149,7 +148,7 @@ class File extends React.Component {
     if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
 
     await this.loadContent()
-    await this.setIsEditable()
+    await this.setIsOnlineEditable()
     this.loadTimeline()
     this.buildBreadcrumbs()
   }
@@ -162,7 +161,7 @@ class File extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      await this.setIsEditable()
+      await this.setIsOnlineEditable()
       this.loadTimeline()
       this.buildBreadcrumbs()
     }
@@ -625,7 +624,7 @@ class File extends React.Component {
     // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
 
-  setIsEditable = async () => {
+  setIsOnlineEditable = async () => {
     const { state } = this
     if (!(state.content.file_extension && state.config.system.config.collaborative_document_edition)) {
       return
@@ -634,7 +633,7 @@ class File extends React.Component {
       (type) => type.extension === state.content.file_extension.substr(1) && type.associated_action === ACTION_EDIT
     )
     this.setState({
-      isEditable: editorType.length >= 1
+      isOnlineEditable: editorType.length >= 1
     })
   }
 
@@ -676,7 +675,7 @@ class File extends React.Component {
                 />
               }
 
-              {state.loggedUser.userRoleIdInWorkspace >= 2 && state.isEditable &&
+              {state.loggedUser.userRoleIdInWorkspace >= 2 && state.isOnlineEditable &&
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickEdit}

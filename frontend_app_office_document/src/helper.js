@@ -38,19 +38,19 @@ export const FETCH_CONFIG = {
 }
 
 export const getTemplateFromFileType = (software, fileType, availableTemplates) => {
-  const softwareSupportedFileTypes = FILE_TYPES[software] ? FILE_TYPES[software] : {}
+  const softwareSupportedFileTypes = FILE_TYPES[software] || {}
   const extension = softwareSupportedFileTypes[fileType] ? softwareSupportedFileTypes[fileType].ext : 'notAnExtension'
   const template = availableTemplates.filter((template) => template.endsWith(extension))
   return template.length === 1 ? template[0] : null
 }
 
 export const getTranslationFromFileType = (software, fileType) => {
-  const softwareSupportedFileTypes = FILE_TYPES[software] ? FILE_TYPES[software] : {}
+  const softwareSupportedFileTypes = FILE_TYPES[software] || {}
   return softwareSupportedFileTypes[fileType] ? softwareSupportedFileTypes[fileType].translation : ''
 }
 
 export const getExtensionFromFileType = (software, fileType) => {
-  const softwareSupportedFileTypes = FILE_TYPES[software] ? FILE_TYPES[software] : {}
+  const softwareSupportedFileTypes = FILE_TYPES[software] || {}
   return softwareSupportedFileTypes[fileType] ? softwareSupportedFileTypes[fileType].ext : ''
 }
 
@@ -65,6 +65,6 @@ export const getAvaibleFileTypes = (software, availableTemplates) => {
 }
 
 export const getIconUrlFromFileType = (software, fileType) => {
-  const softwareSupportedFileTypes = FILE_TYPES[software] ? FILE_TYPES[software] : {}
+  const softwareSupportedFileTypes = FILE_TYPES[software] || {}
   return softwareSupportedFileTypes[fileType] ? softwareSupportedFileTypes[fileType].img : null
 }

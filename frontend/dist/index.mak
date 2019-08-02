@@ -84,7 +84,6 @@
     <script type='text/javascript' src='/assets/tracim.app.js'></script>
 
     <script type='text/javascript' src='/app/workspace.app.js'></script>
-    <script type='text/javascript' src='/app/office_document.app.js'></script>
 
     % for app in applications:
     <script type='text/javascript' src='/app/${app.minislug}.app.js'></script>

@@ -3,7 +3,7 @@ import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import ReactDOM from 'react-dom'
 import File from './container/File.jsx'
-import CollaboraFrame from './component/CollaboraFrame.jsx'
+import CollaborativeEditionFrame from './component/CollaborativeEditionFrame.jsx'
 import PopupCreateFile from './container/PopupCreateFile.jsx'
 import { Router, Switch, Route } from 'react-router'
 
@@ -26,7 +26,7 @@ const appInterface = {
               data.content.workspace_id = match.params.workspaceId
               data.content.content_id = match.params.contentId
               return (
-                <CollaboraFrame
+                <CollaborativeEditionFrame
                   content={data.content}
                   config={data.config}
                   history={data.config.history}
