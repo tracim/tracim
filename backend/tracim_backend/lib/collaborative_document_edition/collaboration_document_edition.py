@@ -31,7 +31,12 @@ from tracim_backend.models.data import Content
 
 
 class CollaborativeDocumentEditionApi(ABC):
-    def __init__(self, current_user: typing.Optional[User], session: Session, config: CFG) -> None:
+    def __init__(
+        self,
+        config: CFG,
+        current_user: typing.Optional[User] = None,
+        session: typing.Optional[Session] = None,
+    ) -> None:
         self._session = session
         self._user = current_user
         self._config = config
@@ -90,6 +95,7 @@ class CollaborativeDocumentEditionApi(ABC):
         self._get_file_template_path(template_filename)
 
     def update_content_from_template(self, content: Content, template_filename: str) -> Content:
+        assert self._session
         template_path = self._get_file_template_path(template_filename)
         new_mimetype = mimetypes.guess_type(template_path)[0]
         api = ContentApi(config=self._config, session=self._session, current_user=self._user)
