@@ -73,7 +73,7 @@ class CollaborativeDocumentEditionController(Controller):
         Get thread content
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_lib(
+        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         return collaborative_document_edition_api.get_file_template_list()
@@ -93,7 +93,7 @@ class CollaborativeDocumentEditionController(Controller):
         api = ContentApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
-        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_lib(
+        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         collaborative_document_edition_api.check_template_available(hapic_data.body.template)
@@ -115,7 +115,7 @@ class CollaborativeDocumentEditionController(Controller):
         )
         api.save(content, ActionDescription.CREATION)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
-            collaborative_document_edition_api.update_from_template(
+            collaborative_document_edition_api.update_content_from_template(
                 content=content, template_filename=hapic_data.body.template
             )
         api.execute_created_content_actions(content)

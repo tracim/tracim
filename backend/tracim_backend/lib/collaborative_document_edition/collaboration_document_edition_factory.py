@@ -14,7 +14,7 @@ class CollaborativeDocumentEditionFactory(object):
     """
 
     @classmethod
-    def get_collaborative_document_edition_controller(cls, config: "CFG"):
+    def get_controller(cls, config: "CFG"):
         assert config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
         from tracim_backend.views.collaborative_document_edition_api.collabora_controller import (
             CollaboraController,
@@ -31,9 +31,7 @@ class CollaborativeDocumentEditionFactory(object):
             )
 
     @classmethod
-    def get_collaborative_document_edition_lib(
-        cls, session: Session, current_user: typing.Optional[User], config: "CFG"
-    ):
+    def get_lib(cls, session: Session, current_user: typing.Optional[User], config: "CFG"):
 
         if config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import

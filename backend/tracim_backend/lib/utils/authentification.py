@@ -14,6 +14,7 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
 
@@ -227,10 +228,10 @@ class ApiTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthent
 
 @implementer(IAuthenticationPolicy)
 class QueryTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthenticationPolicy):
-    def __init__(self):
+    def __init__(self) -> None:
         self.callback = None
 
-    def authenticated_userid(self, request):
+    def authenticated_userid(self, request: TracimRequest) -> typing.Optional[int]:
         app_config = request.registry.settings["CFG"]  # type: CFG
         # check if user is correct
         token = self.unauthenticated_userid(request)
@@ -245,11 +246,11 @@ class QueryTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthe
             return None
         return user.user_id
 
-    def unauthenticated_userid(self, request) -> str:
+    def unauthenticated_userid(self, request: TracimRequest) -> str:
         return request.params.get(AUTH_TOKEN_QUERY_PARAMETER)
 
-    def remember(self, request, userid, **kw):
+    def remember(self, request: TracimRequest, userid: int, **kw) -> typing.List[typing.Any]:
         return []
 
-    def forget(self, request):
+    def forget(self, request: TracimRequest) -> typing.List[typing.Any]:
         return []

@@ -215,7 +215,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
 
         wopi_controller = WOPIController()
         configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
-        collaborative_document_edition_controller = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_controller(
+        collaborative_document_edition_controller = CollaborativeDocumentEditionFactory().get_controller(
             app_config
         )
         configurator.include(
