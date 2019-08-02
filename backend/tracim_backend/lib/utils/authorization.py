@@ -129,7 +129,7 @@ class CurrentContentRoleChecker(AuthorizationChecker):
     Check if current_user as correct role in workspace of current_content
     """
 
-    def __init__(self, role_level: int):
+    def __init__(self, role_level: int) -> None:
         self.role_level = role_level
 
     def check(self, tracim_context: TracimContext) -> bool:

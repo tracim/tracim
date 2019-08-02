@@ -4,17 +4,21 @@ from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import NoValidCollaborativeDocumentEditionSoftware
+from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition import (
+    CollaborativeDocumentEditionApi,
+)
 from tracim_backend.lib.collaborative_document_edition.data import COLLABORA_DOCUMENT_EDITION_SLUG
 from tracim_backend.models.auth import User
+from tracim_backend.views.controllers import Controller
 
 
 class CollaborativeDocumentEditionFactory(object):
     """
-    Factory to get correct objects related to search engine activated
+    Factory to get correct objects related to collaborative software
     """
 
     @classmethod
-    def get_collaborative_document_edition_controller(cls, config: "CFG"):
+    def get_controller(cls, config: "CFG") -> Controller:
         assert config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
         from tracim_backend.views.collaborative_document_edition_api.collabora_controller import (
             CollaboraController,
@@ -25,15 +29,15 @@ class CollaborativeDocumentEditionFactory(object):
             return CollaboraController()
         else:
             raise NoValidCollaborativeDocumentEditionSoftware(
-                "Can't provide search controller "
-                ' because search engine provided "{}"'
+                "Can't provide collaborative document edition controller "
+                ' because collaborative document edition software provided "{}"'
                 " is not valid".format(config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE)
             )
 
     @classmethod
-    def get_collaborative_document_edition_lib(
+    def get_lib(
         cls, session: Session, current_user: typing.Optional[User], config: "CFG"
-    ):
+    ) -> CollaborativeDocumentEditionApi:
 
         if config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import
@@ -46,7 +50,7 @@ class CollaborativeDocumentEditionFactory(object):
             )
         else:
             raise NoValidCollaborativeDocumentEditionSoftware(
-                "Can't provide search controller "
-                ' because search engine provided "{}"'
+                "Can't provide collaborative document edition lib "
+                ' because collaborative document edition software provided "{}"'
                 " is not valid".format(config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE)
             )

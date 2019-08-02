@@ -16,7 +16,7 @@ class WopiPutHeadersSchema(marshmallow.Schema):
 
 
 class WopiPutHeaders(object):
-    def __init__(self, wopi_lool_timestamp: datetime = None):
+    def __init__(self, wopi_lool_timestamp: datetime = None) -> None:
         self.wopi_lool_timestamp = wopi_lool_timestamp
 
 
@@ -60,7 +60,7 @@ class WOPICheckFileInfoSchema(marshmallow.Schema):
     )
 
 
-class WopiPutResponse(marshmallow.Schema):
+class WopiPutResponseSchema(marshmallow.Schema):
     LastModifiedTime = marshmallow.fields.DateTime(
         description="Last time the file was modified", attribute="last_modified_time"
     )

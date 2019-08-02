@@ -7,7 +7,7 @@ from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.views.core_api.schemas import StrippedString
 
 
-class CollaborativeDocumentEditionToken(marshmallow.Schema):
+class CollaborativeDocumentEditionTokenSchema(marshmallow.Schema):
     access_token = marshmallow.fields.String(
         required=True,
         description="The access token which should be sent to collabora online and "
@@ -20,7 +20,7 @@ class FileCreateFromTemplate(object):
     Create From Template model
     """
 
-    def __init__(self, template: str, filename: str, parent_id: int):
+    def __init__(self, template: str, filename: str, parent_id: int) -> None:
         self.template = template
         self.filename = filename
         self.parent_id = parent_id

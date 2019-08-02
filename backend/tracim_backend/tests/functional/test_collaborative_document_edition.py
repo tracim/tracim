@@ -18,7 +18,7 @@ class TestCollaborativeDocumentEdition(object):
         url = "/api/v2/collaborative-document-edition/templates"
         res = web_testapp.get(url, status=200)
         content = res.json_body
-        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_lib(
+        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
             current_user=admin_user, session=session, config=app_config
         )
         assert (
@@ -63,7 +63,7 @@ class TestCollaborativeDocumentEdition(object):
         """
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
-        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_lib(
+        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
             current_user=admin_user, session=session, config=app_config
         )
         data_workspace = workspace_api.create_workspace(label="data")

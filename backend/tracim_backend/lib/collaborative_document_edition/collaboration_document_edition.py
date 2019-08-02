@@ -1,11 +1,10 @@
+from abc import ABC
 import mimetypes
 import os
 from os.path import isfile
 from os.path import join
 import typing
 
-from defusedxml import ElementTree
-import requests
 from sqlalchemy.orm import Session
 
 from tracim_backend import CFG
@@ -31,55 +30,36 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 
 
-class CollaborativeDocumentEditionApi(object):
-    def __init__(self, current_user: typing.Optional[User], session: Session, config: CFG) -> None:
+class CollaborativeDocumentEditionApi(ABC):
+    def __init__(
+        self,
+        config: CFG,
+        current_user: typing.Optional[User] = None,
+        session: typing.Optional[Session] = None,
+    ) -> None:
         self._session = session
         self._user = current_user
         self._config = config
 
-    def discover(self) -> typing.List[CollaborativeDocumentEditionFileType]:
-        response = requests.get(
-            self._config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL + "/hosting/discovery",
-            timeout=2,
-        )
-        root = ElementTree.fromstring(response.text)
-        supported_collabora_file = []  # type: typing.List[CollaborativeDocumentEditionFileType]
-        for xml_app in root.findall("net-zone/app"):
-            mimetype = xml_app.get("name")
-            # INFO - G.M - 2019-07-17 - this list return also a non mimetype type,
-            # we should not add him.
-            if mimetype == "Capabilities":
-                continue
-            for xml_action in xml_app:
-                extension = xml_action.get("ext")
-                url_source = xml_action.get("urlsrc")
-                associated_action = xml_action.get("name")
-                supported_collabora_file.append(
-                    CollaborativeDocumentEditionFileType(
-                        mimetype=mimetype,
-                        extension=extension,
-                        associated_action=associated_action,
-                        url_source=url_source,
-                    )
-                )
-        return supported_collabora_file
+    def get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
+        """
+        Get list of supported file type for collaborative editions
+        """
+        raise NotImplementedError()
 
-    def get_collaboration_document_edition_config(self) -> CollaborativeDocumentEditionConfig:
+    def get_config(self) -> CollaborativeDocumentEditionConfig:
         return CollaborativeDocumentEditionConfig(
             software=self._config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE,
-            supported_file_types=self.discover(),
+            supported_file_types=self.get_supported_file_types(),
         )
 
     def get_file_template_list(self) -> FileTemplateList:
         return FileTemplateList(file_templates=self._get_template_list())
 
-    def _has_template_extension(self, template_name: str, extension_list: typing.List[str]):
-        for extension in extension_list:
-            if template_name.endswith(extension):
-                return True
-        return False
-
     def _get_template_list(self) -> typing.List[str]:
+        """
+        return list of templates names as string like "text.odt"
+        """
         template_list = []
         try:
             is_dir_exist(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
@@ -94,7 +74,7 @@ class CollaborativeDocumentEditionApi(object):
             template_list.append(filename)
         return template_list
 
-    def _get_file_template_path(self, template_filename) -> str:
+    def _get_file_template_path(self, template_filename: str) -> str:
         template_path = "{}/{}".format(
             self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, template_filename
         )
@@ -107,10 +87,15 @@ class CollaborativeDocumentEditionApi(object):
             raise FileTemplateNotAvailable from exc
         return template_path
 
-    def check_template_available(self, template_filename) -> None:
+    def check_template_available(self, template_filename: str) -> None:
+        """
+        check  if template is available by trying to get it, will raise
+        some exception if it fail
+        """
         self._get_file_template_path(template_filename)
 
-    def update_from_template(self, content: Content, template_filename: str) -> Content:
+    def update_content_from_template(self, content: Content, template_filename: str) -> Content:
+        assert self._session
         template_path = self._get_file_template_path(template_filename)
         new_mimetype = mimetypes.guess_type(template_path)[0]
         api = ContentApi(config=self._config, session=self._session, current_user=self._user)
@@ -121,4 +106,7 @@ class CollaborativeDocumentEditionApi(object):
         return content
 
     def get_token(self, access_token: str) -> CollaborativeDocumentEditionToken:
+        """
+        Return serializable object containing token information.
+        """
         return CollaborativeDocumentEditionToken(access_token=access_token)
