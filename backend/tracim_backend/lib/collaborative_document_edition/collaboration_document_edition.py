@@ -82,7 +82,7 @@ class CollaborativeDocumentEditionLib(ABC):
         return template_list
 
     def _get_file_template_path(self, template_filename: str) -> str:
-        template_path = "{}/{}".format(
+        template_path = os.path.join(
             self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, template_filename
         )
         try:
