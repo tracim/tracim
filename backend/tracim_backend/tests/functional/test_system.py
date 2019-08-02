@@ -168,10 +168,6 @@ class TestConfigEndpointCollabora(object):
     Tests for /api/v2/system/config
     """
 
-    """
-    Get some config info about tracim
-    """
-
     @patch("requests.get")
     def test_api__get_config__ok_200__nominal_case(self, patched_get, web_testapp):
 
