@@ -16,9 +16,6 @@ from tracim_backend.exceptions import FileTemplateNotAvailable
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition import (
-    CollaborativeDocumentEditionApi,
-)
 from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
     CollaborativeDocumentEditionFactory,
 )
@@ -63,11 +60,11 @@ class CollaborativeDocumentEditionController(Controller):
         self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
     ) -> CollaborativeDocumentEditionToken:
         app_config = request.registry.settings["CFG"]  # type: CFG
-        collabora_api = CollaborativeDocumentEditionApi(
+        collaborative_document_edition_lib = CollaborativeDocumentEditionFactory().get_lib(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         access_token = request.current_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY)
-        return collabora_api.get_token(access_token=access_token)
+        return collaborative_document_edition_lib.get_token(access_token=access_token)
 
     # File template infor
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])

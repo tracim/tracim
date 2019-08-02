@@ -1,3 +1,4 @@
+from abc import ABC
 import mimetypes
 import os
 from os.path import isfile
@@ -29,7 +30,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 
 
-class CollaborativeDocumentEditionApi(object):
+class CollaborativeDocumentEditionApi(ABC):
     def __init__(self, current_user: typing.Optional[User], session: Session, config: CFG) -> None:
         self._session = session
         self._user = current_user
