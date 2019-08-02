@@ -1,7 +1,9 @@
 from http import HTTPStatus
 import typing
 
+from hapic import HapicData
 from pyramid.config import Configurator
+from pyramid.traversal import DefaultRootFactory
 import transaction
 
 from tracim_backend.app_models.contents import FILE_TYPE
@@ -58,7 +60,7 @@ class CollaborativeDocumentEditionController(Controller):
     @check_right(is_user)
     @hapic.output_body(CollaborativeDocumentEditionTokenSchema())
     def collaborative_document_edition_token(
-        self, context, request: TracimRequest, hapic_data=None
+        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
     ) -> CollaborativeDocumentEditionToken:
         app_config = request.registry.settings["CFG"]  # type: CFG
         collabora_api = CollaborativeDocumentEditionApi(
@@ -71,7 +73,7 @@ class CollaborativeDocumentEditionController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
     @hapic.output_body(FileTemplateInfoSchema())
     def get_file_template_infos(
-        self, context, request: TracimRequest, hapic_data=None
+        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
     ) -> FileTemplateList:
         """
         Get thread content
@@ -93,7 +95,7 @@ class CollaborativeDocumentEditionController(Controller):
     @hapic.output_body(ContentDigestSchema())
     @hapic.input_body(FileCreateFromTemplateSchema())
     def create_file_from_template(
-        self, context, request: TracimRequest, hapic_data=None
+        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
     ) -> ContentInContext:
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(

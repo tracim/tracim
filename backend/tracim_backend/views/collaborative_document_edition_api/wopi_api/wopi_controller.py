@@ -1,11 +1,14 @@
 # coding=utf-8
 from datetime import timezone
 from http import HTTPStatus
+import typing
 
 from depot.manager import DepotManager
+from hapic.data import HapicData
 from hapic.data import HapicFile
 from pyramid.config import Configurator
 from pyramid.response import Response
+from pyramid.traversal import DefaultRootFactory
 import transaction
 
 from tracim_backend import CFG
@@ -17,6 +20,8 @@ from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_current_content_contributor
 from tracim_backend.lib.utils.authorization import is_current_content_reader
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
+from tracim_backend.lib.wopi.models import WopiCheckFileInfo
+from tracim_backend.lib.wopi.models import WopiLastModifiedTime
 from tracim_backend.lib.wopi.wopi import WopiApi
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_controller import (
@@ -32,7 +37,7 @@ from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_schem
     WopiPutHeadersSchema,
 )
 from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_schema import (
-    WopiPutResponse,
+    WopiPutResponseSchema,
 )
 from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_schema import (
     WOPITokenQuerySchema,
@@ -59,7 +64,9 @@ class WOPIController(Controller):
     @hapic.input_path(ContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
     @hapic.output_file([])
-    def get_content(self, context, request: TracimRequest, hapic_data=None):
+    def get_content(
+        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+    ) -> HapicFile:
         """
         WOPI GetFile endpoint :
         https://wopi.readthedocs.io/projects/wopirest/en/latest/files/GetFile.html#getfile
@@ -86,7 +93,9 @@ class WOPIController(Controller):
     @hapic.input_path(ContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
     @hapic.output_body(WOPICheckFileInfoSchema())
-    def check_file_info(self, context, request: TracimRequest, hapic_data=None):
+    def check_file_info(
+        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+    ) -> WopiCheckFileInfo:
         """
         WOPI CheckFileInfo endpoint
         https://wopi.readthedocs.io/projects/wopirest/en/latest/files/CheckFileInfo.html#checkfileinfo
@@ -101,8 +110,10 @@ class WOPIController(Controller):
     @hapic.input_path(ContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
     @hapic.input_headers(WopiPutHeadersSchema())
-    @hapic.output_body(WopiPutResponse())
-    def put_content(self, context, request: TracimRequest, hapic_data=None):
+    @hapic.output_body(WopiPutResponseSchema())
+    def put_content(
+        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+    ) -> typing.Union[WopiLastModifiedTime, Response]:
         """
         WOPI PutRelativeFile endpoint
         https://wopi.readthedocs.io/projects/wopirest/en/latest/files/PutRelativeFile.html#putrelativefile
@@ -148,7 +159,7 @@ class WOPIController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config
         ).last_modified_time(request.current_content)
 
-    def bind(self, configurator: Configurator):
+    def bind(self, configurator: Configurator) -> None:
 
         # Get content
         configurator.add_route(
