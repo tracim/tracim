@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import i18n from '../i18n.js'
 import {
@@ -399,4 +399,4 @@ class AdminWorkspaceUser extends React.Component {
   }
 }
 
-export default withTranslation()(Radium(AdminWorkspaceUser))
+export default translate()(Radium(AdminWorkspaceUser))

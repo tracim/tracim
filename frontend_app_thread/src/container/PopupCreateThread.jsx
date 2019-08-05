@@ -1,6 +1,6 @@
 import React from 'react'
 import i18n from '../i18n.js'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import {
   addAllResourceI18n,
   CardPopupCreateContent,
@@ -123,4 +123,4 @@ class PopupCreateThread extends React.Component {
   }
 }
 
-export default withTranslation()(PopupCreateThread)
+export default translate()(PopupCreateThread)

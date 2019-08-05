@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
@@ -300,4 +300,4 @@ export class PreviewComponent extends React.Component {
   }
 }
 
-export default withTranslation()(Radium(PreviewComponent))
+export default translate()(Radium(PreviewComponent))

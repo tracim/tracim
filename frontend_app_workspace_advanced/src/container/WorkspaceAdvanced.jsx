@@ -1,6 +1,6 @@
 import React from 'react'
 import WorkspaceAdvancedComponent from '../component/WorkspaceAdvancedComponent.jsx'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
@@ -468,4 +468,4 @@ class WorkspaceAdvanced extends React.Component {
   }
 }
 
-export default withTranslation()(Radium(WorkspaceAdvanced))
+export default translate()(Radium(WorkspaceAdvanced))

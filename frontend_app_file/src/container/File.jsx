@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
@@ -738,4 +738,4 @@ class File extends React.Component {
   }
 }
 
-export default withTranslation()(File)
+export default translate()(File)

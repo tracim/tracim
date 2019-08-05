@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Badge, Avatar } from 'tracim_frontend_lib'
@@ -61,7 +61,7 @@ const ContentItemSearch = props => {
   )
 }
 
-export default withTranslation()(ContentItemSearch)
+export default translate()(ContentItemSearch)
 
 ContentItemSearch.propTypes = {
   statusSlug: PropTypes.string.isRequired,
