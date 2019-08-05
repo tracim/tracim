@@ -30,6 +30,10 @@ export const FILE_TYPES = {
   }
 }
 
+export const PAGE = {
+  ONLINE_EDITION: (contentId) => `/api/v2/collaborative-document-edition/wopi/files/${contentId}`
+}
+
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',

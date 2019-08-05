@@ -5,7 +5,7 @@ import 'regenerator-runtime/runtime'
 import PopupCreateOfficeDocument from './container/PopupCreateOfficeDocument.jsx'
 import CollaborativeEditionFrame from './container/CollaborativeEditionFrame.jsx'
 import { Router } from 'react-router'
-import { NewVersionBtn, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 // @TODO make a file that contains all events implemented by this App.
 // @todo add this file to appInterface
