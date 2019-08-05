@@ -64,7 +64,13 @@ class CollaborativeEditionFrame extends React.Component {
 
   async componentDidMount () {
     console.log('%c<CollaboraFrame> did mount', `color: ${this.props.data.config.hexcolor}`)
-    await this.loadContent()
+    try {
+      await this.loadContent()
+    } catch (error) {
+      console.log(error.message)
+      return
+    }
+
     await this.setIframeConfig()
     this.showIframe()
     window.addEventListener('message', this.handleIframeIsClosing, false)
@@ -76,19 +82,46 @@ class CollaborativeEditionFrame extends React.Component {
   }
 
   loadContent = async () => {
-    const fetchResultFile = await handleFetchResult(
-      await getFileContent(this.props.data.config.apiUrl, this.props.data.content.workspace_id, this.props.data.content.content_id)
-    )
-    switch (fetchResultFile.apiResponse.status) {
+    const { props } = this
+    const request = await getFileContent(props.data.config.apiUrl, props.data.content.workspace_id, props.data.content.content_id)
+    const response = await handleFetchResult(request)
+    switch (response.apiResponse.status) {
       case 200:
         this.setState({
           content: {
-            ...fetchResultFile.body
+            ...response.body
           }
         })
         break
+      case 400:
+        switch (response.body.code) {
+          case 2023:
+            GLOBAL_dispatchEvent({
+              type: CUSTOM_EVENT.REDIRECT,
+              data: {
+                url: `/ui/workspaces/${props.data.content.workspace_id}/contents`
+              }
+            })
+            throw new Error(response.body.message)
+          case 2022:
+            GLOBAL_dispatchEvent({
+              type: CUSTOM_EVENT.REDIRECT,
+              data: {
+                url: `/ui`
+              }
+            })
+            throw new Error(response.body.message)
+        }
+        break
       default:
-        this.sendGlobalFlashMessage(this.props.t('Error while loading file'))
+        this.sendGlobalFlashMessage(props.t('Error while loading file'))
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.REDIRECT,
+          data: {
+            url: '/ui'
+          }
+        })
+        throw new Error('Unknown error')
     }
   }
 
@@ -141,6 +174,15 @@ class CollaborativeEditionFrame extends React.Component {
         break
     }
   }
+
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
 
   render () {
     return (

@@ -20,8 +20,6 @@ import {
   getExtensionFromFileType
 } from '../helper.js'
 
-const CONTENT_TYPE_FILE = 'file'
-
 class PopupCreateOfficeDocument extends React.Component {
   constructor (props) {
     super(props)
@@ -38,7 +36,7 @@ class PopupCreateOfficeDocument extends React.Component {
       software: '',
       externalTranslationList: [
         props.t('Create an office document')
-      ],
+      ]
     }
 
     // i18n has been init, add resources from frontend
@@ -81,7 +79,7 @@ class PopupCreateOfficeDocument extends React.Component {
 
   handleValidate = async () => {
     const { config, workspaceId, idFolder, newContentName, availableTemplates, selectedOption, software } = this.state
-    const { history, PAGE } = this.props.data.config
+    const { PAGE } = this.props.data.config
     const templateName = getTemplateFromFileType(software, selectedOption.value, availableTemplates)
     const filename = newContentName + getExtensionFromFileType(software, selectedOption.value)
     const request = postOfficeDocumentFromTemplate(config.apiUrl, workspaceId, idFolder, config.slug, filename, templateName)
@@ -92,7 +90,12 @@ class PopupCreateOfficeDocument extends React.Component {
       case 200:
         this.handleClose()
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-        history.push(PAGE.WORKSPACE.CONTENT_EDITION(response.body.workspace_id, CONTENT_TYPE_FILE, response.body.content_id))
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.REDIRECT,
+          data: {
+            url: PAGE.WORKSPACE.CONTENT_EDITION(response.body.workspace_id, response.body.content_id)
+          }
+        })
         break
       case 400:
         switch (response.body.code) {
@@ -151,7 +154,7 @@ class PopupCreateOfficeDocument extends React.Component {
         value: fileType,
         img: {
           alt: fileType,
-          src: getIconUrlFromFileType(software, fileType),
+          src: getIconUrlFromFileType(state.software, fileType),
           height: 52,
           width: 52
         }
