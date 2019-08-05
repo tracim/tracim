@@ -7,5 +7,7 @@
   "Spreadsheet": "Tableur",
   "Text": "Texte",
   "Presentation": "Présentation",
-  "Draw": "Graphique"
+  "Draw": "Graphique",
+  "Error while loading file": "Erreur lors du chargement du fichier",
+  "Create an office document": "Créer un document bureautique"
 }

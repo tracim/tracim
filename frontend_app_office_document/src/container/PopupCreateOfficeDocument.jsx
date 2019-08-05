@@ -35,7 +35,10 @@ class PopupCreateOfficeDocument extends React.Component {
       availableFileTypes: [],
       availableTemplates: [],
       selectedOption: '',
-      software: ''
+      software: '',
+      externalTranslationList: [
+        props.t('Create an office document')
+      ],
     }
 
     // i18n has been init, add resources from frontend
@@ -140,10 +143,11 @@ class PopupCreateOfficeDocument extends React.Component {
   setSelectedOption = fileType => this.setState({ selectedOption: fileType })
 
   buildOptions () {
-    const { software } = this.state
-    return this.state.availableFileTypes.map(
+    const { props, state } = this
+
+    return state.availableFileTypes.map(
       (fileType) => ({
-        text: getTranslationFromFileType(software, fileType),
+        text: props.t(getTranslationFromFileType(state.software, fileType)),
         value: fileType,
         img: {
           alt: fileType,
