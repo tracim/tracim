@@ -7,5 +7,7 @@
   "Spreadsheet": "Spreadsheet",
   "Text": "Text",
   "Presentation": "Presentation",
-  "Draw": "Draw"
+  "Draw": "Draw",
+  "Error while loading file": "Error while loading file",
+  "Create an office document": "Create an office document"
 }
