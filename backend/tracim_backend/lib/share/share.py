@@ -1,4 +1,6 @@
 from datetime import datetime
+from smtplib import SMTPException
+from smtplib import SMTPRecipientsRefused
 import typing
 import uuid
 
@@ -6,7 +8,11 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import WrongSharePassword
+from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
+from tracim_backend.lib.share.share_email_manager import ShareEmailManager
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.models.auth import User
 from tracim_backend.models.content_share import ContentShare
@@ -41,7 +47,11 @@ class ShareLib(object):
         return base_query
 
     def share_content(
-        self, content: Content, emails: typing.List[str], password: typing.Optional[str] = None
+        self,
+        content: Content,
+        emails: typing.List[str],
+        password: typing.Optional[str] = None,
+        do_notify=True,
     ) -> typing.List[ContentShare]:
         content_shares = []
         created = datetime.now()
@@ -61,7 +71,44 @@ class ShareLib(object):
             self.save(content_share)
             content_shares.append(content_share)
             self._session.flush()
+
+        if do_notify and self._config.EMAIL__NOTIFICATION__ACTIVATED:
+            try:
+                email_manager = self._get_email_manager(self._config, self._session)
+                email_manager.notify__share__content(
+                    emitter=self._user,
+                    shared_content=content,
+                    content_share_receivers=self.get_content_shares_in_context(content_shares),
+                    share_password=password,
+                )
+            # FIXME - G.M - 2018-11-02 - hack: accept bad recipient user creation
+            # this should be fixed to find a solution to allow "fake" email but
+            # also have clear error case for valid mail.
+            except SMTPRecipientsRefused:
+                logger.warning(
+                    self,
+                    "Share initied by {email} but SMTP server refuse to send notification".format(
+                        email=self._user.email
+                    ),
+                )
+            except SMTPException as exc:
+                raise NotificationSendingFailed(
+                    "Notification for shared file can't be send " "(SMTP error)."
+                ) from exc
         return content_shares
+
+    def _get_email_manager(self, config: CFG, session: Session):
+        """
+        :return: EmailManager instance
+        """
+        smtp_config = SmtpConfiguration(
+            config.EMAIL__NOTIFICATION__SMTP__SERVER,
+            config.EMAIL__NOTIFICATION__SMTP__PORT,
+            config.EMAIL__NOTIFICATION__SMTP__USER,
+            config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+        )
+
+        return ShareEmailManager(config=config, smtp_config=smtp_config, session=session)
 
     def get_content_shares(self, content: Content) -> typing.List[ContentShare]:
         return self.base_query().filter(ContentShare.content_id == content.content_id).all()

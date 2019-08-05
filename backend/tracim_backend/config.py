@@ -339,6 +339,22 @@ class CFG(object):
             _("[{website_title}] Someone created an account for you"),
         )
 
+        # share content email
+        self.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML = self.get_raw_config(
+            "email.notification.share_content_to_receiver.template.html"
+        )
+        self.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT = self.get_raw_config(
+            "email.notification.share_content_to_receiver.subject",
+            _("[{website_title}] {emitter_name} shared content {content_filename} with you"),
+        )
+        self.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML = self.get_raw_config(
+            "email.notification.share_content_to_emitter.template.html"
+        )
+        self.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT = self.get_raw_config(
+            "email.notification.share_content_to_emitter.subject",
+            _("[{website_title}] you shared {content_filename} to {nb_receivers} users"),
+        )
+
         # Reset password notification
         self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML = self.get_raw_config(
             "email.notification.reset_password_request.template.html"

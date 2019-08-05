@@ -1,8 +1,11 @@
 import pytest
+from rq import SimpleWorker
 import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.share.share import ShareLib
+from tracim_backend.lib.utils.utils import get_redis_connection
+from tracim_backend.lib.utils.utils import get_rq_queue
 from tracim_backend.models.content_share import ContentShareType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -303,7 +306,7 @@ class TestPrivateShareEndpoints(object):
         assert content[0]["share_id"]
         share_id = content[0]["share_id"]
 
-        res = web_testapp.delete(
+        web_testapp.delete(
             "/api/v2/workspaces/{}/contents/{}/shares/{}".format(
                 workspace.workspace_id, test_file.content_id, share_id
             ),
@@ -328,6 +331,155 @@ class TestPrivateShareEndpoints(object):
         )
         content = res.json_body
         assert len(content) == 1
+
+
+@pytest.mark.usefixtures("base_fixture")
+class TestPrivateShareEndpointsWithNotification(object):
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+    )
+    def test_api__add_share__ok_200__with_email_notification(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_api_factory,
+        admin_user,
+        mailhog,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.save(test_file)
+        share_api = share_api_factory.get()  # type: ShareLib
+        share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
+        transaction.commit()
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 3
+        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        for email in response:
+            assert (
+                email["Content"]["Headers"]["From"][0]
+                == "Tracim Notifications <test_user_from+0@localhost>"
+            )
+            headers = email["Content"]["Headers"]
+            assert headers["To"][0] in valid_dests
+            valid_dests.remove(headers["To"][0])
+        assert valid_dests == []
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_test_with_mail_test_async"}], indirect=True
+    )
+    def test_api__add_share__ok_200__with_email_notification_async(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_api_factory,
+        admin_user,
+        mailhog,
+        app_config,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.save(test_file)
+        share_api = share_api_factory.get()  # type: ShareLib
+        share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
+        transaction.commit()
+
+        mailhog.cleanup_mailhog()
+        # Send mail async from redis queue
+        redis = get_redis_connection(app_config)
+        queue = get_rq_queue(redis, "mail_sender")
+        worker = SimpleWorker([queue], connection=queue.connection)
+        worker.work(burst=True)
+
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 3
+        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        for email in response:
+            assert (
+                email["Content"]["Headers"]["From"][0]
+                == "Tracim Notifications <test_user_from+0@localhost>"
+            )
+            headers = email["Content"]["Headers"]
+            assert headers["To"][0] in valid_dests
+            valid_dests.remove(headers["To"][0])
+        assert valid_dests == []
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+    )
+    def test_api__add_share__ok_200__with_email_notification_and_password(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_api_factory,
+        admin_user,
+        mailhog,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.save(test_file)
+        share_api = share_api_factory.get()  # type: ShareLib
+        share_api.share_content(
+            test_file, emails=["test@test.test", "test2@test2.test2"], password="toto"
+        )
+        transaction.commit()
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 3
+        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        for email in response:
+            assert (
+                email["Content"]["Headers"]["From"][0]
+                == "Tracim Notifications <test_user_from+0@localhost>"
+            )
+            headers = email["Content"]["Headers"]
+            assert headers["To"][0] in valid_dests
+            valid_dests.remove(headers["To"][0])
+        assert valid_dests == []
 
 
 @pytest.mark.usefixtures("base_fixture")
