@@ -77,7 +77,8 @@
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent",
-      "CustomEvent"
+      "CustomEvent",
+      "appOfficeDocument"
     ],
     "parser": "babel-eslint",
     "ignore": []

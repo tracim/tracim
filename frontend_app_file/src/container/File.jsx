@@ -638,7 +638,10 @@ class File extends React.Component {
 
   getOnlineEditionAction = () => {
     const { state } = this
-    return appOfficeDocument.getOnlineEditionAction(
+    if (!appOfficeDocument) {
+      return null
+    }
+    return appOfficeDocument.default.getOnlineEditionAction(
       state.content,
       state.config.system.config.collaborative_document_edition
     )

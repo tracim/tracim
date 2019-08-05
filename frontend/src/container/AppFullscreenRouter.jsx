@@ -70,8 +70,8 @@ class AppFullscreenRouter extends React.Component {
               return null
             }} />
 
-            <Route path={PAGE.WORKSPACE.CONTENT_EDITION()} render={() => {
-              props.renderAppFullscreen({ slug: 'agenda', hexcolor: '#7d4e24' }, props.user, {})
+            <Route path={PAGE.WORKSPACE.CONTENT_EDITION(':idws', ':idcts')} render={({match}) => {
+              props.renderAppFullscreen({ slug: 'office_document', hexcolor: '#7d4e24' }, props.user, {workspace_id: match.params.idws, content_id: match.params.idcts})
               return null
             }} />
           </div>
