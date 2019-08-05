@@ -4,6 +4,7 @@ import classnames from 'classnames'
 import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
 import { revisionTypeList } from '../../helper.js'
+import PropTypes from "prop-types";
 
 // require('./Revision.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -52,3 +53,27 @@ const Revision = props => {
 }
 
 export default withTranslation()(Radium(Revision))
+
+Revision.propTypes = {
+  customClass: PropTypes.string,
+  allowClickOnRevision: PropTypes.bool,
+  number: PropTypes.number,
+  authorPublicName: PropTypes.string,
+  status: PropTypes.string,
+  createdFormated: PropTypes.string,
+  createdDistance: PropTypes.string,
+  revisionType: PropTypes.string,
+  onClickRevision: PropTypes.func
+}
+
+Revision.defaultProps = {
+  customClass: '',
+  allowClickOnRevision: false,
+  number: 0,
+  authorPublicName: '',
+  status: '',
+  createdFormated: '',
+  createdDistance: '',
+  revisionType: '',
+  onClickRevision: () => {}
+}

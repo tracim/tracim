@@ -19,17 +19,11 @@ const PopinFixedOption = props => {
 export default withTranslation()(PopinFixedOption)
 
 PopinFixedOption.propTypes = {
-  selectedStatus: PropTypes.object,
-  availableStatus: PropTypes.array,
-  i18n: PropTypes.object, // translate resource to overrides default one,
-  onClickNewVersionBtn: PropTypes.func,
-  onChangeStatus: PropTypes.func,
+  customClass: PropTypes.string,
   display: PropTypes.bool
 }
 
 PopinFixedOption.defaultProps = {
-  availableStatus: [],
-  i18n: {},
-  onClickNewVersionBtn: () => {},
+  customClass: '',
   display: true
 }

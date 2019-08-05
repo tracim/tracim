@@ -3,7 +3,6 @@ import { expect } from 'chai'
 import { shallow, configure } from 'enzyme'
 import sinon from 'sinon'
 import NewMemberForm from '../../src/component/NewMemberForm/NewMemberForm.jsx'
-import PageTitle from "../../src/component/Layout/PageTitle";
 require('../../src/component/NewMemberForm/NewMemberForm.styl')
 
 describe('<NewMemberForm />', () => {
@@ -12,6 +11,7 @@ describe('<NewMemberForm />', () => {
   const onClickBtnValidateCallBack = sinon.stub()
   const onChangeRoleCallBack = sinon.stub()
   const onClickKnownMemberCallBack = sinon.stub()
+  const onChangeNameOrEmailCallBack = sinon.stub()
 
   const props = {
     onClickCloseAddMemberBtn: onClickCloseAddMemberBtnCallBack,
@@ -29,16 +29,15 @@ describe('<NewMemberForm />', () => {
     userRoleIdInWorkspace: 8,
     canSendInviteNewUser: true,
     emailNotifActivated: true,
-    roleList: [ {slug: 'randomRole'}],
+    roleList: [{ slug: 'random' }, { slug: 'Role' }],
     autoCompleteClicked: true,
     onClickBtnValidate: onClickBtnValidateCallBack,
     onChangeRole: onChangeRoleCallBack,
     onClickKnownMember: onClickKnownMemberCallBack,
+    onChangeNameOrEmail: onChangeNameOrEmailCallBack,
     autoCompleteActive: true,
     role: 'randomRole'
   }
-
-  const Children = () => <div><h1>Random title</h1>I am a children of ListItemWrapper</div>
 
   const wrapper = shallow(
     <NewMemberForm
@@ -51,11 +50,28 @@ describe('<NewMemberForm />', () => {
       expect(wrapper.find('#addmember').prop('value')).to.equal(props.nameOrEmail)
     })
 
+    it(`should display ${props.roleList.length} roles`, () => {
+      expect(wrapper.find('.memberlist__form__role__list__item').length).equal(props.roleList.length)
+      for(let i = 0; i < props.roleList.length; i++) {
+        expect(wrapper.find(`[value='${props.roleList[i].slug}']`).length)
+          .to.equal(1)
+        expect(wrapper.find(`[value='${props.roleList[i].slug}']`).prop('checked'))
+          .to.equal(props.roleList[i].slug === props.role)
+      }
+    })
+
+    it(`should have the submit button disabled property set to ${!props.autoCompleteClicked}`, () => {
+      expect(wrapper.find('.memberlist__form__submitbtn > button').prop('disabled'))
+        .to.equal(!props.autoCompleteClicked)
+    })
+
     it(`should display the 5 first searched known Member of the list`, () => {
       expect(wrapper.find('.autocomplete__item').length).equal(5)
       for(let i = 0; i < 5; i++) {
-        expect(wrapper.find('div.autocomplete__item__avatar > Avatar').at(i).prop('publicName')).to.equal(props.searchedKnownMemberList[i].public_name)
-        expect(wrapper.find('div.autocomplete__item__name').at(i)).to.have.text().equal(props.searchedKnownMemberList[i].public_name)
+        expect(wrapper.find('div.autocomplete__item__avatar > Avatar').at(i).prop('publicName'))
+          .to.equal(props.searchedKnownMemberList[i].public_name)
+        expect(wrapper.find('div.autocomplete__item__name').at(i))
+          .to.have.text().equal(props.searchedKnownMemberList[i].public_name)
       }
     })
   })
@@ -84,8 +100,13 @@ describe('<NewMemberForm />', () => {
     })
 
     it(`onClickAutoComplete handler should call the proper handler`, () => {
-      wrapper.find(`.item__radiobtn > input`).simulate('change')
+      wrapper.find(`.item__radiobtn > input`).at(0).simulate('change')
       expect(onChangeRoleCallBack.called).to.true
+    })
+
+    it(`onChangeNameOrEmail handler should call the proper handler`, () => {
+      wrapper.find(`input.name__input`).simulate('change', { target: { value: 'randomValue' } })
+      expect(onChangeNameOrEmailCallBack.called).to.true
     })
   })
 })

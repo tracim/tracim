@@ -3,6 +3,7 @@
 module.exports = {
   require: [
     '@babel/register',
+    '@babel/polyfill',
     'ignore-styles',
     'test/setup'
   ],

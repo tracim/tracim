@@ -1,6 +1,7 @@
 import React from 'react'
 import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
+import PropTypes from 'prop-types'
 
 // require('./SelectStatus.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -52,3 +53,17 @@ export const SelectStatus = props => {
 }
 
 export default withTranslation()(Radium(SelectStatus))
+
+SelectStatus.propTypes = {
+  availableStatus: PropTypes.arrayOf(PropTypes.object),
+  selectedStatus: PropTypes.object,
+  disabled: PropTypes.bool,
+  onChangeStatus: PropTypes.func
+}
+
+SelectStatus.defaultProps = {
+  availableStatus: [],
+  selectedStatus: {},
+  disabled: false,
+  onChangeStatus: () => {}
+}

@@ -1,14 +1,14 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import { shallow } from 'enzyme'
 import TextAreaApp from '../../src/component/Input/TextAreaApp/TextAreaApp.jsx'
-import PropTypes from "prop-types";
+import sinon from "sinon";
 require('../../src/component/Input/TextAreaApp/TextAreaApp.styl')
 
 describe('<TextAreaApp />', () => {
-  const onChangeText = () => console.log('t')
-  const onClickCancelBtn = () => console.log('t')
-  const onClickValidateBtn = () => console.log('t')
+  const onChangeText = sinon.stub()
+  const onClickCancelBtn = sinon.stub()
+  const onClickValidateBtn = sinon.stub()
 
   const props = {
     text: 'Lorem',
@@ -23,27 +23,34 @@ describe('<TextAreaApp />', () => {
 
   const wrapper = shallow(
     <TextAreaApp
-      text={props.text}
-      onChangeText={props.onChangeText}
-      onClickCancelBtn={props.onClickCancelBtn}
-      onClickValidateBtn={props.onClickValidateBtn}
-      disableValidateBtn={props.disableValidateBtn}
-      id={props.id}
-      customClass={props.customClass}
-      customColor={props.customColor}
+      { ...props }
     />
   ).dive()
 
-  // it(`should display "${props.text}"`, () =>
-  //
-  //   expect(wrapper.find(`#${props.id}`)).to.have.text().equal(props.text)
-  // )
+  describe('Static design', () => {
+    it(`should display "${props.text}"`, () =>
+      expect(wrapper.find(`#${props.id}`).prop('value')).to.equal(props.text)
+    )
 
-  // it(`should have the class "${props.customClass}"`, () => {
-  //   expect(wrapper.find(`.${props.customClass}`)).to.have.lengthOf(1)
-  // })
+    it(`the form should have the class "${props.customClass}"`, () => {
+      expect(wrapper.find(`form.${props.customClass}`)).to.have.lengthOf(1)
+    })
+  })
 
-  // it(`should display its text in color ${props.style.color}`, () =>
-  //   // expect(wrapper.find('.badge').prop('style')).to.deep.equal(props.style)
-  // )
+  describe('Handlers', () => {
+    it('onClickValidateBtn handler should call the proper handler', () => {
+      wrapper.find(`button.${props.customClass}__submit`).simulate('click')
+      expect(onClickValidateBtn.called).to.true
+    })
+
+    it('onClickCancelBtn handler should call the proper handler', () => {
+      wrapper.find(`button.${props.customClass}__cancel`).simulate('click')
+      expect(onClickCancelBtn.called).to.true
+    })
+
+    it('onChangeText handler should call the proper handler', () => {
+      wrapper.find(`textarea.${props.customClass}__text`).simulate('change')
+      expect(onChangeText.called).to.true
+    })
+  })
 })

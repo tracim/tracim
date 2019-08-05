@@ -1,6 +1,7 @@
 import React from 'react'
 import Radium from 'radium'
 import { withTranslation } from 'react-i18next'
+import PropTypes from 'prop-types'
 
 const NewVersionBtn = props => {
   return (
@@ -28,3 +29,17 @@ const NewVersionBtn = props => {
 }
 
 export default withTranslation()(Radium(NewVersionBtn))
+
+NewVersionBtn.propTypes = {
+  onClickNewVersionBtn: PropTypes.func,
+  disabled: PropTypes.bool,
+  customColor: PropTypes.string,
+  label: PropTypes.string
+}
+
+NewVersionBtn.defaultProps = {
+  onClickNewVersionBtn: () => {},
+  disabled: false,
+  customColor: '',
+  label: ''
+}

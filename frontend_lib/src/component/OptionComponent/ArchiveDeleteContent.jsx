@@ -1,6 +1,7 @@
 import React from 'react'
 import Radium from 'radium'
 import { withTranslation } from 'react-i18next'
+import PropTypes from 'prop-types'
 
 const ArchiveDeleteContent = props => {
   const styleColorBtn = {
@@ -42,3 +43,17 @@ const ArchiveDeleteContent = props => {
 }
 
 export default withTranslation()(Radium(ArchiveDeleteContent))
+
+ArchiveDeleteContent.propTypes = {
+  onClickDeleteBtn: PropTypes.func,
+  onClickArchiveBtn: PropTypes.func,
+  disabled: PropTypes.bool,
+  customColor: PropTypes.string
+}
+
+ArchiveDeleteContent.defaultProps = {
+  onClickDeleteBtn: () => {},
+  onClickArchiveBtn: () => {},
+  disabled: false,
+  customColor: ''
+}

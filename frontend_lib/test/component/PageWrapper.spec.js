@@ -15,7 +15,7 @@ describe('<PageWrapper />', () => {
     <PageWrapper
       { ...props }
     >
-      <PageTitle />
+      <PageTitle title={'randomTitle'} />
       <PageContent />
     </PageWrapper>
   )
