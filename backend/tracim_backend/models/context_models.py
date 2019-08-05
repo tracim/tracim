@@ -1457,17 +1457,17 @@ class ContentShareInContext(object):
     @property
     def url(self) -> str:
         # TODO - G.M - 2019-07-31 - import here to avoid recursive import.
-        from tracim_backend.lib.share.share import ShareApi
+        from tracim_backend.lib.share.share import ShareLib
 
-        api = ShareApi(config=self.config, session=self.dbsession, current_user=self._user)
+        api = ShareLib(config=self.config, session=self.dbsession, current_user=self._user)
         return api.frontend_url(self.content_share)
 
     @property
     def direct_url(self) -> str:
         # TODO - G.M - 2019-07-31 - import here to avoid recursive import.
-        from tracim_backend.lib.share.share import ShareApi
+        from tracim_backend.lib.share.share import ShareLib
 
-        api = ShareApi(config=self.config, session=self.dbsession, current_user=self._user)
+        api = ShareLib(config=self.config, session=self.dbsession, current_user=self._user)
         return api.direct_api_url(self.content_share)
 
     @property

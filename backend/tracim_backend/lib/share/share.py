@@ -21,7 +21,7 @@ PUBLIC_API_SHARED_CONTENT_LINK_PATTERN = (
 )
 
 
-class ShareApi(object):
+class ShareLib(object):
     def __init__(
         self,
         session: Session,

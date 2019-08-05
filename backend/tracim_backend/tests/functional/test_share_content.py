@@ -2,7 +2,7 @@ import pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
-from tracim_backend.lib.share.share import ShareApi
+from tracim_backend.lib.share.share import ShareLib
 from tracim_backend.models.content_share import ContentShareType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -69,7 +69,7 @@ class TestPrivateShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -124,7 +124,7 @@ class TestPrivateShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -179,7 +179,7 @@ class TestPrivateShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -249,7 +249,7 @@ class TestPrivateShareEndpoints(object):
             do_notify=False,
         )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -288,7 +288,7 @@ class TestPrivateShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -358,7 +358,7 @@ class TestGuestDownloadShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
@@ -402,7 +402,7 @@ class TestGuestDownloadShareEndpoints(object):
             do_notify=False,
         )
         content_api.save(test_folder)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(test_folder, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_folder)
         assert len(content_shares) == 1
@@ -441,7 +441,7 @@ class TestGuestDownloadShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
@@ -480,7 +480,7 @@ class TestGuestDownloadShareEndpoints(object):
             do_notify=False,
         )
         content_api.save(test_folder)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(test_folder, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_folder)
         assert len(content_shares) == 1
@@ -519,7 +519,7 @@ class TestGuestDownloadShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(
             test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
         )
@@ -565,7 +565,7 @@ class TestGuestDownloadShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(
             test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
         )
@@ -605,7 +605,7 @@ class TestGuestDownloadShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareApi
+        share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(
             test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
         )

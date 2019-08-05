@@ -12,7 +12,7 @@ from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.share.share import ShareApi
+from tracim_backend.lib.share.share import ShareLib
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_content_manager
@@ -59,7 +59,7 @@ class ShareController(Controller):
         Allow to share this file to external person
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ShareApi(
+        api = ShareLib(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         shares_content = api.share_content(
@@ -80,7 +80,7 @@ class ShareController(Controller):
         Get all share related to a file
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ShareApi(
+        api = ShareLib(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -99,7 +99,7 @@ class ShareController(Controller):
         remove a file share
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ShareApi(
+        api = ShareLib(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         api.disable_content_share(request.current_content, hapic_data.path.share_id)
@@ -115,7 +115,7 @@ class ShareController(Controller):
         get content file info
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ShareApi(current_user=None, session=request.dbsession, config=app_config)
+        api = ShareLib(current_user=None, session=request.dbsession, config=app_config)
         content_share = api.get_content_share_by_token(
             share_token=hapic_data.path.share_token
         )  # type: ContentShare
@@ -137,7 +137,7 @@ class ShareController(Controller):
         remove a file share
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ShareApi(current_user=None, session=request.dbsession, config=app_config)
+        api = ShareLib(current_user=None, session=request.dbsession, config=app_config)
         content_share = api.get_content_share_by_token(
             share_token=hapic_data.path.share_token
         )  # type: ContentShare
