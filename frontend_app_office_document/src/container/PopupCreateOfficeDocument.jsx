@@ -38,8 +38,6 @@ class PopupCreateOfficeDocument extends React.Component {
         props.t('Create an office document')
       ]
     }
-
-    // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
   }
@@ -68,14 +66,14 @@ class PopupCreateOfficeDocument extends React.Component {
     }
   }
 
-  handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
-
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, // handled by tracim_front:dist/index.html
     data: {
       name: this.state.appName
     }
   })
+
+  handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleValidate = async () => {
     const { config, workspaceId, idFolder, newContentName, availableTemplates, selectedOption, software } = this.state

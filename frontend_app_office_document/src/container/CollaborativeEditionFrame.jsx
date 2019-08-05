@@ -36,12 +36,23 @@ class CollaborativeEditionFrame extends React.Component {
     }
   }
 
-  buildCompleteIframeUrl = (urlSource, accessToken) => {
-    const { state } = this
-    const protocol = window.location.protocol
-    // INFO - B.L - 2019.08.01 - We assume frontend is on the same host than the API
-    const host = window.location.host
-    return `${urlSource}WOPISrc=${protocol}//${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1`
+  async componentDidMount () {
+    console.log('%c<CollaboraFrame> did mount', `color: ${this.props.data.config.hexcolor}`)
+    try {
+      await this.loadContent()
+    } catch (error) {
+      console.log(error.message)
+      return
+    }
+
+    await this.setIframeConfig()
+    this.showIframe()
+    window.addEventListener('message', this.handleIframeIsClosing, false)
+  }
+
+  componentWillUnmount () {
+    console.log('%c<CollaboraFrame> will Unmount', `color: ${this.props.data.config.hexcolor}`)
+    document.removeEventListener('message', this.handleIframeIsClosing)
   }
 
   handleIframeIsClosing = (event) => {
@@ -62,23 +73,12 @@ class CollaborativeEditionFrame extends React.Component {
     }
   }
 
-  async componentDidMount () {
-    console.log('%c<CollaboraFrame> did mount', `color: ${this.props.data.config.hexcolor}`)
-    try {
-      await this.loadContent()
-    } catch (error) {
-      console.log(error.message)
-      return
-    }
-
-    await this.setIframeConfig()
-    this.showIframe()
-    window.addEventListener('message', this.handleIframeIsClosing, false)
-  }
-
-  componentWillUnmount () {
-    console.log('%c<CollaboraFrame> will Unmount', `color: ${this.props.data.config.hexcolor}`)
-    document.removeEventListener('message', this.handleIframeIsClosing)
+  buildCompleteIframeUrl = (urlSource, accessToken) => {
+    const { state } = this
+    const protocol = window.location.protocol
+    // INFO - B.L - 2019.08.01 - We assume frontend is on the same host than the API
+    const host = window.location.host
+    return `${urlSource}WOPISrc=${protocol}//${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1`
   }
 
   loadContent = async () => {
