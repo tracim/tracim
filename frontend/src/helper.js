@@ -35,7 +35,7 @@ export const PAGE = {
     CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
     CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
-    CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/online_edition/${idcts}`
+    CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',

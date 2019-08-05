@@ -31,6 +31,9 @@ export const FILE_TYPES = {
 }
 
 export const PAGE = {
+  WORKSPACE: {
+    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`
+  },
   ONLINE_EDITION: (contentId) => `/api/v2/collaborative-document-edition/wopi/files/${contentId}`
 }
 
