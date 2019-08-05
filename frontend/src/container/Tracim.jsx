@@ -209,7 +209,7 @@ class Tracim extends React.Component {
     // }
 
     if (
-      !unLoggedAllowedPageList.includes(props.location.pathname) && (
+      !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
         !props.system.workspaceListLoaded ||
         !props.system.appListLoaded ||
         !props.system.contentTypeListLoaded

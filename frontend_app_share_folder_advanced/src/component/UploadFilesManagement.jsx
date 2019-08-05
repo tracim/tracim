@@ -36,6 +36,7 @@ const UploadFilesManagement = props => {
             onClickDeleteShareLink={() => props.onClickDeleteShareLink(shareLink.share_id)}
             hexcolor={customColor}
             isProtected={shareLink.has_password}
+            userRoleIdInWorkspace={props.userRoleIdInWorkspace}
           />
         )
         : <div className='share_folder_advanced__content__empty'>

@@ -79,7 +79,7 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
       if (status === 401) {
         // FIME - GB - 2019-02-08 - Find a better way of handling the list of unLoggedAllowedPageList
         // https://github.com/tracim/tracim/issues/2144
-        if (!unLoggedAllowedPageList.find(page => document.location.pathname.startsWith(page))) {
+        if (!unLoggedAllowedPageList.some(url => document.location.pathname.startsWith(url))) {
           dispatch(setRedirectLogin(document.location.pathname + document.location.search))
           dispatch(setUserDisconnected())
           history.push(`${PAGE.LOGIN}${Cookies.get(COOKIE_FRONTEND.LAST_CONNECTION) ? '?dc=1' : ''}`)

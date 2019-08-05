@@ -6,6 +6,7 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import DownloadForm from '../component/GuestPage/DownloadForm.jsx'
 import { getFileInfos } from '../action-creator.async.js'
+import { displayFileSize } from 'tracim_frontend_lib'
 
 class GuestDownload extends React.Component {
   constructor (props) {
@@ -34,7 +35,7 @@ class GuestDownload extends React.Component {
       case 204:
         this.setState({
           fileName: fetchResultFileInfos.json.file_name,
-          fileSize: fetchResultFileInfos.json.file_size,
+          fileSize: displayFileSize(fetchResultFileInfos.json.file_size),
           fileId: fetchResultFileInfos.json.file_id,
           userName: fetchResultFileInfos.json.user_name
         })

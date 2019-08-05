@@ -16,6 +16,7 @@ import {
 } from 'tracim_frontend_lib'
 import { debug } from '../debug'
 import {
+  getShareLinksList,
   // getShareFolder,
   // putShareLinkList,
   getContentTypeList
@@ -134,7 +135,6 @@ class ShareFolderAdvanced extends React.Component {
         break
       default:
         this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
-        return
     }
   }
 
@@ -174,7 +174,6 @@ class ShareFolderAdvanced extends React.Component {
 
     let shareEmailList = parserStringToList(state.shareEmails)
     let invalidEmails = []
-
 
     shareEmailList.forEach(shareEmail => {
       if (!checkEmailValidity(shareEmail)) invalidEmails.push(shareEmail)

@@ -63,6 +63,7 @@ class ShareDownloadManagement extends React.Component {
                   isProtected={shareLink.has_password}
                   onClickDeleteShareLink={props.onClickDeleteShareLink}
                   hexcolor={props.hexcolor}
+                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 />
               )
             : <div className='m-auto'>{props.t('This file has {{numberLinks}} share links', { numberLinks: props.shareLinkList.length })}</div>

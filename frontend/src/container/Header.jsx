@@ -111,7 +111,7 @@ class Header extends React.Component {
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
             <ul className='header__menu__rightside'>
-              {!unLoggedAllowedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
+              {!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && !props.system.config.email_notification_activated && (
                 <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
                     <ComposedIcon
@@ -139,7 +139,7 @@ class Header extends React.Component {
                 </li>
               )}
 
-              {!unLoggedAllowedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
+              {!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && props.appList.some(a => a.slug === 'agenda') && (
                 <li className='header__menu__rightside__agenda'>
                   <Link
                     className='btn outlineTextBtn primaryColorBorder nohover'
