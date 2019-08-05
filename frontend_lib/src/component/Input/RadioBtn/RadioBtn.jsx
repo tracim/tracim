@@ -44,17 +44,21 @@ class RadioBtnWithImage extends React.Component{
   }
 
   render () {
-    const { img, isChecked, value, text} = this.props
-    const className = 'radio_btn_group__btn radio_btn_group__btn_img ' + (isChecked ? 'radio_btn_group__btn_img__checked' : '')
+    const { img, isChecked, value, text, customColor } = this.props
+    const className = 'radio_btn_group__btn radio_btn_group__btn__img ' + (isChecked ? 'radio_btn_group__btn__img__checked' : '')
+    const positionStyle = this.getPositionStyle()
     return (
       <div
         className={className}
         onClick={this.handleClick.bind(this)}
         data-value={value}
-        style={this.getPositionStyle()}
+        style={{
+          ...positionStyle,
+          borderColor: customColor
+        }}
       >
-        <img src={img.src} alt={img.alt} height={img.height} width={img.width} />
-        <div className={'radio_btn_group__btn_img__label'}>{text}</div>
+        <img className={'radio_btn_group__btn__img__img'} src={img.src} alt={img.alt} height={img.height} width={img.width} />
+        <div className={'radio_btn_group__btn__img__label'}>{text}</div>
       </div>
       )
   }
@@ -81,7 +85,7 @@ export class RadioBtnGroup extends React.Component {
   }
 
   buildButtons () {
-    const { options } = this.props
+    const { options, customColor } = this.props
     return options.map((option, i) => {
       if (option.img) {
         return (
@@ -93,6 +97,7 @@ export class RadioBtnGroup extends React.Component {
             value={option.value}
             index={i}
             onClick={this.toggleRadioBtn.bind(this)}
+            customColor={customColor}
           />
         )
       }

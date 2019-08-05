@@ -4,9 +4,13 @@ import {
   CardPopupCreateContent,
   handleFetchResult,
   addAllResourceI18n,
-  RadioBtnGroup
+  RadioBtnGroup,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
-import { postOfficeDocumentFromTemplate, getOfficeDocumentTemplates } from '../action.async.js'
+import {
+  postOfficeDocumentFromTemplate,
+  getOfficeDocumentTemplates
+} from '../action.async.js'
 import i18n from '../i18n.js'
 import {
   getAvaibleFileTypes,
@@ -40,17 +44,17 @@ class PopupCreateOfficeDocument extends React.Component {
   }
 
   componentDidMount () {
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
     this.setDocumentOptions()
   }
 
   componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<PopupCreateOfficeDocument> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -66,7 +70,7 @@ class PopupCreateOfficeDocument extends React.Component {
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
-    type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
+    type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, // handled by tracim_front:dist/index.html
     data: {
       name: this.state.appName
     }
@@ -84,14 +88,14 @@ class PopupCreateOfficeDocument extends React.Component {
     switch (response.apiResponse.status) {
       case 200:
         this.handleClose()
-        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         history.push(PAGE.WORKSPACE.CONTENT_EDITION(response.body.workspace_id, CONTENT_TYPE_FILE, response.body.content_id))
         break
       case 400:
         switch (response.body.code) {
           case 3002:
             GLOBAL_dispatchEvent({
-              type: 'addFlashMsg',
+              type: CUSTOM_EVENT.ADD_FLASH_MSG,
               data: {
                 msg: this.props.t('A content with the same name already exists'),
                 type: 'warning',
@@ -102,7 +106,7 @@ class PopupCreateOfficeDocument extends React.Component {
         }
         break
       default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while creating document'),
           type: 'warning',
@@ -144,8 +148,8 @@ class PopupCreateOfficeDocument extends React.Component {
         img: {
           alt: fileType,
           src: getIconUrlFromFileType(software, fileType),
-          height: 42,
-          width: 42
+          height: 52,
+          width: 52
         }
       })
     )
@@ -175,6 +179,7 @@ class PopupCreateOfficeDocument extends React.Component {
           data-cy='popup__office__radiogrp'
           options={this.buildOptions()}
           handleNewSelectedValue={this.setSelectedOption}
+          customColor={this.state.config.hexcolor}
         />
       </CardPopupCreateContent>
     )
