@@ -45,13 +45,12 @@ class CollaborativeEditionFrame extends React.Component {
   }
 
   handleIframeIsClosing = (event) => {
+    const { props, state } = this
     if (JSON.parse(event.data).MessageId === 'close') {
       GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.OPEN_CONTENT_URL,
+        type: CUSTOM_EVENT.REDIRECT,
         data: {
-          workspaceId: this.props.data.content.workspace_id,
-          contentType: this.state.content.content_type,
-          contentId: this.props.data.content.content_id
+          url: PAGE.WORKSPACE.CONTENT(props.data.content.workspace_id, state.content.content_type, props.data.content.content_id)
         }
       })
     }

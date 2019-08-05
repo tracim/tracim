@@ -57,7 +57,7 @@ const appInterface = {
     return () => {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.REDIRECT,
-        data: { url: `/ui/workspaces/${content.workspace_id}/contents/online_edition/${content.content_id}` }
+        data: { url: `/ui/online_edition/workspaces/${content.workspace_id}/contents/${content.content_id}` }
       })
     }
   }
