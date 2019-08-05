@@ -25,8 +25,7 @@ import {
   MODE,
   removeExtensionOfFilename,
   displayFileSize,
-  PAGE,
-  debug
+  PAGE
 } from '../helper.js'
 import {
   getFileContent,
@@ -51,9 +50,9 @@ class File extends React.Component {
     this.state = {
       appName: 'file',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: props.data ? props.data.config : null,
+      loggedUser: props.data ? props.data.loggedUser : null,
+      content: props.data ? props.data.content : null,
       timeline: props.data ? [] : [], // debug.timeline,
       externalTranslationList: [
         props.t('File'),
@@ -637,8 +636,17 @@ class File extends React.Component {
     })
   }
 
+  getOnlineEditionAction = () => {
+    const { state } = this
+    return appOfficeDocument.getOnlineEditionAction(
+      state.content,
+      state.config.system.config.collaborative_document_edition
+    )
+  }
+
   render () {
     const { props, state } = this
+    const onlineEditionAction = this.getOnlineEditionAction()
 
     if (!state.isVisible) return null
 
@@ -675,10 +683,10 @@ class File extends React.Component {
                 />
               }
 
-              {state.loggedUser.userRoleIdInWorkspace >= 2 && state.isOnlineEditable &&
+              { onlineEditionAction &&
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
-                  onClickNewVersionBtn={this.handleClickEdit}
+                  onClickNewVersionBtn={onlineEditionAction}
                   disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
                   label={props.t('Edit')}
                   style={{

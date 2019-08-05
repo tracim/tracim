@@ -3,9 +3,7 @@ import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import ReactDOM from 'react-dom'
 import File from './container/File.jsx'
-import CollaborativeEditionFrame from './component/CollaborativeEditionFrame.jsx'
 import PopupCreateFile from './container/PopupCreateFile.jsx'
-import { Router, Switch, Route } from 'react-router'
 
 // @TODO make a file that contains all events implemented by this App.
 // @todo add this file to appInterface
@@ -19,32 +17,7 @@ const appInterface = {
   isRendered: false,
   renderAppFeature: (data) => {
     return ReactDOM.render(
-      <Router history={data.config.history}>
-        <Switch>
-          <Route path='/ui/workspaces/:workspaceId/contents/file/:contentId/online_edition' render={
-            ({ match }) => {
-              data.content.workspace_id = match.params.workspaceId
-              data.content.content_id = match.params.contentId
-              return (
-                <CollaborativeEditionFrame
-                  content={data.content}
-                  config={data.config}
-                  history={data.config.history}
-                />
-              )
-            }
-          } />
-          <Route path='/ui/workspaces/:workspaceId/contents/file/:contentId' render={
-            ({ match }) => {
-              data.content.workspace_id = match.params.workspaceId
-              data.content.content_id = match.params.contentId
-              return (
-                <File data={data} />
-              )
-            }
-          } />
-        </Switch>
-      </Router>
+      <File data={data} />
       , document.getElementById(data.config.domContainer)
     )
   },

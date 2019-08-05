@@ -22,3 +22,21 @@ export const getOfficeDocumentTemplates = (apiUrl, workspaceId) =>
     },
     method: 'GET'
   })
+
+export const getWOPIToken = apiUrl =>
+  fetch(`${apiUrl}/collaborative-document-edition/token`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+
+export const getFileContent = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
