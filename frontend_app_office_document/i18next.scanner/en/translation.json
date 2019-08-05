@@ -9,5 +9,8 @@
   "Presentation": "Presentation",
   "Draw": "Draw",
   "Error while loading file": "Error while loading file",
-  "Create an office document": "Create an office document"
+  "Create an office document": "Create an office document",
+  "Content not found": "Content not found",
+  "Workspace not found": "Workspace not found",
+  "You cannot edit this type of file online": "You cannot edit this type of file online"
 }

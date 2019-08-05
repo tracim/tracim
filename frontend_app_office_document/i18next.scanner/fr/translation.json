@@ -9,5 +9,8 @@
   "Presentation": "Présentation",
   "Draw": "Graphique",
   "Error while loading file": "Erreur lors du chargement du fichier",
-  "Create an office document": "Créer un document bureautique"
+  "Create an office document": "Créer un document bureautique",
+  "Content not found": "Contenu non trouvé",
+  "Workspace not found": "Workspace non trouvé_",
+  "You cannot edit this type of file online": "Vous ne pouvez pas éditer ce type de fichier en ligne"
 }

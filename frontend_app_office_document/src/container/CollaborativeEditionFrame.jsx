@@ -96,6 +96,7 @@ class CollaborativeEditionFrame extends React.Component {
       case 400:
         switch (response.body.code) {
           case 2023:
+            this.sendGlobalFlashMessage(props.t('Content not found'))
             GLOBAL_dispatchEvent({
               type: CUSTOM_EVENT.REDIRECT,
               data: {
@@ -104,6 +105,7 @@ class CollaborativeEditionFrame extends React.Component {
             })
             throw new Error(response.body.message)
           case 2022:
+            this.sendGlobalFlashMessage(props.t('Workspace not found'))
             GLOBAL_dispatchEvent({
               type: CUSTOM_EVENT.REDIRECT,
               data: {
@@ -146,6 +148,7 @@ class CollaborativeEditionFrame extends React.Component {
     )
 
     if (!softwareFileType) {
+      this.sendGlobalFlashMessage(props.t('You cannot edit this type of file online'))
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.OPEN_CONTENT_URL,
         data: {
