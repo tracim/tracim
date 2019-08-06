@@ -27,6 +27,8 @@
     "react-dropzone": "5.0.1",
     "react-i18next": "7.4.0",
     "react-image-lightbox": "^5.1.0",
+    "react-router": "^5.0.1",
+    "react-router-dom": "^5.0.1",
     "regenerator-runtime": "^0.13.2",
     "whatwg-fetch": "^3.0.0"
   },
@@ -75,7 +77,8 @@
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent",
-      "CustomEvent"
+      "CustomEvent",
+      "appOfficeDocument"
     ],
     "parser": "babel-eslint",
     "ignore": []

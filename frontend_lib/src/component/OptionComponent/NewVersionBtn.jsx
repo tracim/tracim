@@ -18,7 +18,8 @@ const NewVersionBtn = props => {
         ':hover': {
           backgroundColor: props.customColor,
           color: '#fdfdfd'
-        }
+        },
+        ...props.style
       }}
     >
       <i className='fa fa-plus-circle mr-3' />

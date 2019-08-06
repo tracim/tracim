@@ -6,6 +6,10 @@ class TracimError(Exception):
     pass
 
 
+class NoValidCollaborativeDocumentEditionSoftware(TracimError):
+    pass
+
+
 class TracimException(Exception):
     pass
 
@@ -14,7 +18,15 @@ class RunTimeError(TracimError):
     pass
 
 
+class NotAFileError(Exception):
+    pass
+
+
 class NotWritableDirectory(Exception):
+    pass
+
+
+class NotReadableFile(Exception):
     pass
 
 
@@ -112,6 +124,10 @@ class SameValueError(ValueError):
 
 class NotAuthenticated(TracimException):
     pass
+
+
+class FileTemplateNotAvailable(TracimException):
+    error_code = ErrorCode.FILE_TEMPLATE_NOT_AVAILABLE
 
 
 class CaldavNotAuthenticated(NotAuthenticated):

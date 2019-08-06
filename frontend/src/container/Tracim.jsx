@@ -260,7 +260,8 @@ class Tracim extends React.Component {
           <Route exact path={[
             PAGE.ADMIN.USER,
             PAGE.ADMIN.WORKSPACE,
-            PAGE.AGENDA
+            PAGE.AGENDA,
+            PAGE.WORKSPACE.CONTENT_EDITION()
           ]} render={() => <AppFullscreenRouter />} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
