@@ -633,7 +633,10 @@ class File extends React.Component {
     } catch (error) {
       // INFO - B.L - 2019/08/05 - if appOfficeDocument is not activated in the backend
       // the global variable will not exists and cause a ReferenceError
-      if (error instanceof ReferenceError) return null
+      if (error instanceof ReferenceError) {
+        console.log('appOfficeDocument is not activated disabling online edition')
+        return null
+      }
       throw error
     }
   }
