@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import appFactory from '../appFactory.js'
 import {
   workspaceConfig
@@ -52,4 +52,4 @@ class Home extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
-export default connect(mapStateToProps)(withRouter(appFactory(withTranslation()(Home))))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(Home))))

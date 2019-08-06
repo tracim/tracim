@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import {
   Delimiter,
   PageWrapper,
@@ -96,4 +96,4 @@ const AdminWorkspace = props =>
     </PageContent>
   </PageWrapper>
 
-export default withTranslation()(AdminWorkspace)
+export default translate()(AdminWorkspace)

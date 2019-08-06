@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
   handleFetchResult,
@@ -133,4 +133,4 @@ class PopupCreateWorkspace extends React.Component {
   }
 }
 
-export default withTranslation()(PopupCreateWorkspace)
+export default translate()(PopupCreateWorkspace)

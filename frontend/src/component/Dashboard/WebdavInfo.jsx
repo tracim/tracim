@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
 require('./WebdavInfo.styl')
@@ -35,7 +35,7 @@ export const WebdavInfo = props => (
   </div>
 )
 
-export default withTranslation()(WebdavInfo)
+export default translate()(WebdavInfo)
 
 WebdavInfo.propTypes = {
   introText: PropTypes.string,

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
@@ -262,7 +262,7 @@ const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDragAndDrop
   )
 )
 
-export default withTranslation()(FolderContainer)
+export default translate()(FolderContainer)
 
 Folder.propTypes = {
   folderData: PropTypes.object,
