@@ -71,8 +71,7 @@ class File extends React.Component {
       progressUpload: {
         display: false,
         percent: 0
-      },
-      isOnlineEditable: false
+      }
     }
 
     // i18n has been init, add resources from frontend
@@ -147,7 +146,6 @@ class File extends React.Component {
     if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
 
     await this.loadContent()
-    await this.setIsOnlineEditable()
     this.loadTimeline()
     this.buildBreadcrumbs()
   }
@@ -160,7 +158,6 @@ class File extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      await this.setIsOnlineEditable()
       this.loadTimeline()
       this.buildBreadcrumbs()
     }
@@ -623,19 +620,6 @@ class File extends React.Component {
     // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
 
-  setIsOnlineEditable = async () => {
-    const { state } = this
-    if (!(state.content.file_extension && state.config.system.config.collaborative_document_edition)) {
-      return
-    }
-    const editorType = state.config.system.config.collaborative_document_edition.supported_file_types.filter(
-      (type) => type.extension === state.content.file_extension.substr(1) && type.associated_action === ACTION_EDIT
-    )
-    this.setState({
-      isOnlineEditable: editorType.length >= 1
-    })
-  }
-
   getOnlineEditionAction = () => {
     const { state } = this
     try {
@@ -647,7 +631,10 @@ class File extends React.Component {
         state.config.system.config.collaborative_document_edition
       )
     } catch (error) {
-      return null
+      // INFO - B.L - 2019/08/05 - if appOfficeDocument is not activated in the backend
+      // the global variable will not exists and cause a ReferenceError
+      if (error instanceof ReferenceError) return null
+      throw error
     }
   }
 
