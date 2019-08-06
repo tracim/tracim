@@ -1,6 +1,6 @@
 import React from 'react'
 import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
@@ -675,4 +675,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default withTranslation()(Radium(HtmlDocument))
+export default translate()(Radium(HtmlDocument))

@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
@@ -42,7 +42,6 @@ import {
 } from '../action.async.js'
 
 const CONTENT_TYPE_FILE = 'file'
-const ACTION_EDIT = 'edit'
 
 class File extends React.Component {
   constructor (props) {
@@ -789,4 +788,4 @@ class File extends React.Component {
   }
 }
 
-export default withTranslation()(File)
+export default translate()(File)

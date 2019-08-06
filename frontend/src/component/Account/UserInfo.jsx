@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { getUserProfile } from '../../helper.js'
 import { Avatar } from 'tracim_frontend_lib'
 
@@ -30,4 +30,4 @@ export const UserInfo = props =>
     </div>
   </div>
 
-export default withTranslation()(UserInfo)
+export default translate()(UserInfo)

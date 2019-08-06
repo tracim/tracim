@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 require('./MenuSubComponent.styl')
 
@@ -30,4 +30,4 @@ export const MenuSubComponent = props => {
   )
 }
 
-export default withTranslation()(MenuSubComponent)
+export default translate()(MenuSubComponent)

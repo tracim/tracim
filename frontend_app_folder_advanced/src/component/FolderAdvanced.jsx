@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { Checkbox } from 'tracim_frontend_lib'
 
 const FolderAdvanced = props => {
@@ -70,4 +70,4 @@ const FolderAdvanced = props => {
   )
 }
 
-export default withTranslation()(FolderAdvanced)
+export default translate()(FolderAdvanced)

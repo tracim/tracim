@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 const FileItemHeader = props => {
   return (
@@ -27,4 +27,4 @@ const FileItemHeader = props => {
   )
 }
 
-export default withTranslation()(FileItemHeader)
+export default translate()(FileItemHeader)
