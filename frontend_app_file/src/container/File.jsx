@@ -42,7 +42,6 @@ import {
 } from '../action.async.js'
 
 const CONTENT_TYPE_FILE = 'file'
-const ACTION_EDIT = 'edit'
 
 class File extends React.Component {
   constructor (props) {

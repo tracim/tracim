@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { PAGE } from '../helper.js'
 import {
   handleFetchResult,
@@ -199,4 +199,4 @@ class CollaborativeEditionFrame extends React.Component {
   }
 }
 
-export default withTranslation()(CollaborativeEditionFrame)
+export default translate()(CollaborativeEditionFrame)
