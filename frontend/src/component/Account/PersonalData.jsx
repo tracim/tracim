@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { editableUserAuthTypeList } from '../../helper.js'
 
@@ -112,4 +112,4 @@ PersonalData.propTypes = {
 }
 
 const mapStateToProps = () => ({}) // connect for .dispatch()
-export default connect(mapStateToProps)(withTranslation()(PersonalData))
+export default connect(mapStateToProps)(translate()(PersonalData))

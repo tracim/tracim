@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 // INFO - CH - 2019-04-17 - Component deprecated because unused
 
@@ -25,7 +25,7 @@ const MenuLinkList = props => {
     </ul>
   )
 }
-export default withTranslation()(MenuLinkList)
+export default translate()(MenuLinkList)
 
 MenuLinkList.propTypes = {
   onClickFeature: PropTypes.func.isRequired,

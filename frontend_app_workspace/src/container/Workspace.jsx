@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 class Workspace extends React.Component {
   render () {
@@ -7,4 +7,4 @@ class Workspace extends React.Component {
   }
 }
 
-export default withTranslation()(Workspace)
+export default translate()(Workspace)

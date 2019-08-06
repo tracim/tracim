@@ -1,6 +1,6 @@
 import React from 'react'
 import i18n from '../i18n.js'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { debug } from '../debug.js'
 import {
   addAllResourceI18n,
@@ -478,4 +478,4 @@ class Thread extends React.Component {
   }
 }
 
-export default withTranslation()(Thread)
+export default translate()(Thread)
