@@ -473,3 +473,44 @@ If there is an update of tracim, use this one to migrate index (experimental, pr
 `tracimcli search index-upgrade-experimental`
 
 Your data are correctly indexed now, you can go to tracim ui and use search mecanism.
+
+# Collaborative Edition online #
+
+## Collaborative edition server ##
+At the moment tracim is only tested with [Collabora CODE](https://www.collaboraoffice.com/code/), but Tracim is theoretically ready for any software using the protocol `WOPI`.
+
+All the informations to set up a `Collabora CODE` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
+
+To set up a `Collabora CODE` server using docker for testing purpose:
+
+`sudo docker run -d -t -p PORT:PORT -e "domain=IP_OF_TRACIM_API" -e "username=admin" -e "password=S3cRet" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.0.4-3`
+
+**Tracim is tested with the version 4.0.4-3, you can use the latest version at your own risk**
+
+
+## Configuring tracim in development.ini ##
+
+To enable online edition on Tracim and allow communication with your edition software.
+
+First you need to enable the edition on the API:
+
+`collaborative_document_edition.activated = True`
+`collaborative_document_edition.software = collabora`
+
+Then you need to indicate the ip adress of the server for the protocol `WOPI`:
+
+`collaborative_document_edition.collabora.base_url = COLLABORA_IP_ADDRESS:PORT`
+
+
+Then you can set up default office document templates files, these templates will be the one used to create an empty document using Tracim online app.
+
+Basic templates are provided by default with Tracim:
+
+`basic_setup.file_template_dir = %(here)s/tracim_backend/templates/open_documents`
+
+But you can change the default directory to use your templates files:
+
+`collaborative_document_edition.file_template_dir =  PATH_TO_YOUR_TEMPLATE_DIRECTORY`
+
+Filenames of the templates inside the directory are not relevant only their extensions matter and need correspond to the software's default extensions.
+For example `CODE` edit `Libre Office` files, so extensions will be `odt`, `odp`, `ods`.
