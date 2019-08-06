@@ -95,6 +95,24 @@ class CollaborativeEditionFrame extends React.Component {
         break
       case 400:
         switch (response.body.code) {
+          case 1002:
+            this.sendGlobalFlashMessage(props.t('Content not found'))
+            GLOBAL_dispatchEvent({
+              type: CUSTOM_EVENT.REDIRECT,
+              data: {
+                url: `/ui/workspaces/${props.data.content.workspace_id}/contents`
+              }
+            })
+            throw new Error(response.body.message)
+          case 1023:
+            this.sendGlobalFlashMessage(props.t('Content not found'))
+            GLOBAL_dispatchEvent({
+              type: CUSTOM_EVENT.REDIRECT,
+              data: {
+                url: `/ui/workspaces/${props.data.content.workspace_id}/contents`
+              }
+            })
+            throw new Error(response.body.message)
           case 2023:
             this.sendGlobalFlashMessage(props.t('Content not found'))
             GLOBAL_dispatchEvent({
