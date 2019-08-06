@@ -3,6 +3,8 @@
 .comment
   &.sent
     padding-left 5%
+    margin-left auto
+    width calc(100% - 50px)
     & ^[0]__body a // renders .comment.sent .comment__body a
       text-decoration underline
       color #fff
@@ -10,56 +12,43 @@
         font-weight bold
   &.received
     padding-right 5%
+    margin-right auto
+    width calc(100% - 50px)
     & ^[0]__body a // renders .comment.received .comment__body a
       text-decoration underline
       color inherit
       &:hover
         font-weight bold
-  p
-    margin 0
-  &__header
-    &__text
-      display flex
-      justify-content space-between
-      width 100%
-      color grey
-    &__avatar
-      position absolute
-      top 5px
-    ^[0].received ^[1] // renders .comment.received .comment__header
-      &__avatar
-        left -20px
-        top 5px
-      &__text
-        padding-left calc(5% + 16px)
-        padding-right 15px
-    ^[0].sent ^[1] // .comment.sent .comment__header
-      &__text
-        padding-right calc(5% + 15px)
-        padding-left 15px
-      &__avatar
-        display block
-        top 5px
-        left auto
-        right -20px
   &__body
     border-radius 5px
     padding 15px 15px 15px 20px
+    border 1px solid darkGrey
+    background-color offWhite
+    display flex
+    &__author
+      margin-left 20px
+    &__date
+      margin-left 20px
+      font-size 12px
+    &__text
+      margin-left 20px
+      margin-top 10px
+  p
+    margin 0
     & img
       max-width 100%
       height auto
 
+// /*** MEDIA XS ***/
 
-/*** MEDIA XS ***/
+// @media(max-width: max-xs)
 
-@media(max-width: max-xs)
-
-  .comment
-    &.received
-      .comment__header__text
-        padding-left calc(5% + 16px)
-        padding-right 15px
-    &.sent
-      .comment__header__text
-        padding-right calc(5% + 16px)
-        padding-left 15px
+//   .comment
+//     &.received
+//       .comment__header__text
+//         padding-left calc(5% + 16px)
+//         padding-right 15px
+//     &.sent
+//       .comment__header__text
+//         padding-right calc(5% + 16px)
+//         padding-left 15px

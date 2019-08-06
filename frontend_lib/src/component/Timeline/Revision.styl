@@ -1,26 +1,36 @@
 @import '../../css/Variable.styl'
 
 .revision
-  align-items center
-  margin-top 20px
-  padding 10px 15px
   width 100%
   background-color offWhite
+  margin 0 auto
+  border-top 1px solid mediumGrey
+  height 65px
+  display flex
+  flex-direction column
+  &:first-child
+    border none
   &__data
     display flex
     align-items center
+    margin auto 10px
     &__nb
       display inline-block
       min-width 20px
       text-align right
       margin-right 5px
-      font-weight bold
     &__icon
       margin-right 5px
-    &__created
-      margin-left auto
-      text-align right
-  &__date
-    color grey
-    font-size 17px
-    margin auto 15px auto auto
+    &__infos
+      width 100%
+      padding-left 15px
+      &__created
+        margin-left auto
+        text-align right
+        font-size 12px
+      &__author
+        font-size 12px
+  // &__date
+  //   color grey
+  //   font-size 17px
+  //   margin auto 15px auto auto

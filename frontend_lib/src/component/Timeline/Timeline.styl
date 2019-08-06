@@ -25,14 +25,16 @@
     &__messagelist
       flex 1 1 auto
       margin-bottom 0
-      padding-left 0
+      padding 5px
       border-bottom 1px solid grey
       overflow-y auto
       list-style none
       &__item
         position relative
-        margin 15px 25px
-        width calc(100% - 50px) //50px => margin + left/right
+        margin 15px 0
+        width 100%
+        & + .revision
+          border none
     &__texteditor
       flex 0 1 auto
       margin 20px
