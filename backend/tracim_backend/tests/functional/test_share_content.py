@@ -2,8 +2,8 @@ import pytest
 from rq import SimpleWorker
 import transaction
 
+from tracim_backend.applications.share.share import ShareLib
 from tracim_backend.error import ErrorCode
-from tracim_backend.lib.share.share import ShareLib
 from tracim_backend.lib.utils.utils import get_redis_connection
 from tracim_backend.lib.utils.utils import get_rq_queue
 from tracim_backend.models.content_share import ContentShareType

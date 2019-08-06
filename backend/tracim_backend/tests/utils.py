@@ -18,6 +18,7 @@ from wsgidav.dav_provider import _DAVResource
 
 from tracim_backend import CFG
 from tracim_backend import CaldavAppFactory
+from tracim_backend.applications.share.share import ShareLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
@@ -25,7 +26,6 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi
-from tracim_backend.lib.share.share import ShareLib
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User

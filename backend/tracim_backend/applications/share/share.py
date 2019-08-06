@@ -7,11 +7,11 @@ import uuid
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 
+from tracim_backend.applications.share.share_email_manager import ShareEmailManager
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
-from tracim_backend.lib.share.share_email_manager import ShareEmailManager
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.models.auth import User

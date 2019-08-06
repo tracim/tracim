@@ -9,6 +9,7 @@ import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
 
+from tracim_backend.applications.share.share_controller import ShareController
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import CaldavNotAuthenticated
@@ -67,7 +68,6 @@ from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.views.frontend import FrontendController
-from tracim_backend.views.share_api.share_controller import ShareController
 
 try:  # Python 3.5+
     from http import HTTPStatus
