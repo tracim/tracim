@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 export class AddUserForm extends React.Component {
@@ -149,4 +149,4 @@ export class AddUserForm extends React.Component {
   }
 }
 
-export default withTranslation()(AddUserForm)
+export default translate()(AddUserForm)

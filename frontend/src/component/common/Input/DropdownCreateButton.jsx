@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import SubDropdownCreateButton from './SubDropdownCreateButton.jsx'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 const DropdownCreateButton = props => {
   return (
@@ -35,7 +35,7 @@ const DropdownCreateButton = props => {
   )
 }
 
-export default withTranslation()(DropdownCreateButton)
+export default translate()(DropdownCreateButton)
 
 DropdownCreateButton.propTypes = {
   availableApp: PropTypes.array.isRequired,

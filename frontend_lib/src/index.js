@@ -52,6 +52,8 @@ import IconButton from './component/Button/IconButton.jsx'
 import IconWithWarning from './component/Icon/IconWithWarning.jsx'
 import DisplayState from './component/DisplayState/DisplayState.jsx'
 
+import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
+
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: i18n.changeLanguage(data); break
@@ -101,5 +103,6 @@ export {
   ListItemWrapper,
   IconButton,
   IconWithWarning,
-  DisplayState
+  DisplayState,
+  RadioBtnGroup
 }

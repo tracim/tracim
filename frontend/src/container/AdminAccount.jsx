@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link, withRouter } from 'react-router-dom'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -300,4 +300,4 @@ class Account extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system }) => ({ breadcrumbs, user, workspaceList, timezone, system })
-export default withRouter(connect(mapStateToProps)(withTranslation()(Account)))
+export default withRouter(connect(mapStateToProps)(translate()(Account)))

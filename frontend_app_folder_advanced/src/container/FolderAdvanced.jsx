@@ -1,7 +1,7 @@
 import React from 'react'
 import FolderAdvancedComponent from '../component/FolderAdvanced.jsx'
 import i18n from '../i18n.js'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import {
   PopinFixed,
   PopinFixedHeader,
@@ -288,4 +288,4 @@ class FolderAdvanced extends React.Component {
   }
 }
 
-export default withTranslation()(FolderAdvanced)
+export default translate()(FolderAdvanced)

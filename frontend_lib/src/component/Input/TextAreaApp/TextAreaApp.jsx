@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 
 // require('./TextAreaApp.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -55,7 +55,7 @@ export const TextAreaApp = props =>
     </div>
   </form>
 
-export default withTranslation()(Radium(TextAreaApp))
+export default translate()(Radium(TextAreaApp))
 
 TextAreaApp.propTypes = {
   text: PropTypes.string.isRequired,

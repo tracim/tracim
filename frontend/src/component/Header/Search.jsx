@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 require('./Search.styl')
 
@@ -45,4 +45,4 @@ class Search extends React.Component {
     )
   }
 }
-export default withTranslation()(Search)
+export default translate()(Search)

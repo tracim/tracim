@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
   Delimiter,
@@ -229,4 +229,4 @@ export class AdminUser extends React.Component {
   }
 }
 
-export default withTranslation()(AdminUser)
+export default translate()(AdminUser)

@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
@@ -24,9 +24,9 @@ import {
 import {
   MODE,
   removeExtensionOfFilename,
-  displayFileSize
+  displayFileSize,
+  PAGE
 } from '../helper.js'
-import { debug } from '../debug.js'
 import {
   getFileContent,
   getFileComment,
@@ -41,15 +41,17 @@ import {
   putMyselfFileRead
 } from '../action.async.js'
 
+const CONTENT_TYPE_FILE = 'file'
+
 class File extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       appName: 'file',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: props.data ? props.data.config : null,
+      loggedUser: props.data ? props.data.loggedUser : null,
+      content: props.data ? props.data.content : null,
       timeline: props.data ? [] : [], // debug.timeline,
       externalTranslationList: [
         props.t('File'),
@@ -102,11 +104,9 @@ class File extends React.Component {
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
-
         const previouslyUnsavedComment = localStorage.getItem(
           generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
         )
-
         this.setState(prev => ({
           content: { ...prev.content, ...data },
           isVisible: true,
@@ -153,7 +153,6 @@ class File extends React.Component {
     const { state } = this
 
     console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
-
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
@@ -194,8 +193,10 @@ class File extends React.Component {
           content: {
             ...fetchResultFile.body,
             filenameNoExtension: filenameNoExtension,
+            // FIXME - b.l - refactor urls
             previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}&revision_id=${fetchResultFile.body.current_revision_id}`,
             lightboxUrlList: (new Array(fetchResultFile.body.page_nb)).fill('').map((n, i) =>
+              // FIXME - b.l - refactor urls
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
           }
@@ -264,6 +265,7 @@ class File extends React.Component {
       type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
+          // FIXME - b.l - refactor urls
           url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
           label: `${state.content.filename}`,
           link: null,
@@ -310,6 +312,13 @@ class File extends React.Component {
   }
 
   handleClickNewVersion = () => this.setState({ mode: MODE.EDIT })
+
+  handleClickEdit = () => {
+    const { state } = this
+    state.config.history.push(
+      PAGE.WORKSPACE.CONTENT_EDITION(state.content.workspace_id, CONTENT_TYPE_FILE, state.content.content_id)
+    )
+  }
 
   handleClickValidateNewDescription = async newDescription => {
     const { props, state } = this
@@ -479,6 +488,7 @@ class File extends React.Component {
         // use state.content.workspace_id instead of revision.workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
         previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1&revision_id=${revision.revision_id}`,
         lightboxUrlList: (new Array(revision.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
+          // FIXME - b.l - refactor urls
           `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${pageNb}`
         )
       },
@@ -536,6 +546,7 @@ class File extends React.Component {
     xhr.upload.addEventListener('progress', uploadInProgress, false)
     xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: false, percent: 0 } }), false)
 
+    // FIXME - b.l - refactor urls
     xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
     xhr.setRequestHeader('Accept', 'application/json')
     xhr.withCredentials = true
@@ -582,6 +593,7 @@ class File extends React.Component {
       fileCurrentPage: nextPageNumber,
       content: {
         ...prev.content,
+        // FIXME - b.l - refactor urls
         previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}&revision_id=${state.content.current_revision_id}`
       }
     }))
@@ -589,22 +601,48 @@ class File extends React.Component {
 
   getDownloadBaseUrl = (apiUrl, content, mode) => {
     const urlRevisionPart = mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
+    // FIXME - b.l - refactor urls
     return `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${urlRevisionPart}`
   }
 
   // INFO - CH - 2019-05-24 - last path param revision_id is to force browser to not use cache when we upload new revision
   // see https://github.com/tracim/tracim/issues/1804
   getDownloadRawUrl = ({ config: { apiUrl }, content, mode }) =>
+    // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1&revision_id=${content.current_revision_id}`
 
   getDownloadPdfPageUrl = ({ config: { apiUrl }, content, mode, fileCurrentPage }) =>
+    // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
 
   getDownloadPdfFullUrl = ({ config: { apiUrl }, content, mode }) =>
+    // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
+
+  getOnlineEditionAction = () => {
+    const { state } = this
+    try {
+      if (!appOfficeDocument) {
+        return null
+      }
+      return appOfficeDocument.default.getOnlineEditionAction(
+        state.content,
+        state.config.system.config.collaborative_document_edition
+      )
+    } catch (error) {
+      // INFO - B.L - 2019/08/05 - if appOfficeDocument is not activated in the backend
+      // the global variable will not exists and cause a ReferenceError
+      if (error instanceof ReferenceError) {
+        console.log('appOfficeDocument is not activated disabling online edition')
+        return null
+      }
+      throw error
+    }
+  }
 
   render () {
     const { props, state } = this
+    const onlineEditionAction = this.getOnlineEditionAction()
 
     if (!state.isVisible) return null
 
@@ -638,6 +676,18 @@ class File extends React.Component {
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
                   label={props.t('Update')}
+                />
+              }
+
+              { onlineEditionAction &&
+                <NewVersionBtn
+                  customColor={state.config.hexcolor}
+                  onClickNewVersionBtn={onlineEditionAction}
+                  disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
+                  label={props.t('Edit')}
+                  style={{
+                    marginLeft: '5px'
+                  }}
                 />
               }
 
@@ -738,4 +788,4 @@ class File extends React.Component {
   }
 }
 
-export default withTranslation()(File)
+export default translate()(File)
