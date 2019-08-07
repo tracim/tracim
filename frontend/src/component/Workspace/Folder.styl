@@ -63,7 +63,9 @@ folderopen()
       .folder__header__triangleborder
         border-top-color inherit
         &__triangle
-          border-top-color inherit
+          // INFO - CH - 2019-08-07 - In the HTML, the .folder__header__triangleborder__triangle class also has .primaryColorFontLighten
+          // So it has it's font in the primary color always but only uses it as border color on mousehover
+          border-top-color currentColor
     &__triangleborder
       display none
       position absolute
