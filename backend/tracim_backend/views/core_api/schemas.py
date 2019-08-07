@@ -82,6 +82,25 @@ class StrippedString(String):
         return value.strip()
 
 
+class CollaborativeFileTypeSchema(marshmallow.Schema):
+    mimetype = marshmallow.fields.String(
+        example="application/vnd.oasis.opendocument.text",
+        required=True,
+        description="Collabora Online file mimetype",
+    )
+    extension = marshmallow.fields.String(
+        example="odt", required=True, description="Collabora Online file extensions"
+    )
+    associated_action = marshmallow.fields.String(
+        example="edit", required=True, description="Collabora Online action allowed"
+    )
+    url_source = marshmallow.fields.URL(
+        required=True,
+        description="URL of the collabora online editor for this type of file",
+        example="http://localhost:9980/loleaflet/305832f/loleaflet.html",
+    )
+
+
 class SimpleFileSchema(marshmallow.Schema):
     """
     Just a simple schema for file
@@ -784,13 +803,6 @@ class AboutSchema(marshmallow.Schema):
     website = marshmallow.fields.URL(allow_none=True)
 
 
-class ConfigSchema(marshmallow.Schema):
-    email_notification_activated = marshmallow.fields.Bool()
-    new_user_invitation_do_notify = marshmallow.fields.Bool()
-    webdav_enabled = marshmallow.fields.Bool()
-    webdav_url = marshmallow.fields.String()
-
-
 class ErrorCodeSchema(marshmallow.Schema):
     name = marshmallow.fields.Str()
     code = marshmallow.fields.Int()
@@ -1018,6 +1030,13 @@ class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
     pass
 
 
+class CollaborativeDocumentEditionConfigSchema(marshmallow.Schema):
+    software = marshmallow.fields.String()
+    supported_file_types = marshmallow.fields.List(
+        marshmallow.fields.Nested(CollaborativeFileTypeSchema())
+    )
+
+
 class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
@@ -1085,3 +1104,13 @@ class SetContentStatusSchema(marshmallow.Schema):
     @post_load
     def set_status(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetContentStatus(**data)
+
+
+class ConfigSchema(marshmallow.Schema):
+    email_notification_activated = marshmallow.fields.Bool()
+    new_user_invitation_do_notify = marshmallow.fields.Bool()
+    webdav_enabled = marshmallow.fields.Bool()
+    webdav_url = marshmallow.fields.String()
+    collaborative_document_edition = marshmallow.fields.Nested(
+        CollaborativeDocumentEditionConfigSchema(), allow_none=True
+    )

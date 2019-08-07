@@ -1,7 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 const PopinFixedOption = props => {
   return (
@@ -16,7 +16,7 @@ const PopinFixedOption = props => {
   )
 }
 
-export default withTranslation()(PopinFixedOption)
+export default translate()(PopinFixedOption)
 
 PopinFixedOption.propTypes = {
   selectedStatus: PropTypes.object,

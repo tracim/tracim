@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Avatar from '../Avatar/Avatar.jsx'
 import IconWithWarning from '../Icon/IconWithWarning.jsx'
 
@@ -165,4 +165,4 @@ export const NewMemberForm = props => {
   )
 }
 
-export default withTranslation()(NewMemberForm)
+export default translate()(NewMemberForm)

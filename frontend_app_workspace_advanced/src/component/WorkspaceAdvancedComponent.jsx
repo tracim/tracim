@@ -6,7 +6,7 @@ import {
   CardPopup,
   Avatar
 } from 'tracim_frontend_lib'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 const color = require('color')
 
@@ -259,4 +259,4 @@ const WorkspaceAdvancedComponent = props => {
   )
 }
 
-export default withTranslation()(Radium(WorkspaceAdvancedComponent))
+export default translate()(Radium(WorkspaceAdvancedComponent))

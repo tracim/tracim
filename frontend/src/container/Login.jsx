@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import * as Cookies from 'js-cookie'
 import Card from '../component/common/Card/Card.jsx'
@@ -69,7 +69,6 @@ class Login extends React.Component {
     if (query.dc && query.dc === '1') {
       props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
       props.history.push(props.location.pathname)
-      return
     }
 
     await this.loadConfig()
@@ -270,4 +269,4 @@ class Login extends React.Component {
 }
 
 const mapStateToProps = ({ user, system, breadcrumbs }) => ({ user, system, breadcrumbs })
-export default withRouter(connect(mapStateToProps)(withTranslation()(Login)))
+export default withRouter(connect(mapStateToProps)(translate()(Login)))
