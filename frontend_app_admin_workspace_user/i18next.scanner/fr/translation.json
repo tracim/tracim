@@ -45,8 +45,5 @@
   "Create a shared space": "Créer un espace partagé",
   "Home": "Accueil",
   "Users": "Utilisateurs",
-  "Administration": "Administration",
-  "Create user, create shared space, administration of instance": "__NOT_TRANSLATED__",
-  "Create shared space, add member in shared space": "__NOT_TRANSLATED__",
-  "Access to shared space where user is member": "__NOT_TRANSLATED__"
+  "Administration": "Administration"
 }

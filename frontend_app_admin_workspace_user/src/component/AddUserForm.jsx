@@ -107,40 +107,38 @@ export class AddUserForm extends React.Component {
 
           <div className='profile__list'>
             {Object.keys(props.profile).map(p => props.profile[p]).map(p =>
-              <div>
-                <label
-                  className='profile__list__item'
-                  htmlFor={p.slug}
-                  key={p.id}
-                  data-cy={`profile__list__item__${p.slug}`}
-                >
-                  <div className='d-flex align-items'>
+              <label
+                className='profile__list__item'
+                htmlFor={p.slug}
+                key={p.id}
+                data-cy={`profile__list__item__${p.slug}`}
+              >
+                <div className='d-flex align-items'>
+                  <div>
+                    <input
+                      type='radio'
+                      name='newUserProfile'
+                      id={p.slug}
+                      value={p.slug}
+                      checked={state.newUserProfile === p.slug}
+                      onChange={this.handleChangeNewUserProfile}
+                    />
+                  </div>
+
+                  <div className='userrole__role__icon mx-2' style={{ color: p.hexcolor }}>
+                    <i className={`fa fa-fw fa-${p.faIcon}`} />
+                  </div>
+
+                  <div className='profile__list__item__content'>
                     <div>
-                      <input
-                        type='radio'
-                        name='newUserProfile'
-                        id={p.slug}
-                        value={p.slug}
-                        checked={state.newUserProfile === p.slug}
-                        onChange={this.handleChangeNewUserProfile}
-                      />
+                      {props.t(p.label) /* this trad key is declared in frontend/helper.js, object PROFILE */}
                     </div>
-
-                    <div className='userrole__role__icon mx-2' style={{ color: p.hexcolor }}>
-                      <i className={`fa fa-fw fa-${p.faIcon}`} />
-                    </div>
-
-                    <div className='profile__list__item__content'>
-                      <div>
-                        {props.t(p.label) /* this trad key is declared in frontend/helper.js, object PROFILE */}
-                      </div>
-                      <div className='profile__list__item__description' >
-                        {props.t(p.description) /* this trad key is declared in frontend/helper.js, object PROFILE */}
-                      </div>
+                    <div className='profile__list__item__description' >
+                      {props.t(p.description) /* this trad key is declared in frontend/helper.js, object PROFILE */}
                     </div>
                   </div>
-                </label>
-              </div>
+                </div>
+              </label>
             )}
           </div>
         </div>

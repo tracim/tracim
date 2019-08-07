@@ -35,9 +35,5 @@
   "This content is archived": "This content is archived",
   "This content is deleted": "This content is deleted",
   "Status changed to {{status}}": "Status changed to {{status}}",
-  "This content is deprecated": "This content is deprecated",
-  "Content manager + add member and edit shared space": "Content manager + add member and edit shared space",
-  "Contributor + create folder and manage content": "Contributor + create folder and manage content",
-  "Reader + create/modify content": "Reader + create/modify content",
-  "Just read content": "Just read content"
+  "This content is deprecated": "This content is deprecated"
 }
