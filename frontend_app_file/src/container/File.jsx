@@ -679,7 +679,7 @@ class File extends React.Component {
                 />
               }
 
-              { onlineEditionAction &&
+              {state.loggedUser.userRoleIdInWorkspace >= 2 && onlineEditionAction &&
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={onlineEditionAction}
