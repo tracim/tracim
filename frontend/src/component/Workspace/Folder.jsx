@@ -11,7 +11,8 @@ import DragHandle from '../DragHandle.jsx'
 import {
   PAGE,
   ROLE_OBJECT,
-  DRAG_AND_DROP
+  DRAG_AND_DROP,
+  sortWorkspaceContent
 } from '../../helper.js'
 
 require('./Folder.styl')
@@ -156,7 +157,7 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {folderContentList.map((content, i) => content.type === 'folder'
+          {folderContentList.sort(sortWorkspaceContent).map((content, i) => content.type === 'folder'
             ? (
               <FolderContainer
                 availableApp={props.availableApp}
