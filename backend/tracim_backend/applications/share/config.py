@@ -24,7 +24,7 @@ def load_config(app_config: CFG) -> CFG:
     return app_config
 
 
-def check_config(app_config: CFG):
+def check_config(app_config: CFG) -> CFG:
     # INFO - G.M - 2019-02-01 - check if template are available,
     # do not allow running with email_notification_activated
     # if templates needed are not available
@@ -41,3 +41,4 @@ def check_config(app_config: CFG):
                         template_description=template_description, template_path=template_path
                     )
                 )
+    return app_config
