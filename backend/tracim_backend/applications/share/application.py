@@ -9,6 +9,6 @@ def get_app(app_config: CFG) -> Application:
         fa_icon="share",
         is_active=True,
         config={},
-        main_route="/ui/workspaces/{workspace_id}/share_content",
+        main_route="",
         app_config=app_config,
     )
