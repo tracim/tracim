@@ -55,6 +55,7 @@ class ContentShare(DeclarativeBase):
 
     @classmethod
     def _hash(cls, cleartext_password_or_token: str) -> str:
+        """ Hash method to create hash from string """
         salt = sha256()
         salt.update(os.urandom(60))
         salt = salt.hexdigest()
