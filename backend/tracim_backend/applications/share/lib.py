@@ -97,7 +97,7 @@ class ShareLib(object):
                 ) from exc
         return content_shares
 
-    def _get_email_manager(self, config: CFG, session: Session):
+    def _get_email_manager(self, config: CFG, session: Session) -> ShareEmailManager:
         """
         :return: EmailManager instance
         """
@@ -124,7 +124,7 @@ class ShareLib(object):
             content_shares_in_context.append(self.get_content_share_in_context(content_share))
         return content_shares_in_context
 
-    def get_content_share_by_token(self, share_token: str):
+    def get_content_share_by_token(self, share_token: str) -> ContentShare:
         return (
             self._session.query(ContentShare).filter(ContentShare.share_token == share_token).one()
         )
