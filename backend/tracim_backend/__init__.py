@@ -9,7 +9,7 @@ import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
 
-from tracim_backend.applications.share.share_controller import ShareController
+from tracim_backend.applications.share.controller import ShareController
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import CaldavNotAuthenticated

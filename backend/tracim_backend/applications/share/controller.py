@@ -6,6 +6,9 @@ from hapic.data import HapicFile
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.applications.share.lib import ShareLib
+from tracim_backend.applications.share.models import ContentShare
+from tracim_backend.applications.share.models_in_context import ContentShareInContext
 from tracim_backend.applications.share.schema import ContentShareInfoSchema
 from tracim_backend.applications.share.schema import ContentShareSchema
 from tracim_backend.applications.share.schema import ShareCreationBodySchema
@@ -14,7 +17,6 @@ from tracim_backend.applications.share.schema import ShareListQuerySchema
 from tracim_backend.applications.share.schema import ShareTokenPathSchema
 from tracim_backend.applications.share.schema import ShareTokenWithFilenamePathSchema
 from tracim_backend.applications.share.schema import TracimSharePasswordHeaderSchema
-from tracim_backend.applications.share.share import ShareLib
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import TracimFileNotFound
@@ -26,8 +28,6 @@ from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
-from tracim_backend.models.content_share import ContentShare
-from tracim_backend.models.context_models import ContentShareInContext
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema

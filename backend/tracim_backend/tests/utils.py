@@ -18,7 +18,7 @@ from wsgidav.dav_provider import _DAVResource
 
 from tracim_backend import CFG
 from tracim_backend import CaldavAppFactory
-from tracim_backend.applications.share.share import ShareLib
+from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi

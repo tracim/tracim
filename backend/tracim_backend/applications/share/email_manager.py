@@ -4,13 +4,13 @@ from email.mime.text import MIMEText
 from email.utils import formataddr
 import typing
 
+from tracim_backend.applications.share.models_in_context import ContentShareInContext
 from tracim_backend.lib.mail_notifier.notifier import EmailManager
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.models.auth import User
-from tracim_backend.models.context_models import ContentShareInContext
 from tracim_backend.models.data import Content
 
 
