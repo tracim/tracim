@@ -398,7 +398,7 @@ class User(DeclarativeBase):
     def _generate_token(
         cls, create_hash=False
     ) -> typing.Union[str, datetime, typing.Optional[str]]:
-        token = str(uuid.uuid4())
+        token = str(uuid.uuid4().hex)
         creation_datetime = datetime.utcnow()
         hashed_token = None
         if create_hash:
