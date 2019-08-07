@@ -205,9 +205,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
     # add share app
-    from tracim_backend.applications import share as share_app
+    import tracim_backend.applications.share.controller as share_app_controller
 
-    share_app.import_controller(
+    share_app_controller.import_controller(
         app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
     )
     if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:

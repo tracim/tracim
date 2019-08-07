@@ -147,9 +147,9 @@ class CFG(object):
         self._load_caldav_config()
         self._load_search_config()
         self._load_collaborative_document_edition_config()
-        from tracim_backend.applications import share as share_app
+        import tracim_backend.applications.share.config as share_app_config
 
-        share_app.load_config(self)
+        share_app_config.load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -573,9 +573,9 @@ class CFG(object):
         self._check_caldav_config_validity()
         self._check_search_config_validity()
         self._check_collaborative_document_edition_config_validity()
-        from tracim_backend.applications import share as share_app
+        import tracim_backend.applications.share.config as share_app_config
 
-        share_app.check_config(self)
+        share_app_config.check_config(self)
 
     def _check_collaborative_document_edition_config_validity(self) -> None:
         if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
@@ -846,7 +846,7 @@ class CFG(object):
             creation_label="Create an office document",
             available_statuses=content_status_list.get_all(),
         )
-        import tracim_backend.applications.share as share_app
+        import tracim_backend.applications.share.application as share_app
 
         share_content = share_app.get_app(app_config=self)
         # process activated app list
