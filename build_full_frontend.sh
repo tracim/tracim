@@ -91,8 +91,8 @@ cd $DEFAULTDIR/frontend_app_folder_advanced || exit 1
 
 # app Share Folder Advanced
 log "cd $DEFAULTDIR/frontend_app_share_folder_advanced"
-cd $DEFAULTDIR/frontend_app_folder_advanced || exit 1
-./build_folder.sh $dev
+cd $DEFAULTDIR/frontend_app_share_folder_advanced || exit 1
+./build_share_folder.sh $dev
 
 
 # app Calendar
