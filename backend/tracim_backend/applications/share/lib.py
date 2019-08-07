@@ -130,6 +130,14 @@ class ShareLib(object):
         )
 
     def check_password(self, content_share: ContentShare, password: typing.Optional[str]) -> None:
+        """
+        Check password if content_share has password. If there is a content_share password, it
+        will check and raise WrongSharePassword Exception in case password given
+        doesn't match content_check one.
+        :param content_share: contentShare to check.
+        :param password: cleartext password
+        :return: None
+        """
         if content_share.password:
             if not password or not content_share.validate_password(password):
                 raise WrongSharePassword(
