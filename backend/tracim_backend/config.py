@@ -152,8 +152,9 @@ class CFG(object):
         # to make thing easier later
         # when app will be load dynamycally.
         import tracim_backend.applications.share.config as share_app_config
-
         share_app_config.load_config(self)
+        import tracim_backend.applications.upload_permissions.config as upload_permissions_config
+        upload_permissions_config.load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -178,7 +179,8 @@ class CFG(object):
             "contents/folder,"
             "agenda,"
             "office_document,"
-            "share_content"
+            "share_content,"
+            "upload_permission"
         )
 
         self.APP__ENABLED = string_to_list(
@@ -582,8 +584,9 @@ class CFG(object):
         # to make thing easier later
         # when app will be load dynamycally.
         import tracim_backend.applications.share.config as share_app_config
-
         share_app_config.check_config(self)
+        import tracim_backend.applications.upload_permissions.config as upload_permissions_config
+        upload_permissions_config.check_config(self)
 
     def _check_collaborative_document_edition_config_validity(self) -> None:
         if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
@@ -860,6 +863,10 @@ class CFG(object):
         import tracim_backend.applications.share.application as share_app
 
         share_content = share_app.get_app(app_config=self)
+
+        import tracim_backend.applications.upload_permissions.application as upload_permissions_app
+
+        upload_permissions = upload_permissions_app.get_app(app_config=self)
         # process activated app list
         available_apps = OrderedDict(
             [
@@ -871,6 +878,7 @@ class CFG(object):
                 (agenda.slug, agenda),
                 (office_document.slug, office_document),
                 (share_content.slug, share_content),
+                (upload_permissions.slug, upload_permissions),
             ]
         )
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var

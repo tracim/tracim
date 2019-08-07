@@ -255,6 +255,10 @@ class WorkspacesDoNotMatch(TracimException):
     error_code = ErrorCode.WORKSPACE_DO_NOT_MATCH
 
 
+class ContentNamespaceDoNotMatch(TracimException):
+    error_code = ErrorCode.CONTENT_NAMESPACE_DO_NOT_MATCH
+
+
 class PasswordDoNotMatch(TracimException):
     error_code = ErrorCode.PASSWORD_DO_NOT_MATCH
 
