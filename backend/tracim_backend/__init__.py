@@ -9,7 +9,6 @@ import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
 
-from tracim_backend.applications.share.controller import ShareController
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import CaldavNotAuthenticated
@@ -194,7 +193,6 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     thread_controller = ThreadController()
     file_controller = FileController()
     folder_controller = FolderController()
-    share_controller = ShareController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -206,7 +204,12 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(share_controller.bind, route_prefix=BASE_API_V2)
+    # add share app
+    from tracim_backend.applications import share as share_app
+
+    share_app.import_controller(
+        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
+    )
     if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
         # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
         # import is here because import WOPI of Collabora controller without adding it to

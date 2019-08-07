@@ -5,10 +5,10 @@ from marshmallow import post_load
 from marshmallow.validate import OneOf
 
 from tracim_backend.app_models.validator import bool_as_int_validator
-from tracim_backend.app_models.validator import share_email_validator
-from tracim_backend.app_models.validator import share_password_validator
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.applications.share.models import ContentShareType
+from tracim_backend.applications.share.validators import share_email_validator
+from tracim_backend.applications.share.validators import share_password_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import ContentIdPathSchema
 from tracim_backend.views.core_api.schemas import StrippedString

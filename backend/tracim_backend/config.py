@@ -147,6 +147,9 @@ class CFG(object):
         self._load_caldav_config()
         self._load_search_config()
         self._load_collaborative_document_edition_config()
+        from tracim_backend.applications import share as share_app
+
+        share_app.load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -170,7 +173,8 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "agenda,"
-            "office_document"
+            "office_document,"
+            "share_content"
         )
 
         self.APP__ENABLED = string_to_list(
@@ -339,22 +343,6 @@ class CFG(object):
         self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT = self.get_raw_config(
             "email.notification.created_account.subject",
             _("[{website_title}] Someone created an account for you"),
-        )
-
-        # share content email
-        self.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML = self.get_raw_config(
-            "email.notification.share_content_to_receiver.template.html"
-        )
-        self.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT = self.get_raw_config(
-            "email.notification.share_content_to_receiver.subject",
-            _("[{website_title}] {emitter_name} shared content {content_filename} with you"),
-        )
-        self.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML = self.get_raw_config(
-            "email.notification.share_content_to_emitter.template.html"
-        )
-        self.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT = self.get_raw_config(
-            "email.notification.share_content_to_emitter.subject",
-            _("[{website_title}] you shared {content_filename} to {nb_receivers} users"),
         )
 
         # Reset password notification
@@ -585,6 +573,9 @@ class CFG(object):
         self._check_caldav_config_validity()
         self._check_search_config_validity()
         self._check_collaborative_document_edition_config_validity()
+        from tracim_backend.applications import share as share_app
+
+        share_app.check_config(self)
 
     def _check_collaborative_document_edition_config_validity(self) -> None:
         if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
@@ -855,7 +846,9 @@ class CFG(object):
             creation_label="Create an office document",
             available_statuses=content_status_list.get_all(),
         )
+        import tracim_backend.applications.share as share_app
 
+        share_content = share_app.get_app(app_config=self)
         # process activated app list
         available_apps = OrderedDict(
             [
@@ -866,6 +859,7 @@ class CFG(object):
                 (markdownpluspage.slug, markdownpluspage),
                 (agenda.slug, agenda),
                 (office_document.slug, office_document),
+                (share_content.slug, share_content),
             ]
         )
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var

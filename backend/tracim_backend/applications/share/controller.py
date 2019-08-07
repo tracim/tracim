@@ -41,6 +41,14 @@ shareables_content_type = [FILE_TYPE]
 is_shareable_content_type = ContentTypeChecker(shareables_content_type)
 
 
+def import_controller(
+    configurator: Configurator, app_config: CFG, route_prefix: str
+) -> Configurator:
+    share_controller = ShareController()
+    configurator.include(share_controller.bind, route_prefix=route_prefix)
+    return configurator
+
+
 class ShareController(Controller):
     """
     Endpoints for Share Content
