@@ -27,7 +27,7 @@ class CollaborativeEditionFrame extends React.Component {
         top: 61,
         left: 0,
         position: 'fixed',
-        zIndex: 100,
+        zIndex: 25,
         ...props.iframeStyle
       },
       accessToken: '',
