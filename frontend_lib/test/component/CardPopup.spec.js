@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import { shallow } from 'enzyme'
 import sinon from 'sinon'
 import CardPopup from '../../src/component/CardPopup/CardPopup.jsx'
 require('../../src/component/CardPopup/CardPopup.styl')
@@ -23,14 +23,14 @@ describe('<CardPopup />', () => {
 
   const wrapper = shallow(
     <CardPopup
-      { ...props }
+      {...props}
     >
       <Children />
     </CardPopup>
   )
 
   describe('Static design', () => {
-    it(`should have the customClass  in the right DOM element"${props.customClass}"`, () =>
+    it(`should have the customClass in the right DOM element "${props.customClass}"`, () =>
       expect(wrapper.find(`.${props.customClass}.cardPopup`)).to.have.lengthOf(1)
     )
 
@@ -50,15 +50,15 @@ describe('<CardPopup />', () => {
       expect(wrapper.find('.cardPopup__body').find(Children).length).equal(1)
     )
 
-    it(`should be set hideCloseBtn to : ${props.hideCloseBtn}`, () => {
+    it(`should be set hideCloseBtn to: ${props.hideCloseBtn}`, () => {
       expect(wrapper.find(`.cardPopup__close`)).to.have.lengthOf(1)
     })
   })
 
   describe('Handlers', () => {
-    it(`onClick handler should call the proper handler`, () => {
+    it(`onClose handler should call the proper handler: onCloseCallBack`, () => {
       wrapper.find(`.cardPopup__close`).simulate('click')
-      expect(onCloseCallBack.called).to.true
+      expect(onCloseCallBack.called).to.equal(true)
     })
   })
 })

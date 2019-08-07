@@ -13,7 +13,7 @@ describe('<PageContent />', () => {
 
   const wrapper = shallow(
     <PageContent
-      { ...props }
+      {...props}
     >
       <Children />
     </PageContent>
@@ -24,11 +24,11 @@ describe('<PageContent />', () => {
       expect(wrapper.find('.pageContentGeneric').find(Children).length).equal(1)
     )
 
-    it(`the div should have the class : ${(props.parentClass)}`, () =>
+    it(`the div should have the class: ${(props.parentClass)}`, () =>
       expect(wrapper.find(`div.${(props.parentClass)}`)).to.have.lengthOf(1)
     )
 
-    it(`the div should have the class : ${(props.customClass)}`, () =>
+    it(`the div should have the class: ${(props.customClass)}`, () =>
       expect(wrapper.find(`div.${(props.customClass)}`)).to.have.lengthOf(1)
     )
   })

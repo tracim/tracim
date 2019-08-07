@@ -1,8 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import { shallow } from 'enzyme'
 import CardPopupCreateContent from '../../src/component/CardPopup/CardPopupCreateContent.jsx'
-import sinon from "sinon";
+import sinon from 'sinon'
 require('../../src/component/CardPopup/CardPopupCreateContent.styl')
 
 describe('<CardPopupCreateContent />', () => {
@@ -78,19 +78,19 @@ describe('<CardPopupCreateContent />', () => {
   })
 
   describe('Handlers', () => {
-    it(`onChange handler should call the proper handler`, () => {
+    it(`onValidate handler should call the proper handler when the Enter key is pressed`, () => {
       wrapper.find(`.createcontent__form__input`).simulate('keyDown', { key: 'Enter', preventDefault: () => {} })
-      expect(onValidateCallBack.called).to.true
+      expect(onValidateCallBack.called).to.equal(true)
     })
 
-    it(`onClick handler should call the proper handler`, () => {
+    it(`onClose handler should call the proper handler when the Escpae key is pressed`, () => {
       wrapper.find(`.createcontent__form__input`).simulate('keyDown', { key: 'Escape', preventDefault: () => {} })
-      expect(onCloseCallBack.called).to.true
+      expect(onCloseCallBack.called).to.equal(true)
     })
 
-    it(`onClick handler should call the proper handler`, () => {
+    it(`onChangeContentName handler should call the proper handler`, () => {
       wrapper.find(`.createcontent__form__input`).simulate('change', { value: 'randomText' })
-      expect(onChangeContentNameCallBack.called).to.true
+      expect(onChangeContentNameCallBack.called).to.equal(true)
     })
   })
 })

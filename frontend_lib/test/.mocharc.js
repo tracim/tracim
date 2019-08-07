@@ -3,7 +3,8 @@
 module.exports = {
   require: [
     '@babel/register',
-    '@babel/polyfill',
+    'core-js/stable',
+    'regenerator-runtime/runtime',
     'ignore-styles',
     'test/setup'
   ],

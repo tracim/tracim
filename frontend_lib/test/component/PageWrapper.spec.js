@@ -13,7 +13,7 @@ describe('<PageWrapper />', () => {
 
   const wrapper = shallow(
     <PageWrapper
-      { ...props }
+      {...props}
     >
       <PageTitle title={'randomTitle'} />
       <PageContent />
@@ -26,8 +26,8 @@ describe('<PageWrapper />', () => {
       expect(wrapper.find('.pageWrapperGeneric').find(PageContent).length).equal(1)
     })
 
-    it(`the div should have the class : "${(props.customClass)}"`, () =>
-      expect(wrapper.find(`div.${(props.customClass)}.pageWrapperGeneric`)).to.have.lengthOf(1)
+    it(`the div should have the class: "${props.customClass}"`, () =>
+      expect(wrapper.find(`div.${props.customClass}.pageWrapperGeneric`)).to.have.lengthOf(1)
     )
   })
 })

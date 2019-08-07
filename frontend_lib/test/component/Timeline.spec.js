@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount, render, shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import Timeline from '../../src/component/Timeline/Timeline.jsx'
 import sinon from 'sinon'
 
@@ -41,7 +41,7 @@ describe('<Timeline />', () => {
   window.HTMLElement.prototype.scrollIntoView = () => {}
   const wrapper = mount(
     <Timeline
-      { ...props }
+      {...props}
     />
   )
 
@@ -54,17 +54,17 @@ describe('<Timeline />', () => {
   describe('Handlers', () => {
     it(`onClickWysiwygBtnCallBack should be called when the advancedText button is clicked`, () => {
       wrapper.find(`.${props.customClass}__texteditor__advancedtext__btn`).simulate('click')
-      expect(onClickWysiwygBtnCallBack.called).to.true
+      expect(onClickWysiwygBtnCallBack.called).to.equal(true)
     })
 
     it(`onClickValidateNewCommentBtnCallBack should be called when the submit button is clicked`, () => {
       wrapper.find(`.${props.customClass}__texteditor__submit__btn`).simulate('click')
-      expect(onClickValidateNewCommentBtnCallBack.called).to.true
+      expect(onClickValidateNewCommentBtnCallBack.called).to.equal(true)
     })
 
     it(`onChangeNewCommentCallBack should be called when comment is changing`, () => {
       wrapper.find(`#wysiwygTimelineComment`).simulate('change')
-      expect(onChangeNewCommentCallBack.called).to.true
+      expect(onChangeNewCommentCallBack.called).to.equal(true)
     })
   })
 })

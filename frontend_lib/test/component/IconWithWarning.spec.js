@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import { shallow } from 'enzyme'
 import IconWithWarning from '../../src/component/Icon/IconWithWarning.jsx'
 require('../../src/component/Icon/IconWithWarning.styl')
 

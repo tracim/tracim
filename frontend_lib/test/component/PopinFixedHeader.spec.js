@@ -22,7 +22,7 @@ describe('<PopinFixedHeader />', () => {
 
   const wrapper = shallow(
     <PopinFixedHeader
-      { ...props }
+      {...props}
     />
   ).dive()
 
@@ -41,7 +41,7 @@ describe('<PopinFixedHeader />', () => {
   })
 
   describe('Intern function', () => {
-    it ('onChangeTitle() should change the state title', () => {
+    it('onChangeTitle() should change the state title', () => {
       const e = { target: { value: 'testTitle' } }
       wrapper.instance().onChangeTitle(e)
       expect(wrapper.state('editTitleValue')).to.equal(e.target.value)
@@ -84,12 +84,12 @@ describe('<PopinFixedHeader />', () => {
     it(`onValidateChangeTitleCallBack should be call when click the undo button`, () => {
       wrapper.find(`button.${(props.customClass)}__header__changetitle`).at(0).simulate('click')
       wrapper.find(`button.${(props.customClass)}__header__changetitle`).at(1).simulate('click')
-      expect(onValidateChangeTitleCallBack.called).to.true
+      expect(onValidateChangeTitleCallBack.called).to.equal(true)
     })
 
     it(`onClickCloseBtnCallBack should be call when click the close button`, () => {
       wrapper.find(`div.${(props.customClass)}__header__close`).simulate('click')
-      expect(onClickCloseBtnCallBack.called).to.true
+      expect(onClickCloseBtnCallBack.called).to.equal(true)
     })
   })
 })

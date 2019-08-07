@@ -1,9 +1,8 @@
 import React from 'react'
-import {expect} from 'chai'
-import {shallow, configure} from 'enzyme'
+import { expect } from 'chai'
+import { shallow } from 'enzyme'
 import DisplayState from '../../src/component/DisplayState/DisplayState.jsx'
-import PropTypes from "prop-types";
-import sinon from "sinon";
+import sinon from 'sinon'
 
 require('../../src/component/DisplayState/DisplayState.styl')
 
@@ -42,20 +41,20 @@ describe('<DisplayState />', function () {
     })
 
     it(`should not display the button when the btnType is set to link"`, () => {
-      wrapper.setProps({btnType: 'link'})
+      wrapper.setProps({ btnType: 'link' })
       expect(wrapper.find(`button.displaystate__btn`)).to.have.lengthOf(0)
     })
 
     it(`should display 1 icon when the btnType is set to link"${props.icon}"`, () => {
-      wrapper.setProps({btnType: 'link'})
+      wrapper.setProps({ btnType: 'link' })
       expect(wrapper.find(`.fa-${props.icon}`)).to.have.lengthOf(1)
     })
   })
 
   describe('Handlers', () => {
-    it(`onClick handler should call the proper handler`, () => {
+    it(`onClickBtn handler should call the proper handler when the button is clicked`, () => {
       wrapper.find(`.displaystate__btn`).simulate('click')
-      expect(onClickBtnCallBack.called).to.true
+      expect(onClickBtnCallBack.called).to.equal(true)
     })
   })
 })

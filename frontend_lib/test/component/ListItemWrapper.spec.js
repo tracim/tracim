@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import { shallow } from 'enzyme'
 import ListItemWrapper from '../../src/component/ListItemWrapper/ListItemWrapper.jsx'
 require('../../src/component/ListItemWrapper/ListItemWrapper.styl')
 
@@ -8,7 +8,7 @@ describe('<ListItemWrapper />', () => {
   const props = {
     customClass: 'randomCustomClass',
     label: 'randomLabel',
-    contentType: 'randomContentType',
+    contentType: {},
     isLast: false,
     read: false
   }
@@ -17,7 +17,7 @@ describe('<ListItemWrapper />', () => {
 
   const wrapper = shallow(
     <ListItemWrapper
-      { ...props }
+      {...props}
     >
       <Children />
     </ListItemWrapper>
@@ -27,23 +27,23 @@ describe('<ListItemWrapper />', () => {
     expect(wrapper.find('.content.primaryColorBgLightenHover').prop('title')).to.equal(props.label)
   )
 
-  it(`should have its children`, () => {
+  it(`should have its children`, () =>
     expect(wrapper.find('.content.primaryColorBgLightenHover').find(Children).length).equal(1)
-  })
+  )
 
   it(`should have the class "${props.customClass}"`, () =>
     expect(wrapper.find(`.content.primaryColorBgLightenHover.${props.customClass}`)).to.have.lengthOf(1)
   )
 
-  it(`should have the class "read" is set to true`, () => {
-    wrapper.setProps({isLast: true})
+  it(`should have the class "item-last" when isLast is set to true`, () => {
+    wrapper.setProps({ isLast: true })
     expect(wrapper.find(`.content.primaryColorBgLightenHover.item-last`)).to.have.lengthOf(1)
-    wrapper.setProps({isLast: props.isLast})
+    wrapper.setProps({ isLast: props.isLast })
   })
 
-  it(`should have the class "item-last" when read is set to true`, () => {
-    wrapper.setProps({read: true})
+  it(`should have the class "read" when read is set to true`, () => {
+    wrapper.setProps({ read: true })
     expect(wrapper.find(`.content.primaryColorBgLightenHover.read`)).to.have.lengthOf(1)
-    wrapper.setProps({read: props.read})
+    wrapper.setProps({ read: props.read })
   })
 })

@@ -17,7 +17,7 @@ describe('<PageTitle />', () => {
 
   const wrapper = shallow(
     <PageTitle
-      { ...props }
+      {...props}
     >
       <Children />
     </PageTitle>
@@ -28,26 +28,26 @@ describe('<PageTitle />', () => {
       expect(wrapper.find('.pageTitleGeneric').find(Children).length).equal(1)
     )
 
-    it(`3 div should have the class : "${(props.parentClass)}"`, () => {
-      expect(wrapper.find(`div.${(props.parentClass)}.pageTitleGeneric`)).to.have.lengthOf(1)
-      expect(wrapper.find(`div.${(props.parentClass)}__title.pageTitleGeneric__title`)).to.have.lengthOf(1)
-      expect(wrapper.find(`div.${(props.parentClass)}__subtitle.pageTitleGeneric__subtitle`)).to.have.lengthOf(1)
+    it(`3 div should have the class: "${props.parentClass}"`, () => {
+      expect(wrapper.find(`div.${props.parentClass}.pageTitleGeneric`)).to.have.lengthOf(1)
+      expect(wrapper.find(`div.${props.parentClass}__title.pageTitleGeneric__title`)).to.have.lengthOf(1)
+      expect(wrapper.find(`div.${props.parentClass}__subtitle.pageTitleGeneric__subtitle`)).to.have.lengthOf(1)
     })
 
-    it(`the div should have the class : "${(props.customClass)}"`, () =>
+    it(`the div should have the class: "${props.customClass}"`, () =>
       expect(wrapper.find(`div.${(props.customClass)}.pageTitleGeneric`)).to.have.lengthOf(1)
     )
 
-    it(`should have the icon : "${props.icon}"`, () => {
+    it(`should have the icon: "${props.icon}"`, () => {
       expect(wrapper.find(`i.fa.fa-fw.fa-${props.icon}`)).to.have.lengthOf(1)
     })
 
-    it(`should display the title : "${props.title}"`, () => {
-      expect(wrapper.find(`[data-cy='layoutPageTitle']`)).to.have.text().equal(props.title)
+    it(`should display the title: "${props.title}"`, () => {
+      expect(wrapper.find(`div.${props.parentClass}__title`)).to.have.text().equal(props.title)
     })
 
-    it(`should display the title : "${props.subtitle}"`, () => {
-      expect(wrapper.find(`[data-cy='layoutPageSubTitle']`)).to.have.text().equal(props.subtitle)
+    it(`should display the title: "${props.subtitle}"`, () => {
+      expect(wrapper.find(`div.${props.parentClass}__subtitle`)).to.have.text().equal(props.subtitle)
     })
   })
 })

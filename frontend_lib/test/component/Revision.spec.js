@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import Revision from '../../src/component/Timeline/Revision.jsx'
 import sinon from 'sinon'
 
@@ -19,9 +19,9 @@ describe('<Revision />', () => {
     onClickRevision: onClickRevisionCallBack
   }
 
-  const wrapper = shallow(
-    <Revision { ...props } />
-  ).dive()
+  const wrapper = mount(
+    <Revision {...props} />
+  )
 
   describe('Static design', () => {
     it(`should have the class '${props.customClass}__messagelist__version'`, () => {
@@ -41,11 +41,11 @@ describe('<Revision />', () => {
     it(`should call onClickRevision when click and when allowClickOnRevision`, () => {
       wrapper.setProps({ allowClickOnRevision: true })
       wrapper.find(`li.${props.customClass}__messagelist__version`).simulate('click')
-      expect(onClickRevisionCallBack.called).to.true
+      expect(onClickRevisionCallBack.called).to.equal(true)
       onClickRevisionCallBack.resetHistory()
       wrapper.setProps({ allowClickOnRevision: props.allowClickOnRevision })
       wrapper.find(`li.${props.customClass}__messagelist__version`).simulate('click')
-      expect(onClickRevisionCallBack.called).to.not.true
+      expect(onClickRevisionCallBack.called).to.equal(false)
     })
   })
 })

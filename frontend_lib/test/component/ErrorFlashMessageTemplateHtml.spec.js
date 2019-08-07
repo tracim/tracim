@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import { mount } from 'enzyme'
 import ErrorFlashMessageTemplateHtml from '../../src/component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 require('../../src/component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.styl')
 
@@ -9,11 +9,11 @@ describe('<ErrorFlashMessageTemplateHtml />', () => {
     errorMsg: 'randomErrorMsg'
   }
 
-  const wrapper = shallow(
+  const wrapper = mount(
     <ErrorFlashMessageTemplateHtml
       {...props}
     />
-  ).dive()
+  )
 
   it(`should display "${props.errorMsg}"`, () =>
     expect(wrapper.find('.flashMessageHtml')).to.have.text().contains(props.errorMsg)

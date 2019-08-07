@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import { shallow } from 'enzyme'
 import Delimiter from '../../src/component/Delimiter/Delimiter.jsx'
 require('../../src/component/Delimiter/Delimiter.styl')
 

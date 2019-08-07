@@ -1,10 +1,9 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import PopinFixedOption from '../../src/component/PopinFixed/PopinFixedOption.jsx'
 
 describe('<PopinFixedOption />', () => {
-
   const props = {
     customClass: 'randomCustomClass',
     display: false
@@ -12,11 +11,11 @@ describe('<PopinFixedOption />', () => {
 
   const Children = () => <div><h1>Random title</h1>I am the first children of PopinFixedContent</div>
 
-  const wrapper = shallow(
-    <PopinFixedOption { ...props }>
+  const wrapper = mount(
+    <PopinFixedOption {...props}>
       <Children />
     </PopinFixedOption>
-  ).dive()
+  )
 
   describe('Static design', () => {
     it(`should have the class '${props.customClass}__option'`, () => {

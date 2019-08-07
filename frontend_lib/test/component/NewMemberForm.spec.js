@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import { mount } from 'enzyme'
 import sinon from 'sinon'
 import NewMemberForm from '../../src/component/NewMemberForm/NewMemberForm.jsx'
 require('../../src/component/NewMemberForm/NewMemberForm.styl')
@@ -39,20 +39,20 @@ describe('<NewMemberForm />', () => {
     role: 'randomRole'
   }
 
-  const wrapper = shallow(
+  const wrapper = mount(
     <NewMemberForm
-      { ...props }
+      {...props}
     />
-  ).dive()
+  )
 
   describe('Static design', () => {
-    it(`text input should have the value : ${props.nameOrEmail}`, () => {
+    it(`text input should have the value: ${props.nameOrEmail}`, () => {
       expect(wrapper.find('#addmember').prop('value')).to.equal(props.nameOrEmail)
     })
 
     it(`should display ${props.roleList.length} roles`, () => {
       expect(wrapper.find('.memberlist__form__role__list__item').length).equal(props.roleList.length)
-      for(let i = 0; i < props.roleList.length; i++) {
+      for (let i = 0; i < props.roleList.length; i++) {
         expect(wrapper.find(`[value='${props.roleList[i].slug}']`).length)
           .to.equal(1)
         expect(wrapper.find(`[value='${props.roleList[i].slug}']`).prop('checked'))
@@ -67,7 +67,7 @@ describe('<NewMemberForm />', () => {
 
     it(`should display the 5 first searched known Member of the list`, () => {
       expect(wrapper.find('.autocomplete__item').length).equal(5)
-      for(let i = 0; i < 5; i++) {
+      for (let i = 0; i < 5; i++) {
         expect(wrapper.find('div.autocomplete__item__avatar > Avatar').at(i).prop('publicName'))
           .to.equal(props.searchedKnownMemberList[i].public_name)
         expect(wrapper.find('div.autocomplete__item__name').at(i))
@@ -77,36 +77,36 @@ describe('<NewMemberForm />', () => {
   })
 
   describe('Handlers', () => {
-    it(`onClick handler should call the proper handler when validate form`, () => {
+    it(`onClickBtnValidate handler should call the proper handler when validate form`, () => {
       wrapper.find(`button`).simulate('click')
-      expect(onClickBtnValidateCallBack.called).to.true
+      expect(onClickBtnValidateCallBack.called).to.equal(true)
     })
 
-    it(`onClose handler should call the proper handler when closing the form`, () => {
+    it(`onClickCloseAddMemberBtn handler should call the proper handler when closing the form`, () => {
       wrapper.find(`.memberlist__form__close`).simulate('click')
-      expect(onClickCloseAddMemberBtnCallBack.called).to.true
+      expect(onClickCloseAddMemberBtnCallBack.called).to.equal(true)
     })
 
     it(`onClickKnownMember handler should call the proper handler`, () => {
       wrapper.find(`div.autocomplete__item.primaryColorBgHover`).at(0).simulate('click')
-      expect(onClickKnownMemberCallBack.called).to.true
+      expect(onClickKnownMemberCallBack.called).to.equal(true)
     })
 
     it(`onClickAutoComplete handler should call the proper handler`, () => {
-      wrapper.setProps({searchedKnownMemberList: []})
+      wrapper.setProps({ searchedKnownMemberList: [] })
       wrapper.find(`div.autocomplete__item.primaryColorBgHover`).at(0).simulate('click')
-      expect(onClickAutoCompleteCallBack.called).to.true
-      wrapper.setProps({searchedKnownMemberList: props.searchedKnownMemberList})
+      expect(onClickAutoCompleteCallBack.called).to.equal(true)
+      wrapper.setProps({ searchedKnownMemberList: props.searchedKnownMemberList })
     })
 
-    it(`onClickAutoComplete handler should call the proper handler`, () => {
+    it(`onChangeRole handler should call the proper handler`, () => {
       wrapper.find(`.item__radiobtn > input`).at(0).simulate('change')
-      expect(onChangeRoleCallBack.called).to.true
+      expect(onChangeRoleCallBack.called).to.equal(true)
     })
 
     it(`onChangeNameOrEmail handler should call the proper handler`, () => {
       wrapper.find(`input.name__input`).simulate('change', { target: { value: 'randomValue' } })
-      expect(onChangeNameOrEmailCallBack.called).to.true
+      expect(onChangeNameOrEmailCallBack.called).to.equal(true)
     })
   })
 })

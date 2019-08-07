@@ -1,8 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import TextAreaApp from '../../src/component/Input/TextAreaApp/TextAreaApp.jsx'
-import sinon from "sinon";
+import sinon from 'sinon'
 require('../../src/component/Input/TextAreaApp/TextAreaApp.styl')
 
 describe('<TextAreaApp />', () => {
@@ -21,15 +21,15 @@ describe('<TextAreaApp />', () => {
     disableValidateBtn: false
   }
 
-  const wrapper = shallow(
+  const wrapper = mount(
     <TextAreaApp
-      { ...props }
+      {...props}
     />
-  ).dive()
+  )
 
   describe('Static design', () => {
     it(`should display "${props.text}"`, () =>
-      expect(wrapper.find(`#${props.id}`).prop('value')).to.equal(props.text)
+      expect(wrapper.find(`textarea.${props.customClass}__text`).prop('value')).to.equal(props.text)
     )
 
     it(`the form should have the class "${props.customClass}"`, () => {
@@ -40,17 +40,17 @@ describe('<TextAreaApp />', () => {
   describe('Handlers', () => {
     it('onClickValidateBtn handler should call the proper handler', () => {
       wrapper.find(`button.${props.customClass}__submit`).simulate('click')
-      expect(onClickValidateBtn.called).to.true
+      expect(onClickValidateBtn.called).to.equal(true)
     })
 
     it('onClickCancelBtn handler should call the proper handler', () => {
       wrapper.find(`button.${props.customClass}__cancel`).simulate('click')
-      expect(onClickCancelBtn.called).to.true
+      expect(onClickCancelBtn.called).to.equal(true)
     })
 
     it('onChangeText handler should call the proper handler', () => {
       wrapper.find(`textarea.${props.customClass}__text`).simulate('change')
-      expect(onChangeText.called).to.true
+      expect(onChangeText.called).to.equal(true)
     })
   })
 })

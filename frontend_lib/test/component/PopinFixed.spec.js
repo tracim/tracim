@@ -19,7 +19,7 @@ describe('<PopinFixed />', () => {
 
   const wrapper = shallow(
     <PopinFixed
-      { ...props }
+      {...props}
     >
       <PopinFixedHeader />
       <PopinFixedOption />
@@ -30,9 +30,9 @@ describe('<PopinFixed />', () => {
   describe('Static design', () => {
     it(`should have the class visible when props.visible is set to true`, () => {
       expect(wrapper.find(`div.${props.customClass}.visible`).length).to.equal(0)
-      wrapper.setProps({visible: true})
+      wrapper.setProps({ visible: true })
       expect(wrapper.find(`div.${props.customClass}.visible`).length).to.equal(1)
-      wrapper.setProps({visible: props.visible})
+      wrapper.setProps({ visible: props.visible })
     })
 
     it(`div should have the proper style`, () => {
@@ -44,31 +44,31 @@ describe('<PopinFixed />', () => {
         sandbox.spy(console, 'error')
       })
 
-      afterEach(function() {
+      afterEach(function () {
         sandbox.restore()
       })
 
       it('passing forbidden children should return error', () => {
         shallow(
           <PopinFixed
-            { ...props }>
-            <div></div>
+            {...props}>
+            <div />
           </PopinFixed>
         )
-        expect(console.error.called).to.true
+        expect(console.error.called).to.equal(true)
         sandbox.restore()
       })
 
       it('passing valid childrens should not return error', () => {
         shallow(
           <PopinFixed
-            { ...props }>
+            {...props}>
             <PopinFixedHeader />
             <PopinFixedOption />
             <PopinFixedContent />
           </PopinFixed>
         )
-        expect(console.error.called).to.not.true
+        expect(console.error.called).to.equal(false)
       })
     })
   })

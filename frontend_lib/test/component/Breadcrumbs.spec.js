@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import { shallow } from 'enzyme'
 import Breadcrumbs from '../../src/component/Breadcrumbs/Breadcrumbs.jsx'
 require('../../src/component/Breadcrumbs/Breadcrumbs.styl')
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import {shallow, configure} from 'enzyme'
+import { shallow } from 'enzyme'
 import Avatar from '../../src/component/Avatar/Avatar.jsx'
 
 require('../../src/component/Avatar/Avatar.styl')
@@ -49,7 +49,7 @@ describe('<Avatar />', () => {
   describe(`Component's function`, () => {
     describe('getTwoLetter(name) with a name with space', () => {
       it(`name : "public name" should return "pn"`, () => {
-        publicName='public name'
+        publicName = 'public name'
         expectedNameResult = 'pn'
         twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
         expect(twoLetterPublicName).to.equal(expectedNameResult)

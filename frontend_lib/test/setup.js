@@ -16,6 +16,7 @@ if (!global.window && !global.document) {
     userAgent: 'mocha',
   })
 
+  global.CustomEvent = window.CustomEvent
   global.window = window
   global.document = window.document
   global.navigator = window.navigator
