@@ -135,7 +135,7 @@ export const NewMemberForm = props => {
                     <i className={`fa fa-fw fa-${r.faIcon}`} />
                   </div>
 
-                  <div>
+                  <div className='item__text__content'>
                     <div className='item__text__name'>
                       {props.t(r.label) /* this trad key comes from frontend/helper.js, object ROLE */}
                     </div>

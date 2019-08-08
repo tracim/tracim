@@ -114,7 +114,7 @@ export class AddUserForm extends React.Component {
                 data-cy={`profile__list__item__${p.slug}`}
               >
                 <div className='d-flex align-items'>
-                  <div>
+                  <div className='userrole__role__input'>
                     <input
                       type='radio'
                       name='newUserProfile'
@@ -130,7 +130,7 @@ export class AddUserForm extends React.Component {
                   </div>
 
                   <div className='profile__list__item__content'>
-                    <div>
+                    <div className='profile__list__item__label'>
                       {props.t(p.label) /* this trad key is declared in frontend/helper.js, object PROFILE */}
                     </div>
                     <div className='profile__list__item__description' >
