@@ -23,7 +23,7 @@ describe('<ListItemWrapper />', () => {
     </ListItemWrapper>
   )
 
-  it(`should have the title : "${props.label}"`, () =>
+  it(`should have the title: "${props.label}"`, () =>
     expect(wrapper.find('.content.primaryColorBgLightenHover').prop('title')).to.equal(props.label)
   )
 

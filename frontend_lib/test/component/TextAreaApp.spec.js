@@ -38,17 +38,17 @@ describe('<TextAreaApp />', () => {
   })
 
   describe('Handlers', () => {
-    it('onClickValidateBtn handler should call the proper handler', () => {
+    it('onClickValidateBtn handler should call the proper handler when the validate button is clicked', () => {
       wrapper.find(`button.${props.customClass}__submit`).simulate('click')
       expect(onClickValidateBtn.called).to.equal(true)
     })
 
-    it('onClickCancelBtn handler should call the proper handler', () => {
+    it('onClickCancelBtn handler should call the proper handler when the cancel button is clicked', () => {
       wrapper.find(`button.${props.customClass}__cancel`).simulate('click')
       expect(onClickCancelBtn.called).to.equal(true)
     })
 
-    it('onChangeText handler should call the proper handler', () => {
+    it('onChangeText handler should call the proper handler when textarea is changing', () => {
       wrapper.find(`textarea.${props.customClass}__text`).simulate('change')
       expect(onChangeText.called).to.equal(true)
     })

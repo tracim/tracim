@@ -53,32 +53,54 @@ describe('helper.js', () => {
   })
 
   describe('handleFetchResult()', () => {
-    it('should return the proper Promise', (done) => {
+    it('should return the proper Response when status: 200\'', (done) => {
       const cloneFetchResult = {
         json: () => 'jsonTest'
       }
-      const fetchResult = {
+      const fetchResult = Promise.resolve({
+        ok: true,
         status: 200,
-        clone: () => cloneFetchResult
+        clone: () => ({ json: () => 'jsonTest' })
+      })
+      fetchResult.then((response) => {
+        handleFetchResult(response).then((result) => {
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json() })
+        }).then(done, done)
+      })
+    })
+
+    it('should return the proper Response when status: 300\'', (done) => {
+      const cloneFetchResult = {
+        json: () => 'jsonTest'
       }
-      handleFetchResult(fetchResult).then((result) => {
-        expect(result).to.eql({ apiResponse: fetchResult, body: cloneFetchResult.json() })
-      }).then(done, done)
+      const fetchResult = Promise.resolve({
+        ok: true,
+        status: 300,
+        clone: () => ({ json: () => 'jsonTest' })
+      })
+      fetchResult.then((response) => {
+        handleFetchResult(response).then((result) => {
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json() })
+        }).then(done, done)
+      })
     })
   })
 
   describe('generateFetchResponse()', () => {
-    it('should return the proper fetchResult', (done) => {
+    it('should return the proper Response when status: 200', (done) => {
       const cloneFetchResult = {
         json: () => 'jsonTest'
       }
-      const fetchResult = {
+      const fetchResult = Promise.resolve({
+        ok: true,
         status: 200,
-        clone: () => cloneFetchResult
-      }
-      generateFetchResponse(fetchResult).then((result) => {
-        expect(result).to.eql({apiResponse: fetchResult, body: cloneFetchResult.json()})
-      }).then(done, done)
+        clone: () => ({ json: () => 'jsonTest' })
+      })
+      fetchResult.then((response) => {
+        generateFetchResponse(response).then((result) => {
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json() })
+        }).then(done, done)
+      })
     })
   })
 })

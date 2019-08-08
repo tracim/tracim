@@ -26,7 +26,7 @@ describe('<PopinFixedOption />', () => {
       expect(wrapper.find(`div.wsContentGeneric__option__menu.${props.customClass}__option__menu`)).to.have.lengthOf(1)
     })
 
-    it(`should contains the children`, () => {
+    it(`should contains the proper children`, () => {
       expect(wrapper.find('div.wsContentGeneric__option__menu').find(Children).length).equal(1)
     })
   })

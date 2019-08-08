@@ -1,7 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import sinon from 'sinon'
 import PopinFixed from '../../src/component/PopinFixed/PopinFixed'
 import PopinFixedContent from '../../src/component/PopinFixed/PopinFixedContent'
 import PopinFixedHeader from '../../src/component/PopinFixed/PopinFixedHeader'
@@ -37,39 +36,6 @@ describe('<PopinFixed />', () => {
 
     it(`div should have the proper style`, () => {
       expect(wrapper.find(`div.${props.customClass}`).prop('style')).to.eql(props.style)
-    })
-    describe('Console spy', () => {
-      const sandbox = sinon.sandbox.create()
-      beforeEach(() => {
-        sandbox.spy(console, 'error')
-      })
-
-      afterEach(function () {
-        sandbox.restore()
-      })
-
-      it('passing forbidden children should return error', () => {
-        shallow(
-          <PopinFixed
-            {...props}>
-            <div />
-          </PopinFixed>
-        )
-        expect(console.error.called).to.equal(true)
-        sandbox.restore()
-      })
-
-      it('passing valid childrens should not return error', () => {
-        shallow(
-          <PopinFixed
-            {...props}>
-            <PopinFixedHeader />
-            <PopinFixedOption />
-            <PopinFixedContent />
-          </PopinFixed>
-        )
-        expect(console.error.called).to.equal(false)
-      })
     })
   })
 })

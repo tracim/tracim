@@ -37,16 +37,16 @@ describe('<SelectStatus />', () => {
 
   const wrapper = mount(
     <SelectStatus
-      {...props }
+      {...props}
     />
   )
 
   describe('Static design', () => {
-    it(`should have the button not disabled when disabled is false`, () =>
+    it(`should have the button not disabled when the property disabled is false`, () =>
       expect(wrapper.find('#dropdownMenu2').prop('disabled')).to.equal(props.disabled)
     )
 
-    it(`should have the button disabled when disabled is true`, () => {
+    it(`should have the button disabled when the property disabled is true`, () => {
       wrapper.setProps({ disabled: true })
       expect(wrapper.find('#dropdownMenu2').prop('disabled')).to.equal(true)
       wrapper.setProps({ disabled: props.disabled })
@@ -69,12 +69,6 @@ describe('<SelectStatus />', () => {
     it(`second submenu_item should have its icon: "${props.availableStatus[1].faIcon}"`, () => {
       expect(wrapper.find(`button.selectStatus__submenu__item`).at(1)
         .find(`i.fa-${props.availableStatus[1].faIcon}`))
-        .to.have.lengthOf(1)
-    })
-
-    it(`first submenu_item should have its icon: "${props.availableStatus[0].faIcon}"`, () => {
-      expect(wrapper.find(`button.selectStatus__submenu__item`).at(0)
-        .find(`i.fa-${props.availableStatus[0].faIcon}`))
         .to.have.lengthOf(1)
     })
   })

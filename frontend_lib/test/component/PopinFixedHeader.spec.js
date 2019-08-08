@@ -27,7 +27,7 @@ describe('<PopinFixedHeader />', () => {
   ).dive()
 
   describe('Static design', () => {
-    it(`6 elements should have the class : "${(props.customClass)}"`, () => {
+    it(`6 elements should have the class: "${(props.customClass)}"`, () => {
       expect(wrapper.find(`div.${(props.customClass)}__header`)).to.have.lengthOf(1)
       expect(wrapper.find(`div.${(props.customClass)}__header__icon`)).to.have.lengthOf(1)
       expect(wrapper.find(`div.${(props.customClass)}__header__title`)).to.have.lengthOf(1)
@@ -35,7 +35,7 @@ describe('<PopinFixedHeader />', () => {
       expect(wrapper.find(`div.${(props.customClass)}__header__close`)).to.have.lengthOf(1)
     })
 
-    it(`should display the icon : ${props.faIcon}`, () => {
+    it(`should display the icon: ${props.faIcon}`, () => {
       expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
     })
   })

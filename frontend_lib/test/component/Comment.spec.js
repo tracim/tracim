@@ -62,7 +62,7 @@ describe('<Comment />', () => {
       expect(wrapper.find(`div.${props.customClass}__body`).render()).to.have.text().equal(props.text)
     })
 
-    it(`the date div should have the title : ${props.createdFormated}`, () => {
+    it(`the date div should have the title: ${props.createdFormated}`, () => {
       expect(wrapper.find(`div.${props.customClass}__header__text__date`).prop('title')).to.equal(props.createdFormated)
     })
 

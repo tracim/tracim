@@ -46,7 +46,7 @@ describe('<Timeline />', () => {
   )
 
   describe('Static design', () => {
-    it(`The textarea should have the value :"${props.newComment}"`, () => {
+    it(`The textarea should have the value:"${props.newComment}"`, () => {
       expect(wrapper.find('#wysiwygTimelineComment').prop('value')).to.equal(props.newComment)
     })
   })

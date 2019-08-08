@@ -38,11 +38,11 @@ describe('<IconButton />', () => {
       expect(wrapper.find(`button.${props.className}.btn`).prop('style')).to.deep.equal(props.style)
     )
 
-    it(`button disabled property should be set to : ${props.disabled}`, () =>
+    it(`button disabled property should be set to: ${props.disabled}`, () =>
       expect(wrapper.find(`button.${props.className}.btn`).prop('disabled')).to.equal(props.disabled)
     )
 
-    it(`should have the icon : "${props.icon}"`, () =>
+    it(`should have the icon: "${props.icon}"`, () =>
       expect(wrapper.find(`.fa.fa-${props.icon}`)).to.have.lengthOf(1)
     )
   })
