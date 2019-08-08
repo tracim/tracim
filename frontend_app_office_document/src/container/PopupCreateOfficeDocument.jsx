@@ -73,6 +73,19 @@ class PopupCreateOfficeDocument extends React.Component {
     }
   })
 
+  handleInputKeyDown = e => {
+    switch (e.key) {
+      case 'Enter':
+        e.preventDefault()
+        this.handleValidate()
+        break
+      case 'Escape':
+        e.preventDefault()
+        this.handleClose()
+        break
+    }
+  }
+
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleValidate = async () => {
@@ -178,6 +191,7 @@ class PopupCreateOfficeDocument extends React.Component {
           placeholder={this.props.t("Office Document's title")}
           value={this.state.newContentName}
           onChange={this.handleChangeNewContentName}
+          onKeyDown={this.handleInputKeyDown}
           autoFocus
         />
         <RadioBtnGroup
