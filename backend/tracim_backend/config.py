@@ -827,7 +827,7 @@ class CFG(object):
         office_document = Application(
             label="Office Document",
             slug="office_document",
-            fa_icon="file-excel-o",
+            fa_icon="file-o",
             is_active=self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
             config={},
             main_route="/ui/workspaces/{workspace_id}/office",
