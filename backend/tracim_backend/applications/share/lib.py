@@ -51,7 +51,7 @@ class ShareLib(object):
         content: Content,
         emails: typing.List[str],
         password: typing.Optional[str] = None,
-        do_notify=True,
+        do_notify: bool = False,
     ) -> typing.List[ContentShare]:
         content_shares = []
         created = datetime.now()
@@ -72,7 +72,7 @@ class ShareLib(object):
             content_shares.append(content_share)
             self._session.flush()
 
-        if do_notify and self._config.EMAIL__NOTIFICATION__ACTIVATED:
+        if do_notify:
             try:
                 email_manager = self._get_email_manager(self._config, self._session)
                 email_manager.notify__share__content(

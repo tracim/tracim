@@ -365,7 +365,9 @@ class TestPrivateShareEndpointsWithNotification(object):
             )
         content_api.save(test_file)
         share_api = share_api_factory.get()  # type: ShareLib
-        share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
+        share_api.share_content(
+            test_file, emails=["test@test.test", "test2@test2.test2"], do_notify=True
+        )
         transaction.commit()
         response = mailhog.get_mailhog_mails()
         assert len(response) == 3
@@ -411,7 +413,9 @@ class TestPrivateShareEndpointsWithNotification(object):
             )
         content_api.save(test_file)
         share_api = share_api_factory.get()  # type: ShareLib
-        share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
+        share_api.share_content(
+            test_file, emails=["test@test.test", "test2@test2.test2"], do_notify=True
+        )
         transaction.commit()
 
         mailhog.cleanup_mailhog()
@@ -465,7 +469,10 @@ class TestPrivateShareEndpointsWithNotification(object):
         content_api.save(test_file)
         share_api = share_api_factory.get()  # type: ShareLib
         share_api.share_content(
-            test_file, emails=["test@test.test", "test2@test2.test2"], password="toto"
+            test_file,
+            emails=["test@test.test", "test2@test2.test2"],
+            password="toto",
+            do_notify=True,
         )
         transaction.commit()
         response = mailhog.get_mailhog_mails()

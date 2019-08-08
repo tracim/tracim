@@ -71,7 +71,10 @@ class ShareController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         shares_content = api.share_content(
-            request.current_content, hapic_data.body.emails, hapic_data.body.password
+            request.current_content,
+            hapic_data.body.emails,
+            hapic_data.body.password,
+            do_notify=app_config.EMAIL__NOTIFICATION__ACTIVATED,
         )
         return api.get_content_shares_in_context(shares_content)
 
