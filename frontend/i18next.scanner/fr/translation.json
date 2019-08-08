@@ -204,7 +204,7 @@
   "Insufficient rights": "Droits insuffisants",
   "Create user, create shared space, administration of instance": "Création d'utilisateurs, création d'espaces partagés, administration de l'instance",
   "Create shared space, add member in shared space": "Création d'espaces partagés, ajout de membres dans les espaces partagés",
-  "Access to shared space where user is member": "Accès au espaces partagés dont il est membre",
+  "Access to shared space where user is member": "Accès aux espaces partagés dont il est membre",
   "Contributor + create folder and manage content": "Contributeur + création de fichiers et gestion de contenus",
   "Reader + create/modify content": "Lecteur + création et modification de contenus",
   "Just read content": "Uniquement lecture de contenus",

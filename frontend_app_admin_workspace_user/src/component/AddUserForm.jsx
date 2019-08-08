@@ -130,10 +130,10 @@ export class AddUserForm extends React.Component {
                   </div>
 
                   <div className='profile__list__item__content'>
-                    <div className='profile__list__item__label'>
+                    <div className='profile__list__item__content__label'>
                       {props.t(p.label) /* this trad key is declared in frontend/helper.js, object PROFILE */}
                     </div>
-                    <div className='profile__list__item__description' >
+                    <div className='profile__list__item__content__description' >
                       {props.t(p.description) /* this trad key is declared in frontend/helper.js, object PROFILE */}
                     </div>
                   </div>
