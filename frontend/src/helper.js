@@ -191,4 +191,4 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
 
 export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'
 
-export const sortWorkspaceContent = (a, b) => a.type === 'folder' && a.type !== b.type ? -1 : 1
+export const sortWorkspaceContent = (a, b) => a.type === CONTENT_TYPE.FOLDER && a.type !== b.type ? -1 : 1
