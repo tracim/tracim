@@ -9,7 +9,7 @@ import {
   findUserRoleIdInWorkspace,
   ROLE_OBJECT,
   CONTENT_TYPE,
-  sortWorkspaceContent
+  sortWorkspaceContents
 } from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
@@ -457,7 +457,7 @@ class WorkspaceContent extends React.Component {
 
     const rootContentList = filteredWorkspaceContentList
       .filter(c => c.parentId === null)
-      .sort(sortWorkspaceContent)
+      .sort(sortWorkspaceContents)
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 

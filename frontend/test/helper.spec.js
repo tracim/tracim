@@ -1,12 +1,12 @@
 import { expect, assert } from 'chai'
-import { sortWorkspaceContent } from '../src/helper.js'
+import { sortWorkspaceContents } from '../src/helper.js'
 
 describe('In file helper.js', () => {
-  describe('the function sortWorkspaceContent()', () => {
+  describe('the function sortWorkspaceContents()', () => {
     it('should sort the array of content by folder and alphabetically properly', () => {
       // INFO - CH - 2019-08-08 - on the list bellow, contents only have the properties that mattes for the sort
       // Note that Array.sort() differs between chrome and node.js.
-      // the implementation of sortWorkspaceContent should handles these differences
+      // the implementation of sortWorkspaceContents should handles these differences
       const contentListAsGivenByApi = [
         { id: 1, label: 'content 0', type: 'html-document'},
         { id: 2, label: 'content 0', type: 'folder'},
@@ -96,7 +96,7 @@ describe('In file helper.js', () => {
         { id: 19, label: 'content 9', type: 'html-document'}
       ]
 
-      const sortedContentList = contentListAsGivenByApi.sort(sortWorkspaceContent)
+      const sortedContentList = contentListAsGivenByApi.sort(sortWorkspaceContents)
 
       expect(sortedContentList).to.deep.equal(contentListSortedByFolderAndAlphabetically)
     })
