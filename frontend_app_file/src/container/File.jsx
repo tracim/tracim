@@ -199,7 +199,8 @@ class File extends React.Component {
               // FIXME - b.l - refactor urls
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
-          }
+          },
+          mode: MODE.VIEW
         })
         break
       default:
