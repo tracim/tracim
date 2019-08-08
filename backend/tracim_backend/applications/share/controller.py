@@ -168,6 +168,9 @@ class ShareController(Controller):
                 )
             ) from exc
         filename = hapic_data.path.filename
+
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", when filename returned will be original file one.
         if not filename or filename == "raw":
             filename = content_share.content.file_name
         return HapicFile(
