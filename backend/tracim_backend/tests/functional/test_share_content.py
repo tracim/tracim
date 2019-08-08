@@ -54,7 +54,7 @@ class TestPrivateShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -72,7 +72,7 @@ class TestPrivateShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -109,7 +109,7 @@ class TestPrivateShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -127,7 +127,7 @@ class TestPrivateShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -164,7 +164,7 @@ class TestPrivateShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -182,7 +182,7 @@ class TestPrivateShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -238,7 +238,7 @@ class TestPrivateShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -252,7 +252,7 @@ class TestPrivateShareEndpoints(object):
             do_notify=False,
         )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -273,7 +273,7 @@ class TestPrivateShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -291,7 +291,7 @@ class TestPrivateShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -345,7 +345,7 @@ class TestPrivateShareEndpointsWithNotification(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
         mailhog,
     ) -> None:
@@ -364,7 +364,7 @@ class TestPrivateShareEndpointsWithNotification(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
             test_file, emails=["test@test.test", "test2@test2.test2"], do_notify=True
         )
@@ -392,7 +392,7 @@ class TestPrivateShareEndpointsWithNotification(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
         mailhog,
         app_config,
@@ -412,7 +412,7 @@ class TestPrivateShareEndpointsWithNotification(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
             test_file, emails=["test@test.test", "test2@test2.test2"], do_notify=True
         )
@@ -448,7 +448,7 @@ class TestPrivateShareEndpointsWithNotification(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
         mailhog,
     ) -> None:
@@ -467,7 +467,7 @@ class TestPrivateShareEndpointsWithNotification(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
             test_file,
             emails=["test@test.test", "test2@test2.test2"],
@@ -499,7 +499,7 @@ class TestGuestDownloadShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -517,7 +517,7 @@ class TestGuestDownloadShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
@@ -547,7 +547,7 @@ class TestGuestDownloadShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -561,7 +561,7 @@ class TestGuestDownloadShareEndpoints(object):
             do_notify=False,
         )
         content_api.save(test_folder)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_folder, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_folder)
         assert len(content_shares) == 1
@@ -582,7 +582,7 @@ class TestGuestDownloadShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -600,7 +600,7 @@ class TestGuestDownloadShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
@@ -625,7 +625,7 @@ class TestGuestDownloadShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -639,7 +639,7 @@ class TestGuestDownloadShareEndpoints(object):
             do_notify=False,
         )
         content_api.save(test_folder)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_folder, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_folder)
         assert len(content_shares) == 1
@@ -660,7 +660,7 @@ class TestGuestDownloadShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -678,7 +678,7 @@ class TestGuestDownloadShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
             test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
         )
@@ -706,7 +706,7 @@ class TestGuestDownloadShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -724,7 +724,7 @@ class TestGuestDownloadShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
             test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
         )
@@ -746,7 +746,7 @@ class TestGuestDownloadShareEndpoints(object):
         session,
         web_testapp,
         content_type_list,
-        share_api_factory,
+        share_lib_factory,
         admin_user,
     ) -> None:
         workspace_api = workspace_api_factory.get()
@@ -764,7 +764,7 @@ class TestGuestDownloadShareEndpoints(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         content_api.save(test_file)
-        share_api = share_api_factory.get()  # type: ShareLib
+        share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
             test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
         )

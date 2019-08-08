@@ -56,7 +56,7 @@ class ContentApiFactory(object):
         )
 
 
-class ShareApiFactory(object):
+class ShareLibFactory(object):
     def __init__(self, session: Session, app_config: CFG, admin_user: User):
         self.session = session
         self.app_config = app_config
