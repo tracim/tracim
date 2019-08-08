@@ -25,18 +25,28 @@ describe('Scroll to active content when refreshing the page', () => {
     })
   })
 
+  beforeEach(function () {
+    cy.loginAs('administrators')
+    cy.visitPage({pageName: p.CONTENTS, params: {workspaceId: workspaceId}})
+  })
+
+  afterEach(function () {
+    cy.cancelXHR()
+  })
+
   describe('Open a content', () => {
     describe('Open a file', () => {
       it('should scroll to file when refreshing the page', () => {
-        cy.loginAs('administrators')
-        cy.visitPage({pageName: p.CONTENTS, params: {workspaceId: workspaceId}})
         cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + nbContent}})
           .find('.content__item')
           .click()
+
         cy.reload()
+
         cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + nbContent}})
           .find('.content__item')
           .should('be.visible')
+
         cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + 0}})
           .find('.content__item')
           .should('be.not.visible')
@@ -45,15 +55,16 @@ describe('Scroll to active content when refreshing the page', () => {
 
     describe('Open a folder', () => {
       it('should scroll to folder when refreshing the page', () => {
-        cy.loginAs('administrators')
-        cy.visitPage({pageName: p.CONTENTS, params: {workspaceId: workspaceId}})
         cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: lastFolder.content_id}})
           .find('.folder__header__name')
           .click()
+
         cy.reload()
+
         cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: lastFolder.content_id}})
           .find('.folder__header__name')
           .should('be.visible')
+
         cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: firstFolder.content_id}})
           .find('.folder__header__name')
           .should('be.not.visible')
@@ -62,18 +73,20 @@ describe('Scroll to active content when refreshing the page', () => {
 
     describe('Open a file when a folder is open', () => {
       it('should scroll to file and not folder when refreshing the page', () => {
-        cy.loginAs('administrators')
-        cy.visitPage({pageName: p.CONTENTS, params: {workspaceId: workspaceId}})
         cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: firstFolder.content_id}})
           .find('.folder__header__name')
           .click()
+
         cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + nbContent}})
           .find('.content__item')
           .click()
+
         cy.reload()
+
         cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + nbContent}})
           .find('.content__item')
           .should('be.visible')
+
         cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: firstFolder.content_id}})
           .find('.folder__header__name')
           .should('be.not.visible')
