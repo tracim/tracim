@@ -41,7 +41,7 @@ class CollaborativeEditionFrame extends React.Component {
     const { props } = this
     console.log('%c<CollaboraFrame> did mount', `color: ${this.props.data.config.hexcolor}`, props)
     if (!this.checkUserPermissions()) {
-      this.sendGlobalFlashMessage(props.t("You don't have the permission to edit this file"))
+      this.sendGlobalFlashMessage(props.t("You are not allowed to edit this file"))
       this.redirectTo(props.data.content.workspace_id)
       return
     }
