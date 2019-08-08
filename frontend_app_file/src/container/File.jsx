@@ -11,6 +11,7 @@ import {
   PopinFixedContent,
   Timeline,
   NewVersionBtn,
+  GenericButton,
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
@@ -680,14 +681,17 @@ class File extends React.Component {
               }
 
               { onlineEditionAction &&
-                <NewVersionBtn
+                <GenericButton
+                  customClass='wsContentGeneric__option__menu__addversion newversionbtn btn outlineTextBtn'
+                  dataCy='wsContentGeneric__option__menu__addversion'
                   customColor={state.config.hexcolor}
-                  onClickNewVersionBtn={onlineEditionAction}
+                  onClick={onlineEditionAction}
                   disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
-                  label={props.t('Edit')}
+                  label={props.t('Edit online')}
                   style={{
                     marginLeft: '5px'
                   }}
+                  faIcon={'fa-edit mr-3'}
                 />
               }
 
