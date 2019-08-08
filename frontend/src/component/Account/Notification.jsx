@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { BtnSwitch } from 'tracim_frontend_lib'
 import { ROLE } from '../../helper.js'
 
@@ -67,4 +67,4 @@ export const Notification = props =>
     </div>
   </div>
 
-export default withTranslation()(Notification)
+export default translate()(Notification)

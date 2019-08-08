@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { Popover, PopoverBody } from 'reactstrap'
 import { generateRandomPassword } from 'tracim_frontend_lib'
@@ -145,7 +145,7 @@ class NewUpload extends React.Component {
   }
 }
 
-export default withTranslation()(Radium(NewUpload))
+export default translate()(Radium(NewUpload))
 
 NewUpload.propTypes = {
   // shareLinkList: PropTypes.array.isRequired,

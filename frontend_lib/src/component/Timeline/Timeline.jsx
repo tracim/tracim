@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import Radium from 'radium'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import DisplayState from '../DisplayState/DisplayState.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
@@ -187,7 +187,7 @@ class Timeline extends React.Component {
   }
 }
 
-export default withTranslation()(Radium(Timeline))
+export default translate()(Radium(Timeline))
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,

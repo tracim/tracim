@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import PreviewComponent from './PreviewComponent.jsx'
 import { MODE } from '../helper.js'
@@ -102,4 +102,4 @@ export const FileComponent = props =>
     }
   </div>
 
-export default withTranslation()(Radium(FileComponent))
+export default translate()(Radium(FileComponent))

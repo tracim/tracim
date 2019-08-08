@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 export const ImportConfirmation = props => {
   return (
@@ -11,4 +11,4 @@ export const ImportConfirmation = props => {
   )
 }
 
-export default withTranslation()(ImportConfirmation)
+export default translate()(ImportConfirmation)

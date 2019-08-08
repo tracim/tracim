@@ -1,7 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
 class PopinFixedHeader extends React.Component {
@@ -107,7 +107,7 @@ class PopinFixedHeader extends React.Component {
   }
 }
 
-export default withTranslation()(PopinFixedHeader)
+export default translate()(PopinFixedHeader)
 
 PopinFixedHeader.propTypes = {
   faIcon: PropTypes.string.isRequired,

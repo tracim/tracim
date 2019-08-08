@@ -1,7 +1,7 @@
 import Avatar from '../Avatar/Avatar.jsx'
 import React from 'react'
 import classnames from 'classnames'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { revisionTypeList } from '../../helper.js'
 
@@ -51,4 +51,4 @@ const Revision = props => {
   )
 }
 
-export default withTranslation()(Radium(Revision))
+export default translate()(Radium(Revision))

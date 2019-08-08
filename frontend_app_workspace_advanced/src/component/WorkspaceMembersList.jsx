@@ -3,7 +3,7 @@ import {
   NewMemberForm,
   Avatar
 } from 'tracim_frontend_lib'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 const WorkspaceMembersList = props => {
   return (
@@ -127,4 +127,4 @@ const WorkspaceMembersList = props => {
   )
 }
 
-export default withTranslation()(WorkspaceMembersList)
+export default translate()(WorkspaceMembersList)

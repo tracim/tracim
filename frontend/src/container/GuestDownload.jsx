@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -74,4 +74,4 @@ class GuestDownload extends React.Component {
     )
   }
 }
-export default withTranslation()(GuestDownload)
+export default translate()(GuestDownload)

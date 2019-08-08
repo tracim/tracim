@@ -727,3 +727,23 @@ class TestSessionEndpointWithCookieAuthToken(object):
             assert res.json_body["code"] is None
             assert "message" in res.json.keys()
             assert "details" in res.json.keys()
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestWhoamiEndpointWithUserAuthToken(object):
+    def test_api__try_whoami_enpoint_with_user_auth_token_ok_200__nominal_case(
+        self, web_testapp, admin_user
+    ):
+        token = str(admin_user.ensure_auth_token(20))
+        transaction.commit()
+        query_param = {"access_token": token}
+        res = web_testapp.get("/api/v2/auth/whoami", status=200, params=query_param)
+        assert res.json_body["public_name"] == "Global manager"
+        assert res.json_body["email"] == "admin@admin.admin"
+        assert res.json_body["created"]
+        assert res.json_body["is_active"]
+        assert res.json_body["profile"]
+        assert res.json_body["profile"] == "administrators"
+        assert res.json_body["avatar_url"] is None
+        assert res.json_body["auth_type"] == "internal"

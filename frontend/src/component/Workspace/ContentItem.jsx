@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { DragSource } from 'react-dnd'
@@ -126,7 +126,7 @@ const contentItemDragAndDropSourceCollect = (connect, monitor) => ({
   isDragging: monitor.isDragging()
 })
 
-export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDragAndDropSource, contentItemDragAndDropSourceCollect)(withTranslation()(ContentItem))
+export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDragAndDropSource, contentItemDragAndDropSourceCollect)(translate()(ContentItem))
 
 ContentItem.propTypes = {
   statusSlug: PropTypes.string.isRequired,

@@ -2,7 +2,7 @@ import React from 'react'
 import UploadFilesManagement from '../component/UploadFilesManagement.jsx'
 import NewUpload from '../component/NewUpload.jsx'
 import i18n from '../i18n'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import {
   PopinFixed,
   PopinFixedHeader,
@@ -205,11 +205,11 @@ class ShareFolderAdvanced extends React.Component {
 
     // switch (fetchResultSaveNewShareLinkList.status) {
     //   case 204:
-        this.setState({
-          shareEmails: '',
-          sharePassword: '',
-          currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
-        })
+    this.setState({
+      shareEmails: '',
+      sharePassword: '',
+      currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
+    })
     //     break
     //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
     // }
@@ -233,7 +233,7 @@ class ShareFolderAdvanced extends React.Component {
       })
 
       if (invalidEmails.length > 0) {
-          this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+        this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
       }
 
       this.setState({ shareEmails: emailList.join('\n') })
@@ -284,4 +284,4 @@ class ShareFolderAdvanced extends React.Component {
   }
 }
 
-export default withTranslation()(ShareFolderAdvanced)
+export default translate()(ShareFolderAdvanced)

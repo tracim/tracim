@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 
 require('./FileProperties.styl')
@@ -104,4 +104,4 @@ export class FileProperties extends React.Component {
   }
 }
 
-export default withTranslation()(Radium(FileProperties))
+export default translate()(Radium(FileProperties))

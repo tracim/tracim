@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Dropzone from 'react-dropzone' // INFO - GB- 2019-07-31 - react-dropzone is in an older version because of a persistent problem with Hooks
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 export const FileDropzone = props => {
   return (
@@ -10,7 +10,7 @@ export const FileDropzone = props => {
       onClick={props.onClick}
       multiple={props.multipleFiles}
       style={{}} // to reset default style
-      inputProps={{'data-cy': 'filecontent__form_input_file'}}
+      inputProps={{ 'data-cy': 'filecontent__form_input_file' }}
     >
       <div className='filecontent__form mb-4' drop='true'>
         {(() => {
@@ -19,14 +19,14 @@ export const FileDropzone = props => {
               <div>
                 <div
                   className='filecontent__form__icon d-flex justify-content-center'
-                  style={{color: props.hexcolor}}
+                  style={{ color: props.hexcolor }}
                 >
                   <i className='fa fa-download' />
                 </div>
 
                 <div
                   className='filecontent__form__instruction text-center'
-                  style={{color: props.hexcolor}}
+                  style={{ color: props.hexcolor }}
                 >
                   {props.t('Drag and drop your file here')}
                 </div>
@@ -40,7 +40,7 @@ export const FileDropzone = props => {
               if (!props.multipleFiles) {
                 return (
                   <div className='filecontent__preview' drop='true'>
-                    <i className='filecontent__preview__nopreview-icon fa fa-paperclip' style={{color: props.hexcolor}} />
+                    <i className='filecontent__preview__nopreview-icon fa fa-paperclip' style={{ color: props.hexcolor }} />
                     <div className='filecontent__preview__nopreview-msg'>
                       {props.filename}
                     </div>
@@ -53,14 +53,14 @@ export const FileDropzone = props => {
                   <div>
                     <div
                       className='filecontent__form__icon d-flex justify-content-center'
-                      style={{color: props.hexcolor}}
+                      style={{ color: props.hexcolor }}
                     >
                       <i className='fa fa-download' />
                     </div>
 
                     <div
                       className='filecontent__form__instruction text-center'
-                      style={{color: props.hexcolor}}
+                      style={{ color: props.hexcolor }}
                     >
                       {props.t('Drag and drop your file here')}
                     </div>
@@ -84,7 +84,7 @@ export const FileDropzone = props => {
   )
 }
 
-export default withTranslation()(FileDropzone)
+export default translate()(FileDropzone)
 
 FileDropzone.propTypes = {
   onDrop: PropTypes.func.isRequired,

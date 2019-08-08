@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import Button from '../common/Input/Button.jsx'
 import InputGroupText from '../common/Input/InputGroupText.jsx'
@@ -76,4 +76,4 @@ class DownloadForm extends React.Component {
     )
   }
 }
-export default withTranslation()(DownloadForm)
+export default translate()(DownloadForm)

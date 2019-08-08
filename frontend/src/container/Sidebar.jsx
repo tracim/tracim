@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import classnames from 'classnames'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import appFactory from '../appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
@@ -152,4 +152,4 @@ class Sidebar extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
-export default withRouter(connect(mapStateToProps)(appFactory(withTranslation()(Sidebar))))
+export default withRouter(connect(mapStateToProps)(appFactory(translate()(Sidebar))))

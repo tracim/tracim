@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
@@ -76,4 +76,4 @@ class ShareLink extends React.Component {
     )
   }
 }
-export default withTranslation()(Radium(ShareLink))
+export default translate()(Radium(ShareLink))

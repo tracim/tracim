@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link, withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import {
   PAGE,
   ROLE,
@@ -599,4 +599,4 @@ class WorkspaceContent extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
   breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType
 })
-export default withRouter(connect(mapStateToProps)(appFactory(withTranslation()(WorkspaceContent))))
+export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { Link, withRouter } from 'react-router-dom'
 import {
   PageWrapper,
@@ -587,4 +587,4 @@ class Dashboard extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
   breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system
 })
-export default connect(mapStateToProps)(withRouter(appFactory(withTranslation()(Dashboard))))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))

@@ -5,6 +5,7 @@ import typing
 from pyramid.request import Request
 from sqlalchemy.orm import Session
 
+from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFoundInTracimRequest
@@ -29,7 +30,7 @@ class TracimContext(object):
     Abstract class, Context of Tracim, neede for tracim authorization mecanism.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Authenticated user
         self._current_user = None  # type: User
         # Current workspace, found in request path
@@ -76,7 +77,7 @@ class TracimContext(object):
         )
 
     @property
-    def current_comment(self):
+    def current_comment(self) -> Content:
         """
         Current comment if exist, if you are deleting comment 8 of content 21,
         current comment will be 8.
@@ -86,7 +87,7 @@ class TracimContext(object):
         )
 
     @property
-    def candidate_user(self):
+    def candidate_user(self) -> User:
         """
         User which is not authenticated user but needed for an action,
         for example if admin (user_id=1) want to change profile of bob
@@ -97,7 +98,7 @@ class TracimContext(object):
         )
 
     @property
-    def candidate_workspace(self):
+    def candidate_workspace(self) -> Workspace:
         """
         Secondary workspace if exist, useful for special action.
         For example, if you want to move
@@ -109,7 +110,7 @@ class TracimContext(object):
         )
 
     @property
-    def candidate_content_type(self):
+    def candidate_content_type(self) -> ContentType:
         """
         content_type given in entry
         """
@@ -124,7 +125,7 @@ class TracimContext(object):
 
     def _generate_if_none(
         self, param: typing.Any, generator: typing.Callable, id_fetcher: typing.Callable
-    ):
+    ) -> typing.Any:
         """
         generate parameter if None else return it directly
         :param param: param to check
@@ -136,12 +137,12 @@ class TracimContext(object):
             return generator(id_fetcher)
         return param
 
-    def _get_user(self, user_id_fetcher: typing.Callable):
+    def _get_user(self, user_id_fetcher: typing.Callable[[], int]) -> User:
         user_id = user_id_fetcher()
         uapi = UserApi(None, show_deleted=True, session=self.dbsession, config=self.app_config)
         return uapi.get_one(user_id)
 
-    def _get_workspace(self, workspace_id_fetcher):
+    def _get_workspace(self, workspace_id_fetcher: typing.Callable[[], int]) -> Workspace:
         workspace_id = workspace_id_fetcher()
         wapi = WorkspaceApi(
             current_user=self.current_user,
@@ -151,7 +152,19 @@ class TracimContext(object):
         )
         return wapi.get_one(workspace_id)
 
-    def _get_content(self, content_id_fetcher):
+    def _get_workspace_id_in_request(self) -> typing.Optional[int]:
+        """
+        Return workspace_id if exist, return None if workspace_id doesn't exist
+        This differ from _get_current_workspace_id as it does not raise exception
+        but None in case workspace_id doesn't exist
+        :return:
+        """
+        try:
+            return self._get_current_workspace_id()
+        except WorkspaceNotFoundInTracimRequest:
+            return None
+
+    def _get_content(self, content_id_fetcher: typing.Callable[[], int]) -> Content:
         content_id = content_id_fetcher()
         api = ContentApi(
             current_user=self.current_user,
@@ -160,13 +173,19 @@ class TracimContext(object):
             session=self.dbsession,
             config=self.app_config,
         )
+        # INFO - G.M - 2019-07-18 - code to allow get current_content according to current_workspace
+        # only if there is a current workspace id.
+        current_workspace = None
+        if self._get_workspace_id_in_request():
+            current_workspace = self.current_workspace
+
         return api.get_one(
             content_id=content_id,
-            workspace=self.current_workspace,
+            workspace=current_workspace,
             content_type=content_type_list.Any_SLUG,
         )
 
-    def _get_content_type(self, content_type_slug_fetcher):
+    def _get_content_type(self, content_type_slug_fetcher: typing.Callable[[], str]) -> ContentType:
         content_type_slug = content_type_slug_fetcher()
         return content_type_list.get_one_by_slug(content_type_slug)
 
@@ -227,7 +246,7 @@ class TracimRequest(TracimContext, Request):
         self.add_finished_callback(self._cleanup)
 
     @property
-    def dbsession(self) -> Session:
+    def dbsession(self) -> typing.Optional[Session]:
         """Overriden by Pyramid, see models/_init_.py file"""
         pass
 
@@ -358,6 +377,6 @@ class TracimRequest(TracimContext, Request):
         exception_if_invalid_id = InvalidWorkspaceId("new_workspace_id is not a correct integer")
         return self._get_body_id("new_workspace_id", exception_if_none, exception_if_invalid_id)
 
-    def _get_candidate_content_type_slug(self):
+    def _get_candidate_content_type_slug(self) -> str:
         exception_if_none = ContentTypeNotInTracimRequest("No content_type property found in body")
         return self._get_body_str("content_type", exception_if_none)

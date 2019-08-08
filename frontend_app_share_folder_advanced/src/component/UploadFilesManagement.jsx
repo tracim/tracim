@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import PropTypes from 'prop-types'
 import { ShareLink } from 'tracim_frontend_lib'
@@ -47,7 +47,7 @@ const UploadFilesManagement = props => {
   )
 }
 
-export default withTranslation()(Radium(UploadFilesManagement))
+export default translate()(Radium(UploadFilesManagement))
 
 UploadFilesManagement.propTypes = {
   shareLinkList: PropTypes.array.isRequired,

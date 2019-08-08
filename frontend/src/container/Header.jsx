@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import i18n from '../i18n.js'
 import appFactory from '../appFactory.js'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
@@ -176,4 +176,4 @@ class Header extends React.Component {
 }
 
 const mapStateToProps = ({ searchResult, lang, user, system, appList }) => ({ searchResult, lang, user, system, appList })
-export default withRouter(connect(mapStateToProps)(withTranslation()(appFactory(Header))))
+export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

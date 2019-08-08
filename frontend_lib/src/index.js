@@ -64,6 +64,8 @@ import ShareLink from './component/ShareLink/ShareLink.jsx'
 
 import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
+import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
+
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -124,5 +126,6 @@ export {
   FileDropzone,
   ShareLink,
   ShareDownload,
-  ProgressBar
+  ProgressBar,
+  RadioBtnGroup
 }

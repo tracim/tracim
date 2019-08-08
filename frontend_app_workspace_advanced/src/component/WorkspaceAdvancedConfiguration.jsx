@@ -4,7 +4,7 @@ import {
   BtnSwitch,
   CardPopup
 } from 'tracim_frontend_lib'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 const color = require('color')
 
@@ -122,4 +122,4 @@ const WorkspaceAdvancedConfiguration = props => {
   )
 }
 
-export default withTranslation()(Radium(WorkspaceAdvancedConfiguration))
+export default translate()(Radium(WorkspaceAdvancedConfiguration))

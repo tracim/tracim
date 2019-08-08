@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { Popover, PopoverBody } from 'reactstrap'
 import { generateRandomPassword } from '../../helper.js'
@@ -164,4 +164,4 @@ class NewShareDownload extends React.Component {
   }
 }
 
-export default withTranslation()(Radium(NewShareDownload))
+export default translate()(Radium(NewShareDownload))

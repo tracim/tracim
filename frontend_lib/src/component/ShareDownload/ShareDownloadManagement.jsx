@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import Radium from 'radium'
 import { CUSTOM_EVENT } from '../../customEvent.js'
@@ -74,4 +74,4 @@ class ShareDownloadManagement extends React.Component {
   }
 }
 
-export default withTranslation()(Radium(ShareDownloadManagement))
+export default translate()(Radium(ShareDownloadManagement))

@@ -44,8 +44,8 @@ export const getContentTypeList = apiUrl =>
 // export const deleteShareLink = (apiUrl, workspaceId, contentId, shareId) =>
 //   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares/${shareId}`, {
 //     credentials: 'include',
-//     headers: { 
-//       ...FETCH_CONFIG.headers 
+//     headers: {
+//       ...FETCH_CONFIG.headers
 //     },
 //     method: 'DELETE'
 //   })
