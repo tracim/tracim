@@ -147,6 +147,10 @@ class CFG(object):
         self._load_caldav_config()
         self._load_search_config()
         self._load_collaborative_document_edition_config()
+
+        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+        # to make thing easier later
+        # when app will be load dynamycally.
         import tracim_backend.applications.share.config as share_app_config
 
         share_app_config.load_config(self)
@@ -573,6 +577,10 @@ class CFG(object):
         self._check_caldav_config_validity()
         self._check_search_config_validity()
         self._check_collaborative_document_edition_config_validity()
+
+        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+        # to make thing easier later
+        # when app will be load dynamycally.
         import tracim_backend.applications.share.config as share_app_config
 
         share_app_config.check_config(self)
@@ -846,6 +854,9 @@ class CFG(object):
             creation_label="Create an office document",
             available_statuses=content_status_list.get_all(),
         )
+        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+        # to make thing easier later
+        # when app will be load dynamycally.
         import tracim_backend.applications.share.application as share_app
 
         share_content = share_app.get_app(app_config=self)

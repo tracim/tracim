@@ -204,12 +204,16 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
-    # add share app
+
+    # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+    # to make thing easier later
+    # when app will be load dynamycally.
     import tracim_backend.applications.share.controller as share_app_controller
 
     share_app_controller.import_controller(
         app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
     )
+
     if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
         # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
         # import is here because import WOPI of Collabora controller without adding it to
