@@ -1,23 +1,25 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
-import NewVersionBtn from '../../src/component/OptionComponent/NewVersionBtn.jsx'
+import { shallow } from 'enzyme'
+import GenericButton from '../../src/component/Button/GenericButton.jsx'
 import sinon from 'sinon'
 
-describe('<NewVersionBtn />', () => {
+describe('<GenericButton />', () => {
   const onClickCallBack = sinon.stub()
 
   const props = {
-    onClickNewVersionBtn: onClickCallBack,
+    onClick: onClickCallBack,
     disabled: false,
+    customClass: 'randomCustomClass',
     label: 'randomLabel',
     dataCy: 'random-data-cy',
+    faIcon: 'randomIcon',
     style: { color: 'yellow' },
     customColor: 'randomCustomColor'
   }
 
-  const wrapper = mount(
-    <NewVersionBtn
+  const wrapper = shallow(
+    <GenericButton
       {...props}
     />
   )
@@ -27,8 +29,20 @@ describe('<NewVersionBtn />', () => {
       expect(wrapper.find('button')).to.have.text().equal(props.label)
     )
 
+    it(`the button should have the class "${props.customClass}"`, () =>
+      expect(wrapper.find(`button.${props.customClass}`)).to.have.lengthOf(1)
+    )
+
     it(`should display its text in color ${props.style.color}`, () =>
       expect(wrapper.find('button').prop('style').color).to.equal(props.style.color)
+    )
+
+    it(`should have the icon: ${props.faIcon}`, () =>
+      expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
+    )
+
+    it(`should have the icon: ${props.faIcon}`, () =>
+      expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
     )
 
     it(`the button should be disabled when disabled is set to true`, () => {
