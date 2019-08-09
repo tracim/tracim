@@ -18,7 +18,7 @@ class SystemApi(object):
         # TODO - G.M - 2018-09-26 - Set version correctly
         return AboutModel(
             name="Tracim",
-            version="2.3.2_build_027",
+            version="2.3.2_build_029",
             datetime=datetime.datetime.now(),
             website="https://www.tracim.fr",
         )
