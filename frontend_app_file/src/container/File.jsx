@@ -200,7 +200,8 @@ class File extends React.Component {
               // FIXME - b.l - refactor urls
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
-          }
+          },
+          mode: MODE.VIEW
         })
         break
       default:
@@ -700,6 +701,7 @@ class File extends React.Component {
                   className='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
+                  data-cy='appFileLastVersionBtn'
                 >
                   <i className='fa fa-history' />
                   {props.t('Last version')}
