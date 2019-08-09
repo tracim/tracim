@@ -697,6 +697,7 @@ class File extends React.Component {
                   className='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
+                  data-cy='appFileLastVersionBtn'
                 >
                   <i className='fa fa-history' />
                   {props.t('Last version')}
