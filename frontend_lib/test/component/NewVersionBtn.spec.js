@@ -18,9 +18,9 @@ describe('<NewVersionBtn />', () => {
 
   const wrapper = mount(
     <NewVersionBtn
-  {...props}
-  />
-)
+      {...props}
+    />
+  )
 
   describe('Design static', () => {
     it(`should display "${props.label}"`, () =>

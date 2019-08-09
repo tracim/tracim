@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import GenericButton from '../../src/component/Button/GenericButton.jsx'
 import sinon from 'sinon'
 
@@ -18,7 +18,7 @@ describe('<GenericButton />', () => {
     customColor: 'randomCustomColor'
   }
 
-  const wrapper = mount(
+  const wrapper = shallow(
     <GenericButton
       {...props}
     />
@@ -38,11 +38,11 @@ describe('<GenericButton />', () => {
     )
 
     it(`should have the icon: ${props.faIcon}`, () =>
-      expect(wrapper.find(`i.fa.${props.faIcon}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
     )
 
     it(`should have the icon: ${props.faIcon}`, () =>
-      expect(wrapper.find(`i.fa.${props.faIcon}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
     )
 
     it(`the button should be disabled when disabled is set to true`, () => {

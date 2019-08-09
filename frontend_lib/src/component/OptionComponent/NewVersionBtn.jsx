@@ -1,6 +1,6 @@
 import React from 'react'
 import GenericButton from '../Button/GenericButton'
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 
 const NewVersionBtn = props => {
   return (
@@ -10,7 +10,7 @@ const NewVersionBtn = props => {
       onClick={props.onClickNewVersionBtn}
       disabled={props.disabled}
       style={props.style}
-      faIcon={'fa-plus-circle mr-3'}
+      faIcon={'plus-circle mr-3'}
       label={props.label}
       customColor={props.customColor}
     />
@@ -30,7 +30,7 @@ GenericButton.propTypes = {
 GenericButton.defaultProps = {
   onClickNewVersionBtn: () => {},
   disabled: false,
-  customClass: '',
+  customColor: '',
   label: '',
   style: {}
 }
