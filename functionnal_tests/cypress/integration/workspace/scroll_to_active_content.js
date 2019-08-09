@@ -53,23 +53,23 @@ describe('Scroll to active content when refreshing the page', () => {
       })
     })
 
-    describe('Open a folder', () => {
-      it('should scroll to folder when refreshing the page', () => {
-        cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: lastFolder.content_id}})
-          .find('.folder__header__name')
-          .click()
-
-        cy.reload()
-
-        cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: lastFolder.content_id}})
-          .find('.folder__header__name')
-          .should('be.visible')
-
-        cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: firstFolder.content_id}})
-          .find('.folder__header__name')
-          .should('be.not.visible')
-      })
-    })
+    // describe('Open a folder', () => {
+    //   it('should scroll to folder when refreshing the page', () => {
+    //     cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: lastFolder.content_id}})
+    //       .find('.folder__header__name')
+    //       .click()
+    //
+    //     cy.reload()
+    //
+    //     cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: lastFolder.content_id}})
+    //       .find('.folder__header__name')
+    //       .should('be.visible')
+    //
+    //     cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: firstFolder.content_id}})
+    //       .find('.folder__header__name')
+    //       .should('be.not.visible')
+    //   })
+    // })
 
     describe('Open a file when a folder is open', () => {
       it('should scroll to file and not folder when refreshing the page', () => {

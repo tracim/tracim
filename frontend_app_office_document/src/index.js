@@ -55,7 +55,7 @@ const appInterface = {
     if (!editorType) return null
 
     return {
-      label: editorType.associated_action === ACTION_EDIT && userRoleId >= 2 ? i18n.t('Edit') : i18n.t('View'),
+      label: editorType.associated_action === ACTION_EDIT && userRoleId >= 2 ? i18n.t('Edit online') : i18n.t('View online'),
       callback: () => {
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.REDIRECT,
