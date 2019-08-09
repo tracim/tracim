@@ -696,6 +696,7 @@ class FileController(Controller):
             "create_file", "/workspaces/{workspace_id}/files", request_method="POST"
         )
         configurator.add_view(self.create_file, route_name="create_file")
+
         # upload raw file
         configurator.add_route(
             "upload_file",

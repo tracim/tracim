@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../i18n.js'
 import {
@@ -260,7 +260,8 @@ class Tracim extends React.Component {
           <Route exact path={[
             PAGE.ADMIN.USER,
             PAGE.ADMIN.WORKSPACE,
-            PAGE.AGENDA
+            PAGE.AGENDA,
+            PAGE.WORKSPACE.CONTENT_EDITION()
           ]} render={() => <AppFullscreenRouter />} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
@@ -280,4 +281,4 @@ class Tracim extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system }) => ({
   breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system
 })
-export default withRouter(connect(mapStateToProps)(withTranslation()(Tracim)))
+export default withRouter(connect(mapStateToProps)(translate()(Tracim)))

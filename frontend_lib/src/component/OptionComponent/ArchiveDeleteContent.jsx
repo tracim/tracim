@@ -1,6 +1,6 @@
 import React from 'react'
 import Radium from 'radium'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
 const ArchiveDeleteContent = props => {
@@ -42,7 +42,7 @@ const ArchiveDeleteContent = props => {
   )
 }
 
-export default withTranslation()(Radium(ArchiveDeleteContent))
+export default translate()(Radium(ArchiveDeleteContent))
 
 ArchiveDeleteContent.propTypes = {
   onClickDeleteBtn: PropTypes.func,

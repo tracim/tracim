@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import PropTypes from 'prop-types'
 
@@ -52,7 +52,7 @@ export const SelectStatus = props => {
   )
 }
 
-export default withTranslation()(Radium(SelectStatus))
+export default translate()(Radium(SelectStatus))
 
 SelectStatus.propTypes = {
   availableStatus: PropTypes.arrayOf(PropTypes.object),

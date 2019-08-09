@@ -1,10 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { FETCH_CONFIG, ROLE, PROFILE } from './helper.js'
+import { FETCH_CONFIG, ROLE, PROFILE, PAGE, findUserRoleIdInWorkspace } from './helper.js'
 import i18n from './i18n.js'
 
-const mapStateToProps = ({ system }) => ({ system })
+const mapStateToProps = ({ system, currentWorkspace }) => ({ system, currentWorkspace })
 
 export function appFactory (WrappedComponent) {
   return withRouter(connect(mapStateToProps)(class AppFactory extends React.Component {
@@ -20,13 +20,16 @@ export function appFactory (WrappedComponent) {
         translation: i18n.store.data,
         system: this.props.system,
         roleList: ROLE,
-        profileObject: PROFILE
+        profileObject: PROFILE,
+        history: this.props.history
       },
       content
     })
 
     renderAppFullscreen = (appConfig, user, content) => GLOBAL_renderAppFullscreen({
-      loggedUser: user.logged ? user : {},
+      loggedUser: user.logged
+        ? { ...user, userRoleIdInWorkspace: findUserRoleIdInWorkspace(user.user_id, this.props.currentWorkspace.memberList, ROLE) }
+        : {},
       config: {
         ...appConfig,
         domContainer: 'appFullscreenContainer',
@@ -51,7 +54,9 @@ export function appFactory (WrappedComponent) {
         translation: i18n.store.data,
         system: this.props.system,
         roleList: ROLE,
-        profileObject: PROFILE
+        profileObject: PROFILE,
+        history: this.props.history,
+        PAGE: PAGE
       },
       workspaceId,
       folderId: folderId === 'null' ? null : folderId

@@ -1,6 +1,6 @@
 import React from 'react'
 import Radium from 'radium'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
 const NewVersionBtn = props => {
@@ -19,7 +19,8 @@ const NewVersionBtn = props => {
         ':hover': {
           backgroundColor: props.customColor,
           color: '#fdfdfd'
-        }
+        },
+        ...props.style
       }}
     >
       <i className='fa fa-plus-circle mr-3' />
@@ -28,7 +29,7 @@ const NewVersionBtn = props => {
   )
 }
 
-export default withTranslation()(Radium(NewVersionBtn))
+export default translate()(Radium(NewVersionBtn))
 
 NewVersionBtn.propTypes = {
   onClickNewVersionBtn: PropTypes.func,

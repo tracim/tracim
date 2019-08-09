@@ -1,5 +1,5 @@
 import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
+import { reactI18nextModule } from 'react-i18next'
 import { frTranslation, enTranslation } from 'tracim_frontend_lib'
 import en from '../i18next.scanner/en/translation.json'
 import fr from '../i18next.scanner/fr/translation.json'
@@ -22,6 +22,8 @@ const wsEnTranslation = require('../dist/app/workspace_en_translation.json')
 const wsFrTranslation = require('../dist/app/workspace_fr_translation.json')
 const agendaEnTranslation = require('../dist/app/agenda_en_translation.json')
 const agendaFrTranslation = require('../dist/app/agenda_fr_translation.json')
+const officeDocumentEnTranslation = require('../dist/app/office_document_en_translation.json')
+const officeDocumentFrTranslation = require('../dist/app/office_document_fr_translation.json')
 
 export const getBrowserLang = () => {
   const browserLang = navigator.language
@@ -33,7 +35,7 @@ export const getBrowserLang = () => {
 }
 
 i18n
-  .use(initReactI18next)
+  .use(reactI18nextModule)
   .init({
     fallbackLng: getBrowserLang(),
     // have a common namespace used around the full app
@@ -54,7 +56,8 @@ i18n
           ...wsAdvancedEnTranslation, // advanced workspace
           ...adminWsUserEnTranslation, // admin workspace user
           ...wsEnTranslation, // workspace
-          ...agendaEnTranslation // agenda
+          ...agendaEnTranslation, // agenda
+          ...officeDocumentEnTranslation
         }
       },
       fr: {
@@ -68,7 +71,8 @@ i18n
           ...wsAdvancedFrTranslation, // advanced workspace
           ...adminWsUserFrTranslation, // admin workspace user
           ...wsFrTranslation, // workspace
-          ...agendaFrTranslation // agenda
+          ...agendaFrTranslation, // agenda
+          ...officeDocumentFrTranslation
         }
       }
     }

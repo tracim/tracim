@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
 
 export class Password extends React.Component {
@@ -161,7 +161,7 @@ export class Password extends React.Component {
 }
 
 const mapStateToProps = () => ({})
-export default connect(mapStateToProps)(withTranslation()(Password))
+export default connect(mapStateToProps)(translate()(Password))
 
 Password.defaultProps = {
   displayAdminInfo: false

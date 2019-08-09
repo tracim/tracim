@@ -1,10 +1,10 @@
 import Avatar from '../Avatar/Avatar.jsx'
 import React from 'react'
 import classnames from 'classnames'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { revisionTypeList } from '../../helper.js'
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 
 // require('./Revision.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -52,7 +52,7 @@ const Revision = props => {
   )
 }
 
-export default withTranslation()(Radium(Revision))
+export default translate()(Radium(Revision))
 
 Revision.propTypes = {
   customClass: PropTypes.string,

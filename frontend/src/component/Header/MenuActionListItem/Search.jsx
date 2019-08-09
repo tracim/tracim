@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 // INFO - CH - 2019-04-17 - Component deprecated because unused
 
@@ -26,7 +26,7 @@ const Search = props => {
     </li>
   )
 }
-export default withTranslation()(Search)
+export default translate()(Search)
 
 Search.propTypes = {
   onChangeInput: PropTypes.func.isRequired,

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
@@ -11,7 +11,8 @@ import DragHandle from '../DragHandle.jsx'
 import {
   PAGE,
   ROLE_OBJECT,
-  DRAG_AND_DROP
+  DRAG_AND_DROP,
+  sortWorkspaceContents
 } from '../../helper.js'
 
 require('./Folder.styl')
@@ -53,17 +54,18 @@ class Folder extends React.Component {
           'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
         data-cy={`folder_${props.folderData.id}`}
+        id={props.folderData.id}
       >
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
-          className='folder__header align-items-center primaryColorBgLightenHover primaryColorBorderLightenHover'
+          className='folder__header align-items-center primaryColorBgLightenHover'
           onClick={() => props.onClickFolder(props.folderData.id)}
           ref={props.connectDropTarget}
           title={props.folderData.label}
         >
           <div className='folder__header__triangleborder'>
-            <div className='folder__header__triangleborder__triangle' />
+            <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
           </div>
 
           {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
@@ -155,7 +157,7 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {folderContentList.map((content, i) => content.type === 'folder'
+          {folderContentList.sort(sortWorkspaceContents).map((content, i) => content.type === 'folder'
             ? (
               <FolderContainer
                 availableApp={props.availableApp}
@@ -261,7 +263,7 @@ const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDragAndDrop
   )
 )
 
-export default withTranslation()(FolderContainer)
+export default translate()(FolderContainer)
 
 Folder.propTypes = {
   folderData: PropTypes.object,

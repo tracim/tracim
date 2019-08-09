@@ -5,7 +5,7 @@ import {
   DisplayState
 } from 'tracim_frontend_lib'
 import { MODE } from '../helper.js'
-import { withTranslation } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 export const HtmlDocument = props => {
   return (
@@ -41,7 +41,7 @@ export const HtmlDocument = props => {
         {props.mode === MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
             msg={props.t('You have a pending draft')}
-            type='link'
+            btnType='link'
             icon='hand-o-right'
             btnLabel={props.t('resume writing')}
             onClickBtn={props.onClickShowDraft}
@@ -81,7 +81,7 @@ export const HtmlDocument = props => {
   )
 }
 
-export default withTranslation()(HtmlDocument)
+export default translate()(HtmlDocument)
 
 HtmlDocument.propTypes = {
   mode: PropTypes.string,
