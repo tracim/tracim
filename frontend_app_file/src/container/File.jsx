@@ -680,7 +680,7 @@ class File extends React.Component {
                 />
               }
 
-              { onlineEditionAction &&
+              {state.loggedUser.userRoleIdInWorkspace >= 2 && onlineEditionAction &&
                 <GenericButton
                   customClass='wsContentGeneric__option__menu__addversion newversionbtn btn outlineTextBtn'
                   dataCy='wsContentGeneric__option__menu__addversion'

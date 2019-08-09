@@ -15,6 +15,10 @@ describe('Author and avatar ar shown in timeline', () => {
       })
   })
 
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   it('Avatar is shown in timeline after creation (author)', function () {
     cy.loginAs('users')
     cy.visit(this.documentUrl)
