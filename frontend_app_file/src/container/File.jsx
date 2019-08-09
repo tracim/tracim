@@ -691,7 +691,7 @@ class File extends React.Component {
                   style={{
                     marginLeft: '5px'
                   }}
-                  faIcon={'edit mr-3'}
+                  faIcon={'edit'}
                 />
               }
 

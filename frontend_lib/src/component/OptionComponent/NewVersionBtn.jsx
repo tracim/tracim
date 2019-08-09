@@ -10,7 +10,7 @@ const NewVersionBtn = props => {
       onClick={props.onClickNewVersionBtn}
       disabled={props.disabled}
       style={props.style}
-      faIcon={'plus-circle mr-3'}
+      faIcon={'plus-circle'}
       label={props.label}
       customColor={props.customColor}
     />
