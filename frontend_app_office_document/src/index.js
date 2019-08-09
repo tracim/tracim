@@ -6,6 +6,7 @@ import PopupCreateOfficeDocument from './container/PopupCreateOfficeDocument.jsx
 import CollaborativeEditionFrame from './container/CollaborativeEditionFrame.jsx'
 import { Router } from 'react-router'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import i18n from './i18n.js'
 
 // @TODO make a file that contains all events implemented by this App.
 // @todo add this file to appInterface
@@ -42,23 +43,25 @@ const appInterface = {
 
     return ReactDOM.unmountComponentAtNode(document.getElementById(domId)) // returns bool
   },
-  getOnlineEditionAction: (content, collaborativeDocumentEdition) => {
+  getOnlineEditionAction: (content, collaborativeDocumentEdition, userRoleId) => {
     if (!(content.file_extension && collaborativeDocumentEdition)) {
       return null
     }
-    const editorType = collaborativeDocumentEdition.supported_file_types.filter(
-      (type) => type.extension === content.file_extension.substr(1) && type.associated_action === ACTION_EDIT
+
+    let editorType = collaborativeDocumentEdition.supported_file_types.find(
+      (type) => type.extension === content.file_extension.substr(1)
     )
 
-    if (editorType.length === 0) {
-      return null
-    }
+    if (!editorType) return null
 
-    return () => {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.REDIRECT,
-        data: { url: `/ui/online_edition/workspaces/${content.workspace_id}/contents/${content.content_id}` }
-      })
+    return {
+      label: editorType.actionType === ACTION_EDIT && userRoleId >= 2 ? i18n.t('Edit') : i18n.t('View'),
+      callback: () => {
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.REDIRECT,
+          data: { url: `/ui/online_edition/workspaces/${content.workspace_id}/contents/${content.content_id}` }
+        })
+      }
     }
   }
 }
