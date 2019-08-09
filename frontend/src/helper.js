@@ -59,29 +59,45 @@ export const ROLE = [{
   slug: 'workspace-manager',
   faIcon: 'gavel',
   hexcolor: '#ed0007',
-  tradKey: i18n.t('Shared space manager'), // trad key allow the parser to generate an entry in the json file
-  label: 'Shared space manager' // label must be used in components
+  tradKey: [
+    i18n.t('Shared space manager'),
+    i18n.t('Content manager + add member and edit shared space')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Shared space manager', // label must be used in components
+  description: 'Content manager + add member and edit shared space'
 }, {
   id: 4,
   slug: 'content-manager',
   faIcon: 'graduation-cap',
   hexcolor: '#f2af2d',
-  tradKey: i18n.t('Content manager'), // trad key allow the parser to generate an entry in the json file
-  label: 'Content manager' // label must be used in components
+  tradKey: [
+    i18n.t('Content manager'),
+    i18n.t('Contributor + create folder and manage content')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Content manager', // label must be used in components
+  description: 'Contributor + create folder and manage content'
 }, {
   id: 2,
   slug: 'contributor',
   faIcon: 'pencil',
   hexcolor: '#3145f7',
-  tradKey: i18n.t('Contributor'), // trad key allow the parser to generate an entry in the json file
-  label: 'Contributor' // label must be used in components
+  tradKey: [
+    i18n.t('Contributor'),
+    i18n.t('Reader + create/modify content')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Contributor', // label must be used in components
+  description: 'Reader + create/modify content'
 }, {
   id: 1,
   slug: 'reader',
   faIcon: 'eye',
   hexcolor: '#15d948',
-  tradKey: i18n.t('Reader'), // trad key allow the parser to generate an entry in the json file
-  label: 'Reader' // label must be used in components
+  tradKey: [
+    i18n.t('Reader'),
+    i18n.t('Just read content')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Reader', // label must be used in components
+  description: 'Just read content'
 }]
 
 export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
@@ -130,24 +146,36 @@ export const PROFILE = {
     slug: 'administrators',
     faIcon: 'shield',
     hexcolor: '#ed0007',
-    tradKey: i18n.t('Administrator'), // trad key allow the parser to generate an entry in the json file
-    label: 'Administrator' // label must be used in components
+    tradKey: [
+      i18n.t('Administrator'),
+      i18n.t('Create user, create shared space, administration of instance')
+    ], // trad key allow the parser to generate an entry in the json file
+    label: 'Administrator', // label must be used in components
+    description: 'Create user, create shared space, administration of instance'
   },
   MANAGER: {
     id: 2,
     slug: 'trusted-users',
     faIcon: 'graduation-cap',
     hexcolor: '#f2af2d',
-    tradKey: i18n.t('Trusted user'), // trad key allow the parser to generate an entry in the json file
-    label: 'Trusted user' // label must be used in components
+    tradKey: [
+      i18n.t('Trusted user'),
+      i18n.t('Create shared space, add member in shared space')
+    ], // trad key allow the parser to generate an entry in the json file
+    label: 'Trusted user', // label must be used in components
+    description: 'Create shared space, add member in shared space'
   },
   USER: {
     id: 4,
     slug: 'users',
     faIcon: 'user',
     hexcolor: '#3145f7',
-    tradKey: i18n.t('User'), // trad key allow the parser to generate an entry in the json file
-    label: 'User' // label must be used in components
+    tradKey: [
+      i18n.t('User'),
+      i18n.t('Access to shared space where user is member')
+    ], // trad key allow the parser to generate an entry in the json file
+    label: 'User', // label must be used in components
+    description: 'Access to shared space where user is member'
   }
 }
 
