@@ -42,10 +42,10 @@ describe('<WorkspaceListItem />', () => {
     )
   )
 
-  const wrapper = mount(
-    <ComponentWithMockHOC {...props} />,
-    { wrappingComponent: RouterMock }
-  )
+  // const wrapper = mount(
+  //   <ComponentWithMockHOC {...props} />,
+  //   { wrappingComponent: RouterMock }
+  // )
 
   it('force success', () => assert(true, true))
 
