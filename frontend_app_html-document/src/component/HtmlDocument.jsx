@@ -41,7 +41,7 @@ export const HtmlDocument = props => {
         {props.mode === MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
             msg={props.t('You have a pending draft')}
-            type='link'
+            btnType='link'
             icon='hand-o-right'
             btnLabel={props.t('resume writing')}
             onClickBtn={props.onClickShowDraft}

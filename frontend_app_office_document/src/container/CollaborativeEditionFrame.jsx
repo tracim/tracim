@@ -23,21 +23,28 @@ class CollaborativeEditionFrame extends React.Component {
       iframeId: props.frameId ? props.frameId : IFRAME_ID,
       iframeStyle: {
         width: '100%',
-        height: '100%',
+        height: 'calc(100% - 61px)',
         top: 61,
         left: 0,
         position: 'fixed',
-        zIndex: 100,
+        zIndex: 25,
         ...props.iframeStyle
       },
       accessToken: '',
       onlineEditorUrl: '',
-      ready: false
+      ready: false,
+      loggedUser: props.data.loggedUser
     }
   }
 
   async componentDidMount () {
-    console.log('%c<CollaboraFrame> did mount', `color: ${this.props.data.config.hexcolor}`)
+    const { props } = this
+    console.log('%c<CollaboraFrame> did mount', `color: ${this.props.data.config.hexcolor}`, props)
+    if (!this.checkUserPermissions()) {
+      this.sendGlobalFlashMessage(props.t("You are not allowed to edit this file"))
+      this.redirectTo(props.data.content.workspace_id)
+      return
+    }
     try {
       await this.loadContent()
     } catch (error) {
@@ -58,13 +65,12 @@ class CollaborativeEditionFrame extends React.Component {
   handleIframeIsClosing = (event) => {
     const { props, state } = this
     if (JSON.parse(event.data).MessageId === 'close') {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.REDIRECT,
-        data: {
-          url: PAGE.WORKSPACE.CONTENT(props.data.content.workspace_id, state.content.content_type, props.data.content.content_id)
-        }
-      })
+      this.redirectTo(props.data.content.workspace_id, state.content.content_type, props.data.content.content_id)
     }
+  }
+
+  checkUserPermissions = () => {
+    return this.state.loggedUser.userRoleIdInWorkspace >= 2
   }
 
   showIframe = () => {
@@ -98,37 +104,22 @@ class CollaborativeEditionFrame extends React.Component {
           // INFO - B.L - 2019.08.06 - content id does not exists in db
           case 1003:
           // INFO - B.L - 2019.08.06 - content id is not a valid integer
-          case 2023:
+          case 2023: // eslint-disable-line no-fallthrough
             this.sendGlobalFlashMessage(props.t('Content not found'))
-            GLOBAL_dispatchEvent({
-              type: CUSTOM_EVENT.REDIRECT,
-              data: {
-                url: `/ui/workspaces/${props.data.content.workspace_id}/contents`
-              }
-            })
+            this.redirectTo(props.data.content.workspace_id)
             throw new Error(response.body.message)
           // INFO - B.L - 2019.08.06 - workspace does not exists or forbidden
           case 1002:
           // INFO - B.L - 2019.08.06 - workspace id is not a valid integer
-          case 2022:
+          case 2022: // eslint-disable-line no-fallthrough
             this.sendGlobalFlashMessage(props.t('Workspace not found'))
-            GLOBAL_dispatchEvent({
-              type: CUSTOM_EVENT.REDIRECT,
-              data: {
-                url: `/ui`
-              }
-            })
+            this.redirectTo()
             throw new Error(response.body.message)
         }
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading file'))
-        GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.REDIRECT,
-          data: {
-            url: '/ui'
-          }
-        })
+        this.sendGlobalFlashMessage(props.t('Unknown error'))
+        this.redirectTo()
         throw new Error('Unknown error')
     }
   }
@@ -139,14 +130,8 @@ class CollaborativeEditionFrame extends React.Component {
       return
     }
     if (!props.data.config.system.config.collaborative_document_edition) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.OPEN_CONTENT_URL,
-        data: {
-          workspaceId: props.data.content.workspace_id,
-          contentType: state.content.content_type,
-          contentId: props.data.content.content_id
-        }
-      })
+      this.sendGlobalFlashMessage(props.t('Unknown url'))
+      this.redirectTo(props.data.content.workspace_id, state.content.content_type, props.data.content.content_id)
       return
     }
     const softwareFileType = props.data.config.system.config.collaborative_document_edition.supported_file_types.find(
@@ -155,14 +140,7 @@ class CollaborativeEditionFrame extends React.Component {
 
     if (!softwareFileType) {
       this.sendGlobalFlashMessage(props.t('You cannot edit this type of file online'))
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.OPEN_CONTENT_URL,
-        data: {
-          workspaceId: props.data.content.workspace_id,
-          contentType: state.content.content_type,
-          contentId: props.data.content.content_id
-        }
-      })
+      this.redirectTo(props.data.content.workspace_id, state.content.content_type, props.data.content.content_id)
       return
     }
 
@@ -192,6 +170,22 @@ class CollaborativeEditionFrame extends React.Component {
       delay: undefined
     }
   })
+
+  redirectTo = (workspaceId, contentType, contentId) => {
+    let url = '/ui'
+    if (workspaceId) {
+      url += `/workspaces/${workspaceId}/contents`
+    }
+    if (workspaceId && contentId) {
+      url += `/${contentType}/${contentId}`
+    }
+    GLOBAL_dispatchEvent({
+      type: CUSTOM_EVENT.REDIRECT,
+      data: {
+        url: url
+      }
+    })
+  }
 
   render () {
     return (
