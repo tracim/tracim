@@ -28,7 +28,7 @@ class PopupCreateOfficeDocument extends React.Component {
       config: props.data.config,
       loggedUser: props.data.loggedUser,
       workspaceId: props.data.workspaceId,
-      idFolder: props.data.idFolder,
+      folderId: props.data.folderId,
       newContentName: '',
       availableFileTypes: [],
       availableTemplates: [],
@@ -73,14 +73,27 @@ class PopupCreateOfficeDocument extends React.Component {
     }
   })
 
+  handleInputKeyDown = e => {
+    switch (e.key) {
+      case 'Enter':
+        e.preventDefault()
+        this.handleValidate()
+        break
+      case 'Escape':
+        e.preventDefault()
+        this.handleClose()
+        break
+    }
+  }
+
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleValidate = async () => {
-    const { config, workspaceId, idFolder, newContentName, availableTemplates, selectedOption, software } = this.state
+    const { config, workspaceId, folderId, newContentName, availableTemplates, selectedOption, software } = this.state
     const { PAGE } = this.props.data.config
     const templateName = getTemplateFromFileType(software, selectedOption.value, availableTemplates)
     const filename = newContentName + getExtensionFromFileType(software, selectedOption.value)
-    const request = postOfficeDocumentFromTemplate(config.apiUrl, workspaceId, idFolder, config.slug, filename, templateName)
+    const request = postOfficeDocumentFromTemplate(config.apiUrl, workspaceId, folderId, config.slug, filename, templateName)
 
     const response = await handleFetchResult(await request)
 
@@ -178,6 +191,7 @@ class PopupCreateOfficeDocument extends React.Component {
           placeholder={this.props.t("Office Document's title")}
           value={this.state.newContentName}
           onChange={this.handleChangeNewContentName}
+          onKeyDown={this.handleInputKeyDown}
           autoFocus
         />
         <RadioBtnGroup

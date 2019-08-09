@@ -11,7 +11,8 @@ import DragHandle from '../DragHandle.jsx'
 import {
   PAGE,
   ROLE_OBJECT,
-  DRAG_AND_DROP
+  DRAG_AND_DROP,
+  sortWorkspaceContents
 } from '../../helper.js'
 
 require('./Folder.styl')
@@ -58,13 +59,13 @@ class Folder extends React.Component {
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
-          className='folder__header align-items-center primaryColorBgLightenHover primaryColorBorderLightenHover'
+          className='folder__header align-items-center primaryColorBgLightenHover'
           onClick={() => props.onClickFolder(props.folderData.id)}
           ref={props.connectDropTarget}
           title={props.folderData.label}
         >
           <div className='folder__header__triangleborder'>
-            <div className='folder__header__triangleborder__triangle' />
+            <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
           </div>
 
           {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
@@ -156,7 +157,7 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {folderContentList.map((content, i) => content.type === 'folder'
+          {folderContentList.sort(sortWorkspaceContents).map((content, i) => content.type === 'folder'
             ? (
               <FolderContainer
                 availableApp={props.availableApp}
