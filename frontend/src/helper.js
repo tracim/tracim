@@ -148,10 +148,10 @@ export const PROFILE = {
     hexcolor: '#ed0007',
     tradKey: [
       i18n.t('Administrator'),
-      i18n.t('Trusted user + create users, create shared spaces, administration of instance')
+      i18n.t('Trusted user + create users, administration of instance')
     ], // trad key allow the parser to generate an entry in the json file
     label: 'Administrator', // label must be used in components
-    description: 'Trusted user + create users, create shared spaces, administration of instance'
+    description: 'Trusted user + create users, administration of instance'
   },
   MANAGER: {
     id: 2,
