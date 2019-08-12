@@ -917,6 +917,7 @@ class ContentCreationSchema(marshmallow.Schema):
 
 
 class ContentDigestSchema(marshmallow.Schema):
+    content_namespace = marshmallow.fields.String(example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     slug = StrippedString(example="intervention-report-12")
     parent_id = marshmallow.fields.Int(

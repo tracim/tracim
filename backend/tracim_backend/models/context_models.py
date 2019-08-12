@@ -821,6 +821,10 @@ class ContentInContext(object):
         return self.content.workspace
 
     @property
+    def content_namespace(self) -> ContentNamespaces:
+        return self.content.content_namespace.value
+
+    @property
     def parent(self) -> typing.Optional["ContentInContext"]:
         if self.content.parent:
             from tracim_backend.lib.core.content import ContentApi
