@@ -55,6 +55,9 @@ import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
 
 import IconButton from './component/Button/IconButton.jsx'
 import ComposedIcon from './component/Icon/ComposedIcon.jsx'
+
+import GenericButton from './component/Button/GenericButton.jsx'
+
 import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
@@ -107,6 +110,7 @@ export {
   CardPopup,
   CardPopupCreateContent,
   NewVersionBtn,
+  GenericButton,
   ArchiveDeleteContent,
   SelectStatus,
   ErrorFlashMessageTemplateHtml,

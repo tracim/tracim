@@ -12,6 +12,7 @@ import {
   PopinFixedRightPart,
   Timeline,
   NewVersionBtn,
+  GenericButton,
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
@@ -210,7 +211,8 @@ class File extends React.Component {
               // FIXME - b.l - refactor urls
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
-          }
+          },
+          mode: MODE.VIEW
         })
         break
       default:
@@ -774,15 +776,18 @@ class File extends React.Component {
                 />
               }
 
-              { onlineEditionAction &&
-                <NewVersionBtn
+              {state.loggedUser.userRoleIdInWorkspace >= 2 && onlineEditionAction &&
+                <GenericButton
+                  customClass='wsContentGeneric__option__menu__addversion newversionbtn btn outlineTextBtn'
+                  dataCy='wsContentGeneric__option__menu__addversion'
                   customColor={state.config.hexcolor}
-                  onClickNewVersionBtn={onlineEditionAction}
+                  onClick={onlineEditionAction}
                   disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
-                  label={props.t('Edit')}
+                  label={props.t('Edit online')}
                   style={{
                     marginLeft: '5px'
                   }}
+                  faIcon={'edit'}
                 />
               }
 
@@ -791,6 +796,7 @@ class File extends React.Component {
                   className='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
+                  data-cy='appFileLastVersionBtn'
                 >
                   <i className='fa fa-history' />
                   {props.t('Last version')}

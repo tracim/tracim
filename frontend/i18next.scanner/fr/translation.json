@@ -213,5 +213,12 @@
   "You have not yet chosen any files to upload.": "Vous n'avez pas encore sélectionné de fichiers à télécharger.",
   "Send": "Envoyer",
   "Thank you, your import is finished!": "Merci, votre importation est terminée !",
-  "You can now close this page, your recipient will receive the notification of your import.": "Vous pouvez maintenant fermer cette page, votre destinataire va recevoir la notification de votre import."
+  "You can now close this page, your recipient will receive the notification of your import.": "Vous pouvez maintenant fermer cette page, votre destinataire va recevoir la notification de votre import.",
+  "Create user, create shared space, administration of instance": "Création d'utilisateurs, création d'espaces partagés, administration de l'instance",
+  "Create shared space, add member in shared space": "Création d'espaces partagés, ajout de membres dans les espaces partagés",
+  "Access to shared space where user is member": "Accès aux espaces partagés dont il est membre",
+  "Contributor + create folder and manage content": "Contributeur + création de fichiers et gestion de contenus",
+  "Reader + create/modify content": "Lecteur + création et modification de contenus",
+  "Just read content": "Uniquement lecture de contenus",
+  "Content manager + add member and edit shared space": "Gestionnaire de contenu + ajout de membres et modification de l'espace partagé"
 }

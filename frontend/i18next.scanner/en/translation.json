@@ -213,5 +213,12 @@
   "You have not yet chosen any files to upload.": "You have not yet chosen any files to upload.",
   "Send": "Send",
   "Thank you, your import is finished": "Thank you, your import is finished",
-  "You can now close this page, your recipient will receive the notification of your import.": "You can now close this page, your recipient will receive the notification of your import."
+  "You can now close this page, your recipient will receive the notification of your import.": "You can now close this page, your recipient will receive the notification of your import.",
+  "Create user, create shared space, administration of instance": "Create user, create shared space, administration of instance",
+  "Create shared space, add member in shared space": "Create shared space, add member in shared space",
+  "Access to shared space where user is member": "Access to shared space where user is member",
+  "Contributor + create folder and manage content": "Contributor + create folder and manage content",
+  "Reader + create/modify content": "Reader + create/modify content",
+  "Just read content": "Just read content",
+  "Content manager + add member and edit shared space": "Content manager + add member and edit shared space"
 }

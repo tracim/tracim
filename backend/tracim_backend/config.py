@@ -827,10 +827,10 @@ class CFG(object):
         office_document = Application(
             label="Office Document",
             slug="office_document",
-            fa_icon="comments-o",
+            fa_icon="file-o",
             is_active=self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
             config={},
-            main_route="/ui/workspaces/{workspace_id}/office",
+            main_route="",
             app_config=self,
         )
         office_document.add_content_type(
