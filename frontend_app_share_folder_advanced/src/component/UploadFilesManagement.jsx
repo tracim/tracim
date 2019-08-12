@@ -31,11 +31,11 @@ const UploadFilesManagement = props => {
       {props.shareLinkList.length > 0
         ? props.shareLinkList.map(shareLink =>
           <ShareLink
+            hexcolor={customColor}
             email={shareLink.email}
             link={shareLink.direct_url}
-            onClickDeleteShareLink={() => props.onClickDeleteShareLink(shareLink.share_id)}
-            hexcolor={customColor}
             isProtected={shareLink.has_password}
+            onClickDeleteShareLink={() => props.onClickDeleteShareLink(shareLink.share_id)}
             userRoleIdInWorkspace={props.userRoleIdInWorkspace}
           />
         )

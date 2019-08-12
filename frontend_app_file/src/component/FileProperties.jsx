@@ -2,6 +2,8 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 
+const color = require('color')
+
 require('./FileProperties.styl')
 
 export class FileProperties extends React.Component {
@@ -36,6 +38,10 @@ export class FileProperties extends React.Component {
         <div className='fileProperties__content'>
           <div className='fileProperties__content__detail'>
             <div className='fileProperties__content__detail__item'>
+              {props.t('Type')}: {props.fileType}
+            </div>
+
+            <div className='fileProperties__content__detail__item'>
               {props.t('Size')}: {props.fileSize}
             </div>
 
@@ -43,53 +49,72 @@ export class FileProperties extends React.Component {
               {props.t('Page number')}: {props.filePageNb}
             </div>
 
-            <div className='fileProperties__content__detail__description'>
-              {state.displayFormNewDescription
-                ? (
-                  <form className='fileProperties__content__detail__description__editiondesc'>
-                    <textarea
-                      value={state.newDescription}
-                      onChange={this.handleChangeDescription}
-                    />
-
-                    <div className='fileProperties__content__detail__description__editiondesc__btn'>
-                      <button
-                        type='button'
-                        className='fileProperties__content__detail__description__editiondesc__btn__cancel btn'
-                        onClick={this.handleToggleFormNewDescription}
-                      >
-                        {props.t('Cancel')}
-                      </button>
-
-                      <button
-                        type='button'
-                        className='fileProperties__content__detail__description__editiondesc__validate btn'
-                        onClick={this.handleClickValidateNewDescription}
-                      >
-                        {props.t('Validate')}
-                      </button>
-                    </div>
-                  </form>
-                )
-                : (
-                  <div>
-                    {props.t('Description')}: {props.description}
-                  </div>
-                )
-              }
+            <div className='fileProperties__content__detail__item'>
+              {props.t('Creation date')}: {props.creationDate}
             </div>
+
+            <div className='fileProperties__content__detail__item'>
+              {props.t('Last modification')}: {props.lastModification}
+            </div>
+
+            <div className='fileProperties__content__detail__description'>
+              {props.t('Description')}:
+            </div>
+            {state.displayFormNewDescription
+              ? (
+                <form className='fileProperties__content__detail__description__editiondesc'>
+                  <textarea
+                    value={state.newDescription}
+                    onChange={this.handleChangeDescription}
+                  />
+
+                  <div className='fileProperties__content__detail__description__editiondesc__btn'>
+                    <button
+                      type='button'
+                      className='fileProperties__content__detail__description__editiondesc__btn__cancel btn'
+                      onClick={this.handleToggleFormNewDescription}
+                      key='cancelBtn'
+                      style={{
+                        ':hover': {
+                          backgroundColor: props.color
+                        }
+                      }}
+                    >
+                      {props.t('Cancel')}
+                    </button>
+
+                    <button
+                      type='button'
+                      className='fileProperties__content__detail__description__editiondesc__btn__validate btn'
+                      onClick={this.handleClickValidateNewDescription}
+                      key='validateBtn'
+                      style={{
+                        ':hover': {
+                          backgroundColor: props.color
+                        }
+                      }}
+                    >
+                      {props.t('Validate')}
+                    </button>
+                  </div>
+                </form>
+              )
+              : (
+                <div className='fileProperties__content__detail__description__text'>
+                  {props.description}
+                </div>
+              )
+            }
 
             {props.displayChangeDescriptionBtn && !state.displayFormNewDescription &&
               <button
                 type='button'
-                className='fileProperties__content__detail__btndesc btn outlineTextBtn'
+                className='fileProperties__content__detail__btndesc btn highlightBtn'
                 onClick={this.handleToggleFormNewDescription}
                 style={{
-                  borderWidth: '1px',
-                  borderStyle: 'solid',
-                  borderColor: props.color,
+                  backgroundColor: props.color,
                   ':hover': {
-                    backgroundColor: props.color
+                    backgroundColor: color(props.color).darken(0.15).hex()
                   }
                 }}
                 disabled={props.disableChangeDescription}

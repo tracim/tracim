@@ -885,7 +885,7 @@ class File extends React.Component {
                 label: props.t('Share'),
                 icon: 'fa-share-alt',
                 children: <ShareDownload
-                  label={state.config.label}
+                  label={props.t(state.config.label)}
                   hexcolor={state.config.hexcolor}
                   shareEmails={state.shareEmails}
                   onChangeEmails={this.handleChangeEmails}
@@ -904,8 +904,11 @@ class File extends React.Component {
                 icon: 'fa-info-circle',
                 children: <FileProperties
                   color={state.config.hexcolor}
+                  fileType={state.content.file_extension}
                   fileSize={displayFileSize(state.content.size)}
                   filePageNb={state.content.page_nb}
+                  creationDate={displayDistanceDate(state.content.created, state.loggedUser.lang)}
+                  lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
                   description={state.content.raw_content}
                   displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
                   disableChangeDescription={!state.content.is_editable}
