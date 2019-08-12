@@ -24,15 +24,15 @@ class UploadDataForm(object):
     Simple parent_id object
     """
 
-    def __init__(self, message: str = "", name: str = "", password: str = "") -> None:
+    def __init__(self, message: str = "", username: str = "", password: str = "") -> None:
         self.message = message
-        self.name = name
+        self.username = username
         self.password = password
 
 
 class UploadDataFormSchema(marshmallow.Schema):
     message = StrippedString()
-    name = StrippedString()
+    username = StrippedString()
     password = marshmallow.fields.String(
         example="8QLa$<w",
         required=False,

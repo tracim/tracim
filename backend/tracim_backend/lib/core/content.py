@@ -587,6 +587,7 @@ class ContentApi(object):
             content_type_slug=content_type_list.Comment.slug,
             workspace=workspace,
             parent=parent,
+            content_namespace=parent.content_namespace,
             do_notify=False,
             do_save=False,
             label="",

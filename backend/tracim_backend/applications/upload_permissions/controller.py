@@ -23,6 +23,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_content_manager
+from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentNamespaces
@@ -131,7 +132,7 @@ class UploadPermissionController(Controller):
         content_api = ContentApi(
             config=app_config, current_user=upload_permission.author, session=request.dbsession
         )
-        label_name = "upload by {}-{}".format(hapic_data.forms.name, datetime.now())
+        label_name = "upload by {}-{}".format(hapic_data.forms.username, datetime.now())
         upload_folder = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=upload_permission.workspace,
@@ -157,6 +158,14 @@ class UploadPermissionController(Controller):
                 new_mimetype=_file.type,
                 new_content=_file.file,
             )
+        content_api.create_comment(
+            parent=content,
+            content=_("message from {username}: {message}").format(
+                username=hapic_data.forms.username, message=hapic_data.forms.message
+            ),
+            do_save=True,
+            do_notify=False,
+        )
         content_api.execute_created_content_actions(content)
         return
 
