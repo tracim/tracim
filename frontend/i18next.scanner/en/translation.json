@@ -202,11 +202,11 @@
   ", create the first content of that type by clicking on the button 'Create'": ", create the first content of that type by clicking on the button 'Create'",
   "This shared space has no content of that type yet": "This shared space has no content of that type yet",
   "Insufficient rights": "Insufficient rights",
-  "Create user, create shared space, administration of instance": "Create user, create shared space, administration of instance",
-  "Create shared space, add member in shared space": "Create shared space, add member in shared space",
-  "Access to shared space where user is member": "Access to shared space where user is member",
-  "Contributor + create folder and manage content": "Contributor + create folder and manage content",
+  "Content manager + add members and edit shared spaces": "Content manager + add members and edit shared spaces",
+  "Contributor + create folders and manage contents": "Contributor + create folders and manage contents",
   "Reader + create/modify content": "Reader + create/modify content",
-  "Just read content": "Just read content",
-  "Content manager + add member and edit shared space": "Content manager + add member and edit shared space"
+  "Read contents": "Read contents",
+  "Access to shared spaces where user is member": "Access to shared spaces where user is member",
+  "Trusted user + create users, create shared spaces, administration of instance": "Trusted user + create users, create shared spaces, administration of instance",
+  "User + create shared spaces, add members in shared spaces": "User + create shared spaces, add members in shared spaces"
 }
