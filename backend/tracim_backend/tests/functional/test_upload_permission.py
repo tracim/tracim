@@ -319,7 +319,7 @@ class TestPrivateUploadPermissionWithNotification(object):
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestGuestUploadEndpoints(object):
-    def test_api__guest_upload_content_info__ok_200__with_password(
+    def test_api__guest_upload_content__ok_200__with_password(
         self,
         workspace_api_factory,
         content_api_factory,
@@ -403,7 +403,7 @@ class TestGuestUploadEndpoints(object):
         )
         assert len(res.json_body) == 0
 
-    def test_api__guest_upload_content_info__err_403__wrong_password(
+    def test_api__guest_upload_content__err_403__wrong_password(
         self,
         workspace_api_factory,
         content_api_factory,
@@ -435,7 +435,7 @@ class TestGuestUploadEndpoints(object):
         )
         assert res.json_body["code"] == ErrorCode.WRONG_SHARE_PASSWORD
 
-    def test_api__guest_upload_content_info__ok_200__without_password(
+    def test_api__guest_upload_content__ok_200__without_password(
         self,
         workspace_api_factory,
         content_api_factory,
