@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { BtnSwitch } from 'tracim_frontend_lib'
 import { ROLE } from '../../helper.js'
@@ -68,3 +69,14 @@ export const Notification = props =>
   </div>
 
 export default translate()(Notification)
+
+Notification.propTypes = {
+  workspaceList: PropTypes.arrayOf(PropTypes.object),
+  userLoggedId: PropTypes.number,
+  onChangeSubscriptionNotif: PropTypes.func
+}
+
+Notification.propTypes = {
+  workspaceList: [],
+  onChangeSubscriptionNotif: () => {}
+}

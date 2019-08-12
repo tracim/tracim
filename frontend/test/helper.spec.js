@@ -1,5 +1,11 @@
 import { expect, assert } from 'chai'
-import { sortWorkspaceContents } from '../src/helper.js'
+import {
+  sortWorkspaceContents,
+  findUserRoleIdInWorkspace,
+  ROLE,
+  getUserProfile,
+  PROFILE
+} from '../src/helper.js'
 
 describe('In file helper.js', () => {
   describe('the function sortWorkspaceContents()', () => {
@@ -99,6 +105,65 @@ describe('In file helper.js', () => {
       const sortedContentList = contentListAsGivenByApi.sort(sortWorkspaceContents)
 
       expect(sortedContentList).to.deep.equal(contentListSortedByFolderAndAlphabetically)
+    })
+  })
+
+  describe('the function findUserRoleIdInWorkspace()', () => {
+    const memberList = [{
+      id: 0,
+      role: 'reader'
+    },{
+      id: 1,
+      role: 'contributor'
+    },{
+      id: 2,
+      role: 'content-manager'
+    },{
+      id: 3,
+      role: 'workspace-manager'
+    }]
+
+    it('the function should return the correct reader id', () => {
+      const roleId = findUserRoleIdInWorkspace(0, memberList, ROLE)
+      expect(roleId).to.equal(1)
+    })
+
+    it('the function should return the correct contributor id', () => {
+      const roleId = findUserRoleIdInWorkspace(1, memberList, ROLE)
+      expect(roleId).to.equal(2)
+    })
+
+    it('the function should return the correct content-manager id', () => {
+      const roleId = findUserRoleIdInWorkspace(2, memberList, ROLE)
+      expect(roleId).to.equal(4)
+    })
+
+    it('the function should return the correct workspace-manager id', () => {
+      const roleId = findUserRoleIdInWorkspace(3, memberList, ROLE)
+      expect(roleId).to.equal(8)
+    })
+
+    it('the function should return the correct reader id when the user is not in memberList', () => {
+      const roleId = findUserRoleIdInWorkspace(4, memberList, ROLE)
+      expect(roleId).to.equal(1)
+    })
+  })
+
+  describe('the getUserProfile() function', () => {
+    it('should return the proper profile when the slug is "administrators"', () => {
+      expect(getUserProfile('administrators')).to.eql(PROFILE.ADMINISTRATOR)
+    })
+
+    it('should return the proper profile when the slug is "trusted-users"', () => {
+      expect(getUserProfile('trusted-users')).to.eql(PROFILE.MANAGER)
+    })
+
+    it('should return the proper profile when the slug is "users"', () => {
+      expect(getUserProfile('users')).to.eql(PROFILE.USER)
+    })
+
+    it('should return an empty object when the slug is empty', () => {
+      expect(getUserProfile()).to.eql({})
     })
   })
 })
