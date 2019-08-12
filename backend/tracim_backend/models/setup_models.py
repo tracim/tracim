@@ -12,6 +12,7 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 import zope.sqlalchemy
 
+from tracim_backend.applications.share.models import ContentShare  # noqa: F401
 from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.models.auth import Group  # noqa: F401
 from tracim_backend.models.auth import Permission  # noqa: F401

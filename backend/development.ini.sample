@@ -286,11 +286,15 @@ email.notification.reply_to.email = reply+{content_id}@trac.im
 email.notification.references.email = thread+{content_id}@trac.im
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
 email.notification.created_account.subject = [{website_title}] Someone created an account for you
+email.notification.share_content_to_emitter.subject = [{website_title}] you shared {content_filename} to {nb_receivers} users
+email.notification.share_content_to_receiver.subject = [{website_title}] {emitter_name} shared content {content_filename} with you
 
 ### Templates ###
 email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
 email.notification.created_account.template.html = %(email.template_dir)s/created_account_body_html.mak
 email.notification.reset_password_request.template.html = %(email.template_dir)s/reset_password_body_html.mak
+email.notification.share_content_to_emitter.template.html = %(email.template_dir)s/shared_content_to_emitter_body_html.mak
+email.notification.share_content_to_receiver.template.html = %(email.template_dir)s/shared_content_to_receiver_body_html.mak
 
 ####
 # EMAIL-REPLY
