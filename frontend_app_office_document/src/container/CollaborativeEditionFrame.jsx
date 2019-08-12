@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import i18n from '../i18n.js'
 import { PAGE } from '../helper.js'
 import {
   handleFetchResult,
@@ -48,6 +49,7 @@ class CollaborativeEditionFrame extends React.Component {
 
     await this.setIframeConfig()
     this.showIframe()
+    i18n.changeLanguage(this.state.loggedUser.lang)
     window.addEventListener('message', this.handleIframeIsClosing, false)
   }
 
@@ -58,7 +60,14 @@ class CollaborativeEditionFrame extends React.Component {
 
   handleIframeIsClosing = (event) => {
     const { props, state } = this
-    if (JSON.parse(event.data).MessageId === 'close') {
+    let data = {}
+    // INFO - B.L - if might catch event producing utf-8 error while parsing
+    try {
+      data = JSON.parse(event.data)
+    } catch (error) {
+      data = {}
+    }
+    if (data.MessageId && data.MessageId === 'close') {
       this.redirectTo(props.data.content.workspace_id, state.content.content_type, props.data.content.content_id)
     }
   }
@@ -72,10 +81,10 @@ class CollaborativeEditionFrame extends React.Component {
   buildCompleteIframeUrl = (urlSource, accessToken) => {
     const { state } = this
     const protocol = window.location.protocol
-    const readyonly = !state.content.is_editable || state.loggedUser.userRoleIdInWorkspace >= 2
+    const readyonly = !state.content.is_editable || !state.loggedUser.userRoleIdInWorkspace >= 2
     // INFO - B.L - 2019.08.01 - We assume frontend is on the same host than the API
     const host = window.location.host
-    let url = `${urlSource}WOPISrc=${protocol}//${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1`
+    let url = `${urlSource}WOPISrc=${protocol}//${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1&lang=${state.loggedUser.lang}`
     if (readyonly) {
       url += '&permission=readonly'
     }
