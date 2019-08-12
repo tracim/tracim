@@ -1,0 +1,386 @@
+import pytest
+from rq import SimpleWorker
+import transaction
+
+from tracim_backend.applications.share.models import ContentShareType
+from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
+from tracim_backend.lib.utils.utils import get_redis_connection
+from tracim_backend.lib.utils.utils import get_rq_queue
+from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import create_1000px_png_test_image
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestPrivateUploadPermissionEndpoints(object):
+    def test_api__get_upload_permission__ok_200__no_result(
+        self, workspace_api_factory, session, web_testapp, content_type_list
+    ) -> None:
+        """
+        Get one file of a content
+        """
+
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        transaction.commit()
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+        )
+        content = res.json_body
+        assert len(content) == 0
+
+    def test_api__get_upload_permission__ok_200__nominal_case(
+        self, workspace_api_factory, session, web_testapp, upload_permission_lib_factory, admin_user
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["test@test.test", "test2@test2.test2"]
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+        )
+        content = res.json_body
+        assert len(content) == 2
+        assert content[0]["author_id"] == admin_user.user_id
+        assert content[0]["has_password"] is False
+        assert content[0]["type"] == ContentShareType.EMAIL.value
+        assert content[0]["disabled"] is None
+        assert content[0]["is_disabled"] is False
+        assert content[0]["upload_permission_id"]
+        assert content[0]["email"] == "test@test.test"
+        assert content[0]["url"].startswith("http://localhost:6543/ui/guest-upload/")
+        assert content[0]["created"]
+        assert content[0]["author"]
+        assert (
+            content[0]["upload_permission_group_uuid"] == content[1]["upload_permission_group_uuid"]
+        )
+        assert content[0]["created"] == content[1]["created"]
+        assert content[0]["upload_permission_id"] != content[1]["upload_permission_id"]
+        assert content[1]["email"] == "test2@test2.test2"
+
+    def test_api__get_upload_permission__err_400__not_shareable_type(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["test@test.test", "test2@test2.test2"]
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+        )
+        content = res.json_body
+        assert len(content) == 2
+        assert content[0]["author_id"] == admin_user.user_id
+        assert content[0]["has_password"] is False
+        assert content[0]["type"] == ContentShareType.EMAIL.value
+        assert content[0]["disabled"] is None
+        assert content[0]["is_disabled"] is False
+        assert content[0]["upload_permission_id"]
+        assert content[0]["email"] == "test@test.test"
+        assert content[0]["url"].startswith("http://localhost:6543/ui/guest-upload/")
+        assert content[0]["created"]
+        assert content[0]["author"]
+        assert (
+            content[0]["upload_permission_group_uuid"] == content[1]["upload_permission_group_uuid"]
+        )
+        assert content[0]["created"] == content[1]["created"]
+        assert content[0]["upload_permission_id"] != content[1]["upload_permission_id"]
+        assert content[1]["email"] == "test2@test2.test2"
+
+    def test_api__add_upload_permission__ok_200__nominal_case(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["thissharewill@notbe.presentinresponse"]
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+        )
+        content = res.json_body
+        assert len(content) == 1
+        params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
+        res = web_testapp.post_json(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id),
+            params=params,
+            status=200,
+        )
+        content = res.json_body
+        assert len(content) == 2
+        assert content[0]["author_id"] == admin_user.user_id
+        assert content[0]["has_password"] is True
+        assert content[0]["type"] == ContentShareType.EMAIL.value
+        assert content[0]["disabled"] is None
+        assert content[0]["is_disabled"] is False
+        assert content[0]["upload_permission_id"]
+        assert content[0]["email"] == "test@test.test"
+        assert content[0]["url"].startswith("http://localhost:6543/ui/guest-upload/")
+        assert content[0]["created"]
+        assert content[0]["author"]
+        assert (
+            content[0]["upload_permission_group_uuid"] == content[1]["upload_permission_group_uuid"]
+        )
+        assert content[0]["created"] == content[1]["created"]
+        assert content[0]["upload_permission_id"] != content[1]["upload_permission_id"]
+        assert content[1]["email"] == "test2@test2.test2"
+
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+        )
+        content = res.json_body
+        assert len(content) == 3
+
+    def test_api__delete_upload_permission__ok_200__nominal_case(
+        self, workspace_api_factory, session, web_testapp, upload_permission_lib_factory, admin_user
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["thissharewill@notbe.presentinresponse"]
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+        )
+        content = res.json_body
+        assert len(content) == 1
+        assert content[0]["upload_permission_id"]
+        upload_permission_id = content[0]["upload_permission_id"]
+
+        web_testapp.delete(
+            "/api/v2/workspaces/{}/upload_permissions/{}".format(
+                workspace.workspace_id, upload_permission_id
+            ),
+            status=204,
+        )
+
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+        )
+        content = res.json_body
+        assert len(content) == 0
+
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id),
+            status=200,
+            params={"show_disabled": 1},
+        )
+        content = res.json_body
+        assert len(content) == 1
+
+
+@pytest.mark.usefixtures("base_fixture")
+class TestPrivateUploadPermissionWithNotification(object):
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+    )
+    def test_api__add_upload_permission__ok_200__with_email_notification(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+        mailhog,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["test@test.test", "test2@test2.test2"]
+        )
+        transaction.commit()
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 3
+        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        for email in response:
+            assert (
+                email["Content"]["Headers"]["From"][0]
+                == "Tracim Notifications <test_user_from+0@localhost>"
+            )
+            headers = email["Content"]["Headers"]
+            assert headers["To"][0] in valid_dests
+            valid_dests.remove(headers["To"][0])
+        assert valid_dests == []
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_test_with_mail_test_async"}], indirect=True
+    )
+    def test_api__add_upload_permission__ok_200__with_email_notification_async(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+        mailhog,
+        app_config,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["test@test.test", "test2@test2.test2"]
+        )
+        transaction.commit()
+
+        mailhog.cleanup_mailhog()
+        # Send mail async from redis queue
+        redis = get_redis_connection(app_config)
+        queue = get_rq_queue(redis, "mail_sender")
+        worker = SimpleWorker([queue], connection=queue.connection)
+        worker.work(burst=True)
+
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 3
+        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        for email in response:
+            assert (
+                email["Content"]["Headers"]["From"][0]
+                == "Tracim Notifications <test_user_from+0@localhost>"
+            )
+            headers = email["Content"]["Headers"]
+            assert headers["To"][0] in valid_dests
+            valid_dests.remove(headers["To"][0])
+        assert valid_dests == []
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+    )
+    def test_api__add_upload_permission__ok_200__with_email_notification_and_password(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+        mailhog,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["test@test.test", "test2@test2.test2"], password="toto"
+        )
+        transaction.commit()
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 3
+        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        for email in response:
+            assert (
+                email["Content"]["Headers"]["From"][0]
+                == "Tracim Notifications <test_user_from+0@localhost>"
+            )
+            headers = email["Content"]["Headers"]
+            assert headers["To"][0] in valid_dests
+            valid_dests.remove(headers["To"][0])
+        assert valid_dests == []
+
+
+#
+#
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestGuestUploadEndpoints(object):
+    def test_api__guest_upload_content_info__ok_200__nominal_case(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["thissharewill@notbe.presentinresponse"]
+        )
+        upload_permissions = upload_permission_lib.get_upload_permissions(workspace)
+        assert len(upload_permissions) == 1
+        upload_permission = upload_permissions[0]
+        transaction.commit()
+        params = {"name": "toto", "password": "qdsdqs", "message": "hello folk !"}
+        image = create_1000px_png_test_image()
+        web_testapp.post(
+            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+                upload_permission_token=upload_permission.token
+            ),
+            status=204,
+            upload_files=[("files", image.name, image.getvalue())],
+            params=params,
+        )
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        params = {"namespaces_filter": "upload"}
+        res = web_testapp.get(
+            "/api/v2/workspaces/{workspace_id}/contents".format(
+                workspace_id=workspace.workspace_id
+            ),
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 2
+        file = res[0]
+        assert file["label"] == "test_image"
+        assert file["filename"] == "test_image.png"
+        assert file["content_type"] == "file"
+        image_content_id = file["content_id"]
+        dir = res[1]
+        assert dir["label"].startswith("upload by toto")
+        assert dir["parent_id"] is None
+        assert dir["content_type"] == "folder"
+
+        res = web_testapp.get(
+            "/api/v2/workspaces/{workspace_id}/files/{content_id}/raw/".format(
+                workspace_id=workspace.workspace_id, content_id=image_content_id
+            ),
+            status=200,
+        )
+        assert res.body == image.getvalue()
+
+        res = web_testapp.get(
+            "/api/v2/workspaces/{workspace_id}/contents".format(
+                workspace_id=workspace.workspace_id
+            ),
+            status=200,
+        )
+        assert len(res.json_body) == 0

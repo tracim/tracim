@@ -4,64 +4,66 @@ from email.mime.text import MIMEText
 from email.utils import formataddr
 import typing
 
-from tracim_backend.applications.share.models_in_context import ContentShareInContext
+from tracim_backend.applications.upload_permissions.models_in_context import (
+    UploadPermissionInContext,
+)
 from tracim_backend.lib.mail_notifier.notifier import EmailManager
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.models.auth import User
-from tracim_backend.models.data import Content
+from tracim_backend.models.data import Workspace
 
 
-class ShareEmailManager(EmailManager):
-    def notify__share__content(
+class UploadPermissionEmailManager(EmailManager):
+    def notify_upload_permission(
         self,
         emitter: User,
-        shared_content: Content,
-        content_share_receivers: typing.List[ContentShareInContext],
-        share_password: str,
+        workspace: Workspace,
+        upload_permission_receivers: typing.List[UploadPermissionInContext],
+        upload_permission_password: str,
     ) -> None:
         """
         Send mails to notify users for sharing content
         :param emitter: User emitter of the sharing
-        :param shared_content: content that is now shared
-        :param content_share_receivers: list of content share
-        :param share_password: cleartext password of the sharing
+        :param workspace: workspace where receivers can now upload file
+        :param upload_permission_receivers: list of upload_permission
+        :param upload_permission_password: cleartext password of the sharing
         """
 
         email_sender = EmailSender(
             self.config, self._smtp_config, self.config.EMAIL__NOTIFICATION__ACTIVATED
         )
-        share_password_enabled = False
-        if share_password:
-            share_password_enabled = True
+        upload_permission_password_enabled = False
+        if upload_permission_password:
+            upload_permission_password_enabled = True
         translator = Translator(self.config, default_lang=emitter.lang)
         message = self._notify_emitter(
             emitter=emitter,
-            shared_content=shared_content,
-            content_share_receivers=content_share_receivers,
-            share_password=share_password,
+            workspace=workspace,
+            upload_permission_receivers=upload_permission_receivers,
+            upload_permission_password=upload_permission_password,
             translator=translator,
         )
         send_email_through(
             config=self.config, sendmail_callable=email_sender.send_mail, message=message
         )
-        for content_share in content_share_receivers:
-            emails_receivers_list = [
-                share_content.email for share_content in content_share_receivers
-            ]
-            logger.info(
-                self,
-                'Generating share mail from user "{}" to "{}"'.format(
-                    emitter.user_id, "".join(emails_receivers_list)
-                ),
-            )
+        emails_receivers_list = [
+            upload_permission.email for upload_permission in upload_permission_receivers
+        ]
+        logger.info(
+            self,
+            'Generating upload permission mail from user "{}" to "{}"'.format(
+                emitter.user_id, "".join(emails_receivers_list)
+            ),
+        )
+        for upload_permission in upload_permission_receivers:
             message = self._notify_receiver(
                 emitter=emitter,
-                shared_content=shared_content,
-                content_share=content_share,
-                share_password_enabled=share_password_enabled,
+                workspace=workspace,
+                upload_permission=upload_permission,
+                upload_permission_password_enabled=upload_permission_password_enabled,
                 translator=translator,
             )
             send_email_through(
@@ -71,37 +73,37 @@ class ShareEmailManager(EmailManager):
     def _notify_emitter(
         self,
         emitter: User,
-        shared_content: Content,
-        content_share_receivers: typing.List[ContentShareInContext],
-        share_password: str,
+        workspace: Workspace,
+        upload_permission_receivers: typing.List[UploadPermissionInContext],
+        upload_permission_password: str,
         translator: Translator,
     ) -> Message:
         logger.info(
             self,
-            'preparing email to user "{}" about share on content "{}" info created'.format(
-                emitter.user_id, shared_content.content_id
+            'preparing email to user "{}" about upload_permission on workspace "{}" info created'.format(
+                emitter.user_id, workspace.workspace_id
             ),
         )
         message = MIMEMultipart("alternative")
         translated_subject = translator.get_translation(
-            self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT
+            self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT
         )
         message["Subject"] = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
-            content_filename=shared_content.file_name,
-            nb_receivers=len(content_share_receivers),
+            nb_receivers=len(upload_permission_receivers),
+            workspace_name=workspace.label,
         )
         message["From"] = self._get_sender()
         to_addr = formataddr((emitter.display_name, emitter.email))
         message["To"] = to_addr
         html_template_file_path = (
-            self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML
+            self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML
         )
         context = {
             "emitter": emitter,
-            "shared_content": shared_content,
-            "content_share_receivers": content_share_receivers,
-            "share_password": share_password,
+            "workspace": workspace,
+            "upload_permission_receivers": upload_permission_receivers,
+            "upload_permission_password": upload_permission_password,
         }
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator
@@ -117,36 +119,36 @@ class ShareEmailManager(EmailManager):
     def _notify_receiver(
         self,
         emitter: User,
-        shared_content: Content,
-        content_share: ContentShareInContext,
-        share_password_enabled: bool,
+        workspace: Workspace,
+        upload_permission: UploadPermissionInContext,
+        upload_permission_password_enabled: bool,
         translator: Translator,
     ) -> Message:
         logger.info(
             self,
-            'preparing email from user "{}" for the share on content "{}" to "{}"'.format(
-                emitter.user_id, shared_content.content_id, content_share.email
+            'preparing email from user "{}" for the upload permission on workspace "{}" to "{}"'.format(
+                emitter.user_id, workspace.workspace_id, upload_permission.email
             ),
         )
         message = MIMEMultipart("alternative")
         translated_subject = translator.get_translation(
-            self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT
+            self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT
         )
         message["Subject"] = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
-            content_filename=shared_content.file_name,
             emitter_name=emitter.display_name,
+            workspace_name=workspace.label,
         )
         message["From"] = self._get_sender()
-        message["To"] = content_share.email
+        message["To"] = upload_permission.email
         html_template_file_path = (
-            self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML
+            self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML
         )
         context = {
             "emitter": emitter,
-            "shared_content": shared_content,
-            "content_share": content_share,
-            "share_password_enabled": share_password_enabled,
+            "workspace": workspace,
+            "upload_permission": upload_permission,
+            "upload_permission_password_enabled": upload_permission_password_enabled,
         }
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator

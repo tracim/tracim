@@ -19,6 +19,7 @@ from wsgidav.dav_provider import _DAVResource
 from tracim_backend import CFG
 from tracim_backend import CaldavAppFactory
 from tracim_backend.applications.share.lib import ShareLib
+from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
@@ -64,6 +65,20 @@ class ShareLibFactory(object):
 
     def get(self, current_user: typing.Optional[User] = None) -> ShareLib:
         return ShareLib(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.admin_user,
+        )
+
+
+class UploadPermissionLibFactory(object):
+    def __init__(self, session: Session, app_config: CFG, admin_user: User):
+        self.session = session
+        self.app_config = app_config
+        self.admin_user = admin_user
+
+    def get(self, current_user: typing.Optional[User] = None) -> UploadPermissionLib:
+        return UploadPermissionLib(
             session=self.session,
             config=self.app_config,
             current_user=current_user or self.admin_user,

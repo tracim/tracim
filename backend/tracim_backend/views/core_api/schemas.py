@@ -17,6 +17,7 @@ from tracim_backend.app_models.validator import content_status_validator
 from tracim_backend.app_models.validator import not_empty_string_validator
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
+from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -509,6 +510,13 @@ class FilterContentQuerySchema(marshmallow.Schema):
         " If multiple value of parent_ids separated by comma,"
         " return mix of all content of all theses parent_ids",
         default="0",
+    )
+    namespaces_filter = StrippedString(
+        validate=regex_string_as_list_of_string,
+        example="content,upload",
+        description="comma list of namespaces allowed",
+        default=None,
+        allow_none=True,
     )
     complete_path_to_id = marshmallow.fields.Int(
         example=6,

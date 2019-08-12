@@ -152,6 +152,7 @@ class ContentApi(object):
         all_content_in_treeview: bool = True,
         force_show_all_types: bool = False,
         disable_user_workspaces_filter: bool = False,
+        namespaces_filter: typing.Optional[typing.List[ContentNamespaces]] = None,
     ) -> None:
         self._session = session
         self._user = current_user
@@ -169,6 +170,7 @@ class ContentApi(object):
         if self._user:
             default_lang = self._user.lang
         self.translator = Translator(app_config=self._config, default_lang=default_lang)
+        self.namespaces_filter = namespaces_filter
 
     @contextmanager
     def show(
@@ -285,6 +287,9 @@ class ContentApi(object):
 
         if not self._show_temporary:
             result = result.filter(Content.is_temporary == False)  # noqa: E711
+
+        if self.namespaces_filter:
+            result = result.filter(Content.content_namespace.in_(self.namespaces_filter))
 
         return result
 

@@ -29,7 +29,7 @@ class WorkspaceApi(object):
     def __init__(
         self,
         session: Session,
-        current_user: User,
+        current_user: typing.Optional[User],
         config: CFG,
         force_role: bool = False,
         show_deleted: bool = False,

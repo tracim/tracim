@@ -152,8 +152,10 @@ class CFG(object):
         # to make thing easier later
         # when app will be load dynamycally.
         import tracim_backend.applications.share.config as share_app_config
+
         share_app_config.load_config(self)
         import tracim_backend.applications.upload_permissions.config as upload_permissions_config
+
         upload_permissions_config.load_config(self)
 
     def _load_global_config(self) -> None:
@@ -584,8 +586,10 @@ class CFG(object):
         # to make thing easier later
         # when app will be load dynamycally.
         import tracim_backend.applications.share.config as share_app_config
+
         share_app_config.check_config(self)
         import tracim_backend.applications.upload_permissions.config as upload_permissions_config
+
         upload_permissions_config.check_config(self)
 
     def _check_collaborative_document_edition_config_validity(self) -> None:
