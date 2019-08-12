@@ -94,7 +94,7 @@ class ShareTokenWithFilenamePath(object):
 
 
 class ShareCreationBody(object):
-    def __init__(self, emails: typing.List[str], password: str):
+    def __init__(self, emails: typing.List[str], password: typing.Optional[str]):
         self.emails = emails
         self.password = password
 
@@ -102,7 +102,7 @@ class ShareCreationBody(object):
 class ShareCreationBodySchema(marshmallow.Schema):
     emails = marshmallow.fields.List(marshmallow.fields.Email(validate=share_email_validator))
     password = marshmallow.fields.String(
-        example="8QLa$<w", required=True, validate=share_password_validator
+        example="8QLa$<w", required=False, allow_none=True, validate=share_password_validator
     )
 
     @post_load
