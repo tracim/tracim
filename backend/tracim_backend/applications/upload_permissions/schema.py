@@ -98,7 +98,7 @@ class UploadPermissionIdPathSchema(WorkspaceIdPathSchema):
 
 
 class UploadPermissionCreationBody(object):
-    def __init__(self, emails: typing.List[str], password: str):
+    def __init__(self, emails: typing.List[str], password: typing.Optional[str]):
         self.emails = emails
         self.password = password
 
@@ -108,7 +108,10 @@ class UploadPermissionCreationBodySchema(marshmallow.Schema):
         marshmallow.fields.Email(validate=upload_permission_email_validator)
     )
     password = marshmallow.fields.String(
-        example="8QLa$<w", required=True, validate=upload_permission_password_validator
+        example="8QLa$<w",
+        required=False,
+        allow_none=True,
+        validate=upload_permission_password_validator,
     )
 
     @post_load
