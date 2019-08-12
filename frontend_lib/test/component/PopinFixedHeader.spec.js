@@ -17,12 +17,11 @@ describe('<PopinFixedHeader />', () => {
     componentTitle: <h1>Random Element</h1>,
     userRoleIdInWorkspace: 3,
     onValidateChangeTitle: onValidateChangeTitleCallBack,
-    disableChangeTitle: false,
-    t: key => key
+    disableChangeTitle: false
   }
 
   const wrapper = mount(
-    <PopinFixedHeader.WrappedComponent
+    <PopinFixedHeader
       {...props}
     />
   )
@@ -42,42 +41,49 @@ describe('<PopinFixedHeader />', () => {
   })
 
   describe('Intern function', () => {
+    const wrapperWithoutHoc = mount(
+      <PopinFixedHeader.WrappedComponent
+        {...props}
+        t={key => key}
+      />
+    )
+
     it('onChangeTitle() should change the state title', () => {
       const e = { target: { value: 'testTitle' } }
-      wrapper.instance().onChangeTitle(e)
-      expect(wrapper.state('editTitleValue')).to.equal(e.target.value)
+      wrapperWithoutHoc.instance().onChangeTitle(e)
+      expect(wrapperWithoutHoc.state('editTitleValue')).to.equal(e.target.value)
     })
 
     it('handleClickUndoChangeTitleBtn() should undo the title change', () => {
-      wrapper.instance().handleClickChangeTitleBtn()
+      wrapperWithoutHoc.instance().handleClickChangeTitleBtn()
       const e = { target: { value: 'testTitle' } }
-      wrapper.instance().onChangeTitle(e)
-      wrapper.instance().handleClickUndoChangeTitleBtn()
-      expect(wrapper.state('editTitle')).to.equal(false)
-      expect(wrapper.state('editTitleValue')).to.equal(props.rawTitle)
+      wrapperWithoutHoc.instance().onChangeTitle(e)
+      wrapperWithoutHoc.instance().handleClickUndoChangeTitleBtn()
+      expect(wrapperWithoutHoc.state('editTitle')).to.equal(false)
+      expect(wrapperWithoutHoc.state('editTitleValue')).to.equal(props.rawTitle)
     })
 
     it('handleClickChangeTitleBtn() should setTitle to true', () => {
-      wrapper.instance().handleClickChangeTitleBtn()
-      expect(wrapper.state('editTitle')).to.equal(true)
-      expect(wrapper.state('editTitleValue')).to.equal(props.rawTitle)
-      wrapper.instance().handleClickChangeTitleBtn()
-      expect(wrapper.state('editTitle')).to.equal(false)
+      wrapperWithoutHoc.instance().handleClickChangeTitleBtn()
+      expect(wrapperWithoutHoc.state('editTitle')).to.equal(true)
+      expect(wrapperWithoutHoc.state('editTitleValue')).to.equal(props.rawTitle)
+      wrapperWithoutHoc.instance().handleClickChangeTitleBtn()
+      expect(wrapperWithoutHoc.state('editTitle')).to.equal(false)
     })
 
     it('handleInputKeyPress() should call handleClickChangeTitleBtn if the key is "Enter"', () => {
-      wrapper.instance().handleInputKeyPress({ key: 'Enter' })
-      expect(wrapper.state('editTitle')).to.equal(true)
-      expect(wrapper.state('editTitleValue')).to.equal(props.rawTitle)
+      wrapperWithoutHoc.instance().handleInputKeyPress({ key: 'Enter' })
+      expect(wrapperWithoutHoc.state('editTitle')).to.equal(true)
+      expect(wrapperWithoutHoc.state('editTitleValue')).to.equal(props.rawTitle)
     })
 
     it('handleInputKeyPress() should call handleClickUndoChangeTitleBtn if the key is "Escape"', () => {
-      wrapper.instance().handleClickChangeTitleBtn()
+      wrapperWithoutHoc.instance().handleClickChangeTitleBtn()
       const e = { target: { value: 'testTitle' } }
-      wrapper.instance().onChangeTitle(e)
-      wrapper.instance().handleInputKeyPress({ key: 'Escape' })
-      expect(wrapper.state('editTitle')).to.equal(false)
-      expect(wrapper.state('editTitleValue')).to.equal(props.rawTitle)
+      wrapperWithoutHoc.instance().onChangeTitle(e)
+      wrapperWithoutHoc.instance().handleInputKeyPress({ key: 'Escape' })
+      expect(wrapperWithoutHoc.state('editTitle')).to.equal(false)
+      expect(wrapperWithoutHoc.state('editTitleValue')).to.equal(props.rawTitle)
     })
   })
 

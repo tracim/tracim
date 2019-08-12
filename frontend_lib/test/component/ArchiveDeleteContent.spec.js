@@ -11,12 +11,11 @@ describe('<ArchiveDeleteContent />', () => {
   const props = {
     onClickDeleteBtn: onClickDeleteBtnCallBack,
     onClickArchiveBtn: onClickArchiveBtnCallBack,
-    disabled: false,
-    t: (tradKey) => tradKey
+    disabled: false
   }
 
   const wrapper = mount(
-    <ArchiveDeleteContent.WrappedComponent
+    <ArchiveDeleteContent
       {...props}
     />
   )

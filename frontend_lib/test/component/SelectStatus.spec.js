@@ -75,7 +75,7 @@ describe('<SelectStatus />', () => {
 
   describe('Handlers', () => {
     it(`first submenu_item should call the proper onClick`, () => {
-      wrapper.find(`button.selectStatus__submenu__item`).at(0).simulate('click')
+      wrapper.find(`button.selectStatus__submenu__item`).first().simulate('click')
       expect(onChangeStatusCallBack.called).to.equal(true)
       onChangeStatusCallBack.resetHistory()
     })

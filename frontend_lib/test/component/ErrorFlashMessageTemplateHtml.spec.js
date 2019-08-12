@@ -6,12 +6,11 @@ require('../../src/component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemp
 
 describe('<ErrorFlashMessageTemplateHtml />', () => {
   const props = {
-    errorMsg: 'randomErrorMsg',
-    t: (key) => key
+    errorMsg: 'randomErrorMsg'
   }
 
   const wrapper = mount(
-    <ErrorFlashMessageTemplateHtml.WrappedComponent
+    <ErrorFlashMessageTemplateHtml
       {...props}
     />
   )

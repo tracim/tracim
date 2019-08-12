@@ -88,19 +88,19 @@ describe('<NewMemberForm />', () => {
     })
 
     it(`onClickKnownMember handler should call the proper handler`, () => {
-      wrapper.find(`div.autocomplete__item.primaryColorBgHover`).at(0).simulate('click')
+      wrapper.find(`div.autocomplete__item.primaryColorBgHover`).first().simulate('click')
       expect(onClickKnownMemberCallBack.called).to.equal(true)
     })
 
     it(`onClickAutoComplete handler should call the proper handler`, () => {
       wrapper.setProps({ searchedKnownMemberList: [] })
-      wrapper.find(`div.autocomplete__item.primaryColorBgHover`).at(0).simulate('click')
+      wrapper.find(`div.autocomplete__item.primaryColorBgHover`).first().simulate('click')
       expect(onClickAutoCompleteCallBack.called).to.equal(true)
       wrapper.setProps({ searchedKnownMemberList: props.searchedKnownMemberList })
     })
 
     it(`onChangeRole handler should call the proper handler`, () => {
-      wrapper.find(`.item__radiobtn > input`).at(0).simulate('change')
+      wrapper.find(`.item__radiobtn > input`).first().simulate('change')
       expect(onChangeRoleCallBack.called).to.equal(true)
     })
 
