@@ -145,7 +145,7 @@ class ShareController(Controller):
     @hapic.output_file([])
     def guest_download_file(self, context, request: TracimRequest, hapic_data=None) -> HapicFile:
         """
-        remove a file share
+        get file content
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ShareLib(current_user=None, session=request.dbsession, config=app_config)
