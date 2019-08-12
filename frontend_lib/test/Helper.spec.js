@@ -5,10 +5,9 @@ import {
   handleFetchResult,
   generateFetchResponse,
   appFeatureCustomEventHandlerShowApp
-
-} from '../../src/helper.js'
+} from '../src/helper.js'
 import sinon from 'sinon'
-import { CUSTOM_EVENT } from '../../src/customEvent.js'
+import { CUSTOM_EVENT } from '../src/customEvent.js'
 
 describe('helper.js', () => {
   describe('generateLocalStorageContentId()', () => {
