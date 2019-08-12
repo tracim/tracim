@@ -37,7 +37,7 @@ export default DisplayState
 DisplayState.propTypes = {
   msg: PropTypes.string,
   btnType: PropTypes.oneOf([
-    'label', 'link'
+    'button', 'link'
   ]),
   icon: PropTypes.string,
   btnLabel: PropTypes.string,

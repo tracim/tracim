@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import PopinFixedHeader from '../../src/component/PopinFixed/PopinFixedHeader'
 import sinon from 'sinon'
 
@@ -17,14 +17,15 @@ describe('<PopinFixedHeader />', () => {
     componentTitle: <h1>Random Element</h1>,
     userRoleIdInWorkspace: 3,
     onValidateChangeTitle: onValidateChangeTitleCallBack,
-    disableChangeTitle: false
+    disableChangeTitle: false,
+    t: key => key
   }
 
-  const wrapper = shallow(
-    <PopinFixedHeader
+  const wrapper = mount(
+    <PopinFixedHeader.WrappedComponent
       {...props}
     />
-  ).dive()
+  )
 
   describe('Static design', () => {
     it(`6 elements should have the class: "${(props.customClass)}"`, () => {
