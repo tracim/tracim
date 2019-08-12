@@ -9,6 +9,7 @@ describe('content :: workspace > dashbord', function () {
     cy.visit('/ui/workspaces/1/dashboard')
   })
   it('dashboard__workspaceInfo > memberlist', function () {
+    cy.get('.memberlist').scrollIntoView()
     cy.get('.memberlist .memberlist__list').should('be.visible')
     cy.get('.memberlist .memberlist__header.subTitle').should('be.visible')
     cy.get('.memberlist .memberlist__wrapper').should('be.visible')

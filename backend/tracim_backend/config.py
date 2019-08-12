@@ -148,6 +148,13 @@ class CFG(object):
         self._load_search_config()
         self._load_collaborative_document_edition_config()
 
+        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+        # to make thing easier later
+        # when app will be load dynamycally.
+        import tracim_backend.applications.share.config as share_app_config
+
+        share_app_config.load_config(self)
+
     def _load_global_config(self) -> None:
         """
         Load generic config
@@ -170,7 +177,8 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "agenda,"
-            "office_document"
+            "office_document,"
+            "share_content"
         )
 
         self.APP__ENABLED = string_to_list(
@@ -570,6 +578,13 @@ class CFG(object):
         self._check_search_config_validity()
         self._check_collaborative_document_edition_config_validity()
 
+        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+        # to make thing easier later
+        # when app will be load dynamycally.
+        import tracim_backend.applications.share.config as share_app_config
+
+        share_app_config.check_config(self)
+
     def _check_collaborative_document_edition_config_validity(self) -> None:
         if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
             if self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
@@ -839,7 +854,12 @@ class CFG(object):
             creation_label="Create an office document",
             available_statuses=content_status_list.get_all(),
         )
+        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+        # to make thing easier later
+        # when app will be load dynamycally.
+        import tracim_backend.applications.share.application as share_app
 
+        share_content = share_app.get_app(app_config=self)
         # process activated app list
         available_apps = OrderedDict(
             [
@@ -850,6 +870,7 @@ class CFG(object):
                 (markdownpluspage.slug, markdownpluspage),
                 (agenda.slug, agenda),
                 (office_document.slug, office_document),
+                (share_content.slug, share_content),
             ]
         )
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var

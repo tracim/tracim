@@ -190,6 +190,9 @@ class FileController(Controller):
                 )
             ) from exc
         filename = hapic_data.path.filename
+
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", where filename returned will be original file one.
         if not filename or filename == "raw":
             filename = content.file_name
         return HapicFile(
@@ -233,6 +236,8 @@ class FileController(Controller):
             ) from exc
 
         filename = hapic_data.path.filename
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", where filename returned will be a custom one.
         if not filename or filename == "raw":
             filename = "{label}_r{revision_id}{file_extension}".format(
                 label=revision.file_name,
@@ -281,6 +286,8 @@ class FileController(Controller):
             file_extension=content.file_extension,
         )
         filename = hapic_data.path.filename
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", where filename returned will a custom one.
         if not filename or filename == "raw":
             filename = "{label}_page_{page_number}.pdf".format(
                 label=content.label, page_number=hapic_data.query.page
@@ -318,6 +325,8 @@ class FileController(Controller):
             content.revision_id, file_extension=content.file_extension
         )
         filename = hapic_data.path.filename
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", where filename returned will be a custom one.
         if not filename or filename == "raw":
             filename = "{label}.pdf".format(label=content.label)
         return HapicFile(
@@ -354,6 +363,8 @@ class FileController(Controller):
             revision.revision_id, file_extension=revision.file_extension
         )
         filename = hapic_data.path.filename
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", where filename returned will be a custom one.
         if not filename or filename == "raw":
             filename = "{label}_r{revision_id}.pdf".format(
                 revision_id=revision.revision_id, label=revision.label
@@ -395,6 +406,9 @@ class FileController(Controller):
             file_extension=revision.file_extension,
         )
         filename = hapic_data.path.filename
+
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", where filename returned will a custom one.
         if not filename or filename == "raw":
             filename = "{label}_page_{page_number}.pdf".format(
                 label=content.label, page_number=hapic_data.query.page
@@ -439,6 +453,8 @@ class FileController(Controller):
             height=allowed_dim.dimensions[0].height,
         )
         filename = hapic_data.path.filename
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", where filename returned will a custom one.
         if not filename or filename == "raw":
             filename = "{label}_page_{page_number}.jpg".format(
                 label=content.label, page_number=hapic_data.query.page
@@ -482,6 +498,8 @@ class FileController(Controller):
             width=hapic_data.path.width,
         )
         filename = hapic_data.path.filename
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", where filename returned will a custom one.
         if not filename or filename == "raw":
             filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
                 label=content.label,
@@ -529,6 +547,8 @@ class FileController(Controller):
             file_extension=revision.file_extension,
         )
         filename = hapic_data.path.filename
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", where filename returned will a custom one.
         if not filename or filename == "raw":
             filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(
                 revision_id=revision.revision_id,
