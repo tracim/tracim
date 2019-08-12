@@ -19,6 +19,7 @@ from tracim_backend.applications.upload_permissions.schema import UploadPermissi
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionTokenPath
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
@@ -112,6 +113,7 @@ class UploadPermissionController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
+    @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(UploadPermissionTokenPath())
     @hapic.input_forms(UploadDataFormSchema())
     @hapic.input_files(SimpleFileSchema())
