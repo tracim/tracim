@@ -12,7 +12,6 @@ import {
 
 const FORM_ID = 'loleafletform'
 const IFRAME_ID = 'loleafletframe'
-const ACTION_EDIT = 'edit'
 
 class CollaborativeEditionFrame extends React.Component {
   constructor (props) {
@@ -40,11 +39,6 @@ class CollaborativeEditionFrame extends React.Component {
   async componentDidMount () {
     const { props } = this
     console.log('%c<CollaboraFrame> did mount', `color: ${this.props.data.config.hexcolor}`, props)
-    if (!this.checkUserPermissions()) {
-      this.sendGlobalFlashMessage(props.t("You are not allowed to edit this file"))
-      this.redirectTo(props.data.content.workspace_id)
-      return
-    }
     try {
       await this.loadContent()
     } catch (error) {
@@ -69,10 +63,6 @@ class CollaborativeEditionFrame extends React.Component {
     }
   }
 
-  checkUserPermissions = () => {
-    return this.state.loggedUser.userRoleIdInWorkspace >= 2
-  }
-
   showIframe = () => {
     if (this.state.ready) {
       document.getElementById(this.state.formId).submit()
@@ -82,9 +72,14 @@ class CollaborativeEditionFrame extends React.Component {
   buildCompleteIframeUrl = (urlSource, accessToken) => {
     const { state } = this
     const protocol = window.location.protocol
+    const readyonly = !state.content.is_editable || state.loggedUser.userRoleIdInWorkspace >= 2
     // INFO - B.L - 2019.08.01 - We assume frontend is on the same host than the API
     const host = window.location.host
-    return `${urlSource}WOPISrc=${protocol}//${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1`
+    let url = `${urlSource}WOPISrc=${protocol}//${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1`
+    if (readyonly) {
+      url += '&permission=readonly'
+    }
+    return url
   }
 
   loadContent = async () => {
@@ -135,7 +130,7 @@ class CollaborativeEditionFrame extends React.Component {
       return
     }
     const softwareFileType = props.data.config.system.config.collaborative_document_edition.supported_file_types.find(
-      (type) => type.extension === state.content.file_extension.substr(1) && type.associated_action === ACTION_EDIT
+      (type) => type.extension === state.content.file_extension.substr(1)
     )
 
     if (!softwareFileType) {

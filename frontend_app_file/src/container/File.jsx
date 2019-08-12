@@ -629,7 +629,8 @@ class File extends React.Component {
       }
       return appOfficeDocument.default.getOnlineEditionAction(
         state.content,
-        state.config.system.config.collaborative_document_edition
+        state.config.system.config.collaborative_document_edition,
+        state.loggedUser.userRoleIdInWorkspace
       )
     } catch (error) {
       // INFO - B.L - 2019/08/05 - if appOfficeDocument is not activated in the backend
@@ -681,14 +682,14 @@ class File extends React.Component {
                 />
               }
 
-              {state.loggedUser.userRoleIdInWorkspace >= 2 && onlineEditionAction &&
+              {onlineEditionAction &&
                 <GenericButton
                   customClass='wsContentGeneric__option__menu__addversion newversionbtn btn outlineTextBtn'
                   dataCy='wsContentGeneric__option__menu__addversion'
                   customColor={state.config.hexcolor}
-                  onClick={onlineEditionAction}
+                  onClick={onlineEditionAction.callback}
                   disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
-                  label={props.t('Edit online')}
+                  label={props.t(onlineEditionAction.label)}
                   style={{
                     marginLeft: '5px'
                   }}
