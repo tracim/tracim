@@ -1,3 +1,4 @@
+import cgi
 from datetime import datetime
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
@@ -7,7 +8,9 @@ import uuid
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+import transaction
 
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.upload_permissions.email_manager import (
     UploadPermissionEmailManager,
 )
@@ -20,12 +23,16 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import UploadPermissionNotFound
 from tracim_backend.exceptions import WrongSharePassword
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.revision_protection import new_revision
 
 FRONTEND_UPLOAD_PERMISSION_LINK_PATTERN = (
     "{frontend_ui_base_url}guest-upload/{upload_permission_token}"
@@ -206,7 +213,7 @@ class UploadPermissionLib(object):
         self._session.add(upload_permission)
         return upload_permission
 
-    def notify_uploaded_contents(
+    def _notify_uploaded_contents(
         self,
         uploader_username: str,
         workspace: Workspace,
@@ -219,3 +226,59 @@ class UploadPermissionLib(object):
             uploader_username=uploader_username,
             workspace=workspace,
         )
+
+    def upload_files(
+        self,
+        upload_permission: UploadPermission,
+        uploader_username: str,
+        message: str,
+        files: typing.List[cgi.FieldStorage],
+        do_notify: bool = False,
+    ):
+        content_api = ContentApi(
+            config=self._config, current_user=upload_permission.author, session=self._session
+        )
+        _ = content_api.translator.get_translation
+        folder_label = _("Files uploaded by {username} on {date}").format(
+            username=uploader_username, date=datetime.now()
+        )
+        upload_folder = content_api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=upload_permission.workspace,
+            label=folder_label,
+            do_notify=False,
+            do_save=True,
+            content_namespace=ContentNamespaces.UPLOAD,
+        )
+        created_contents = []
+        for _file in files:
+            content = content_api.create(
+                filename=_file.filename,
+                content_type_slug=content_type_list.File.slug,
+                workspace=upload_permission.workspace,
+                parent=upload_folder,
+                do_notify=False,
+                content_namespace=ContentNamespaces.UPLOAD,
+            )
+            content_api.save(content, ActionDescription.CREATION)
+            with new_revision(session=self._session, tm=transaction.manager, content=content):
+                content_api.update_file_data(
+                    content,
+                    new_filename=_file.filename,
+                    new_mimetype=_file.type,
+                    new_content=_file.file,
+                )
+            content_api.create_comment(
+                parent=content,
+                content=_("Message from {username}: {message}").format(
+                    username=uploader_username, message=message
+                ),
+                do_save=True,
+                do_notify=False,
+            )
+            created_contents.append(content_api.get_content_in_context(content))
+            content_api.execute_created_content_actions(content)
+        if do_notify:
+            self._notify_uploaded_contents(
+                uploader_username, upload_permission.workspace, created_contents
+            )

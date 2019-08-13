@@ -1,12 +1,9 @@
-from datetime import datetime
 from http import HTTPStatus
 import typing
 
 from pyramid.config import Configurator
-import transaction
 
 from tracim_backend import TracimRequest
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.applications.upload_permissions.models_in_context import (
@@ -23,14 +20,9 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import UploadPermissionNotFound
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_content_manager
-from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
-from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.data import ContentNamespaces
-from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
@@ -133,54 +125,13 @@ class UploadPermissionController(Controller):
         # TODO - G.M - 2019-08-01 - verify in access to upload_permission can be granted
         # we should considered do these check at decorator level
         api.check_password(upload_permission, password=hapic_data.forms.password)
-
-        content_api = ContentApi(
-            config=app_config, current_user=upload_permission.author, session=request.dbsession
+        api.upload_files(
+            upload_permission=upload_permission,
+            uploader_username=hapic_data.forms.username,
+            message=hapic_data.forms.message,
+            files=hapic_data.files.files,
+            do_notify=app_config.EMAIL__NOTIFICATION__ACTIVATED,
         )
-
-        label_name = _("Files uploaded by {username} on {date}").format(
-            username=hapic_data.forms.username, date=datetime.now()
-        )
-        upload_folder = content_api.create(
-            content_type_slug=content_type_list.Folder.slug,
-            workspace=upload_permission.workspace,
-            label=label_name,
-            do_notify=False,
-            do_save=True,
-            content_namespace=ContentNamespaces.UPLOAD,
-        )
-        created_contents = []
-        for _file in hapic_data.files.files:
-            content = content_api.create(
-                filename=_file.filename,
-                content_type_slug=content_type_list.File.slug,
-                workspace=upload_permission.workspace,
-                parent=upload_folder,
-                do_notify=False,
-                content_namespace=ContentNamespaces.UPLOAD,
-            )
-            content_api.save(content, ActionDescription.CREATION)
-            with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
-                content_api.update_file_data(
-                    content,
-                    new_filename=_file.filename,
-                    new_mimetype=_file.type,
-                    new_content=_file.file,
-                )
-            content_api.create_comment(
-                parent=content,
-                content=_("message from {username}: {message}").format(
-                    username=hapic_data.forms.username, message=hapic_data.forms.message
-                ),
-                do_save=True,
-                do_notify=False,
-            )
-            created_contents.append(content_api.get_content_in_context(content))
-            content_api.execute_created_content_actions(content)
-        if app_config.EMAIL__NOTIFICATION__ACTIVATED:
-            api.notify_uploaded_contents(
-                hapic_data.forms.username, upload_permission.workspace, created_contents
-            )
         return
 
     def bind(self, configurator: Configurator) -> None:
