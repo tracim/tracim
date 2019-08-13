@@ -195,7 +195,7 @@ class ShareController(Controller):
         configurator.add_route(
             "add_content_share",
             "/workspaces/{workspace_id}/contents/{content_id}/shares",
-            request_method="PUT",
+            request_method="POST",
         )
         configurator.add_view(self.add_content_share, route_name="add_content_share")
         configurator.add_route(
