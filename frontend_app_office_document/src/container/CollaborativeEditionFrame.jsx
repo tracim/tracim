@@ -4,7 +4,8 @@ import i18n from '../i18n.js'
 import { PAGE } from '../helper.js'
 import {
   handleFetchResult,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  addAllResourceI18n
 } from 'tracim_frontend_lib'
 import {
   getWOPIToken,
@@ -35,6 +36,8 @@ class CollaborativeEditionFrame extends React.Component {
       ready: false,
       loggedUser: props.data.loggedUser
     }
+    addAllResourceI18n(i18n, props.data.config.translation, props.data.loggedUser.lang)
+    i18n.changeLanguage(props.data.loggedUser.lang)
   }
 
   async componentDidMount () {
@@ -49,7 +52,6 @@ class CollaborativeEditionFrame extends React.Component {
 
     await this.setIframeConfig()
     this.showIframe()
-    i18n.changeLanguage(this.state.loggedUser.lang)
     window.addEventListener('message', this.handleIframeIsClosing, false)
   }
 
@@ -61,7 +63,7 @@ class CollaborativeEditionFrame extends React.Component {
   handleIframeIsClosing = (event) => {
     const { props, state } = this
     let data = {}
-    // INFO - B.L - if might catch event producing utf-8 error while parsing
+    // INFO - B.L - 2019.08.12 - if might catch event producing utf-8 error while parsing
     try {
       data = JSON.parse(event.data)
     } catch (error) {
@@ -169,7 +171,7 @@ class CollaborativeEditionFrame extends React.Component {
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
-      msg: msg,
+      msg: this.props.t(msg),
       type: 'warning',
       delay: undefined
     }
