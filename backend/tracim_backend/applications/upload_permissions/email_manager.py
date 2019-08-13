@@ -7,16 +7,96 @@ import typing
 from tracim_backend.applications.upload_permissions.models_in_context import (
     UploadPermissionInContext,
 )
+from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.notifier import EmailManager
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.models.auth import User
+from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import Workspace
 
 
 class UploadPermissionEmailManager(EmailManager):
+    def notify_new_upload(
+        self,
+        uploader_username,
+        workspace: Workspace,
+        uploaded_contents: typing.List[ContentInContext],
+    ) -> None:
+        email_sender = EmailSender(
+            self.config, self._smtp_config, self.config.EMAIL__NOTIFICATION__ACTIVATED
+        )
+        notifiable_roles = WorkspaceApi(
+            current_user=None, session=self.session, config=self.config
+        ).get_notifiable_roles(workspace, force_notify=True)
+
+        for role in notifiable_roles:
+            logger.info(
+                self,
+                'Generating new upload notification in workspace "{}" from "{}" to "{}"'.format(
+                    workspace.workspace_id, uploader_username, role.user.email
+                ),
+            )
+            translator = Translator(app_config=self.config, default_lang=role.user.lang)
+
+            message = self._notify_new_upload(
+                workspace=workspace,
+                receiver=role.user,
+                uploader_username=uploader_username,
+                translator=translator,
+                uploaded_contents=uploaded_contents,
+            )
+            send_email_through(
+                config=self.config, sendmail_callable=email_sender.send_mail, message=message
+            )
+
+    def _notify_new_upload(
+        self,
+        workspace: Workspace,
+        receiver: User,
+        uploader_username: str,
+        uploaded_contents: typing.List[ContentInContext],
+        translator: Translator,
+    ) -> Message:
+        logger.info(
+            self,
+            'preparing email to user "{}" about new upload on workspace "{}" info created'.format(
+                receiver.user_id, workspace.workspace_id
+            ),
+        )
+        message = MIMEMultipart("alternative")
+        translated_subject = translator.get_translation(
+            self.config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT
+        )
+        message["Subject"] = translated_subject.format(
+            website_title=self.config.WEBSITE__TITLE,
+            uploader_username=uploader_username,
+            nb_uploaded_contents=len(uploaded_contents),
+            workspace_name=workspace.label,
+        )
+        message["From"] = self._get_sender()
+        to_addr = formataddr((receiver.display_name, receiver.email))
+        message["To"] = to_addr
+        html_template_file_path = self.config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML
+        context = {
+            "receiver": receiver,
+            "workspace": workspace,
+            "uploader_username": uploader_username,
+            "uploaded_contents": uploaded_contents,
+        }
+        body_html = self._render_template(
+            mako_template_filepath=html_template_file_path, context=context, translator=translator
+        )
+
+        part2 = MIMEText(body_html, "html", "utf-8")
+        # Attach parts into message container.
+        # According to RFC 2046, the last part of a multipart message,
+        # in this case the HTML message, is best and preferred.
+        message.attach(part2)
+        return message
+
     def notify_upload_permission(
         self,
         emitter: User,

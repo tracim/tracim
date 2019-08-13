@@ -201,7 +201,7 @@ class TestPrivateUploadPermissionEndpoints(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-class TestPrivateUploadPermissionWithNotification(object):
+class TestUploadPermissionWithNotification(object):
     @pytest.mark.parametrize(
         "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
     )
@@ -313,9 +313,55 @@ class TestPrivateUploadPermissionWithNotification(object):
             valid_dests.remove(headers["To"][0])
         assert valid_dests == []
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+    )
+    def test_api__guest_upload_content__ok_200__without_password(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+        mailhog,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["thissharewill@notbe.presentinresponse"]
+        )
+        upload_permissions = upload_permission_lib.get_upload_permissions(workspace)
+        assert len(upload_permissions) == 1
+        upload_permission = upload_permissions[0]
+        transaction.commit()
+        params = {"username": "toto", "message": "hello folk !"}
+        image = create_1000px_png_test_image()
+        mailhog.cleanup_mailhog()
+        web_testapp.post(
+            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+                upload_permission_token=upload_permission.token
+            ),
+            status=204,
+            upload_files=[("files", image.name, image.getvalue())],
+            params=params,
+        )
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 1
+        valid_dests = ["Global manager <admin@admin.admin>"]
+        for email in response:
+            assert (
+                email["Content"]["Headers"]["From"][0]
+                == "Tracim Notifications <test_user_from+0@localhost>"
+            )
+            headers = email["Content"]["Headers"]
+            assert headers["To"][0] in valid_dests
+            valid_dests.remove(headers["To"][0])
+        assert valid_dests == []
 
-#
-#
+
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestGuestUploadEndpoints(object):

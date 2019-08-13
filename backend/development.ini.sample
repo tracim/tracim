@@ -299,6 +299,7 @@ email.notification.share_content_to_emitter.template.html = %(email.template_dir
 email.notification.share_content_to_receiver.template.html = %(email.template_dir)s/shared_content_to_receiver_body_html.mak
 email.notification.upload_permission_to_emitter.template.html = %(email.template_dir)s/upload_permission_to_emitter_body_html.mak
 email.notification.upload_permission_to_receiver.template.html = %(email.template_dir)s/upload_permission_to_receiver_body_html.mak
+email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak
 
 ####
 # EMAIL-REPLY

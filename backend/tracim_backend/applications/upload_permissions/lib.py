@@ -22,6 +22,7 @@ from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.models.auth import User
+from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import Workspace
 
 FRONTEND_UPLOAD_PERMISSION_LINK_PATTERN = (
@@ -190,3 +191,17 @@ class UploadPermissionLib(object):
     def save(self, upload_permission: UploadPermission) -> UploadPermission:
         self._session.add(upload_permission)
         return upload_permission
+
+    def notify_uploaded_contents(
+        self,
+        uploader_username: str,
+        workspace: Workspace,
+        uploaded_contents: typing.List[ContentInContext],
+    ):
+        email_manager = self._get_email_manager(self._config, self._session)
+        # TODO - G.M - 2019-08-12 - handle exceptions there
+        email_manager.notify_new_upload(
+            uploaded_contents=uploaded_contents,
+            uploader_username=uploader_username,
+            workspace=workspace,
+        )

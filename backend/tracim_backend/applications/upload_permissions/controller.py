@@ -168,6 +168,12 @@ class UploadPermissionController(Controller):
             do_save=True,
             do_notify=False,
         )
+        if app_config.EMAIL__NOTIFICATION__ACTIVATED:
+            api.notify_uploaded_contents(
+                hapic_data.forms.username,
+                upload_permission.workspace,
+                [content_api.get_content_in_context(content)],
+            )
         content_api.execute_created_content_actions(content)
         return
 
