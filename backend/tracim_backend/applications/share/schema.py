@@ -152,6 +152,9 @@ class ContentShareSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         example="hello@tracim.fr", required=True, validate=share_email_validator
     )
+    share_token = marshmallow.fields.String(
+        description="token of the content_share", example="444b026a068d42d6ab5e12fde08efb7b"
+    )
     has_password = marshmallow.fields.Boolean(required=True)
     share_group_id = marshmallow.fields.String(required=True)
     share_id = marshmallow.fields.Int(
@@ -170,9 +173,12 @@ class ContentShareSchema(marshmallow.Schema):
         format=DATETIME_FORMAT, description="Share disabled date", allow_none=True
     )
     is_disabled = marshmallow.fields.Boolean(required=True, description="is this share disabled ?")
-    url = marshmallow.fields.URL(example="/ui/guest-download/<token>")
+    url = marshmallow.fields.URL(
+        example="http://localhost:6543/ui/guest-download/444b026a068d42d6ab5e12fde08efb7b"
+    )
     direct_url = marshmallow.fields.URL(
-        allow_none=True, example="/api/v2/public/guest-download/<token>/<filename>"
+        allow_none=True,
+        example="http://localhost:6543/api/v2/public/guest-download/444b026a068d42d6ab5e12fde08efb7b/myfile.txt",
     )
     author_id = marshmallow.fields.Integer(
         example=3, validate=strictly_positive_int_validator, required=True
