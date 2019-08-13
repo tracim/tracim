@@ -150,6 +150,9 @@ class ContentShareSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         example="hello@tracim.fr", required=True, validate=share_email_validator
     )
+    share_token = marshmallow.fields.String(
+        description="token of the content_share", example="444b026a068d42d6ab5e12fde08efb7b"
+    )
     has_password = marshmallow.fields.Boolean(required=True)
     share_group_id = marshmallow.fields.String(required=True)
     share_id = marshmallow.fields.Int(
