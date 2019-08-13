@@ -24,7 +24,7 @@ const serializeContent = c => ({
   statusSlug: c.status,
   subContentTypeList: c.sub_content_types,
   isOpen: c.isOpen ? c.isOpen : false, // only useful for folder
-  activedShares: c.active_shares,
+  activedShares: c.actives_shares,
   created: c.created
 })
 

@@ -154,13 +154,13 @@ export const getShareLinksList = (apiUrl, workspaceId, contentId) =>
     method: 'GET'
   })
 
-export const postShareLinksList = (apiUrl, workspaceId, contentId, shareEmailsList, sharePassword) =>
+export const putShareLinksList = (apiUrl, workspaceId, contentId, shareEmailsList, sharePassword) =>
   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
-    method: 'POST',
+    method: 'PUT',
     body: JSON.stringify({
       emails: shareEmailsList,
       password: sharePassword

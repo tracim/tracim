@@ -731,16 +731,11 @@ export const putContentItemMove = (source, destination) => dispatch => {
   })
 }
 
-export const getFileInfos = (token) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/public/guest-download/${token}/`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'GET'
+export const getFileInfos = (token) =>
+  fetch(`${FETCH_CONFIG.apiUrl}/public/guest-download/${token}`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
     },
-    dispatch
+    method: 'GET'
   })
-}

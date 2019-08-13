@@ -6,7 +6,8 @@ const PAGES = {
   AGENDA: 'agenda',
   EDIT_FOLDER: 'editFolder',
   SEARCH: 'search',
-  ADMIN_WORKSPACE: 'adminWorkspace'
+  ADMIN_WORKSPACE: 'adminWorkspace',
+  SHARE_FOLDER: 'share_folder'
 }
 
 const URLS = {

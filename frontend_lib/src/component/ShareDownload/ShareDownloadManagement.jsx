@@ -29,7 +29,8 @@ class ShareDownloadManagement extends React.Component {
 
   render () {
     const { props } = this
-
+    const shareLinkList = props.shareLinkList ? props.shareLinkList : []
+    
     return (
       <div className='shareDownload'>
         <div className='shareDownload__management__header'>
@@ -53,12 +54,12 @@ class ShareDownloadManagement extends React.Component {
             </button>
           }
         </div>
-        {props.shareLinkList.length > 0
+        {shareLinkList.length > 0
           ? props.userRoleIdInWorkspace >= 4
-            ? props.shareLinkList.map(shareLink =>
+            ? shareLinkList.map(shareLink =>
                 <ShareLink
                   email={shareLink.email}
-                  link={shareLink.direct_url}
+                  link={shareLink.url}
                   id={shareLink.share_id}
                   isProtected={shareLink.has_password}
                   onClickDeleteShareLink={props.onClickDeleteShareLink}

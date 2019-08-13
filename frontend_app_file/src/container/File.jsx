@@ -38,7 +38,7 @@ import {
   getFileComment,
   getFileRevision,
   getShareLinksList,
-  postShareLinksList,
+  putShareLinksList,
   postFileNewComment,
   putFileContent,
   putFileStatus,
@@ -171,6 +171,7 @@ class File extends React.Component {
       await this.loadContent()
       this.loadTimeline()
       this.buildBreadcrumbs()
+      this.loadShareLinkList()
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
@@ -279,7 +280,7 @@ class File extends React.Component {
     switch (fetchResultShareLinkList.apiResponse.status) {
       case 200:
         this.setState({
-          shareLinkList: fetchResultShareLinkList.json
+          shareLinkList: fetchResultShareLinkList.body
         })
         break
       default:
@@ -327,6 +328,7 @@ class File extends React.Component {
       case 200:
         this.loadContent()
         this.loadTimeline()
+        this.loadShareLinkList()
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       case 400:
@@ -642,21 +644,21 @@ class File extends React.Component {
       this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
     }
 
-    const fetchResultPostShareLinks = await postShareLinksList(
+    const fetchResultPutShareLinks = await handleFetchResult(await putShareLinksList(
       state.config.apiUrl,
       state.content.workspace_id,
       state.content.content_id,
       shareEmailList,
       state.sharePassword !== '' ? state.sharePassword : null
-    )
+    ))
 
-    switch (fetchResultPostShareLinks.status) {
-      case 204:
-        this.setState({
-          shareLinkList: fetchResultPostShareLinks.json,
+    switch (fetchResultPutShareLinks.apiResponse.status) {
+      case 200:
+        this.setState(prev => ({
+          shareLinkList: [...prev.shareLinkList, ...fetchResultPutShareLinks.body],
           shareEmails: '',
           sharePassword: ''
-        })
+        }))
         break
       default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
     }
@@ -685,7 +687,7 @@ class File extends React.Component {
     const { config, content } = this.state
 
     const fetchResultDeleteShareLink = await handleFetchResult(
-      await deleteShareLink(config.apiUrl, content.workspace_id, content.content_id, this.state.shareLinkList)
+      await deleteShareLink(config.apiUrl, content.workspace_id, content.content_id, shareLinkId)
     )
 
     switch (fetchResultDeleteShareLink.status) {

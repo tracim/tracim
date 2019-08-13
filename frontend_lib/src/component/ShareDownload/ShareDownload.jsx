@@ -23,12 +23,12 @@ class ShareDownload extends React.Component {
   handleClickCancelButton = () => {
     this.props.onChangeEmails({target: {value: ''}})
     this.props.onChangePassword({target: {value: ''}})
-    this.setState({currentPage: this.SHARE_STATUS.SHARE_MANAGE})
+    this.setState({ currentPage: this.SHARE_STATUS.SHARE_MANAGE })
   }
 
   handleNewShare = () => {
     this.props.onClickNewShare()
-    this.setState({currentPage: this.SHARE_STATUS.SHARE_MANAGE})
+    this.setState({ currentPage: this.SHARE_STATUS.SHARE_MANAGE })
   }
 
   render () {

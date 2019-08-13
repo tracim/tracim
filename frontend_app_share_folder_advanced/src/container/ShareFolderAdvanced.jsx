@@ -1,3 +1,6 @@
+// TODO - G.B. - This component is a wip because it's waiting the backend 
+// https://github.com/tracim/tracim/issues/2126
+
 import React from 'react'
 import UploadFilesManagement from '../component/UploadFilesManagement.jsx'
 import NewUpload from '../component/NewUpload.jsx'
@@ -16,7 +19,7 @@ import {
 } from 'tracim_frontend_lib'
 import { debug } from '../debug'
 import {
-  getShareLinksList,
+  // getShareLinksList,
   // getShareFolder,
   // putShareLinkList,
   getContentTypeList
@@ -123,19 +126,19 @@ class ShareFolderAdvanced extends React.Component {
   }
 
   loadShareLinkList = async () => {
-    const { content, config } = this.state
+    // const { content, config } = this.state
 
-    const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
+    // const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
 
-    switch (fetchResultShareLinkList.apiResponse.status) {
-      case 200:
-        this.setState({
-          shareLinkList: fetchResultShareLinkList.json
-        })
-        break
-      default:
-        this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
-    }
+    // switch (fetchResultShareLinkList.apiResponse.status) {
+    //   case 200:
+    //     this.setState({
+    //       shareLinkList: fetchResultShareLinkList.json
+    //     })
+    //     break
+    //   default:
+    //     this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
+    // }
   }
 
   handleChangeEmails = e => this.setState({ shareEmails: e.target.value })

@@ -6,7 +6,14 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import DownloadForm from '../component/GuestPage/DownloadForm.jsx'
 import { getFileInfos } from '../action-creator.async.js'
-import { displayFileSize } from 'tracim_frontend_lib'
+import {
+  displayFileSize,
+  handleFetchResult,
+  CUSTOM_EVENT
+} from 'tracim_frontend_lib'
+import {
+  FETCH_CONFIG
+} from '../helper.js'
 
 class GuestDownload extends React.Component {
   constructor (props) {
@@ -17,7 +24,8 @@ class GuestDownload extends React.Component {
       file: {
         fileName: '',
         fileSize: 0,
-        fileId: 0
+        fileId: 0,
+        isProtected: false
       },
       guestPassword: {
         value: '',
@@ -28,25 +36,43 @@ class GuestDownload extends React.Component {
 
   async componentDidMount () {
     const { props } = this
+    const request = await getFileInfos(props.match.params.token)
+    const response = await handleFetchResult(request)
 
-    const fetchResultFileInfos = getFileInfos(props.match.params.token)
-
-    switch (fetchResultFileInfos.status) {
-      case 204:
+    switch (response.apiResponse.status) {
+      case 200:
         this.setState({
-          fileName: fetchResultFileInfos.json.file_name,
-          fileSize: displayFileSize(fetchResultFileInfos.json.file_size),
-          fileId: fetchResultFileInfos.json.file_id,
-          userName: fetchResultFileInfos.json.user_name
+          file: {
+            fileName: response.body.content_filename,
+            fileSize: displayFileSize(response.body.content_size),
+            fileId: response.body.content_id,
+            isProtected: response.body.has_password
+          },
+          userName: response.body.author.public_name
         })
         break
-      default: this.sendGlobalFlashMsg(props.t('Error while loading file infos', 'warning'))
+      case 400:
+        this.sendGlobalFlashMessage(props.t('Error in the URL'))
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while loading file infos'))
     }
   }
 
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: this.props.t(msg),
+      type: 'warning',
+      delay: undefined
+    }
+  })
+
   handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })
 
-  handleClickDownload = () => {}
+  handleDownloadFile = () => {
+    // FIXME - b.l - refactor urls
+    return `${FETCH_CONFIG.apiUrl}/public/guest-download/${this.props.match.params.token}/${this.state.file.fileName}`
+  }
 
   render () {
     const { props, state } = this
@@ -64,7 +90,7 @@ class GuestDownload extends React.Component {
               file={state.file}
               guestPassword={state.guestPassword}
               onChangePassword={this.handleChangePassword}
-              onClickDownload={this.handleClickDownload}
+              onDownloadFile={this.handleDownloadFile}
             />
           </CardBody>
         </Card>

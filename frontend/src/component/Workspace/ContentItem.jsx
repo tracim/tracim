@@ -54,7 +54,10 @@ class ContentItem extends React.Component {
           >
             <div className='content__type'
               title={props.t(props.contentType.label)}
-              style={{ color: props.contentType.hexcolor }}
+              style={{
+                color: props.contentType.hexcolor,
+                padding: props.isShared ? '0 15px' : '0 25px'
+              }}
             >
               {props.isShared
                 ? <ComposedIcon

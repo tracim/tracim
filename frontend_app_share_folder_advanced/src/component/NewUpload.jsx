@@ -1,3 +1,6 @@
+// TODO - G.B. - This component is a wip because it's waiting the backend 
+// https://github.com/tracim/tracim/issues/2126
+
 import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'

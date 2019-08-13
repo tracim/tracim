@@ -32,8 +32,8 @@ describe('<Revision />', () => {
       expect(wrapper.find('span.revision__data__nb')).to.have.text().contains(props.number)
     })
 
-    it(`the span ".revision__data__created" should contains "${props.createdDistance}"`, () => {
-      expect(wrapper.find('span.revision__data__created')).to.have.text().contains(props.createdDistance)
+    it(`the span ".revision__data__infos__created" should contains "${props.createdDistance}"`, () => {
+      expect(wrapper.find('span.revision__data__infos__created')).to.have.text().contains(props.createdDistance)
     })
   })
 
