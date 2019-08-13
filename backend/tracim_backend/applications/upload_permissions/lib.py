@@ -6,6 +6,7 @@ import uuid
 
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.applications.upload_permissions.email_manager import (
     UploadPermissionEmailManager,
@@ -17,6 +18,7 @@ from tracim_backend.applications.upload_permissions.models_in_context import (
 )
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import NotificationSendingFailed
+from tracim_backend.exceptions import UploadPermissionNotFound
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
@@ -136,11 +138,18 @@ class UploadPermissionLib(object):
         return upload_permissions_in_context
 
     def get_upload_permission_by_token(self, upload_permission_token: str) -> UploadPermission:
-        return (
-            self._session.query(UploadPermission)
-            .filter(UploadPermission.token == upload_permission_token)
-            .one()
-        )
+        try:
+            return (
+                self._session.query(UploadPermission)
+                .filter(UploadPermission.token == upload_permission_token)
+                .one()
+            )
+        except NoResultFound as exc:
+            raise UploadPermissionNotFound(
+                'Upload permission with token "{}" not found in database'.format(
+                    upload_permission_token
+                )
+            ) from exc
 
     def check_password(
         self, upload_permission: UploadPermission, password: typing.Optional[str]
@@ -165,12 +174,17 @@ class UploadPermissionLib(object):
     def get_upload_permission(
         self, workspace: Workspace, upload_permission_id: int
     ) -> UploadPermission:
-        return (
-            self.base_query()
-            .filter(UploadPermission.workspace_id == workspace.workspace_id)
-            .filter(UploadPermission.upload_permission_id == upload_permission_id)
-            .one()
-        )  # type: UploadPermission
+        try:
+            return (
+                self.base_query()
+                .filter(UploadPermission.workspace_id == workspace.workspace_id)
+                .filter(UploadPermission.upload_permission_id == upload_permission_id)
+                .one()
+            )  # type: UploadPermission
+        except NoResultFound as exc:
+            raise UploadPermissionNotFound(
+                'Upload permission "{}" not found in database'.format(upload_permission_id)
+            ) from exc
 
     def disable_upload_permission(
         self, workspace: Workspace, upload_permission_id: int

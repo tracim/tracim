@@ -19,6 +19,7 @@ from tracim_backend.applications.upload_permissions.schema import UploadPermissi
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionTokenPath
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import UploadPermissionNotFound
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -96,6 +97,7 @@ class UploadPermissionController(Controller):
         return api.get_upload_permissions_in_context(upload_permission)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
+    @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
     @check_right(is_content_manager)
     @hapic.input_path(UploadPermissionIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
@@ -114,6 +116,7 @@ class UploadPermissionController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UploadPermissionTokenPath())
     @hapic.input_forms(UploadDataFormSchema())
     @hapic.input_files(SimpleFileSchema())

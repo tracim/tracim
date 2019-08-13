@@ -64,46 +64,6 @@ class TestPrivateUploadPermissionEndpoints(object):
         assert content[0]["upload_permission_id"] != content[1]["upload_permission_id"]
         assert content[1]["email"] == "test2@test2.test2"
 
-    def test_api__get_upload_permission__err_400__not_shareable_type(
-        self,
-        workspace_api_factory,
-        content_api_factory,
-        session,
-        web_testapp,
-        content_type_list,
-        upload_permission_lib_factory,
-        admin_user,
-    ) -> None:
-        workspace_api = workspace_api_factory.get()
-        workspace = workspace_api.create_workspace("test workspace", save_now=True)
-        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
-        upload_permission_lib.add_permission_to_workspace(
-            workspace, emails=["test@test.test", "test2@test2.test2"]
-        )
-        transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
-        )
-        content = res.json_body
-        assert len(content) == 2
-        assert content[0]["author_id"] == admin_user.user_id
-        assert content[0]["has_password"] is False
-        assert content[0]["type"] == ContentShareType.EMAIL.value
-        assert content[0]["disabled"] is None
-        assert content[0]["is_disabled"] is False
-        assert content[0]["upload_permission_id"]
-        assert content[0]["email"] == "test@test.test"
-        assert content[0]["url"].startswith("http://localhost:6543/ui/guest-upload/")
-        assert content[0]["created"]
-        assert content[0]["author"]
-        assert (
-            content[0]["upload_permission_group_uuid"] == content[1]["upload_permission_group_uuid"]
-        )
-        assert content[0]["created"] == content[1]["created"]
-        assert content[0]["upload_permission_id"] != content[1]["upload_permission_id"]
-        assert content[1]["email"] == "test2@test2.test2"
-
     def test_api__add_upload_permission__ok_200__nominal_case(
         self,
         workspace_api_factory,
@@ -198,6 +158,20 @@ class TestPrivateUploadPermissionEndpoints(object):
         )
         content = res.json_body
         assert len(content) == 1
+
+    def test_api__delete_upload_permission__err_400__upload_permission_not_found(
+        self, workspace_api_factory, session, web_testapp, upload_permission_lib_factory, admin_user
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        res = web_testapp.delete(
+            "/api/v2/workspaces/{}/upload_permissions/{}".format(workspace.workspace_id, 1),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -480,6 +454,28 @@ class TestGuestUploadEndpoints(object):
             params=params,
         )
         assert res.json_body["code"] == ErrorCode.WRONG_SHARE_PASSWORD
+
+    def test_api__guest_upload_content__err_400__upload_permission_not_found(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        image = create_1000px_png_test_image()
+        params = {"username": "toto", "password": "anotherpassword", "message": "hello folk !"}
+        res = web_testapp.post(
+            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+                upload_permission_token="invalid_token"
+            ),
+            status=400,
+            upload_files=[("files", image.name, image.getvalue())],
+            params=params,
+        )
+        assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
 
     def test_api__guest_upload_content__ok_200__without_password(
         self,

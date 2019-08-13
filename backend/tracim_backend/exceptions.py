@@ -142,6 +142,10 @@ class WorkspaceNotFound(NotFound):
     error_code = ErrorCode.WORKSPACE_NOT_FOUND
 
 
+class UploadPermissionNotFound(NotFound):
+    error_code = ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
+
+
 class WorkspaceNotFoundInTracimRequest(NotFound):
     error_code = ErrorCode.WORKSPACE_NOT_IN_TRACIM_REQUEST
 
