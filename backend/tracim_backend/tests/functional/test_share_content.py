@@ -97,7 +97,7 @@ class TestPrivateShareEndpoints(object):
         )
         assert content[0]["created"]
         assert content[0]["author"]
-        assert content[0]["share_group_id"] == content[1]["share_group_id"]
+        assert content[0]["share_group_uuid"] == content[1]["share_group_uuid"]
         assert content[0]["created"] == content[1]["created"]
         assert content[0]["share_id"] != content[1]["share_id"]
         assert content[1]["email"] == "test2@test2.test2"
@@ -152,7 +152,7 @@ class TestPrivateShareEndpoints(object):
         )
         assert content[0]["created"]
         assert content[0]["author"]
-        assert content[0]["share_group_id"] == content[1]["share_group_id"]
+        assert content[0]["share_group_uuid"] == content[1]["share_group_uuid"]
         assert content[0]["created"] == content[1]["created"]
         assert content[0]["share_id"] != content[1]["share_id"]
         assert content[1]["email"] == "test2@test2.test2"
@@ -217,7 +217,7 @@ class TestPrivateShareEndpoints(object):
         )
         assert content[0]["created"]
         assert content[0]["author"]
-        assert content[0]["share_group_id"] == content[1]["share_group_id"]
+        assert content[0]["share_group_uuid"] == content[1]["share_group_uuid"]
         assert content[0]["created"] == content[1]["created"]
         assert content[0]["share_id"] != content[1]["share_id"]
         assert content[1]["email"] == "test2@test2.test2"

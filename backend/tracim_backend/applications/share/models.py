@@ -44,7 +44,7 @@ class ContentShare(DeclarativeBase):
     author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     email = Column(Unicode(MAX_EMAIL_LENGTH), nullable=False)
     share_token = Column(Unicode(MAX_SHARE_TOKEN_LENGTH), nullable=False)
-    share_group_id = Column(Unicode(MAX_GROUP_SHARE_ID_LENGTH), nullable=False)
+    share_group_uuid = Column(Unicode(MAX_GROUP_SHARE_ID_LENGTH), nullable=False)
     type = Column(Enum(ContentShareType), nullable=False)
     _password = Column("password", Unicode(MAX_HASHED_PASSWORD_LENGTH), nullable=True)
     enabled = Column(Boolean, unique=False, nullable=False, default=True)
