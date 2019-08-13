@@ -57,7 +57,7 @@ class ShareLib(object):
     ) -> typing.List[ContentShare]:
         content_shares = []
         created = datetime.now()
-        share_group_id = str(uuid.uuid4())
+        share_group_uuid = str(uuid.uuid4())
         for email in emails:
             content_share = ContentShare(
                 author=self._user,
@@ -67,7 +67,7 @@ class ShareLib(object):
                 password=password,
                 type=ContentShareType.EMAIL,
                 created=created,
-                share_group_id=share_group_id,
+                share_group_uuid=share_group_uuid,
                 enabled=True,
             )
             self.save(content_share)

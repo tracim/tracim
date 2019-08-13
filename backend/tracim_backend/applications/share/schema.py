@@ -156,7 +156,7 @@ class ContentShareSchema(marshmallow.Schema):
         description="token of the content_share", example="444b026a068d42d6ab5e12fde08efb7b"
     )
     has_password = marshmallow.fields.Boolean(required=True)
-    share_group_id = marshmallow.fields.String(required=True)
+    share_group_uuid = marshmallow.fields.String(required=True)
     share_id = marshmallow.fields.Int(
         example=4,
         required=True,
