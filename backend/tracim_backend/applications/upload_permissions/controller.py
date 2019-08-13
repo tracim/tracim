@@ -137,7 +137,10 @@ class UploadPermissionController(Controller):
         content_api = ContentApi(
             config=app_config, current_user=upload_permission.author, session=request.dbsession
         )
-        label_name = "upload by {}-{}".format(hapic_data.forms.username, datetime.now())
+
+        label_name = _("Files uploaded by {username} on {date}").format(
+            username=hapic_data.forms.username, date=datetime.now()
+        )
         upload_folder = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=upload_permission.workspace,

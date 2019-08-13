@@ -383,14 +383,14 @@ class TestGuestUploadEndpoints(object):
         comment = res[0]
         assert comment["label"] == ""
         assert comment["content_type"] == "comment"
-        file = res[1]
+        file = res[2]
         assert file["label"] == "test_image"
         assert file["filename"] == "test_image.png"
         assert file["content_type"] == "file"
         image_content_id = file["content_id"]
         assert file["content_id"] == comment["parent_id"]
-        dir = res[2]
-        assert dir["label"].startswith("upload by toto")
+        dir = res[1]
+        assert dir["label"].startswith("Files uploaded by toto")
         assert dir["parent_id"] is None
         assert dir["content_type"] == "folder"
 
@@ -521,14 +521,14 @@ class TestGuestUploadEndpoints(object):
         comment = res[0]
         assert comment["label"] == ""
         assert comment["content_type"] == "comment"
-        file = res[1]
+        file = res[2]
         assert file["label"] == "test_image"
         assert file["filename"] == "test_image.png"
         assert file["content_type"] == "file"
         image_content_id = file["content_id"]
         assert file["content_id"] == comment["parent_id"]
-        dir = res[2]
-        assert dir["label"].startswith("upload by toto")
+        dir = res[1]
+        assert dir["label"].startswith("Files uploaded by toto")
         assert dir["parent_id"] is None
         assert dir["content_type"] == "folder"
 
