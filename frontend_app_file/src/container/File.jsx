@@ -11,6 +11,7 @@ import {
   PopinFixedContent,
   Timeline,
   NewVersionBtn,
+  GenericButton,
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
@@ -199,7 +200,8 @@ class File extends React.Component {
               // FIXME - b.l - refactor urls
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
-          }
+          },
+          mode: MODE.VIEW
         })
         break
       default:
@@ -627,7 +629,8 @@ class File extends React.Component {
       }
       return appOfficeDocument.default.getOnlineEditionAction(
         state.content,
-        state.config.system.config.collaborative_document_edition
+        state.config.system.config.collaborative_document_edition,
+        state.loggedUser.userRoleIdInWorkspace
       )
     } catch (error) {
       // INFO - B.L - 2019/08/05 - if appOfficeDocument is not activated in the backend
@@ -679,15 +682,18 @@ class File extends React.Component {
                 />
               }
 
-              {state.loggedUser.userRoleIdInWorkspace >= 2 && onlineEditionAction &&
-                <NewVersionBtn
+              {onlineEditionAction &&
+                <GenericButton
+                  customClass='wsContentGeneric__option__menu__addversion newversionbtn btn outlineTextBtn'
+                  dataCy='wsContentGeneric__option__menu__addversion'
                   customColor={state.config.hexcolor}
-                  onClickNewVersionBtn={onlineEditionAction}
+                  onClick={onlineEditionAction.callback}
                   disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
-                  label={props.t('Edit')}
+                  label={props.t(onlineEditionAction.label)}
                   style={{
                     marginLeft: '5px'
                   }}
+                  faIcon={'edit'}
                 />
               }
 
@@ -696,6 +702,7 @@ class File extends React.Component {
                   className='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
+                  data-cy='appFileLastVersionBtn'
                 >
                   <i className='fa fa-history' />
                   {props.t('Last version')}

@@ -154,6 +154,7 @@ class CFG(object):
         import tracim_backend.applications.share.config as share_app_config
 
         share_app_config.load_config(self)
+
         import tracim_backend.applications.upload_permissions.config as upload_permissions_config
 
         upload_permissions_config.load_config(self)
@@ -588,9 +589,6 @@ class CFG(object):
         import tracim_backend.applications.share.config as share_app_config
 
         share_app_config.check_config(self)
-        import tracim_backend.applications.upload_permissions.config as upload_permissions_config
-
-        upload_permissions_config.check_config(self)
 
     def _check_collaborative_document_edition_config_validity(self) -> None:
         if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
@@ -852,7 +850,7 @@ class CFG(object):
             fa_icon="file-o",
             is_active=self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
             config={},
-            main_route="/ui/workspaces/{workspace_id}/office",
+            main_route="",
             app_config=self,
         )
         office_document.add_content_type(
@@ -867,7 +865,6 @@ class CFG(object):
         import tracim_backend.applications.share.application as share_app
 
         share_content = share_app.get_app(app_config=self)
-
         import tracim_backend.applications.upload_permissions.application as upload_permissions_app
 
         upload_permissions = upload_permissions_app.get_app(app_config=self)

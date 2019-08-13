@@ -49,6 +49,7 @@ import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
 
 import IconButton from './component/Button/IconButton.jsx'
+import GenericButton from './component/Button/GenericButton.jsx'
 import IconWithWarning from './component/Icon/IconWithWarning.jsx'
 import DisplayState from './component/DisplayState/DisplayState.jsx'
 
@@ -91,6 +92,7 @@ export {
   CardPopup,
   CardPopupCreateContent,
   NewVersionBtn,
+  GenericButton,
   ArchiveDeleteContent,
   SelectStatus,
   ErrorFlashMessageTemplateHtml,

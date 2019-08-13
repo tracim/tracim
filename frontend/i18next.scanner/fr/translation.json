@@ -201,5 +201,12 @@
   "The destination folder doesn't allow this content type": "Le dossier de destination n'autorise pas ce type de contenu",
   ", create the first content of that type by clicking on the button 'Create'": ", créez le premier contenu de ce type en cliquant sur le bouton 'Créer'",
   "This shared space has no content of that type yet": "Cet espace partagé n'a pas encore de contenu de ce type",
-  "Insufficient rights": "Droits insuffisants"
+  "Insufficient rights": "Droits insuffisants",
+  "Content manager + add members and edit shared spaces": "Gestionnaire de contenu + ajouter des membres et modifiers les espaces partagés",
+  "Contributor + create folders and manage contents": "Contributeur + créer des dossiers et gérer les contenus",
+  "Reader + create/modify content": "Lecteur + créer/modifier les contenus",
+  "Read contents": "Lire les contenus",
+  "Access to shared spaces where user is member": "Accès aux espaces partagés où l'utilisateur est membre",
+  "Trusted user + create users, administration of instance": "Utilisateur de confiance + créer des utilisateurs, administration d'instance",
+  "User + create shared spaces, add members in shared spaces": "Utilisateur + créer des espaces partagés, ajouter des membres dans les espaces partagés"
 }

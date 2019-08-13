@@ -7,12 +7,10 @@ import uuid
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 
+from tracim_backend.applications.share.email_manager import ShareEmailManager
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.share.models import ContentShareType
 from tracim_backend.applications.share.models_in_context import ContentShareInContext
-from tracim_backend.applications.upload_permissions.email_manager import (
-    UploadPermissionEmailManager,
-)
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import WrongSharePassword
@@ -80,7 +78,7 @@ class ShareLib(object):
                 email_manager.notify__share__content(
                     emitter=self._user,
                     shared_content=content,
-                    upload_permission_receivers=self.get_content_shares_in_context(content_shares),
+                    content_share_receivers=self.get_content_shares_in_context(content_shares),
                     share_password=password,
                 )
             # FIXME - G.M - 2018-11-02 - hack: accept bad recipient user creation
@@ -99,7 +97,7 @@ class ShareLib(object):
                 ) from exc
         return content_shares
 
-    def _get_email_manager(self, config: CFG, session: Session) -> UploadPermissionEmailManager:
+    def _get_email_manager(self, config: CFG, session: Session) -> ShareEmailManager:
         """
         :return: EmailManager instance
         """
@@ -110,7 +108,7 @@ class ShareLib(object):
             config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
         )
 
-        return UploadPermissionEmailManager(config=config, smtp_config=smtp_config, session=session)
+        return ShareEmailManager(config=config, smtp_config=smtp_config, session=session)
 
     def get_content_shares(self, content: Content) -> typing.List[ContentShare]:
         return self.base_query().filter(ContentShare.content_id == content.content_id).all()

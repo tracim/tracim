@@ -118,17 +118,29 @@ Cypress.Commands.add('waitForTinyMCELoaded', () => {
   })
 })
 
-Cypress.Commands.add('form_request', (method, url, formData, done) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(method, url);
-    xhr.send(formData);
+Cypress.Commands.add('form_request', (method, url, formData) => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+
+    xhr.withCredentials = true
+    xhr.open(method, url, true)
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 204) resolve()
+        else resolve(JSON.parse(xhr.responseText))
+      }
+    }
+
+    xhr.send(formData)
+  })
 })
 
 Cypress.Commands.add('ignoreTinyMceError', () => {
   Cypress.on('uncaught:exception', (err, runnable) => {
-      console.log('uncaught:exception')
-      return false
-    })
+    console.log('uncaught:exception')
+    return false
+  })
 })
 
 Cypress.Commands.add('saveCookieValue', (user, cookieValue) => {
