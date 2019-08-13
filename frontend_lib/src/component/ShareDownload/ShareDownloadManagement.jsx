@@ -54,21 +54,27 @@ class ShareDownloadManagement extends React.Component {
             </button>
           }
         </div>
-        {shareLinkList.length > 0
-          ? props.userRoleIdInWorkspace >= 4
-            ? shareLinkList.map(shareLink =>
-                <ShareLink
-                  email={shareLink.email}
-                  link={shareLink.url}
-                  id={shareLink.share_id}
-                  isProtected={shareLink.has_password}
-                  onClickDeleteShareLink={props.onClickDeleteShareLink}
-                  hexcolor={props.hexcolor}
-                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
-                />
-              )
-            : <div className='m-auto'>{props.t('This file has {{numberLinks}} share links', { numberLinks: props.shareLinkList.length })}</div>
-          : <div className='m-auto'>{props.t('No share link has been created yet')}</div>
+
+        {shareLinkList.length > 0 && props.userRoleIdInWorkspace >= 4 &&
+          shareLinkList.map(shareLink =>
+            <ShareLink
+              email={shareLink.email}
+              link={shareLink.url}
+              id={shareLink.share_id}
+              isProtected={shareLink.has_password}
+              onClickDeleteShareLink={props.onClickDeleteShareLink}
+              hexcolor={props.hexcolor}
+              userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+            />
+          )
+        }
+
+        {shareLinkList.length > 0 && props.userRoleIdInWorkspace < 4 &&
+          <div className='m-auto'>{props.t('This file has {{numberLinks}} share links', { numberLinks: props.shareLinkList.length })}</div>
+        }
+
+        {shareLinkList.length <= 0 &&
+          <div className='m-auto'>{props.t('No share link has been created yet')}</div>
         }
       </div>
     )

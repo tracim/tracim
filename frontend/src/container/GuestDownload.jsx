@@ -12,7 +12,8 @@ import {
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
-  FETCH_CONFIG
+  FETCH_CONFIG,
+  PAGE
 } from '../helper.js'
 
 class GuestDownload extends React.Component {
@@ -53,8 +54,11 @@ class GuestDownload extends React.Component {
         break
       case 400:
         this.sendGlobalFlashMessage(props.t('Error in the URL'))
+        props.history.push(PAGE.LOGIN)
+        break
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading file infos'))
+        props.history.push(PAGE.LOGIN)
     }
   }
 
@@ -69,8 +73,7 @@ class GuestDownload extends React.Component {
 
   handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })
 
-  handleDownloadFile = () => {
-    // FIXME - b.l - refactor urls
+  getDownloadUrl = () => {
     return `${FETCH_CONFIG.apiUrl}/public/guest-download/${this.props.match.params.token}/${this.state.file.fileName}`
   }
 
@@ -90,7 +93,7 @@ class GuestDownload extends React.Component {
               file={state.file}
               guestPassword={state.guestPassword}
               onChangePassword={this.handleChangePassword}
-              onDownloadFile={this.handleDownloadFile}
+              onDownloadFile={this.getDownloadUrl}
             />
           </CardBody>
         </Card>

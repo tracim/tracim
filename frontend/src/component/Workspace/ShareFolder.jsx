@@ -11,7 +11,7 @@ import {
 require('./Folder.styl')
 
 class ShareFolder extends React.Component {
-  calculateIcon = () => {
+  getIcon = () => {
     const { props } = this
 
     if (props.folderData.isOpen) return 'fa-share-alt'
@@ -25,11 +25,8 @@ class ShareFolder extends React.Component {
     const folderContentList = props.workspaceContentList
       .filter(c => c.parentId === props.folderData.id)
       .sort((a, b) => {
-        if (a.created > b.created) {
-          return -1
-        } else {
-          return 1
-        }
+        if (a.created > b.created) return -1
+        return 1
       })
 
     return (
@@ -58,9 +55,9 @@ class ShareFolder extends React.Component {
           >
             <div className='folder__header__icon'
               title={props.t('Folder')}
-              style={{ color: props.contentType.find(c => c.slug === 'folder').hexcolor }}
+              style={{ color: (props.contentType.find(c => c.slug === 'folder') || {hexcolor: ''}).hexcolor }}
             >
-              <i className={classnames('fa fa-fw', this.calculateIcon())} />
+              <i className={classnames('fa fa-fw', this.getIcon())} />
             </div>
 
             <div className='folder__header__name'>
@@ -111,7 +108,7 @@ class ShareFolder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {folderContentList.map((content, i) => content.type === 'folder'
+          {folderContentList.map((content, index) => content.type === 'folder'
             ? (
               <ShareFolder
                 availableApp={props.availableApp}
@@ -126,7 +123,7 @@ class ShareFolder extends React.Component {
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
                 setFolderRead={props.setFolderRead}
-                isLast={props.isLast && i === folderContentList.length - 1}
+                isLast={props.isLast && index === folderContentList.length - 1}
                 key={content.id}
                 t={props.t}
                 location={props.location}

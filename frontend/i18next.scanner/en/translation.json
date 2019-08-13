@@ -223,5 +223,6 @@
   "Read contents": "Read contents",
   "Access to shared spaces where user is member": "Access to shared spaces where user is member",
   "Trusted user + create users, administration of instance": "Trusted user + create users, administration of instance",
-  "User + create shared spaces, add members in shared spaces": "User + create shared spaces, add members in shared spaces"
+  "User + create shared spaces, add members in shared spaces": "User + create shared spaces, add members in shared spaces",
+  "Error in the URL": "Error in the URL"
 }

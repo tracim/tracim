@@ -38,7 +38,7 @@ import {
   getFileComment,
   getFileRevision,
   getShareLinksList,
-  putShareLinksList,
+  postShareLinksList,
   postFileNewComment,
   putFileContent,
   putFileStatus,
@@ -644,7 +644,7 @@ class File extends React.Component {
       this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
     }
 
-    const fetchResultPutShareLinks = await handleFetchResult(await putShareLinksList(
+    const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
       state.config.apiUrl,
       state.content.workspace_id,
       state.content.content_id,
@@ -652,10 +652,10 @@ class File extends React.Component {
       state.sharePassword !== '' ? state.sharePassword : null
     ))
 
-    switch (fetchResultPutShareLinks.apiResponse.status) {
+    switch (fetchResultPostShareLinks.apiResponse.status) {
       case 200:
         this.setState(prev => ({
-          shareLinkList: [...prev.shareLinkList, ...fetchResultPutShareLinks.body],
+          shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
           shareEmails: '',
           sharePassword: ''
         }))
