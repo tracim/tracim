@@ -195,7 +195,7 @@ class TestPrivateShareEndpoints(object):
         content = res.json_body
         assert len(content) == 1
         params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
-        res = web_testapp.put_json(
+        res = web_testapp.post_json(
             "/api/v2/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
@@ -257,7 +257,7 @@ class TestPrivateShareEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
-        res = web_testapp.put_json(
+        res = web_testapp.post_json(
             "/api/v2/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
