@@ -1,13 +1,10 @@
 {
   "Last version": "Last version",
-  "Validate and create": "Validate and create",
   "Error while archiving document": "Error while archiving document",
   "Error while deleting document": "Error while deleting document",
   "Error while restoring document": "Error while restoring document",
   "Restore": "Restore",
   "Error while creating file": "Error while creating file",
-  "Drag and drop your file here": "Drag and drop your file here",
-  "You can also import your file by clicking here": "You can also import your file by clicking here",
   "Cancel": "Cancel",
   "Validate": "Validate",
   "Download file": "Download file",
@@ -20,7 +17,6 @@
   "Error while saving new description": "Error while saving new description",
   "Error while uploading file": "Error while uploading file",
   "Page number": "Page number",
-  "Upload a file": "Upload a file",
   "Error while loading timeline": "Error while loading timeline",
   "Bytes": "Bytes",
   "KB": "KB",
@@ -39,7 +35,6 @@
   "Error while saving new comment": "Error while saving new comment",
   "No preview available": "No preview available",
   " of ": " of ",
-  "A content with same name already exists": "A content with same name already exists",
   "Error while saving new title": "Error while saving new title",
   "This content is archived": "This content is archived",
   "This content is deleted": "This content is deleted",
@@ -51,6 +46,8 @@
   "Previous page": "Previous page",
   "Next page": "Next page",
   "You can't send an empty comment": "You can't send an empty comment",
+  "Share": "Share",
+  "Creation date": "Creation date",
   "of": "of",
   "Edit online": "Edit online"
 }

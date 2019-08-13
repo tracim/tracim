@@ -9,6 +9,7 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
+  PopinFixedRightPart,
   Timeline,
   NewVersionBtn,
   ArchiveDeleteContent,
@@ -653,21 +654,31 @@ class HtmlDocument extends React.Component {
             key={'html-document'}
           />
 
-          <Timeline
+          <PopinFixedRightPart
             customClass={`${config.slug}__contentpage`}
             customColor={config.hexcolor}
-            loggedUser={loggedUser}
-            timelineData={timeline}
-            showHeader
-            newComment={newComment}
-            disableComment={mode === MODE.REVISION || mode === MODE.EDIT || !content.is_editable}
-            availableStatusList={config.availableStatuses}
-            wysiwyg={timelineWysiwyg}
-            onChangeNewComment={this.handleChangeNewComment}
-            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            onClickRevisionBtn={this.handleClickShowRevision}
-            shouldScrollToBottom={mode !== MODE.REVISION}
+            menuItemList={[
+              {
+                id: 'timeline',
+                label: t('Timeline'),
+                icon: 'fa-history',
+                children: <Timeline
+                  customClass={`${config.slug}__contentpage`}
+                  customColor={config.hexcolor}
+                  loggedUser={loggedUser}
+                  timelineData={timeline}
+                  newComment={newComment}
+                  disableComment={mode === MODE.REVISION || mode === MODE.EDIT || !content.is_editable}
+                  availableStatusList={config.availableStatuses}
+                  wysiwyg={timelineWysiwyg}
+                  onChangeNewComment={this.handleChangeNewComment}
+                  onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+                  onClickWysiwygBtn={this.handleToggleWysiwyg}
+                  onClickRevisionBtn={this.handleClickShowRevision}
+                  shouldScrollToBottom={mode !== MODE.REVISION}
+                />
+              }
+            ]}
           />
         </PopinFixedContent>
       </PopinFixed>

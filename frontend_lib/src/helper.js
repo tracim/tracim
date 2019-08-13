@@ -122,9 +122,50 @@ export const appFeatureCustomEventHandlerShowApp = (newContent, currentContentId
   return true
 }
 
+// INFO - GB - 2019-07-05 - This password generetor function was based on
+// https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
+export const generateRandomPassword = () => {
+  let password = []
+  let charCode = String.fromCharCode
+  let randomNumber = Math.random
+  let random, i
+
+  for (i = 0; i < 10; i++) { // password with a size 10
+    random = 0 | randomNumber() * 62 // generate upper OR lower OR number
+    password.push(charCode(48 + random + (random > 9 ? 7 : 0) + (random > 35 ? 6 : 0)))
+  }
+  let randomPassword = password.sort(() => { return randomNumber() - 0.5 }).join('')
+
+  return randomPassword
+}
+
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   }
+}
+
+export const displayFileSize = (bytes, decimals) => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const dm = decimals <= 0 ? 0 : decimals || 2
+  const sizes = [i18n.t('Bytes'), i18n.t('KB'), i18n.t('MB'), i18n.t('GB'), i18n.t('TB'), i18n.t('PB'), i18n.t('EB'), i18n.t('ZB'), i18n.t('YB')]
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
+
+export const parserStringToList = string => {
+  let list = string.split(' ').join(',').split('\n').join(',').split(',')
+  list = list.filter(notEmptyString => notEmptyString !== '')
+  return list
+}
+
+// INFO - GB - 2019-07-31 - This function check if the email has three parts arranged like somethig@something.somethig
+export const checkEmailValidity = email => {
+  const parts = email.split('@')
+  if (parts.length !== 2) return false
+  
+  const domainParts = parts[1].split('.')
+  return domainParts.length === 2
 }

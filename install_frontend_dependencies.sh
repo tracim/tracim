@@ -156,6 +156,15 @@ log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
 
 
+# install app Share Folder Advanced
+log "cd $DEFAULTDIR/frontend_app_share_folder_advanced"
+cd $DEFAULTDIR/frontend_app_share_folder_advanced  || exit 1
+log "npm i"
+npm i --loglevel warn && loggood "success" || logerror "some error"
+log "npm link tracim_frontend_lib"
+npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+
+
 # install app Agenda
 log "cd $DEFAULTDIR/frontend_app_agenda"
 cd $DEFAULTDIR/frontend_app_agenda  || exit 1

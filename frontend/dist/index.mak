@@ -88,6 +88,7 @@
     % for app in applications:
     <script type='text/javascript' src='/app/${app.minislug}.app.js'></script>
     %endfor
+    <script type='text/javascript' src='/app/share_folder.app.js'></script>
     <script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
     <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
 

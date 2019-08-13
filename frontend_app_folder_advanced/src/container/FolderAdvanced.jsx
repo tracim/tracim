@@ -11,7 +11,8 @@ import {
   addAllResourceI18n,
   // SelectStatus,
   ArchiveDeleteContent,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -52,8 +53,11 @@ class FolderAdvanced extends React.Component {
     const { state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-        console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
+        console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) {
+          this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
+        }
         break
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)

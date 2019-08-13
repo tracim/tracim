@@ -1,0 +1,55 @@
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
+.guestupload, .guestdownload
+  &__card
+    &__form
+      &__text
+        margin 15px
+      &__groupepw
+        margin-right 5px
+        flex-grow 2
+        &__question
+          margin-bottom 15px
+          background-color transparent
+          border none
+          color grey
+          font-size 18px
+          padding 0
+          cursor pointer
+          &:focus
+            box-shadow 0 0 0 0
+            border 0 none
+            outline 0
+      &__right
+        &__btn
+          margin-left auto
+          color offWhite!important //INFO - G.B. - 2019-08-13 - override bootstrap rule to <a>
+
+.guestupload
+  &__card
+    &__form
+      &__left
+        width 50%
+      &__right
+        margin-left 20px
+        width 50%
+        display flex
+        flex-flow column
+        &__files
+          flex 1
+          max-height 260px
+          overflow-y auto
+
+.importConfirmation
+  width 425px
+  min-height 200px
+  display flex
+  align-items center
+  text-align center
+  justify-content center
+  flex-direction column
+  &__icon
+    font-size 30px
+    margin 10px
+    -webkit-text-stroke 1px black
+    color transparent

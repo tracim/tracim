@@ -9,6 +9,7 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
+  PopinFixedRightPart,
   Timeline,
   NewVersionBtn,
   GenericButton,
@@ -20,18 +21,24 @@ import {
   Badge,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  ShareDownload,
+  displayFileSize,
+  checkEmailValidity,
+  parserStringToList
 } from 'tracim_frontend_lib'
 import {
   MODE,
   removeExtensionOfFilename,
-  displayFileSize,
   PAGE
 } from '../helper.js'
 import {
+  deleteShareLink,
   getFileContent,
   getFileComment,
   getFileRevision,
+  getShareLinksList,
+  putShareLinksList,
   postFileNewComment,
   putFileContent,
   putFileStatus,
@@ -41,6 +48,7 @@ import {
   putFileRestoreDeleted,
   putMyselfFileRead
 } from '../action.async.js'
+import FileProperties from '../component/FileProperties.jsx'
 
 const CONTENT_TYPE_FILE = 'file'
 
@@ -67,11 +75,13 @@ class File extends React.Component {
       fileCurrentPage: 1,
       timelineWysiwyg: false,
       mode: MODE.VIEW,
-      displayProperty: false,
       progressUpload: {
         display: false,
         percent: 0
-      }
+      },
+      shareEmails: '',
+      sharePassword: '',
+      shareLinkList: []
     }
 
     // i18n has been init, add resources from frontend
@@ -148,6 +158,7 @@ class File extends React.Component {
     await this.loadContent()
     this.loadTimeline()
     this.buildBreadcrumbs()
+    this.loadShareLinkList()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -160,6 +171,7 @@ class File extends React.Component {
       await this.loadContent()
       this.loadTimeline()
       this.buildBreadcrumbs()
+      this.loadShareLinkList()
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
@@ -260,6 +272,22 @@ class File extends React.Component {
     })
   }
 
+  loadShareLinkList = async () => {
+    const { content, config } = this.state
+
+    const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
+
+    switch (fetchResultShareLinkList.apiResponse.status) {
+      case 200:
+        this.setState({
+          shareLinkList: fetchResultShareLinkList.body
+        })
+        break
+      default:
+        this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
+    }
+  }
+
   buildBreadcrumbs = () => {
     const { state } = this
 
@@ -300,12 +328,13 @@ class File extends React.Component {
       case 200:
         this.loadContent()
         this.loadTimeline()
+        this.loadShareLinkList()
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
+          case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
         break
@@ -507,8 +536,6 @@ class File extends React.Component {
     this.loadContent(1)
   }
 
-  handleClickProperty = () => this.setState(prev => ({ displayProperty: !prev.displayProperty }))
-
   handleChangeFile = newFile => {
     if (!newFile || !newFile[0]) return
 
@@ -599,6 +626,76 @@ class File extends React.Component {
         previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}&revision_id=${state.content.current_revision_id}`
       }
     }))
+  }
+
+  handleClickNewShare = async () => {
+    const { state, props } = this
+
+    let shareEmailList = parserStringToList(state.shareEmails)
+    let invalidEmails = []
+
+    shareEmailList.forEach(shareEmail => {
+      if (!checkEmailValidity(shareEmail)) invalidEmails.push(shareEmail)
+    })
+
+    shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
+
+    if (invalidEmails.length > 0) {
+      this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
+    }
+
+    const fetchResultPutShareLinks = await handleFetchResult(await putShareLinksList(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      state.content.content_id,
+      shareEmailList,
+      state.sharePassword !== '' ? state.sharePassword : null
+    ))
+
+    switch (fetchResultPutShareLinks.apiResponse.status) {
+      case 200:
+        this.setState(prev => ({
+          shareLinkList: [...prev.shareLinkList, ...fetchResultPutShareLinks.body],
+          shareEmails: '',
+          sharePassword: ''
+        }))
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+    }
+  }
+
+  handleChangeEmails = e => this.setState({ shareEmails: e.target.value })
+  handleChangePassword = e => this.setState({ sharePassword: e.target.value })
+  handleKeyDownEnter = e => {
+    if (e.key === 'Enter') {
+      const emailList = parserStringToList(this.state.shareEmails)
+      let invalidEmails = []
+
+      emailList.forEach(email => {
+        if (!checkEmailValidity(email)) invalidEmails.push(email)
+      })
+
+      if (invalidEmails.length > 0) {
+        this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+      }
+
+      this.setState({ shareEmails: emailList.join('\n') })
+    }
+  }
+
+  handleClickDeleteShareLink = async shareLinkId => {
+    const { config, content } = this.state
+
+    const fetchResultDeleteShareLink = await handleFetchResult(
+      await deleteShareLink(config.apiUrl, content.workspace_id, content.content_id, shareLinkId)
+    )
+
+    switch (fetchResultDeleteShareLink.status) {
+      case 204:
+        this.loadShareLinkList()
+        break
+      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
+    }
   }
 
   getDownloadBaseUrl = (apiUrl, content, mode) => {
@@ -743,18 +840,12 @@ class File extends React.Component {
             loggedUser={state.loggedUser}
             previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
             isJpegAvailable={state.content.has_jpeg_preview}
-            fileSize={displayFileSize(state.content.size)}
             filePageNb={state.content.page_nb}
             fileCurrentPage={state.fileCurrentPage}
-            displayProperty={state.displayProperty}
-            onClickProperty={this.handleClickProperty}
             version={state.content.number}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
-            description={state.content.raw_content}
-            onClickValidateNewDescription={this.handleClickValidateNewDescription}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
-            isEditable={state.content.is_editable}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             onClickRestoreArchived={this.handleClickRestoreArchived}
@@ -774,20 +865,66 @@ class File extends React.Component {
             progressUpload={state.progressUpload}
           />
 
-          <Timeline
+          <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
-            loggedUser={state.loggedUser}
-            timelineData={state.timeline}
-            newComment={state.newComment}
-            disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
-            availableStatusList={state.config.availableStatuses}
-            wysiwyg={state.timelineWysiwyg}
-            onChangeNewComment={this.handleChangeNewComment}
-            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            onClickRevisionBtn={this.handleClickShowRevision}
-            shouldScrollToBottom={state.mode !== MODE.REVISION}
+            menuItemList={[
+              {
+                id: 'timeline',
+                label: props.t('Timeline'),
+                icon: 'fa-history',
+                children: <Timeline
+                  customClass={`${state.config.slug}__contentpage`}
+                  customColor={state.config.hexcolor}
+                  loggedUser={state.loggedUser}
+                  timelineData={state.timeline}
+                  newComment={state.newComment}
+                  disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
+                  availableStatusList={state.config.availableStatuses}
+                  wysiwyg={state.timelineWysiwyg}
+                  onChangeNewComment={this.handleChangeNewComment}
+                  onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+                  onClickWysiwygBtn={this.handleToggleWysiwyg}
+                  onClickRevisionBtn={this.handleClickShowRevision}
+                  shouldScrollToBottom={state.mode !== MODE.REVISION}
+                />
+              },
+              {
+                id: 'share',
+                label: props.t('Share'),
+                icon: 'fa-share-alt',
+                children: <ShareDownload
+                  label={props.t(state.config.label)}
+                  hexcolor={state.config.hexcolor}
+                  shareEmails={state.shareEmails}
+                  onChangeEmails={this.handleChangeEmails}
+                  onKeyDownEnter={this.handleKeyDownEnter}
+                  sharePassword={state.sharePassword}
+                  onChangePassword={this.handleChangePassword}
+                  shareLinkList={state.shareLinkList}
+                  onClickDeleteShareLink={this.handleClickDeleteShareLink}
+                  onClickNewShare={this.handleClickNewShare}
+                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                />
+              },
+              {
+                id: 'properties',
+                label: props.t('Properties'),
+                icon: 'fa-info-circle',
+                children: <FileProperties
+                  color={state.config.hexcolor}
+                  fileType={state.content.file_extension}
+                  fileSize={displayFileSize(state.content.size)}
+                  filePageNb={state.content.page_nb}
+                  creationDate={displayDistanceDate(state.content.created, state.loggedUser.lang)}
+                  lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
+                  description={state.content.raw_content}
+                  displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
+                  disableChangeDescription={!state.content.is_editable}
+                  onClickValidateNewDescription={this.handleClickValidateNewDescription}
+                />
+              }
+            ]}
           />
         </PopinFixedContent>
       </PopinFixed>
