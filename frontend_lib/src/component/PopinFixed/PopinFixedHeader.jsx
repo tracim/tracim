@@ -2,6 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {

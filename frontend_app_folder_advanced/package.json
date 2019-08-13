@@ -22,6 +22,7 @@
     "@babel/plugin-transform-object-assign": "^7.2.0",
     "@babel/preset-env": "^7.5.2",
     "@babel/preset-react": "^7.0.0",
+    "reactstrap": "^8.0.0",
     "babel-eslint": "^10.0.2",
     "babel-loader": "^8.0.6",
     "classnames": "^2.2.6",

@@ -1,7 +1,5 @@
 import React from 'react'
 
-require('./ProgressBar.styl')
-
 export const ProgressBar = props => {
   const intPercent = parseInt(props.percent)
   const rotateLeft = intPercent <= 50 ? 0 : (intPercent - 50) / 100 * 360

@@ -20,6 +20,10 @@ class ContentShareInContext(object):
         self._user = user
 
     @property
+    def share_token(self) -> str:
+        return self.content_share.share_token
+
+    @property
     def content_id(self) -> int:
         return self.content_share.content_id
 

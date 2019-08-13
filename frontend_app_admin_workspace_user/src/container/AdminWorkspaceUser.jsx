@@ -108,8 +108,8 @@ class AdminWorkspaceUser extends React.Component {
   sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
-      msg: msg,
-      type: type,
+      msg: this.props.t(msg),
+      type: 'warning',
       delay: undefined
     }
   })
