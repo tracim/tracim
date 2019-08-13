@@ -9,7 +9,7 @@ var dateFnsLocale = {
   en: require('date-fns/locale/en')
 }
 
-const generateFetchResponse = async fetchResult => {
+export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()
   return new Promise((resolve, reject) => resolve({
     apiResponse: fetchResult,
@@ -17,7 +17,7 @@ const generateFetchResponse = async fetchResult => {
   }))
 }
 
-const errorFlashMessageTemplateObject = errorMsg => ({
+export const errorFlashMessageTemplateObject = errorMsg => ({
   type: CUSTOM_EVENT.ADD_FLASH_MSG,
   data: {
     msg: <ErrorFlashMessageTemplateHtml errorMsg={errorMsg} />,

@@ -22,7 +22,7 @@ export default NewVersionBtn
 GenericButton.propTypes = {
   onClickNewVersionBtn: PropTypes.func,
   disabled: PropTypes.bool,
-  style: PropTypes.string,
+  style: PropTypes.object,
   label: PropTypes.string,
   customColor: PropTypes.string
 }

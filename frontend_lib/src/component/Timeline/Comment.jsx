@@ -1,6 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import Avatar from '../Avatar/Avatar.jsx'
+import PropTypes from 'prop-types'
 
 const Comment = props => {
   const styleSent = {
@@ -43,3 +44,21 @@ const Comment = props => {
 }
 
 export default Comment
+
+Comment.propTypes = {
+  customClass: PropTypes.string,
+  author:  PropTypes.string,
+  text: PropTypes.string,
+  createdFormated: PropTypes.string,
+  createdDistance: PropTypes.string,
+  fromMe: PropTypes.bool
+}
+
+Comment.defaultProps = {
+  customClass: '',
+  author:  '',
+  text: '',
+  createdFormated: '',
+  createdDistance: '',
+  fromMe: false
+}
