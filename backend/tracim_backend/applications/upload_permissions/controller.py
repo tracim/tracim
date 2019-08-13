@@ -13,6 +13,7 @@ from tracim_backend.applications.upload_permissions.models_in_context import (
     UploadPermissionInContext,
 )
 from tracim_backend.applications.upload_permissions.schema import UploadDataFormSchema
+from tracim_backend.applications.upload_permissions.schema import UploadFilesSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionCreationBodySchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionIdPathSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionListQuerySchema
@@ -32,7 +33,6 @@ from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import NoContentSchema
-from tracim_backend.views.core_api.schemas import SimpleFileSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.core_api.workspace_controller import SWAGGER_TAG__WORKSPACE_ENDPOINTS
 
@@ -119,7 +119,7 @@ class UploadPermissionController(Controller):
     @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UploadPermissionTokenPath())
     @hapic.input_forms(UploadDataFormSchema())
-    @hapic.input_files(SimpleFileSchema())
+    @hapic.input_files(UploadFilesSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def guest_upload_file(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
@@ -146,38 +146,38 @@ class UploadPermissionController(Controller):
             do_save=True,
             content_namespace=ContentNamespaces.UPLOAD,
         )
-        _file = hapic_data.files.files
-        content = content_api.create(
-            filename=_file.filename,
-            content_type_slug=content_type_list.File.slug,
-            workspace=upload_permission.workspace,
-            parent=upload_folder,
-            do_notify=False,
-            content_namespace=ContentNamespaces.UPLOAD,
-        )
-        content_api.save(content, ActionDescription.CREATION)
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
-            content_api.update_file_data(
-                content,
-                new_filename=_file.filename,
-                new_mimetype=_file.type,
-                new_content=_file.file,
+        created_contents = []
+        for _file in hapic_data.files.files:
+            content = content_api.create(
+                filename=_file.filename,
+                content_type_slug=content_type_list.File.slug,
+                workspace=upload_permission.workspace,
+                parent=upload_folder,
+                do_notify=False,
+                content_namespace=ContentNamespaces.UPLOAD,
             )
-        content_api.create_comment(
-            parent=content,
-            content=_("message from {username}: {message}").format(
-                username=hapic_data.forms.username, message=hapic_data.forms.message
-            ),
-            do_save=True,
-            do_notify=False,
-        )
+            content_api.save(content, ActionDescription.CREATION)
+            with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+                content_api.update_file_data(
+                    content,
+                    new_filename=_file.filename,
+                    new_mimetype=_file.type,
+                    new_content=_file.file,
+                )
+            content_api.create_comment(
+                parent=content,
+                content=_("message from {username}: {message}").format(
+                    username=hapic_data.forms.username, message=hapic_data.forms.message
+                ),
+                do_save=True,
+                do_notify=False,
+            )
+            created_contents.append(content_api.get_content_in_context(content))
+            content_api.execute_created_content_actions(content)
         if app_config.EMAIL__NOTIFICATION__ACTIVATED:
             api.notify_uploaded_contents(
-                hapic_data.forms.username,
-                upload_permission.workspace,
-                [content_api.get_content_in_context(content)],
+                hapic_data.forms.username, upload_permission.workspace, created_contents
             )
-        content_api.execute_created_content_actions(content)
         return
 
     def bind(self, configurator: Configurator) -> None:

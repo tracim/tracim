@@ -1,3 +1,4 @@
+import cgi
 import typing
 
 import marshmallow
@@ -17,6 +18,32 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
+
+
+class UploadFiles(object):
+    def __init__(self, **files: cgi.FieldStorage) -> None:
+        self.files = files.values()
+
+
+class UploadFilesSchema(marshmallow.Schema):
+    """
+    schema to handle up to 10 files
+    """
+
+    file1 = marshmallow.fields.Raw(required=False, description="a file")
+    file2 = marshmallow.fields.Raw(required=False, description="a file")
+    file3 = marshmallow.fields.Raw(required=False, description="a file")
+    file4 = marshmallow.fields.Raw(required=False, description="a file")
+    file5 = marshmallow.fields.Raw(required=False, description="a file")
+    file6 = marshmallow.fields.Raw(required=False, description="a file")
+    file7 = marshmallow.fields.Raw(required=False, description="a file")
+    file8 = marshmallow.fields.Raw(required=False, description="a file")
+    file9 = marshmallow.fields.Raw(required=False, description="a file")
+    file10 = marshmallow.fields.Raw(required=False, description="a file")
+
+    @post_load
+    def create_file(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UploadFiles(**data)
 
 
 class UploadDataForm(object):

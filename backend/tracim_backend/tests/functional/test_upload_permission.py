@@ -366,7 +366,7 @@ class TestGuestUploadEndpoints(object):
                 upload_permission_token=upload_permission.token
             ),
             status=204,
-            upload_files=[("files", image.name, image.getvalue())],
+            upload_files=[("file1", image.name, image.getvalue())],
             params=params,
         )
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -450,7 +450,7 @@ class TestGuestUploadEndpoints(object):
                 upload_permission_token=upload_permission.token
             ),
             status=403,
-            upload_files=[("files", image.name, image.getvalue())],
+            upload_files=[("file1", image.name, image.getvalue())],
             params=params,
         )
         assert res.json_body["code"] == ErrorCode.WRONG_SHARE_PASSWORD
@@ -472,7 +472,7 @@ class TestGuestUploadEndpoints(object):
                 upload_permission_token="invalid_token"
             ),
             status=400,
-            upload_files=[("files", image.name, image.getvalue())],
+            upload_files=[("file1", image.name, image.getvalue())],
             params=params,
         )
         assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
@@ -504,7 +504,7 @@ class TestGuestUploadEndpoints(object):
                 upload_permission_token=upload_permission.token
             ),
             status=204,
-            upload_files=[("files", image.name, image.getvalue())],
+            upload_files=[("file1", image.name, image.getvalue())],
             params=params,
         )
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -560,3 +560,56 @@ class TestGuestUploadEndpoints(object):
             status=200,
         )
         assert len(res.json_body) == 0
+
+    def test_api__guest_upload_content__ok_200__10_files(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["thissharewill@notbe.presentinresponse"]
+        )
+        upload_permissions = upload_permission_lib.get_upload_permissions(workspace)
+        assert len(upload_permissions) == 1
+        upload_permission = upload_permissions[0]
+        transaction.commit()
+        params = {"username": "toto", "message": "hello folk !"}
+        image = create_1000px_png_test_image()
+        web_testapp.post(
+            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+                upload_permission_token=upload_permission.token
+            ),
+            status=204,
+            upload_files=[
+                ("file1", "file1.png", image.getvalue()),
+                ("file2", "file2.png", image.getvalue()),
+                ("file3", "file3.png", image.getvalue()),
+                ("file4", "file4.png", image.getvalue()),
+                ("file5", "file5.png", image.getvalue()),
+                ("file6", "file6.png", image.getvalue()),
+                ("file7", "file7.png", image.getvalue()),
+                ("file8", "file8.png", image.getvalue()),
+                ("file9", "file9.png", image.getvalue()),
+                ("file10", "file10.png", image.getvalue()),
+            ],
+            params=params,
+        )
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        params = {"namespaces_filter": "upload"}
+        res = web_testapp.get(
+            "/api/v2/workspaces/{workspace_id}/contents".format(
+                workspace_id=workspace.workspace_id
+            ),
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 21
