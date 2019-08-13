@@ -574,6 +574,7 @@ class TestGuestDownloadShareEndpoints(object):
         assert share["content_size"] == 9
         assert share["content_filename"] == "Test_file.txt"
         assert share["content_file_extension"] == ".txt"
+        assert share["has_password"] is False
 
     def test_api__guest_download_content_info__err_400__not_shareable_type(
         self,

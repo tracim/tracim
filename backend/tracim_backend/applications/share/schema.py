@@ -121,7 +121,9 @@ class ShareTokenWithFilenamePathSchema(marshmallow.Schema):
 
 class ContentShareInfoSchema(marshmallow.Schema):
     author = marshmallow.fields.Nested(UserDigestSchema)
-
+    has_password = marshmallow.fields.Boolean(
+        description="is password required to get content share content ?"
+    )
     content_file_extension = StrippedString(example=".txt")
     content_filename = StrippedString(example="nameofthefile.txt")
     content_label = StrippedString(example="nameofthefile")
