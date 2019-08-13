@@ -18,6 +18,7 @@ from tracim_backend.applications.share.schema import ShareTokenPathSchema
 from tracim_backend.applications.share.schema import ShareTokenWithFilenamePathSchema
 from tracim_backend.applications.share.schema import TracimSharePasswordHeaderSchema
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import ContentShareNotFound
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import WrongSharePassword
@@ -101,6 +102,7 @@ class ShareController(Controller):
         return api.get_content_shares_in_context(shares_content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @check_right(is_content_manager)
     @check_right(is_shareable_content_type)
     @hapic.input_path(ShareIdPathSchema())
@@ -117,6 +119,7 @@ class ShareController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(ShareTokenPathSchema())
     @hapic.output_body(ContentShareInfoSchema())
     def guest_download_info(
@@ -139,6 +142,7 @@ class ShareController(Controller):
         return api.get_content_share_in_context(content_share)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(ShareTokenWithFilenamePathSchema())
     @hapic.input_headers(TracimSharePasswordHeaderSchema())
