@@ -63,7 +63,7 @@ class UploadPermissionLib(object):
         workspace: Workspace,
         emails: typing.List[str],
         password: typing.Optional[str] = None,
-        do_notify=True,
+        do_notify=False,
     ) -> typing.List[UploadPermission]:
         upload_permissions = []
         created = datetime.now()
@@ -84,7 +84,7 @@ class UploadPermissionLib(object):
             upload_permissions.append(upload_permission)
             self._session.flush()
 
-        if do_notify and self._config.EMAIL__NOTIFICATION__ACTIVATED:
+        if do_notify:
             try:
                 email_manager = self._get_email_manager(self._config, self._session)
                 email_manager.notify_upload_permission(

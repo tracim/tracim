@@ -63,7 +63,10 @@ class UploadPermissionController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         upload_permission = api.add_permission_to_workspace(
-            request.current_workspace, hapic_data.body.emails, hapic_data.body.password
+            request.current_workspace,
+            hapic_data.body.emails,
+            hapic_data.body.password,
+            do_notify=app_config.EMAIL__NOTIFICATION__ACTIVATED,
         )
         return api.get_upload_permissions_in_context(upload_permission)
 

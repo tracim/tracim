@@ -194,7 +194,7 @@ class TestUploadPermissionWithNotification(object):
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
-            workspace, emails=["test@test.test", "test2@test2.test2"]
+            workspace, emails=["test@test.test", "test2@test2.test2"], do_notify=True
         )
         transaction.commit()
         response = mailhog.get_mailhog_mails()
@@ -229,7 +229,7 @@ class TestUploadPermissionWithNotification(object):
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
-            workspace, emails=["test@test.test", "test2@test2.test2"]
+            workspace, emails=["test@test.test", "test2@test2.test2"], do_notify=True
         )
         transaction.commit()
 
@@ -271,7 +271,10 @@ class TestUploadPermissionWithNotification(object):
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
-            workspace, emails=["test@test.test", "test2@test2.test2"], password="toto"
+            workspace,
+            emails=["test@test.test", "test2@test2.test2"],
+            password="toto",
+            do_notify=True,
         )
         transaction.commit()
         response = mailhog.get_mailhog_mails()
