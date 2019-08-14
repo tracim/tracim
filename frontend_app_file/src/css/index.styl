@@ -103,14 +103,25 @@
     height calc(100% - headerHeight)
     &__contentpage__content__left
       min-height 250px
+  .newversionbtn
+    & > i
+      margin 0
+    & > span
+      display none
 
 @media (max-width: max-xs)
   .file
     height calc(100% - headerHeight)
-    &__option__menu__addversion
-      padding 8px 5px
-      & > i
-        display none
+    &__option__menu
+      &__addversion
+        padding 8px 5px
+        & > i
+          display none
+      &__editBtn
+        & > i
+          margin 0
+        & > span
+          display none
     &__contentpage
       display block
       &__content
@@ -138,3 +149,9 @@
                 margin-left 10px
                 &__icon
                   margin-left 15px
+  .newversionbtn
+    & > i
+      margin 0
+    & > span
+      display none
+

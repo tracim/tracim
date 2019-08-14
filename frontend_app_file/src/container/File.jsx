@@ -684,7 +684,7 @@ class File extends React.Component {
 
               {onlineEditionAction &&
                 <GenericButton
-                  customClass='wsContentGeneric__option__menu__addversion newversionbtn btn outlineTextBtn'
+                  customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
                   dataCy='wsContentGeneric__option__menu__addversion'
                   customColor={state.config.hexcolor}
                   onClick={onlineEditionAction.callback}
@@ -717,6 +717,7 @@ class File extends React.Component {
                   availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
                   disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
+                  compactVersion={onlineEditionAction}
                 />
               }
 
