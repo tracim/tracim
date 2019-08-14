@@ -144,6 +144,7 @@ class FolderAdvanced extends React.Component {
 
     const oldAvailableAppList = state.content.sub_content_types
 
+    // FIXME - G.B. - 2019-08-14 - We need a sub-app system so you don't have to put the hardcoded strings 
     let newAvailableAppList = []
 
     if (state.content.sub_content_types.find(c => c === appSlug)) {
