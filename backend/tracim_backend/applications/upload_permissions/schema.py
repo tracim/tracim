@@ -22,7 +22,7 @@ from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
 class UploadFiles(object):
     def __init__(self, **files: cgi.FieldStorage) -> None:
-        self.files = files.values()
+        self.files = files.values()  # type: typing.List[cgi.FieldStorage]
 
 
 class UploadFilesSchema(marshmallow.Schema):
