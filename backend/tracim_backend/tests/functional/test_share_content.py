@@ -413,6 +413,7 @@ class TestPrivateShareEndpointsWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
@@ -469,6 +470,7 @@ class TestPrivateShareEndpointsWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
@@ -507,18 +509,23 @@ class TestPrivateShareEndpointsWithNotification(object):
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
             test_file,
-            emails=["test@test.test", "test2@test2.test2"],
+            emails=["toto <test@test.test>", "test2@test2.test2"],
             password="toto",
             do_notify=True,
         )
         transaction.commit()
         response = mailhog.get_mailhog_mails()
         assert len(response) == 3
-        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        valid_dests = [
+            "Global manager <admin@admin.admin>",
+            "toto <test@test.test>",
+            "test2@test2.test2",
+        ]
         for email in response:
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
