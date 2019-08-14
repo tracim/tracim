@@ -69,7 +69,7 @@ class WorkspaceContent extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.REFRESH_CONTENT_LIST:
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
-        await this.loadContentList(state.workspaceIdInUrl)
+        this.loadContentList(state.workspaceIdInUrl)
         break
 
       case CUSTOM_EVENT.OPEN_CONTENT_URL:
