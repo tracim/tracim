@@ -319,7 +319,7 @@ class TestUploadPermissionWithNotification(object):
                 upload_permission_token=upload_permission.token
             ),
             status=204,
-            upload_files=[("files", image.name, image.getvalue())],
+            upload_files=[("file1", image.name, image.getvalue())],
             params=params,
         )
         response = mailhog.get_mailhog_mails()
