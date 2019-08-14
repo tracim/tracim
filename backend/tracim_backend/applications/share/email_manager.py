@@ -138,7 +138,7 @@ class ShareEmailManager(EmailManager):
             content_filename=shared_content.file_name,
             emitter_name=emitter.display_name,
         )
-        message["From"] = self._get_sender()
+        message["From"] = self._get_sender(emitter)
         message["To"] = content_share.email
         username, address = email.utils.parseaddr(content_share.email)
         html_template_file_path = (
