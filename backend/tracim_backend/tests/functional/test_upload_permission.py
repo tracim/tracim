@@ -322,7 +322,7 @@ class TestUploadPermissionWithNotification(object):
                 upload_permission_token=upload_permission.token
             ),
             status=204,
-            upload_files=[("file1", image.name, image.getvalue())],
+            upload_files=[("file_1", image.name, image.getvalue())],
             params=params,
         )
         response = mailhog.get_mailhog_mails()
@@ -369,7 +369,7 @@ class TestGuestUploadEndpoints(object):
                 upload_permission_token=upload_permission.token
             ),
             status=204,
-            upload_files=[("file1", image.name, image.getvalue())],
+            upload_files=[("file_1", image.name, image.getvalue())],
             params=params,
         )
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -453,7 +453,7 @@ class TestGuestUploadEndpoints(object):
                 upload_permission_token=upload_permission.token
             ),
             status=403,
-            upload_files=[("file1", image.name, image.getvalue())],
+            upload_files=[("file_1", image.name, image.getvalue())],
             params=params,
         )
         assert res.json_body["code"] == ErrorCode.WRONG_SHARE_PASSWORD
@@ -475,7 +475,7 @@ class TestGuestUploadEndpoints(object):
                 upload_permission_token="invalid_token"
             ),
             status=400,
-            upload_files=[("file1", image.name, image.getvalue())],
+            upload_files=[("file_1", image.name, image.getvalue())],
             params=params,
         )
         assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
@@ -507,7 +507,7 @@ class TestGuestUploadEndpoints(object):
                 upload_permission_token=upload_permission.token
             ),
             status=204,
-            upload_files=[("file1", image.name, image.getvalue())],
+            upload_files=[("file_1", image.name, image.getvalue())],
             params=params,
         )
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -591,7 +591,7 @@ class TestGuestUploadEndpoints(object):
                 upload_permission_token=upload_permission.token
             ),
             status=204,
-            upload_files=[("file1", image.name, image.getvalue())],
+            upload_files=[("file_1", image.name, image.getvalue())],
             params=params,
         )
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -676,16 +676,16 @@ class TestGuestUploadEndpoints(object):
             ),
             status=204,
             upload_files=[
-                ("file1", "file1.png", image.getvalue()),
-                ("file2", "file2.png", image.getvalue()),
-                ("file3", "file3.png", image.getvalue()),
-                ("file4", "file4.png", image.getvalue()),
-                ("file5", "file5.png", image.getvalue()),
-                ("file6", "file6.png", image.getvalue()),
-                ("file7", "file7.png", image.getvalue()),
-                ("file8", "file8.png", image.getvalue()),
-                ("file9", "file9.png", image.getvalue()),
-                ("file10", "file10.png", image.getvalue()),
+                ("file_1", "file1.png", image.getvalue()),
+                ("file_2", "file2.png", image.getvalue()),
+                ("file_3", "file3.png", image.getvalue()),
+                ("file_4", "file4.png", image.getvalue()),
+                ("file_5", "file5.png", image.getvalue()),
+                ("file_6", "file6.png", image.getvalue()),
+                ("file_7", "file7.png", image.getvalue()),
+                ("file_8", "file8.png", image.getvalue()),
+                ("file_9", "file9.png", image.getvalue()),
+                ("file_10", "file10.png", image.getvalue()),
             ],
             params=params,
         )

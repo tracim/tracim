@@ -5,6 +5,7 @@ import marshmallow
 from marshmallow import post_load
 from marshmallow.validate import OneOf
 
+from tracim_backend import TracimRequest
 from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.applications.upload_permissions.models import UploadPermissionType
@@ -20,30 +21,24 @@ from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
 
+class UploadFileSchema(marshmallow.Schema):
+    file_ = marshmallow.fields.Raw(
+        required=False,
+        load_from="file_*",
+        dump_to="file_*",
+        description="a file, you can add as file as you want by uploading file_* (* is any number)"
+        " file in the same form.",
+    )
+
+
 class UploadFiles(object):
-    def __init__(self, **files: cgi.FieldStorage) -> None:
-        self.files = files.values()  # type: typing.List[cgi.FieldStorage]
-
-
-class UploadFilesSchema(marshmallow.Schema):
-    """
-    schema to handle up to 10 files
-    """
-
-    file1 = marshmallow.fields.Raw(required=False, description="a file")
-    file2 = marshmallow.fields.Raw(required=False, description="a file")
-    file3 = marshmallow.fields.Raw(required=False, description="a file")
-    file4 = marshmallow.fields.Raw(required=False, description="a file")
-    file5 = marshmallow.fields.Raw(required=False, description="a file")
-    file6 = marshmallow.fields.Raw(required=False, description="a file")
-    file7 = marshmallow.fields.Raw(required=False, description="a file")
-    file8 = marshmallow.fields.Raw(required=False, description="a file")
-    file9 = marshmallow.fields.Raw(required=False, description="a file")
-    file10 = marshmallow.fields.Raw(required=False, description="a file")
-
-    @post_load
-    def create_file(self, data: typing.Dict[str, typing.Any]) -> object:
-        return UploadFiles(**data)
+    def __init__(self, request: TracimRequest, prefix_pattern: str) -> None:
+        """ Hack to get list of uploaded file in a form given without using hapic"""
+        self.files = []  # type: typing.List[cgi.FieldStorage]
+        for name, item in request.POST.items():
+            if name.startswith(prefix_pattern) and isinstance(item, cgi.FieldStorage):
+                setattr(self, name, item)
+                self.files.append(item)
 
 
 class UploadDataForm(object):

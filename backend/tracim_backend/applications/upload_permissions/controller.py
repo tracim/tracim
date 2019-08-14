@@ -10,7 +10,8 @@ from tracim_backend.applications.upload_permissions.models_in_context import (
     UploadPermissionInContext,
 )
 from tracim_backend.applications.upload_permissions.schema import UploadDataFormSchema
-from tracim_backend.applications.upload_permissions.schema import UploadFilesSchema
+from tracim_backend.applications.upload_permissions.schema import UploadFiles
+from tracim_backend.applications.upload_permissions.schema import UploadFileSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionCreationBodySchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionIdPathSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionListQuerySchema
@@ -113,12 +114,15 @@ class UploadPermissionController(Controller):
     @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UploadPermissionTokenPath())
     @hapic.input_forms(UploadDataFormSchema())
-    @hapic.input_files(UploadFilesSchema())
+    @hapic.input_files(UploadFileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def guest_upload_file(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        upload a file as guest
+        upload files as guest
         """
+        # TODO - G.M - 2019-08-14 - replace UploadFiles Object hack to proper hapic support
+        # see
+        upload_files = UploadFiles(request, prefix_pattern="file_")
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = UploadPermissionLib(current_user=None, session=request.dbsession, config=app_config)
         upload_permission = api.get_upload_permission_by_token(
@@ -131,7 +135,7 @@ class UploadPermissionController(Controller):
             upload_permission=upload_permission,
             uploader_username=hapic_data.forms.username,
             message=hapic_data.forms.message,
-            files=hapic_data.files.files,
+            files=upload_files.files,
             do_notify=app_config.EMAIL__NOTIFICATION__ACTIVATED,
         )
         return
