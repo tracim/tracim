@@ -15,6 +15,8 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import UserInContext
+from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import Workspace
 
 
@@ -22,7 +24,8 @@ class UploadPermissionEmailManager(EmailManager):
     def notify_new_upload(
         self,
         uploader_username,
-        workspace: Workspace,
+        uploader_email,
+        workspace_in_context: WorkspaceInContext,
         uploaded_contents: typing.List[ContentInContext],
     ) -> None:
         email_sender = EmailSender(
@@ -30,21 +33,22 @@ class UploadPermissionEmailManager(EmailManager):
         )
         notifiable_roles = WorkspaceApi(
             current_user=None, session=self.session, config=self.config
-        ).get_notifiable_roles(workspace, force_notify=True)
+        ).get_notifiable_roles(workspace_in_context.workspace, force_notify=True)
 
         for role in notifiable_roles:
             logger.info(
                 self,
                 'Generating new upload notification in workspace "{}" from "{}" to "{}"'.format(
-                    workspace.workspace_id, uploader_username, role.user.email
+                    workspace_in_context.workspace_id, uploader_username, role.user.email
                 ),
             )
             translator = Translator(app_config=self.config, default_lang=role.user.lang)
 
             message = self._notify_new_upload(
-                workspace=workspace,
+                workspace_in_context=workspace_in_context,
                 receiver=role.user,
                 uploader_username=uploader_username,
+                uploader_email=uploader_email,
                 translator=translator,
                 uploaded_contents=uploaded_contents,
             )
@@ -54,16 +58,17 @@ class UploadPermissionEmailManager(EmailManager):
 
     def _notify_new_upload(
         self,
-        workspace: Workspace,
-        receiver: User,
+        workspace_in_context: WorkspaceInContext,
+        receiver: UserInContext,
         uploader_username: str,
+        uploader_email: str,
         uploaded_contents: typing.List[ContentInContext],
         translator: Translator,
     ) -> Message:
         logger.info(
             self,
             'preparing email to user "{}" about new upload on workspace "{}" info created'.format(
-                receiver.user_id, workspace.workspace_id
+                receiver.user_id, workspace_in_context.workspace_id
             ),
         )
         message = MIMEMultipart("alternative")
@@ -74,7 +79,7 @@ class UploadPermissionEmailManager(EmailManager):
             website_title=self.config.WEBSITE__TITLE,
             uploader_username=uploader_username,
             nb_uploaded_contents=len(uploaded_contents),
-            workspace_name=workspace.label,
+            workspace_name=workspace_in_context.label,
         )
         message["From"] = self._get_sender()
         to_addr = formataddr((receiver.display_name, receiver.email))
@@ -82,8 +87,9 @@ class UploadPermissionEmailManager(EmailManager):
         html_template_file_path = self.config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML
         context = {
             "receiver": receiver,
-            "workspace": workspace,
+            "workspace": workspace_in_context,
             "uploader_username": uploader_username,
+            "uploader_email": uploader_email,
             "uploaded_contents": uploaded_contents,
         }
         body_html = self._render_template(
@@ -99,15 +105,15 @@ class UploadPermissionEmailManager(EmailManager):
 
     def notify_upload_permission(
         self,
-        emitter: User,
-        workspace: Workspace,
+        emitter: UserInContext,
+        workspace_in_context: WorkspaceInContext,
         upload_permission_receivers: typing.List[UploadPermissionInContext],
         upload_permission_password: str,
     ) -> None:
         """
         Send mails to notify users for sharing content
         :param emitter: User emitter of the sharing
-        :param workspace: workspace where receivers can now upload file
+        :param workspace_in_context: workspace where receivers can now upload file
         :param upload_permission_receivers: list of upload_permission
         :param upload_permission_password: cleartext password of the sharing
         """
@@ -121,7 +127,7 @@ class UploadPermissionEmailManager(EmailManager):
         translator = Translator(self.config, default_lang=emitter.lang)
         message = self._notify_emitter(
             emitter=emitter,
-            workspace=workspace,
+            workspace_in_context=workspace_in_context,
             upload_permission_receivers=upload_permission_receivers,
             upload_permission_password=upload_permission_password,
             translator=translator,
@@ -141,7 +147,7 @@ class UploadPermissionEmailManager(EmailManager):
         for upload_permission in upload_permission_receivers:
             message = self._notify_receiver(
                 emitter=emitter,
-                workspace=workspace,
+                workspace=workspace_in_context,
                 upload_permission=upload_permission,
                 upload_permission_password_enabled=upload_permission_password_enabled,
                 translator=translator,
@@ -152,8 +158,8 @@ class UploadPermissionEmailManager(EmailManager):
 
     def _notify_emitter(
         self,
-        emitter: User,
-        workspace: Workspace,
+        emitter: UserInContext,
+        workspace_in_context: WorkspaceInContext,
         upload_permission_receivers: typing.List[UploadPermissionInContext],
         upload_permission_password: str,
         translator: Translator,
@@ -161,7 +167,7 @@ class UploadPermissionEmailManager(EmailManager):
         logger.info(
             self,
             'preparing email to user "{}" about upload_permission on workspace "{}" info created'.format(
-                emitter.user_id, workspace.workspace_id
+                emitter.user_id, workspace_in_context.workspace_id
             ),
         )
         message = MIMEMultipart("alternative")
@@ -171,7 +177,7 @@ class UploadPermissionEmailManager(EmailManager):
         message["Subject"] = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
             nb_receivers=len(upload_permission_receivers),
-            workspace_name=workspace.label,
+            workspace_name=workspace_in_context.label,
         )
         message["From"] = self._get_sender()
         to_addr = formataddr((emitter.display_name, emitter.email))
@@ -181,7 +187,7 @@ class UploadPermissionEmailManager(EmailManager):
         )
         context = {
             "emitter": emitter,
-            "workspace": workspace,
+            "workspace": workspace_in_context,
             "upload_permission_receivers": upload_permission_receivers,
             "upload_permission_password": upload_permission_password,
         }

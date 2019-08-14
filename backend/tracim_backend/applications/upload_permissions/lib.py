@@ -24,11 +24,14 @@ from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import UploadPermissionNotFound
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import Workspace
@@ -85,11 +88,15 @@ class UploadPermissionLib(object):
             self._session.flush()
 
         if do_notify:
+            userlib = UserApi(config=self._config, current_user=self._user, session=self._session)
+            workspace_lib = WorkspaceApi(
+                config=self._config, current_user=self._user, session=self._session
+            )
             try:
                 email_manager = self._get_email_manager(self._config, self._session)
                 email_manager.notify_upload_permission(
-                    emitter=self._user,
-                    workspace=workspace,
+                    emitter=userlib.get_user_with_context(self._user),
+                    workspace_in_context=workspace_lib.get_workspace_with_context(workspace),
                     upload_permission_receivers=self.get_upload_permissions_in_context(
                         upload_permissions
                     ),
@@ -216,7 +223,8 @@ class UploadPermissionLib(object):
     def _notify_uploaded_contents(
         self,
         uploader_username: str,
-        workspace: Workspace,
+        uploader_email: str,
+        workspace_in_context: WorkspaceInContext,
         uploaded_contents: typing.List[ContentInContext],
     ):
         email_manager = self._get_email_manager(self._config, self._session)
@@ -224,7 +232,8 @@ class UploadPermissionLib(object):
         email_manager.notify_new_upload(
             uploaded_contents=uploaded_contents,
             uploader_username=uploader_username,
-            workspace=workspace,
+            workspace_in_context=workspace_in_context,
+            uploader_email=uploader_email,
         )
 
     def upload_files(
@@ -280,6 +289,14 @@ class UploadPermissionLib(object):
             created_contents.append(content_api.get_content_in_context(content))
             content_api.execute_created_content_actions(content)
         if do_notify:
+            workspace_lib = WorkspaceApi(
+                config=self._config, current_user=upload_permission.author, session=self._session
+            )
             self._notify_uploaded_contents(
-                uploader_username, upload_permission.workspace, created_contents
+                uploader_username=uploader_username,
+                workspace_in_context=workspace_lib.get_workspace_with_context(
+                    upload_permission.workspace
+                ),
+                uploaded_contents=created_contents,
+                uploader_email=upload_permission.email,
             )

@@ -1,10 +1,12 @@
 <p>${_('Hello,')}</p>
-<p>${_('{username} allowed you to upload on sharespace {workspace_name}').format(username=emitter.display_name, workspace_name=workspace.label)}</p>
+<p>${_('{username}(<a href="mailto:{email}">{email}</a>) allowed you to upload file in this shared space (number: {workspace_id}):').format(username=html_escape(emitter.display_name), email=html_escape(emitter.email) ,workspace_id=html_escape(workspace.workspace_id))|n}</p>
 <a href="${upload_permission.url}" id='call-to-action-button'>${_('Upload file')}</a>
 
 %if upload_permission_password_enabled:
-    <p>${_("This permission is protected by password, please contact {username} to get password.").format(username=emitter.display_name)}</p>
+    <p>${_('This upload is protected by a password, please contact me (<a href="mailto:{emitter_email}">{username}</a>) to get the password.').format(emitter_email=html_escape(emitter.email),username=html_escape(emitter.display_name))|n}</p>
 %endif
+
+<p>${_("Note: You can also use this link: {url}").format(url=upload_permission.url)}<p>
 <p>${_("Enjoy your day :)")}</p>
 <p>${_("Suricat', your digital assistant")}</p>
 
