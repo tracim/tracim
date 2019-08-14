@@ -114,7 +114,7 @@ class WorkspaceContent extends React.Component {
     try {
       await this.loadContentList(wsToLoad)
     } catch (error) {
-      console.log('error while loading content list in workspace content mount')
+      console.log(error.message)
       return
     }
 
@@ -142,7 +142,7 @@ class WorkspaceContent extends React.Component {
       this.buildBreadcrumbs()
     }
     if (!state.contentLoaded) {
-      this.loadContentList(workspaceId).catch(e => console.log('error while loading content list in workspace content update'))
+      this.loadContentList(workspaceId).catch(error => console.log(error.message))
     }
   }
 
