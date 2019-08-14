@@ -4,9 +4,12 @@
 
 %if share_password_enabled:
     <p>${_("This content is protected by password, please contact {username} to get password.").format(username=emitter.display_name)}</p>
+    <p>${_("Note: you can also use this link: {url}").format(url=content_share.url)}<p>
 %else:
-        <p>${_("Note: you can also use the direct link: {direct_url}").format(direct_url=content_share.direct_url)}<p>
+    <p>${_("Note: you can also use this direct link: {direct_url}").format(direct_url=content_share.direct_url)}<p>
 %endif
+
+
 <p>${_("Enjoy your day :)")}</p>
 <p>${_("Suricat', your digital assistant")}</p>
 
