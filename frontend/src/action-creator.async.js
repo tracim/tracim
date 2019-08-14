@@ -70,7 +70,13 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
   dispatch({ type: `${param.method}/${actionName}/PENDING` })
 
   try {
-    const fetchResult = await fetch(url, param)
+    const fetchResult = await fetch(url, param).catch(error => {
+      console.log(error)
+      return false
+    })
+    if (!fetchResult) {
+      return { status: 'failedToFetch' }
+    }
     fetchResult.json = await (async () => { // await for the .json()
       const status = fetchResult.status
       if (status === 204) return ''
