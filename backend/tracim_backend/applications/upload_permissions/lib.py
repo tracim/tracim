@@ -66,7 +66,7 @@ class UploadPermissionLib(object):
         do_notify=False,
     ) -> typing.List[UploadPermission]:
         upload_permissions = []
-        created = datetime.now()
+        created = datetime.utcnow()
         upload_permission_group_uuid = str(uuid.uuid4().hex)
         for email in emails:
             upload_permission = UploadPermission(
@@ -197,7 +197,7 @@ class UploadPermissionLib(object):
         self, workspace: Workspace, upload_permission_id: int
     ) -> UploadPermission:
         upload_permission_to_disable = self.get_upload_permission(workspace, upload_permission_id)
-        upload_permission_to_disable.disabled = datetime.now()
+        upload_permission_to_disable.disabled = datetime.utcnow()
         upload_permission_to_disable.enabled = False
         self.save(upload_permission=upload_permission_to_disable)
         return upload_permission_to_disable
@@ -240,7 +240,7 @@ class UploadPermissionLib(object):
         )
         _ = content_api.translator.get_translation
         folder_label = _("Files uploaded by {username} on {date}").format(
-            username=uploader_username, date=datetime.now()
+            username=uploader_username, date=datetime.utcnow()
         )
         upload_folder = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
