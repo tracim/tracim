@@ -141,6 +141,8 @@ class FolderAdvanced extends React.Component {
 
   handleClickCheckbox = async appSlug => {
     const { props, state } = this
+    const APP_FILE_SLUG = 'file'
+    const APP_OFFICE_DOCUMENT_SLUG = 'office_document'
 
     const oldAvailableAppList = state.content.sub_content_types
 
@@ -149,13 +151,13 @@ class FolderAdvanced extends React.Component {
 
     if (state.content.sub_content_types.find(c => c === appSlug)) {
       newAvailableAppList = state.content.sub_content_types.filter(c => c !== appSlug)
-      if (appSlug === 'file') {
-        newAvailableAppList = newAvailableAppList.filter(c => c !== 'office_document')
+      if (appSlug === APP_FILE_SLUG) {
+        newAvailableAppList = newAvailableAppList.filter(c => c !== APP_OFFICE_DOCUMENT_SLUG)
       }
     } else {
       newAvailableAppList = [...state.content.sub_content_types, appSlug]
-      if (appSlug === 'file') {
-        newAvailableAppList = [...newAvailableAppList, 'office_document']
+      if (appSlug === APP_FILE_SLUG) {
+        newAvailableAppList = [...newAvailableAppList, APP_OFFICE_DOCUMENT_SLUG]
       }
     }
 
