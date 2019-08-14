@@ -1,8 +1,8 @@
 <p>${_('Hello {username},').format(username=emitter.display_name)}</p>
-<p>${_('You share the file <i>{content_filename}</i> with :').format(content_filename=html_escape(shared_content.file_name))|n}</p>
+<p>${_('You share the file <i>{content_filename}</i>:').format(content_filename=html_escape(shared_content.file_name))|n}</p>
 <ul>
 % for content_share in content_share_receivers:
-    <li>${_('<i>{email}</i>: <a href="{url}">{url}</a>').format(email=html_escape(content_share.email), url=html_escape(content_share.url))| n}</li>
+    <li>${_('with <i>{email}</i>, available with this link: <a href="{url}">{url}</a>').format(email=html_escape(content_share.email), url=html_escape(content_share.url))| n}</li>
 % endfor
 </ul>
 
