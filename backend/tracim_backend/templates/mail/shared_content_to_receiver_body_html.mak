@@ -1,4 +1,8 @@
-<p>${_('Hello,')}</p>
+%if receiver_username:
+    <p>${_('Hello {username},').format(username=receiver_username)}</p>
+%else:
+    <p>${_('Hello,')}</p>
+%endif
 <p>${_('I share a file with you.')}</p>
 <p>${_('You can see it there: <a href="{url}" id="call-to-action-button">{filename}</a>').format(url=html_escape(content_share.url),filename=html_escape(shared_content.file_name))|n}</p>
 

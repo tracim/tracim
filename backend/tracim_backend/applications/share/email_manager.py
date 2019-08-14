@@ -1,3 +1,4 @@
+import email
 from email.message import Message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -139,6 +140,7 @@ class ShareEmailManager(EmailManager):
         )
         message["From"] = self._get_sender()
         message["To"] = content_share.email
+        username, address = email.utils.parseaddr(content_share.email)
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML
         )
@@ -147,6 +149,7 @@ class ShareEmailManager(EmailManager):
             "shared_content": shared_content,
             "content_share": content_share,
             "share_password_enabled": share_password_enabled,
+            "receiver_username": username,
         }
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator
