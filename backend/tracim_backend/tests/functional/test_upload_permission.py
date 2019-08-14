@@ -564,6 +564,90 @@ class TestGuestUploadEndpoints(object):
         )
         assert len(res.json_body) == 0
 
+    def test_api__guest_upload_content__ok_200__empty_message(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["thissharewill@notbe.presentinresponse"]
+        )
+        upload_permissions = upload_permission_lib.get_upload_permissions(workspace)
+        assert len(upload_permissions) == 1
+        upload_permission = upload_permissions[0]
+        transaction.commit()
+        params = {"username": "toto"}
+        image = create_1000px_png_test_image()
+        web_testapp.post(
+            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+                upload_permission_token=upload_permission.token
+            ),
+            status=204,
+            upload_files=[("file1", image.name, image.getvalue())],
+            params=params,
+        )
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        params = {"namespaces_filter": "upload"}
+        res = web_testapp.get(
+            "/api/v2/workspaces/{workspace_id}/contents".format(
+                workspace_id=workspace.workspace_id
+            ),
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 3
+        comment = res[0]
+        assert comment["label"] == ""
+        assert comment["content_type"] == "comment"
+        file = res[2]
+        assert file["label"] == "test_image"
+        assert file["filename"] == "test_image.png"
+        assert file["content_type"] == "file"
+        image_content_id = file["content_id"]
+        assert file["content_id"] == comment["parent_id"]
+        dir = res[1]
+        assert dir["label"].startswith("Files uploaded by toto")
+        assert dir["parent_id"] is None
+        assert dir["content_type"] == "folder"
+
+        res = web_testapp.get(
+            "/api/v2/workspaces/{workspace_id}/contents/{content_id}/comments".format(
+                workspace_id=workspace.workspace_id, content_id=image_content_id
+            ),
+            status=200,
+        )
+        res = res.json_body
+        assert len(res) == 1
+        comment_result = res[0]
+        assert comment_result["raw_content"] == "Uploaded by toto."
+        assert comment_result["parent_id"] == image_content_id
+        assert comment_result["author"]["user_id"] == admin_user.user_id
+
+        res = web_testapp.get(
+            "/api/v2/workspaces/{workspace_id}/files/{content_id}/raw/".format(
+                workspace_id=workspace.workspace_id, content_id=image_content_id
+            ),
+            status=200,
+        )
+        assert res.body == image.getvalue()
+
+        res = web_testapp.get(
+            "/api/v2/workspaces/{workspace_id}/contents".format(
+                workspace_id=workspace.workspace_id
+            ),
+            status=200,
+        )
+        assert len(res.json_body) == 0
+
     def test_api__guest_upload_content__ok_200__10_files(
         self,
         workspace_api_factory,

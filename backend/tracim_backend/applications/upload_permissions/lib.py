@@ -251,6 +251,12 @@ class UploadPermissionLib(object):
             content_namespace=ContentNamespaces.UPLOAD,
         )
         created_contents = []
+        if message:
+            comment_message = _("Message from {username}: {message}").format(
+                username=uploader_username, message=message
+            )
+        else:
+            comment_message = _("Uploaded by {username}.").format(username=uploader_username)
         for _file in files:
             content = content_api.create(
                 filename=_file.filename,
@@ -269,12 +275,7 @@ class UploadPermissionLib(object):
                     new_content=_file.file,
                 )
             content_api.create_comment(
-                parent=content,
-                content=_("Message from {username}: {message}").format(
-                    username=uploader_username, message=message
-                ),
-                do_save=True,
-                do_notify=False,
+                parent=content, content=comment_message, do_save=True, do_notify=False
             )
             created_contents.append(content_api.get_content_in_context(content))
             content_api.execute_created_content_actions(content)
