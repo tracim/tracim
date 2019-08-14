@@ -4,13 +4,19 @@
     <p>${_('Hello,')}</p>
 %endif
 <p>${_('I share a file with you.')}</p>
-<p>${_('You can see it there: <a href="{url}" id="call-to-action-button">{filename}</a>').format(url=html_escape(content_share.url),filename=html_escape(shared_content.file_name))|n}</p>
+<p>${_('You can download this file here:')}</p>
+
+<p>${_('<a href="{url}" id="call-to-action-button">{filename}</a>({file_size})').format(
+   url=html_escape(content_share.url),
+   filename=html_escape(shared_content.filename),
+   file_size=html_escape(shared_content.size)
+)|n}</p>
 
 %if share_password_enabled:
-    <p>${_("This content is protected by password, please contact me ({username}) to get password.").format(username=emitter.display_name)}</p>
-    <p>${_("Note: if the link does not work, please copy/paste the following one: {url}").format(url=content_share.url)}<p>
+    <p>${_('This file is protected by a password, please contact me (<a href="mailto:{emitter_email}">{username}</a>) to get the password.').format(emitter_email=html_escape(emitter.email),username=html_escape(emitter.display_name))|n}</p>
+    <p>${_("Note: You can also use this link: {url}").format(url=content_share.url)}<p>
 %else:
-    <p>${_("Note: if the link does not work, you can copy/paste the following direct link: {direct_url}").format(direct_url=content_share.direct_url)}<p>
+    <p>${_("Note: You can also use this direct link: {direct_url}").format(direct_url=content_share.direct_url)}<p>
 %endif
 
 <p>${_("Thanks a lot")}</p>

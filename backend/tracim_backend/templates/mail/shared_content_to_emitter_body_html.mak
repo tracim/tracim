@@ -1,13 +1,13 @@
 <p>${_('Hello {username},').format(username=emitter.display_name)}</p>
-<p>${_('You share the file <i>{content_filename}</i>:').format(content_filename=html_escape(shared_content.file_name))|n}</p>
+<p>${_('You shared the file <i>{content_filename}</i> with:').format(content_filename=html_escape(shared_content.filename))|n}</p>
 <ul>
 % for content_share in content_share_receivers:
-    <li>${_('with <i>{email}</i>, available with this link: <a href="{url}">{url}</a>').format(email=html_escape(content_share.email), url=html_escape(content_share.url))| n}</li>
+    <li>${_('<i>{email}</i> at this link: <a href="{url}">{url}</a>').format(email=html_escape(content_share.email), url=html_escape(content_share.url))| n}</li>
 % endfor
 </ul>
 
 %if share_password:
-    <p>${_('This content is protected by password, password is "{share_password}"').format(share_password=share_password)}</p>
+    <p>${_('This file is protected by this password: "{share_password}"').format(share_password=share_password)}</p>
 %endif
 
 <p>${_("Enjoy your day :)")}</p>

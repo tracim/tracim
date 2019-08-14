@@ -12,14 +12,14 @@ from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.models.auth import User
-from tracim_backend.models.data import Content
+from tracim_backend.models.context_models import ContentInContext
 
 
 class ShareEmailManager(EmailManager):
     def notify__share__content(
         self,
         emitter: User,
-        shared_content: Content,
+        shared_content: ContentInContext,
         content_share_receivers: typing.List[ContentShareInContext],
         share_password: str,
     ) -> None:
@@ -72,7 +72,7 @@ class ShareEmailManager(EmailManager):
     def _notify_emitter(
         self,
         emitter: User,
-        shared_content: Content,
+        shared_content: ContentInContext,
         content_share_receivers: typing.List[ContentShareInContext],
         share_password: str,
         translator: Translator,
@@ -89,7 +89,7 @@ class ShareEmailManager(EmailManager):
         )
         message["Subject"] = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
-            content_filename=shared_content.file_name,
+            content_filename=shared_content.filename,
             nb_receivers=len(content_share_receivers),
         )
         message["From"] = self._get_sender()
@@ -118,7 +118,7 @@ class ShareEmailManager(EmailManager):
     def _notify_receiver(
         self,
         emitter: User,
-        shared_content: Content,
+        shared_content: ContentInContext,
         content_share: ContentShareInContext,
         share_password_enabled: bool,
         translator: Translator,
@@ -135,7 +135,7 @@ class ShareEmailManager(EmailManager):
         )
         message["Subject"] = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
-            content_filename=shared_content.file_name,
+            content_filename=shared_content.filename,
             emitter_name=emitter.display_name,
         )
         message["From"] = self._get_sender(emitter)

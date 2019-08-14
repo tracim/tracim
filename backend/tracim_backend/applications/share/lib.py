@@ -14,6 +14,7 @@ from tracim_backend.applications.share.models_in_context import ContentShareInCo
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import WrongSharePassword
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
@@ -73,11 +74,13 @@ class ShareLib(object):
             self._session.flush()
 
         if do_notify:
+            api = ContentApi(config=self._config, session=self._session, current_user=self._user)
+            content_in_context = api.get_content_in_context(content)
             try:
                 email_manager = self._get_email_manager(self._config, self._session)
                 email_manager.notify__share__content(
                     emitter=self._user,
-                    shared_content=content,
+                    shared_content=content_in_context,
                     content_share_receivers=self.get_content_shares_in_context(content_shares),
                     share_password=password,
                 )
