@@ -19,11 +19,11 @@ export const SelectStatus = props => {
         style={{color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent'}}
         disabled={props.disabled}
       >
-        <span className={classnames('selectStatus__dropdownbtn__label', { 'selectStatus__compactVersion': props.compactVersion })} >
+        <span className={classnames('selectStatus__dropdownbtn__label', { 'selectStatus__mobileVersion': props.mobileVersion })} >
           {props.t('Status')}:
         </span>
         
-        <span className={classnames({ 'selectStatus__compactVersion': props.compactVersion })}> 
+        <span className={classnames({ 'selectStatus__mobileVersion': props.mobileVersion })}> 
           {props.selectedStatus ? props.t(props.selectedStatus.label) : ''}
         </span>
 
@@ -66,7 +66,7 @@ SelectStatus.propTypes = {
   selectedStatus: PropTypes.object,
   disabled: PropTypes.bool,
   onChangeStatus: PropTypes.func,
-  compactVersion: PropTypes.bool
+  mobileVersion: PropTypes.bool
 }
 
 SelectStatus.defaultProps = {
@@ -74,5 +74,5 @@ SelectStatus.defaultProps = {
   selectedStatus: {},
   disabled: false,
   onChangeStatus: () => {},
-  compactVersion: false
+  mobileVersion: false
 }

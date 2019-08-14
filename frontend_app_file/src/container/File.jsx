@@ -717,7 +717,7 @@ class File extends React.Component {
                   availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
                   disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
-                  compactVersion={onlineEditionAction}
+                  mobileVersion={onlineEditionAction}
                 />
               }
 
