@@ -85,8 +85,8 @@ class UploadPermissionController(Controller):
             config=app_config,
             show_disabled=hapic_data.query.show_disabled,
         )
-        upload_permission = api.get_upload_permissions(request.current_workspace)
-        return api.get_upload_permissions_in_context(upload_permission)
+        upload_permissions = api.get_upload_permissions(request.current_workspace)
+        return api.get_upload_permissions_in_context(upload_permissions)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
     @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
@@ -104,7 +104,6 @@ class UploadPermissionController(Controller):
         api.disable_upload_permission(
             request.current_workspace, hapic_data.path.upload_permission_id
         )
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
