@@ -106,14 +106,25 @@
     height calc(100% - headerHeight)
     &__contentpage__content__left
       min-height 250px
+  .newversionbtn
+    & > .genericButton__icon
+      margin 0
+    & > .genericButton__label
+      display none
 
 @media (max-width: max-xs)
   .file
     height calc(100% - headerHeight)
-    &__option__menu__addversion
-      padding 8px 5px
-      & > i
-        display none
+    &__option__menu
+      &__addversion
+        padding 8px 5px
+        & > i
+          display none
+      &__editBtn
+        & > .genericButton__icon
+          margin 0
+        & > .genericButton__label
+          display none
     &__contentpage
       display block
       &__content
@@ -140,3 +151,9 @@
                 margin-left 10px
                 &__icon
                   margin-left 15px
+  .newversionbtn
+    & > .genericButton__icon
+      margin 0
+    & > .genericButton__label
+      display none
+
