@@ -20,7 +20,7 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
     const { props } = this
 
     return (
-      <section className='forgotpassword primaryColorBg'>
+      <section className='forgotpassword'>
         <Card customClass='forgotpassword__card'>
           <CardHeader customClass='forgotpassword__card__header primaryColorBgLighten text-center'>
             {props.t('Forgot password')}
@@ -44,7 +44,7 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
                 <Button
                   htmlType='button'
                   bootstrapType=''
-                  customClass='btnSubmit forgotpassword__card__body__btnsubmit'
+                  customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover forgotpassword__card__body__btnsubmit'
                   label={props.t('Go back to previous page')}
                   onClick={this.handleClickBack}
                 />

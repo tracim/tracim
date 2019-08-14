@@ -34,6 +34,7 @@ export const PAGE = {
     AGENDA: (idws = ':idws') => `/ui/workspaces/${idws}/agenda`,
     CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
     CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
+    SHARE_FOLDER: (idws = ':idws') => `/ui/workspaces/${idws}/contents/share_folder`,
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
     CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`
   },
@@ -49,10 +50,19 @@ export const PAGE = {
     USER: '/ui/admin/user',
     USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
   },
-  SEARCH_RESULT: '/ui/search-result'
+  SEARCH_RESULT: '/ui/search-result',
+  GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
+  GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`
 }
 
-export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF, PAGE.RESET_PASSWORD]
+export const unLoggedAllowedPageList = [
+  PAGE.LOGIN,
+  PAGE.FORGOT_PASSWORD,
+  PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF,
+  PAGE.RESET_PASSWORD,
+  PAGE.GUEST_UPLOAD(''),
+  PAGE.GUEST_DOWNLOAD('')
+]
 
 export const ROLE = [{
   id: 8,

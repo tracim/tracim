@@ -97,7 +97,8 @@ class TestPrivateShareEndpoints(object):
         )
         assert content[0]["created"]
         assert content[0]["author"]
-        assert content[0]["share_group_id"] == content[1]["share_group_id"]
+        assert content[0]["share_token"]
+        assert content[0]["share_group_uuid"] == content[1]["share_group_uuid"]
         assert content[0]["created"] == content[1]["created"]
         assert content[0]["share_id"] != content[1]["share_id"]
         assert content[1]["email"] == "test2@test2.test2"
@@ -152,7 +153,7 @@ class TestPrivateShareEndpoints(object):
         )
         assert content[0]["created"]
         assert content[0]["author"]
-        assert content[0]["share_group_id"] == content[1]["share_group_id"]
+        assert content[0]["share_group_uuid"] == content[1]["share_group_uuid"]
         assert content[0]["created"] == content[1]["created"]
         assert content[0]["share_id"] != content[1]["share_id"]
         assert content[1]["email"] == "test2@test2.test2"
@@ -195,7 +196,7 @@ class TestPrivateShareEndpoints(object):
         content = res.json_body
         assert len(content) == 1
         params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
-        res = web_testapp.put_json(
+        res = web_testapp.post_json(
             "/api/v2/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
@@ -217,7 +218,8 @@ class TestPrivateShareEndpoints(object):
         )
         assert content[0]["created"]
         assert content[0]["author"]
-        assert content[0]["share_group_id"] == content[1]["share_group_id"]
+        assert content[0]["share_group_uuid"] == content[1]["share_group_uuid"]
+        assert content[0]["share_token"]
         assert content[0]["created"] == content[1]["created"]
         assert content[0]["share_id"] != content[1]["share_id"]
         assert content[1]["email"] == "test2@test2.test2"
@@ -257,7 +259,7 @@ class TestPrivateShareEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
-        res = web_testapp.put_json(
+        res = web_testapp.post_json(
             "/api/v2/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
@@ -331,6 +333,41 @@ class TestPrivateShareEndpoints(object):
         )
         content = res.json_body
         assert len(content) == 1
+
+    def test_api__delete_share__err__400__content_share_not_found(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.save(test_file)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.delete(
+            "/api/v2/workspaces/{}/contents/{}/shares/{}".format(
+                workspace.workspace_id, test_file.content_id, 1
+            ),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -539,6 +576,7 @@ class TestGuestDownloadShareEndpoints(object):
         assert share["content_size"] == 9
         assert share["content_filename"] == "Test_file.txt"
         assert share["content_file_extension"] == ".txt"
+        assert share["has_password"] is False
 
     def test_api__guest_download_content_info__err_400__not_shareable_type(
         self,
@@ -574,6 +612,22 @@ class TestGuestDownloadShareEndpoints(object):
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
+
+    def test_api__guest_download_content_info__err_400__content_share_not_found(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        res = web_testapp.get(
+            "/api/v2/public/guest-download/{share_token}".format(share_token="invalid-token"),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
 
     def test_api__guest_download_content_file__ok_200__nominal_case(
         self,
@@ -617,6 +671,24 @@ class TestGuestDownloadShareEndpoints(object):
         assert res.headers[
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format("toto.txt", "toto.txt")
+
+    def test_api__guest_download_content_file__err_400__content_share_not_found(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        res = web_testapp.get(
+            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+                share_token="invalid-token"
+            ),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
 
     def test_api__guest_download_content_file__err_400__not_shareable_type(
         self,

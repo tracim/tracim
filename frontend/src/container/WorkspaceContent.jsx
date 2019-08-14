@@ -16,6 +16,7 @@ import ContentItem from '../component/Workspace/ContentItem.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
 import OpenContentApp from '../component/Workspace/OpenContentApp.jsx'
+import OpenShareFolderApp from '../component/Workspace/OpenShareFolderApp.jsx'
 import OpenCreateContentApp from '../component/Workspace/OpenCreateContentApp.jsx'
 import {
   PageWrapper,
@@ -508,6 +509,17 @@ class WorkspaceContent extends React.Component {
           )}
 
           {state.contentLoaded && (
+            <Route path={PAGE.WORKSPACE.SHARE_FOLDER(':idws')} component={() =>
+              <OpenShareFolderApp
+                // automatically open the share folder advanced
+                workspaceId={state.workspaceIdInUrl}
+                appOpenedType={state.appOpenedType}
+                updateAppOpenedType={this.handleUpdateAppOpenedType}
+              />
+            } />
+          )}
+
+          {state.contentLoaded && (
             <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
               <OpenCreateContentApp
                 // automatically open the popup create content of the app in url
@@ -577,6 +589,7 @@ class WorkspaceContent extends React.Component {
                         fileName={content.fileName}
                         fileExtension={content.fileExtension}
                         faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
+                        isShared={content.activedShares !== 0}
                         statusSlug={content.statusSlug}
                         contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
                         isLast={i === rootContentList.length - 1}

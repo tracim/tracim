@@ -39,7 +39,7 @@ describe('App File', () => {
           params: { workspaceId: workspaceId, contentType: 'file', contentId: secondContentId }
         })
 
-        cy.get('[data-cy="revision_data_2"')
+        cy.get('[data-cy="revision_data_2"]')
           .click()
 
         cy.get('[data-cy="appFileLastVersionBtn"]')

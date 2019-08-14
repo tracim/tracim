@@ -949,6 +949,9 @@ class ContentDigestSchema(marshmallow.Schema):
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Content creation date"
     )
+    actives_shares = marshmallow.fields.Int(
+        description="number of active share on file", validate=positive_int_validator
+    )
 
 
 class ReadStatusSchema(marshmallow.Schema):

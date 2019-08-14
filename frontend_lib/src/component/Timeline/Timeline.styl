@@ -2,11 +2,10 @@
 
 .timeline
   display flex
-  flex-direction row
-  margin 10px 10px 10px 5px
+  flex-direction column
   border-radius 10px
   width 100%
-  height calc(100% - 10px)
+  height 100%
   & a
     color #007bff
     &:hover
@@ -15,35 +14,28 @@
   & p
     margin 0
     padding 0
-  &__header
-    display flex
-    flex-direction column
-    border-radius 10px 0 0 10px
-    width 50px
-    background-color grey-hover
+  &__title
+    margin 10px 15px
+    padding 10px
     font-size 20px
-    color darkGrey
-    cursor pointer
-    &__icon
-      text-align center
-    &__title
-      transform rotate(-90deg)
   &__body
     display flex
     flex-direction column
     width 100%
+    height 100%
     &__messagelist
       flex 1 1 auto
       margin-bottom 0
-      padding-left 0
+      padding 5px
       border-bottom 1px solid grey
-      background-color offWhite
       overflow-y auto
       list-style none
       &__item
         position relative
-        margin 15px 25px
-        width calc(100% - 50px) //50px => margin + left/right
+        margin 10px 0
+        width 100%
+        & + .revision
+          border none
     &__texteditor
       flex 0 1 auto
       margin 20px
