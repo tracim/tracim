@@ -144,9 +144,19 @@ class FolderAdvanced extends React.Component {
 
     const oldAvailableAppList = state.content.sub_content_types
 
-    const newAvailableAppList = state.content.sub_content_types.find(c => c === appSlug)
-      ? state.content.sub_content_types.filter(c => c !== appSlug)
-      : [...state.content.sub_content_types, appSlug]
+    let newAvailableAppList = []
+
+    if (state.content.sub_content_types.find(c => c === appSlug)) {
+      newAvailableAppList = state.content.sub_content_types.filter(c => c !== appSlug)
+      if (appSlug === 'file') {
+        newAvailableAppList = newAvailableAppList.filter(c => c !== 'office_document')
+      }
+    } else {
+      newAvailableAppList = [...state.content.sub_content_types, appSlug]
+      if (appSlug === 'file') {
+        newAvailableAppList = [...newAvailableAppList, 'office_document']
+      }
+    }
 
     this.setState(prev => ({ content: { ...prev.content, sub_content_types: newAvailableAppList } }))
 
