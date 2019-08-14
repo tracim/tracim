@@ -10,6 +10,7 @@ describe('<Notification />', () => {
   const onChangeSubscriptionNotifCallBack = sinon.stub()
 
   const props = {
+    userLoggedId: 0,
     workspaceList: [{
       memberList: [{
         id: 0,
@@ -31,7 +32,6 @@ describe('<Notification />', () => {
       id: 2,
       label: 'randomLabel2'
     }],
-    userLoggedId: 0,
     onChangeSubscriptionNotif: onChangeSubscriptionNotifCallBack
   }
 

@@ -73,10 +73,10 @@ export default translate()(Notification)
 Notification.propTypes = {
   workspaceList: PropTypes.arrayOf(PropTypes.object),
   userLoggedId: PropTypes.number,
-  onChangeSubscriptionNotif: PropTypes.func
+  // onChangeSubscriptionNotif: PropTypes.func
 }
 
-Notification.propTypes = {
+Notification.defaultProps = {
   workspaceList: [],
   onChangeSubscriptionNotif: () => {}
 }
