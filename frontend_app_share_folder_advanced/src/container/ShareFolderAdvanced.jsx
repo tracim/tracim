@@ -1,290 +1,272 @@
-// TODO - G.B. - This component is a wip because it's waiting the backend 
-// https://github.com/tracim/tracim/issues/2126
+import React from 'react'
+import UploadFilesManagement from '../component/UploadFilesManagement.jsx'
+import NewUpload from '../component/NewUpload.jsx'
+import i18n from '../i18n'
+import { translate } from 'react-i18next'
+import {
+  PopinFixed,
+  PopinFixedHeader,
+  PopinFixedContent,
+  addAllResourceI18n,
+  handleFetchResult,
+  CUSTOM_EVENT,
+  checkEmailValidity,
+  parserStringToList,
+  appFeatureCustomEventHandlerShowApp
+} from 'tracim_frontend_lib'
+import { debug } from '../debug'
+import {
+  getImportAuthorizationsList,
+  deleteImportAuthorization,
+  postImportAuthorizationsList,
+  getContentTypeList
+} from '../action.async.js'
 
-// import React from 'react'
-// import UploadFilesManagement from '../component/UploadFilesManagement.jsx'
-// import NewUpload from '../component/NewUpload.jsx'
-// import i18n from '../i18n'
-// import { translate } from 'react-i18next'
-// import {
-//   PopinFixed,
-//   PopinFixedHeader,
-//   PopinFixedContent,
-//   addAllResourceI18n,
-//   handleFetchResult,
-//   CUSTOM_EVENT,
-//   checkEmailValidity,
-//   parserStringToList,
-//   appFeatureCustomEventHandlerShowApp
-// } from 'tracim_frontend_lib'
-// import { debug } from '../debug'
-// import {
-//   getShareLinksList,
-//   getShareFolder,
-//   putShareLinkList,
-//   getContentTypeList
-// } from '../action.async.js'
+class ShareFolderAdvanced extends React.Component {
+  constructor (props) {
+    super(props)
 
-// class ShareFolderAdvanced extends React.Component {
-//   constructor (props) {
-//     super(props)
+    this.UPLOAD_STATUS = {
+      UPLOAD_MANAGEMENT: 'management',
+      NEW_UPLOAD: 'newUpload'
+    }
 
-//     this.UPLOAD_STATUS = {
-//       UPLOAD_MANAGEMENT: 'management',
-//       NEW_UPLOAD: 'newUpload'
-//     }
+    this.state = {
+      appName: 'share_folder',
+      isVisible: true,
+      config: props.data ? props.data.config : debug.config,
+      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
+      content: props.data ? props.data.content : debug.content,
+      externalTranslationList: [
+        props.t('Inbox')
+      ],
+      tracimContentTypeList: [],
+      currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT,
+      uploadLinkList: [],
+      uploadEmails: '',
+      uploadPassword: ''
+    }
 
-//     this.state = {
-//       appName: 'share_folder',
-//       isVisible: true,
-//       config: props.data ? props.data.config : debug.config,
-//       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-//       content: props.data ? props.data.content : debug.content,
-//       externalTranslationList: [
-//         props.t('Share Folder')
-//       ],
-//       tracimContentTypeList: [],
-//       currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT,
-//       shareLinkList: [],
-//       shareEmails: '',
-//       sharePassword: ''
-//     }
+    // i18n has been init, add resources from frontend
+    addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
+    i18n.changeLanguage(this.state.loggedUser.lang)
 
-//     // i18n has been init, add resources from frontend
-//     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
-//     i18n.changeLanguage(this.state.loggedUser.lang)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  }
 
-//     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
-//   }
+  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    const { state } = this
+    switch (type) {
+      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
+        console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) {
+          this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
+        }
+        break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
+        this.setState(prev => ({
+          loggedUser: {
+            ...prev.loggedUser,
+            lang: data
+          }
+        }))
+        i18n.changeLanguage(data)
+        this.loadContent()
+        break
+    }
+  }
 
-//   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-//     const { state } = this
-//     switch (type) {
-//       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-//         console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-//         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-//         if (isSameContentId) {
-//           this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
-//         }
-//         break
-//       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-//         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-//         this.setState(prev => ({
-//           loggedUser: {
-//             ...prev.loggedUser,
-//             lang: data
-//           }
-//         }))
-//         i18n.changeLanguage(data)
-//         this.loadContent()
-//         break
-//     }
-//   }
+  componentDidMount () {
+    this.loadContent()
+    this.loadImportAuthorizationsList()
+  }
 
-//   componentDidMount () {
-//     this.loadContent()
-//     this.loadShareLinkList()
-//   }
+  componentDidUpdate (prevProps, prevState) {
+    const { state } = this
 
-//   componentDidUpdate (prevProps, prevState) {
-//     const { state } = this
+    if (prevState.content.content_id !== state.content.content_id) {
+      this.loadContent()
+    }
+  }
 
-//     if (prevState.content.content_id !== state.content.content_id) {
-//       this.loadContent()
-//     }
-//   }
+  componentWillUnmount () {
+    console.log('%c<ShareFolderAdvanced> will Unmount', `color: ${this.state.config.hexcolor}`)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  }
 
-//   componentWillUnmount () {
-//     console.log('%c<ShareFolderAdvanced> will Unmount', `color: ${this.state.config.hexcolor}`)
-//     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
-//   }
+  sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: msg,
+      type: type,
+      delay: undefined
+    }
+  })
 
-//   sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
-//     type: CUSTOM_EVENT.ADD_FLASH_MSG,
-//     data: {
-//       msg: msg,
-//       type: type,
-//       delay: undefined
-//     }
-//   })
+  loadContent = async () => {
+    const { props, state } = this
 
-//   loadContent = async () => {
-//     const { props, state } = this
+    const fetchContentTypeList = await handleFetchResult(await getContentTypeList(state.config.apiUrl))
 
-//     const fetchSharedFolder = await handleFetchResult(await getShareFolder(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
-//     const fetchContentTypeList = await handleFetchResult(await getContentTypeList(state.config.apiUrl))
+    switch (fetchContentTypeList.apiResponse.status) {
+      case 200: this.setState({ tracimContentTypeList: fetchContentTypeList.body.filter(ct => ct.slug !== 'comment') }); break
+      default: this.sendGlobalFlashMessage(props.t("Error while loading tracim's content type list"), 'warning')
+    }
+  }
 
-//     switch (fetchSharedFolder.apiResponse.status) {
-//       case 200: this.setState({content: fetchSharedFolder.body}); break
-//       default: this.sendGlobalFlashMessage(props.t('Error while loading shared folder details'), 'warning')
-//     }
+  loadImportAuthorizationsList = async () => {
+    const { content, config } = this.state
 
-//     switch (fetchContentTypeList.apiResponse.status) {
-//       case 200: this.setState({ tracimContentTypeList: fetchContentTypeList.body.filter(ct => ct.slug !== 'comment') }); break
-//       default: this.sendGlobalFlashMessage(props.t("Error while loading tracim's content type list"), 'warning')
-//     }
-//   }
+    const fetchResultImportAuthorizationsList = await handleFetchResult(await getImportAuthorizationsList(config.apiUrl, content.workspace_id))
 
-//   loadShareLinkList = async () => {
-//     const { content, config } = this.state
+    switch (fetchResultImportAuthorizationsList.apiResponse.status) {
+      case 200:
+        this.setState({
+          uploadLinkList: fetchResultImportAuthorizationsList.body
+        })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
+        break
+      default:
+        this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
+    }
+  }
 
-//     const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
+  handleChangeEmails = e => this.setState({ uploadEmails: e.target.value })
+  handleChangePassword = e => this.setState({ uploadPassword: e.target.value })
 
-//     switch (fetchResultShareLinkList.apiResponse.status) {
-//       case 200:
-//         this.setState({
-//           shareLinkList: fetchResultShareLinkList.json
-//         })
-//         break
-//       default:
-//         this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
-//     }
-//   }
+  handleClickBtnCloseApp = () => {
+    this.setState({ isVisible: false })
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
+  }
 
-//   handleChangeEmails = e => this.setState({ shareEmails: e.target.value })
-//   handleChangePassword = e => this.setState({ sharePassword: e.target.value })
+  handleClickDeleteImportAuthorization = async importAuthorizationId => {
+    const { config, content } = this.state
+    const { props } = this
 
-//   handleClickBtnCloseApp = () => {
-//     this.setState({ isVisible: false })
-//     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
-//   }
+    const fetchResultDeleteImportAuthorization = await handleFetchResult(
+      await deleteImportAuthorization(config.apiUrl, content.workspace_id, importAuthorizationId)
+    )
 
-//   handleClickDeleteShareLink = shareLinkId => { // = async shareLinkId => {
-//     const { config, content } = this.state
+    switch (fetchResultDeleteImportAuthorization.status) {
+      case 204:
+        this.loadImportAuthorizationsList()
+        break
+      case 400:
+        this.sendGlobalFlashMessage(props.t('Error in the URL'))
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while deleting share link'))
+    }
+  }
 
-//     this.setState(previousState => ({
-//       shareLinkList: previousState.shareLinkList.filter(shareLink => shareLink.id !== shareLinkId)
-//     }))
+  handleClickNewUploadComponent = () => {
+    this.setState({ currentPage: this.UPLOAD_STATUS.NEW_UPLOAD })
+  }
 
-//     const fetchResultSaveNewShareLinkList = await handleFetchResult(
-//       await putShareLinkList(state.config.apiUrl, state.content.workspace_id, state.shareLinkList)
-//     )
+  handleClickNewUpload = async () => {
+    const { state, props } = this
 
-//     switch (fetchResultSaveNewShareLinkList.status) {
-//       case 204:
-//         ??
-//         break
-//       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
-//     }
-//   }
+    let uploadEmailList = parserStringToList(state.uploadEmails)
+    let invalidEmails = []
 
-//   handleClickNewUploadComponent = () => {
-//     this.setState({ currentPage: this.UPLOAD_STATUS.NEW_UPLOAD })
-//   }
+    uploadEmailList.forEach(uploadEmail => {
+      if (!checkEmailValidity(uploadEmail)) invalidEmails.push(uploadEmail)
+    })
 
-//   handleClickNewUpload = () => { // = async () => {
-//     const { state } = this
+    uploadEmailList = uploadEmailList.filter(uploadEmail => !invalidEmails.includes(uploadEmail))
 
-//     let shareEmailList = parserStringToList(state.shareEmails)
-//     let invalidEmails = []
+    if (invalidEmails.length > 0) {
+      this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
+    }
 
-//     shareEmailList.forEach(shareEmail => {
-//       if (!checkEmailValidity(shareEmail)) invalidEmails.push(shareEmail)
-//     })
+    const fetchResultPostImportAuthorizations = await handleFetchResult(await postImportAuthorizationsList(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      uploadEmailList,
+      state.uploadPassword !== '' ? state.uploadPassword : null
+    ))
 
-//     shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
+    switch (fetchResultPostImportAuthorizations.apiResponse.status) {
+      case 200:
+        this.setState(prev => ({
+          uploadLinkList: [...prev.uploadLinkList, ...fetchResultPostImportAuthorizations.body],
+          uploadEmails: '',
+          uploadPassword: ''
+        }))
+        this.setState({ currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+    }
+  }
 
-//     this.setState(previousState => ({
-//       shareLinkList: [
-//         ...previousState.shareLinkList,
-//         {
-//           emails: shareEmailList,
-//           link: '?',
-//           id: new Date(),
-//           isProtected: state.sharePassword !== ''
-//         }
-//       ]
-//     }))
+  handleClickCancelNewUpload = () => {
+    this.setState({
+      uploadEmails: '',
+      uploadPassword: '',
+      currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
+    })
+  }
 
-//     if (invalidEmails.length > 0) {
-//       this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
-//     }
-//     console.log(shareEmailList)
-//     this.setState({shareLinkList: newShareLinkList})
+  handleKeyDownEnter = e => {
+    if (e.key === 'Enter') {
+      let emailList = parserStringToList(this.state.uploadEmails)
+      let invalidEmails = []
 
-//     const fetchResultSaveNewShareLinkList = await handleFetchResult(
-//       await putShareLinkList(state.config.apiUrl, state.content.workspace_id, state.shareLinkList)
-//     )
+      emailList.forEach(email => {
+        if (!checkEmailValidity(email)) invalidEmails.push(email)
+      })
 
-//     switch (fetchResultSaveNewShareLinkList.status) {
-//       case 204:
-//         this.setState({
-//           shareEmails: '',
-//           sharePassword: '',
-//           currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
-//         })
-//         break
-//       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
-//     }
-//   }
+      if (invalidEmails.length > 0) {
+        this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+      }
 
-//   handleClickCancelNewUpload = () => {
-//     this.setState({
-//       shareEmails: '',
-//       sharePassword: '',
-//       currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
-//     })
-//   }
+      this.setState({ uploadEmails: emailList.join('\n') })
+    }
+  }
 
-//   handleKeyDownEnter = e => {
-//     if (e.key === 'Enter') {
-//       let emailList = parserStringToList(this.state.shareEmails)
-//       let invalidEmails = []
+  render () {
+    const { state } = this
+    const customColor = (state.tracimContentTypeList.find(type => type.slug === 'file') || { hexcolor: state.config.hexcolor }).hexcolor
 
-//       emailList.forEach(email => {
-//         if (!checkEmailValidity(email)) invalidEmails.push(email)
-//       })
+    if (!state.isVisible) return null
 
-//       if (invalidEmails.length > 0) {
-//         this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
-//       }
+    return (
+      <PopinFixed customClass='share_folder_advanced'>
+        <PopinFixedHeader
+          customClass={'folderAdvanced'}
+          customColor={state.config.hexcolor}
+          faIcon={state.config.faIcon}
+          // rawTitle={state.content.label}
+          componentTitle={<div>Inbox</div>}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+          onClickCloseBtn={this.handleClickBtnCloseApp}
+        />
 
-//       this.setState({ shareEmails: emailList.join('\n') })
-//     }
-//   }
+        <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
+          {state.currentPage === this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
+            ? <UploadFilesManagement
+              customColor={customColor}
+              uploadLinkList={state.uploadLinkList}
+              onClickDeleteImportAuthorization={this.handleClickDeleteImportAuthorization}
+              onClickNewUploadComponent={this.handleClickNewUploadComponent}
+              userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+            />
+            : <NewUpload
+              customColor={customColor}
+              onClickNewUpload={this.handleClickNewUpload}
+              onClickCancelNewUpload={this.handleClickCancelNewUpload}
+              uploadEmails={state.uploadEmails}
+              onChangeUploadEmails={this.handleChangeEmails}
+              uploadPassword={state.uploadPassword}
+              onChangeUploadPassword={this.handleChangePassword}
+              onKeyDownEnter={this.handleKeyDownEnter}
+            />
+          }
+        </PopinFixedContent>
+      </PopinFixed>
+    )
+  }
+}
 
-//   render () {
-//     const { state } = this
-//     const customColor = (state.tracimContentTypeList.find(type => type.slug === 'file') || { hexcolor: state.config.hexcolor }).hexcolor
-
-//     if (!state.isVisible) return null
-
-//     return (
-//       <PopinFixed customClass='share_folder_advanced'>
-//         <PopinFixedHeader
-//           customClass={'folderAdvanced'}
-//           customColor={state.config.hexcolor}
-//           faIcon={state.config.faIcon}
-//           // rawTitle={state.content.label}
-//           componentTitle={<div>Share folder</div>}
-//           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-//           onClickCloseBtn={this.handleClickBtnCloseApp}
-//         />
-
-//         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
-//           {state.currentPage === this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
-//             ? <UploadFilesManagement
-//               customColor={customColor}
-//               shareLinkList={state.shareLinkList}
-//               onClickDeleteShareLink={this.handleClickDeleteShareLink}
-//               onClickNewUploadComponent={this.handleClickNewUploadComponent}
-//             />
-//             : <NewUpload
-//               customColor={customColor}
-//               onClickDeleteShareLink={this.handleClickDeleteShareLink}
-//               onClickNewUpload={this.handleClickNewUpload}
-//               onClickCancelNewUpload={this.handleClickCancelNewUpload}
-//               shareEmails={state.shareEmails}
-//               onChangeShareEmails={this.handleChangeEmails}
-//               sharePassword={state.sharePassword}
-//               onChangeSharePassword={this.handleChangePassword}
-//               onKeyDownEnter={this.handleKeyDownEnter}
-//             />
-//           }
-//         </PopinFixedContent>
-//       </PopinFixed>
-//     )
-//   }
-// }
-
-// export default translate()(ShareFolderAdvanced)
+export default translate()(ShareFolderAdvanced)

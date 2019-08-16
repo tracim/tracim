@@ -241,7 +241,8 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  handleToggleUploadEnabled = () => {}
+  // FIXME - G.B. - 2019-08-16 - We still don't have this feature at backend
+  // https://github.com/tracim/tracim/issues/2215
   // handleToggleUploadEnabled = async () => {
   //   const { props, state } = this
   //   const oldUploadEnabledValue = state.content.upload_enabled
@@ -269,7 +270,8 @@ class WorkspaceAdvanced extends React.Component {
   //   }
   // }
 
-  handleToggleDownloadEnabled = () => {}
+  // FIXME - G.B. - 2019-08-16 - We still don't have this feature at backend
+  // https://github.com/tracim/tracim/issues/2215
   // handleToggleDownloadEnabled = async () => {
   //   const { props, state } = this
   //   const oldDownloadEnabledValue = state.content.download_enabled
@@ -538,10 +540,12 @@ class WorkspaceAdvanced extends React.Component {
                   appAgendaAvailable={state.content.appAgendaAvailable}
                   agendaEnabled={state.content.agenda_enabled}
                   onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
-                  downloadEnabled // ={state.content.download_enabled}
-                  onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
-                  uploadEnabled // ={state.content.upload_enabled}
-                  onToggleUploadEnabled={this.handleToggleUploadEnabled}
+                  // FIXME - G.B. - 2019-08-16 - We still don't have this features at backend
+                  // https://github.com/tracim/tracim/issues/2215
+                  // downloadEnabled={state.content.download_enabled}
+                  // onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
+                  // uploadEnabled=={state.content.upload_enabled}
+                  // onToggleUploadEnabled={this.handleToggleUploadEnabled}
                 />
               }
             ]}

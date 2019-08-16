@@ -12,6 +12,7 @@ import {
   sortWorkspaceContents
 } from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
+import ShareFolder from '../component/Workspace/ShareFolder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
@@ -23,10 +24,12 @@ import {
   PageTitle,
   PageContent,
   BREADCRUMBS_TYPE,
+  handleFetchResult,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
+  getShareFolderContentList,
   getContentPathList,
   getWorkspaceMemberList,
   putWorkspaceContentArchived,
@@ -59,7 +62,11 @@ class WorkspaceContent extends React.Component {
     this.state = {
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
       appOpenedType: false,
-      contentLoaded: false
+      contentLoaded: false,
+      shareFolder: {
+        isOpen: false,
+        content: []
+      }
     }
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
@@ -151,6 +158,15 @@ class WorkspaceContent extends React.Component {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
+
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: this.props.t(msg),
+      type: 'warning',
+      delay: undefined
+    }
+  })
 
   buildBreadcrumbs = () => {
     const { props, state } = this
@@ -350,6 +366,20 @@ class WorkspaceContent extends React.Component {
     props.history.push(`${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`)
   }
 
+  handleClickShareFolder = () => {
+    if (this.state.shareFolder.isOpen) {
+      this.setState({ shareFolder: { isOpen: false } })
+    } else {
+      this.setState({ shareFolder: { isOpen: true } })
+      this.getUploadedContent()
+    }
+  }
+
+  handleClickManageAction = () => {
+    console.log('%c<WorkspaceContent> Custom event openShareFolder', 'color: #28a745')
+    this.props.history.push(PAGE.WORKSPACE.SHARE_FOLDER(this.state.workspaceIdInUrl) + this.props.location.search)
+  }
+
   getContentParentList = (content, contentList) => {
     const parent = contentList.find(c => c.id === content.parentId)
     if (!parent) return []
@@ -439,6 +469,26 @@ class WorkspaceContent extends React.Component {
     return contentType
       ? contentType.faIcon
       : 'th'
+  }
+
+  getUploadedContent = async () => {
+    const { props, state } = this
+
+    const request = await getShareFolderContentList(state.workspaceIdInUrl)
+    const response = await handleFetchResult(request)
+
+    switch (response.apiResponse.status) {
+      case 200:
+        this.setState({
+          shareFolder: {
+            content: response.body
+          }
+        })
+        break
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
+        props.history.push(PAGE.LOGIN)
+    }
   }
 
   filterWorkspaceContent = (contentList, filter) => filter.length === 0
@@ -549,9 +599,25 @@ class WorkspaceContent extends React.Component {
 
             <PageContent parentClass='workspace__content'>
               <div className='workspace__content__fileandfolder folder__content active'>
-                {workspaceContentList.length > 0 &&
-                  <ContentItemHeader />
-                }
+                <ContentItemHeader />
+
+                <ShareFolder
+                  isOpen={state.shareFolder.isOpen}
+                  userRoleIdInWorkspace={userRoleIdInWorkspace}
+                  onClickExtendedAction={{
+                    edit: this.handleClickEditContentItem,
+                    download: this.handleClickDownloadContentItem,
+                    archive: this.handleClickArchiveContentItem,
+                    delete: this.handleClickDeleteContentItem
+                  }}
+                  onClickManageAction={this.handleClickManageAction}
+                  onClickFolder={this.handleClickShareFolder}
+                  shareFolderContentList={state.shareFolder.content}
+                  contentType={contentType}
+                  readStatusList={currentWorkspace.contentReadStatusList}
+                  isLast={isWorkspaceEmpty || isFilteredWorkspaceEmpty}
+                  t={t}
+                />
 
                 {state.contentLoaded && (isWorkspaceEmpty || isFilteredWorkspaceEmpty)
                   ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)

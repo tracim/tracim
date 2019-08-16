@@ -8,6 +8,7 @@ import { CUSTOM_EVENT, ProgressBar } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
 import { newFlashMessage } from '../action-creator.sync.js'
+import { postUploadFile } from '../action-creator.async.js'
 
 class GuestUpload extends React.Component {
   constructor (props) {
@@ -80,9 +81,11 @@ class GuestUpload extends React.Component {
     xhr.upload.addEventListener('progress', uploadInProgress, false)
     xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: this.UPLOAD_STATUS.AFTER_LOAD, percent: 0 } }), false)
 
-    // TODO - GB - 2019-07-31 - xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
+    xhr.open('POST', `${state.config.apiUrl}/public/guest-upload/${token}`, true)
     xhr.setRequestHeader('Accept', 'application/json')
     xhr.withCredentials = true
+
+    // postUploadFile = (token, filesUploadedList, guestName, uploadPassword, comment)
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4) {

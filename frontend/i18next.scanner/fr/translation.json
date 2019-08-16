@@ -226,5 +226,8 @@
   "User + create shared spaces, add members in shared spaces": "Utilisateur + créer des espaces partagés, ajouter des membres dans les espaces partagés",
   "Error in the URL": "Erreur dans l'URL",
   "Content not found": "Contenu non trouvé",
-  "Workspace not found": "Workspace non trouvé"
+  "Workspace not found": "Workspace non trouvé",
+  "Inbox": "Boite de réception",
+  "Error while loading uploaded files": "Erreur lors du chargement des fichiers téléversés",
+  "Manage": "Paramétrer"
 }
