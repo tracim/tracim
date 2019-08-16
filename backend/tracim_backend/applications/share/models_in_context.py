@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.config import CFG
+from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserInContext
@@ -18,6 +19,10 @@ class ContentShareInContext(object):
         self.dbsession = dbsession
         self.config = config
         self._user = user
+
+    @property
+    def email_user(self) -> EmailUser:
+        return EmailUser(user_email=self.content_share.email)
 
     @property
     def share_token(self) -> str:

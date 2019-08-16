@@ -11,6 +11,7 @@ from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 
@@ -144,12 +145,13 @@ class ShareEmailManager(EmailManager):
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML
         )
+        receiver = EmailUser(user_email=content_share.email)
         context = {
             "emitter": emitter,
             "shared_content": shared_content,
             "content_share": content_share,
             "share_password_enabled": share_password_enabled,
-            "receiver": username,
+            "receiver": receiver,
         }
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator
