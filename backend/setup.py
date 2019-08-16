@@ -69,7 +69,7 @@ requires = [
     # search support
     'elasticsearch',
     'elasticsearch-dsl',
-    # other
+    # text-formatting
     'humanize'
 ]
 
