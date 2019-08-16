@@ -443,6 +443,7 @@ class EmailManager(object):
                 imports=[
                     "from mako.filters import html_escape",
                     "from lxml.html.diff import htmldiff",
+                    "import humanize",
                 ],
             )
             return template.render(_=translator.get_translation, config=self.config, **context)
