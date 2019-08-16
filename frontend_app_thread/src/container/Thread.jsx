@@ -464,13 +464,13 @@ class Thread extends React.Component {
             allowClickOnRevision={false}
             onClickRevisionBtn={() => {}}
             shouldScrollToBottom
-            showHeader={false}
             isArchived={content.is_archived}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             isDeleted={content.is_deleted}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             isDeprecated={content.status === config.availableStatuses[3].slug}
             deprecatedStatus={config.availableStatuses[3]}
+            showTitle={false}
           />
         </PopinFixedContent>
       </PopinFixed>

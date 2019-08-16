@@ -6,14 +6,17 @@ import uuid
 
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.applications.share.email_manager import ShareEmailManager
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.share.models import ContentShareType
 from tracim_backend.applications.share.models_in_context import ContentShareInContext
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import ContentShareNotFound
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import WrongSharePassword
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
@@ -55,7 +58,7 @@ class ShareLib(object):
     ) -> typing.List[ContentShare]:
         content_shares = []
         created = datetime.now()
-        share_group_id = str(uuid.uuid4())
+        share_group_uuid = str(uuid.uuid4())
         for email in emails:
             content_share = ContentShare(
                 author=self._user,
@@ -65,7 +68,7 @@ class ShareLib(object):
                 password=password,
                 type=ContentShareType.EMAIL,
                 created=created,
-                share_group_id=share_group_id,
+                share_group_uuid=share_group_uuid,
                 enabled=True,
             )
             self.save(content_share)
@@ -73,11 +76,13 @@ class ShareLib(object):
             self._session.flush()
 
         if do_notify:
+            api = ContentApi(config=self._config, session=self._session, current_user=self._user)
+            content_in_context = api.get_content_in_context(content)
             try:
                 email_manager = self._get_email_manager(self._config, self._session)
                 email_manager.notify__share__content(
                     emitter=self._user,
-                    shared_content=content,
+                    shared_content=content_in_context,
                     content_share_receivers=self.get_content_shares_in_context(content_shares),
                     share_password=password,
                 )
@@ -125,9 +130,16 @@ class ShareLib(object):
         return content_shares_in_context
 
     def get_content_share_by_token(self, share_token: str) -> ContentShare:
-        return (
-            self._session.query(ContentShare).filter(ContentShare.share_token == share_token).one()
-        )
+        try:
+            return (
+                self._session.query(ContentShare)
+                .filter(ContentShare.share_token == share_token)
+                .one()
+            )
+        except NoResultFound as exc:
+            raise ContentShareNotFound(
+                'Content Share with token "{}" not found in database'.format(share_token)
+            ) from exc
 
     def check_password(self, content_share: ContentShare, password: typing.Optional[str]) -> None:
         """
@@ -147,12 +159,17 @@ class ShareLib(object):
                 )
 
     def get_content_share(self, content: Content, share_id: int) -> ContentShare:
-        return (
-            self.base_query()
-            .filter(ContentShare.content_id == content.content_id)
-            .filter(ContentShare.share_id == share_id)
-            .one()
-        )  # type: ContentShare
+        try:
+            return (
+                self.base_query()
+                .filter(ContentShare.content_id == content.content_id)
+                .filter(ContentShare.share_id == share_id)
+                .one()
+            )  # type: ContentShare
+        except NoResultFound as exc:
+            raise ContentShareNotFound(
+                'Content Share "{}" not found in database'.format(share_id)
+            ) from exc
 
     def disable_content_share(self, content: Content, share_id: int) -> ContentShare:
         content_share_to_disable = self.get_content_share(content, share_id)

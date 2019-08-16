@@ -20,6 +20,10 @@ class ContentShareInContext(object):
         self._user = user
 
     @property
+    def share_token(self) -> str:
+        return self.content_share.share_token
+
+    @property
     def content_id(self) -> int:
         return self.content_share.content_id
 
@@ -28,8 +32,8 @@ class ContentShareInContext(object):
         return self.content_share.share_id
 
     @property
-    def share_group_id(self) -> str:
-        return self.content_share.share_group_id
+    def share_group_uuid(self) -> str:
+        return self.content_share.share_group_uuid
 
     @property
     def email(self) -> str:

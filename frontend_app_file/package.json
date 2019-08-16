@@ -24,7 +24,6 @@
     "radium": "^0.25.2",
     "react": "16.7.0",
     "react-dom": "16.7.0",
-    "react-dropzone": "5.0.1",
     "react-i18next": "7.4.0",
     "react-image-lightbox": "^5.1.0",
     "react-router": "^5.0.1",

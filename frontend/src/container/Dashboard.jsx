@@ -421,6 +421,7 @@ class Dashboard extends React.Component {
       ? props.appList
         .filter(app => userRoleIdInWorkspace === 2 ? app.slug !== 'contents/folder' : true)
         .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
+        .filter(app => app.slug !== 'contents/share_folder')
         .map(app => {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || { creationLabel: '', slug: '' }
           // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications

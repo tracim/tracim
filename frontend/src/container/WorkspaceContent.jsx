@@ -16,6 +16,7 @@ import ContentItem from '../component/Workspace/ContentItem.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
 import OpenContentApp from '../component/Workspace/OpenContentApp.jsx'
+import OpenShareFolderApp from '../component/Workspace/OpenShareFolderApp.jsx'
 import OpenCreateContentApp from '../component/Workspace/OpenCreateContentApp.jsx'
 import {
   PageWrapper,
@@ -100,18 +101,23 @@ class WorkspaceContent extends React.Component {
   }
 
   async componentDidMount () {
-    const { workspaceList, match } = this.props
+    const { props } = this
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
 
     let wsToLoad = null
 
-    if (match.params.idws === undefined) {
-      if (workspaceList.length > 0) wsToLoad = workspaceList[0].id
+    if (props.match.params.idws === undefined) {
+      if (props.workspaceList.length > 0) wsToLoad = props.workspaceList[0].id
       else return
-    } else wsToLoad = match.params.idws
+    } else wsToLoad = props.match.params.idws
 
-    await this.loadContentList(wsToLoad)
+    try {
+      await this.loadContentList(wsToLoad)
+    } catch (error) {
+      console.log(error.message)
+      return
+    }
 
     this.scrollToActiveContent()
     this.buildBreadcrumbs()
@@ -134,8 +140,10 @@ class WorkspaceContent extends React.Component {
 
     if (prevState.workspaceIdInUrl !== workspaceId || prevFilter !== currentFilter) {
       this.setState({ workspaceIdInUrl: workspaceId })
-      this.loadContentList(workspaceId)
       this.buildBreadcrumbs()
+    }
+    if (!state.contentLoaded) {
+      this.loadContentList(workspaceId).catch(error => console.log(error.message))
     }
   }
 
@@ -146,7 +154,6 @@ class WorkspaceContent extends React.Component {
 
   buildBreadcrumbs = () => {
     const { props, state } = this
-
     const breadcrumbsList = [{
       link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
@@ -184,7 +191,7 @@ class WorkspaceContent extends React.Component {
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
-  loadContentList = async workspaceId => {
+  loadContentList = async (workspaceId) => {
     console.log('%c<WorkspaceContent> loadContentList', 'color: #c17838')
     const { props } = this
 
@@ -209,8 +216,29 @@ class WorkspaceContent extends React.Component {
         ]
         props.dispatch(setWorkspaceContentList(fetchContentList.json, folderToOpen))
         break
+      case 400:
+        switch (fetchContentList.json.code) {
+          // INFO - B.L - 2019.08.06 - content id does not exists in db
+          case 1003:
+          // INFO - B.L - 2019.08.06 - content id is not a valid integer
+          case 2023: // eslint-disable-line no-fallthrough
+            props.dispatch(newFlashMessage(props.t('Content not found'), 'warning'))
+            props.history.push(`/ui/workspaces/${workspaceId}/contents`)
+            throw new Error(fetchContentList.json.message)
+          // INFO - B.L - 2019.08.06 - workspace does not exists or forbidden
+          case 1002:
+          // INFO - B.L - 2019.08.06 - workspace id is not a valid integer
+          case 2022: // eslint-disable-line no-fallthrough
+            props.dispatch(newFlashMessage(props.t('Workspace not found'), 'warning'))
+            props.history.push('/ui')
+            throw new Error(fetchContentList.json.message)
+        }
+        break
       case 401: break
-      default: props.dispatch(newFlashMessage(props.t('Error while loading content list'), 'warning'))
+      default: {
+        props.history.push('/ui')
+        throw new Error('Error while loading content list')
+      }
     }
 
     switch (wsMember.status) {
@@ -481,6 +509,17 @@ class WorkspaceContent extends React.Component {
           )}
 
           {state.contentLoaded && (
+            <Route path={PAGE.WORKSPACE.SHARE_FOLDER(':idws')} component={() =>
+              <OpenShareFolderApp
+                // automatically open the share folder advanced
+                workspaceId={state.workspaceIdInUrl}
+                appOpenedType={state.appOpenedType}
+                updateAppOpenedType={this.handleUpdateAppOpenedType}
+              />
+            } />
+          )}
+
+          {state.contentLoaded && (
             <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
               <OpenCreateContentApp
                 // automatically open the popup create content of the app in url
@@ -550,6 +589,7 @@ class WorkspaceContent extends React.Component {
                         fileName={content.fileName}
                         fileExtension={content.fileExtension}
                         faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
+                        isShared={content.activedShares !== 0}
                         statusSlug={content.statusSlug}
                         contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
                         isLast={i === rootContentList.length - 1}

@@ -1124,6 +1124,15 @@ class ContentInContext(object):
             return base64.b64encode(self.content.depot_file.file.read()).decode("ascii")
         return None
 
+    @property
+    def actives_shares(self) -> int:
+        # TODO - G.M - 2019-08-12 - handle case where share app is not enabled, by
+        # not starting it there. see #2189
+        from tracim_backend.applications.share.lib import ShareLib
+
+        api = ShareLib(config=self.config, session=self.dbsession, current_user=self._user)
+        return len(api.get_content_shares(self.content))
+
 
 class RevisionInContext(object):
     """

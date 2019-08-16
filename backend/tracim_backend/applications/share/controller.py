@@ -18,6 +18,7 @@ from tracim_backend.applications.share.schema import ShareTokenPathSchema
 from tracim_backend.applications.share.schema import ShareTokenWithFilenamePathSchema
 from tracim_backend.applications.share.schema import TracimSharePasswordHeaderSchema
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import ContentShareNotFound
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import WrongSharePassword
@@ -101,6 +102,7 @@ class ShareController(Controller):
         return api.get_content_shares_in_context(shares_content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @check_right(is_content_manager)
     @check_right(is_shareable_content_type)
     @hapic.input_path(ShareIdPathSchema())
@@ -117,6 +119,7 @@ class ShareController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(ShareTokenPathSchema())
     @hapic.output_body(ContentShareInfoSchema())
     def guest_download_info(
@@ -139,13 +142,14 @@ class ShareController(Controller):
         return api.get_content_share_in_context(content_share)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(ShareTokenWithFilenamePathSchema())
     @hapic.input_headers(TracimSharePasswordHeaderSchema())
     @hapic.output_file([])
     def guest_download_file(self, context, request: TracimRequest, hapic_data=None) -> HapicFile:
         """
-        remove a file share
+        get file content
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ShareLib(current_user=None, session=request.dbsession, config=app_config)
@@ -191,7 +195,7 @@ class ShareController(Controller):
         configurator.add_route(
             "add_content_share",
             "/workspaces/{workspace_id}/contents/{content_id}/shares",
-            request_method="PUT",
+            request_method="POST",
         )
         configurator.add_view(self.add_content_share, route_name="add_content_share")
         configurator.add_route(

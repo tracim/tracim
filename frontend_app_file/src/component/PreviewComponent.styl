@@ -6,7 +6,6 @@
 
 .previewcomponent
   position relative
-  border-radius 10px
   height 100%
   background-color offWhite
   overflow-x hidden
@@ -24,109 +23,34 @@
       cursor pointer
       & > i
         margin-right 8px
-  &__property
-    display flex
-    justify-content flex-end
-    position absolute
-    top 0
-    left 0
-    width 100%
-    height 100%
-    transition left 0.5s
-    &__button
-      display flex
-      flex-direction column
-      align-items center
-      justify-content space-between
-      width 50px
-      height 100%
-      background-color grey
-      border-radius 5px 0 0 5px
-      cursor pointer
-      // &__icon
-      //   justify-content flex-start
-      //   font-size 30px
-      //   color white
-      &__title
-        margin-bottom 30px
-        color white
-        font-size 20px
-        transform rotate(-90deg)
-      &__arrow
-        font-size 20px
-        color offWhite
-    &__content
-      width 100%
-      overflow-X hidden
-      background-color offWhite
-      &__detail
-        padding 20px
-        &__item
-          margin-bottom 20px
-        &__description
-          &__editiondesc
-            margin 20px 0
-            textarea
-              width 100%
-              height 200px
-            &__btn
-              display flex
-              justify-content flex-end
-              &__cancel
-                margin 0 15px 0 0
-        &__btndesc
-          display block
-          margin 15px 0
-          width 200px
   &__dloption
     display flex
     justify-content space-evenly
     margin 0 auto
-    padding 10px 50px 0 0
+    padding-top 10px
     width 250px
     &__icon
       font-size 20px
       cursor pointer
       color fontColor
-  &__slider
-    position relative
-    display flex
-    align-items center
-    width calc(100% - 50px) // 50px => width of property
+  &__fileimg
     height calc(100% - 53px) // 53px => height of dloption
-    &__fileimg
-      display flex
-      flex-direction column
-      justify-content center
-      width 100%
-      height 100%
-      & > img
-        max-height 100%
-        max-width 100%
-      &.previewAvailable
-        cursor pointer
-    &__icon
-      margin 0 5px
-      font-size 20px
+    display flex
+    flex-direction column
+    justify-content center
+    width 100%
+    & > img
+      max-height 100%
+      max-width 100%
+    &.previewAvailable
       cursor pointer
-    &__pagecount
-      position absolute
-      right 5px
-      bottom 5px
-      font-size 13px
+  &__icon
+    margin 0 5px
+    font-size 20px
+    cursor pointer
+  &__pagecount
+    position absolute
+    right 5px
+    bottom 5px
+    font-size 13px
 
-.closedproperty
-  .previewcomponent
-    &__property
-      left calc(100% - 50px) // 100% - __property__button:width
-      &__button
-        border-radius 0 5px 5px 0
-      &__content
-        overflow-Y auto
-
-@media (max-width: max-xs)
-  .closedproperty
-    .previewcomponent
-      display flex
-      flex-direction column
-      width calc(100% - 30px) // 30px => margin
