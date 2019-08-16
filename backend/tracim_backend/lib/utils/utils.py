@@ -373,16 +373,16 @@ class EmailUser(object):
     Useful object to handle more easily different way to deal with email address and username
     """
 
-    def __init__(self, user_email: str, username: typing.Optional[str] = None):
+    def __init__(self, user_email: str, username: typing.Optional[str] = None) -> None:
         assert user_email
         email_username, email_address = email.utils.parseaddr(user_email)
         self.username = username or email_username or ""
         self.email_address = email_address
 
     @property
-    def full_email_address(self):
+    def full_email_address(self) -> str:
         return email.utils.formataddr((self.username, self.email_address))
 
     @property
-    def email_link(self):
+    def email_link(self) -> str:
         return "mailto:{email_address}".format(email_address=self.email_address)
