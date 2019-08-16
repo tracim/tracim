@@ -29,7 +29,7 @@ class WorkspaceApi(object):
     def __init__(
         self,
         session: Session,
-        current_user: User,
+        current_user: typing.Optional[User],
         config: CFG,
         force_role: bool = False,
         show_deleted: bool = False,
@@ -216,12 +216,14 @@ class WorkspaceApi(object):
             if role.workspace == workspace:
                 role.do_notify = True
 
-    def get_notifiable_roles(self, workspace: Workspace) -> [UserRoleInWorkspace]:
+    def get_notifiable_roles(
+        self, workspace: Workspace, force_notify: bool = False
+    ) -> [UserRoleInWorkspace]:
         roles = []
         for role in workspace.roles:
             if (
-                role.do_notify is True
-                and role.user != self._user
+                (force_notify or role.do_notify is True)
+                and (not self._user or role.user != self._user)
                 and role.user.is_active
                 and not role.user.is_deleted
                 and role.user.auth_type != AuthType.UNKNOWN

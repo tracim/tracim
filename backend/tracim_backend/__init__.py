@@ -213,6 +213,11 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     share_app_controller.import_controller(
         app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
     )
+    import tracim_backend.applications.upload_permissions.controller as upload_permission_controller
+
+    upload_permission_controller.import_controller(
+        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
+    )
 
     if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
         # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
