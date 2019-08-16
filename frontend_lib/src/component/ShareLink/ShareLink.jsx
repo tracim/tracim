@@ -35,7 +35,11 @@ class ShareLink extends React.Component {
           <div className='shareLink__linkInfos__email'>
             {props.email}
           </div>
-          <div className='shareLink__linkInfos__link' id='shareLink'>
+          <div 
+            className='shareLink__linkInfos__link' 
+            id='shareLink'
+            title={props.link}
+          >
             {props.link}
           </div>
         </div>

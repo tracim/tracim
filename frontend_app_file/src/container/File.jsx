@@ -282,6 +282,7 @@ class File extends React.Component {
         this.setState({
           shareLinkList: fetchResultShareLinkList.body
         })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default:
         this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
@@ -659,6 +660,7 @@ class File extends React.Component {
           shareEmails: '',
           sharePassword: ''
         }))
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
     }
@@ -685,6 +687,7 @@ class File extends React.Component {
 
   handleClickDeleteShareLink = async shareLinkId => {
     const { config, content } = this.state
+    const { props } = this
 
     const fetchResultDeleteShareLink = await handleFetchResult(
       await deleteShareLink(config.apiUrl, content.workspace_id, content.content_id, shareLinkId)
@@ -694,7 +697,11 @@ class File extends React.Component {
       case 204:
         this.loadShareLinkList()
         break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
+      case 400:
+        this.sendGlobalFlashMessage(props.t('Error in the URL'))
+        props.history.push(PAGE.LOGIN)
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while deleting share link'))
     }
   }
 
