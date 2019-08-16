@@ -2,6 +2,7 @@
 import datetime as datetime_root
 from datetime import datetime
 from datetime import timedelta
+import enum
 import json
 import os
 import typing
@@ -12,6 +13,7 @@ from depot.fields.sqlalchemy import UploadedFileField
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
 from sqlalchemy import Column
+from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Sequence
@@ -576,6 +578,11 @@ class ContentChecker(object):
             return True
 
 
+class ContentNamespaces(enum.Enum):
+    CONTENT = "content"
+    UPLOAD = "upload"
+
+
 class ContentRevisionRO(DeclarativeBase):
     """
     Revision of Content. It's immutable, update or delete an existing ContentRevisionRO will throw
@@ -624,6 +631,9 @@ class ContentRevisionRO(DeclarativeBase):
     node = relationship("Content", foreign_keys=[content_id], back_populates="revisions")
     # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
     owner = relationship("User", remote_side=[User.user_id])
+    content_namespace = Column(
+        Enum(ContentNamespaces), nullable=False, server_default=ContentNamespaces.CONTENT.name
+    )
 
     """ List of column copied when make a new revision from another """
     _cloned_columns = (
@@ -647,6 +657,7 @@ class ContentRevisionRO(DeclarativeBase):
         "workspace",
         "workspace_id",
         "is_temporary",
+        "content_namespace",
     )
 
     # Read by must be used like this:
@@ -707,7 +718,12 @@ class ContentRevisionRO(DeclarativeBase):
         return new_rev
 
     @classmethod
-    def copy(cls, revision: "ContentRevisionRO", parent: "Content") -> "ContentRevisionRO":
+    def copy(
+        cls,
+        revision: "ContentRevisionRO",
+        parent: "Content",
+        new_content_namespace: ContentNamespaces,
+    ) -> "ContentRevisionRO":
 
         copy_rev = cls()
         import copy
@@ -719,6 +735,8 @@ class ContentRevisionRO(DeclarativeBase):
                 column_value = copy.copy(parent.id)
             elif column_name == "parent" and parent:
                 column_value = copy.copy(parent)
+            elif column_name == "content_namespace":
+                column_value = new_content_namespace
             else:
                 column_value = copy.copy(getattr(revision, column_name))
             setattr(copy_rev, column_name, column_value)
@@ -1117,6 +1135,18 @@ class Content(DeclarativeBase):
     @parent.expression
     def parent(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.parent
+
+    @hybrid_property
+    def content_namespace(self) -> ContentNamespaces:
+        return self.revision.content_namespace
+
+    @content_namespace.setter
+    def content_namespace(self, value: ContentNamespaces) -> None:
+        self.revision.content_namespace = value
+
+    @content_namespace.expression
+    def content_namespace(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.content_namespace
 
     @hybrid_property
     def node(self) -> "Content":

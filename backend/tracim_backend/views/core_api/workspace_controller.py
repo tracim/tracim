@@ -45,6 +45,7 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.views import BASE_API_V2
@@ -393,6 +394,7 @@ class WorkspaceController(Controller):
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
+            namespaces_filter=content_filter.namespaces_filter or [ContentNamespaces.CONTENT],
             show_archived=content_filter.show_archived,
             show_deleted=content_filter.show_deleted,
             show_active=content_filter.show_active,

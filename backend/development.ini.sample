@@ -288,6 +288,8 @@ email.notification.content_update.subject = [{website_title}] [{workspace_label}
 email.notification.created_account.subject = [{website_title}] Someone created an account for you
 email.notification.share_content_to_emitter.subject = [{website_title}] you shared {content_filename} to {nb_receivers} users
 email.notification.share_content_to_receiver.subject = [{website_title}] {emitter_name} shared content {content_filename} with you
+email.notification.upload_permission_to_emitter.subject = [{website_title}] you give upload permission on {workspace_name} to {nb_receivers} users
+email.notification.upload_permission_to_receiver.subject = [{website_title}] {emitter_name} give you access to upload content into {workspace_name} share space
 
 ### Templates ###
 email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
@@ -295,6 +297,9 @@ email.notification.created_account.template.html = %(email.template_dir)s/create
 email.notification.reset_password_request.template.html = %(email.template_dir)s/reset_password_body_html.mak
 email.notification.share_content_to_emitter.template.html = %(email.template_dir)s/shared_content_to_emitter_body_html.mak
 email.notification.share_content_to_receiver.template.html = %(email.template_dir)s/shared_content_to_receiver_body_html.mak
+email.notification.upload_permission_to_emitter.template.html = %(email.template_dir)s/upload_permission_to_emitter_body_html.mak
+email.notification.upload_permission_to_receiver.template.html = %(email.template_dir)s/upload_permission_to_receiver_body_html.mak
+email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak
 
 ####
 # EMAIL-REPLY

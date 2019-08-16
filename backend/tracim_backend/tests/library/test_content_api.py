@@ -16,6 +16,7 @@ from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
@@ -308,7 +309,12 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        assert api._is_filename_available("test", workspace, parent=None) is True
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+            )
+            is True
+        )
         content = Content()
         content.label = "test"
         content.owner = user
@@ -318,7 +324,12 @@ class TestContentApi(object):
         content.revision_type = ActionDescription.CREATION
         session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) is False
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+            )
+            is False
+        )
         content = Content()
         content.label = "test"
         content.owner = user
@@ -328,7 +339,57 @@ class TestContentApi(object):
         content.revision_type = ActionDescription.CREATION
         session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) is False
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+            )
+            is False
+        )
+
+    def test_unit__is_filename_available__ok__different_namespace(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        workspace = workspace_api_factory.get(user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.UPLOAD
+            )
+            is True
+        )
+        content = Content()
+        content.label = "test"
+        content.owner = user
+        content.parent = None
+        content.workspace = workspace
+        content.content_namespace = ContentNamespaces.CONTENT
+        content.type = content_type_list.Page.slug
+        content.revision_type = ActionDescription.CREATION
+        session.add(content)
+        api.save(content, ActionDescription.CREATION, do_notify=False)
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.UPLOAD
+            )
+            is True
+        )
 
     def test_unit__is_filename_available__ok__different_workspace(
         self,
@@ -355,7 +416,12 @@ class TestContentApi(object):
             "test workspace2", save_now=True
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        assert api._is_filename_available("test", workspace, parent=None) is True
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+            )
+            is True
+        )
         content = Content()
         content.label = "test"
         content.owner = user
@@ -365,7 +431,12 @@ class TestContentApi(object):
         content.revision_type = ActionDescription.CREATION
         session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) is True
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+            )
+            is True
+        )
 
     def test_unit__is_filename_available__ok__different_parent(
         self,
@@ -408,7 +479,12 @@ class TestContentApi(object):
         folder2.type = content_type_list.Folder.slug
         folder2.revision_type = ActionDescription.CREATION
         session.add(folder)
-        assert api._is_filename_available("test", workspace, parent=None) is True
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+            )
+            is True
+        )
         content = Content()
         content.label = "test"
         content.owner = user
@@ -418,7 +494,12 @@ class TestContentApi(object):
         content.revision_type = ActionDescription.CREATION
         session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) is True
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+            )
+            is True
+        )
         content = Content()
         content.label = "test"
         content.owner = user
@@ -428,7 +509,12 @@ class TestContentApi(object):
         content.revision_type = ActionDescription.CREATION
         session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) is True
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+            )
+            is True
+        )
         content = Content()
         content.label = "test"
         content.owner = user
@@ -438,7 +524,12 @@ class TestContentApi(object):
         content.revision_type = ActionDescription.CREATION
         session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) is False
+        assert (
+            api._is_filename_available(
+                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+            )
+            is False
+        )
 
     def test_unit__set_allowed_content__ok__private_method(
         self,
@@ -1162,6 +1253,42 @@ class TestContentApi(object):
         assert ActionDescription.STATUS_UPDATE == c.revision_type
         assert c.get_current_revision().owner_id == user.user_id
 
+    def test_create_file__ok__another_namespace(
+        self,
+        content_type_list,
+        user_api_factory,
+        content_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+
+        api = ContentApi(current_user=user, session=session, config=app_config)
+        p = api.create(
+            content_type_list.Page.slug,
+            workspace,
+            None,
+            "this_is_a_page",
+            do_save=True,
+            content_namespace=ContentNamespaces.UPLOAD,
+        )
+        transaction.commit()
+        assert p.content_namespace == ContentNamespaces.UPLOAD
+
     def test_create_comment_ok(
         self,
         user_api_factory,
@@ -1322,6 +1449,93 @@ class TestContentApi(object):
         assert text_file_after_move.children[0].id == comment_before_move_id
         assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
 
+    def test_unit_move_file_with_comments__different_namespace(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
+        """
+        Check if copy of content does proper copy of subcontent.
+        """
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
+            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+        foldera = api.create(
+            content_type_list.Folder.slug,
+            workspace,
+            None,
+            "folder a",
+            "",
+            True,
+            content_namespace=ContentNamespaces.CONTENT,
+        )
+        with session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=foldera,
+                label="test_file",
+                do_save=False,
+            )
+            api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
+        api.save(text_file, ActionDescription.CREATION)
+        api.create_comment(
+            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+        )
+
+        comment_before_move_id = text_file.children[0].id
+        comment_before_move_workspace_id = text_file.children[0].workspace_id
+        assert text_file.content_namespace == ContentNamespaces.CONTENT
+        assert text_file.children[0].content_namespace == ContentNamespaces.CONTENT
+        assert text_file.children[0].description == "just a comment"
+        workspace2 = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace2", save_now=True
+        )
+        folderb = api.create(
+            content_type_list.Folder.slug,
+            workspace2,
+            None,
+            "folder b",
+            "",
+            True,
+            content_namespace=ContentNamespaces.UPLOAD,
+        )
+        with new_revision(content=text_file, tm=transaction.manager, session=session):
+            api.move(
+                item=text_file,
+                new_parent=folderb,
+                new_workspace=workspace2,
+                must_stay_in_same_workspace=False,
+            )
+            api.save(text_file)
+        transaction.commit()
+        api2 = ContentApi(current_user=user, session=session, config=app_config)
+        text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
+        assert text_file_after_move.content_namespace == ContentNamespaces.UPLOAD
+        assert text_file_after_move.children[0].description == "just a comment"
+        assert text_file_after_move.children[0].id == comment_before_move_id
+        assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
+        assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
+
     def test_unit_copy_file_different_label_different_parent_ok(
         self,
         user_api_factory,
@@ -1349,7 +1563,14 @@ class TestContentApi(object):
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        foldera = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label="folder a",
+            filename="",
+            do_save=True,
+        )
         with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -1365,7 +1586,14 @@ class TestContentApi(object):
         workspace2 = workspace_api_factory.get(current_user=user2).create_workspace(
             "test workspace2", save_now=True
         )
-        folderb = api2.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
+        folderb = api2.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            parent=None,
+            label="folder b",
+            filename="",
+            do_save=True,
+        )
 
         api2.copy(item=text_file, new_parent=folderb, new_label="test_file_copy")
 
@@ -1380,6 +1608,72 @@ class TestContentApi(object):
         assert text_file_copy.label == "test_file_copy"
         assert text_file_copy.type == text_file.type
         assert text_file_copy.parent.content_id == folderb.content_id
+        assert text_file_copy.owner.user_id == user2.user_id
+        assert text_file_copy.get_current_revision().owner_id == user2.user_id
+        assert text_file_copy.description == text_file.description
+        assert text_file_copy.file_extension == text_file.file_extension
+        assert text_file_copy.file_mimetype == text_file.file_mimetype
+        assert text_file_copy.revision_type == ActionDescription.COPY
+        assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
+
+    def test_unit_copy_file_same_label_different_namespace(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
+            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+        with session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.CONTENT,
+                label="test_file",
+                do_save=False,
+            )
+            api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
+
+        api.save(text_file, ActionDescription.CREATION)
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
+
+        api2.copy(
+            item=text_file,
+            new_content_namespace=ContentNamespaces.UPLOAD,
+            new_label="test_file_copy",
+        )
+
+        transaction.commit()
+        text_file_copy = api2.get_one_by_label_and_parent("test_file_copy")
+
+        assert text_file != text_file_copy
+        assert text_file_copy.content_id != text_file.content_id
+        assert text_file_copy.workspace_id == workspace.workspace_id
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()
+        assert text_file_copy.depot_file.path != text_file.depot_file.path
+        assert text_file_copy.label == "test_file_copy"
+        assert text_file_copy.type == text_file.type
+        assert text_file_copy.content_namespace == ContentNamespaces.UPLOAD
         assert text_file_copy.owner.user_id == user2.user_id
         assert text_file_copy.get_current_revision().owner_id == user2.user_id
         assert text_file_copy.description == text_file.description

@@ -68,7 +68,9 @@ requires = [
     'caldav',
     # search support
     'elasticsearch',
-    'elasticsearch-dsl'
+    'elasticsearch-dsl',
+    # text-formatting
+    'humanize'
 ]
 
 tests_require = [

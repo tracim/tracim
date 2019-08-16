@@ -9,7 +9,7 @@
 <p>${_('<a href="{url}" id="call-to-action-button">{filename}</a>({file_size})').format(
    url=html_escape(content_share.url),
    filename=html_escape(shared_content.filename),
-   file_size=html_escape(shared_content.size)
+   file_size=html_escape(humanize.naturalsize(shared_content.size))
 )|n}</p>
 
 %if share_password_enabled:

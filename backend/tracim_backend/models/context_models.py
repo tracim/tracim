@@ -29,6 +29,7 @@ from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
@@ -400,8 +401,10 @@ class ContentFilter(object):
         label: str = None,
         page_nb: int = None,
         limit: int = None,
+        namespaces_filter: str = None,
     ) -> None:
         self.parent_ids = string_to_list(parent_ids, ",", int)
+        self.namespaces_filter = string_to_list(namespaces_filter, ",", ContentNamespaces)
         self.complete_path_to_id = complete_path_to_id
         self.workspace_id = workspace_id
         self.show_archived = bool(show_archived)
@@ -816,6 +819,10 @@ class ContentInContext(object):
     @property
     def workspace(self) -> Workspace:
         return self.content.workspace
+
+    @property
+    def content_namespace(self) -> ContentNamespaces:
+        return self.content.content_namespace.value
 
     @property
     def parent(self) -> typing.Optional["ContentInContext"]:

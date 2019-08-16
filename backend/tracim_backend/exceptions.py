@@ -142,6 +142,10 @@ class WorkspaceNotFound(NotFound):
     error_code = ErrorCode.WORKSPACE_NOT_FOUND
 
 
+class UploadPermissionNotFound(NotFound):
+    error_code = ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
+
+
 class ContentShareNotFound(NotFound):
     error_code = ErrorCode.CONTENT_SHARE_NOT_FOUND
 
@@ -257,6 +261,10 @@ class ContentTypeNotAllowed(TracimException):
 
 class WorkspacesDoNotMatch(TracimException):
     error_code = ErrorCode.WORKSPACE_DO_NOT_MATCH
+
+
+class ContentNamespaceDoNotMatch(TracimException):
+    error_code = ErrorCode.CONTENT_NAMESPACE_DO_NOT_MATCH
 
 
 class PasswordDoNotMatch(TracimException):

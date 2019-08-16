@@ -2251,6 +2251,7 @@ class TestFiles(object):
         assert res["is_archived"] is False
         assert res["is_deleted"] is False
         assert res["is_editable"] is True
+        assert res["content_namespace"] == "content"
         assert res["workspace_id"] == business_workspace.workspace_id
         assert isinstance(res["content_id"], int)
         content_id = res["content_id"]
@@ -2271,6 +2272,7 @@ class TestFiles(object):
         assert res["is_archived"] is False
         assert res["is_deleted"] is False
         assert res["is_editable"] is True
+        assert res["content_namespace"] == "content"
         assert res["workspace_id"] == business_workspace.workspace_id
         assert isinstance(res["content_id"], int)
         assert res["status"] == "open"
