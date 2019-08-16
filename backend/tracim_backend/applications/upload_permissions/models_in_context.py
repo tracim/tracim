@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.context_models import WorkspaceInContext
@@ -23,6 +24,10 @@ class UploadPermissionInContext(object):
         self.dbsession = dbsession
         self.config = config
         self._user = user
+
+    @property
+    def email_user(self) -> EmailUser:
+        return EmailUser(user_email=self.upload_permission.email)
 
     @property
     def workspace_id(self) -> int:

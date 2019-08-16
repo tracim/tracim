@@ -149,7 +149,7 @@ class ShareEmailManager(EmailManager):
             "shared_content": shared_content,
             "content_share": content_share,
             "share_password_enabled": share_password_enabled,
-            "receiver_username": username,
+            "receiver": username,
         }
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator

@@ -13,6 +13,7 @@ from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserInContext
@@ -43,12 +44,11 @@ class UploadPermissionEmailManager(EmailManager):
                 ),
             )
             translator = Translator(app_config=self.config, default_lang=role.user.lang)
-
+            uploader = EmailUser(username=uploader_username, user_email=uploader_email)
             message = self._notify_new_upload(
                 workspace_in_context=workspace_in_context,
                 receiver=role.user,
-                uploader_username=uploader_username,
-                uploader_email=uploader_email,
+                uploader=uploader,
                 translator=translator,
                 uploaded_contents=uploaded_contents,
             )
@@ -60,8 +60,7 @@ class UploadPermissionEmailManager(EmailManager):
         self,
         workspace_in_context: WorkspaceInContext,
         receiver: UserInContext,
-        uploader_username: str,
-        uploader_email: str,
+        uploader: EmailUser,
         uploaded_contents: typing.List[ContentInContext],
         translator: Translator,
     ) -> Message:
@@ -77,7 +76,7 @@ class UploadPermissionEmailManager(EmailManager):
         )
         message["Subject"] = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
-            uploader_username=uploader_username,
+            uploader_username=uploader.username,
             nb_uploaded_contents=len(uploaded_contents),
             workspace_name=workspace_in_context.label,
         )
@@ -85,11 +84,11 @@ class UploadPermissionEmailManager(EmailManager):
         to_addr = formataddr((receiver.display_name, receiver.email))
         message["To"] = to_addr
         html_template_file_path = self.config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML
+
         context = {
             "receiver": receiver,
             "workspace": workspace_in_context,
-            "uploader_username": uploader_username,
-            "uploader_email": uploader_email,
+            "uploader": uploader,
             "uploaded_contents": uploaded_contents,
         }
         body_html = self._render_template(
@@ -230,10 +229,12 @@ class UploadPermissionEmailManager(EmailManager):
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML
         )
+        receiver = EmailUser(user_email=upload_permission.email)
         context = {
             "emitter": emitter,
             "workspace": workspace,
             "upload_permission": upload_permission,
+            "receiver": receiver,
             "upload_permission_password_enabled": upload_permission_password_enabled,
         }
         body_html = self._render_template(

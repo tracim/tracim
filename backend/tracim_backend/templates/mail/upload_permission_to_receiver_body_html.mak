@@ -1,4 +1,8 @@
-<p>${_('Hello,')}</p>
+%if receiver.username:
+    <p>${_('Hello {username},').format(username=receiver.username)}</p>
+%else:
+    <p>${_('Hello,')}</p>
+%endif
 <p>${_('{username}(<a href="mailto:{email}">{email}</a>) allowed you to upload file in this shared space (number: {workspace_id}):').format(username=html_escape(emitter.display_name), email=html_escape(emitter.email) ,workspace_id=html_escape(workspace.workspace_id))|n}</p>
 <a href="${upload_permission.url}" id='call-to-action-button'>${_('Upload file')}</a>
 

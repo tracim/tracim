@@ -194,12 +194,16 @@ class TestUploadPermissionWithNotification(object):
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
-            workspace, emails=["test@test.test", "test2@test2.test2"], do_notify=True
+            workspace, emails=["test@test.test", "toto <test2@test2.test2>"], do_notify=True
         )
         transaction.commit()
         response = mailhog.get_mailhog_mails()
         assert len(response) == 3
-        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        valid_dests = [
+            "Global manager <admin@admin.admin>",
+            "test@test.test",
+            "toto <test2@test2.test2>",
+        ]
         for email in response:
             assert (
                 email["Content"]["Headers"]["From"][0]
@@ -229,7 +233,7 @@ class TestUploadPermissionWithNotification(object):
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
-            workspace, emails=["test@test.test", "test2@test2.test2"], do_notify=True
+            workspace, emails=["test@test.test", "toto <test2@test2.test2>"], do_notify=True
         )
         transaction.commit()
 
@@ -242,7 +246,11 @@ class TestUploadPermissionWithNotification(object):
 
         response = mailhog.get_mailhog_mails()
         assert len(response) == 3
-        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        valid_dests = [
+            "Global manager <admin@admin.admin>",
+            "test@test.test",
+            "toto <test2@test2.test2>",
+        ]
         for email in response:
             assert (
                 email["Content"]["Headers"]["From"][0]
@@ -272,14 +280,18 @@ class TestUploadPermissionWithNotification(object):
         upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
             workspace,
-            emails=["test@test.test", "test2@test2.test2"],
+            emails=["test@test.test", "toto <test2@test2.test2>"],
             password="toto",
             do_notify=True,
         )
         transaction.commit()
         response = mailhog.get_mailhog_mails()
         assert len(response) == 3
-        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        valid_dests = [
+            "Global manager <admin@admin.admin>",
+            "test@test.test",
+            "toto <test2@test2.test2>",
+        ]
         for email in response:
             assert (
                 email["Content"]["Headers"]["From"][0]
@@ -308,7 +320,7 @@ class TestUploadPermissionWithNotification(object):
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         upload_permission_lib = upload_permission_lib_factory.get()
         upload_permission_lib.add_permission_to_workspace(
-            workspace, emails=["thissharewill@notbe.presentinresponse"]
+            workspace, emails=["toto <thissharewill@notbe.presentinresponse>"]
         )
         upload_permissions = upload_permission_lib.get_upload_permissions(workspace)
         assert len(upload_permissions) == 1

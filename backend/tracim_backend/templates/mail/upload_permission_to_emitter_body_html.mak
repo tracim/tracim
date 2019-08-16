@@ -2,7 +2,7 @@
 <p>${_('You allowed the upload in this shared space <a href={sharedspace_url}>{sharedspace_name}</a> with:').format(sharedspace_name=html_escape(workspace.label), sharedspace_url=html_escape(workspace.frontend_url))|n}</p>
 <ul>
 % for upload_permission in upload_permission_receivers:
-<li>${_('<i><a href="mailto:{email}">{email}</a></i> at this link: <a href="{url}">{url}</a>').format(email=html_escape(upload_permission.email), url=html_escape(upload_permission.url))| n}</li>
+<li>${_('<i><a href="{email_link}">{email}</a></i> at this link: <a href="{url}">{url}</a>').format(email=html_escape(upload_permission.email_user.email_address), email_link=html_escape(upload_permission.email_user.email_link), url=html_escape(upload_permission.url))| n}</li>
 % endfor
 </ul>
 
