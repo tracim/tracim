@@ -1,5 +1,5 @@
-%if receiver_username:
-    <p>${_('Hello {username},').format(username=receiver_username)}</p>
+%if receiver.username:
+    <p>${_('Hello {username},').format(username=receiver.username)}</p>
 %else:
     <p>${_('Hello,')}</p>
 %endif
