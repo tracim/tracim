@@ -20,6 +20,7 @@
     "cypress-wait-until": "^1.2.1"
   },
   "dependencies": {
-    "mocha": "^6.1.4"
+    "mocha": "^6.1.4",
+    "unfetch": "^4.1.0"
   }
 }

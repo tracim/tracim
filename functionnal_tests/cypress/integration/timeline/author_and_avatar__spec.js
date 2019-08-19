@@ -1,4 +1,4 @@
-describe('Author and avatar ar shown in timeline', () => {
+describe('Author and avatar are shown in timeline', () => {
   beforeEach(() => {
     cy.resetDB()
     cy.setupBaseDB()

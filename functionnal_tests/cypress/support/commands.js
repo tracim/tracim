@@ -165,3 +165,21 @@ Cypress.Commands.add('cleanSessionCookies', () => {
 Cypress.Commands.add('cancelXHR', () => {
   cy.visit('/api/v2/doc/')
 })
+
+// https://github.com/cypress-io/cypress/issues/95
+// https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/stubbing-spying__window-fetch/cypress/integration/polyfill-fetch-from-tests-spec.js
+// INFO - B.L - 2019.08.16 - Tracim uses fetch for async requests and cypress route can't stub fetch
+// This function replace window.fetch by a polyfill to use xhr instead of fetch, it is invisible in the app
+Cypress.Commands.add('polyfillFetch', () => {
+  Cypress.log({});
+
+  cy.readFile('node_modules/unfetch/dist/unfetch.umd.js', { log: false })
+    .as('unfetch')
+    .then((unfetch) => {
+      Cypress.on('window:before:load', (win) => {
+        delete win.fetch
+        win.eval(unfetch)
+        win.fetch = win.unfetch
+      })
+    })
+})

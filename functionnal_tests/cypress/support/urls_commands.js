@@ -1,3 +1,5 @@
+import unfetch from 'unfetch/polyfill'
+
 const PAGES = {
   HOME: 'home',
   LOGIN: 'login',
