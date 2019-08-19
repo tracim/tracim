@@ -35,7 +35,7 @@ const UploadFilesManagement = props => {
             email={shareLink.email}
             link={shareLink.url}
             isProtected={shareLink.has_password}
-            onClickDeleteShareLink={() => props.onClickDeleteImportAuthorization(shareLink.share_id)}
+            onClickDeleteShareLink={() => props.onClickDeleteImportAuthorization(shareLink.upload_permission_id)}
             userRoleIdInWorkspace={props.userRoleIdInWorkspace}
           />
         )
