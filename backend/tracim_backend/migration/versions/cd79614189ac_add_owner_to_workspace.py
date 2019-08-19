@@ -57,7 +57,10 @@ class TemporaryWorkspaces(DeclarativeBase):
     workspace_id = Column(Integer, primary_key=True)
     owner_id = Column(Integer, nullable=True)
     roles = relationship(
-        "TemporaryRoles", remote_side=[TemporaryRoles.workspace_id], back_populates="workspace"
+        "TemporaryRoles",
+        remote_side=[TemporaryRoles.workspace_id],
+        back_populates="workspace",
+        order_by="TemporaryRoles.user_id",
     )
 
     @property
