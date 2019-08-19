@@ -20,7 +20,7 @@ from tracim_backend.tests.fixtures import *  # noqa:F401,F403
 class TestContent(object):
     def test_unit__create_content__ok__nominal_case(self, admin_user, session, content_type_list):
         assert session.query(Workspace).filter(Workspace.label == "TEST_WORKSPACE_1").count() == 0
-        workspace = Workspace(label="TEST_WORKSPACE_1")
+        workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()
         assert session.query(Workspace).filter(Workspace.label == "TEST_WORKSPACE_1").count() == 1
@@ -56,7 +56,7 @@ class TestContent(object):
         assert searched_content.label == content.label
 
     def test_unit__update__ok__nominal_case(self, admin_user, session, content_type_list):
-        workspace = Workspace(label="TEST_WORKSPACE_1")
+        workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()
         with freeze_time("1999-12-31 23:59:59"):
@@ -130,7 +130,7 @@ class TestContent(object):
 
     def test_unit__update__err__without_prepare(self, admin_user, session, content_type_list):
         # file creation
-        workspace = Workspace(label="TEST_WORKSPACE_1")
+        workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()
         content = Content(
@@ -155,7 +155,7 @@ class TestContent(object):
         self, admin_user, session, content_type_list
     ):
         """ Depot file access thought content property methods. """
-        workspace = Workspace(label="TEST_WORKSPACE_1")
+        workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()
         content = Content(
@@ -185,7 +185,7 @@ class TestContent(object):
         assert content.depot_file.file.read() == b"test"
 
     def test_unit__get_children__ok__nominal_case(sel, admin_user, session, content_type_list):
-        workspace = Workspace(label="TEST_WORKSPACE_1")
+        workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()
         parent_folder = Content(
@@ -223,10 +223,10 @@ class TestContent(object):
         assert parent_folder.children == []
 
     def test_unit__query_content__ok__nominal_case(self, admin_user, session, content_type_list):
-        workspace = Workspace(label="TEST_WORKSPACE_1")
+        workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()
-        workspace2 = Workspace(label="TEST_WORKSPACE_2")
+        workspace2 = Workspace(label="TEST_WORKSPACE_2", owner=admin_user)
         session.add(workspace2)
         session.flush()
         content1 = Content(
