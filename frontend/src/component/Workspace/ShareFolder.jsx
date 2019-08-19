@@ -4,9 +4,8 @@ import { withRouter } from 'react-router'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import ContentItem from './ContentItem.jsx'
-import {
-  PAGE
-} from '../../helper.js'
+import Folder from './Folder.jsx'
+import { PAGE } from '../../helper.js'
 
 require('./Folder.styl')
 
@@ -19,10 +18,15 @@ class ShareFolder extends React.Component {
     return 'fa-share-alt'
   }
 
+  openFolder = folderId => {
+    return (folderId) => this.props.onClickFolder(folderId)
+  }
+
   render () {
     const { props } = this
 
-    const folderContentList = (props.shareFolderContentList ? props.shareFolderContentList : [])
+    const folderContentList = (props.uploadedContentList ? props.uploadedContentList : [])
+      .filter(content => content.parentId === 'shareFolder')
       .sort((a, b) => {
         if (a.created > b.created) return -1
         return 1
@@ -36,11 +40,11 @@ class ShareFolder extends React.Component {
           'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
         data-cy='shareFolder'
-        // id={props.folderData.id}
+        id='shareFolder'
       >
         <div
           className='folder__header align-items-center primaryColorBgLightenHover'
-          onClick={() => props.onClickFolder()}
+          onClick={() => props.onClickShareFolder()}
           title={props.t('Inbox')}
         >
           <div className='folder__header__triangleborder'>
@@ -107,19 +111,22 @@ class ShareFolder extends React.Component {
         <div className='folder__content'>
           {folderContentList.map((content, index) => content.type === 'folder'
             ? (
-              <ShareFolder
+              <Folder
+                availableApp={props.availableApp}
                 folderData={content}
+                workspaceContentList={props.uploadedContentList}
+                getContentParentList={props.getContentParentList}
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={props.onClickExtendedAction}
+                onDropMoveContentItem={props.onDropMoveContentItem}
                 onClickFolder={props.onClickFolder}
-                onClickManageAction={props.onClickManageAction}
+                onClickCreateContent={props.onClickCreateContent}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
-                shareFolderContentList={props.shareFolderContentList}
-                isLast={props.isLast && index === folderContentList.length - 1}
+                setFolderRead={props.setFolderRead}
+                isLast={index === props.uploadedContentList.length - 1}
                 key={content.id}
                 t={props.t}
-                location={props.location}
               />
             )
             : (
@@ -161,6 +168,6 @@ export default translate()(withRouter(ShareFolder))
 ShareFolder.propTypes = {
   folderData: PropTypes.object,
   app: PropTypes.array,
-  onClickFolder: PropTypes.func.isRequired,
+  onClickShareFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired
 }

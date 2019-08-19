@@ -58,7 +58,6 @@ export const putAgendaEnabled = (apiUrl, workspace, agendaEnabled) =>
     })
   })
 
-
 // FIXME - G.B. - 2019-08-16 - We still don't have this features at backend
 // https://github.com/tracim/tracim/issues/2215
 

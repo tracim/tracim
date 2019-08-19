@@ -29,6 +29,7 @@ import {
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
+  getSubFolderShareContentList,
   getShareFolderContentList,
   getContentPathList,
   getWorkspaceMemberList,
@@ -64,8 +65,7 @@ class WorkspaceContent extends React.Component {
       appOpenedType: false,
       contentLoaded: false,
       shareFolder: {
-        isOpen: false,
-        content: []
+        isOpen: false
       }
     }
 
@@ -323,6 +323,7 @@ class WorkspaceContent extends React.Component {
 
   handleClickFolder = async folderId => {
     const { props, state } = this
+    const folder = props.workspaceContentList.find(content => content.id === folderId)
 
     const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
     const newUrlSearchList = (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
@@ -339,6 +340,11 @@ class WorkspaceContent extends React.Component {
 
     if (!props.workspaceContentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
+      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
+    }
+
+    if (folder.parentId === 'shareFolder' && !props.workspaceContentList.some(c => c.parentId === folderId)) {
+      const fetchContentList = await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
       if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
     }
   }
@@ -364,15 +370,6 @@ class WorkspaceContent extends React.Component {
     if (!folderOpen) this.handleClickFolder(folderId)
 
     props.history.push(`${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`)
-  }
-
-  handleClickShareFolder = () => {
-    if (this.state.shareFolder.isOpen) {
-      this.setState({ shareFolder: { isOpen: false } })
-    } else {
-      this.setState({ shareFolder: { isOpen: true } })
-      this.getUploadedContent()
-    }
   }
 
   handleClickManageAction = () => {
@@ -471,7 +468,7 @@ class WorkspaceContent extends React.Component {
       : 'th'
   }
 
-  getUploadedContent = async () => {
+  handleClickShareFolder = async () => {
     const { props, state } = this
 
     const request = await getShareFolderContentList(state.workspaceIdInUrl)
@@ -479,11 +476,19 @@ class WorkspaceContent extends React.Component {
 
     switch (response.apiResponse.status) {
       case 200:
-        this.setState({
+        this.setState(previousState => ({
           shareFolder: {
-            content: response.body
+            isOpen: !previousState.shareFolder.isOpen
+          }
+        }))
+        response.body.forEach(file => {
+          if (file.parent_id === null) {
+            file.parent_id = 'shareFolder'
           }
         })
+        if (!props.workspaceContentList.some(c => c.parentId === 'shareFolder')) {
+          props.dispatch(addWorkspaceContentList(response.body))
+        }
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
@@ -602,8 +607,15 @@ class WorkspaceContent extends React.Component {
                 <ContentItemHeader />
 
                 <ShareFolder
+                  availableApp={createContentAvailableApp}
                   isOpen={state.shareFolder.isOpen}
+                  getContentParentList={this.getContentParentList}
+                  onDropMoveContentItem={this.handleDropMoveContent}
+                  onClickFolder={this.handleClickFolder.bind(this)}
+                  onClickCreateContent={this.handleClickCreateContent}
+                  setFolderRead={this.handleSetFolderRead}
                   userRoleIdInWorkspace={userRoleIdInWorkspace}
+                  uploadedContentList={filteredWorkspaceContentList}
                   onClickExtendedAction={{
                     edit: this.handleClickEditContentItem,
                     download: this.handleClickDownloadContentItem,
@@ -611,10 +623,10 @@ class WorkspaceContent extends React.Component {
                     delete: this.handleClickDeleteContentItem
                   }}
                   onClickManageAction={this.handleClickManageAction}
-                  onClickFolder={this.handleClickShareFolder}
-                  shareFolderContentList={state.shareFolder.content}
+                  onClickShareFolder={this.handleClickShareFolder}
                   contentType={contentType}
                   readStatusList={currentWorkspace.contentReadStatusList}
+                  rootContentList={rootContentList}
                   isLast={isWorkspaceEmpty || isFilteredWorkspaceEmpty}
                   t={t}
                 />

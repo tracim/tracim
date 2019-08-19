@@ -500,6 +500,21 @@ export const getFolderContentList = (workspaceId, folderIdList) => dispatch => {
   })
 }
 
+export const getSubFolderShareContentList = (workspaceId, folderIdList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=upload&parent_ids=${folderIdList.join(',')}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE,
+    dispatch
+  })
+}
+
 export const getShareFolderContentList = (workspaceId) =>
   fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=upload`, {
     credentials: 'include',
@@ -748,18 +763,3 @@ export const getFileInfos = (token) =>
     },
     method: 'GET'
   })
-
-// export const postUploadFile = (token, filesUploadedList, guestName, uploadPassword, comment) =>
-//   fetch(`${FETCH_CONFIG.apiUrl}/public/guest-upload/${token}`, {
-//     credentials: 'include',
-//     headers: {
-//       ...FETCH_CONFIG.headers
-//     },
-//     method: 'POST',
-//     body: JSON.stringify({
-//       file_: filesUploadedList,
-//       username: guestName
-//       password: uploadPassword,
-//       message: comment
-//     })
-//   })

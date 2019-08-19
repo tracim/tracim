@@ -8,7 +8,7 @@ import { CUSTOM_EVENT, ProgressBar } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
 import { newFlashMessage } from '../action-creator.sync.js'
-import { postUploadFile } from '../action-creator.async.js'
+import { FETCH_CONFIG } from '../helper.js'
 
 class GuestUpload extends React.Component {
   constructor (props) {
@@ -71,8 +71,11 @@ class GuestUpload extends React.Component {
     const { props, state } = this
     const formData = new FormData()
 
-    state.uploadFileList.forEach(uploadFile => {
-      formData.append('files', uploadFile)
+    state.uploadFileList.forEach((uploadFile, index) => {
+      formData.append(`file_${index}`, uploadFile)
+      formData.append('username', state.guestName)
+      formData.append('message', state.guestComment)
+      if (state.guestPassword.value !== '') formData.append('password', state.guestPassword.value)
     })
     // INFO - GB - 2019-07-09 - Fetch still doesn't handle event progress, so we need to use old school xhr object.
     const xhr = new XMLHttpRequest()
@@ -81,11 +84,9 @@ class GuestUpload extends React.Component {
     xhr.upload.addEventListener('progress', uploadInProgress, false)
     xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: this.UPLOAD_STATUS.AFTER_LOAD, percent: 0 } }), false)
 
-    xhr.open('POST', `${state.config.apiUrl}/public/guest-upload/${token}`, true)
+    xhr.open('POST', `${FETCH_CONFIG.apiUrl}/public/guest-upload/${this.props.match.params.token}`, true)
     xhr.setRequestHeader('Accept', 'application/json')
     xhr.withCredentials = true
-
-    // postUploadFile = (token, filesUploadedList, guestName, uploadPassword, comment)
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4) {

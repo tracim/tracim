@@ -50,6 +50,8 @@ export default function workspaceContentList (state = [], action) {
       ]
 
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
+      console.log(state)
+      console.log(action)
       return state.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
 
     case `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`:
