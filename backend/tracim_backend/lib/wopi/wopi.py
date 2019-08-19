@@ -3,6 +3,7 @@ import typing
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.utils.utils import wopi_convert_file_name_to_display
 from tracim_backend.lib.wopi.models import WopiCheckFileInfo
 from tracim_backend.lib.wopi.models import WopiLastModifiedTime
 from tracim_backend.models.auth import User
@@ -29,7 +30,7 @@ class WopiLib(object):
         )
         return WopiCheckFileInfo(
             last_modified_time=content.updated,
-            base_file_name=content.file_name,
+            base_file_name=wopi_convert_file_name_to_display(content.file_name),
             size=size,
             owner_id=content.owner_id,
             user_id=self._user.user_id,

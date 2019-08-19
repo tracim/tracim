@@ -257,6 +257,18 @@ def core_convert_file_name_to_display(string: str) -> str:
     return string
 
 
+def wopi_convert_file_name_to_display(string: str) -> str:
+    """
+    Hack to support all file_name name for collaborative edition
+    """
+    REPLACE_CHARS = {"/": "⧸", "?": "ʔ"}
+
+    for key, value in REPLACE_CHARS.items():
+        string = string.replace(key, value)
+
+    return string
+
+
 def webdav_convert_file_name_to_display(string: str) -> str:
     """
     As characters that Windows does not support may have been inserted
