@@ -65,7 +65,7 @@ class TemporaryWorkspaces(DeclarativeBase):
         for role in self.roles:
             if role.role == 8:
                 return role.user_id
-        raise Exception("ALL workspace should have a workspace manager !")
+        raise Exception("All workspaces should have a workspace manager !")
 
 
 def upgrade() -> None:
