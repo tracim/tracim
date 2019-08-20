@@ -641,7 +641,7 @@ class File extends React.Component {
 
     shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
 
-    if (invalidEmails.length > 0) {
+    if (invalidEmails.length > 0 || shareEmailList === 0) {
       this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
     } else {
       const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(

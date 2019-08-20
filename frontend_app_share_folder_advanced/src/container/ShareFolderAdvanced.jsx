@@ -41,7 +41,7 @@ class ShareFolderAdvanced extends React.Component {
         props.t('Inbox')
       ],
       tracimContentTypeList: [],
-      currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT,
+      currentPageStatus: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT,
       uploadLinkList: [],
       uploadEmails: '',
       uploadPassword: ''
@@ -161,7 +161,7 @@ class ShareFolderAdvanced extends React.Component {
   }
 
   handleClickNewUploadComponent = () => {
-    this.setState({ currentPage: this.UPLOAD_STATUS.NEW_UPLOAD })
+    this.setState({ currentPageStatus: this.UPLOAD_STATUS.NEW_UPLOAD })
   }
 
   handleClickNewUpload = async () => {
@@ -176,7 +176,7 @@ class ShareFolderAdvanced extends React.Component {
 
     uploadEmailList = uploadEmailList.filter(uploadEmail => !invalidEmails.includes(uploadEmail))
 
-    if (invalidEmails.length > 0) {
+    if (invalidEmails.length > 0 || uploadEmailList === 0) {
       this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
     } else {
       const fetchResultPostImportAuthorizations = await handleFetchResult(await postImportAuthorizationsList(
@@ -193,7 +193,7 @@ class ShareFolderAdvanced extends React.Component {
             uploadEmails: '',
             uploadPassword: ''
           }))
-          this.setState({ currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
+          this.setState({ currentPageStatus: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
           break
         case 400:
           switch (fetchResultPostImportAuthorizations.body.code) {
@@ -212,7 +212,7 @@ class ShareFolderAdvanced extends React.Component {
     this.setState({
       uploadEmails: '',
       uploadPassword: '',
-      currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
+      currentPageStatus: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
     })
   }
 
@@ -252,7 +252,7 @@ class ShareFolderAdvanced extends React.Component {
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
-          {state.currentPage === this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
+          {state.currentPageStatus === this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
             ? <UploadFilesManagement
               customColor={customColor}
               uploadLinkList={state.uploadLinkList}

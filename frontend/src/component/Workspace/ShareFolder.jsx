@@ -11,6 +11,8 @@ require('./Folder.styl')
 
 class ShareFolder extends React.Component {
   getIcon = () => {
+    // INFO - G.B. - 2019-08-20 - This function always returns the same icon, but I've kept it like that for future improvement.
+    // I think it is good to clearly indicate where to change if you want to have a different icon to a open/close share folder.
     const { props } = this
 
     if (props.isOpen) return 'fa-share-alt'
