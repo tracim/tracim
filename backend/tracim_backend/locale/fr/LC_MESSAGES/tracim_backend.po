@@ -346,7 +346,7 @@ msgid ""
 "href={sharedspace_url}>{sharedspace_name}</a> with:"
 msgstr ""
 "Vous avez autorisé le téléversement dans cet espace partagé <a "
-"href={sharedspace_url}>{sharedspace_name}</a> avec:"
+"href={sharedspace_url}>{sharedspace_name}</a> avec :"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:10
 msgid ""
