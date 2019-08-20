@@ -222,7 +222,7 @@ class UploadPermissionEmailManager(EmailManager):
         message["Subject"] = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
             emitter_name=emitter.display_name,
-            workspace_name=workspace.label,
+            workspace_number=workspace.workspace_id,
         )
         message["From"] = self._get_sender()
         message["To"] = upload_permission.email
