@@ -53,7 +53,7 @@ msgid ""
 "[{website_title}] {emitter_name} shared the file \"{content_filename}\" "
 "with you"
 msgstr ""
-"[{website_title}] {emitter_name} à partagé le fichier {content_filename} "
+"[{website_title}] {emitter_name} à partagé le fichier \"{content_filename}\" "
 "avec vous"
 
 #: tracim_backend/applications/share/config.py:22
@@ -61,30 +61,32 @@ msgid ""
 "[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
 "users"
 msgstr ""
-"[{website_title}] Vous avez partagé le fichier {content_filename} à "
-"{nb_receivers} personnes"
+"[{website_title}] Vous avez partagé  \"{content_filename}\" avec"
+" {nb_receivers} utilisateurs"
 
 #: tracim_backend/applications/upload_permissions/config.py:14
 msgid ""
 "[{website_title}] {emitter_name} allowed you to upload files in this "
 "shared space \"{workspace_number}\""
 msgstr ""
-"[{website_title}] {emitter_name} vous a autorisé à téléverser des "
-"fichiers dans l' espace partagé {workspace_number}"
+"[{website_title}] {emitter_name} vous a autorisé à téléverser des fichiers dans"
+" l'espace partagé \"{workspace_number}\""
 
 #: tracim_backend/applications/upload_permissions/config.py:23
 msgid ""
 "[{website_title}] You allowed {nb_receivers} users to upload files on "
 "\"{workspace_name}\""
 msgstr ""
+"[{website_title}] Vous avez autorisé {nb_receivers} "
+"utilisateurs à téléverser des fichiers dans \"{workspace_name}\""
 
 #: tracim_backend/applications/upload_permissions/config.py:32
 msgid ""
 "[{website_title}] {uploader_username} uploaded {nb_uploaded_contents} "
-"contents into {workspace_name} share space"
+"files into \"{workspace_name}\" share space"
 msgstr ""
 "[{website_title}] {uploader_username} a partagé {nb_uploaded_contents} "
-"fichiers dans l'espace partagé {workspace_name}\"\""
+"fichiers dans l'espace partagé \"{workspace_name}\""
 
 #: tracim_backend/applications/upload_permissions/lib.py:251
 msgid "Files uploaded by {username} on {date}"
