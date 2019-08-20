@@ -210,7 +210,7 @@ msgstr ""
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:13
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:13
 msgid "Enjoy your day :)"
-msgstr "Bonne Journée :)"
+msgstr "Bonne journée :)"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:19
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:10
