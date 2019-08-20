@@ -202,7 +202,7 @@ msgid ""
 "note: as soon as you are connected, we strongly recommend that you change"
 " your password and delete this email."
 msgstr ""
-"note: nous vous recommandons fortement de changer votre mot de passe et "
+"note : nous vous recommandons fortement de changer votre mot de passe et "
 "de supprimer cet email dès que vous êtes connecté."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:18
