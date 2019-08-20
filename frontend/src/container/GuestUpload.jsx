@@ -7,7 +7,6 @@ import FooterLogin from '../component/Login/FooterLogin.jsx'
 import { CUSTOM_EVENT, ProgressBar } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
-import { newFlashMessage } from '../action-creator.sync.js'
 import { FETCH_CONFIG } from '../helper.js'
 
 class GuestUpload extends React.Component {
@@ -98,14 +97,30 @@ class GuestUpload extends React.Component {
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
               case 3002:
-                props.dispatch(newFlashMessage((props.t('A content with the same name already exists'))))
+                this.sendGlobalFlashMessage(props.t('A content with the same name already exists'))
+                this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
                 break
               default:
-                props.dispatch(newFlashMessage((props.t('Error while uploading file'))))
+                this.sendGlobalFlashMessage(props.t('Error while uploading file'))
+                this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
+            }
+            break
+          case 403:
+            console.log('dsds')
+            const jsonResult403 = JSON.parse(xhr.responseText)
+            switch (jsonResult403.code) {
+              case 2053:
+                this.sendGlobalFlashMessage((props.t('Invalid password')))
+                this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
+                break
+              default:
+                this.sendGlobalFlashMessage((props.t('Error while uploading file')))
+                this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
             }
             break
           default:
-            props.dispatch(newFlashMessage(props.t('Error while uploading file')))
+            this.sendGlobalFlashMessage(props.t('Error while uploading file'))
+            this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
         }
       }
     }

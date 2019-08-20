@@ -196,6 +196,14 @@ class ShareFolderAdvanced extends React.Component {
         }))
         this.setState({ currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
         break
+      case 400:
+        switch (fetchResultPostImportAuthorizations.body.code) {
+          case 2001:
+            this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512'))
+            break
+          default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+        }
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
     }
   }
