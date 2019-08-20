@@ -361,7 +361,7 @@ msgid ""
 "I allowed you to upload file in this shared space (number: "
 "{workspace_id}):"
 msgstr ""
-"Je vous a autorisé à téléverser des fichiers dans cet espace partagé "
+"Je vous ai autorisé à téléverser des fichiers dans cet espace partagé "
 "(numéro {workspace_id})"
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
