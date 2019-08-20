@@ -307,6 +307,7 @@ class TestPrivateShareEndpoints(object):
         assert len(content) == 1
         assert content[0]["share_id"]
         share_id = content[0]["share_id"]
+        share_token = content[0]["share_token"]
 
         web_testapp.delete(
             "/api/v2/workspaces/{}/contents/{}/shares/{}".format(
@@ -333,6 +334,19 @@ class TestPrivateShareEndpoints(object):
         )
         content = res.json_body
         assert len(content) == 1
+
+        res = web_testapp.get(
+            "/api/v2/public/guest-download/{share_token}/Test_file.txt".format(
+                share_token=share_token
+            ),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
+        res = web_testapp.get(
+            "/api/v2/public/guest-download/{share_token}".format(share_token=share_token),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
 
     def test_api__delete_share__err__400__content_share_not_found(
         self,
