@@ -293,7 +293,7 @@ msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:10
 msgid "This file is protected by this password: \"{share_password}\""
-msgstr "Le fichier est protégé par ce mot de passe: \"{share_password}\""
+msgstr "Le fichier est protégé par ce mot de passe : \"{share_password}\""
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:4
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:4
