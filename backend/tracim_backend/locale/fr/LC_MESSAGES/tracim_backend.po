@@ -328,7 +328,7 @@ msgstr "Note : vous pouvez aussi utiliser le lien suivant : {url}"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:19
 msgid "Note: You can also use this direct link: {direct_url}"
-msgstr "Note: vous pouvez aussi utiliser le lien direct suivant : {direct_url}"
+msgstr "Note : vous pouvez aussi utiliser le lien direct suivant : {direct_url}"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:22
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:15
