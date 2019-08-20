@@ -280,7 +280,7 @@ msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:2
 msgid "You shared the file <i>{content_filename}</i> with:"
-msgstr "Vous avez partagé le fichier  <i>{content_filename}</i> avec :"
+msgstr "Vous avez partagé le fichier <i>{content_filename}</i> avec :"
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:5
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
