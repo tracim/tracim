@@ -126,7 +126,7 @@ class NewShareDownload extends React.Component {
             </span>
           </div>
         )}
-        
+
         <div className='d-flex mt-3'>
           <button
             className='shareDownload__cancel btn outlineTextBtn'
@@ -155,7 +155,7 @@ class NewShareDownload extends React.Component {
               }
             }}
           >
-            {props.t('New')}
+            {props.t('Create')}
             <i className='fa fa-fw fa-plus-circle' />
           </button>
         </div>
