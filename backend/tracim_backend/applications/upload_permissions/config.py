@@ -30,7 +30,7 @@ def load_config(app_config: CFG) -> CFG:
     app_config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT = app_config.get_raw_config(
         "email.notification.new_upload_event.subject",
         _(
-            "[{website_title}] {uploader_username} uploaded {nb_uploaded_contents} contents into {workspace_name} share space"
+            '[{website_title}] {uploader_username} shared {nb_uploaded_contents} files in "{workspace_name}"'
         ),
     )
     return app_config
