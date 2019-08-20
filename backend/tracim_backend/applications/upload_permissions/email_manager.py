@@ -224,7 +224,7 @@ class UploadPermissionEmailManager(EmailManager):
             emitter_name=emitter.display_name,
             workspace_number=workspace.workspace_id,
         )
-        message["From"] = self._get_sender()
+        message["From"] = self._get_sender(emitter)
         message["To"] = upload_permission.email
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML

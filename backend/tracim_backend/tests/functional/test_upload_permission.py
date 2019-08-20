@@ -208,6 +208,7 @@ class TestUploadPermissionWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
@@ -255,6 +256,7 @@ class TestUploadPermissionWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
@@ -296,6 +298,7 @@ class TestUploadPermissionWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
