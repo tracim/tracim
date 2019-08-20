@@ -12,7 +12,7 @@ def load_config(app_config: CFG) -> CFG:
     app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT = app_config.get_raw_config(
         "email.notification.upload_permission_to_receiver.subject",
         _(
-            "[{website_title}] {emitter_name} give you access to upload content into share space {workspace_number}"
+            '[{website_title}] {emitter_name} allowed you to upload files in this shared space "{workspace_number}"'
         ),
     )
     app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML = app_config.get_raw_config(
@@ -21,7 +21,7 @@ def load_config(app_config: CFG) -> CFG:
     app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT = app_config.get_raw_config(
         "email.notification.upload_permission_to_emitter.subject",
         _(
-            "[{website_title}] you give upload permission on {workspace_name} to {nb_receivers} users"
+            '[{website_title}] You allowed {nb_receivers} users to upload files on "{workspace_name}"'
         ),
     )
     app_config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML = app_config.get_raw_config(

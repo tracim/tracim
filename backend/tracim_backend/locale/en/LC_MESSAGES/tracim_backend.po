@@ -51,7 +51,7 @@ msgid ""
 msgstr ""
 
 #: tracim_backend/applications/share/config.py:22
-msgid "[{website_title}] you shared {content_filename} to {nb_receivers} users"
+msgid "[{website_title}] You shared "{content_filename}" with {nb_receivers} users"
 msgstr ""
 
 #: tracim_backend/applications/upload_permissions/config.py:14

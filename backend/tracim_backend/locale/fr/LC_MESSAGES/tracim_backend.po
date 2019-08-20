@@ -57,7 +57,7 @@ msgstr ""
 "avec vous"
 
 #: tracim_backend/applications/share/config.py:22
-msgid "[{website_title}] you shared {content_filename} to {nb_receivers} users"
+msgid "[{website_title}] You shared "{content_filename}" with {nb_receivers} users"
 msgstr ""
 "[{website_title}] Vous avez partagé le fichier {content_filename} à "
 "{nb_receivers} personnes"
