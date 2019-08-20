@@ -39,6 +39,8 @@ class NewUpload extends React.Component {
   render () {
     const { props, state } = this
     const customColor = props.customColor
+    const passwordType = 'password'
+    const textType = 'text'
 
     return (
       <div className='newUpload'>
@@ -48,7 +50,7 @@ class NewUpload extends React.Component {
 
         <div className='newUpload__email'>
           <textarea
-            type='text'
+            type={textType}
             className='newUpload__email__input form-control'
             placeholder={props.t('Enter the email address of the recipient(s)')}
             rows='10'
@@ -79,7 +81,7 @@ class NewUpload extends React.Component {
           <div className='newUpload__password__wrapper'>
             <i className='fa fa-fw fa-lock' />
             <input
-              type={state.hidePassword ? 'password' : 'text'}
+              type={state.hidePassword ? passwordType : textType}
               className='newUpload__password__input form-control'
               placeholder={props.t('Password to share link (optional)')}
               value={props.uploadPassword}

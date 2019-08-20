@@ -106,7 +106,6 @@ class GuestUpload extends React.Component {
             }
             break
           case 403:
-            console.log('dsds')
             const jsonResult403 = JSON.parse(xhr.responseText)
             switch (jsonResult403.code) {
               case 2053:

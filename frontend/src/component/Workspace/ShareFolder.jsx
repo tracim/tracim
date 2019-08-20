@@ -18,10 +18,6 @@ class ShareFolder extends React.Component {
     return 'fa-share-alt'
   }
 
-  openFolder = folderId => {
-    return (folderId) => this.props.onClickFolder(folderId)
-  }
-
   render () {
     const { props } = this
 
@@ -62,7 +58,7 @@ class ShareFolder extends React.Component {
             </div>
 
             <div className='folder__header__name'>
-              Inbox
+              {props.t('Inbox')}
             </div>
           </div>
 

@@ -643,26 +643,26 @@ class File extends React.Component {
 
     if (invalidEmails.length > 0) {
       this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
-    }
+    } else {
+      const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
+        state.config.apiUrl,
+        state.content.workspace_id,
+        state.content.content_id,
+        shareEmailList,
+        state.sharePassword !== '' ? state.sharePassword : null
+      ))
 
-    const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
-      state.config.apiUrl,
-      state.content.workspace_id,
-      state.content.content_id,
-      shareEmailList,
-      state.sharePassword !== '' ? state.sharePassword : null
-    ))
-
-    switch (fetchResultPostShareLinks.apiResponse.status) {
-      case 200:
-        this.setState(prev => ({
-          shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
-          shareEmails: '',
-          sharePassword: ''
-        }))
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+      switch (fetchResultPostShareLinks.apiResponse.status) {
+        case 200:
+          this.setState(prev => ({
+            shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
+            shareEmails: '',
+            sharePassword: ''
+          }))
+          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
+          break
+        default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+      }
     }
   }
 
@@ -679,9 +679,9 @@ class File extends React.Component {
 
       if (invalidEmails.length > 0) {
         this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+      } else {
+        this.setState({ shareEmails: emailList.join('\n') })
       }
-
-      this.setState({ shareEmails: emailList.join('\n') })
     }
   }
 

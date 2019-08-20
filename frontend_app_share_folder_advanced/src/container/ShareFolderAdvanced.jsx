@@ -54,7 +54,7 @@ class ShareFolderAdvanced extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+  customEventReducer = ({ detail: { type, data } }) => {
     const { state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
@@ -178,33 +178,33 @@ class ShareFolderAdvanced extends React.Component {
 
     if (invalidEmails.length > 0) {
       this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
-    }
+    } else {
+      const fetchResultPostImportAuthorizations = await handleFetchResult(await postImportAuthorizationsList(
+        state.config.apiUrl,
+        state.content.workspace_id,
+        uploadEmailList,
+        state.uploadPassword !== '' ? state.uploadPassword : null
+      ))
 
-    const fetchResultPostImportAuthorizations = await handleFetchResult(await postImportAuthorizationsList(
-      state.config.apiUrl,
-      state.content.workspace_id,
-      uploadEmailList,
-      state.uploadPassword !== '' ? state.uploadPassword : null
-    ))
-
-    switch (fetchResultPostImportAuthorizations.apiResponse.status) {
-      case 200:
-        this.setState(prev => ({
-          uploadLinkList: [...prev.uploadLinkList, ...fetchResultPostImportAuthorizations.body],
-          uploadEmails: '',
-          uploadPassword: ''
-        }))
-        this.setState({ currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
-        break
-      case 400:
-        switch (fetchResultPostImportAuthorizations.body.code) {
-          case 2001:
-            this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512'))
-            break
-          default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
-        }
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+      switch (fetchResultPostImportAuthorizations.apiResponse.status) {
+        case 200:
+          this.setState(prev => ({
+            uploadLinkList: [...prev.uploadLinkList, ...fetchResultPostImportAuthorizations.body],
+            uploadEmails: '',
+            uploadPassword: ''
+          }))
+          this.setState({ currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
+          break
+        case 400:
+          switch (fetchResultPostImportAuthorizations.body.code) {
+            case 2001:
+              this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
+              break
+            default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+          }
+          break
+        default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+      }
     }
   }
 
@@ -227,15 +227,16 @@ class ShareFolderAdvanced extends React.Component {
 
       if (invalidEmails.length > 0) {
         this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+      } else {
+        this.setState({ uploadEmails: emailList.join('\n') })
       }
-
-      this.setState({ uploadEmails: emailList.join('\n') })
     }
   }
 
   render () {
     const { state } = this
     const customColor = (state.tracimContentTypeList.find(type => type.slug === 'file') || { hexcolor: state.config.hexcolor }).hexcolor
+    const title = this.props.t('Inbox')
 
     if (!state.isVisible) return null
 
@@ -245,8 +246,7 @@ class ShareFolderAdvanced extends React.Component {
           customClass={'folderAdvanced'}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          // rawTitle={state.content.label}
-          componentTitle={<div>Inbox</div>}
+          componentTitle={<div>{title}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
         />
