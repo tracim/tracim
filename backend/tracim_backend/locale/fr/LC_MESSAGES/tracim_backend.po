@@ -245,7 +245,7 @@ msgid ""
 "href={sharedspace_url}>{sharedspace_name}</a>"
 msgstr ""
 "{username}(<a href=\"{email_link}\">{email}</a>) a partagé un ou "
-"plusieurs fichiersavec vous dans cet espace partagé: <a "
+"plusieurs fichiers avec vous dans cet espace partagé : <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:4
