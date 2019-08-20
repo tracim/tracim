@@ -218,7 +218,7 @@ msgstr "Bonne journée :)"
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:14
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:14
 msgid "Suricat', your digital assistant"
-msgstr "Suricate, Votre assistant numérique"
+msgstr "Suricate, votre assistant numérique"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:23
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:14
