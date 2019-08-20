@@ -9,7 +9,7 @@ export const comment = {
   faIcon: '',
   hexcolor: '',
   creationLabel: 'Comment',
-  availableStatus: [
+  availableStatuses: [
     open,
     validated,
     cancelled,

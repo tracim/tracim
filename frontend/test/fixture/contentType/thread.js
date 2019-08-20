@@ -12,7 +12,7 @@ export const thread = {
   faIcon,
   hexcolor,
   creationLabel: 'Start a topic',
-  availableStatus: [
+  availableStatuses: [
     open,
     validated,
     cancelled,

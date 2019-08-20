@@ -6,7 +6,7 @@ import { PAGE, PROFILE } from '../helper.js'
 import appFactory from '../appFactory.js'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
-class AppFullscreenRouter extends React.Component {
+export class AppFullscreenRouter extends React.Component {
   constructor (props) {
     super(props)
     this.state = {

@@ -2,9 +2,8 @@ import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import sinon from 'sinon'
-import MenuSubComponent from '../../src/component/Account/MenuSubComponent'
-import { I18nextProvider } from 'react-i18next'
-import i18n from '../../src/i18n.js'
+import { MenuSubComponent as MenuSubComponentWithoutHOC } from '../../src/component/Account/MenuSubComponent'
+import { translateMock } from '../hocMock/translate'
 
 describe('<MenuSubComponent />', () => {
   const onClickMenuItemCallBack = sinon.stub()
@@ -22,13 +21,9 @@ describe('<MenuSubComponent />', () => {
     onClickMenuItem: onClickMenuItemCallBack,
   }
 
-  const wrapper = mount(
-    <I18nextProvider i18n={i18n}>
-      <MenuSubComponent
-        {...props}
-      />
-    </I18nextProvider>
-  )
+  const ComponentWithHoc = translateMock()(MenuSubComponentWithoutHOC)
+
+  const wrapper = mount(<ComponentWithHoc { ...props } />)
 
   describe('static design', () => {
     it(`should render ${props.menu.length} items`, () => {

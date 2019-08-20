@@ -44,7 +44,7 @@ import {
   WORKSPACE_CONTENT_MOVE,
   SEARCHED_KEYWORDS
 } from './action-creator.sync.js'
-import { history } from './index.js'
+import { history } from './helper.js'
 import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
 
 /*

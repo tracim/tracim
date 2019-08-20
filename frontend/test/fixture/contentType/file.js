@@ -12,7 +12,7 @@ export const file = {
   faIcon,
   hexcolor,
   creationLabel: 'Upload a file',
-  availableStatus: [
+  availableStatuses: [
     open,
     validated,
     cancelled,

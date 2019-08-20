@@ -2,9 +2,8 @@ import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import sinon from 'sinon'
-import Notification from '../../src/component/Account/Notification'
-import { I18nextProvider } from 'react-i18next'
-import i18n from '../../src/i18n.js'
+import { Notification as NotificationWithoutHOC } from '../../src/component/Account/Notification'
+import { translateMock } from '../hocMock/translate'
 
 describe('<Notification />', () => {
   const onChangeSubscriptionNotifCallBack = sinon.stub()
@@ -35,13 +34,9 @@ describe('<Notification />', () => {
     onChangeSubscriptionNotif: onChangeSubscriptionNotifCallBack
   }
 
-  const wrapper = mount(
-    <I18nextProvider i18n={i18n}>
-      <Notification
-        {...props}
-      />
-    </I18nextProvider>
-  )
+  const ComponentWithHoc = translateMock()(NotificationWithoutHOC)
+
+  const wrapper = mount(<ComponentWithHoc { ...props } />)
 
   describe('static design', () => {
     it(`should display ${props.workspaceList.length} workspace`, () => {

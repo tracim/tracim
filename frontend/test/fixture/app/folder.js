@@ -4,5 +4,6 @@ export const folder = {
   isActive: true,
   faIcon: 'folder-o',
   hexcolor: '#414548',
-  config: {}
+  config: {},
+  creationLabel: 'Create a folder'
 }

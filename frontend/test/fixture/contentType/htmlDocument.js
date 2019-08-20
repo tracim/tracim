@@ -12,7 +12,7 @@ export const htmlDocument = {
   faIcon,
   hexcolor,
   creationLabel: 'Write a document',
-  availableStatus: [
+  availableStatuses: [
     open,
     validated,
     cancelled,

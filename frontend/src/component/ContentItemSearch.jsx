@@ -6,7 +6,7 @@ import { Badge, Avatar } from 'tracim_frontend_lib'
 
 require('./ContentItemSearch.styl')
 
-const ContentItemSearch = props => {
+export const ContentItemSearch = props => {
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || { hexcolor: '', label: '', faIcon: '' }
 
   return (

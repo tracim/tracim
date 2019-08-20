@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
-const ExtandedAction = props => {
+export const ExtandedAction = props => {
   return (
     <div
       className='extandedaction dropdown'

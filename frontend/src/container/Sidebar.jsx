@@ -19,7 +19,7 @@ import {
 } from '../helper.js'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
-class Sidebar extends React.Component {
+export class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {

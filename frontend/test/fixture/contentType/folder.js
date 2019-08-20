@@ -12,7 +12,7 @@ export const folder = {
   faIcon,
   hexcolor,
   creationLabel: 'Create a folder',
-  availableStatus: [
+  availableStatuses: [
     open,
     validated,
     cancelled,
