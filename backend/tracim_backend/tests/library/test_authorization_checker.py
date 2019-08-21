@@ -88,7 +88,7 @@ class TestAuthorizationChecker(object):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
-        current_workspace = Workspace(workspace_id=3)
+        current_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=5)
         session.add(current_user)
         session.add(current_workspace)
@@ -112,7 +112,7 @@ class TestAuthorizationChecker(object):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
-        current_workspace = Workspace(workspace_id=3)
+        current_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=2)
         session.add(current_user)
         session.add(current_workspace)
@@ -139,7 +139,7 @@ class TestAuthorizationChecker(object):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
-        current_workspace = Workspace(workspace_id=3)
+        current_workspace = Workspace(workspace_id=3, owner=current_user)
         session.add(current_user)
         session.add(current_workspace)
         session.flush()
@@ -168,7 +168,7 @@ class TestAuthorizationChecker(object):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
-        candidate_workspace = Workspace(workspace_id=3)
+        candidate_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=5)
         session.add(current_user)
         session.add(candidate_workspace)
@@ -192,7 +192,7 @@ class TestAuthorizationChecker(object):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
-        candidate_workspace = Workspace(workspace_id=3)
+        candidate_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=2)
         session.add(current_user)
         session.add(candidate_workspace)
@@ -219,7 +219,7 @@ class TestAuthorizationChecker(object):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
-        candidate_workspace = Workspace(workspace_id=3)
+        candidate_workspace = Workspace(workspace_id=3, owner=current_user)
         session.add(current_user)
         session.add(candidate_workspace)
         session.flush()
@@ -480,7 +480,7 @@ class TestAuthorizationChecker(object):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
-        current_workspace = Workspace(workspace_id=3)
+        current_workspace = Workspace(workspace_id=3, owner=current_user)
         candidate_content_type = ContentType(
             slug="test",
             fa_icon="",
@@ -522,7 +522,7 @@ class TestAuthorizationChecker(object):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
-        current_workspace = Workspace(workspace_id=3)
+        current_workspace = Workspace(workspace_id=3, owner=current_user)
         candidate_content_type = ContentType(
             slug="test",
             fa_icon="",
@@ -564,7 +564,7 @@ class TestAuthorizationChecker(object):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
-        current_workspace = Workspace(workspace_id=3)
+        current_workspace = Workspace(workspace_id=3, owner=current_user)
         candidate_content_type = ContentType(
             slug="test",
             fa_icon="",
@@ -607,7 +607,7 @@ class TestAuthorizationChecker(object):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
-        current_workspace = Workspace(workspace_id=3)
+        current_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level)
         candidate_content_type = ContentType(
             slug="test",

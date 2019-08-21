@@ -63,8 +63,6 @@ class Workspace(DeclarativeBase):
     # for mysql will probably be needed, see fix in User sqlalchemy object
     label = Column(Unicode(1024), unique=False, nullable=False, default="")
     description = Column(Text(), unique=False, nullable=False, default="")
-    agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
-
     #  Default value datetime.utcnow,
     # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
@@ -75,6 +73,9 @@ class Workspace(DeclarativeBase):
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
 
     revisions = relationship("ContentRevisionRO")
+    agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
+    owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    owner = relationship("User", remote_side=[User.user_id])
 
     @hybrid_property
     def contents(self) -> ["Content"]:

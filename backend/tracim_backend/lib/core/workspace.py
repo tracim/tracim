@@ -96,6 +96,7 @@ class WorkspaceApi(object):
         workspace.agenda_enabled = agenda_enabled
         workspace.created = datetime.utcnow()
         workspace.updated = datetime.utcnow()
+        workspace.owner = self._user
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
