@@ -43,3 +43,11 @@ export function shallowUntilTarget(componentInstance, TargetComponent, {
 
   throw new Error(`Could not find ${TargetComponent} in rendered instance: ${componentInstance}; gave up after ${maxTries} tries`)
 }
+
+export function restoreHistoryCallBack(callbacks) {
+  callbacks.forEach(c => c.resetHistory())
+}
+
+export const isFunction = (functionToCheck) => {
+  return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
+}

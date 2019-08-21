@@ -6,7 +6,8 @@ module.exports = {
     'regenerator-runtime/runtime',
     '@babel/register',
     'ignore-styles',
-    'test/setup'
+    'test/setup',
+    'isomorphic-fetch'
   ],
   reporter: 'spec',
   colors: true,
