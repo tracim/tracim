@@ -48,6 +48,8 @@ import MemberList from '../component/Dashboard/MemberList.jsx'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
 
+const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
+
 class Dashboard extends React.Component {
   constructor (props) {
     super(props)
@@ -485,9 +487,9 @@ class Dashboard extends React.Component {
                     dangerouslySetInnerHTML={{ __html: convertBackslashNToBr(props.curWs.description) }}
                   />
 
-                  {userRoleIdInWorkspace >= 2 && (
-                    <div className='dashboard__calltoaction'>
-                      {contentTypeButtonList.map(app =>
+                  <div className='dashboard__calltoaction'>
+                    {contentTypeButtonList.map(app => {
+                      return (userRoleIdInWorkspace >= 2 || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
                         <ContentTypeBtn
                           customClass='dashboard__calltoaction__button'
                           hexcolor={app.hexcolor}
@@ -501,9 +503,9 @@ class Dashboard extends React.Component {
                           appSlug={app.slug}
                           key={app.slug}
                         />
-                      )}
-                    </div>
-                  )}
+                      )
+                    })}
+                  </div>
                 </div>
 
                 <UserStatus
