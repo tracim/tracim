@@ -290,3 +290,28 @@ class TestContent(object):
         content1_from_query = base_query.filter(Content.workspace == workspace1).one()
         assert content1.id == content1_from_query.id
         assert "TEST_CONTENT_DESCRIPTION_1_UPDATED" == content1_from_query.description
+
+    def test_unit__get_allowed_content_type__ok(
+        self, admin_user, session, content_type_list
+    ) -> None:
+        workspace = Workspace(label="TEST_WORKSPACE")
+        session.add(workspace)
+        session.flush()
+        content1 = Content(
+            owner=admin_user,
+            workspace=workspace,
+            type=content_type_list.Page.slug,
+            label="TEST_CONTENT_1",
+            description="TEST_CONTENT_DESCRIPTION_1",
+            revision_type=ActionDescription.CREATION,
+            is_deleted=False,
+            is_archived=False,
+        )
+        content1.properties = {"allowed_content": {"unknown_type": True}}
+        try:
+            assert content1.get_allowed_content_types() == []
+        except ValueError:
+            pytest.fail(
+                "Unknown content type should not raise exception anymore "
+                "when getting allowed content_type"
+            )
