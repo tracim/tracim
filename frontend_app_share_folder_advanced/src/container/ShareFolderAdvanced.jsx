@@ -1,4 +1,4 @@
-// TODO - G.B. - This component is a wip because it's waiting the backend 
+// TODO - G.B. - This component is a wip because it's waiting the backend
 // https://github.com/tracim/tracim/issues/2126
 
 // import React from 'react'
