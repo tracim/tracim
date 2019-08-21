@@ -599,15 +599,15 @@ keys = generic
 [formatter_color]
 class=colorlog.ColoredFormatter
 format = %(asctime)s %(log_color)s%(levelname)-5.5s %(reset)s[%(name)s:%(lineno)s][%(threadName)s] %(log_color)s%(message)s
-datefmt = %H:%M:%S
+datefmt = %Y-%m-%d %H:%M:%S
 
 [formatter_generic]
 format = %(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s
-datefmt = %H:%M:%S
+datefmt = %Y-%m-%d %H:%M:%S
 
 [formatter_tracim_email_notification]
 format = %(asctime)s %(network)s %(action)s %(recipient)s %(subject)s %(message)s
-datefmt = %H:%M:%S
+datefmt = %Y-%m-%d %H:%M:%S
 
 ### HANDLERS ###
 [handlers]
