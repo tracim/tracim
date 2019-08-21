@@ -29,7 +29,7 @@ metadata = MetaData(naming_convention=NAMING_CONVENTION)
 DeclarativeBase = declarative_base(metadata=metadata)
 
 revision = "cd79614189ac"
-down_revision = "eeac0cd986c1"
+down_revision = "7bd8ec4c7236"
 
 
 class TemporaryRoles(DeclarativeBase):
