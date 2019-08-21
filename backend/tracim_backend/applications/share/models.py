@@ -4,6 +4,7 @@ from hashlib import sha256
 import os
 import typing
 
+import sqlalchemy
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -47,7 +48,13 @@ class ContentShare(DeclarativeBase):
     share_group_uuid = Column(Unicode(MAX_GROUP_SHARE_ID_LENGTH), nullable=False)
     type = Column(Enum(ContentShareType), nullable=False)
     _password = Column("password", Unicode(MAX_HASHED_PASSWORD_LENGTH), nullable=True)
-    enabled = Column(Boolean, unique=False, nullable=False, default=True)
+    enabled = Column(
+        Boolean,
+        unique=False,
+        nullable=False,
+        default=True,
+        server_default=sqlalchemy.sql.expression.literal(True),
+    )
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     disabled = Column(DateTime, unique=False, nullable=True, default=None)
     content = relationship("Content", remote_side=[Content.id], backref="shares")
