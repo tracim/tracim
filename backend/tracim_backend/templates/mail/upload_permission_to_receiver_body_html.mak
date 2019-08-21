@@ -13,7 +13,7 @@
 <p>${_("Note: You can also use this link: {url}").format(url=upload_permission.url)}<p>
 
 <p>${_("Thanks a lot")}</p>
-<p>${_(" (through tracim)".format(emitter.display_name))}</p>
+<p>${_("{username} (through tracim)").format(username=emitter.display_name)}</p>
 
 
 <pre>

@@ -153,11 +153,7 @@ class UploadPermissionLib(object):
 
     def get_upload_permission_by_token(self, upload_permission_token: str) -> UploadPermission:
         try:
-            return (
-                self._session.query(UploadPermission)
-                .filter(UploadPermission.token == upload_permission_token)
-                .one()
-            )
+            return self.base_query().filter(UploadPermission.token == upload_permission_token).one()
         except NoResultFound as exc:
             raise UploadPermissionNotFound(
                 'Upload permission with token "{}" not found in database'.format(

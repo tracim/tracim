@@ -307,6 +307,7 @@ class TestPrivateShareEndpoints(object):
         assert len(content) == 1
         assert content[0]["share_id"]
         share_id = content[0]["share_id"]
+        share_token = content[0]["share_token"]
 
         web_testapp.delete(
             "/api/v2/workspaces/{}/contents/{}/shares/{}".format(
@@ -333,6 +334,19 @@ class TestPrivateShareEndpoints(object):
         )
         content = res.json_body
         assert len(content) == 1
+
+        res = web_testapp.get(
+            "/api/v2/public/guest-download/{share_token}/Test_file.txt".format(
+                share_token=share_token
+            ),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
+        res = web_testapp.get(
+            "/api/v2/public/guest-download/{share_token}".format(share_token=share_token),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
 
     def test_api__delete_share__err__400__content_share_not_found(
         self,
@@ -679,6 +693,14 @@ class TestGuestDownloadShareEndpoints(object):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format("toto.txt", "toto.txt")
 
+        res2 = web_testapp.post(
+            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+                share_token=content_share.share_token
+            ),
+            status=200,
+        )
+        assert res.body == res2.body
+
     def test_api__guest_download_content_file__err_400__content_share_not_found(
         self,
         workspace_api_factory,
@@ -732,7 +754,7 @@ class TestGuestDownloadShareEndpoints(object):
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
-    def test_api__guest_download_content_file__ok_200__with_password(
+    def test_api__guest_download_content_file_post__ok_200__with_password(
         self,
         workspace_api_factory,
         content_api_factory,
@@ -765,11 +787,11 @@ class TestGuestDownloadShareEndpoints(object):
         assert len(content_shares) == 1
         content_share = content_shares[0]
         transaction.commit()
-        res = web_testapp.get(
+        res = web_testapp.post(
             "/api/v2/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
-            headers={"Tracim-Share-Password": "123456"},
+            params={"password": "123456"},
             status=200,
         )
         assert res.body == b"Test file"
@@ -817,8 +839,14 @@ class TestGuestDownloadShareEndpoints(object):
             ),
             status=403,
         )
+        web_testapp.post(
+            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+                share_token=content_share.share_token
+            ),
+            status=403,
+        )
 
-    def test_api__guest_download_content_file__err_403__wrong_password(
+    def test_api__guest_download_content_file_post__err_403__wrong_password(
         self,
         workspace_api_factory,
         content_api_factory,
@@ -851,10 +879,10 @@ class TestGuestDownloadShareEndpoints(object):
         assert len(content_shares) == 1
         content_share = content_shares[0]
         transaction.commit()
-        web_testapp.get(
+        web_testapp.post(
             "/api/v2/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
-            headers={"Tracim-Share-Password": "987654321"},
+            params={"password": "987654321"},
             status=403,
         )

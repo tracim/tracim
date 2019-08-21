@@ -137,6 +137,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         assert len(content) == 1
         assert content[0]["upload_permission_id"]
         upload_permission_id = content[0]["upload_permission_id"]
+        upload_permission_token = content[0]["token"]
 
         web_testapp.delete(
             "/api/v2/workspaces/{}/upload_permissions/{}".format(
@@ -158,6 +159,14 @@ class TestPrivateUploadPermissionEndpoints(object):
         )
         content = res.json_body
         assert len(content) == 1
+
+        res = web_testapp.post(
+            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+                upload_permission_token=upload_permission_token
+            ),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
 
     def test_api__delete_upload_permission__err_400__upload_permission_not_found(
         self, workspace_api_factory, session, web_testapp, upload_permission_lib_factory, admin_user
@@ -208,6 +217,7 @@ class TestUploadPermissionWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
@@ -255,6 +265,7 @@ class TestUploadPermissionWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
@@ -296,6 +307,7 @@ class TestUploadPermissionWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
