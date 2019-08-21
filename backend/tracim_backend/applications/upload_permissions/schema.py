@@ -3,6 +3,7 @@ import typing
 
 import marshmallow
 from marshmallow import post_load
+from marshmallow.validate import Length
 from marshmallow.validate import OneOf
 
 from tracim_backend import TracimRequest
@@ -127,7 +128,9 @@ class UploadPermissionCreationBody(object):
 
 class UploadPermissionCreationBodySchema(marshmallow.Schema):
     emails = marshmallow.fields.List(
-        marshmallow.fields.Email(validate=upload_permission_email_validator)
+        marshmallow.fields.Email(validate=upload_permission_email_validator),
+        validate=Length(min=1),
+        required=True,
     )
     password = marshmallow.fields.String(
         example="8QLa$<w",
