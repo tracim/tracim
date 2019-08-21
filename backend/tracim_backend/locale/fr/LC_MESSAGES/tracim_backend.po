@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-08-20 16:01+0200\n"
+"POT-Creation-Date: 2019-08-21 12:14+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -88,15 +88,15 @@ msgstr ""
 "[{website_title}] {uploader_username} a partagé {nb_uploaded_contents} "
 "fichiers dans \"{workspace_name}\""
 
-#: tracim_backend/applications/upload_permissions/lib.py:251
+#: tracim_backend/applications/upload_permissions/lib.py:247
 msgid "Files uploaded by {username} on {date}"
 msgstr "Fichiers téléchargés par {username} le {date}"
 
-#: tracim_backend/applications/upload_permissions/lib.py:264
+#: tracim_backend/applications/upload_permissions/lib.py:260
 msgid "Message from {username}: {message}"
 msgstr "Message de {username}: {message}"
 
-#: tracim_backend/applications/upload_permissions/lib.py:268
+#: tracim_backend/applications/upload_permissions/lib.py:264
 msgid "Uploaded by {username}."
 msgstr "Téléversé par {username}."
 
@@ -311,7 +311,9 @@ msgid "You can download this file here:"
 msgstr "Vous pouvez télécharger ce fichier ici :"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:9
-msgid "<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a>({file_size})"
+msgid ""
+"<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a> "
+"({file_size})"
 msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:16
