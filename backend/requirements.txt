@@ -18,6 +18,7 @@ click==7.0                # via rq
 cliff==2.14.0
 cmd2==0.9.6               # via cliff
 colorama==0.4.1           # via cmd2
+colorlog==4.0.2
 colour==0.1.5
 defusedxml==0.5.0         # via wsgidav
 elasticsearch-dsl==7.0.0
