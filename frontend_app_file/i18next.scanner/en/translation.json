@@ -50,5 +50,7 @@
   "Creation date": "Creation date",
   "of": "of",
   "Edit online": "Edit online",
-  "Error in the URL": "Error in the URL"
+  "Error in the URL": "Error in the URL",
+  "The password length must be between 6 and 512 characters and the email(s) must be valid": "The password length must be between 6 and 512 characters and the email(s) must be valid",
+  "Error while creating new share link": "Error while creating new share link"
 }

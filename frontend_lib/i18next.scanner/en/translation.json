@@ -53,5 +53,6 @@
   "Generate random password": "Generate random password",
   "Show password": "Show password",
   "This file has {{numberLinks}} share links": "This file has {{numberLinks}} share links",
-  "made by {{author}}": "made by {{author}}"
+  "by {{author}}": "by {{author}}",
+  "Create": "Create"
 }

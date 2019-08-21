@@ -146,7 +146,7 @@ class WorkspaceContent extends React.Component {
     const currentFilter = qs.parse(props.location.search).type
 
     if (prevState.workspaceIdInUrl !== workspaceId || prevFilter !== currentFilter) {
-      this.setState({ workspaceIdInUrl: workspaceId })
+      this.setState({ workspaceIdInUrl: workspaceId, contentLoaded: false })
       this.buildBreadcrumbs()
     }
     if (!state.contentLoaded) {

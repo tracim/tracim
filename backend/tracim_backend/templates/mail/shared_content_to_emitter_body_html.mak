@@ -2,7 +2,7 @@
 <p>${_('You shared the file <i>{content_filename}</i> with:').format(content_filename=html_escape(shared_content.filename))|n}</p>
 <ul>
 % for content_share in content_share_receivers:
-    <li>${_('<i>{email}</i> at this link: <a href="{url}">{url}</a>').format(email=html_escape(content_share.email), url=html_escape(content_share.url))| n}</li>
+    <li>${_('<i><a href="{email_link}">{email}</a></i> at this link: <a href="{url}">{url}</a>').format(email=html_escape(content_share.email_user.email_address), email_link=html_escape(content_share.email_user.email_link), url=html_escape(content_share.url))| n}</li>
 % endfor
 </ul>
 

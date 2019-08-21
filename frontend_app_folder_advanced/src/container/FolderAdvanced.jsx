@@ -144,13 +144,27 @@ class FolderAdvanced extends React.Component {
   }
 
   handleClickCheckbox = async appSlug => {
-    const { props, state } = this
+    const { props, state } = this 
+    
+    // FIXME - G.B. - 2019-08-14 - We need a sub-app system so you don't have to put the hardcoded strings 
+    const APP_FILE_SLUG = 'file'
+    const APP_OFFICE_DOCUMENT_SLUG = 'office_document'
 
     const oldAvailableAppList = state.content.sub_content_types
 
-    const newAvailableAppList = state.content.sub_content_types.find(c => c === appSlug)
-      ? state.content.sub_content_types.filter(c => c !== appSlug)
-      : [...state.content.sub_content_types, appSlug]
+    let newAvailableAppList = []
+
+    if (state.content.sub_content_types.find(c => c === appSlug)) {
+      newAvailableAppList = state.content.sub_content_types.filter(c => c !== appSlug)
+      if (appSlug === APP_FILE_SLUG) {
+        newAvailableAppList = newAvailableAppList.filter(c => c !== APP_OFFICE_DOCUMENT_SLUG)
+      }
+    } else {
+      newAvailableAppList = [...state.content.sub_content_types, appSlug]
+      if (appSlug === APP_FILE_SLUG) {
+        newAvailableAppList = [...newAvailableAppList, APP_OFFICE_DOCUMENT_SLUG]
+      }
+    }
 
     this.setState(prev => ({ content: { ...prev.content, sub_content_types: newAvailableAppList } }))
 
