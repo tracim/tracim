@@ -53,7 +53,7 @@ class FolderAdvanced extends React.Component {
     const { state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-        console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
+        console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
         if (isSameContentId) {
           this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))

@@ -19,33 +19,33 @@ export const getContentTypeList = apiUrl =>
     method: 'GET'
   })
 
-// export const getShareLinksList = (apiUrl, workspaceId, contentId) =>
-//   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
-//     credentials: 'include',
-//     headers: {
-//       ...FETCH_CONFIG.headers
-//     },
-//     method: 'GET'
-//   })
+export const getImportAuthorizationsList = (apiUrl, workspaceId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/upload_permissions`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
 
-// export const postShareLinksList = (apiUrl, workspaceId, contentId, shareEmailsList, sharePassword) =>
-//   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
-//     credentials: 'include',
-//     headers: {
-//       ...FETCH_CONFIG.headers
-//     },
-//     method: 'POST',
-//     body: JSON.stringify({
-//       emails: shareEmailsList
-//       password: sharePassword
-//     })
-//   })
+export const deleteImportAuthorization = (apiUrl, workspaceId, authorizationId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/upload_permissions/${authorizationId}`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'DELETE'
+  })
 
-// export const deleteShareLink = (apiUrl, workspaceId, contentId, shareId) =>
-//   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares/${shareId}`, {
-//     credentials: 'include',
-//     headers: {
-//       ...FETCH_CONFIG.headers
-//     },
-//     method: 'DELETE'
-//   })
+export const postImportAuthorizationsList = (apiUrl, workspaceId, uploadEmailsList, uploadPassword) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/upload_permissions`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      emails: uploadEmailsList,
+      password: uploadPassword
+    })
+  })

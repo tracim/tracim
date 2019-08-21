@@ -5,5 +5,7 @@
   "Share Folder": "Share Folder",
   "New authorization": "New authorization",
   "Import authorizations": "Import authorizations",
-  "No upload link has been created yet": "No upload link has been created yet"
+  "No upload link has been created yet": "No upload link has been created yet",
+  "The password length must be between 6 and 512 characters and the email(s) must be valid": "The password length must be between 6 and 512 characters and the email(s) must be valid",
+  "Error while creating new share link": "Error while creating new share link"
 }
