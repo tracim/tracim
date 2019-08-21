@@ -6,7 +6,7 @@
 <p>${_('I share a file with you.')}</p>
 <p>${_('You can download this file here:')}</p>
 
-<p>${_('<a href="{url}" id="call-to-action-button">{filename}</a>({file_size})').format(
+<p>${_('<a href="{url}" id="call-to-action-button">{filename}</a> ({file_size})').format(
    url=html_escape(content_share.url),
    filename=html_escape(shared_content.filename),
    file_size=html_escape(humanize.naturalsize(shared_content.size))
