@@ -48,6 +48,7 @@ from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.agenda.agenda import AgendaApi
 from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import AuthType
@@ -953,3 +954,14 @@ class UserApi(object):
             return False
 
         return True
+
+    def allowed_to_create_new_workspaces(self, user: User) -> bool:
+        # INFO - G.M - 2019-08-21 - 0 mean no limit here
+        if self._config.LIMITATION__SHAREDSPACE_PER_USER == 0:
+            return True
+
+        workspace_api = WorkspaceApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
+        owned_workspace = workspace_api.get_workspace_owned_by_user(user_id=user.user_id)
+        return not (len(owned_workspace) >= self._config.LIMITATION__SHAREDSPACE_PER_USER)

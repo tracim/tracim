@@ -88,3 +88,5 @@ class ErrorCode(IntEnum):
     # Caldav
     CALDAV_NOT_AUTHORIZED = 5001
     CALDAV_NOT_AUTHENTICATED = 5002
+    # Quota limit
+    USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES = 6001

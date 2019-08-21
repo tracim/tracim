@@ -9,6 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -83,6 +84,11 @@ class WorkspaceApi(object):
         agenda_enabled: bool = True,
         save_now: bool = False,
     ) -> Workspace:
+        from tracim_backend.lib.core.user import UserApi
+
+        uapi = UserApi(session=self._session, current_user=self._user, config=self._config)
+        if not uapi.allowed_to_create_new_workspaces(self._user):
+            raise UserNotAllowedToCreateMoreWorkspace("User not allowed to create more workspace")
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
 
@@ -335,6 +341,9 @@ class WorkspaceApi(object):
         )
 
         return _("Workspace {}").format(query.count() + 1)
+
+    def get_workspace_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
+        return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
 
 class UnsafeWorkspaceApi(WorkspaceApi):
