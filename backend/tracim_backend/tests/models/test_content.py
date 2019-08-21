@@ -294,7 +294,7 @@ class TestContent(object):
     def test_unit__get_allowed_content_type__ok(
         self, admin_user, session, content_type_list
     ) -> None:
-        workspace = Workspace(label="TEST_WORKSPACE")
+        workspace = Workspace(label="TEST_WORKSPACE", owner=admin_user)
         session.add(workspace)
         session.flush()
         content1 = Content(
