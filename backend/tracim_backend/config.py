@@ -285,7 +285,7 @@ class CFG(object):
 
     def _load_limitation_config(self) -> None:
         self.LIMITATION__SHAREDSPACE_PER_USER = int(
-            self.get_raw_config("limiation.sharedspace_per_user", "0")
+            self.get_raw_config("limitation.sharedspace_per_user", "0")
         )
 
     def _load_email_config(self) -> None:

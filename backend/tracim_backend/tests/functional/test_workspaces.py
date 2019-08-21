@@ -14,6 +14,24 @@ from tracim_backend.tests.utils import set_html_document_slug_to_legacy
 
 
 @pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_one_workspace_per_user"}], indirect=True
+)
+class TestWorkspaceEndpointOneWorkspacePerUserLimitation(object):
+    def test_api__create_workspace_err_400__workspace_limit(self, web_testapp, admin_user) -> None:
+        """
+        Test create workspace : label already used
+        """
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"label": "superworkspace", "description": "mysuperdescription"}
+        web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
+        params = {"label": "superworkspace2", "description": "mysuperdescription"}
+        res = web_testapp.post_json("/api/v2/workspaces", status=400, params=params)
+        assert res.json_body["code"] == ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
+
+
+@pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWorkspaceEndpoint(object):
