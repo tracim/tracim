@@ -14,7 +14,6 @@
     padding 10px
 
 .workspace_advanced
-  // width 1000px
   height 100%
   overflow-y auto
   &-content
@@ -22,7 +21,7 @@
   &__contentpage__content
     // Côme - 2018/09/19 - the rule bellow get override by other apps including frontend_lib, so !important
     height calc(100% - 107px) !important
-    overflow-y auto
+    overflow-y hidden
     &__left
       background-color offWhite
   &__description
@@ -34,14 +33,11 @@
       display flex
       justify-content end
   &__userlist
-    position relative
-    width 100%
-    padding-top 10px
+    width calc(100% - 65px)
+    overflow-y auto
     &__list
       margin 0
       padding 0
-      //height 300px
-      //overflow-y auto
       list-style none
       &__item
         display flex
@@ -115,8 +111,9 @@
           cursor pointer
     &__title
       padding-left 20px
+      padding-top 20px
   &__optionalfunctionalities
-    width 100%
+    width calc(100% - 65px)
     padding-top 10px
     &__title
       padding-left 20px
