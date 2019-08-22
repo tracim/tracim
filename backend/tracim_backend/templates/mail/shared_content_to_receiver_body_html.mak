@@ -3,8 +3,7 @@
 %else:
     <p>${_('Hello,')}</p>
 %endif
-<p>${_('I share a file with you.')}</p>
-<p>${_('You can download this file here:')}</p>
+<p>${_('I share a file with you, download it here:')}</p>
 
 <p>${_('<a href="{url}" id="call-to-action-button">{filename}</a> ({file_size})').format(
    url=html_escape(content_share.url),
