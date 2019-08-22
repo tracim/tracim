@@ -597,17 +597,28 @@ keys = generic
 ; keys = color
 
 [formatter_color]
-class=colorlog.ColoredFormatter
+## use utc based date format:
+class=tracim_backend.lib.utils.logger.ColoredUTCFormatter
+## alternative date: use normal current date (localized)
+; class=colorlog.ColoredFormatter
 format = %(asctime)s %(log_color)s%(levelname)-5.5s %(reset)s[%(name)s:%(lineno)s][%(threadName)s] %(log_color)s%(message)s
-datefmt = %H:%M:%S
+datefmt = %Y-%m-%d %H:%M:%S
 
 [formatter_generic]
+## use utc based date format:
+class=tracim_backend.lib.utils.logger.StandardUTCFormatter
+## alternative date: use normal current date (localized)
+; class=logging.Formatter
 format = %(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s
-datefmt = %H:%M:%S
+datefmt = %Y-%m-%d %H:%M:%S
 
 [formatter_tracim_email_notification]
+## use utc based date format:
+class=tracim_backend.lib.utils.logger.StandardUTCFormatter
+## alternative date: use normal current date (localized)
+; class=logging.Formatter
 format = %(asctime)s %(network)s %(action)s %(recipient)s %(subject)s %(message)s
-datefmt = %H:%M:%S
+datefmt = %Y-%m-%d %H:%M:%S
 
 ### HANDLERS ###
 [handlers]
