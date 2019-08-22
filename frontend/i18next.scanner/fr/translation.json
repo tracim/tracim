@@ -229,5 +229,6 @@
   "Workspace not found": "Workspace non trouvé",
   "Inbox": "Boite de réception",
   "Error while loading uploaded files": "Erreur lors du chargement des fichiers téléversés",
+  "Error while downloading file": "Erreur lors du téléchargement du fichier",
   "Manage": "Paramétrer"
 }
