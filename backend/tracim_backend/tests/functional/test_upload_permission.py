@@ -119,6 +119,31 @@ class TestPrivateUploadPermissionEndpoints(object):
         content = res.json_body
         assert len(content) == 3
 
+    def test_api__add_upload_permission__err_400__empty_email_list(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+        upload_permission_lib.add_permission_to_workspace(workspace, emails=[])
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"emails": [], "password": "123456"}
+        res = web_testapp.post_json(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id),
+            params=params,
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+
     def test_api__delete_upload_permission__ok_200__nominal_case(
         self, workspace_api_factory, session, web_testapp, upload_permission_lib_factory, admin_user
     ) -> None:
