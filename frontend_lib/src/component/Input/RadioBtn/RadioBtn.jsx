@@ -20,7 +20,9 @@ class RadioBtn extends React.Component{
       <div
         className={'radio_btn_group__btn ' + (isChecked ? 'radio_btn_group__btn__checked' : '')}
         onClick={this.handleClick.bind(this)}
+        onKeyDown={this.props.handleKeyDown ? this.props.handleKeyDown: () => {}}
         data-value={value}
+        tabIndex='0'
       >
         <label>{text}</label>
       </div>
@@ -65,12 +67,14 @@ class RadioBtnWithImage extends React.Component{
     return (
       <div
         className={className}
-        onClick={this.handleClick.bind(this)}
         data-value={value}
         style={{
           ...positionStyle,
           borderColor: customColor
         }}
+        onClick={this.handleClick.bind(this)}
+        onKeyDown={this.props.handleKeyDown ? this.props.handleKeyDown: () => {}}
+        tabIndex='0'
       >
         <img className={'radio_btn_group__btn__img__img'} src={img.src} alt={img.alt} height={img.height} width={img.width} />
         <div className={'radio_btn_group__btn__img__label'}>{text}</div>
@@ -131,8 +135,10 @@ export class RadioBtnGroup extends React.Component {
             text={option.text}
             value={option.value}
             index={i}
-            onClick={this.toggleRadioBtn.bind(this)}
             customColor={customColor}
+            onClick={this.toggleRadioBtn.bind(this)}
+            handleKeyDown={this.props.handleKeyDown}
+
           />
         )
       }
@@ -144,6 +150,7 @@ export class RadioBtnGroup extends React.Component {
           value={option.value}
           index={i}
           onClick={this.toggleRadioBtn.bind(this)}
+          handleKeyDown={this.props.handleKeyDown}
         />
       )
     })
