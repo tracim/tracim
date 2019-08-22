@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-08-22 13:30+0200\n"
+"POT-Creation-Date: 2019-08-22 16:49+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -65,14 +65,11 @@ msgstr ""
 "{nb_receivers} utilisateurs"
 
 #: tracim_backend/applications/upload_permissions/config.py:14
-msgid ""
-"[{website_title}] {emitter_name} allowed you to upload files in this "
-"shared space \"Id: {workspace_number}\""
+msgid "{emitter_name} allowed you to upload files on \"{website_title}\""
 msgstr ""
-"[{website_title}] {emitter_name} vous a autorisé à téléverser des "
-"fichiers dans l'espace partagé \"Id: {workspace_number}\""
+"{emitter_name} vous a autorisé à téléverser fichiers sur \"{website_title}\""
 
-#: tracim_backend/applications/upload_permissions/config.py:23
+#: tracim_backend/applications/upload_permissions/config.py:21
 msgid ""
 "[{website_title}] You allowed {nb_receivers} users to upload files on "
 "\"{workspace_name}\""
@@ -80,7 +77,7 @@ msgstr ""
 "[{website_title}] Vous avez autorisé {nb_receivers} utilisateurs à "
 "téléverser des fichiers dans \"{workspace_name}\""
 
-#: tracim_backend/applications/upload_permissions/config.py:32
+#: tracim_backend/applications/upload_permissions/config.py:30
 msgid ""
 "[{website_title}] {uploader_username} shared {nb_uploaded_contents} files"
 " in \"{workspace_name}\""
@@ -357,13 +354,11 @@ msgstr ""
 "\"{upload_permission_password}\""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:6
-msgid "I allowed you to upload file in this shared space (Id: {workspace_id}):"
-msgstr ""
-"Je vous ai autorisé à téléverser des fichiers dans cet espace partagé "
-"(Id: {workspace_id})"
+msgid "I allowed you to upload files here:"
+msgstr "Je vous ai autorisé à téléverser des fichiers ici:"
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
-msgid "Upload file"
+msgid "Upload files"
 msgstr "Téléverser des fichiers"
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:10

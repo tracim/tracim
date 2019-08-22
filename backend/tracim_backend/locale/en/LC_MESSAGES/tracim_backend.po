@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-08-22 13:30+0200\n"
+"POT-Creation-Date: 2019-08-22 16:49+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -57,18 +57,16 @@ msgid ""
 msgstr ""
 
 #: tracim_backend/applications/upload_permissions/config.py:14
-msgid ""
-"[{website_title}] {emitter_name} allowed you to upload files in this "
-"shared space \"Id: {workspace_number}\""
+msgid "{emitter_name} allowed you to upload files on \"{website_title}\""
 msgstr ""
 
-#: tracim_backend/applications/upload_permissions/config.py:23
+#: tracim_backend/applications/upload_permissions/config.py:21
 msgid ""
 "[{website_title}] You allowed {nb_receivers} users to upload files on "
 "\"{workspace_name}\""
 msgstr ""
 
-#: tracim_backend/applications/upload_permissions/config.py:32
+#: tracim_backend/applications/upload_permissions/config.py:30
 msgid ""
 "[{website_title}] {uploader_username} shared {nb_uploaded_contents} files"
 " in \"{workspace_name}\""
@@ -312,11 +310,11 @@ msgid ""
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:6
-msgid "I allowed you to upload file in this shared space (Id: {workspace_id}):"
+msgid "I allowed you to upload files here:"
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
-msgid "Upload file"
+msgid "Upload files"
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:10
