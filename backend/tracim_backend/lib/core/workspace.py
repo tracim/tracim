@@ -189,14 +189,14 @@ class WorkspaceApi(object):
         return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
     def get_all_for_user(
-        self, user: User, ignored_ids=None, owned: bool = False, with_role: bool = True
+        self, user: User, ignored_ids=None, owned: bool = True, with_role: bool = True
     ):
         query = self._base_query().join(UserRoleInWorkspace)
         if not owned and not with_role:
             return []
         if owned and with_role:
             query = query.filter(
-                or_(UserRoleInWorkspace.user_id == user.user_id), Workspace.owner_id == user.user_id
+                or_(UserRoleInWorkspace.user_id == user.user_id, Workspace.owner_id == user.user_id)
             )
         elif owned:
             query = query.filter(Workspace.owner_id == user.user_id)
