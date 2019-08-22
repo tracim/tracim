@@ -16,7 +16,7 @@ from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
 
-class SharePasswordForm(object):
+class SharePassword(object):
     def __init__(self, password: typing.Optional[str] = None):
         self.password = password
 
@@ -28,7 +28,17 @@ class SharePasswordFormSchema(marshmallow.Schema):
 
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
-        return SharePasswordForm(**data)
+        return SharePassword(**data)
+
+
+class SharePasswordBodySchema(marshmallow.Schema):
+    password = marshmallow.fields.String(
+        required=False, allow_none=True, example="8QLa$<w", validate=share_password_validator
+    )
+
+    @post_load
+    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return SharePassword(**data)
 
 
 class ShareListQuery(object):
