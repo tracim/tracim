@@ -15,6 +15,7 @@ from tracim_backend.applications.upload_permissions.schema import UploadFileSche
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionCreationBodySchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionIdPathSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionListQuerySchema
+from tracim_backend.applications.upload_permissions.schema import UploadPermissionPasswordBodySchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionTokenPath
 from tracim_backend.config import CFG
@@ -113,6 +114,26 @@ class UploadPermissionController(Controller):
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UploadPermissionTokenPath())
+    @hapic.input_body(UploadPermissionPasswordBodySchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def guest_upload_check(self, context, request: TracimRequest, hapic_data=None) -> None:
+        """
+        check upload password and token validity
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = UploadPermissionLib(current_user=None, session=request.dbsession, config=app_config)
+        upload_permission = api.get_upload_permission_by_token(
+            upload_permission_token=hapic_data.path.upload_permission_token
+        )  # type: UploadPermission
+        # TODO - G.M - 2019-08-01 - verify in access to upload_permission can be granted
+        # we should considered do these check at decorator level
+        api.check_password(upload_permission, password=hapic_data.body.password)
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
+    @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.input_path(UploadPermissionTokenPath())
     @hapic.input_forms(UploadDataFormSchema())
     @hapic.input_files(UploadFileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
@@ -162,6 +183,12 @@ class UploadPermissionController(Controller):
         configurator.add_view(self.disable_upload_permission, route_name="delete_upload_permission")
 
         # public upload api
+        configurator.add_route(
+            "guest_upload_check",
+            "/public/guest-upload/{upload_permission_token}/check",
+            request_method="POST",
+        )
+        configurator.add_view(self.guest_upload_check, route_name="guest_upload_check")
         configurator.add_route(
             "guest_upload_file",
             "/public/guest-upload/{upload_permission_token}",
