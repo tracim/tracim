@@ -52,6 +52,24 @@ class UploadDataForm(object):
         self.password = password
 
 
+class UploadPermissionPasswordBody(object):
+    def __init__(self, password: typing.Optional[str] = None):
+        self.password = password
+
+
+class UploadPermissionPasswordBodySchema(marshmallow.Schema):
+    password = marshmallow.fields.String(
+        required=False,
+        allow_none=True,
+        example="8QLa$<w",
+        validate=upload_permission_password_validator,
+    )
+
+    @post_load
+    def make_body_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UploadPermissionPasswordBody(**data)
+
+
 class UploadDataFormSchema(marshmallow.Schema):
     message = StrippedString()
     username = StrippedString()
