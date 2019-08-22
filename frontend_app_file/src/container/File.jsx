@@ -282,6 +282,7 @@ class File extends React.Component {
         this.setState({
           shareLinkList: fetchResultShareLinkList.body
         })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default:
         this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
@@ -640,27 +641,35 @@ class File extends React.Component {
 
     shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
 
-    if (invalidEmails.length > 0) {
+    if (invalidEmails.length > 0 || shareEmailList === 0) {
       this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
-    }
+    } else {
+      const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
+        state.config.apiUrl,
+        state.content.workspace_id,
+        state.content.content_id,
+        shareEmailList,
+        state.sharePassword !== '' ? state.sharePassword : null
+      ))
 
-    const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
-      state.config.apiUrl,
-      state.content.workspace_id,
-      state.content.content_id,
-      shareEmailList,
-      state.sharePassword !== '' ? state.sharePassword : null
-    ))
-
-    switch (fetchResultPostShareLinks.apiResponse.status) {
-      case 200:
-        this.setState(prev => ({
-          shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
-          shareEmails: '',
-          sharePassword: ''
-        }))
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+      switch (fetchResultPostShareLinks.apiResponse.status) {
+        case 200:
+          this.setState(prev => ({
+            shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
+            shareEmails: '',
+            sharePassword: ''
+          }))
+          break
+        case 400:
+          switch (fetchResultPostShareLinks.body.code) {
+            case 2001:
+              this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
+              break
+            default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+          }
+          break
+        default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+      }
     }
   }
 
@@ -677,14 +686,15 @@ class File extends React.Component {
 
       if (invalidEmails.length > 0) {
         this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+      } else {
+        this.setState({ shareEmails: emailList.join('\n') })
       }
-
-      this.setState({ shareEmails: emailList.join('\n') })
     }
   }
 
   handleClickDeleteShareLink = async shareLinkId => {
     const { config, content } = this.state
+    const { props } = this
 
     const fetchResultDeleteShareLink = await handleFetchResult(
       await deleteShareLink(config.apiUrl, content.workspace_id, content.content_id, shareLinkId)
@@ -694,7 +704,11 @@ class File extends React.Component {
       case 204:
         this.loadShareLinkList()
         break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
+      case 400:
+        this.sendGlobalFlashMessage(props.t('Error in the URL'))
+        props.history.push(PAGE.LOGIN)
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while deleting share link'))
     }
   }
 

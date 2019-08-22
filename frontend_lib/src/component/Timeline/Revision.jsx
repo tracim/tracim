@@ -44,7 +44,7 @@ const Revision = props => {
             <span className='revision__data__infos__created' title={props.createdFormated}>{props.createdDistance}</span>
           </div>
           <span className='revision__data__infos__author'>
-            {props.t('made by {{author}}', {author: props.authorPublicName, interpolation: {escapeValue: false}})}
+            {props.t('by {{author}}', {author: props.authorPublicName, interpolation: {escapeValue: false}})}
           </span>
         </div>      
       </span>

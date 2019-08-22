@@ -131,11 +131,7 @@ class ShareLib(object):
 
     def get_content_share_by_token(self, share_token: str) -> ContentShare:
         try:
-            return (
-                self._session.query(ContentShare)
-                .filter(ContentShare.share_token == share_token)
-                .one()
-            )
+            return self.base_query().filter(ContentShare.share_token == share_token).one()
         except NoResultFound as exc:
             raise ContentShareNotFound(
                 'Content Share with token "{}" not found in database'.format(share_token)

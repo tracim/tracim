@@ -500,6 +500,30 @@ export const getFolderContentList = (workspaceId, folderIdList) => dispatch => {
   })
 }
 
+export const getSubFolderShareContentList = (workspaceId, folderIdList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=upload&parent_ids=${folderIdList.join(',')}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE,
+    dispatch
+  })
+}
+
+export const getShareFolderContentList = (workspaceId) =>
+  fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=upload`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+
 export const getContentPathList = (workspaceId, contentId, folderIdList) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?complete_path_to_id=${contentId}&parent_ids=${folderIdList.join(',')}`,

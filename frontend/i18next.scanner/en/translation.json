@@ -225,5 +225,8 @@
   "User + create shared spaces, add members in shared spaces": "User + create shared spaces, add members in shared spaces",
   "Error in the URL": "Error in the URL",
   "Content not found": "Content not found",
-  "Workspace not found": "Workspace not found"
+  "Workspace not found": "Workspace not found",
+  "Inbox": "Inbox",
+  "Error while loading uploaded files": "Error while loading uploaded files",
+  "Manage": "Manage"
 }

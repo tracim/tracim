@@ -70,7 +70,9 @@ requires = [
     'elasticsearch',
     'elasticsearch-dsl',
     # text-formatting
-    'humanize'
+    'humanize',
+    # logging
+    'colorlog'
 ]
 
 tests_require = [

@@ -38,8 +38,10 @@ from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
 from tracim_backend.exceptions import ContentStatusNotExist
+from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import CopyRevisionAbortedDepotCorrupted
 from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import get_locale
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
@@ -61,8 +63,6 @@ class Workspace(DeclarativeBase):
     # for mysql will probably be needed, see fix in User sqlalchemy object
     label = Column(Unicode(1024), unique=False, nullable=False, default="")
     description = Column(Text(), unique=False, nullable=False, default="")
-    agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
-
     #  Default value datetime.utcnow,
     # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
@@ -73,6 +73,9 @@ class Workspace(DeclarativeBase):
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
 
     revisions = relationship("ContentRevisionRO")
+    agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
+    owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    owner = relationship("User", remote_side=[User.user_id])
 
     @hybrid_property
     def contents(self) -> ["Content"]:
@@ -1425,18 +1428,24 @@ class Content(DeclarativeBase):
 
     def get_allowed_content_types(self) -> typing.List[ContentType]:
         types = []
-        try:
-            allowed_types = self.properties["allowed_content"]
-            for type_label, is_allowed in allowed_types.items():
-                if is_allowed:
+        allowed_types = self.properties["allowed_content"]
+        for type_label, is_allowed in allowed_types.items():
+            if is_allowed:
+                try:
                     types.append(content_type_list.get_one_by_slug(type_label))
-        # TODO BS 2018-08-13: This try/except is not correct: except exception
-        # if we know what to except.
-        except Exception as e:
-            print(e.__str__())
-            print("----- /*\\ *****")
-            raise ValueError("Not allowed content property")
-
+                except ContentTypeNotExist:
+                    # INFO - G.M - 2019-08-16 - allowed_content can contain not valid value if
+                    # we do disable some app. we should ignore invalid value.
+                    logger.warning(
+                        self,
+                        "{type_label} content_type doesn't seems to be a loaded content_type "
+                        'but does exist in content_revision "{content_revision}" of content "{content_id}" allowed_content,'
+                        "it will be ignored".format(
+                            type_label=type_label,
+                            content_revision=self.revision_id,
+                            content_id=self.content_id,
+                        ),
+                    )
         return types
 
     def get_history(self, drop_empty_revision=False) -> "[VirtualEvent]":

@@ -14,9 +14,10 @@ from tracim_backend.applications.share.schema import ContentShareSchema
 from tracim_backend.applications.share.schema import ShareCreationBodySchema
 from tracim_backend.applications.share.schema import ShareIdPathSchema
 from tracim_backend.applications.share.schema import ShareListQuerySchema
+from tracim_backend.applications.share.schema import SharePasswordBodySchema
+from tracim_backend.applications.share.schema import SharePasswordFormSchema
 from tracim_backend.applications.share.schema import ShareTokenPathSchema
 from tracim_backend.applications.share.schema import ShareTokenWithFilenamePathSchema
-from tracim_backend.applications.share.schema import TracimSharePasswordHeaderSchema
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentShareNotFound
 from tracim_backend.exceptions import ContentTypeNotAllowed
@@ -144,12 +145,12 @@ class ShareController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
-    @hapic.input_path(ShareTokenWithFilenamePathSchema())
-    @hapic.input_headers(TracimSharePasswordHeaderSchema())
-    @hapic.output_file([])
-    def guest_download_file(self, context, request: TracimRequest, hapic_data=None) -> HapicFile:
+    @hapic.input_path(ShareTokenPathSchema())
+    @hapic.input_body(SharePasswordBodySchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def guest_download_check(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        get file content
+        Check if share token is correct and password given valid
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ShareLib(current_user=None, session=request.dbsession, config=app_config)
@@ -159,7 +160,51 @@ class ShareController(Controller):
 
         # TODO - G.M - 2019-08-01 - verify in access to content share can be granted
         # we should considered do these check at decorator level
-        api.check_password(content_share, password=hapic_data.headers.tracim_share_password)
+        api.check_password(content_share, password=hapic_data.body.password)
+        if content_share.content.type not in shareables_content_type:
+            raise ContentTypeNotAllowed()
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
+    @hapic.input_path(ShareTokenWithFilenamePathSchema())
+    @hapic.output_file([])
+    def guest_download_file_get(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> HapicFile:
+        """
+        get file content
+        """
+        return self.guest_download_file(context, request, hapic_data)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
+    @hapic.input_path(ShareTokenWithFilenamePathSchema())
+    @hapic.input_forms(SharePasswordFormSchema())
+    @hapic.output_file([])
+    def guest_download_file_post(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> HapicFile:
+        """
+        get file content with password
+        """
+        return self.guest_download_file(context, request, hapic_data)
+
+    def guest_download_file(self, context, request: TracimRequest, hapic_data=None) -> HapicFile:
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ShareLib(current_user=None, session=request.dbsession, config=app_config)
+        content_share = api.get_content_share_by_token(
+            share_token=hapic_data.path.share_token
+        )  # type: ContentShare
+
+        # TODO - G.M - 2019-08-01 - verify in access to content share can be granted
+        # we should considered do these check at decorator level
+        if hapic_data.forms:
+            password = hapic_data.forms.password
+        else:
+            password = None
+        api.check_password(content_share, password=password)
         if content_share.content.type not in shareables_content_type:
             raise ContentTypeNotAllowed()
 
@@ -218,8 +263,22 @@ class ShareController(Controller):
         configurator.add_view(self.guest_download_info, route_name="guest_download_info")
 
         configurator.add_route(
-            "guest_download_file",
+            "guest_download_check",
+            "/public/guest-download/{share_token}/check",
+            request_method="POST",
+        )
+        configurator.add_view(self.guest_download_check, route_name="guest_download_check")
+
+        configurator.add_route(
+            "guest_download_file_get",
             "/public/guest-download/{share_token}/{filename}",
             request_method="GET",
         )
-        configurator.add_view(self.guest_download_file, route_name="guest_download_file")
+        configurator.add_view(self.guest_download_file_get, route_name="guest_download_file_get")
+
+        configurator.add_route(
+            "guest_download_file_post",
+            "/public/guest-download/{share_token}/{filename}",
+            request_method="POST",
+        )
+        configurator.add_view(self.guest_download_file_post, route_name="guest_download_file_post")

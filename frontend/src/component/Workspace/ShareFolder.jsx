@@ -4,17 +4,18 @@ import { withRouter } from 'react-router'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import ContentItem from './ContentItem.jsx'
-import {
-  PAGE
-} from '../../helper.js'
+import Folder from './Folder.jsx'
+import { PAGE } from '../../helper.js'
 
 require('./Folder.styl')
 
 class ShareFolder extends React.Component {
   getIcon = () => {
+    // INFO - G.B. - 2019-08-20 - This function always returns the same icon, but I've kept it like that for future improvement.
+    // I think it is good to clearly indicate where to change if you want to have a different icon to a open/close share folder.
     const { props } = this
 
-    if (props.folderData.isOpen) return 'fa-share-alt'
+    if (props.isOpen) return 'fa-share-alt'
 
     return 'fa-share-alt'
   }
@@ -22,8 +23,8 @@ class ShareFolder extends React.Component {
   render () {
     const { props } = this
 
-    const folderContentList = props.workspaceContentList
-      .filter(c => c.parentId === props.folderData.id)
+    const folderContentList = (props.uploadedContentList ? props.uploadedContentList : [])
+      .filter(content => content.parentId === 'shareFolder')
       .sort((a, b) => {
         if (a.created > b.created) return -1
         return 1
@@ -32,18 +33,17 @@ class ShareFolder extends React.Component {
     return (
       <div
         className={classnames('folder', {
-          'active': props.folderData.isOpen && folderContentList.length > 0,
+          'active': props.isOpen && folderContentList.length > 0,
           'item-last': props.isLast,
           'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
-        data-cy={`folder_${props.folderData.id}`}
-        id={props.folderData.id}
+        data-cy='shareFolder'
+        id='shareFolder'
       >
         <div
           className='folder__header align-items-center primaryColorBgLightenHover'
-          onClick={() => props.onClickFolder(props.folderData.id)}
-          ref={props.connectDropTarget}
-          title={props.folderData.label}
+          onClick={() => props.onClickShareFolder()}
+          title={props.t('Inbox')}
         >
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
@@ -51,17 +51,16 @@ class ShareFolder extends React.Component {
 
           <div
             className='folder__header__dragPreview'
-            ref={props.connectDragPreview}
           >
             <div className='folder__header__icon'
               title={props.t('Folder')}
-              style={{ color: (props.contentType.find(c => c.slug === 'folder') || {hexcolor: ''}).hexcolor }}
+              style={{ color: (props.contentType.find(c => c.slug === 'folder') || { hexcolor: '' }).hexcolor }}
             >
               <i className={classnames('fa fa-fw', this.getIcon())} />
             </div>
 
             <div className='folder__header__name'>
-              { props.folderData.label }
+              {props.t('Inbox')}
             </div>
           </div>
 
@@ -87,14 +86,14 @@ class ShareFolder extends React.Component {
                   <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                     <div
                       className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
-                      onClick={e => props.onClickExtendedAction.edit(e, props.folderData)}
+                      onClick={e => props.onClickManageAction()}
                     >
                       <div className='subdropdown__item__icon mr-3'>
                         <i className='fa fa-fw fa-pencil' />
                       </div>
 
                       <div className='subdropdown__item__text'>
-                        {props.t('Edit')}
+                        {props.t('Manage')}
                       </div>
                     </div>
                   </div>
@@ -110,23 +109,22 @@ class ShareFolder extends React.Component {
         <div className='folder__content'>
           {folderContentList.map((content, index) => content.type === 'folder'
             ? (
-              <ShareFolder
+              <Folder
                 availableApp={props.availableApp}
                 folderData={content}
-                workspaceContentList={props.workspaceContentList}
+                workspaceContentList={props.uploadedContentList}
                 getContentParentList={props.getContentParentList}
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={props.onClickExtendedAction}
+                onDropMoveContentItem={props.onDropMoveContentItem}
                 onClickFolder={props.onClickFolder}
                 onClickCreateContent={props.onClickCreateContent}
-                onDropMoveContentItem={props.onDropMoveContentItem}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
                 setFolderRead={props.setFolderRead}
-                isLast={props.isLast && index === folderContentList.length - 1}
+                isLast={index === props.uploadedContentList.length - 1}
                 key={content.id}
                 t={props.t}
-                location={props.location}
               />
             )
             : (
@@ -147,13 +145,12 @@ class ShareFolder extends React.Component {
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={{
                   edit: e => props.onClickExtendedAction.edit(e, content),
-                  move: null,
-                  download: null,
-                  archive: null,
-                  delete: null
+                  download: e => props.onClickExtendedAction.download(e, content),
+                  archive: e => props.onClickExtendedAction.archive(e, content),
+                  delete: e => props.onClickExtendedAction.delete(e, content)
                 }}
                 onDropMoveContentItem={props.onDropMoveContentItem}
-                isLast={props.isLast && i === folderContentList.length - 1}
+                isLast={props.isLast && index === folderContentList.length - 1}
                 key={content.id}
               />
             )
@@ -169,6 +166,6 @@ export default translate()(withRouter(ShareFolder))
 ShareFolder.propTypes = {
   folderData: PropTypes.object,
   app: PropTypes.array,
-  onClickFolder: PropTypes.func.isRequired,
+  onClickShareFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired
 }

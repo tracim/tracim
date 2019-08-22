@@ -15,35 +15,34 @@ Cypress.Commands.add('loginAs', (role = 'administrators') => {
     cy.setSessionCookieFromEnv(role)
     return cy.getUserByRole(role)
   }
-  cy.getUserByRole(role)
-    .then(user => {
-      return cy.request({
-        method: 'POST',
-        url: LOGIN_URL,
-        body: {
-          'email': user.email,
-          'password': user.password
-        }
-      })
+  cy.getUserByRole(role).then(user => cy.login(user, role))
+})
+
+Cypress.Commands.add('login', (user, role) => {
+  return cy.request({
+    method: 'POST',
+    url: LOGIN_URL,
+    body: {
+      'email': user.email,
+      'password': user.password
+    }
+  }).then(response => {
+    cy.waitUntil(() => cy.getCookie('session_key').then(cookie => {
+      if (cookie && cookie.value) {
+        return cy.saveCookieValue(role, cookie.value)
+      }
+      return false
+    }))
+    return cy.request({
+      method: 'PUT',
+      url: '/api/v2/users/' + response.body.user_id,
+      body: {
+        lang: 'en',
+        public_name: response.body.public_name,
+        timezone: 'Europe/Paris'
+      }
     })
-    .then(response => {
-      cy.waitUntil(() => cy.getCookie('session_key').then(cookie => {
-        if (cookie && cookie.value) {
-          return cy.saveCookieValue(role, cookie.value)
-        }
-        return false
-      }))
-      return cy.request({
-        method: 'PUT',
-        url: '/api/v2/users/' + response.body.user_id,
-        body: {
-          lang: 'en',
-          public_name: response.body.public_name,
-          timezone: 'Europe/Paris'
-        }
-      })
-    })
-    .then(response => response.body)
+  }).then(response => response.body)
 })
 
 Cypress.Commands.add('logout', () => {

@@ -2,6 +2,7 @@ import typing
 
 import marshmallow
 from marshmallow import post_load
+from marshmallow.validate import Length
 from marshmallow.validate import OneOf
 
 from tracim_backend.app_models.validator import bool_as_int_validator
@@ -16,24 +17,29 @@ from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
 
-class TracimSharePasswordHeader(object):
-    def __init__(self, tracim_share_password: typing.Optional[str] = None):
-        self.tracim_share_password = tracim_share_password
+class SharePassword(object):
+    def __init__(self, password: typing.Optional[str] = None):
+        self.password = password
 
 
-class TracimSharePasswordHeaderSchema(marshmallow.Schema):
-    tracim_share_password = marshmallow.fields.String(
-        required=False,
-        allow_none=True,
-        example="8QLa$<w",
-        validate=share_password_validator,
-        load_from="Tracim-Share-Password",
-        dump_to="Tracim-Share-Password",
+class SharePasswordFormSchema(marshmallow.Schema):
+    password = marshmallow.fields.String(
+        required=False, allow_none=True, example="8QLa$<w", validate=share_password_validator
     )
 
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
-        return TracimSharePasswordHeader(**data)
+        return SharePassword(**data)
+
+
+class SharePasswordBodySchema(marshmallow.Schema):
+    password = marshmallow.fields.String(
+        required=False, allow_none=True, example="8QLa$<w", validate=share_password_validator
+    )
+
+    @post_load
+    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return SharePassword(**data)
 
 
 class ShareListQuery(object):
@@ -100,7 +106,11 @@ class ShareCreationBody(object):
 
 
 class ShareCreationBodySchema(marshmallow.Schema):
-    emails = marshmallow.fields.List(marshmallow.fields.Email(validate=share_email_validator))
+    emails = marshmallow.fields.List(
+        marshmallow.fields.Email(validate=share_email_validator),
+        validate=Length(min=1),
+        required=True,
+    )
     password = marshmallow.fields.String(
         example="8QLa$<w", required=False, allow_none=True, validate=share_password_validator
     )

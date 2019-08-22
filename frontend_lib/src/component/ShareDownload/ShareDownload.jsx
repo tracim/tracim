@@ -12,23 +12,23 @@ class ShareDownload extends React.Component {
     }
 
     this.state = {
-      currentPage: this.SHARE_STATUS.SHARE_MANAGE
+      currentPageStatus: this.SHARE_STATUS.SHARE_MANAGE
     }
   }
 
   handleNewShareDownload = () => {
-    this.setState({currentPage: this.SHARE_STATUS.NEW_SHARE})
+    this.setState({currentPageStatus: this.SHARE_STATUS.NEW_SHARE})
   }
 
   handleClickCancelButton = () => {
     this.props.onChangeEmails({target: {value: ''}})
     this.props.onChangePassword({target: {value: ''}})
-    this.setState({ currentPage: this.SHARE_STATUS.SHARE_MANAGE })
+    this.setState({ currentPageStatus: this.SHARE_STATUS.SHARE_MANAGE })
   }
 
   handleNewShare = () => {
     this.props.onClickNewShare()
-    this.setState({ currentPage: this.SHARE_STATUS.SHARE_MANAGE })
+    this.setState({ currentPageStatus: this.SHARE_STATUS.SHARE_MANAGE })
   }
 
   render () {
@@ -36,7 +36,7 @@ class ShareDownload extends React.Component {
 
     return (
       <div className='shareDownload'>
-        {state.currentPage === this.SHARE_STATUS.SHARE_MANAGE
+        {state.currentPageStatus === this.SHARE_STATUS.SHARE_MANAGE
           ? <ShareDownloadManagement
             userRoleIdInWorkspace={props.userRoleIdInWorkspace}
             shareLinkList={props.shareLinkList}

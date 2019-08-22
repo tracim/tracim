@@ -119,6 +119,31 @@ class TestPrivateUploadPermissionEndpoints(object):
         content = res.json_body
         assert len(content) == 3
 
+    def test_api__add_upload_permission__err_400__empty_email_list(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+        upload_permission_lib.add_permission_to_workspace(workspace, emails=[])
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"emails": [], "password": "123456"}
+        res = web_testapp.post_json(
+            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id),
+            params=params,
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+
     def test_api__delete_upload_permission__ok_200__nominal_case(
         self, workspace_api_factory, session, web_testapp, upload_permission_lib_factory, admin_user
     ) -> None:
@@ -137,6 +162,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         assert len(content) == 1
         assert content[0]["upload_permission_id"]
         upload_permission_id = content[0]["upload_permission_id"]
+        upload_permission_token = content[0]["token"]
 
         web_testapp.delete(
             "/api/v2/workspaces/{}/upload_permissions/{}".format(
@@ -158,6 +184,14 @@ class TestPrivateUploadPermissionEndpoints(object):
         )
         content = res.json_body
         assert len(content) == 1
+
+        res = web_testapp.post(
+            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+                upload_permission_token=upload_permission_token
+            ),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
 
     def test_api__delete_upload_permission__err_400__upload_permission_not_found(
         self, workspace_api_factory, session, web_testapp, upload_permission_lib_factory, admin_user
@@ -208,6 +242,7 @@ class TestUploadPermissionWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
@@ -255,6 +290,7 @@ class TestUploadPermissionWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
@@ -296,6 +332,7 @@ class TestUploadPermissionWithNotification(object):
             assert (
                 email["Content"]["Headers"]["From"][0]
                 == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
             )
             headers = email["Content"]["Headers"]
             assert headers["To"][0] in valid_dests
@@ -712,3 +749,134 @@ class TestGuestUploadEndpoints(object):
         )
         res = res.json_body
         assert len(res) == 21
+
+    def test_api__guest_upload_check__ok_200__with_password(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["thissharewill@notbe.presentinresponse"], password="mysuperpassword"
+        )
+        upload_permissions = upload_permission_lib.get_upload_permissions(workspace)
+        assert len(upload_permissions) == 1
+        upload_permission = upload_permissions[0]
+        transaction.commit()
+        params = {"password": "mysuperpassword"}
+        web_testapp.post_json(
+            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+                upload_permission_token=upload_permission.token
+            ),
+            status=204,
+            params=params,
+        )
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        params = {"namespaces_filter": "upload"}
+        res = web_testapp.get(
+            "/api/v2/workspaces/{workspace_id}/contents".format(
+                workspace_id=workspace.workspace_id
+            ),
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 0
+
+    def test_api__guest_upload_check__err_403__wrong_password(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["thissharewill@notbe.presentinresponse"], password="mysuperpassword"
+        )
+        upload_permissions = upload_permission_lib.get_upload_permissions(workspace)
+        assert len(upload_permissions) == 1
+        upload_permission = upload_permissions[0]
+        transaction.commit()
+        res = web_testapp.post_json(
+            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+                upload_permission_token=upload_permission.token
+            ),
+            status=403,
+        )
+        assert res.json_body["code"] == ErrorCode.WRONG_SHARE_PASSWORD
+
+    def test_api__guest_upload_check__err_400__upload_permission_not_found(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        res = web_testapp.post_json(
+            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+                upload_permission_token="invalid_token"
+            ),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
+
+    def test_api__guest_upload_check__ok_200__without_password(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["thissharewill@notbe.presentinresponse"]
+        )
+        upload_permissions = upload_permission_lib.get_upload_permissions(workspace)
+        assert len(upload_permissions) == 1
+        upload_permission = upload_permissions[0]
+        transaction.commit()
+        web_testapp.post_json(
+            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+                upload_permission_token=upload_permission.token
+            ),
+            status=204,
+        )
+        web_testapp.post_json(
+            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+                upload_permission_token=upload_permission.token
+            ),
+            status=204,
+            params={"password": None},
+        )
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        params = {"namespaces_filter": "upload"}
+        res = web_testapp.get(
+            "/api/v2/workspaces/{workspace_id}/contents".format(
+                workspace_id=workspace.workspace_id
+            ),
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 0
