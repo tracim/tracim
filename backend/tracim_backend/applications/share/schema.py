@@ -2,6 +2,7 @@ import typing
 
 import marshmallow
 from marshmallow import post_load
+from marshmallow.validate import Length
 from marshmallow.validate import OneOf
 
 from tracim_backend.app_models.validator import bool_as_int_validator
@@ -95,7 +96,11 @@ class ShareCreationBody(object):
 
 
 class ShareCreationBodySchema(marshmallow.Schema):
-    emails = marshmallow.fields.List(marshmallow.fields.Email(validate=share_email_validator))
+    emails = marshmallow.fields.List(
+        marshmallow.fields.Email(validate=share_email_validator),
+        validate=Length(min=1),
+        required=True,
+    )
     password = marshmallow.fields.String(
         example="8QLa$<w", required=False, allow_none=True, validate=share_password_validator
     )
