@@ -121,6 +121,7 @@ class DownloadForm extends React.Component {
           }
         </form>
         <div className='d-flex'>
+          {/* INFO - G.B. - 2019-08-22 - This button should be always outside the form, to not trigger the submit. */}
           <button
             className='btn highlightBtn primaryColorBg primaryColorBgDarkenHover guestdownload__card__form__right__btn'
             onClick={this.handleSubmit}
