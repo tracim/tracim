@@ -50,7 +50,7 @@ import {
 } from '../action-creator.sync.js'
 import SearchResult from './SearchResult.jsx'
 
-class Tracim extends React.Component {
+export class Tracim extends React.Component {
   constructor (props) {
     super(props)
 

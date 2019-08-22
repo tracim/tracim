@@ -108,8 +108,7 @@ describe('<Account />', () => {
     before(() => {
       nock(FETCH_CONFIG.apiUrl)
         .put('/users/me')
-        .query(true)
-        .reply(200, {body: 'dzqdzq'})
+        .reply(200, { })
 
       nock(FETCH_CONFIG.apiUrl)
         .put('/users/me/email')
