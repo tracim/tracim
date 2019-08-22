@@ -963,5 +963,5 @@ class UserApi(object):
         workspace_api = WorkspaceApi(
             session=self._session, current_user=self._user, config=self._config
         )
-        owned_workspace = workspace_api.get_workspace_owned_by_user(user_id=user.user_id)
+        owned_workspace = workspace_api.get_all_for_user(user=user, owned=True, with_role=False)
         return not (len(owned_workspace) >= self._config.LIMITATION__SHAREDSPACE_PER_USER)

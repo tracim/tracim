@@ -2,6 +2,7 @@
 from datetime import datetime
 import typing
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
@@ -184,20 +185,29 @@ class WorkspaceApi(object):
     def get_all(self):
         return self._base_query().all()
 
-    def get_all_for_user(self, user: User, ignored_ids=None):
-        workspaces = []
+    def _get_workspace_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
+        return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
-        for role in user.roles:
-            if not role.workspace.is_deleted:
-                if not ignored_ids:
-                    workspaces.append(role.workspace)
-                elif role.workspace.workspace_id not in ignored_ids:
-                    workspaces.append(role.workspace)
-                else:
-                    pass  # do not return workspace
+    def get_all_for_user(
+        self, user: User, ignored_ids=None, owned: bool = False, with_role: bool = True
+    ):
+        query = self._base_query().join(UserRoleInWorkspace)
+        if not owned and not with_role:
+            return []
+        if owned and with_role:
+            query = query.filter(
+                or_(UserRoleInWorkspace.user_id == user.user_id), Workspace.owner_id == user.user_id
+            )
+        elif owned:
+            query = query.filter(Workspace.owner_id == user.user_id)
+        elif with_role:
+            query = query.filter(UserRoleInWorkspace.user_id == user.user_id)
 
-        workspaces.sort(key=lambda workspace: workspace.label.lower())
-        return workspaces
+        if ignored_ids:
+            query = query.filter(~Workspace.workspace_id._in(ignored_ids))
+
+        query = query.order_by(Workspace.label)
+        return query.all()
 
     def get_all_manageable(self) -> typing.List[Workspace]:
         """Get all workspaces the current user has manager rights on."""
@@ -341,9 +351,6 @@ class WorkspaceApi(object):
         )
 
         return _("Workspace {}").format(query.count() + 1)
-
-    def get_workspace_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
-        return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
 
 class UnsafeWorkspaceApi(WorkspaceApi):
