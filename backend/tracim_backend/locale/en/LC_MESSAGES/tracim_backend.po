@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-08-21 12:14+0200\n"
+"POT-Creation-Date: 2019-08-22 13:23+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -59,7 +59,7 @@ msgstr ""
 #: tracim_backend/applications/upload_permissions/config.py:14
 msgid ""
 "[{website_title}] {emitter_name} allowed you to upload files in this "
-"shared space \"{workspace_number}\""
+"shared space \"Id: {workspace_number}\""
 msgstr ""
 
 #: tracim_backend/applications/upload_permissions/config.py:23
@@ -316,9 +316,7 @@ msgid ""
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:6
-msgid ""
-"I allowed you to upload file in this shared space (number: "
-"{workspace_id}):"
+msgid "I allowed you to upload file in this shared space (Id: {workspace_id}):"
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
