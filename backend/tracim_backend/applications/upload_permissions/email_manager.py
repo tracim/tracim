@@ -220,9 +220,7 @@ class UploadPermissionEmailManager(EmailManager):
             self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT
         )
         message["Subject"] = translated_subject.format(
-            website_title=self.config.WEBSITE__TITLE,
-            emitter_name=emitter.display_name,
-            workspace_number=workspace.workspace_id,
+            website_title=self.config.WEBSITE__TITLE, emitter_name=emitter.display_name
         )
         message["From"] = self._get_sender(emitter)
         message["To"] = upload_permission.email
