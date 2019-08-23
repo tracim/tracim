@@ -191,7 +191,9 @@ class WorkspaceApi(object):
     def get_all_for_user(
         self, user: User, ignored_ids=None, owned: bool = True, with_role: bool = True
     ):
-        query = self._base_query().select_from(Workspace).join(UserRoleInWorkspace)
+        query = self._base_query().join(
+            UserRoleInWorkspace, Workspace.workspace_id == UserRoleInWorkspace.workspace_id
+        )
         if not owned and not with_role:
             return []
         if owned and with_role:
