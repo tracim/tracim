@@ -933,7 +933,9 @@ class File extends React.Component {
                   fileSize={displayFileSize(state.content.size)}
                   filePageNb={state.content.page_nb}
                   creationDate={displayDistanceDate(state.content.created, state.loggedUser.lang)}
+                  creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
                   lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
+                  lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
                   description={state.content.raw_content}
                   displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
                   disableChangeDescription={!state.content.is_editable}
