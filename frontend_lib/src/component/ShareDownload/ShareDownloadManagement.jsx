@@ -32,7 +32,7 @@ class ShareDownloadManagement extends React.Component {
     const shareLinkList = props.shareLinkList ? props.shareLinkList : []
     
     return (
-      <div className='shareDownload'>
+      <div>
         <div className='shareDownload__management__header'>
           <div className='shareDownload__title'>
             {props.t('{{label}} share', {label: props.label, interpolation: {escapeValue: false}})}
