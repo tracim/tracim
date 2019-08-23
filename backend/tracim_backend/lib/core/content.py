@@ -1909,12 +1909,12 @@ class ContentApi(object):
 
     def check_upload_size(self, content_length: int):
         if (
-            self._config.UPLOAD__CONTENT_LENGTH__MAX_SIZE
-            and content_length > self._config.UPLOAD__CONTENT_LENGTH__MAX_SIZE
+            self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE
+            and content_length > self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE
         ):
             raise FileSizeOverMaxLimitation(
                 'File cannot be added because his size "{}" is higher than max allowed size : "{}"'.format(
-                    content_length, self._config.UPLOAD__CONTENT_LENGTH__MAX_SIZE
+                    content_length, self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE
                 )
             )
 

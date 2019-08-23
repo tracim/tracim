@@ -141,6 +141,7 @@ class CFG(object):
             ),
         )
         self._load_global_config()
+        self._load_limitation_config()
         self._load_email_config()
         self._load_ldap_config()
         self._load_webdav_config()
@@ -158,12 +159,6 @@ class CFG(object):
         import tracim_backend.applications.upload_permissions.config as upload_permissions_config
 
         upload_permissions_config.load_config(self)
-        self._load_limit_config()
-
-    def _load_limit_config(self) -> None:
-        self.UPLOAD__CONTENT_LENGTH__MAX_SIZE = int(
-            self.get_raw_config("upload.content_length.max_size", "0")
-        )
 
     def _load_global_config(self) -> None:
         """
@@ -286,6 +281,14 @@ class CFG(object):
         frontend_dist_folder = os.path.join(tracim_v2_folder, "frontend", "dist")
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
+        )
+
+    def _load_limitation_config(self) -> None:
+        self.LIMITATION__SHAREDSPACE_PER_USER = int(
+            self.get_raw_config("limitation.sharedspace_per_user", "0")
+        )
+        self.LIMITATION__CONTENT_LENGTH_FILE_SIZE = self.get_raw_config(
+            "limitation.content_length_file_size", None
         )
 
     def _load_email_config(self) -> None:
