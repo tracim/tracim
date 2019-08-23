@@ -38,27 +38,27 @@ export class FileProperties extends React.Component {
         <div className='fileProperties__content'>
           <div className='fileProperties__content__detail'>
             <div className='fileProperties__content__detail__item'>
-              {props.t('Type')}: {props.fileType}
+              {props.t('Type:')} {props.fileType}
             </div>
 
             <div className='fileProperties__content__detail__item'>
-              {props.t('Size')}: {props.fileSize}
+              {props.t('Size:')} {props.fileSize}
             </div>
 
             <div className='fileProperties__content__detail__item'>
-              {props.t('Page number')}: {props.filePageNb}
+              {props.t('Page number:')} {props.filePageNb}
             </div>
 
-            <div className='fileProperties__content__detail__item'>
-              {props.t('Creation date')}: {props.creationDate}
+            <div className='fileProperties__content__detail__item' title={props.creationDateFormatted} >
+              {props.t('Creation date:')} {props.creationDate}
             </div>
 
-            <div className='fileProperties__content__detail__item'>
-              {props.t('Last modification')}: {props.lastModification}
+            <div className='fileProperties__content__detail__item' title={props.lastModificationFormatted} >
+              {props.t('Last modification:')} {props.lastModification}
             </div>
 
             <div className='fileProperties__content__detail__description'>
-              {props.t('Description')}:
+              {props.t('Description:')}
             </div>
             {state.displayFormNewDescription
               ? (
