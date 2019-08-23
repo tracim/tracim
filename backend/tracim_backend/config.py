@@ -290,9 +290,7 @@ class CFG(object):
         self.LIMITATION__CONTENT_LENGTH_FILE_SIZE = int(
             self.get_raw_config("limitation.content_length_file_size", "0")
         )
-        self.WORKSPACE__CONTENT_LENGTH__MAX_SIZE = int(
-            self.get_raw_config("workspace.content_length.max_size", "0")
-        )
+        self.LIMITATION__WORKSPACE_SIZE = int(self.get_raw_config("limitation.workspace_size", "0"))
 
     def _load_email_config(self) -> None:
         """
