@@ -64,6 +64,16 @@ basic_setup.session_secret = change_this_value_please!
 ; cors.access-control-allowed-origin = http://localhost:6543,http://localhost:8090
 
 ####
+# LIMITATION
+####
+
+# limit number of sharespaces any user can be owner, 0 mean not limit, default to 0
+; limitation.sharedspace_per_user = 0
+# max upload content length accepted by tracim for file in bytes
+# by default 0 meaning no limit. 104857600 (100MB) is a good value
+; limitation.content_length_file_size = 104857600
+
+####
 # STORAGE
 ####
 
@@ -448,13 +458,6 @@ collaborative_document_edition.software = collabora
 # base url where collabora server exist
 collaborative_document_edition.collabora.base_url = http://localhost:9980
 collaborative_document_edition.file_template_dir =  %(basic_setup.file_template_dir)s
-
-###
-# Limits
-###
-# max upload content length accepted by tracim for file in bytes
-# by default, no limitation. 104857600 (100MB) is a good value
-; upload.content_length.max_size = 104857600
 
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #

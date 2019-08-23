@@ -287,8 +287,8 @@ class CFG(object):
         self.LIMITATION__SHAREDSPACE_PER_USER = int(
             self.get_raw_config("limitation.sharedspace_per_user", "0")
         )
-        self.LIMITATION__CONTENT_LENGTH_FILE_SIZE = self.get_raw_config(
-            "limitation.content_length_file_size", None
+        self.LIMITATION__CONTENT_LENGTH_FILE_SIZE = int(
+            self.get_raw_config("limitation.content_length_file_size", "0")
         )
 
     def _load_email_config(self) -> None:
