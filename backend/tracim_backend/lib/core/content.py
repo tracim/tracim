@@ -1908,7 +1908,11 @@ class ContentApi(object):
         item.revision_type = ActionDescription.REVISION
         return item
 
-    def check_upload_size(self, content_length: int, workspace: Workspace):
+    def check_upload_size(self, content_length: int, workspace: Workspace) -> None:
+        self._check_size_length_limitation(content_length)
+        self._check_workspace_size_limitation(content_length, workspace)
+
+    def _check_size_length_limitation(self, content_length: int) -> None:
         # INFO - G.M - 2019-08-23 - 0 mean no size limit
         if self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE == 0:
             pass
@@ -1918,11 +1922,13 @@ class ContentApi(object):
                     content_length, self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE
                 )
             )
+
+    def _check_workspace_size_limitation(self, content_length: int, workspace: Workspace) -> None:
         workspace_size = workspace.get_size()
-        if (
-            self._config.WORKSPACE__CONTENT_LENGTH__MAX_SIZE
-            and workspace_size + content_length > self._config.WORKSPACE__CONTENT_LENGTH__MAX_SIZE
-        ):
+        # INFO - G.M - 2019-08-23 - 0 mean no size limit
+        if self._config.WORKSPACE__CONTENT_LENGTH__MAX_SIZE == 0:
+            pass
+        elif workspace_size > self._config.WORKSPACE__CONTENT_LENGTH__MAX_SIZE:
             raise FileSizeOverWorkspaceEmptySpace(
                 'File cannot be added (size "{}") because workspace is full: "{}/{}"'.format(
                     content_length, workspace_size, self._config.WORKSPACE__CONTENT_LENGTH__MAX_SIZE

@@ -89,9 +89,14 @@ class Workspace(DeclarativeBase):
 
         return contents
 
-    def get_size(self) -> int:
+    def get_size(self, include_deleted: bool = False, include_archived: bool = False) -> int:
         size = 0
         for revision in self.revisions:
+            # do
+            if not include_deleted and revision.node.is_deleted:
+                continue
+            if not include_archived and revision.node.is_archived:
+                continue
             if revision.depot_file:
                 size += revision.depot_file.file.content_length
         return size
