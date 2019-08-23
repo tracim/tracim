@@ -711,6 +711,10 @@ class WorkspaceInContext(object):
     def created(self) -> datetime:
         return self.workspace.created
 
+    @property
+    def size(self) -> int:
+        return self.workspace.get_size()
+
 
 class UserRoleWorkspaceInContext(object):
     """
