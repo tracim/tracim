@@ -642,35 +642,48 @@ class File extends React.Component {
     shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
 
     if (invalidEmails.length > 0 || shareEmailList === 0) {
-      this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
-    } else {
-      const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
-        state.config.apiUrl,
-        state.content.workspace_id,
-        state.content.content_id,
-        shareEmailList,
-        state.sharePassword !== '' ? state.sharePassword : null
-      ))
-
-      switch (fetchResultPostShareLinks.apiResponse.status) {
-        case 200:
-          this.setState(prev => ({
-            shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
-            shareEmails: '',
-            sharePassword: ''
-          }))
-          break
-        case 400:
-          switch (fetchResultPostShareLinks.body.code) {
-            case 2001:
-              this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
-              break
-            default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
-          }
-          break
-        default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
-      }
+      this.sendGlobalFlashMessage(`${props.t('The following emails are not valid:')}
+      ${invalidEmails}`)
+      return false
     }
+
+    if (state.sharePassword !== '' && state.sharePassword.length < 6) {
+      this.sendGlobalFlashMessage(props.t('The password is too short (minimum 6 characters)'))
+      return false
+    }
+
+    if (state.sharePassword !== '' && state.sharePassword.length > 512) {
+      this.sendGlobalFlashMessage(props.t('The password is too long (maximum 512 characters)'))
+      return false
+    }
+
+    const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      state.content.content_id,
+      shareEmailList,
+      state.sharePassword !== '' ? state.sharePassword : null
+    ))
+
+    switch (fetchResultPostShareLinks.apiResponse.status) {
+      case 200:
+        this.setState(prev => ({
+          shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
+          shareEmails: '',
+          sharePassword: ''
+        }))
+        return true
+      case 400:
+        switch (fetchResultPostShareLinks.body.code) {
+          case 2001:
+            this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
+            break
+          default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+        }
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+    }
+    return false
   }
 
   handleChangeEmails = e => this.setState({ shareEmails: e.target.value })

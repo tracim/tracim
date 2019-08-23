@@ -52,5 +52,8 @@
   "Edit online": "Edit online",
   "Error in the URL": "Error in the URL",
   "The password length must be between 6 and 512 characters and the email(s) must be valid": "The password length must be between 6 and 512 characters and the email(s) must be valid",
-  "Error while creating new share link": "Error while creating new share link"
+  "Error while creating new share link": "Error while creating new share link",
+  "The password is too short (minimum 6 characters)": "The password is too short (minimum 6 characters)",
+  "The password is too long (maximum 512 characters)": "The password is too long (maximum 512 characters)",
+  "The following emails are not valid:": "The following emails are not valid:"
 }
