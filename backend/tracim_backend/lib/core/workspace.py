@@ -2,7 +2,6 @@
 from datetime import datetime
 import typing
 
-from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
@@ -188,26 +187,28 @@ class WorkspaceApi(object):
     def _get_workspace_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
         return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
-    def get_all_for_user(
-        self, user: User, ignored_ids=None, owned: bool = True, with_role: bool = True
-    ):
-        query = self._base_query().join(
-            UserRoleInWorkspace, Workspace.workspace_id == UserRoleInWorkspace.workspace_id
-        )
-        if not owned and not with_role:
-            return []
-        if owned and with_role:
-            query = query.filter(
-                or_(UserRoleInWorkspace.user_id == user.user_id, Workspace.owner_id == user.user_id)
+    def _get_workspace_ids(self, workspaces: typing.List[Workspace]) -> typing.List[int]:
+        workspace_ids = []
+        for workspace in workspaces:
+            workspace_ids.append(workspace.workspace_id)
+        return workspace_ids
+
+    def get_all_for_user(self, user: User, owned: bool = True, with_role: bool = True):
+        query = self._base_query()
+        workspace_ids = []
+        rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        if with_role:
+            workspace_ids.extend(
+                rapi.get_user_workspaces_ids(
+                    user_id=user.user_id, min_role=UserRoleInWorkspace.READER
+                )
             )
-        elif owned:
-            query = query.filter(Workspace.owner_id == user.user_id)
-        elif with_role:
-            query = query.filter(UserRoleInWorkspace.user_id == user.user_id)
+        if owned:
+            workspace_ids.extend(
+                self._get_workspace_ids(self._get_workspace_owned_by_user(user.user_id))
+            )
 
-        if ignored_ids:
-            query = query.filter(~Workspace.workspace_id._in(ignored_ids))
-
+        query = query.filter(Workspace.workspace_id.in_(workspace_ids))
         query = query.order_by(Workspace.label)
         return query.all()
 
