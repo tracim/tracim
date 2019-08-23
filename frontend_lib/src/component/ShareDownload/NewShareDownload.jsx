@@ -59,21 +59,21 @@ class NewShareDownload extends React.Component {
             onKeyDown={props.onKeyDownEnter}
           />
 
-          <button
-            type='button'
+          <div
             className='shareDownload__email__icon'
             id='popoverMultipleEmails'
             key='share_emails'
             style={{ ':hover': { color: props.hexcolor } }}
           >
             <i className='fa fa-fw fa-question-circle' />
-          </button>
+          </div>
 
           <Popover
             placement='bottom'
             isOpen={state.popoverMultipleEmailsOpen}
             target='popoverMultipleEmails'
             toggle={this.handleTogglePopoverMultipleEmails}
+            trigger='hover'
           >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
           </Popover>
