@@ -228,5 +228,6 @@
   "Workspace not found": "Workspace not found",
   "Inbox": "Inbox",
   "Error while loading uploaded files": "Error while loading uploaded files",
+  "Error while downloading file": "Error while downloading file",
   "Manage": "Manage"
 }

@@ -9,12 +9,12 @@ const Comment = props => {
   }
 
   return (
-    <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__body__messagelist__item')}>
+    <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
       <div className={classnames(`${props.customClass}`, 'comment', {
         'sent': props.fromMe,
         'received': !props.fromMe
       })}>
-        <div 
+        <div
           className={classnames(`${props.customClass}__body`, 'comment__body')}
           style={props.fromMe ? styleSent : {}}
         >
