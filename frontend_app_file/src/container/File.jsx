@@ -659,6 +659,7 @@ class File extends React.Component {
             shareEmails: '',
             sharePassword: ''
           }))
+          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
           break
         case 400:
           switch (fetchResultPostShareLinks.body.code) {
