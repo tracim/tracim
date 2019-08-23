@@ -16,6 +16,12 @@ class ShareDownload extends React.Component {
     }
   }
 
+  componentDidMount () {
+    if (this.props.shareLinkList.length === 0) {
+      this.setState({ currentPageStatus: this.SHARE_STATUS.NEW_SHARE })
+    }
+  }
+
   handleNewShareDownload = () => {
     this.setState({ currentPageStatus: this.SHARE_STATUS.NEW_SHARE })
   }

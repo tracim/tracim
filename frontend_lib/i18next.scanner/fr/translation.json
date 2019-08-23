@@ -53,6 +53,5 @@
   "Generate random password": "Générer mot de passe aléatoire",
   "Show password": "Voir le mot de passe",
   "This file has {{numberLinks}} share links": "Ce fichier a {{numberLinks}} liens de partage",
-  "by {{author}}": "par {{author}}",
-  "Create": "Créer"
+  "by {{author}}": "par {{author}}"
 }
