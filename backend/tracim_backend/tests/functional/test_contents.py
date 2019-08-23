@@ -4130,7 +4130,7 @@ class TestFileLimitedContentSize(object):
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
     ) -> None:
         """
-        Set one file of a content
+        Try set one file of a content with different size according to size limit
         """
 
         workspace_api = workspace_api_factory.get()
@@ -4172,7 +4172,8 @@ class TestFileLimitedContentSize(object):
         self, workspace_api_factory, content_api_factory, session, web_testapp, admin_user
     ) -> None:
         """
-        create one file of a content at workspace root
+        try to create one file of a content at workspace root with different size
+        according to size limit
         """
 
         workspace_api = workspace_api_factory.get()
