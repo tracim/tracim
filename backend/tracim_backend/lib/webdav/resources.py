@@ -305,7 +305,7 @@ class WorkspaceResource(DAVCollection):
         if resource:
             content = resource.content
         try:
-            self.content_api.check_upload_size(self.environ["CONTENT_LENGTH"])
+            self.content_api.check_upload_size(int(self.environ["CONTENT_LENGTH"]))
         except FileSizeOverMaxLimitation:
             raise DAVError(HTTP_REQUEST_ENTITY_TOO_LARGE)
         # return item
@@ -712,7 +712,7 @@ class FileResource(DAVNonCollection):
 
     def beginWrite(self, contentType: str = None) -> FakeFileStream:
         try:
-            self.content_api.check_upload_size(self.environ["CONTENT_LENGTH"])
+            self.content_api.check_upload_size(int(self.environ["CONTENT_LENGTH"]))
         except FileSizeOverMaxLimitation:
             raise DAVError(HTTP_REQUEST_ENTITY_TOO_LARGE)
         return FakeFileStream(
