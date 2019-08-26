@@ -642,8 +642,14 @@ class File extends React.Component {
     shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
 
     if (invalidEmails.length > 0 || shareEmailList === 0) {
-      this.sendGlobalFlashMessage(`${props.t('The following emails are not valid:')}
-      ${invalidEmails}`)
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: <div>{props.t('The following emails are not valid:')}<br />{invalidEmails.join(', ')}</div>,
+          type: 'warning',
+          delay: undefined
+        }
+      })
       return false
     }
 

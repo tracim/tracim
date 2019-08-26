@@ -24,7 +24,6 @@ describe('Open a file', () => {
           cy.updateFile(fullFilename, contentType, workspaceId, newContent.content_id, newContent.filename)
         })
     })
-    cy.wait(2000)
   })
 
   beforeEach(function () {
