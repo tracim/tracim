@@ -126,7 +126,7 @@ export class PreviewComponent extends React.Component {
           </a>
         </div>
 
-        <div className='d-flex'>
+        <div className='previewcomponent__filepreview'>
           {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
             <button
               type='button'
