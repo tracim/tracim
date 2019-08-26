@@ -12,14 +12,21 @@ class NewShareDownload extends React.Component {
 
     this.state = {
       isPasswordActive: false,
-      popoverMultipleEmailsOpen: false,
+      popoverMultipleEmailsOpenOnClick: false,
+      popoverMultipleEmailsOpenOnMouseOver: false,
       hidePassword: true
     }
   }
 
-  handleTogglePopoverMultipleEmails = () => {
+  handleTogglePopoverMultipleEmailsOnClick = () => {
     this.setState(prevState => ({
-      popoverMultipleEmailsOpen: !prevState.popoverMultipleEmailsOpen
+      popoverMultipleEmailsOpenOnClick: !prevState.popoverMultipleEmailsOpenOnClick
+    }))
+  }
+
+  handleTogglePopoverMultipleEmailsOnMouseOver = (over) => {
+    this.setState(prevState => ({
+      popoverMultipleEmailsOpenOnMouseOver: over
     }))
   }
 
@@ -59,21 +66,24 @@ class NewShareDownload extends React.Component {
             onKeyDown={props.onKeyDownEnter}
           />
 
-          <div
+          <button
+            type='button'
             className='shareDownload__email__icon'
             id='popoverMultipleEmails'
             key='share_emails'
             style={{ ':hover': { color: props.hexcolor } }}
+            onMouseOver={ () => this.handleTogglePopoverMultipleEmailsOnMouseOver(true) }
+            onMouseOut={ () => this.handleTogglePopoverMultipleEmailsOnMouseOver(false) }
           >
             <i className='fa fa-fw fa-question-circle' />
-          </div>
+          </button>
 
           <Popover
             placement='bottom'
-            isOpen={state.popoverMultipleEmailsOpen}
+            isOpen={state.popoverMultipleEmailsOpenOnClick || state.popoverMultipleEmailsOpenOnMouseOver}
             target='popoverMultipleEmails'
-            toggle={this.handleTogglePopoverMultipleEmails}
-            trigger='hover'
+            toggle={this.handleTogglePopoverMultipleEmailsOnClick}
+            trigger='legacy'
           >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
           </Popover>
