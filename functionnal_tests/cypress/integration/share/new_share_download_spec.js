@@ -35,7 +35,6 @@ describe('Open a file', () => {
       params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
     })
     cy.get('.wsContentGeneric__content__right__header .fa-share-alt').click()
-    cy.get('.shareDownload__btn').click()
   })
 
   afterEach(function () {
