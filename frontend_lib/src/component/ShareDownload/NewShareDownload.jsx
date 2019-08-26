@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { Popover, PopoverBody } from 'reactstrap'
+import { isMobile } from 'react-device-detect'
 import { generateRandomPassword } from '../../helper.js'
 
 const color = require('color')
@@ -12,21 +13,14 @@ class NewShareDownload extends React.Component {
 
     this.state = {
       isPasswordActive: false,
-      popoverMultipleEmailsOpenOnClick: false,
-      popoverMultipleEmailsOpenOnMouseOver: false,
+      popoverMultipleEmailsOpen: false,
       hidePassword: true
     }
   }
 
-  handleTogglePopoverMultipleEmailsOnClick = () => {
+  handleTogglePopoverMultipleEmails = () => {
     this.setState(prevState => ({
-      popoverMultipleEmailsOpenOnClick: !prevState.popoverMultipleEmailsOpenOnClick
-    }))
-  }
-
-  handleTogglePopoverMultipleEmailsOnMouseOver = (over) => {
-    this.setState(prevState => ({
-      popoverMultipleEmailsOpenOnMouseOver: over
+      popoverMultipleEmailsOpen: !prevState.popoverMultipleEmailsOpen
     }))
   }
 
@@ -72,18 +66,16 @@ class NewShareDownload extends React.Component {
             id='popoverMultipleEmails'
             key='share_emails'
             style={{ ':hover': { color: props.hexcolor } }}
-            onMouseOver={ () => this.handleTogglePopoverMultipleEmailsOnMouseOver(true) }
-            onMouseOut={ () => this.handleTogglePopoverMultipleEmailsOnMouseOver(false) }
           >
             <i className='fa fa-fw fa-question-circle' />
           </button>
 
           <Popover
             placement='bottom'
-            isOpen={state.popoverMultipleEmailsOpenOnClick || state.popoverMultipleEmailsOpenOnMouseOver}
+            isOpen={state.popoverMultipleEmailsOpen}
             target='popoverMultipleEmails'
-            toggle={this.handleTogglePopoverMultipleEmailsOnClick}
-            trigger='legacy'
+            toggle={this.handleTogglePopoverMultipleEmails}
+            trigger={isMobile ? 'focus' : 'hover'}
           >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
           </Popover>
