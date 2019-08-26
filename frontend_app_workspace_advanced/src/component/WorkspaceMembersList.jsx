@@ -21,51 +21,49 @@ const WorkspaceMembersList = props => {
                   <Avatar width={'50px'} publicName={m.user.public_name} />
                 </div>
 
-                <div className='workspace_advanced__userlist__list__item__namerole'>
-                  <div className='workspace_advanced__userlist__list__item__namerole__name'>
-                    {m.user.public_name}
-                  </div>
+                <div className='workspace_advanced__userlist__list__item__name'>
+                  {m.user.public_name}
+                </div>
 
-                  <div className='workspace_advanced__userlist__list__item__namerole__role dropdown'>
-                    {(() => {
-                      const role = props.roleList.find(r => r.slug === m.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
-                      return (
-                        <button
-                          className='btndropdown dropdown-toggle'
-                          type='button'
-                          id={`dropdownMenuButton_${m.user_id}`}
-                          data-toggle='dropdown'
-                          aria-haspopup='true'
-                          aria-expanded='false'
-                        >
-                          <div className='btndropdown__icon mr-3' style={{ color: role.hexcolor }}>
-                            <i className={`fa fa-${role.faIcon}`} />
-                          </div>
-
-                          <div className='btndropdown__text mr-auto'>
-                            {props.t(role.label)}
-                          </div>
-                        </button>
-                      )
-                    })()}
-
-                    <div className='subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                      {props.roleList.map(r =>
-                        <div
-                          className='subdropdown__item dropdown-item'
-                          onClick={() => props.onClickNewRole(m.user_id, r.slug)}
-                          key={`role_${r.id}`}
-                        >
-                          <div className='subdropdown__item__icon' style={{ color: r.hexcolor }}>
-                            <i className={`fa fa-fw fa-${r.faIcon}`} />
-                          </div>
-
-                          <div className='subdropdown__item__text'>
-                            {props.t(r.label)}
-                          </div>
+                <div className='workspace_advanced__userlist__list__item__role dropdown'>
+                  {(() => {
+                    const role = props.roleList.find(r => r.slug === m.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
+                    return (
+                      <button
+                        className='btndropdown dropdown-toggle'
+                        type='button'
+                        id={`dropdownMenuButton_${m.user_id}`}
+                        data-toggle='dropdown'
+                        aria-haspopup='true'
+                        aria-expanded='false'
+                      >
+                        <div className='btndropdown__icon mr-3' style={{ color: role.hexcolor }}>
+                          <i className={`fa fa-${role.faIcon}`} />
                         </div>
-                      )}
-                    </div>
+
+                        <div className='btndropdown__text mr-auto'>
+                          {props.t(role.label)}
+                        </div>
+                      </button>
+                    )
+                  })()}
+
+                  <div className='subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                    {props.roleList.map(r =>
+                      <div
+                        className='subdropdown__item dropdown-item'
+                        onClick={() => props.onClickNewRole(m.user_id, r.slug)}
+                        key={`role_${r.id}`}
+                      >
+                        <div className='subdropdown__item__icon' style={{ color: r.hexcolor }}>
+                          <i className={`fa fa-fw fa-${r.faIcon}`} />
+                        </div>
+
+                        <div className='subdropdown__item__text'>
+                          {props.t(r.label)}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
