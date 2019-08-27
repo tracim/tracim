@@ -38,8 +38,6 @@
   "This content is deprecated": "Ce contenu est obsolète",
   "Drag and drop your file here": "Glisser déposer un fichier ici",
   "You can also import your file by clicking here": "Vous pouvez aussi sélectionner votre fichier en cliquant ici",
-  "Upload a file": "Importer un fichier",
-  "Validate and create": "Valider et créer",
   "Copy link": "Copier le lien",
   "Delete link": "Supprimer le lien",
   "New share": "Nouveau partage",
@@ -56,5 +54,14 @@
   "by {{author}}": "par {{author}}",
   "Create": "Créer",
   "Close": "Fermer",
-  "Open": "Ouvrir"
+  "Open": "Ouvrir",
+  "Bytes": "Octets",
+  "KB": "ko",
+  "MB": "Mo",
+  "GB": "Go",
+  "TB": "To",
+  "PB": "Po",
+  "EB": "Eo",
+  "ZB": "Zo",
+  "YB": "Yo"
 }

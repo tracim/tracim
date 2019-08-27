@@ -38,8 +38,6 @@
   "This content is deprecated": "This content is deprecated",
   "Drag and drop your file here": "Drag and drop your file here",
   "You can also import your file by clicking here": "You can also import your file by clicking here",
-  "Upload a file": "Upload a file",
-  "Validate and create": "Validate and create",
   "Copy link": "Copy link",
   "Delete link": "Delete link",
   "New share": "New share",
@@ -56,5 +54,14 @@
   "by {{author}}": "by {{author}}",
   "Create": "Create",
   "Close": "Close",
-  "Open": "Open"
+  "Open": "Open",
+  "Bytes": "Bytes",
+  "KB": "KB",
+  "MB": "MB",
+  "GB": "GB",
+  "TB": "TB",
+  "PB": "PB",
+  "EB": "EB",
+  "ZB": "ZB",
+  "YB": "YB"
 }
