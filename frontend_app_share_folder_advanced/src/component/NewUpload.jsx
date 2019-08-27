@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { Popover, PopoverBody } from 'reactstrap'
 import { generateRandomPassword, ComposedIcon } from 'tracim_frontend_lib'
+import { isMobile } from 'react-device-detect'
 import PropTypes from 'prop-types'
 
 const color = require('color')
@@ -72,6 +73,7 @@ class NewUpload extends React.Component {
             isOpen={state.popoverMultipleEmailsOpen}
             target='popoverMultipleEmails'
             toggle={this.handleTogglePopoverMultipleEmails}
+            trigger={isMobile ? 'focus' : 'hover'}
           >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
           </Popover>

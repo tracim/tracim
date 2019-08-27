@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { Popover, PopoverBody } from 'reactstrap'
+import { isMobile } from 'react-device-detect'
 import { generateRandomPassword } from '../../helper.js'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
@@ -75,6 +76,7 @@ class NewShareDownload extends React.Component {
             isOpen={state.popoverMultipleEmailsOpen}
             target='popoverMultipleEmails'
             toggle={this.handleTogglePopoverMultipleEmails}
+            trigger={isMobile ? 'focus' : 'hover'}
           >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
           </Popover>
