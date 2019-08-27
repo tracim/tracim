@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import ContentItem from './ContentItem.jsx'
 import Folder from './Folder.jsx'
-import { PAGE } from '../../helper.js'
+import { PAGE, SHARE_FOLDER_ID } from '../../helper.js'
 
 require('./Folder.styl')
 
@@ -15,7 +15,7 @@ class ShareFolder extends React.Component {
     // I think it is good to clearly indicate where to change if you want to have a different icon to a open/close share folder.
     const { props } = this
 
-    if (props.isOpen) return 'fa-share-alt'
+    if (props.isOpen) return 'fa-folder-open-o'
 
     return 'fa-share-alt'
   }
@@ -24,7 +24,7 @@ class ShareFolder extends React.Component {
     const { props } = this
 
     const folderContentList = (props.uploadedContentList ? props.uploadedContentList : [])
-      .filter(content => content.parentId === 'shareFolder')
+      .filter(content => content.parentId === SHARE_FOLDER_ID)
       .sort((a, b) => {
         if (a.created > b.created) return -1
         return 1
@@ -37,8 +37,8 @@ class ShareFolder extends React.Component {
           'item-last': props.isLast,
           'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
-        data-cy='shareFolder'
-        id='shareFolder'
+        data-cy={SHARE_FOLDER_ID}
+        id={SHARE_FOLDER_ID}
       >
         <div
           className='folder__header align-items-center primaryColorBgLightenHover'

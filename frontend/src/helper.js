@@ -4,6 +4,7 @@ const configEnv = require('../configEnv.json')
 
 const versionFile = require('./version.json')
 export const TRACIM_APP_VERSION = versionFile.tracim_app_version
+export const SHARE_FOLDER_ID = -1
 
 // this function is declared in i18n to avoid cyclic imports and reexported here for consistency
 export { getBrowserLang }
@@ -110,7 +111,12 @@ export const ROLE = [{
   description: 'Read contents'
 }]
 
-export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
+export const findUserRoleIdInWorkspace = (userId, memberList, roleList, hey) => {
+  console.log('HELLO')
+  console.log(hey)
+  console.log(userId)
+  console.log(memberList)
+  console.log(roleList)
   const user = memberList.find(u => u.id === userId) || { role: 'reader' }
   return (roleList.find(r => user.role === r.slug) || { id: 1 }).id
 }

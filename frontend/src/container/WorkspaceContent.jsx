@@ -9,7 +9,8 @@ import {
   findUserRoleIdInWorkspace,
   ROLE_OBJECT,
   CONTENT_TYPE,
-  sortWorkspaceContents
+  sortWorkspaceContents,
+  SHARE_FOLDER_ID
 } from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ShareFolder from '../component/Workspace/ShareFolder.jsx'
@@ -121,6 +122,7 @@ class WorkspaceContent extends React.Component {
 
     try {
       await this.loadContentList(wsToLoad)
+      await this.loadShareFolderContent()
     } catch (error) {
       console.log(error.message)
       return
@@ -149,8 +151,10 @@ class WorkspaceContent extends React.Component {
       this.setState({ workspaceIdInUrl: workspaceId, contentLoaded: false })
       this.buildBreadcrumbs()
     }
-    if (!state.contentLoaded) {
-      this.loadContentList(workspaceId).catch(error => console.log(error.message))
+
+    if (!state.contentLoaded && state.contentLoaded !== prevState.contentLoaded) {
+      await this.loadContentList(workspaceId).catch(error => console.log(error.message))
+      await this.loadShareFolderContent()
     }
   }
 
@@ -208,6 +212,7 @@ class WorkspaceContent extends React.Component {
   }
 
   loadContentList = async (workspaceId) => {
+    if (this.state.contentLoaded) return false
     console.log('%c<WorkspaceContent> loadContentList', 'color: #c17838')
     const { props } = this
 
@@ -219,7 +224,7 @@ class WorkspaceContent extends React.Component {
 
     let fetchContentList
     if (contentIdInUrl && !isNaN(contentIdInUrl)) fetchContentList = await props.dispatch(getContentPathList(workspaceId, contentIdInUrl, folderIdInUrl))
-    else fetchContentList = await props.dispatch(getFolderContentList(workspaceId, folderIdInUrl))
+    else fetchContentList = await props.dispatch(getFolderContentList(workspaceId, folderIdInUrl.filter(id => id !== SHARE_FOLDER_ID)))
 
     const wsMember = await props.dispatch(getWorkspaceMemberList(workspaceId))
     const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
@@ -256,6 +261,8 @@ class WorkspaceContent extends React.Component {
         throw new Error('Error while loading content list')
       }
     }
+    this.loadShareFolderContent()
+    this.setState({ contentLoaded: true })
 
     switch (wsMember.status) {
       case 200: props.dispatch(setWorkspaceMemberList(wsMember.json)); break
@@ -268,8 +275,6 @@ class WorkspaceContent extends React.Component {
       case 401: break
       default: props.dispatch(newFlashMessage(props.t('Error while loading read status list'), 'warning'))
     }
-
-    this.setState({ contentLoaded: true })
   }
 
   handleClickContentItem = content => {
@@ -343,7 +348,7 @@ class WorkspaceContent extends React.Component {
       if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
     }
 
-    if (folder.parentId === 'shareFolder' && !props.workspaceContentList.some(c => c.parentId === folderId)) {
+    if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceContentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
       if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
     }
@@ -468,32 +473,34 @@ class WorkspaceContent extends React.Component {
       : 'th'
   }
 
-  handleClickShareFolder = async () => {
+  loadShareFolderContent = async () => {
+    if (this.state.contentLoaded) return false
     const { props, state } = this
+    if (props.workspaceContentList.some(c => c.parentId === SHARE_FOLDER_ID)) return
 
     const request = await getShareFolderContentList(state.workspaceIdInUrl)
     const response = await handleFetchResult(request)
 
     switch (response.apiResponse.status) {
       case 200:
-        this.setState(previousState => ({
-          shareFolder: {
-            isOpen: !previousState.shareFolder.isOpen
-          }
-        }))
         response.body.forEach(file => {
           if (file.parent_id === null) {
-            file.parent_id = 'shareFolder'
+            file.parent_id = SHARE_FOLDER_ID
           }
         })
-        if (!props.workspaceContentList.some(c => c.parentId === 'shareFolder')) {
-          props.dispatch(addWorkspaceContentList(response.body))
-        }
+        props.dispatch(addWorkspaceContentList(response.body))
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
-        props.history.push(PAGE.LOGIN)
     }
+  }
+
+  handleClickShareFolder = async () => {
+    this.setState(previousState => ({
+      shareFolder: {
+        isOpen: !previousState.shareFolder.isOpen
+      }
+    }))
   }
 
   filterWorkspaceContent = (contentList, filter) => filter.length === 0
@@ -542,7 +549,9 @@ class WorkspaceContent extends React.Component {
       .filter(c => c.parentId === null)
       .sort(sortWorkspaceContents)
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE, 'OI')
+    console.log('hey')
+    console.log(currentWorkspace.memberList)
 
     const createContentAvailableApp = contentType
       .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)

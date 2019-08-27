@@ -537,6 +537,7 @@ class WorkspaceController(Controller):
                 content,
                 new_parent=new_parent,
                 new_workspace=new_workspace,
+                new_content_namespace=ContentNamespaces.CONTENT,
                 must_stay_in_same_workspace=False,
             )
             api.execute_update_content_actions(content)
