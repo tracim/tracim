@@ -111,12 +111,7 @@ export const ROLE = [{
   description: 'Read contents'
 }]
 
-export const findUserRoleIdInWorkspace = (userId, memberList, roleList, hey) => {
-  console.log('HELLO')
-  console.log(hey)
-  console.log(userId)
-  console.log(memberList)
-  console.log(roleList)
+export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
   const user = memberList.find(u => u.id === userId) || { role: 'reader' }
   return (roleList.find(r => user.role === r.slug) || { id: 1 }).id
 }

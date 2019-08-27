@@ -41,7 +41,7 @@ export class OpenContentApp extends React.Component {
         renderAppFeature(
           contentType.find(ct => ct.slug === contentToOpen.type),
           user,
-          findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE, 'ICILA'),
+          findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE),
           contentToOpen
         )
         this.props.updateAppOpenedType(contentToOpen.type)

@@ -25,7 +25,6 @@ import {
   PageTitle,
   PageContent,
   BREADCRUMBS_TYPE,
-  handleFetchResult,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
@@ -130,6 +129,7 @@ class WorkspaceContent extends React.Component {
 
     this.scrollToActiveContent()
     this.buildBreadcrumbs()
+    this.setState({ workspaceIdInUrl: wsToLoad, contentLoaded: true })
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -148,13 +148,11 @@ class WorkspaceContent extends React.Component {
     const currentFilter = qs.parse(props.location.search).type
 
     if (prevState.workspaceIdInUrl !== workspaceId || prevFilter !== currentFilter) {
-      this.setState({ workspaceIdInUrl: workspaceId, contentLoaded: false })
-      this.buildBreadcrumbs()
-    }
-
-    if (!state.contentLoaded && state.contentLoaded !== prevState.contentLoaded) {
       await this.loadContentList(workspaceId).catch(error => console.log(error.message))
       await this.loadShareFolderContent()
+      this.scrollToActiveContent()
+      this.buildBreadcrumbs()
+      this.setState({ workspaceIdInUrl: workspaceId, contentLoaded: true })
     }
   }
 
@@ -261,8 +259,6 @@ class WorkspaceContent extends React.Component {
         throw new Error('Error while loading content list')
       }
     }
-    this.loadShareFolderContent()
-    this.setState({ contentLoaded: true })
 
     switch (wsMember.status) {
       case 200: props.dispatch(setWorkspaceMemberList(wsMember.json)); break
@@ -474,24 +470,23 @@ class WorkspaceContent extends React.Component {
   }
 
   loadShareFolderContent = async () => {
-    if (this.state.contentLoaded) return false
     const { props, state } = this
-    if (props.workspaceContentList.some(c => c.parentId === SHARE_FOLDER_ID)) return
 
-    const request = await getShareFolderContentList(state.workspaceIdInUrl)
-    const response = await handleFetchResult(request)
+    if (state.contentLoaded) return false
 
-    switch (response.apiResponse.status) {
+    const response = await props.dispatch(getShareFolderContentList(state.workspaceIdInUrl))
+
+    switch (response.status) {
       case 200:
-        response.body.forEach(file => {
-          if (file.parent_id === null) {
-            file.parent_id = SHARE_FOLDER_ID
-          }
-        })
-        props.dispatch(addWorkspaceContentList(response.body))
-        break
+        const publicSharedContentList = response.json.map(file => file.parent_id === null
+          ? { ...file, parent_id: SHARE_FOLDER_ID }
+          : file
+        )
+        props.dispatch(addWorkspaceContentList(publicSharedContentList))
+        return true
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
+        return false
     }
   }
 
@@ -549,9 +544,7 @@ class WorkspaceContent extends React.Component {
       .filter(c => c.parentId === null)
       .sort(sortWorkspaceContents)
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE, 'OI')
-    console.log('hey')
-    console.log(currentWorkspace.memberList)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
     const createContentAvailableApp = contentType
       .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)

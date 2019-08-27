@@ -46,6 +46,7 @@ export const USER_AGENDA_URL = `${USER}/Agenda`
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/${CONTENT}`
+export const WORKSPACE_CONTENT_PUBLIC_SHARE = `${WORKSPACE_CONTENT}/PUBLIC_SHARE`
 export const PATH = 'Path'
 export const WORKSPACE_CONTENT_PATH = `${WORKSPACE_CONTENT}/${PATH}`
 export const setWorkspaceContentList = (workspaceContentList, folderIdToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, folderIdToOpenList })
