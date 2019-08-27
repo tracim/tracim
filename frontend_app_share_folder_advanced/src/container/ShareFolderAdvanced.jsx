@@ -249,6 +249,7 @@ class ShareFolderAdvanced extends React.Component {
           componentTitle={<div>{title}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
+          hideChangeTitleButton
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
