@@ -1,12 +1,12 @@
 @import "../../css/Variable.styl"
 
 .shareDownload
-  display flex
   flex-direction column
-  width 100%
+  width calc(100% - 65px) // 65px is the width of the rightPart header
   height 100%
   min-height 260px
   overflow auto
+  margin-bottom 10px
   &__new
     padding 10px
   &__management
@@ -65,12 +65,15 @@
       &:hover
         color fontColor
   &__cancel
-    display flex
     margin-right 15px
     margin-left auto
   &__newBtn
     margin-right 30px
 
+// MEDIAQUERIES
+
 @media (min-width: min-xs) and (max-width: max-lg)
   .shareDownload
     margin-top 0px
+    height calc(100% - 65px)  // 65px is the width of the rightPart header
+    width 100%
