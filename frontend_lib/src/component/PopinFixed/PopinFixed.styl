@@ -105,6 +105,7 @@
         background-color mediumGrey
         font-size 20px
         color darkGrey
+        cursor pointer
         &__icon
           text-align center
           cursor pointer
@@ -120,6 +121,7 @@
             padding 7px 5px 7px 3px
             background-color lightGrey
             border-left 5px solid
+            height 65px
           &__close
             text-align center
             cursor pointer
@@ -133,6 +135,7 @@
       background-color mediumGrey
       border none
 
+// MEDIAQUERIES
 
 @media (max-width: max-lg)
   .rightPartClose
@@ -169,6 +172,8 @@ responsiveColumnStyle()
             margin 10px
             padding 10px
             width 65px
+            & > i
+              margin auto
             &.active
               border none
               border-top 5px solid

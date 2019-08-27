@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
+import { isMobile } from 'react-device-detect'
 import InputGroupText from '../common/Input/InputGroupText.jsx'
 import {
   postDownloadFile
@@ -112,6 +113,7 @@ class DownloadForm extends React.Component {
                 isOpen={this.state.popoverPasswordInfoOpen}
                 target='popoverPasswordInfo'
                 toggle={this.handleTogglePopoverPasswordInfo}
+                trigger={isMobile ? 'focus' : 'hover'}
               >
                 <PopoverBody>
                   {props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}

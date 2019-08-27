@@ -54,5 +54,7 @@
   "Show password": "Voir le mot de passe",
   "This file has {{numberLinks}} share links": "Ce fichier a {{numberLinks}} liens de partage",
   "by {{author}}": "par {{author}}",
-  "Create": "Créer"
+  "Create": "Créer",
+  "Close": "Fermer",
+  "Open": "Ouvrir"
 }
