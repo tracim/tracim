@@ -49,6 +49,10 @@ export class FileProperties extends React.Component {
               {props.t('Page number:')} {props.filePageNb}
             </div>
 
+            <div className='fileProperties__content__detail__item'>
+              {props.t('Number of shares:')} {props.activesShares}
+            </div>
+
             <div className='fileProperties__content__detail__item' title={props.creationDateFormatted} >
               {props.t('Creation date:')} {props.creationDate}
             </div>
