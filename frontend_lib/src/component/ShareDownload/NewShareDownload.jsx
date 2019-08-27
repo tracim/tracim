@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { Popover, PopoverBody } from 'reactstrap'
 import { generateRandomPassword } from '../../helper.js'
+import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
 const color = require('color')
 
@@ -159,6 +160,17 @@ class NewShareDownload extends React.Component {
             <i className='fa fa-fw fa-plus-circle' />
           </button>
         </div>
+
+        {!props.emailNotifActivated && (
+          <div className='shareDownload__emailWarning'>
+            <ComposedIcon
+              mainIcon='envelope'
+              smallIcon='warning'
+              smallIconCustomClass='text-danger'
+            />
+            {props.t('Email notification are disabled, please manually notify users of any change')}
+          </div>
+        )}
       </div>
     )
   }

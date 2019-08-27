@@ -921,6 +921,7 @@ class File extends React.Component {
                   onClickDeleteShareLink={this.handleClickDeleteShareLink}
                   onClickNewShare={this.handleClickNewShare}
                   userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                  emailNotifActivated={state.config.system.config.email_notification_activated}
                 />
               },
               {
