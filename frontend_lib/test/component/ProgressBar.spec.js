@@ -21,8 +21,8 @@ describe('<ProgressBar />', () => {
       expect(wrapper.find(`.progress-value`).prop('style').backgroundColor).to.equal(props.backgroundColor)
     )
 
-    it(`should display the text ${props.percent}`, () =>
-      expect(wrapper.find(`.progress-value`)).to.have.text().equal(props.percent)
+    it(`should display the text ${props.percent}%`, () =>
+      expect(wrapper.find(`.progress-value`)).to.have.text().equal(`${props.percent}%`)
     )
 
     it(`should display its text ${props.percent} in color ${props.color}`, () =>
