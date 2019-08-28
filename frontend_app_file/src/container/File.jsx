@@ -275,6 +275,8 @@ class File extends React.Component {
   loadShareLinkList = async () => {
     const { content, config } = this.state
 
+    if (this.state.loggedUser.userRoleIdInWorkspace < 2) return
+
     const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
 
     switch (fetchResultShareLinkList.apiResponse.status) {
@@ -905,7 +907,7 @@ class File extends React.Component {
                   shouldScrollToBottom={state.mode !== MODE.REVISION}
                 />
               },
-              {
+              ...(state.loggedUser.userRoleIdInWorkspace > 1 ? [{
                 id: 'share',
                 label: props.t('Share'),
                 icon: 'fa-share-alt',
@@ -922,7 +924,7 @@ class File extends React.Component {
                   onClickNewShare={this.handleClickNewShare}
                   userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
                 />
-              },
+              }] : []),
               {
                 id: 'properties',
                 label: props.t('Properties'),
