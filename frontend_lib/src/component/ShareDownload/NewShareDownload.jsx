@@ -158,7 +158,7 @@ class NewShareDownload extends React.Component {
               }
             }}
           >
-            {props.t('Create')}
+            {props.t('Validate')}
             <i className='fa fa-fw fa-plus-circle' />
           </button>
         </div>

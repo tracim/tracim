@@ -213,10 +213,6 @@
   "Send": "Envoyer",
   "Thank you, your import is finished!": "Merci, votre importation est terminée !",
   "You can now close this page, your recipient will receive the notification of your import.": "Vous pouvez maintenant fermer cette page, votre destinataire va recevoir la notification de votre import.",
-  "Create user, create shared space, administration of instance": "Création d'utilisateurs, création d'espaces partagés, administration de l'instance",
-  "Create shared space, add member in shared space": "Création d'espaces partagés, ajout de membres dans les espaces partagés",
-  "Access to shared space where user is member": "Accès aux espaces partagés dont il est membre",
-  "Just read content": "Uniquement lecture de contenus",
   "Content manager + add members and edit shared spaces": "Gestionnaire de contenu + ajouter des membres et modifiers les espaces partagés",
   "Contributor + create folders and manage contents": "Contributeur + créer des dossiers et gérer les contenus",
   "Reader + create/modify content": "Lecteur + créer/modifier les contenus",
@@ -230,5 +226,7 @@
   "Inbox": "Boite de réception",
   "Error while loading uploaded files": "Erreur lors du chargement des fichiers téléversés",
   "Error while downloading file": "Erreur lors du téléchargement du fichier",
-  "Manage": "Paramétrer"
+  "Manage": "Paramétrer",
+  "Error while loading file infos": "Erreur lors du chargement des informations du fichier",
+  "Full name": "Nom complet"
 }
