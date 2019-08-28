@@ -43,10 +43,10 @@ if [ $? -eq 0 ]; then
 else
     logerror "npm not installed"
     log "install npm with nodejs"
-    $SUDO apt install -y curl && loggood "success" || logerror "some error"
+    $SUDO apt install -y curl && loggood "install curl success" || logerror "failed to install curl"
     curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
     $SUDO apt update
-    $SUDO apt install -y nodejs && loggood "success" || logerror "some error"
+    $SUDO apt install -y nodejs && loggood "install nodejs success" || logerror "failed to install nodejs"
     log "verify if nodejs 10.x is now installed"
     dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s10.'
     if [ $? -eq 0 ]; then
