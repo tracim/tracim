@@ -54,7 +54,7 @@ export class FileProperties extends React.Component {
             </div>
 
             <div className='fileProperties__content__detail__item' title={props.creationDateFormatted} >
-              {props.t('Creation date:')} {props.creationDate}
+              {props.t('Creation date:')} {props.creationDateFormattedWithTime}
             </div>
 
             <div className='fileProperties__content__detail__item' title={props.lastModificationFormatted} >

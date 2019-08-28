@@ -48,9 +48,15 @@
     margin 0 5px
     font-size 20px
     cursor pointer
+    &:focus
+      box-shadow 0 0 0 0
+      outline 0
   &__pagecount
     position absolute
     right 5px
     bottom 5px
     font-size 13px
+  &__filepreview
+    display flex
+    height calc(100% - 53px) // 53px => height of dloption
 

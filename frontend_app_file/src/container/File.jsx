@@ -933,7 +933,7 @@ class File extends React.Component {
                   fileSize={displayFileSize(state.content.size)}
                   filePageNb={state.content.page_nb}
                   activesShares={state.content.actives_shares}
-                  creationDate={displayDistanceDate(state.content.created, state.loggedUser.lang)}
+                  creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                   creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
                   lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
                   lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
