@@ -17,7 +17,8 @@ describe('<PopinFixedHeader />', () => {
     componentTitle: <h1>Random Element</h1>,
     userRoleIdInWorkspace: 3,
     onValidateChangeTitle: onValidateChangeTitleCallBack,
-    disableChangeTitle: false
+    disableChangeTitle: false,
+    hideChangeTitleButton: false
   }
 
   const wrapper = mount(
@@ -37,6 +38,12 @@ describe('<PopinFixedHeader />', () => {
 
     it(`should display the icon: ${props.faIcon}`, () => {
       expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
+    })
+
+    it('should hide the edittitle button when the prop hideChangeTitleButton is set to true', () => {
+      wrapper.setProps({ hideChangeTitleButton: true })
+      expect(wrapper.find(`button.${(props.customClass)}__header__changetitle`)).to.have.lengthOf(0)
+      wrapper.setProps({ hideChangeTitleButton: props.hideChangeTitleButton })
     })
   })
 

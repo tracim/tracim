@@ -85,7 +85,7 @@ class PopinFixedHeader extends React.Component {
           </button>
         }
 
-        {userRoleIdInWorkspace && !hideChangeTitleButton >= 2 &&
+        {userRoleIdInWorkspace >= 2 && !hideChangeTitleButton &&
           <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickChangeTitleBtn}
