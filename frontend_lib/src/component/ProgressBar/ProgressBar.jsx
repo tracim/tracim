@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 export const ProgressBar = props => {
   const intPercent = parseInt(props.percent)
@@ -22,3 +23,14 @@ export const ProgressBar = props => {
 }
 
 export default ProgressBar
+
+ProgressBar.propTypes = {
+  percent: PropTypes.number.isRequired,
+  backgroundColor: PropTypes.string,
+  color: PropTypes.string
+}
+
+ProgressBar.defaultProps = {
+  backgroundColor: '',
+  color: ''
+}
