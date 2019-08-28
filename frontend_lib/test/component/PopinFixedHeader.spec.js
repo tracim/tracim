@@ -40,7 +40,7 @@ describe('<PopinFixedHeader />', () => {
       expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
     })
 
-    it('should hide the edittitle button when the prop showChangeTitleButton is set to true', () => {
+    it('should hide the edittitle button when the prop showChangeTitleButton is set to false', () => {
       wrapper.setProps({ showChangeTitleButton: false })
       expect(wrapper.find(`button.${(props.customClass)}__header__changetitle`)).to.have.lengthOf(0)
       wrapper.setProps({ showChangeTitleButton: props.showChangeTitleButton })
