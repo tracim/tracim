@@ -33,7 +33,7 @@
       display flex
       justify-content end
   &__userlist
-    width calc(100% - 65px)
+    width calc(100% - 65px) // 65px is the width of the rightPart header
     overflow-y auto
     &__list
       margin 0
@@ -61,9 +61,11 @@
             padding 0 15px
             background-color transparent
             cursor pointer
+            max-width 250px
+            width 100%
             &::after
               display flex
-              justify-content flex-end
+              margin-left auto
             &.bordered
               border 1px solid grey
               border-radius 10px
@@ -105,14 +107,17 @@
           font-size 18px
           cursor pointer
     &__title
-      padding 17px 20px
+      padding 17px 15px
   &__optionalfunctionalities
-    width calc(100% - 65px)
+    width calc(100% - 65px)  // 65px is the width of the rightPart header
     padding-top 10px
     &__title
-      padding 7px 20px 17px
+      padding 7px 15px 17px
     &__content
       padding-left 20px
+
+.btndropdown__text
+  text-align left
 
 .workspace_advanced__popup
   .cardPopup__container
