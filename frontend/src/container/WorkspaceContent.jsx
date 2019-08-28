@@ -43,6 +43,8 @@ import {
   newFlashMessage,
   setWorkspaceContentList,
   addWorkspaceContentList,
+  setWorkspaceShareFolderContentList,
+  addWorkspaceShareFolderContentList,
   setWorkspaceContentArchived,
   setWorkspaceContentDeleted,
   setWorkspaceMemberList,
@@ -65,7 +67,7 @@ class WorkspaceContent extends React.Component {
       appOpenedType: false,
       contentLoaded: false,
       shareFolder: {
-        isOpen: false
+        isOpen: (qs.parse(props.location.search).share_folder || '') === '1'
       }
     }
 
@@ -119,17 +121,7 @@ class WorkspaceContent extends React.Component {
       else return
     } else wsToLoad = props.match.params.idws
 
-    try {
-      await this.loadContentList(wsToLoad)
-      await this.loadShareFolderContent()
-    } catch (error) {
-      console.log(error.message)
-      return
-    }
-
-    this.scrollToActiveContent()
-    this.buildBreadcrumbs()
-    this.setState({ workspaceIdInUrl: wsToLoad, contentLoaded: true })
+    this.loadAllWorkspaceContent(wsToLoad, true)
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -148,17 +140,28 @@ class WorkspaceContent extends React.Component {
     const currentFilter = qs.parse(props.location.search).type
 
     if (prevState.workspaceIdInUrl !== workspaceId || prevFilter !== currentFilter) {
-      await this.loadContentList(workspaceId).catch(error => console.log(error.message))
-      await this.loadShareFolderContent()
-      this.scrollToActiveContent()
-      this.buildBreadcrumbs()
-      this.setState({ workspaceIdInUrl: workspaceId, contentLoaded: true })
+      this.setState({ workspaceIdInUrl: workspaceId })
+      this.loadAllWorkspaceContent(workspaceId, false)
     }
   }
 
   componentWillUnmount () {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  }
+
+  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent = false) => {
+    try {
+      await this.loadContentList(workspaceId)
+      await this.loadShareFolderContent(workspaceId)
+    } catch (error) {
+      console.log(error.message)
+      return false
+    }
+
+    this.buildBreadcrumbs()
+    if (shouldScrollToContent) this.scrollToActiveContent()
+    return true
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -210,7 +213,6 @@ class WorkspaceContent extends React.Component {
   }
 
   loadContentList = async (workspaceId) => {
-    if (this.state.contentLoaded) return false
     console.log('%c<WorkspaceContent> loadContentList', 'color: #c17838')
     const { props } = this
 
@@ -243,6 +245,7 @@ class WorkspaceContent extends React.Component {
           case 2023: // eslint-disable-line no-fallthrough
             props.dispatch(newFlashMessage(props.t('Content not found'), 'warning'))
             props.history.push(`/ui/workspaces/${workspaceId}/contents`)
+            this.loadAllWorkspaceContent(workspaceId, false) // INFO - CH - 2019-08-27 - force reload data because, in this case, componentDidUpdate wont
             throw new Error(fetchContentList.json.message)
           // INFO - B.L - 2019.08.06 - workspace does not exists or forbidden
           case 1002:
@@ -271,6 +274,8 @@ class WorkspaceContent extends React.Component {
       case 401: break
       default: props.dispatch(newFlashMessage(props.t('Error while loading read status list'), 'warning'))
     }
+
+    this.setState({ contentLoaded: true })
   }
 
   handleClickContentItem = content => {
@@ -324,7 +329,7 @@ class WorkspaceContent extends React.Component {
 
   handleClickFolder = async folderId => {
     const { props, state } = this
-    const folder = props.workspaceContentList.find(content => content.id === folderId)
+    const folder = props.workspaceContentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.find(c => c.id === folderId)
 
     const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
     const newUrlSearchList = (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
@@ -344,9 +349,9 @@ class WorkspaceContent extends React.Component {
       if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
     }
 
-    if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceContentList.some(c => c.parentId === folderId)) {
+    if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceShareFolderContentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
+      if (fetchContentList.status === 200) props.dispatch(addWorkspaceShareFolderContentList(fetchContentList.json))
     }
   }
 
@@ -373,11 +378,6 @@ class WorkspaceContent extends React.Component {
     props.history.push(`${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`)
   }
 
-  handleClickManageAction = () => {
-    console.log('%c<WorkspaceContent> Custom event openShareFolder', 'color: #28a745')
-    this.props.history.push(PAGE.WORKSPACE.SHARE_FOLDER(this.state.workspaceIdInUrl) + this.props.location.search)
-  }
-
   getContentParentList = (content, contentList) => {
     const parent = contentList.find(c => c.id === content.parentId)
     if (!parent) return []
@@ -389,6 +389,8 @@ class WorkspaceContent extends React.Component {
     const { props, state } = this
 
     if (source.contentId === destination.contentId) return
+
+    if (destination.id === SHARE_FOLDER_ID || destination.parentId === SHARE_FOLDER_ID) return
 
     // INFO - CH - 2019-06-14 - Check that not moving a folder into one of its sub folder
     if (source.workspaceId === destination.workspaceId && destination.parentId !== 0) {
@@ -415,6 +417,7 @@ class WorkspaceContent extends React.Component {
         const { dropEffect, ...actionDestination } = destination
         props.dispatch(moveWorkspaceContent(source, actionDestination))
         this.loadContentList(state.workspaceIdInUrl)
+        this.loadShareFolderContent(state.workspaceIdInUrl)
         break
       case 400:
         switch (fetchMoveContent.json.code) {
@@ -469,12 +472,11 @@ class WorkspaceContent extends React.Component {
       : 'th'
   }
 
-  loadShareFolderContent = async () => {
-    const { props, state } = this
+  loadShareFolderContent = async workspaceId => {
+    const { props } = this
 
-    if (state.contentLoaded) return false
-
-    const response = await props.dispatch(getShareFolderContentList(state.workspaceIdInUrl))
+    const folderIdToOpen = this.getFolderIdToOpenInUrl(props.location.search)
+    const response = await props.dispatch(getShareFolderContentList(workspaceId))
 
     switch (response.status) {
       case 200:
@@ -482,7 +484,7 @@ class WorkspaceContent extends React.Component {
           ? { ...file, parent_id: SHARE_FOLDER_ID }
           : file
         )
-        props.dispatch(addWorkspaceContentList(publicSharedContentList))
+        props.dispatch(setWorkspaceShareFolderContentList(publicSharedContentList, folderIdToOpen))
         return true
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
@@ -491,11 +493,20 @@ class WorkspaceContent extends React.Component {
   }
 
   handleClickShareFolder = async () => {
+    const { props, state } = this
+
+    const newUrlSearchObject = {
+      ...qs.parse(props.location.search),
+      share_folder: state.shareFolder.isOpen ? 0 : 1 // INFO - CH - 2019/08/27 - switch to the opposite
+    }
+
     this.setState(previousState => ({
       shareFolder: {
         isOpen: !previousState.shareFolder.isOpen
       }
     }))
+
+    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
   }
 
   filterWorkspaceContent = (contentList, filter) => filter.length === 0
@@ -531,7 +542,7 @@ class WorkspaceContent extends React.Component {
   }
 
   render () {
-    const { breadcrumbs, user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
+    const { breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t } = this.props
     const { state } = this
 
     const urlFilter = qs.parse(location.search).type
@@ -609,22 +620,22 @@ class WorkspaceContent extends React.Component {
                 <ContentItemHeader />
 
                 <ShareFolder
+                  workspaceId={state.workspaceIdInUrl}
                   availableApp={createContentAvailableApp}
                   isOpen={state.shareFolder.isOpen}
                   getContentParentList={this.getContentParentList}
                   onDropMoveContentItem={this.handleDropMoveContent}
-                  onClickFolder={this.handleClickFolder.bind(this)}
+                  onClickFolder={this.handleClickFolder}
                   onClickCreateContent={this.handleClickCreateContent}
                   setFolderRead={this.handleSetFolderRead}
                   userRoleIdInWorkspace={userRoleIdInWorkspace}
-                  uploadedContentList={filteredWorkspaceContentList}
+                  shareFolderContentList={workspaceShareFolderContentList}
                   onClickExtendedAction={{
                     edit: this.handleClickEditContentItem,
                     download: this.handleClickDownloadContentItem,
                     archive: this.handleClickArchiveContentItem,
                     delete: this.handleClickDeleteContentItem
                   }}
-                  onClickManageAction={this.handleClickManageAction}
                   onClickShareFolder={this.handleClickShareFolder}
                   contentType={contentType}
                   readStatusList={currentWorkspace.contentReadStatusList}
@@ -706,7 +717,7 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
-  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType
+const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType }) => ({
+  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))

@@ -34,7 +34,7 @@ import {
   WORKSPACE_CONTENT_DELETED,
   WORKSPACE_RECENT_ACTIVITY,
   WORKSPACE_READ_STATUS,
-  WORKSPACE_CONTENT_PUBLIC_SHARE,
+  WORKSPACE_CONTENT_SHARE_FOLDER,
   USER_WORKSPACE_DO_NOTIFY,
   USER,
   USER_WORKSPACE_LIST,
@@ -526,7 +526,7 @@ export const getShareFolderContentList = (workspaceId) => dispatch => {
       },
       method: 'GET'
     },
-    actionName: WORKSPACE_CONTENT_PUBLIC_SHARE,
+    actionName: WORKSPACE_CONTENT_SHARE_FOLDER,
     dispatch
   })
 }

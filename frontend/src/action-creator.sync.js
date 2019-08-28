@@ -46,11 +46,14 @@ export const USER_AGENDA_URL = `${USER}/Agenda`
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/${CONTENT}`
-export const WORKSPACE_CONTENT_PUBLIC_SHARE = `${WORKSPACE_CONTENT}/PUBLIC_SHARE`
+export const SHARE_FOLDER = 'SHARE_FOLDER'
+export const WORKSPACE_CONTENT_SHARE_FOLDER = `${WORKSPACE_CONTENT}/${SHARE_FOLDER}`
 export const PATH = 'Path'
 export const WORKSPACE_CONTENT_PATH = `${WORKSPACE_CONTENT}/${PATH}`
 export const setWorkspaceContentList = (workspaceContentList, folderIdToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, folderIdToOpenList })
+export const setWorkspaceShareFolderContentList = (workspaceShareFolderContentList, folderIdToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, folderIdToOpenList })
 export const addWorkspaceContentList = workspaceContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT}`, workspaceContentList })
+export const addWorkspaceShareFolderContentList = workspaceShareFolderContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
@@ -61,6 +64,10 @@ export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
 export const setWorkspaceContentArchived = (workspaceId, contentId) => ({ type: `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`, workspaceId, contentId })
 export const setWorkspaceContentDeleted = (workspaceId, contentId) => ({ type: `${SET}/${WORKSPACE_CONTENT_DELETED}`, workspaceId, contentId })
+export const WORKSPACE_CONTENT_SHARE_FOLDER_ARCHIVED = `${WORKSPACE_CONTENT_SHARE_FOLDER}/Archived`
+export const WORKSPACE_CONTENT_SHARE_FOLDER_DELETED = `${WORKSPACE_CONTENT_SHARE_FOLDER}/Deleted`
+export const setWorkspaceContentShareFolderArchived = (workspaceId, contentId) => ({ type: `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER_ARCHIVED}`, workspaceId, contentId })
+export const setWorkspaceContentShareFolderDeleted = (workspaceId, contentId) => ({ type: `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER_DELETED}`, workspaceId, contentId })
 
 export const WORKSPACE_CONTENT_MOVE = `${MOVE}/${WORKSPACE_CONTENT}`
 export const moveWorkspaceContent = (source, destination) => ({ type: `${MOVE}/${WORKSPACE_CONTENT}`, source, destination })

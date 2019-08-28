@@ -10,20 +10,23 @@ import { PAGE, SHARE_FOLDER_ID } from '../../helper.js'
 require('./Folder.styl')
 
 class ShareFolder extends React.Component {
+  handleClickOpenShareFolderApp = e => {
+    const { props } = this
+
+    e.stopPropagation()
+    props.history.push(PAGE.WORKSPACE.SHARE_FOLDER(props.workspaceId) + props.location.search)
+  }
+
   getIcon = () => {
     // INFO - G.B. - 2019-08-20 - This function always returns the same icon, but I've kept it like that for future improvement.
     // I think it is good to clearly indicate where to change if you want to have a different icon to a open/close share folder.
-    const { props } = this
-
-    if (props.isOpen) return 'fa-folder-open-o'
-
     return 'fa-share-alt'
   }
 
   render () {
     const { props } = this
 
-    const folderContentList = (props.uploadedContentList ? props.uploadedContentList : [])
+    const folderContentList = (props.shareFolderContentList ? props.shareFolderContentList : [])
       .filter(content => content.parentId === SHARE_FOLDER_ID)
       .sort((a, b) => {
         if (a.created > b.created) return -1
@@ -86,7 +89,7 @@ class ShareFolder extends React.Component {
                   <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                     <div
                       className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
-                      onClick={e => props.onClickManageAction()}
+                      onClick={this.handleClickOpenShareFolderApp}
                     >
                       <div className='subdropdown__item__icon mr-3'>
                         <i className='fa fa-fw fa-pencil' />
@@ -112,7 +115,8 @@ class ShareFolder extends React.Component {
               <Folder
                 availableApp={props.availableApp}
                 folderData={content}
-                workspaceContentList={props.uploadedContentList}
+                showCreateContentButton={false}
+                workspaceContentList={props.shareFolderContentList}
                 getContentParentList={props.getContentParentList}
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={props.onClickExtendedAction}
@@ -122,7 +126,7 @@ class ShareFolder extends React.Component {
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
                 setFolderRead={props.setFolderRead}
-                isLast={index === props.uploadedContentList.length - 1}
+                isLast={index === props.shareFolderContentList.length - 1}
                 key={content.id}
                 t={props.t}
               />
