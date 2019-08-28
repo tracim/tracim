@@ -44,11 +44,11 @@ else
     logerror "npm not installed"
     log "install npm with nodejs"
     $SUDO apt install -y curl && loggood "success" || logerror "some error"
-    curl -sL https://deb.nodesource.com/setup_8.x | $SUDOCURL bash -
+    curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
     $SUDO apt update
     $SUDO apt install -y nodejs && loggood "success" || logerror "some error"
-    log "verify if nodejs 8.x is now installed"
-    dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s8.'
+    log "verify if nodejs 10.x is now installed"
+    dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s10.'
     if [ $? -eq 0 ]; then
         loggood "node \"$(node -v)\" is correctly installed"
         npm -v
@@ -59,7 +59,7 @@ else
         exit 1
         fi
     else
-        logerror "nodejs 8.x and npm are not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
+        logerror "nodejs 10.x and npm are not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
         exit 1
     fi
 fi
