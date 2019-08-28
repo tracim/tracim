@@ -24,6 +24,8 @@ const agendaEnTranslation = require('../dist/app/agenda_en_translation.json')
 const agendaFrTranslation = require('../dist/app/agenda_fr_translation.json')
 const officeDocumentEnTranslation = require('../dist/app/office_document_en_translation.json')
 const officeDocumentFrTranslation = require('../dist/app/office_document_fr_translation.json')
+const shareFolderEnTranslation = require('../dist/app/share_folder_en_translation.json')
+const shareFolderFrTranslation = require('../dist/app/share_folder_fr_translation.json')
 
 export const getBrowserLang = () => {
   const browserLang = navigator.language
@@ -57,7 +59,8 @@ i18n
           ...adminWsUserEnTranslation, // admin workspace user
           ...wsEnTranslation, // workspace
           ...agendaEnTranslation, // agenda
-          ...officeDocumentEnTranslation
+          ...officeDocumentEnTranslation,
+          ...shareFolderEnTranslation // share folder
         }
       },
       fr: {
@@ -72,7 +75,8 @@ i18n
           ...adminWsUserFrTranslation, // admin workspace user
           ...wsFrTranslation, // workspace
           ...agendaFrTranslation, // agenda
-          ...officeDocumentFrTranslation
+          ...officeDocumentFrTranslation,
+          ...shareFolderFrTranslation // share folder
         }
       }
     }
