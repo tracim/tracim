@@ -2,8 +2,8 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { Popover, PopoverBody } from 'reactstrap'
+import { generateRandomPassword, ComposedIcon } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
-import { generateRandomPassword } from 'tracim_frontend_lib'
 import PropTypes from 'prop-types'
 
 const color = require('color')
@@ -160,6 +160,17 @@ class NewUpload extends React.Component {
             <i className='fa fa-fw fa-plus-circle' />
           </button>
         </div>
+
+        {!props.emailNotifActivated && (
+          <div className='newUpload__emailWarning'>
+            <ComposedIcon
+              mainIcon='envelope'
+              smallIcon='warning'
+              smallIconCustomClass='text-danger'
+            />
+            {props.t('Email notification are disabled, please manually notify the link')}
+          </div>
+        )}
       </div>
     )
   }
