@@ -6,6 +6,7 @@
   "Import authorizations": "Import authorizations",
   "No upload link has been created yet": "No upload link has been created yet",
   "The password length must be between 6 and 512 characters and the email(s) must be valid": "The password length must be between 6 and 512 characters and the email(s) must be valid",
+  "Email notification are disabled, please manually notify the link": "Email notification are disabled, please manually notify the link",
   "Error while creating new share link": "Error while creating new share link",
   "Enter the email address of the recipient(s)": "Enter the email address of the recipient(s)",
   "Password to share link (optional)": "Password to share link (optional)",
