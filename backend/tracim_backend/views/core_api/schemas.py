@@ -1130,3 +1130,4 @@ class ConfigSchema(marshmallow.Schema):
     collaborative_document_edition = marshmallow.fields.Nested(
         CollaborativeDocumentEditionConfigSchema(), allow_none=True
     )
+    content_length_file_size_limit = marshmallow.fields.Integer()
