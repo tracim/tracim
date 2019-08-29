@@ -162,6 +162,10 @@ class UploadPermissionCreationBodySchema(marshmallow.Schema):
         return UploadPermissionCreationBody(**data)
 
 
+class UploadPermissionPublicInfoSchema(marshmallow.Schema):
+    has_password = marshmallow.fields.Boolean(required=True)
+
+
 class UploadPermissionSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         example="hello@tracim.fr", required=True, validate=upload_permission_email_validator
