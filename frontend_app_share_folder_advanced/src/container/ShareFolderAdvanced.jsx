@@ -269,6 +269,7 @@ class ShareFolderAdvanced extends React.Component {
               uploadPassword={state.uploadPassword}
               onChangeUploadPassword={this.handleChangePassword}
               onKeyDownEnter={this.handleKeyDownEnter}
+              emailNotifActivated={state.config.system.config.email_notification_activated}
             />
           }
         </PopinFixedContent>
