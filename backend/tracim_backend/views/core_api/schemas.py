@@ -316,6 +316,33 @@ class UserIdPathSchema(marshmallow.Schema):
     )
 
 
+class UserWorkspaceFilterQuery(object):
+    def __init__(self, show_owned_workspace: int = 1, show_workspace_with_role: int = 1):
+        self.show_owned_workspace = bool(show_owned_workspace)
+        self.show_workspace_with_role = bool(show_workspace_with_role)
+
+
+class UserWorkspaceFilterQuerySchema(marshmallow.Schema):
+    show_owned_workspace = marshmallow.fields.Int(
+        example=1,
+        default=1,
+        description="if set to 1, then show owned workspace in list"
+        " Default is 1, else do no show them",
+        validate=bool_as_int_validator,
+    )
+    show_workspace_with_role = marshmallow.fields.Int(
+        example=1,
+        default=1,
+        description="if set to 1, then show workspace were user as a role in list"
+        " Default is 1, else do no show them",
+        validate=bool_as_int_validator,
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return UserWorkspaceFilterQuery(**data)
+
+
 class WorkspaceIdPathSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(
         example=4,

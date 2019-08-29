@@ -873,13 +873,95 @@ class TestAccountDisableWorkspaceNotification(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestAccountWorkspaceEndpoint(object):
     """
     Tests for /api/v2/users/me/workspaces
     """
 
+    def test_api__get_user_workspaces__ok_200__with_filter(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        admin_user,
+        application_api_factory,
+        web_testapp,
+        group_api_factory,
+        role_api_factory,
+    ):
+        """
+        Check obtain all workspaces reachables for user with different filter
+        """
+
+        workspace_api = workspace_api_factory.get()
+        owned_and_role_workspace = workspace_api.create_workspace(label="owned_and_role")
+        owned_only_workspace = workspace_api.create_workspace("owned_only")
+        user_api = user_api_factory.get()
+        user_api.create_user("toto@toto.toto", do_notify=False)
+        group_api = group_api_factory.get()
+        groups = [group_api.get_one_with_name("administrators")]
+        test_user = user_api.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api_test_user = workspace_api_factory.get(test_user)
+        role_only_workspace = workspace_api_test_user.create_workspace(label="role_only")
+        rapi = role_api_factory.get()
+        rapi.create_one(admin_user, role_only_workspace, UserRoleInWorkspace.READER, False)
+        rapi.create_one(
+            test_user, owned_only_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        )
+        transaction.commit()
+        rapi_test_user = role_api_factory.get(test_user)
+        rapi_test_user.delete_one(admin_user.user_id, owned_only_workspace.workspace_id)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {}
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200, params=params)
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "1"}
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200, params=params)
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "0"}
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200, params=params)
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "0", "show_owned_workspace": "1"}
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200, params=params)
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "0", "show_owned_workspace": "0"}
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200, params=params)
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == set()
+
+    @pytest.mark.usefixtures("default_content_fixture")
     def test_api__get_account_workspaces__ok_200__nominal_case(
         self,
         workspace_api_factory,
@@ -904,7 +986,7 @@ class TestAccountWorkspaceEndpoint(object):
             workspace=workspace
         )  # nope8
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/users/1/workspaces", status=200)
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200)
         res = res.json_body
         workspace = res[0]
         assert workspace["workspace_id"] == 1

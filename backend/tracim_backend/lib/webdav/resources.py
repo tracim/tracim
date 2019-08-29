@@ -19,7 +19,10 @@ from wsgidav.dav_provider import _DAVResource
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import TracimException
+from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
+from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import AuthorizationChecker
@@ -176,7 +179,14 @@ class RootResource(DAVCollection):
         # TODO : remove comment here
         # raise DAVError(HTTP_FORBIDDEN)
         workspace_name = webdav_convert_file_name_to_bdd(name)
-        new_workspace = self.workspace_api.create_workspace(workspace_name)
+        try:
+            new_workspace = self.workspace_api.create_workspace(workspace_name)
+        except (
+            UserNotAllowedToCreateMoreWorkspace,
+            EmptyLabelNotAllowed,
+            WorkspaceLabelAlreadyUsed,
+        ):
+            raise DAVError(HTTP_FORBIDDEN)
         self.workspace_api.save(new_workspace)
         self.workspace_api.execute_created_workspace_actions(new_workspace)
         transaction.commit()

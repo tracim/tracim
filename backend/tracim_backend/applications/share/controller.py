@@ -14,6 +14,7 @@ from tracim_backend.applications.share.schema import ContentShareSchema
 from tracim_backend.applications.share.schema import ShareCreationBodySchema
 from tracim_backend.applications.share.schema import ShareIdPathSchema
 from tracim_backend.applications.share.schema import ShareListQuerySchema
+from tracim_backend.applications.share.schema import SharePasswordBodySchema
 from tracim_backend.applications.share.schema import SharePasswordFormSchema
 from tracim_backend.applications.share.schema import ShareTokenPathSchema
 from tracim_backend.applications.share.schema import ShareTokenWithFilenamePathSchema
@@ -144,6 +145,28 @@ class ShareController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
+    @hapic.input_path(ShareTokenPathSchema())
+    @hapic.input_body(SharePasswordBodySchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def guest_download_check(self, context, request: TracimRequest, hapic_data=None) -> None:
+        """
+        Check if share token is correct and password given valid
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ShareLib(current_user=None, session=request.dbsession, config=app_config)
+        content_share = api.get_content_share_by_token(
+            share_token=hapic_data.path.share_token
+        )  # type: ContentShare
+
+        # TODO - G.M - 2019-08-01 - verify in access to content share can be granted
+        # we should considered do these check at decorator level
+        api.check_password(content_share, password=hapic_data.body.password)
+        if content_share.content.type not in shareables_content_type:
+            raise ContentTypeNotAllowed()
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(ShareTokenWithFilenamePathSchema())
     @hapic.output_file([])
     def guest_download_file_get(
@@ -238,6 +261,13 @@ class ShareController(Controller):
             "guest_download_info", "/public/guest-download/{share_token}", request_method="GET"
         )
         configurator.add_view(self.guest_download_info, route_name="guest_download_info")
+
+        configurator.add_route(
+            "guest_download_check",
+            "/public/guest-download/{share_token}/check",
+            request_method="POST",
+        )
+        configurator.add_view(self.guest_download_check, route_name="guest_download_check")
 
         configurator.add_route(
             "guest_download_file_get",

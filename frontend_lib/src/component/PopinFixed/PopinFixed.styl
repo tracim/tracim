@@ -101,16 +101,18 @@
       &__header
         display flex
         flex-direction column
-        width 50px
+        width 65px
         background-color mediumGrey
         font-size 20px
         color darkGrey
+        cursor pointer
         &__icon
           text-align center
           cursor pointer
           padding-top 2px
           padding-bottom 2px
           border none
+          height 65px
           &:focus
             border-color transparent
             outline 0
@@ -119,6 +121,7 @@
             padding 7px 5px 7px 3px
             background-color lightGrey
             border-left 5px solid
+            height 65px
           &__close
             text-align center
             cursor pointer
@@ -127,11 +130,12 @@
 .rightPartClose
   .wsContentGeneric__content
     &__left
-      width calc(50% - 45px) // 45px is the width of the rightPart header
+      width calc(50% - 65px) // 65px is the width of the rightPart header
     &__right__header__icon.active
       background-color mediumGrey
       border none
 
+// MEDIAQUERIES
 
 @media (max-width: max-lg)
   .rightPartClose
@@ -161,13 +165,15 @@ responsiveColumnStyle()
         &__header
           flex-direction row
           width 100%
-          min-height 50px
+          height 65px
           justify-content flex-end
           &__icon
-            display flex
             transform none
             margin 10px
             padding 10px
+            width 65px
+            & > i
+              margin auto
             &.active
               border none
               border-top 5px solid
