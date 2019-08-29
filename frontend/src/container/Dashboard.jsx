@@ -418,12 +418,14 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
-
+    console.log(props.appList)
     const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => userRoleIdInWorkspace === 2 ? app.slug !== 'contents/folder' : true)
         .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
         .filter(app => app.slug !== 'contents/share_folder')
+        .filter(app => app.slug !== 'share_content')
+        .filter(app => app.slug !== 'upload_permission')
         .map(app => {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || { creationLabel: '', slug: '' }
           // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications
