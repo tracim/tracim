@@ -40,8 +40,8 @@
   "You can also import your file by clicking here": "Vous pouvez aussi sélectionner votre fichier en cliquant ici",
   "Upload a file": "Importer un fichier",
   "Validate and create": "Valider et créer",
-  "Copy link": "Copier lien",
-  "Delete link": "Supprimer lien",
+  "Copy link": "Copier le lien",
+  "Delete link": "Supprimer le lien",
   "New share": "Nouveau partage",
   "Enter the email address of the recipient(s)": "Saisir l'adresses email du ou des destinataires",
   "To add multiple recipients, separate the email addresses with a comma or space.": "Pour ajouter plusieurs destinataires, séparez les adresses email par une virgule ou un espace.",
@@ -54,5 +54,7 @@
   "Show password": "Voir le mot de passe",
   "This file has {{numberLinks}} share links": "Ce fichier a {{numberLinks}} liens de partage",
   "by {{author}}": "par {{author}}",
-  "Create": "Créer"
+  "Create": "Créer",
+  "Close": "Fermer",
+  "Open": "Ouvrir"
 }
