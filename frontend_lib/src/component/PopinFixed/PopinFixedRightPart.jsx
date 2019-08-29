@@ -29,7 +29,7 @@ class PopinFixedRightPart extends React.Component {
         >
           {props.menuItemList.map(menuItem =>
             <button
-              className={classnames('iconBtn wsContentGeneric__content__right__header__icon nav-item', { 'active': menuItem.id === state.currentChildren })}
+              className={classnames('wsContentGeneric__content__right__header__icon nav-item', { 'active': menuItem.id === state.currentChildren })}
               title={menuItem.label}
               onClick={() => this.handleChangeRightChildren(menuItem.id)}
               style={{ borderColor: props.customColor }}
