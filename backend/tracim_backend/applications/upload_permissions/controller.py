@@ -119,7 +119,7 @@ class UploadPermissionController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ) -> UploadPermissionInContext:
         """
-        check upload password and token validity
+        get somes informations about upload permission
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = UploadPermissionLib(current_user=None, session=request.dbsession, config=app_config)
