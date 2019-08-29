@@ -26,6 +26,7 @@
   "Add a member": "Ajouter un membre",
   "If you type an email that isn't associated to an account, an invitational email will be sent": "Si vous entrez un email qui n'est associé à aucun compte, un email d'invitation lui sera envoyé",
   "Email notifications are disabled, you can't create new users from here": "Les notifications par email sont désactivées, vous ne pouvez pas créer d'utilisateur à partir d'ici",
+  "Email notification are disabled, please manually notify the link": "Les notifications par email sont désactivées, veuillez informer le lien manuellement",
   "Send an invitational email to this user": "Envoyer un email d'invitation à cet utilisateur",
   "I know this user exist": "Je sais que cet utilisateur existe",
   "Cancel": "Annuler",

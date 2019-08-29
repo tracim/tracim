@@ -37,7 +37,7 @@ const WorkspaceMembersList = props => {
                         aria-haspopup='true'
                         aria-expanded='false'
                       >
-                        <div className='btndropdown__icon mr-3' style={{ color: role.hexcolor }}>
+                        <div className='btndropdown__icon' style={{ color: role.hexcolor }}>
                           <i className={`fa fa-${role.faIcon}`} />
                         </div>
 

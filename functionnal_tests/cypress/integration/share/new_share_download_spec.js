@@ -10,6 +10,7 @@ const email2 = 'email2@email2.email2'
 const email3 = 'email1@email3.email3'
 
 let workspaceId
+let contentId
 
 describe('Open a file', () => {
   before(function () {
@@ -19,16 +20,21 @@ describe('Open a file', () => {
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
+        .then(newContent => {
+          contentId = newContent.content_id
+          cy.updateFile(fullFilename, contentType, workspaceId, newContent.content_id, newContent.filename)
+        })
     })
     cy.wait(2000)
   })
 
   beforeEach(function () {
     cy.loginAs('administrators')
-    cy.visitPage({pageName: PAGES.CONTENTS, params: {workspaceId: workspaceId}})
-    cy.get('.content').click()
+    cy.visitPage({
+      pageName: PAGES.CONTENT_OPEN, 
+      params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
+    })
     cy.get('.wsContentGeneric__content__right__header .fa-share-alt').click()
-    cy.get('.shareDownload__btn').click()
   })
 
   afterEach(function () {

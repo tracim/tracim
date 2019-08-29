@@ -26,6 +26,7 @@
   "Add a member": "Add a member",
   "If you type an email that isn't associated to an account, an invitational email will be sent": "If you type an email that isn't associated to an account, an invitational email will be sent",
   "Email notifications are disabled, you can't create new users from here": "Email notifications are disabled, you can't create new users from here",
+  "Email notification are disabled, please manually notify the link": "Email notification are disabled, please manually notify the link",
   "Send an invitational email to this user": "Send an invitational email to this user",
   "I know this user exist": "I know this user exist",
   "Cancel": "Cancel",
