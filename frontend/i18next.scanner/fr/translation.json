@@ -228,5 +228,6 @@
   "Error while downloading file": "Erreur lors du téléchargement du fichier",
   "Manage": "Paramétrer",
   "Error while loading file infos": "Erreur lors du chargement des informations du fichier",
-  "Full name": "Nom complet"
+  "Full name": "Nom complet",
+  "Error while loading upload infos": "Erreur lors du chargement des informations du téléversement"
 }

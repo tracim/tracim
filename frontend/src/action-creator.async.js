@@ -775,3 +775,12 @@ export const postDownloadFile = (token, guestPassword) =>
       password: guestPassword
     })
   })
+
+export const getGuestUploadInfos = (token) =>
+  fetch(`${FETCH_CONFIG.apiUrl}/public/guest-upload/${token}`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
