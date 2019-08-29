@@ -4,11 +4,11 @@ import {validated} from '../contentStatus/validated.js'
 import {cancelled} from '../contentStatus/cancelled.js'
 import {deprecated} from '../contentStatus/deprecated.js'
 
-const {label, slug, faIcon, hexcolor} = fileApp
+const {label, faIcon, hexcolor} = fileApp
 
 export const file = {
   label,
-  slug,
+  slug: 'file',
   faIcon,
   hexcolor,
   creationLabel: 'Upload a file',

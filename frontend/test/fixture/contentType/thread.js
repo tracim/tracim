@@ -8,7 +8,7 @@ const {label, slug, faIcon, hexcolor} = threadApp
 
 export const thread = {
   label,
-  slug,
+  slug: 'thread',
   faIcon,
   hexcolor,
   creationLabel: 'Start a topic',

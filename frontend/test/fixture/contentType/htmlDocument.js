@@ -8,7 +8,7 @@ const {label, slug, faIcon, hexcolor} = htmlDocumentApp
 
 export const htmlDocument = {
   label,
-  slug,
+  slug: 'html-document',
   faIcon,
   hexcolor,
   creationLabel: 'Write a document',

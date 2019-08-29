@@ -8,7 +8,7 @@ const {label, slug, faIcon, hexcolor} = folderApp
 
 export const folder = {
   label,
-  slug,
+  slug: 'folder',
   faIcon,
   hexcolor,
   creationLabel: 'Create a folder',
