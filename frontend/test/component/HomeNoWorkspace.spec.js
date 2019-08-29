@@ -1,8 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { HomeNoWorkspace as HomeNoWorkspaceWithoutHOC } from '../../src/component/Home/HomeNoWorkspace'
-import { translateMock } from '../hocMock/translate'
+import { HomeNoWorkspace as HomeNoWorkspaceWithoutHOC } from '../../src/component/Home/HomeNoWorkspace.jsx'
+import { translateMock } from '../hocMock/translate.js'
 import sinon from 'sinon'
 
 describe('<HomeNoWorkspace />', () => {

@@ -1,8 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { ExtandedAction as ExtandedActionWithoutHOC } from '../../src/component/Workspace/BtnExtandedAction'
-import { translateMock } from '../hocMock/translate'
+import { ExtandedAction as ExtandedActionWithoutHOC } from '../../src/component/Workspace/BtnExtandedAction.jsx'
+import { translateMock } from '../hocMock/translate.js'
 import sinon from 'sinon'
 
 describe('<ExtandedAction />', () => {

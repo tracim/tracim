@@ -1,16 +1,12 @@
 import React from 'react'
-import { expect, assert } from 'chai'
-import { mount, configure } from 'enzyme'
-import configureMockStore from 'redux-mock-store'
-import PasswordRoot ,{ Password } from '../../src/component/Account/Password'
-import { shallowUntilTarget } from '../hocMock/helper.js'
-import thunk from 'redux-thunk'
+import { expect } from 'chai'
+import { mount } from 'enzyme'
+import { Password as PasswordWithoutHOC } from '../../src/component/Account/Password.jsx'
+import { connectMock } from '../hocMock/store.js'
+import { translateMock } from '../hocMock/translate.js'
 import sinon from 'sinon'
 
 describe('<Password />', () => {
-  const middleware = [thunk]
-  const mockStore = configureMockStore(middleware)
-  const store = mockStore({})
 
   const onClickSubmitCallBack = sinon.stub()
   const dispatchMock = sinon.stub()
@@ -21,9 +17,11 @@ describe('<Password />', () => {
     dispatch: dispatchMock
   }
 
-  const component = <PasswordRoot {...props} store={store} />
+  const mapStateToProps = {}
 
-  const wrapper = shallowUntilTarget(component, Password)
+  const ComponentWithHoc = connectMock(mapStateToProps)(translateMock()(PasswordWithoutHOC))
+
+  const wrapper = mount(<ComponentWithHoc { ...props } />).find('Password')
 
   describe('static design', () => {
     it('should have one button', () => {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import CardBody from '../../src/component/common/Card/CardBody'
+import CardBody from '../../src/component/common/Card/CardBody.jsx'
 
 describe('<CardBody />', () => {
   const props = {

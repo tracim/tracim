@@ -1,8 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { FlashMessage as FlashMessageWithoutHOC } from '../../src/component/FlashMessage'
-import { translateMock } from '../hocMock/translate'
+import { FlashMessage as FlashMessageWithoutHOC } from '../../src/component/FlashMessage.jsx'
+import { translateMock } from '../hocMock/translate.js'
 import sinon from 'sinon'
 
 describe('<FlashMessage />', () => {

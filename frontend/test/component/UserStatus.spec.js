@@ -1,15 +1,15 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { UserStatus as UserStatusWithoutHOC } from '../../src/component/Dashboard/UserStatus'
-import { translateMock } from '../hocMock/translate'
+import { UserStatus as UserStatusWithoutHOC } from '../../src/component/Dashboard/UserStatus.jsx'
+import { translateMock } from '../hocMock/translate.js'
 import sinon from 'sinon'
 import { ROLE } from '../../src/helper.js'
 
 describe('<UserStatus />', () => {
   const onClickAddNotifyCallBack = sinon.stub()
   const onClickRemoveNotifyCallBack = sinon.stub()
-  const testRole = ROLE[0]
+  const testRole = ROLE.find(r => r.slug === 'workspace-manager')
 
   const props = {
     user: {
@@ -69,10 +69,10 @@ describe('<UserStatus />', () => {
     })
 
     it(`onClickAddNotifyCallBack should be call when the notification button is clicked and doNotify is false`, () => {
-      wrapper.setProps({ curWs: {
+      wrapper.setProps({
+        curWs: {
           memberList: [{
-            id: 1,
-            role: testRole.slug,
+            ...props.curWs.memberList,
             doNotify: false
           }]
         }

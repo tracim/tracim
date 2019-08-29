@@ -1,7 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
-import { AgendaInfo as AgendaInfoWithoutHOC } from '../../src/component/Dashboard/AgendaInfo'
+import { mount } from 'enzyme'
+import { AgendaInfo as AgendaInfoWithoutHOC } from '../../src/component/Dashboard/AgendaInfo.jsx'
+import { translateMock } from '../hocMock/translate.js'
 
 describe('<AgendaInfo />', () => {
   const props = {
@@ -11,7 +12,9 @@ describe('<AgendaInfo />', () => {
     customClass: 'randomCustomClass'
   }
 
-  const wrapper = shallow(<AgendaInfoWithoutHOC { ...props } t={key => key} />)
+  const ComponentWithHoc = translateMock()(AgendaInfoWithoutHOC)
+
+  const wrapper = mount(<ComponentWithHoc { ...props } />)
 
   describe('static design', () => {
     it(`the root div should have the class: ${props.customClass}`, () =>

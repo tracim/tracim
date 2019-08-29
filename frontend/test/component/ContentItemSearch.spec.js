@@ -1,10 +1,10 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { ContentItemSearch as ContentItemSearchWithoutHOC } from '../../src/component/ContentItemSearch'
-import { contentType } from '../hocMock/redux/contentType/contentType'
-import { translateMock } from '../hocMock/translate'
-import { RouterMock } from '../hocMock/withRouter'
+import { ContentItemSearch as ContentItemSearchWithoutHOC } from '../../src/component/ContentItemSearch.jsx'
+import { contentType } from '../hocMock/redux/contentType/contentType.js'
+import { translateMock } from '../hocMock/translate.js'
+import { RouterMock } from '../hocMock/withRouter.js'
 
 describe('<ContentItemSearch />', () => {
   const status = contentType[2].availableStatuses[0]

@@ -2,8 +2,8 @@ import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import { MenuProfil as MenuProfilWithoutHOC } from '../../src/component/Header/MenuActionListItem/MenuProfil.jsx'
-import { translateMock } from '../hocMock/translate'
-import { RouterMock } from '../hocMock/withRouter'
+import { translateMock } from '../hocMock/translate.js'
+import { RouterMock } from '../hocMock/withRouter.js'
 import sinon from 'sinon'
 
 describe('<MenuProfil />', () => {

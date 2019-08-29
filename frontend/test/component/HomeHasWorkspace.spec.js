@@ -1,8 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { HomeHasWorkspace as HomeHasWorkspaceWithoutHOC } from '../../src/component/Home/HomeHasWorkspace'
-import { translateMock } from '../hocMock/translate'
+import { HomeHasWorkspace as HomeHasWorkspaceWithoutHOC } from '../../src/component/Home/HomeHasWorkspace.jsx'
+import { translateMock } from '../hocMock/translate.js'
 
 describe('<HomeHasWorkspace />', () => {
   const props = {

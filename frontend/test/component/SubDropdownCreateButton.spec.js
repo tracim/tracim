@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { SubDropdownCreateButton as SubDropdownCreateButtonWithoutHOC } from '../../src/component/common/Input/SubDropdownCreateButton'
+import { SubDropdownCreateButton as SubDropdownCreateButtonWithoutHOC } from '../../src/component/common/Input/SubDropdownCreateButton.jsx'
 import sinon from 'sinon'
 import { appList } from '../hocMock/redux/appList/appList.js'
 import { translateMock } from '../hocMock/translate'

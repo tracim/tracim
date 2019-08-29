@@ -1,9 +1,9 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import Card from '../../src/component/common/Card/Card'
-import CardHeader from '../../src/component/common/Card/CardHeader'
-import CardBody from '../../src/component/common/Card/CardBody'
+import Card from '../../src/component/common/Card/Card.jsx'
+import CardHeader from '../../src/component/common/Card/CardHeader.jsx'
+import CardBody from '../../src/component/common/Card/CardBody.jsx'
 
 describe('<Card />', () => {
   const props = {

@@ -1,9 +1,9 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { UserInfo as UserInfoWithoutHOC } from '../../src/component/Account/UserInfo'
-import { translateMock } from '../hocMock/translate'
-import { PROFILE } from '../../src/helper'
+import { UserInfo as UserInfoWithoutHOC } from '../../src/component/Account/UserInfo.jsx'
+import { translateMock } from '../hocMock/translate.js'
+import { PROFILE } from '../../src/helper.js'
 
 describe('<UserInfo />', () => {
   const props = {

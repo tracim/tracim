@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect, assert } from 'chai'
 import { shallow } from 'enzyme'
-import InputGroupText from '../../src/component/common/Input/InputGroupText'
+import InputGroupText from '../../src/component/common/Input/InputGroupText.jsx'
 import sinon from 'sinon'
 
 describe('<InputGroupText />', () => {

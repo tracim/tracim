@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { DragHandle } from '../../src/component/DragHandle'
+import { DragHandle } from '../../src/component/DragHandle.jsx'
 
 describe('<DragHandle />', () => {
   const props = {

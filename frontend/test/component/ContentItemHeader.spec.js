@@ -1,8 +1,8 @@
 import React from 'react'
 import { expect, assert } from 'chai'
 import { mount } from 'enzyme'
-import { FileItemHeader as FileItemHeaderWithoutHOC } from '../../src/component/Workspace/ContentItemHeader'
-import { translateMock } from '../hocMock/translate'
+import { FileItemHeader as FileItemHeaderWithoutHOC } from '../../src/component/Workspace/ContentItemHeader.jsx'
+import { translateMock } from '../hocMock/translate.js'
 
 describe('<ContentItemHeader />', () => {
   const props = {

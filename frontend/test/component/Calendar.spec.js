@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { Calendar as CalendarWithoutHOC } from '../../src/component/Account/Calendar'
+import { Calendar as CalendarWithoutHOC } from '../../src/component/Account/Calendar.jsx'
 import { translateMock } from '../hocMock/translate'
 
 describe('<Calendar />', () => {

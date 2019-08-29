@@ -2,8 +2,8 @@ import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import sinon from 'sinon'
-import { MenuSubComponent as MenuSubComponentWithoutHOC } from '../../src/component/Account/MenuSubComponent'
-import { translateMock } from '../hocMock/translate'
+import { MenuSubComponent as MenuSubComponentWithoutHOC } from '../../src/component/Account/MenuSubComponent.jsx'
+import { translateMock } from '../hocMock/translate.js'
 
 describe('<MenuSubComponent />', () => {
   const onClickMenuItemCallBack = sinon.stub()

@@ -1,9 +1,9 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { MoreInfo as MoreInfoWithoutHOC } from '../../src/component/Dashboard/MoreInfo'
+import { MoreInfo as MoreInfoWithoutHOC } from '../../src/component/Dashboard/MoreInfo.jsx'
 import sinon from 'sinon'
-import {translateMock} from "../hocMock/translate";
+import { translateMock } from '../hocMock/translate.js'
 
 describe('<MoreInfo />', () => {
   const onClickToggleWebdavCallBack = sinon.stub()

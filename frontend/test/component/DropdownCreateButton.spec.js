@@ -1,10 +1,10 @@
 import React from 'react'
 import { expect, assert } from 'chai'
 import { mount } from 'enzyme'
-import DropdownCreateButton from '../../src/component/common/Input/DropdownCreateButton'
+import DropdownCreateButton from '../../src/component/common/Input/DropdownCreateButton.jsx'
 import sinon from 'sinon'
 import { appList } from '../hocMock/redux/appList/appList.js'
-import i18n from '../../src/i18n'
+import i18n from '../../src/i18n.js'
 import { I18nextProvider } from 'react-i18next'
 
 describe('<DropdownCreateButton />', () => {

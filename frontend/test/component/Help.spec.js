@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import Help from '../../src/component/Header/MenuActionListItem/Help'
+import Help from '../../src/component/Header/MenuActionListItem/Help.jsx'
 import sinon from 'sinon'
 
 describe('<Help />', () => {

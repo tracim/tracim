@@ -1,13 +1,12 @@
 import React from 'react'
 import { expect } from 'chai'
+import { mount } from 'enzyme'
 import sinon from 'sinon'
-import PersonalDataRoot, { PersonalData } from '../../src/component/Account/PersonalData'
-import configureMockStore from 'redux-mock-store'
-import { shallowUntilTarget } from '../hocMock/helper.js'
+import { PersonalData as PersonalDataWithoutHOC } from '../../src/component/Account/PersonalData.jsx'
+import { translateMock } from '../hocMock/translate.js'
+import { connectMock } from '../hocMock/store.js'
 
 describe('<PersonnalData />', () => {
-  const mockStore = configureMockStore()
-  const store = mockStore({})
   const onClickSubmitCallBack = sinon.stub()
 
   const props = {
@@ -16,9 +15,13 @@ describe('<PersonnalData />', () => {
     userAuthType: 'randomUserAuthType'
   }
 
-  const component = <PersonalDataRoot {...props} store={store} />
+  const mapStateToProps = {}
 
-  const wrapper = shallowUntilTarget(component, PersonalData)
+  const ComponentWithHoc = connectMock(mapStateToProps)(translateMock()(PersonalDataWithoutHOC))
+
+  const wrapper = mount(<ComponentWithHoc { ...props } />)
+
+  const wrapperInstance = wrapper.find('PersonalData')
 
   describe('handlers', () => {
     it('onClickSubmitCallBack should be called when the button is clicked and the new password is valid', () => {
@@ -33,18 +36,18 @@ describe('<PersonnalData />', () => {
   describe('intern functions', () => {
     const randomText = 'randomText'
     it('handleChangeOldPassword should change the state', () => {
-      wrapper.instance().handleChangeName({ target: { value: randomText } })
-      expect(wrapper.state('newName')).to.equal(randomText)
+      wrapperInstance.instance().handleChangeName({ target: { value: randomText } })
+      expect(wrapperInstance.state('newName')).to.equal(randomText)
     })
 
     it('handleChangeNewPassword should change the state', () => {
-      wrapper.instance().handleChangeEmail({ target: { value: randomText } })
-      expect(wrapper.state('newEmail')).to.equal(randomText)
+      wrapperInstance.instance().handleChangeEmail({ target: { value: randomText } })
+      expect(wrapperInstance.state('newEmail')).to.equal(randomText)
     })
 
     it('handleChangeNewPassword should change the state', () => {
-      wrapper.instance().handleChangeCheckPassword({ target: { value: randomText } })
-      expect(wrapper.state('checkPassword')).to.equal(randomText)
+      wrapperInstance.instance().handleChangeCheckPassword({ target: { value: randomText } })
+      expect(wrapperInstance.state('checkPassword')).to.equal(randomText)
     })
   })
 })

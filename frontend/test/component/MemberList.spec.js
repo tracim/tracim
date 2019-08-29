@@ -1,8 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { MemberList as MemberListWithoutHOC } from '../../src/component/Dashboard/MemberList'
-import { translateMock } from '../hocMock/translate'
+import { MemberList as MemberListWithoutHOC } from '../../src/component/Dashboard/MemberList.jsx'
+import { translateMock } from '../hocMock/translate.js'
 import sinon from 'sinon'
 
 describe('<MemberList />', () => {

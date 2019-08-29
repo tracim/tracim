@@ -1,16 +1,14 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import sinon from 'sinon'
-import { OpenCreateContentApp } from '../../src/component/Workspace/OpenCreateContentApp.jsx'
-import configureMockStore from 'redux-mock-store'
+import { OpenCreateContentApp as OpenCreateContentAppWithoutHOC } from '../../src/component/Workspace/OpenCreateContentApp.jsx'
 import { contentType } from '../hocMock/redux/contentType/contentType.js'
-import { user } from '../hocMock/redux/user/user'
+import { user } from '../hocMock/redux/user/user.js'
+import { connectMock } from '../hocMock/store.js'
+import { withRouterMock } from '../hocMock/withRouter.js'
 
 describe('<OpenCreateContentApp />', () => {
-  const mockStore = configureMockStore()
-  const store = mockStore({})
-
   const renderAppPopupCreationCallBack = sinon.stub()
 
   const props = {
@@ -23,23 +21,28 @@ describe('<OpenCreateContentApp />', () => {
         type: 'contents/html-document'
       }
     },
-    contentType,
-    user,
     location: { parent_id: '' }
   }
 
-  const wrapper = shallow(<OpenCreateContentApp {...props} store={store} />)
+  const mapStateToProps = {
+    user,
+    contentType
+  }
+
+  const ComponentWithHoc = withRouterMock(connectMock(mapStateToProps)(OpenCreateContentAppWithoutHOC))
+
+  const wrapper = mount(<ComponentWithHoc { ...props } />)
 
   describe('intern function', () => {
     it('openCreateContentApp() should call renderAppPopupCreationCallBack to open the creation popup', () => {
-      wrapper.instance().openCreateContentApp()
+      wrapper.find('OpenCreateContentApp').instance().openCreateContentApp()
       expect(renderAppPopupCreationCallBack.called).to.equal(true)
       renderAppPopupCreationCallBack.resetHistory()
     })
 
     it('openCreateContentApp() should not call renderAppPopupCreationCallBack to open the creation popup when workspaceId is undefined', () => {
       wrapper.setProps({ workspaceId: undefined })
-      wrapper.instance().openCreateContentApp()
+      wrapper.find('OpenCreateContentApp').instance().openCreateContentApp()
       expect(renderAppPopupCreationCallBack.called).to.equal(false)
       renderAppPopupCreationCallBack.resetHistory()
       wrapper.setProps({ workspaceId: props.workspaceId })

@@ -2,8 +2,8 @@ import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import sinon from 'sinon'
-import { Notification as NotificationWithoutHOC } from '../../src/component/Account/Notification'
-import { translateMock } from '../hocMock/translate'
+import { Notification as NotificationWithoutHOC } from '../../src/component/Account/Notification.jsx'
+import { translateMock } from '../hocMock/translate.js'
 
 describe('<Notification />', () => {
   const onChangeSubscriptionNotifCallBack = sinon.stub()
