@@ -2151,7 +2151,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
-        assert headers["Subject"][0] == "[TRACIM] [test] test_document2 (Open)"
+        assert headers["Subject"][0] == "[TRACIM] [test] test_document2 (Opened)"
 
 
 @pytest.mark.usefixtures("base_fixture")
