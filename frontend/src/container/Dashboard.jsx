@@ -418,7 +418,9 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
-    console.log(props.appList)
+
+    // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
+    // https://github.com/tracim/tracim/issues/2326
     const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => userRoleIdInWorkspace === 2 ? app.slug !== 'contents/folder' : true)
