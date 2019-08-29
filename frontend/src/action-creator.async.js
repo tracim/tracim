@@ -196,9 +196,9 @@ export const getUser = userId => async dispatch => {
   })
 }
 
-export const getUserWorkspaceList = userId => async dispatch => {
+export const getUserWorkspaceList = (userId, showOwnedWorkspace) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
     param: {
       credentials: 'include',
       headers: {
@@ -424,9 +424,9 @@ export const putUserWorkspaceDoNotify = (user, workspaceId, doNotify) => dispatc
   })
 }
 
-export const getMyselfWorkspaceList = () => dispatch => {
+export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
     param: {
       credentials: 'include',
       headers: {
