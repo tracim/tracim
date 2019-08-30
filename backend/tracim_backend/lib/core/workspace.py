@@ -84,6 +84,8 @@ class WorkspaceApi(object):
         agenda_enabled: bool = True,
         save_now: bool = False,
     ) -> Workspace:
+        # TODO - G.M - 2019-04-11 - Fix Circular Import issue between userApi
+        # and workspaceApi
         from tracim_backend.lib.core.user import UserApi
 
         uapi = UserApi(session=self._session, current_user=self._user, config=self._config)
