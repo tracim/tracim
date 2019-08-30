@@ -907,24 +907,27 @@ class File extends React.Component {
                   shouldScrollToBottom={state.mode !== MODE.REVISION}
                 />
               },
-              ...(state.loggedUser.userRoleIdInWorkspace > 1 ? [{
-                id: 'share',
-                label: props.t('Share'),
-                icon: 'fa-share-alt',
-                children: <ShareDownload
-                  label={props.t(state.config.label)}
-                  hexcolor={state.config.hexcolor}
-                  shareEmails={state.shareEmails}
-                  onChangeEmails={this.handleChangeEmails}
-                  onKeyDownEnter={this.handleKeyDownEnter}
-                  sharePassword={state.sharePassword}
-                  onChangePassword={this.handleChangePassword}
-                  shareLinkList={state.shareLinkList}
-                  onClickDeleteShareLink={this.handleClickDeleteShareLink}
-                  onClickNewShare={this.handleClickNewShare}
-                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-                />
-              }] : []),
+              ...(state.loggedUser.userRoleIdInWorkspace > 1
+                ? [{
+                  id: 'share',
+                  label: props.t('Share'),
+                  icon: 'fa-share-alt',
+                  children: <ShareDownload
+                    label={props.t(state.config.label)}
+                    hexcolor={state.config.hexcolor}
+                    shareEmails={state.shareEmails}
+                    onChangeEmails={this.handleChangeEmails}
+                    onKeyDownEnter={this.handleKeyDownEnter}
+                    sharePassword={state.sharePassword}
+                    onChangePassword={this.handleChangePassword}
+                    shareLinkList={state.shareLinkList}
+                    onClickDeleteShareLink={this.handleClickDeleteShareLink}
+                    onClickNewShare={this.handleClickNewShare}
+                    userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                  />
+                }]
+                : []
+              ),
               {
                 id: 'properties',
                 label: props.t('Properties'),
