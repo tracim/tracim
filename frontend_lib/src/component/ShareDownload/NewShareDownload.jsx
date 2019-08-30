@@ -156,8 +156,8 @@ class NewShareDownload extends React.Component {
           <button
             className='shareDownload__newBtn btn highlightBtn'
             key='newShareDownload'
-            onClick={props.onClickNewShare}
-            disabled={props.shareEmails === ''}
+            onClick={() => props.onClickNewShare(state.isPasswordActive)}
+            disabled={props.shareEmails === '' || (state.isPasswordActive && props.sharePassword === '')}
             style={{
               backgroundColor: props.hexcolor,
               ':hover': {
