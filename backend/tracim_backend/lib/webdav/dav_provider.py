@@ -25,6 +25,7 @@ from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
 from tracim_backend.lib.webdav import resources
 from tracim_backend.lib.webdav.lock_storage import LockStorage
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import Workspace
 
 
@@ -254,6 +255,7 @@ class Provider(DAVProvider):
             config=self.app_config,
             show_archived=False,  # self._show_archive,
             show_deleted=False,  # self._show_delete
+            namespaces_filter=[ContentNamespaces.CONTENT],
         )
 
         try:
@@ -315,6 +317,7 @@ class Provider(DAVProvider):
             config=self.app_config,
             show_archived=False,
             show_deleted=False,
+            namespaces_filter=[ContentNamespaces.CONTENT],
         )
 
         revision_id = re.search(r"/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) ([^/].+)$", path)
