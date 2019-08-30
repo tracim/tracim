@@ -52,5 +52,6 @@
   "Error while loading share links list": "Erreur lors du chargement de la liste des liens de partage",
   "Error while deleting share link": "Erreur lors de la suppression d'un lien de partage",
   "Timeline": "Historique",
-  "Validate and create": "Valider et créer"
+  "Validate and create": "Valider et créer",
+  "Number of shares:": "Nombre de partages :"
 }
