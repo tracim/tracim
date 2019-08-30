@@ -851,7 +851,7 @@ class StatusSchema(marshmallow.Schema):
         description="global_status: open, closed",
         validate=content_global_status_validator,
     )
-    label = StrippedString(example="Open")
+    label = StrippedString(example="Opened")
     fa_icon = StrippedString(example="fa-check")
     hexcolor = StrippedString(example="#0000FF")
 

@@ -24,7 +24,7 @@ class PopinFixedRightPart extends React.Component {
     return (
       <div className={classnames('wsContentGeneric__content__right', `${props.customClass}__content__right`, 'd-flex')}>
         <div
-          className={classnames(`${props.customClass}__header`, 'wsContentGeneric__content__right__header nav')}
+          className={classnames(`${props.customClass}__header`, 'wsContentGeneric__content__right__header nav')} 
           onClick={props.toggleRightPart}
         >
           {props.menuItemList.map(menuItem =>
@@ -40,7 +40,7 @@ class PopinFixedRightPart extends React.Component {
 
           <div
             className='wsContentGeneric__content__right__header__icon__close'
-            title={props.t(props.rightPartOpen ? 'Close' : 'Open')}
+            title={props.rightPartOpen ? props.t('Close') : props.t('Open')}
           >
             <i className={classnames('fa fa-fw', { 'fa-chevron-right': props.rightPartOpen, 'fa-chevron-left': !props.rightPartOpen })} />
           </div>
