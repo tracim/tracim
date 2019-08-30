@@ -186,7 +186,7 @@ class WorkspaceApi(object):
     def get_all(self):
         return self._base_query().all()
 
-    def _get_workspace_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
+    def _get_workspaces_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
         return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
     def _get_workspace_ids(self, workspaces: typing.List[Workspace]) -> typing.List[int]:
@@ -216,7 +216,7 @@ class WorkspaceApi(object):
             )
         if include_owned:
             workspace_ids.extend(
-                self._get_workspace_ids(self._get_workspace_owned_by_user(user.user_id))
+                self._get_workspace_ids(self._get_workspaces_owned_by_user(user.user_id))
             )
 
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
