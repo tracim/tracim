@@ -84,6 +84,8 @@ class WorkspaceApi(object):
         agenda_enabled: bool = True,
         save_now: bool = False,
     ) -> Workspace:
+        # TODO - G.M - 2019-04-11 - Fix Circular Import issue between userApi
+        # and workspaceApi
         from tracim_backend.lib.core.user import UserApi
 
         uapi = UserApi(session=self._session, current_user=self._user, config=self._config)
@@ -184,7 +186,7 @@ class WorkspaceApi(object):
     def get_all(self):
         return self._base_query().all()
 
-    def _get_workspace_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
+    def _get_workspaces_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
         return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
     def _get_workspace_ids(self, workspaces: typing.List[Workspace]) -> typing.List[int]:
@@ -193,19 +195,28 @@ class WorkspaceApi(object):
             workspace_ids.append(workspace.workspace_id)
         return workspace_ids
 
-    def get_all_for_user(self, user: User, owned: bool = True, with_role: bool = True):
+    def get_all_for_user(
+        self, user: User, include_owned: bool = True, include_with_role: bool = True
+    ) -> typing.List[Workspace]:
+        """
+        Get al workspace of user
+        :param user:  just an user
+        :param include_owned: include workspace where user is owner
+        :param include_with_role: include workspace where user has a role
+        :return: list of workspaces found
+        """
         query = self._base_query()
         workspace_ids = []
         rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
-        if with_role:
+        if include_with_role:
             workspace_ids.extend(
                 rapi.get_user_workspaces_ids(
                     user_id=user.user_id, min_role=UserRoleInWorkspace.READER
                 )
             )
-        if owned:
+        if include_owned:
             workspace_ids.extend(
-                self._get_workspace_ids(self._get_workspace_owned_by_user(user.user_id))
+                self._get_workspace_ids(self._get_workspaces_owned_by_user(user.user_id))
             )
 
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
