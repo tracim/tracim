@@ -55,7 +55,7 @@ class NewShareDownload extends React.Component {
           <textarea
             className='shareDownload__email__input form-control'
             placeholder={props.t('Enter the email address of the recipient(s)')}
-            rows='10'
+            rows='1'
             value={props.shareEmails}
             onChange={props.onChangeEmails}
             onKeyDown={props.onKeyDownEnter}
