@@ -8,7 +8,7 @@ import PropTypes from 'prop-types'
 
 const color = require('color')
 
-class NewUpload extends React.Component {
+export class NewUpload extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -38,7 +38,7 @@ class NewUpload extends React.Component {
     }
   }
 
-  handleTooglePasswordInputVisibility = () => {
+  handleTogglePasswordActive = () => {
     this.setState(prevState => ({
       isPasswordActive: !prevState.isPasswordActive
     }))
@@ -126,14 +126,14 @@ class NewUpload extends React.Component {
                 </button>
               </div>
 
-              <span className='newUpload__password__link' onClick={this.handleTooglePasswordInputVisibility}>
+              <span className='newUpload__password__link' onClick={this.handleTogglePasswordActive}>
                 {props.t('Cancel protection by password')}
               </span>
             </div>
           )
           : (
             <div className='newUpload__password'>
-              <span className='newUpload__password__link' onClick={this.handleTooglePasswordInputVisibility}>
+              <span className='newUpload__password__link' onClick={this.handleTogglePasswordActive}>
                 {props.t('Protect by password')}
               </span>
             </div>
