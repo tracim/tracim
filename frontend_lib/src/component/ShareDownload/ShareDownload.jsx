@@ -54,6 +54,7 @@ class ShareDownload extends React.Component {
             sharePassword={props.sharePassword}
             onChangePassword={props.onChangePassword}
             onClickNewShare={this.handleNewShare}
+            emailNotifActivated={props.emailNotifActivated}
           />
         }
       </div>
