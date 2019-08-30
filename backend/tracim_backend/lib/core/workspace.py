@@ -194,18 +194,25 @@ class WorkspaceApi(object):
         return workspace_ids
 
     def get_all_for_user(
-        self, user: User, owned: bool = True, with_role: bool = True
+        self, user: User, include_owned: bool = True, include_with_role: bool = True
     ) -> typing.List[Workspace]:
+        """
+        Get al workspace of user
+        :param user:  just an user
+        :param include_owned: include workspace where user is owner
+        :param include_with_role: include workspace where user has a role
+        :return: list of workspaces found
+        """
         query = self._base_query()
         workspace_ids = []
         rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
-        if with_role:
+        if include_with_role:
             workspace_ids.extend(
                 rapi.get_user_workspaces_ids(
                     user_id=user.user_id, min_role=UserRoleInWorkspace.READER
                 )
             )
-        if owned:
+        if include_owned:
             workspace_ids.extend(
                 self._get_workspace_ids(self._get_workspace_owned_by_user(user.user_id))
             )

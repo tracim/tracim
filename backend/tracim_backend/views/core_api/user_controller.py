@@ -87,8 +87,8 @@ class UserController(Controller):
 
         workspaces = wapi.get_all_for_user(
             request.candidate_user,
-            owned=hapic_data.query.show_owned_workspace,
-            with_role=hapic_data.query.show_workspace_with_role,
+            include_owned=hapic_data.query.show_owned_workspace,
+            include_with_role=hapic_data.query.show_workspace_with_role,
         )
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 

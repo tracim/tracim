@@ -193,7 +193,9 @@ class AgendaApi(object):
             workspace_api = WorkspaceApi(
                 current_user=self._user, session=self._session, config=self._config
             )
-            workspaces = workspace_api.get_all_for_user(user, with_role=True, owned=False)
+            workspaces = workspace_api.get_all_for_user(
+                user, include_with_role=True, include_owned=False
+            )
             for workspace in workspaces:
                 if workspaces_ids_filter and workspace.workspace_id not in workspaces_ids_filter:
                     continue
