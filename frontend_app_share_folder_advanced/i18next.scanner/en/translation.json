@@ -2,11 +2,19 @@
   "To add multiple recipients, separate the email addresses with a comma or space.": "To add multiple recipients, separate the email addresses with a comma or space.",
   "Cancel": "Cancel",
   "New": "New",
-  "Share Folder": "Share Folder",
   "New authorization": "New authorization",
   "Import authorizations": "Import authorizations",
   "No upload link has been created yet": "No upload link has been created yet",
   "The password length must be between 6 and 512 characters and the email(s) must be valid": "The password length must be between 6 and 512 characters and the email(s) must be valid",
   "Email notification are disabled, please manually notify the link": "Email notification are disabled, please manually notify the link",
-  "Error while creating new share link": "Error while creating new share link"
+  "Error while creating new share link": "Error while creating new share link",
+  "Enter the email address of the recipient(s)": "Enter the email address of the recipient(s)",
+  "Password to share link (optional)": "Password to share link (optional)",
+  "Show password": "Show password",
+  "Generate random password": "Generate random password",
+  "Inbox": "Inbox",
+  "Error while loading tracim's content type list": "Error while loading tracim's content type list",
+  "Error while loading share links list": "Error while loading share links list",
+  "Error in the URL": "Error in the URL",
+  "Error while deleting share link": "Error while deleting share link"
 }

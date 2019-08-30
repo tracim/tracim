@@ -2,11 +2,19 @@
   "To add multiple recipients, separate the email addresses with a comma or space.": "Pour ajouter plusieurs destinataires, séparez les adresses email par une virgule ou un espace.",
   "Cancel": "Annuler",
   "New": "Nouveau",
-  "Share Folder": "Dossier Partagé",
   "New authorization": "Nouvelle autorisation",
   "Import authorizations": "Autorisations d'importation",
   "No upload link has been created yet": "Aucun lien de téléversement n'a encore été créé",
-  "The password length must be between 6 and 512 characters and the email(s) must be valid": "Le mot de passe doit être comprise entre 6 et 512 caractères et le(s) email(s) doit (doivent) être valide(s)",
+  "The password length must be between 6 and 512 characters and the email(s) must be valid": "Le mot de passe doit être compris entre 6 et 512 caractères et le(s) email(s) doit (doivent) être valide(s)",
   "Email notification are disabled, please manually notify the link": "Les notifications par email sont désactivées, veuillez informer le lien manuellement",
-  "Error while creating new share link": "Erreur lors de la création d'un nouveau lien de partage"
+  "Error while creating new share link": "Erreur lors de la création d'un nouveau lien de partage",
+  "Enter the email address of the recipient(s)": "Enter the email address of the recipient(s)",
+  "Password to share link (optional)": "Mot de passe du partage (optionnel)",
+  "Show password": "Voir le mot de passe",
+  "Generate random password": "Générer mot de passe aléatoire",
+  "Inbox": "Boite de réception",
+  "Error while loading tracim's content type list": "Erreur lors du chargement des types de contenus tracim",
+  "Error while loading share links list": "Erreur lors du chargement de la liste des liens de partage",
+  "Error in the URL": "Erreur dans l'URL",
+  "Error while deleting share link": "Erreur lors de la suppression d'un lien de partage"
 }

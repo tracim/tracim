@@ -126,71 +126,72 @@ export class PreviewComponent extends React.Component {
           </a>
         </div>
 
-        {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
-          <button
-            type='button'
-            className='previewcomponent__icon btn iconBtn'
-            onClick={props.onClickPreviousPage}
-            style={{ ':hover': { color: props.color } }}
-            title={props.t('Previous page')}
-            disabled={props.fileCurrentPage === 1}
-            key={'file_btn_previouspage'}
-          >
-            <i className='fa fa-chevron-left' />
-          </button>
-        )}
+        <div className='previewcomponent__filepreview'>
+          {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
+            <button
+              type='button'
+              className='previewcomponent__icon btn iconBtn'
+              onClick={props.onClickPreviousPage}
+              style={{ ':hover': { color: props.color } }}
+              title={props.t('Previous page')}
+              disabled={props.fileCurrentPage === 1}
+              key={'file_btn_previouspage'}
+            >
+              <i className='fa fa-chevron-left' />
+            </button>
+          )}
 
-        <div
-          className={
-            classnames('previewcomponent__fileimg', { 'previewAvailable': state.isJpegPreviewDisplayable && props.isJpegAvailable })
-          }
-          onClick={state.isJpegPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
-        >
-          {state.isJpegPreviewDisplayable && props.isJpegAvailable
-            ? (
-              <img src={props.previewUrl} className='img-thumbnail mx-auto' />
-            )
-            : (
-              <div className='filecontent__preview' drop='true'>
-                <i className='filecontent__preview__nopreview-icon fa fa-eye-slash' style={{ color: props.color }} />
-                <div className='filecontent__preview__nopreview-msg'>
-                  {props.t('No preview available')}
+          <div
+            className={
+              classnames('previewcomponent__fileimg', { 'previewAvailable': state.isJpegPreviewDisplayable && props.isJpegAvailable })
+            }
+            onClick={state.isJpegPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
+          >
+            {state.isJpegPreviewDisplayable && props.isJpegAvailable
+              ? (
+                <img src={props.previewUrl} className='img-thumbnail mx-auto' />
+              )
+              : (
+                <div className='filecontent__preview' drop='true'>
+                  <i className='filecontent__preview__nopreview-icon fa fa-eye-slash' style={{ color: props.color }} />
+                  <div className='filecontent__preview__nopreview-msg'>
+                    {props.t('No preview available')}
+                  </div>
                 </div>
-              </div>
-            )
-          }
+              )
+            }
 
-          {state.isJpegPreviewDisplayable && props.isJpegAvailable && state.displayLightbox
-            ? (
-              <Lightbox
-                prevSrc={props.lightboxUrlList[props.fileCurrentPage - 2]}
-                mainSrc={props.lightboxUrlList[props.fileCurrentPage - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
-                nextSrc={props.lightboxUrlList[props.fileCurrentPage]}
-                onCloseRequest={this.handleClickHideImageRaw}
-                onMovePrevRequest={props.onClickPreviousPage}
-                onMoveNextRequest={props.onClickNextPage}
-                imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
-                imagePadding={55}
-              />
-            )
-            : null
-          }
+            {state.isJpegPreviewDisplayable && props.isJpegAvailable && state.displayLightbox
+              ? (
+                <Lightbox
+                  prevSrc={props.lightboxUrlList[props.fileCurrentPage - 2]}
+                  mainSrc={props.lightboxUrlList[props.fileCurrentPage - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
+                  nextSrc={props.lightboxUrlList[props.fileCurrentPage]}
+                  onCloseRequest={this.handleClickHideImageRaw}
+                  onMovePrevRequest={props.onClickPreviousPage}
+                  onMoveNextRequest={props.onClickNextPage}
+                  imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
+                  imagePadding={55}
+                />
+              )
+              : null
+            }
+          </div>
+
+          {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
+            <button
+              type='button'
+              className='previewcomponent__icon btn iconBtn'
+              onClick={props.onClickNextPage}
+              style={{ ':hover': { color: props.color } }}
+              title={props.t('Next page')}
+              disabled={props.fileCurrentPage === props.filePageNb}
+              key={'file_btn_nextpage'}
+            >
+              <i className='fa fa-chevron-right' />
+            </button>
+          )}
         </div>
-
-        {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
-          <button
-            type='button'
-            className='previewcomponent__icon btn iconBtn'
-            onClick={props.onClickNextPage}
-            style={{ ':hover': { color: props.color } }}
-            title={props.t('Next page')}
-            disabled={props.fileCurrentPage === props.filePageNb}
-            key={'file_btn_nextpage'}
-          >
-            <i className='fa fa-chevron-right' />
-          </button>
-        )}
-
         {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
           <div className='previewcomponent__pagecount'>
             {props.fileCurrentPage}{props.t(' of ')}{props.filePageNb}
