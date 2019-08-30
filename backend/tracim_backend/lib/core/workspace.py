@@ -209,12 +209,8 @@ class WorkspaceApi(object):
                 )
             )
         if include_owned:
-            workspace_ids.extend(
-                [
-                    workspace.workspace_id
-                    for workspace in self._get_workspaces_owned_by_user(user.user_id)
-                ]
-            )
+            owned_workspaces = self._get_workspaces_owned_by_user(user.user_id)
+            workspace_ids.extend([workspace.workspace_id for workspace in owned_workspaces])
 
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
         query = query.order_by(Workspace.label)
