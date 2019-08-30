@@ -193,7 +193,9 @@ class WorkspaceApi(object):
             workspace_ids.append(workspace.workspace_id)
         return workspace_ids
 
-    def get_all_for_user(self, user: User, owned: bool = True, with_role: bool = True):
+    def get_all_for_user(
+        self, user: User, owned: bool = True, with_role: bool = True
+    ) -> typing.List[Workspace]:
         query = self._base_query()
         workspace_ids = []
         rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
