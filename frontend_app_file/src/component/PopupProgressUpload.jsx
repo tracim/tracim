@@ -14,7 +14,7 @@ export const PopupProgressUpload = props =>
     <div className='uploadPopup__body'>
       <ProgressBar
         percent={props.percent}
-        color={props.color}
+        backgroundColor={props.color}
       />
       <div className='uploadPopup__filename'>{props.filename}</div>
     </div>
