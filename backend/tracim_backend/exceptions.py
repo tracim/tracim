@@ -287,6 +287,10 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
     pass
 
 
+class UserNotAllowedToCreateMoreWorkspace(TracimException):
+    error_code = ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
+
+
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
     error_code = ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 

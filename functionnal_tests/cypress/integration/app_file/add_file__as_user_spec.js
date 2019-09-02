@@ -18,6 +18,6 @@ context('Upload a file using drop zone', function () {
     cy.dropFixtureInDropZone('Linux-Free-PNG.png', 'image/png', '.filecontent__form', 'file_exemple.png')
     cy.get('[data-cy=popup__createcontent__form__button]').click()
     cy.get('.previewcomponent__dloption__icon').should('have.length', 1)
-    cy.get('#dropdownMenu2').contains('Open')
+    cy.get('#dropdownMenu2').contains('Opened')
   })
 })

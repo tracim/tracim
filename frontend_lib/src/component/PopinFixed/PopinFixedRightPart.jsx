@@ -1,6 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
+import { translate } from 'react-i18next'
 
 class PopinFixedRightPart extends React.Component {
   constructor (props) {
@@ -12,7 +13,7 @@ class PopinFixedRightPart extends React.Component {
 
   handleChangeRightChildren = (newCurrentChildren) => {
     const { props } = this
-    if (!props.rightPartOpen) props.toggleRightPart()
+    if (props.rightPartOpen) props.toggleRightPart()
 
     this.setState({ currentChildren: newCurrentChildren })
   }
@@ -24,10 +25,11 @@ class PopinFixedRightPart extends React.Component {
       <div className={classnames('wsContentGeneric__content__right', `${props.customClass}__content__right`, 'd-flex')}>
         <div
           className={classnames(`${props.customClass}__header`, 'wsContentGeneric__content__right__header nav')} 
+          onClick={props.toggleRightPart}
         >
           {props.menuItemList.map(menuItem =>
             <button
-              className={classnames('iconBtn wsContentGeneric__content__right__header__icon nav-item', { 'active': menuItem.id === state.currentChildren })}
+              className={classnames('wsContentGeneric__content__right__header__icon nav-item', { 'active': menuItem.id === state.currentChildren })}
               title={menuItem.label}
               onClick={() => this.handleChangeRightChildren(menuItem.id)}
               style={{ borderColor: props.customColor }}
@@ -36,11 +38,11 @@ class PopinFixedRightPart extends React.Component {
             </button>
           )}
 
-          <div 
+          <div
             className='wsContentGeneric__content__right__header__icon__close'
-            onClick={props.toggleRightPart}
+            title={props.rightPartOpen ? props.t('Close') : props.t('Open')}
           >
-            <i className={classnames('fa fa-fw', { 'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen })} />
+            <i className={classnames('fa fa-fw', { 'fa-chevron-right': props.rightPartOpen, 'fa-chevron-left': !props.rightPartOpen })} />
           </div>
         </div>
 
@@ -50,7 +52,7 @@ class PopinFixedRightPart extends React.Component {
   }
 }
 
-export default PopinFixedRightPart
+export default translate()(PopinFixedRightPart)
 
 PopinFixedRightPart.propTypes = {
   menuItemList: PropTypes.arrayOf((menuItem, key, componentName) => {
