@@ -43,6 +43,7 @@ from tracim_backend.lib.webdav.design import design_thread
 from tracim_backend.lib.webdav.utils import FakeFileStream
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 
@@ -249,6 +250,7 @@ class WorkspaceResource(DAVCollection):
             session=tracim_context.dbsession,
             config=tracim_context.app_config,
             show_temporary=True,
+            namespaces_filter=[ContentNamespaces.CONTENT],
         )
 
         self._file_count = 0
@@ -614,7 +616,10 @@ class FolderResource(WorkspaceResource):
     def getMemberList(self) -> [_DAVResource]:
         members = []
         content_api = ContentApi(
-            current_user=self.user, config=self.provider.app_config, session=self.session
+            current_user=self.user,
+            config=self.provider.app_config,
+            session=self.session,
+            namespaces_filter=[self.content.content_namespace],
         )
         visible_children = content_api.get_all(
             [self.content.content_id], content_type_list.Any_SLUG, self.workspace
@@ -677,7 +682,10 @@ class FileResource(DAVNonCollection):
         self.user = tracim_context.current_user
         self.session = tracim_context.dbsession
         self.content_api = ContentApi(
-            current_user=self.user, config=tracim_context.app_config, session=self.session
+            current_user=self.user,
+            config=tracim_context.app_config,
+            session=self.session,
+            namespaces_filter=[self.content.content_namespace],
         )
 
         # this is the property that windows client except to check if the file is read-write or read-only,
