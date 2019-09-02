@@ -92,7 +92,7 @@ class Workspace(DeclarativeBase):
     def get_size(self, include_deleted: bool = False, include_archived: bool = False) -> int:
         size = 0
         for revision in self.revisions:
-            # do
+            # INFO - G.M - 2019-09-02 - Don't count deleted and archived file.
             if not include_deleted and revision.node.is_deleted:
                 continue
             if not include_archived and revision.node.is_archived:
