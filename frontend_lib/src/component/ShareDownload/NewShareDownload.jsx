@@ -8,7 +8,7 @@ import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
 const color = require('color')
 
-class NewShareDownload extends React.Component {
+export class NewShareDownload extends React.Component {
   constructor (props) {
     super(props)
 
@@ -38,7 +38,7 @@ class NewShareDownload extends React.Component {
     }
   }
 
-  handleTooglePasswordInputVisibility = () => {
+  handleTogglePasswordActive = () => {
     this.setState(prevState => ({
       isPasswordActive: !prevState.isPasswordActive
     }))
@@ -124,14 +124,14 @@ class NewShareDownload extends React.Component {
                 <i className='fa fa-fw fa-repeat' />
               </button>
             </div>
-            <span className='shareDownload__password__link' onClick={this.handleTooglePasswordInputVisibility}>
+            <span className='shareDownload__password__link' onClick={this.handleTogglePasswordActive}>
               {props.t('Cancel protection by password')}
             </span>
           </div>
         )
         : (
           <div className='shareDownload__password'>
-            <span className='shareDownload__password__link' onClick={this.handleTooglePasswordInputVisibility}>
+            <span className='shareDownload__password__link' onClick={this.handleTogglePasswordActive}>
               {props.t('Protect by password')}
             </span>
           </div>
