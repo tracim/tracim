@@ -64,6 +64,14 @@ basic_setup.session_secret = change_this_value_please!
 ; cors.access-control-allowed-origin = http://localhost:6543,http://localhost:8090
 
 ####
+# LIMITATION
+####
+
+# limit number of sharespaces any user can be owner, 0 mean not limit, default to 0
+; limitation.sharedspace_per_user = 0
+
+
+####
 # STORAGE
 ####
 

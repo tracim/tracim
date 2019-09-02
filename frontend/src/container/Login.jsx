@@ -154,7 +154,9 @@ class Login extends React.Component {
 
   loadWorkspaceList = async () => {
     const { props } = this
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
+    const showOwnedWorkspace = false
+
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
     if (fetchGetWorkspaceList.status === 200) {
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
       this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
