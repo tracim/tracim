@@ -275,12 +275,12 @@ class EmptyValueNotAllowed(TracimException):
     pass
 
 
-class FileSizeOverWorkspaceEmptySpace(TracimException):
-    error_code = ErrorCode.FILE_SIZE_OVER_WORKSPACE_EMPTY_SPACE
-
-
 class FileSizeOverMaxLimitation(TracimException):
     error_code = ErrorCode.FILE_SIZE_OVER_MAX_LIMITATION
+
+
+class FileSizeOverWorkspaceEmptySpace(TracimException):
+    error_code = ErrorCode.FILE_SIZE_OVER_WORKSPACE_EMPTY_SPACE
 
 
 class TracimUnavailablePreviewType(TracimException):
@@ -289,6 +289,10 @@ class TracimUnavailablePreviewType(TracimException):
 
 class EmptyLabelNotAllowed(EmptyValueNotAllowed):
     pass
+
+
+class UserNotAllowedToCreateMoreWorkspace(TracimException):
+    error_code = ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
 
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):

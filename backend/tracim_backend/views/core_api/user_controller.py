@@ -38,6 +38,7 @@ from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
@@ -71,6 +72,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserWorkspaceFilterQuerySchema())
     @hapic.output_body(WorkspaceDigestSchema(many=True))
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -83,7 +85,11 @@ class UserController(Controller):
             config=app_config,
         )
 
-        workspaces = wapi.get_all_for_user(request.candidate_user)
+        workspaces = wapi.get_all_for_user(
+            request.candidate_user,
+            include_owned=hapic_data.query.show_owned_workspace,
+            include_with_role=hapic_data.query.show_workspace_with_role,
+        )
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])

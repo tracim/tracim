@@ -249,6 +249,7 @@ class ShareFolderAdvanced extends React.Component {
           componentTitle={<div>{title}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
+          showChangeTitleButton={false}
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
@@ -269,6 +270,7 @@ class ShareFolderAdvanced extends React.Component {
               uploadPassword={state.uploadPassword}
               onChangeUploadPassword={this.handleChangePassword}
               onKeyDownEnter={this.handleKeyDownEnter}
+              emailNotifActivated={state.config.system.config.email_notification_activated}
             />
           }
         </PopinFixedContent>

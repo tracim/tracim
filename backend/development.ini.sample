@@ -462,6 +462,7 @@ collaborative_document_edition.software = collabora
 collaborative_document_edition.collabora.base_url = http://localhost:9980
 collaborative_document_edition.file_template_dir =  %(basic_setup.file_template_dir)s
 
+
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
 ##############################

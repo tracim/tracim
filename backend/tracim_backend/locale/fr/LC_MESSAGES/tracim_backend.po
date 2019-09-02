@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-08-21 12:14+0200\n"
+"POT-Creation-Date: 2019-08-29 09:55+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -33,7 +33,7 @@ msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] Demande de réinitialisation de mot de passe"
 
 #: tracim_backend/app_models/contents.py:45
-msgid "Open"
+msgid "Opened"
 msgstr "Ouvert"
 
 #: tracim_backend/app_models/contents.py:53
@@ -108,11 +108,11 @@ msgstr "Nouveau dossier"
 msgid "New folder {0}"
 msgstr "Nouveau dossier {0}"
 
-#: tracim_backend/lib/core/workspace.py:333
+#: tracim_backend/lib/core/workspace.py:334
 msgid "Workspace"
 msgstr "Espace partagé"
 
-#: tracim_backend/lib/core/workspace.py:336
+#: tracim_backend/lib/core/workspace.py:337
 msgid "Workspace {}"
 msgstr "Espace partagé {0}"
 

@@ -159,10 +159,14 @@ class GuestUpload extends React.Component {
                   return (
                     <ProgressBar
                       percent={state.progressUpload.percent}
+                      color='inherit'
                     />
                   )
                 default:
-                  return <ImportConfirmation />
+                  return <ImportConfirmation
+                    title={props.t('Thank you, your import is finished!')}
+                    text={props.t('You can now close this page, your recipient will receive the notification of your import.')}
+                  />
               }
             })()}
           </CardBody>

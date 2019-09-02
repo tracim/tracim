@@ -9,7 +9,7 @@
   "User": "User",
   "Dashboard": "Dashboard",
   "All Contents": "All Contents",
-  "Open": "Open",
+  "Opened": "Opened",
   "Validated": "Validated",
   "Cancelled": "Cancelled",
   "Deprecated": "Deprecated",
@@ -211,11 +211,7 @@
   "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.",
   "You have not yet chosen any files to upload.": "You have not yet chosen any files to upload.",
   "Send": "Send",
-  "Thank you, your import is finished": "Thank you, your import is finished",
   "You can now close this page, your recipient will receive the notification of your import.": "You can now close this page, your recipient will receive the notification of your import.",
-  "Create user, create shared space, administration of instance": "Create user, create shared space, administration of instance",
-  "Create shared space, add member in shared space": "Create shared space, add member in shared space",
-  "Access to shared space where user is member": "Access to shared space where user is member",
   "Content manager + add members and edit shared spaces": "Content manager + add members and edit shared spaces",
   "Contributor + create folders and manage contents": "Contributor + create folders and manage contents",
   "Reader + create/modify content": "Reader + create/modify content",
@@ -228,5 +224,9 @@
   "Workspace not found": "Workspace not found",
   "Inbox": "Inbox",
   "Error while loading uploaded files": "Error while loading uploaded files",
-  "Manage": "Manage"
+  "Error while downloading file": "Error while downloading file",
+  "Manage": "Manage",
+  "Error while loading file infos": "Error while loading file infos",
+  "Thank you, your import is finished!": "Thank you, your import is finished!",
+  "Full name": "Full name"
 }
