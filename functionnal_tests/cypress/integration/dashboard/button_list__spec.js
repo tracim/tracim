@@ -1,7 +1,7 @@
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands'
 
-let workspaceId
+let workspaceTest
 
 describe('Dashboard button list', () => {
   before(function () {
@@ -9,13 +9,13 @@ describe('Dashboard button list', () => {
     cy.setupBaseDB()
     cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-      workspaceId = workspace.workspace_id
+      workspaceTest = workspace
     })
   })
 
   beforeEach(() => {
     cy.loginAs('administrators')
-    cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceId}})
+    cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceTest.workspace_id}})
   })
 
   afterEach(() => {
@@ -26,9 +26,9 @@ describe('Dashboard button list', () => {
     describe('if agenda is enabled', () => {
       beforeEach(() => {
         cy.createRandomUser().then( user => {
-          cy.addUserToWorkspace(user.user_id, workspaceId, 'reader')
+          cy.addUserToWorkspace(user.user_id, workspaceTest.workspace_id, 'reader')
           cy.login(user)
-          cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceId}})
+          cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceTest.workspace_id}})
         })
       })
 
@@ -40,15 +40,11 @@ describe('Dashboard button list', () => {
 
     describe('if agenda is not enabled', () => {
       beforeEach(() => {
-        cy.fixture('baseWorkspace').then(workspace => {
-          cy.createRandomUser().then(user => {
-            cy.log(workspace)
-            cy.enableAgenda(workspace, false)
-            cy.addUserToWorkspace(user.user_id, workspace.workspace_id, 'reader')
-            cy.logout()
-            cy.login(user)
-            cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspace.workspace_id}})
-          })
+        cy.createRandomUser().then(user => {
+          cy.enableAgenda(workspaceTest, false)
+          cy.addUserToWorkspace(user.user_id, workspaceTest.workspace_id, 'reader')
+          cy.login(user)
+          cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceTest.workspace_id}})
         })
       })
 
