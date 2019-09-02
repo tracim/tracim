@@ -77,34 +77,34 @@ describe('<NewMemberForm />', () => {
   })
 
   describe('Handlers', () => {
-    it(`onClickBtnValidate handler should call the proper handler when validate form`, () => {
+    it('should call props.onClickBtnValidate when handler onClickBtnValidate is called at form validation', () => {
       wrapper.find(`button`).simulate('click')
       expect(onClickBtnValidateCallBack.called).to.equal(true)
     })
 
-    it(`onClickCloseAddMemberBtn handler should call the proper handler when closing the form`, () => {
+    it('should call props.onClickCloseAddMemberBtn when handler onClickCloseAddMemberBtn is calledat closing the form', () => {
       wrapper.find(`.memberlist__form__close`).simulate('click')
       expect(onClickCloseAddMemberBtnCallBack.called).to.equal(true)
     })
 
-    it(`onClickKnownMember handler should call the proper handler`, () => {
+    it('should call props.onClickKnownMember when handler onClickKnownMember is called', () => {
       wrapper.find(`div.autocomplete__item.primaryColorBgHover`).first().simulate('click')
       expect(onClickKnownMemberCallBack.called).to.equal(true)
     })
 
-    it(`onClickAutoComplete handler should call the proper handler`, () => {
+    it('should call props.onClickAutoComplete when handler onClickAutoComplete is called', () => {
       wrapper.setProps({ searchedKnownMemberList: [] })
       wrapper.find(`div.autocomplete__item.primaryColorBgHover`).first().simulate('click')
       expect(onClickAutoCompleteCallBack.called).to.equal(true)
       wrapper.setProps({ searchedKnownMemberList: props.searchedKnownMemberList })
     })
 
-    it(`onChangeRole handler should call the proper handler`, () => {
+    it('should call props.onChangeRole when handler onChangeRole is called', () => {
       wrapper.find(`.item__radiobtn > input`).first().simulate('change')
       expect(onChangeRoleCallBack.called).to.equal(true)
     })
 
-    it(`onChangeNameOrEmail handler should call the proper handler`, () => {
+    it('should call props.onChangeNameOrEmail when handler onChangeNameOrEmail is called', () => {
       wrapper.find(`input.name__input`).simulate('change', { target: { value: 'randomValue' } })
       expect(onChangeNameOrEmailCallBack.called).to.equal(true)
     })
