@@ -75,7 +75,7 @@ class UploadPermissionLib(object):
             upload_permission = UploadPermission(
                 author=self._user,
                 workspace_id=workspace.workspace_id,
-                email=email,
+                email=email.lower(),
                 token=str(uuid.uuid4()),
                 password=password,
                 type=UploadPermissionType.EMAIL,

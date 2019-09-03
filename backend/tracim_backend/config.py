@@ -141,6 +141,7 @@ class CFG(object):
             ),
         )
         self._load_global_config()
+        self._load_limitation_config()
         self._load_email_config()
         self._load_ldap_config()
         self._load_webdav_config()
@@ -280,6 +281,14 @@ class CFG(object):
         frontend_dist_folder = os.path.join(tracim_v2_folder, "frontend", "dist")
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
+        )
+
+    def _load_limitation_config(self) -> None:
+        self.LIMITATION__SHAREDSPACE_PER_USER = int(
+            self.get_raw_config("limitation.sharedspace_per_user", "0")
+        )
+        self.LIMITATION__CONTENT_LENGTH_FILE_SIZE = int(
+            self.get_raw_config("limitation.content_length_file_size", "0")
         )
 
     def _load_email_config(self) -> None:

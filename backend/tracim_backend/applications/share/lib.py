@@ -63,7 +63,7 @@ class ShareLib(object):
             content_share = ContentShare(
                 author=self._user,
                 content_id=content.content_id,
-                email=email,
+                email=email.lower(),
                 share_token=str(uuid.uuid4()),
                 password=password,
                 type=ContentShareType.EMAIL,
