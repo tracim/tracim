@@ -155,8 +155,9 @@ export const displayFileSize = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
+// INFO - GB - 2019-09-03 - In this function each split is one separator that we change for a comma
 export const parserStringToList = string => {
-  let list = string.split(' ').join(',').split('\n').join(',').split(',')
+  let list = string.split(' ').join(',').split('\n').join(',').split(';').join(',').split(',')
   list = list.filter(notEmptyString => notEmptyString !== '')
   return list
 }
