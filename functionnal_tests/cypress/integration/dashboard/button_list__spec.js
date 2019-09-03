@@ -39,16 +39,13 @@ describe('Dashboard button list', () => {
     })
 
     describe('if agenda is not enabled', () => {
-      beforeEach(() => {
+      it('should show button explore content but not agenda', () => {
+        cy.enableAgenda(workspaceTest, false)
         cy.createRandomUser().then(user => {
-          cy.enableAgenda(workspaceTest, false)
           cy.addUserToWorkspace(user.user_id, workspaceTest.workspace_id, 'reader')
           cy.login(user)
-          cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceTest.workspace_id}})
         })
-      })
-
-      it('should show button explore content but not agenda', () => {
+        cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceTest.workspace_id}})
         cy.get('[data-cy=contentTypeBtn_agenda]').should('not.exist')
         cy.get('[data-cy="contentTypeBtn_contents/all"]')
       })
