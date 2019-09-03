@@ -86,6 +86,8 @@ RUN \
     && rm -rf /tracim/frontend_app_file/node_modules \
     && rm -rf /tracim/frontend_app_folder_advanced/node_modules \
     && rm -rf /tracim/frontend_app_html-document/node_modules \
+    && rm -rf /tracim/frontend_app_office_document/node_modules \
+    && rm -rf /tracim/frontend_app_share_folder_advanced/node_modules \
     && rm -rf /tracim/frontend_app_thread/node_modules \
     && rm -rf /tracim/frontend_app_workspace/node_modules \
     && rm -rf /tracim/frontend_app_workspace_advanced/node_modules \
