@@ -36,6 +36,7 @@ class CollaborativeEditionFrame extends React.Component {
       ready: false,
       loggedUser: props.data.loggedUser
     }
+    this.handleIframeIsClosing = this.handleIframeIsClosing.bind(this)
     addAllResourceI18n(i18n, props.data.config.translation, props.data.loggedUser.lang)
     i18n.changeLanguage(props.data.loggedUser.lang)
   }
@@ -43,6 +44,7 @@ class CollaborativeEditionFrame extends React.Component {
   async componentDidMount () {
     const { props } = this
     console.log('%c<CollaboraFrame> did mount', `color: ${this.props.data.config.hexcolor}`, props)
+    window.addEventListener('message', this.handleIframeIsClosing)
     try {
       await this.loadContent()
     } catch (error) {
@@ -52,15 +54,14 @@ class CollaborativeEditionFrame extends React.Component {
 
     await this.setIframeConfig()
     this.showIframe()
-    window.addEventListener('message', this.handleIframeIsClosing, false)
   }
 
   componentWillUnmount () {
     console.log('%c<CollaboraFrame> will Unmount', `color: ${this.props.data.config.hexcolor}`)
-    document.removeEventListener('message', this.handleIframeIsClosing)
+    window.removeEventListener('message', this.handleIframeIsClosing)
   }
 
-  handleIframeIsClosing = (event) => {
+  handleIframeIsClosing (event) {
     const { props, state } = this
     let data = {}
     // INFO - B.L - 2019.08.12 - if might catch event producing utf-8 error while parsing
