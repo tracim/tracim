@@ -15,7 +15,7 @@ export const NewMemberForm = props => {
       </div>
 
       <div className='memberlist__form__member'>
-        <h4>{props.t('Add a member')}</h4>
+        <div className='memberlist__form__title'>{props.t('Add a member')}</div>
 
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>

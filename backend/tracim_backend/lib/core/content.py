@@ -37,6 +37,7 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import FileSizeOverMaxLimitation
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
@@ -1905,6 +1906,17 @@ class ContentApi(object):
         item.depot_file = FileIntent(new_content, new_filename, new_mimetype)
         item.revision_type = ActionDescription.REVISION
         return item
+
+    def check_upload_size(self, content_length: int):
+        # INFO - G.M - 2019-08-23 - 0 mean no size limit
+        if self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE == 0:
+            return
+        elif content_length > self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE:
+            raise FileSizeOverMaxLimitation(
+                'File cannot be added because his size "{}" is higher than max allowed size : "{}"'.format(
+                    content_length, self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE
+                )
+            )
 
     def archive(self, content: Content):
         if self._user:

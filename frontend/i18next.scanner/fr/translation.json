@@ -87,7 +87,7 @@
   "Member added": "Membre ajouté",
   "Member removed": "Membre supprimé",
   "All Contents": "Tous les contenus",
-  "Open": "Ouvert",
+  "Opened": "Ouvert",
   "Validated": "Validé",
   "Cancelled": "Annulé",
   "Deprecated": "Obsolète",
@@ -227,6 +227,6 @@
   "Error while loading uploaded files": "Erreur lors du chargement des fichiers téléversés",
   "Error while downloading file": "Erreur lors du téléchargement du fichier",
   "Manage": "Paramétrer",
-  "Full name": "Nom",
-  "Error while loading file information": "Erreur lors du chargement du fichier"
+  "Error while loading file infos": "Erreur lors du chargement des informations du fichier",
+  "Full name": "Nom complet"
 }

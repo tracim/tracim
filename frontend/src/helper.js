@@ -222,7 +222,7 @@ export const DRAG_AND_DROP = {
 const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Dashboard'),
   i18n.t('All Contents'),
-  i18n.t('Open'),
+  i18n.t('Opened'),
   i18n.t('Validated'),
   i18n.t('Cancelled'),
   i18n.t('Deprecated')

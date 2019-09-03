@@ -105,19 +105,17 @@
         background-color mediumGrey
         font-size 20px
         color darkGrey
+        cursor pointer
         &__icon
-          text-align center
           cursor pointer
-          padding-top 2px
-          padding-bottom 2px
           border none
           height 65px
+          background-color mediumGrey
           &:focus
             border-color transparent
             outline 0
           &.active
-            margin 0
-            padding 7px 5px 7px 3px
+            padding-left 1px
             background-color lightGrey
             border-left 5px solid
           &__close
@@ -128,11 +126,12 @@
 .rightPartClose
   .wsContentGeneric__content
     &__left
-      width calc(50% - 45px) // 45px is the width of the rightPart header
+      width calc(50% - 65px) // 65px is the width of the rightPart header
     &__right__header__icon.active
       background-color mediumGrey
       border none
 
+// MEDIAQUERIES
 
 @media (max-width: max-lg)
   .rightPartClose
@@ -169,6 +168,8 @@ responsiveColumnStyle()
             margin 10px
             padding 10px
             width 65px
+            & > i
+              margin auto
             &.active
               border none
               border-top 5px solid
