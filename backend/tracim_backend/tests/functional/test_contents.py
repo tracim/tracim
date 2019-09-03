@@ -2325,7 +2325,7 @@ class TestFiles(object):
         self, workspace_api_factory, content_api_factory, session, web_testapp
     ) -> None:
         """
-        create one file of a content but filename is already used here
+        create one file of a content but no input file given
         """
 
         workspace_api = workspace_api_factory.get()
