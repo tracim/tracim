@@ -36,6 +36,7 @@ class CollaborativeEditionFrame extends React.Component {
       ready: false,
       loggedUser: props.data.loggedUser
     }
+    // INFO - B.L - 2019/09/03 handleIframeIsClosing is called by an event from window so we have to bind this
     this.handleIframeIsClosing = this.handleIframeIsClosing.bind(this)
     addAllResourceI18n(i18n, props.data.config.translation, props.data.loggedUser.lang)
     i18n.changeLanguage(props.data.loggedUser.lang)
@@ -44,6 +45,7 @@ class CollaborativeEditionFrame extends React.Component {
   async componentDidMount () {
     const { props } = this
     console.log('%c<CollaboraFrame> did mount', `color: ${this.props.data.config.hexcolor}`, props)
+    //  // INFO - B.L - 2019/09/03 Collabora fire the event from window we need to listen window.
     window.addEventListener('message', this.handleIframeIsClosing)
     try {
       await this.loadContent()
