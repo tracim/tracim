@@ -184,11 +184,14 @@ class TestPrivateUploadPermissionEndpoints(object):
         )
         content = res.json_body
         assert len(content) == 1
-
+        params = {"username": "toto"}
+        image = create_1000px_png_test_image()
         res = web_testapp.post(
             "/api/v2/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission_token
             ),
+            params=params,
+            upload_files=[("file_1", image.name, image.getvalue())],
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
