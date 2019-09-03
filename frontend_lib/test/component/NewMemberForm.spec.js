@@ -82,7 +82,7 @@ describe('<NewMemberForm />', () => {
       expect(onClickBtnValidateCallBack.called).to.equal(true)
     })
 
-    it('should call props.onClickCloseAddMemberBtn when handler onClickCloseAddMemberBtn is calledat closing the form', () => {
+    it('should call props.onClickCloseAddMemberBtn when handler onClickCloseAddMemberBtn is called at form closing', () => {
       wrapper.find(`.memberlist__form__close`).simulate('click')
       expect(onClickCloseAddMemberBtnCallBack.called).to.equal(true)
     })
