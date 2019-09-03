@@ -7,7 +7,6 @@ import sinon from 'sinon'
 describe('<Timeline />', () => {
   const onClickWysiwygBtnCallBack = sinon.stub()
   const onClickRevisionBtnCallBack = sinon.stub()
-  const onClickRestoreArchivedCallBack = sinon.stub()
   const onClickRestoreDeletedCallBack = sinon.stub()
   const onClickValidateNewCommentBtnCallBack = sinon.stub()
   const onChangeNewCommentCallBack = sinon.stub()
@@ -32,8 +31,6 @@ describe('<Timeline />', () => {
     shouldScrollToBottom: true,
     showHeader: true,
     rightPartOpen: false, // irrelevant if showHeader is false
-    isArchived: false,
-    onClickRestoreArchived: onClickRestoreArchivedCallBack,
     isDeleted: false,
     onClickRestoreDeleted: onClickRestoreDeletedCallBack
   }

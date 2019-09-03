@@ -66,9 +66,8 @@ describe('Searching keywords', () => {
         const numberByPage = '5'
         const actived = '1'
         const deleted = '0'
-        const archived = '0'
         const contentTypes = 'html-document%2Cfile%2Cthread%2Cfolder%2Ccomment'
-        cy.visitPage({pageName: PAGES.SEARCH, params: {searchedKeywords: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes}})
+        cy.visitPage({pageName: PAGES.SEARCH, params: {searchedKeywords: htmlDocTitle, pageNumber, numberByPage, actived, deleted, contentTypes}})
 
         cy.get('[data-cy=content__item]').its('length').should('eq', 5)
 

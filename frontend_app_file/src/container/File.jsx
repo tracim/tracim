@@ -13,7 +13,7 @@ import {
   Timeline,
   NewVersionBtn,
   GenericButton,
-  ArchiveDeleteContent,
+  DeleteContent,
   SelectStatus,
   displayDistanceDate,
   convertBackslashNToBr,
@@ -42,9 +42,7 @@ import {
   postFileNewComment,
   putFileContent,
   putFileStatus,
-  putFileIsArchived,
   putFileIsDeleted,
-  putFileRestoreArchived,
   putFileRestoreDeleted,
   putMyselfFileRead
 } from '../action.async.js'
@@ -436,20 +434,6 @@ class File extends React.Component {
     }
   }
 
-  handleClickArchive = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putFileIsArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: true } }))
-        this.loadContent()
-        this.loadTimeline()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while archiving document'))
-    }
-  }
-
   handleClickDelete = async () => {
     const { config, content } = this.state
 
@@ -461,20 +445,6 @@ class File extends React.Component {
         this.loadTimeline()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
-    }
-  }
-
-  handleClickRestoreArchived = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putFileRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
-        this.loadContent()
-        this.loadTimeline()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
 
@@ -515,8 +485,7 @@ class File extends React.Component {
         filenameNoExtension: filenameNoExtension,
         current_revision_id: revision.revision_id,
         contentFull: null,
-        is_archived: prev.is_archived, // archived and delete should always be taken from last version
-        is_deleted: prev.is_deleted,
+        is_deleted: prev.is_deleted, // delete should always be taken from last version
         // use state.content.workspace_id instead of revision.workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
         previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1&revision_id=${revision.revision_id}`,
         lightboxUrlList: (new Array(revision.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
@@ -846,17 +815,16 @@ class File extends React.Component {
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
+                  disabled={state.mode === MODE.REVISION || state.content.is_deleted}
                   mobileVersion={onlineEditionAction}
                 />
               }
 
               {state.loggedUser.userRoleIdInWorkspace >= 4 &&
-                <ArchiveDeleteContent
+                <DeleteContent
                   customColor={state.config.hexcolor}
-                  onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
+                  disabled={state.mode === MODE.REVISION || state.content.is_deleted}
                 />
               }
             </div>
@@ -878,11 +846,9 @@ class File extends React.Component {
             fileCurrentPage={state.fileCurrentPage}
             version={state.content.number}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
-            isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             downloadRawUrl={this.getDownloadRawUrl(state)}
             isPdfAvailable={state.content.has_pdf_preview}

@@ -14,7 +14,6 @@
   "Error while archiving folder": "Erreur lors de l'archivage du dossier",
   "Error while deleting folder": "Erreur lors de la suppression du dossier",
   "Error while restoring folder": "Erreur lors de la restauration du dossier",
-  "This folder is archived": "Ce dossier est archivé",
   "This folder is deleted": "Ce dossier est supprimé",
   "Error saving folder's status, result:": "Erreur lors de la sauvegarde du statut du dossier, résultat :"
 }

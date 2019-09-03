@@ -66,10 +66,6 @@ export const BREADCRUMBS_TYPE = {
 }
 
 export const revisionTypeList = [{
-  id: 'archiving',
-  faIcon: 'archive',
-  label: i18n.t('Item archived')
-}, {
   id: 'content-comment',
   faIcon: 'comment-o',
   label: i18n.t('Comment')
@@ -93,10 +89,6 @@ export const revisionTypeList = [{
   id: 'status-update',
   faIcon: 'random',
   label: statusLabel => i18n.t('Status changed to {{status}}', {status: statusLabel})
-}, {
-  id: 'unarchiving',
-  faIcon: 'file-archive-o',
-  label: i18n.t('Item unarchived')
 }, {
   id: 'undeletion',
   faIcon: 'trash-o',

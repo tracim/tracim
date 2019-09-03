@@ -53,23 +53,6 @@ describe('Searching keywords', () => {
       cy.get(contentHtmlDocGetter).should('be.not.visible')
     })
 
-    describe('then archiving one document', () => {
-      describe('and searching the same keyword and validating again', () => {
-        it('Should not display the archived document', () => {
-          cy.get(searchInput).type(threadTitle).type('{enter}')
-
-          cy.get(contentThreadTitleLongGetter).click()
-          cy.get('[data-cy=archive__button]').click()
-
-          cy.get('[data-cy=displaystate]')
-          cy.get(searchInput).type('{enter}')
-
-          cy.get(contentThreadGetter).should('be.visible')
-          cy.get(contentThreadTitleLongGetter).should('be.not.visible')
-        })
-      })
-    })
-
     describe('then deleting one document', () => {
       describe('and searching the same keyword and validating', () => {
         it('Should not display the deleted document', () => {
@@ -81,7 +64,7 @@ describe('Searching keywords', () => {
           cy.get('[data-cy=displaystate]')
           cy.get(searchInput).type('{enter}')
 
-          cy.get('.searchResult__content__empty').should('be.visible')
+          cy.get('.content').should('have.length', 1)
         })
       })
     })
@@ -101,7 +84,6 @@ describe('Searching keywords', () => {
     const numberByPage = '10'
     const actived = '1'
     const deleted = '0'
-    const archived = '0'
     const contentTypes = 'html-document%2Cfile%2Cthread%2Cfolder%2Ccomment'
 
     before(function () {
@@ -118,7 +100,7 @@ describe('Searching keywords', () => {
     describe('that match two documents', () => {
       beforeEach(function () {
         cy.loginAs('users')
-        cy.visitPage({pageName: PAGES.SEARCH, params: {searchedKeywords: threadTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes}})
+        cy.visitPage({pageName: PAGES.SEARCH, params: {searchedKeywords: threadTitle, pageNumber, numberByPage, actived, deleted, contentTypes}})
       })
 
       it('Should display two results', () => {

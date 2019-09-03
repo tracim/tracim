@@ -33,7 +33,6 @@ import {
   getShareFolderContentList,
   getContentPathList,
   getWorkspaceMemberList,
-  putWorkspaceContentArchived,
   putWorkspaceContentDeleted,
   getMyselfWorkspaceReadStatusList,
   putFolderRead,
@@ -43,7 +42,6 @@ import {
   newFlashMessage,
   setWorkspaceContentList,
   addWorkspaceContentList,
-  setWorkspaceContentArchived,
   setWorkspaceContentDeleted,
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
@@ -287,22 +285,6 @@ class WorkspaceContent extends React.Component {
     e.preventDefault()
     e.stopPropagation()
     console.log('%c<WorkspaceContent> download nyi', 'color: #c17838', content)
-  }
-
-  handleClickArchiveContentItem = async (e, content) => {
-    const { props, state } = this
-
-    e.preventDefault()
-    e.stopPropagation()
-
-    const fetchPutContentArchived = await props.dispatch(putWorkspaceContentArchived(content.workspaceId, content.id))
-    switch (fetchPutContentArchived.status) {
-      case 204:
-        props.dispatch(setWorkspaceContentArchived(content.workspaceId, content.id))
-        this.loadContentList(state.workspaceIdInUrl)
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while archiving content'), 'warning'))
-    }
   }
 
   handleClickDeleteContentItem = async (e, content) => {
@@ -619,7 +601,6 @@ class WorkspaceContent extends React.Component {
                   onClickExtendedAction={{
                     edit: this.handleClickEditContentItem,
                     download: this.handleClickDownloadContentItem,
-                    archive: this.handleClickArchiveContentItem,
                     delete: this.handleClickDeleteContentItem
                   }}
                   onClickManageAction={this.handleClickManageAction}
@@ -644,7 +625,6 @@ class WorkspaceContent extends React.Component {
                         onClickExtendedAction={{
                           edit: this.handleClickEditContentItem,
                           download: this.handleClickDownloadContentItem,
-                          archive: this.handleClickArchiveContentItem,
                           delete: this.handleClickDeleteContentItem
                         }}
                         onDropMoveContentItem={this.handleDropMoveContent}
@@ -677,7 +657,6 @@ class WorkspaceContent extends React.Component {
                         onClickExtendedAction={{
                           edit: e => this.handleClickEditContentItem(e, content),
                           download: e => this.handleClickDownloadContentItem(e, content),
-                          archive: e => this.handleClickArchiveContentItem(e, content),
                           delete: e => this.handleClickDeleteContentItem(e, content)
                         }}
                         onDropMoveContentItem={this.handleDropMoveContent}

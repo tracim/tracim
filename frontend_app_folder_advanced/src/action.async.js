@@ -59,28 +59,8 @@ export const putFolderStatus = (apiUrl, workspaceId, contentId, newStatus) =>
     })
   })
 
-export const putFolderIsArchived = (apiUrl, workspaceId, contentId) => {
-  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'PUT'
-  })
-}
-
 export const putFolderIsDeleted = (apiUrl, workspaceId, contentId) => {
   return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'PUT'
-  })
-}
-
-export const putFolderRestoreArchived = (apiUrl, workspaceId, contentId) => {
-  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
