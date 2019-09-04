@@ -632,7 +632,7 @@ class File extends React.Component {
   handleClickNewShare = async () => {
     const { state, props } = this
 
-    let shareEmailList = parserStringToList(state.shareEmails, [',', ' ', ';', '\n'])
+    let shareEmailList = parserStringToList(state.shareEmails)
     let invalidEmails = []
 
     shareEmailList.forEach(shareEmail => {
@@ -696,7 +696,7 @@ class File extends React.Component {
   handleChangePassword = e => this.setState({ sharePassword: e.target.value })
   handleKeyDownEnter = e => {
     if (e.key === 'Enter') {
-      const emailList = parserStringToList(this.state.shareEmails, [' ', ',', ';', '\n'])
+      const emailList = parserStringToList(this.state.shareEmails)
       let invalidEmails = []
 
       emailList.forEach(email => {

@@ -155,17 +155,12 @@ export const displayFileSize = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
-export const parserStringToList = (string, separatorList) => {
-  let mainSeparator = ''
-  separatorList.forEach((separator, index) => {
-    if(index === 0){
-      mainSeparator = separator
-    }
-    else {
-      string = string.split(separator).join(mainSeparator)
-    }
+export const parserStringToList = (string, separatorList = [',', ' ', ';', '\n']) => {
+  let parsedString = string
+  separatorList.forEach(separator => {
+    parsedString = parsedString.split(separator).join(',')
   })
-  return string.split(mainSeparator).filter(notEmptyString => notEmptyString !== '')
+  return parsedString.split(',').filter(notEmptyString => notEmptyString !== '')
 }
 
 // INFO - GB - 2019-07-31 - This function check if the email has three parts arranged like somethig@something.somethig
