@@ -6,18 +6,18 @@ import sinon from 'sinon'
 require('../../src/component/Input/TextAreaApp/TextAreaApp.styl')
 
 describe('<TextAreaApp />', () => {
-  const onChangeText = sinon.stub()
-  const onClickCancelBtn = sinon.stub()
-  const onClickValidateBtn = sinon.stub()
+  const onChangeTextCallBack = sinon.stub()
+  const onClickCancelBtnCallBack = sinon.stub()
+  const onClickValidateBtnCallBack = sinon.stub()
 
   const props = {
     text: 'Lorem',
     customClass: 'randomTestClass',
     customColor: '#FFFFFF',
     id: 'MyId',
-    onChangeText: onChangeText,
-    onClickCancelBtn: onClickCancelBtn,
-    onClickValidateBtn: onClickValidateBtn,
+    onChangeText: onChangeTextCallBack,
+    onClickCancelBtn: onClickCancelBtnCallBack,
+    onClickValidateBtn: onClickValidateBtnCallBack,
     disableValidateBtn: false
   }
 
@@ -38,19 +38,19 @@ describe('<TextAreaApp />', () => {
   })
 
   describe('Handlers', () => {
-    it('onClickValidateBtn handler should call the proper handler when the validate button is clicked', () => {
+    it('should call props.onClickValidateBtn when handler onClickValidateBtn is called', () => {
       wrapper.find(`button.${props.customClass}__submit`).simulate('click')
-      expect(onClickValidateBtn.called).to.equal(true)
+      expect(onClickValidateBtnCallBack.called).to.equal(true)
     })
 
-    it('onClickCancelBtn handler should call the proper handler when the cancel button is clicked', () => {
+    it('should call props.onClickCancelBtn when handler onClickCancelBtn is called', () => {
       wrapper.find(`button.${props.customClass}__cancel`).simulate('click')
-      expect(onClickCancelBtn.called).to.equal(true)
+      expect(onClickCancelBtnCallBack.called).to.equal(true)
     })
 
-    it('onChangeText handler should call the proper handler when textarea is changing', () => {
+    it('should call props.onChangeText when handler onChangeText is called', () => {
       wrapper.find(`textarea.${props.customClass}__text`).simulate('change')
-      expect(onChangeText.called).to.equal(true)
+      expect(onChangeTextCallBack.called).to.equal(true)
     })
   })
 })

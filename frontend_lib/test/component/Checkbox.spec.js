@@ -60,7 +60,7 @@ describe('<Checkbox />', () => {
   })
 
   describe('Handlers', () => {
-    it('onClickCheckbox handler should call the proper handler', () => {
+    it('should call props.onClickCheckbox when handler onClickCheckbox is called', () => {
       wrapper.find(`label.checkboxCustom`).simulate('click', { preventDefault: () => {}, stopPropagation: () => {} })
       expect(onClickCheckbox.called).to.equal(true)
     })
