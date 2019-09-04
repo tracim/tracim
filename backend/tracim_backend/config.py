@@ -182,7 +182,7 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "agenda,"
-            "office_document,"
+            "collaborative_document_edition,"
             "share_content,"
             "upload_permission"
         )
@@ -854,16 +854,16 @@ class CFG(object):
             app_config=self,
         )
 
-        office_document = Application(
-            label="Office Document",
-            slug="office_document",
+        collaborative_document_edition = Application(
+            label="Collaborative Document Edition",
+            slug="collaborative_document_edition",
             fa_icon="file-o",
             is_active=self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
             config={},
             main_route="",
             app_config=self,
         )
-        office_document.add_content_type(
+        collaborative_document_edition.add_content_type(
             slug="office_document",
             label="Office Document",
             creation_label="Create an office document",
@@ -887,7 +887,7 @@ class CFG(object):
                 (folder.slug, folder),
                 (markdownpluspage.slug, markdownpluspage),
                 (agenda.slug, agenda),
-                (office_document.slug, office_document),
+                (collaborative_document_edition.slug, collaborative_document_edition),
                 (share_content.slug, share_content),
                 (upload_permissions.slug, upload_permissions),
             ]
