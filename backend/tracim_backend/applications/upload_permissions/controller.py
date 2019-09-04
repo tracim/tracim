@@ -20,6 +20,7 @@ from tracim_backend.applications.upload_permissions.schema import UploadPermissi
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionTokenPath
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import UploadPermissionNotFound
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
@@ -151,6 +152,7 @@ class UploadPermissionController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UploadPermissionTokenPath())
     @hapic.input_forms(UploadDataFormSchema())
     @hapic.input_files(UploadFileSchema())
@@ -162,6 +164,10 @@ class UploadPermissionController(Controller):
         # TODO - G.M - 2019-08-14 - replace UploadFiles Object hack to proper hapic support
         # see
         upload_files = UploadFiles(request, prefix_pattern="file_")
+        # INFO - G.M - 2019-09-03 - check validation of file here, because hapic can't
+        # handle them. verify if almost one file as been given.
+        if len(upload_files.files) < 1:
+            raise NoFileValidationError("No files given at input, validation failed.")
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = UploadPermissionLib(current_user=None, session=request.dbsession, config=app_config)
         upload_permission = api.get_upload_permission_by_token(
