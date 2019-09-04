@@ -167,7 +167,7 @@ class ShareFolderAdvanced extends React.Component {
   handleClickNewUpload = async () => {
     const { state, props } = this
 
-    let uploadEmailList = parserStringToList(state.uploadEmails)
+    let uploadEmailList = parserStringToList(state.uploadEmails, [' ', ',', ';', '\n'])
     let invalidEmails = []
 
     uploadEmailList.forEach(uploadEmail => {
@@ -218,7 +218,7 @@ class ShareFolderAdvanced extends React.Component {
 
   handleKeyDownEnter = e => {
     if (e.key === 'Enter') {
-      let emailList = parserStringToList(this.state.uploadEmails)
+      let emailList = parserStringToList(this.state.uploadEmails, [' ', ',', ';', '\n'])
       let invalidEmails = []
 
       emailList.forEach(email => {

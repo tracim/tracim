@@ -155,11 +155,17 @@ export const displayFileSize = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
-// INFO - GB - 2019-09-03 - In this function each split is one separator that we change for a comma
-export const parserStringToList = string => {
-  let list = string.split(' ').join(',').split('\n').join(',').split(';').join(',').split(',')
-  list = list.filter(notEmptyString => notEmptyString !== '')
-  return list
+export const parserStringToList = (string, separatorList) => {
+  let mainSeparator = ''
+  separatorList.forEach((separator, index) => {
+    if(index === 0){
+      mainSeparator = separator
+    }
+    else {
+      string = string.split(separator).join(mainSeparator)
+    }
+  })
+  return string.split(mainSeparator).filter(notEmptyString => notEmptyString !== '')
 }
 
 // INFO - GB - 2019-07-31 - This function check if the email has three parts arranged like somethig@something.somethig
