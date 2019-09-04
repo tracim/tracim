@@ -1915,7 +1915,7 @@ class ContentApi(object):
     def _check_size_length_limitation(self, content_length: int) -> None:
         # INFO - G.M - 2019-08-23 - 0 mean no size limit
         if self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE == 0:
-            pass
+            return
         elif content_length > self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE:
             raise FileSizeOverMaxLimitation(
                 'File cannot be added because his size "{}" is higher than max allowed size : "{}"'.format(
@@ -1927,7 +1927,7 @@ class ContentApi(object):
         workspace_size = workspace.get_size()
         # INFO - G.M - 2019-08-23 - 0 mean no size limit
         if self._config.LIMITATION__WORKSPACE_SIZE == 0:
-            pass
+            return
         elif workspace_size > self._config.LIMITATION__WORKSPACE_SIZE:
             raise FileSizeOverWorkspaceEmptySpace(
                 'File cannot be added (size "{}") because workspace is full: "{}/{}"'.format(
