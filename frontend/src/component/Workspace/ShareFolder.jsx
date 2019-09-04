@@ -146,6 +146,7 @@ class ShareFolder extends React.Component {
                 onClickExtendedAction={{
                   edit: e => props.onClickExtendedAction.edit(e, content),
                   download: e => props.onClickExtendedAction.download(e, content),
+                  archive: e => props.onClickExtendedAction.archive(e, content),
                   delete: e => props.onClickExtendedAction.delete(e, content)
                 }}
                 onDropMoveContentItem={props.onDropMoveContentItem}

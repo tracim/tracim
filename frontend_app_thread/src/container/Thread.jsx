@@ -11,7 +11,7 @@ import {
   PopinFixedContent,
   Timeline,
   SelectStatus,
-  DeleteContent,
+  ArchiveDeleteContent,
   displayDistanceDate,
   convertBackslashNToBr,
   generateLocalStorageContentId,
@@ -26,7 +26,9 @@ import {
   postThreadNewComment,
   putThreadStatus,
   putThreadContent,
+  putThreadIsArchived,
   putThreadIsDeleted,
+  putThreadRestoreArchived,
   putThreadRestoreDeleted,
   putThreadRead
 } from '../action.async.js'
@@ -319,6 +321,26 @@ class Thread extends React.Component {
     }
   }
 
+  handleClickArchive = async () => {
+    const { config, content } = this.state
+
+    const fetchResultArchive = await putThreadIsArchived(config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultArchive.status) {
+      case 204:
+        this.setState(prev => ({ content: { ...prev.content, is_archived: true } }))
+        this.loadContent()
+        break
+      default: GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: this.props.t('Error while archiving thread'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
   handleClickDelete = async () => {
     const { config, content } = this.state
 
@@ -332,6 +354,26 @@ class Thread extends React.Component {
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while deleting thread'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
+  handleClickRestoreArchived = async () => {
+    const { config, content } = this.state
+
+    const fetchResultRestore = await putThreadRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultRestore.status) {
+      case 204:
+        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
+        this.loadContent()
+        break
+      default: GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: this.props.t('Error while restoring thread'),
           type: 'warning',
           delay: undefined
         }
@@ -389,15 +431,16 @@ class Thread extends React.Component {
                 selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                 availableStatus={config.availableStatuses}
                 onChangeStatus={this.handleChangeStatus}
-                disabled={content.is_deleted}
+                disabled={content.is_archived || content.is_deleted}
               />
             }
 
             {loggedUser.userRoleIdInWorkspace >= 4 &&
-              <DeleteContent
+              <ArchiveDeleteContent
                 customColor={config.hexcolor}
+                onClickArchiveBtn={this.handleClickArchive}
                 onClickDeleteBtn={this.handleClickDelete}
-                disabled={content.is_deleted}
+                disabled={content.is_archived || content.is_deleted}
               />
             }
           </div>
@@ -421,6 +464,8 @@ class Thread extends React.Component {
             allowClickOnRevision={false}
             onClickRevisionBtn={() => {}}
             shouldScrollToBottom
+            isArchived={content.is_archived}
+            onClickRestoreArchived={this.handleClickRestoreArchived}
             isDeleted={content.is_deleted}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             isDeprecated={content.status === config.availableStatuses[3].slug}

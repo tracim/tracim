@@ -1,6 +1,7 @@
 const TITLE = 'Title'
 
 const EDIT_LABEL = 'Edit'
+const ARCHIVE_LABEL = 'Archive'
 const DELETE_LABEL = 'Delete'
 
 describe('Content list', function () {
@@ -53,6 +54,21 @@ describe('Content list', function () {
           .get(`.content[title="${TITLE}"]`)
           .should('not.exist')
       })
+
+      it('button achive should archive content without reload', function () {
+        cy.on('window:before:load', (error, runnable) => {
+          assert.isNotOk(true, 'Page reload when clicking and it should not')
+        })
+        cy
+          .get(`.content[title="${TITLE}"] .dropdown`)
+          .click()
+        cy
+          .get(`.content[title="${TITLE}"] .dropdown`)
+          .contains(ARCHIVE_LABEL).click()
+        cy
+          .get(`.content[title="${TITLE}"]`)
+          .should('not.exist')
+      })
     })
 
     describe('as user', function () {
@@ -86,6 +102,15 @@ describe('Content list', function () {
         cy
           .get(`.content[title="${TITLE}"] .dropdown`)
           .contains(DELETE_LABEL).should('not.exist')
+      })
+
+      it('button archive should not exists', function () {
+        cy
+          .get(`.content[title="${TITLE}"] .dropdown`)
+          .click()
+        cy
+          .get(`.content[title="${TITLE}"] .dropdown`)
+          .contains(ARCHIVE_LABEL).should('not.exist')
       })
     })
   })

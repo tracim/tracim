@@ -10,6 +10,16 @@ import { translate } from 'react-i18next'
 export const HtmlDocument = props => {
   return (
     <div className='html-document__contentpage__left__wrapper'>
+      {props.isArchived && (
+        <DisplayState
+          msg={props.t('This content is archived')}
+          btnType='button'
+          icon='archive'
+          btnLabel={props.t('Restore')}
+          onClickBtn={props.onClickRestoreArchived}
+        />
+      )}
+
       {props.isDeleted && (
         <DisplayState
           msg={props.t('This content is deleted')}
@@ -81,6 +91,7 @@ HtmlDocument.propTypes = {
   version: PropTypes.string,
   lastVersion: PropTypes.string,
   text: PropTypes.string,
+  isArchived: PropTypes.bool,
   isDeleted: PropTypes.bool,
   isDeprecated: PropTypes.bool,
   deprecatedStatus: PropTypes.object,
@@ -88,6 +99,7 @@ HtmlDocument.propTypes = {
   onClickValidateBtn: PropTypes.func,
   onChangeText: PropTypes.func,
   onClickCloseEditMode: PropTypes.func,
+  onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickShowDraft: PropTypes.func
 }

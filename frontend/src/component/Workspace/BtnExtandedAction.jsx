@@ -51,6 +51,22 @@ const ExtandedAction = props => {
         {props.userRoleIdInWorkspace >= 4 && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
+            onClick={props.onClickExtendedAction.archive}
+            data-cy='extended_action_archive'
+          >
+            <div className='subdropdown__item__icon mr-3'>
+              <i className='fa fa-fw fa-archive' />
+            </div>
+
+            <div className='subdropdown__item__text'>
+              {props.t('Archive')}
+            </div>
+          </div>
+        )}
+
+        {props.userRoleIdInWorkspace >= 4 && (
+          <div
+            className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.delete}
             data-cy='extended_action_delete'
           >

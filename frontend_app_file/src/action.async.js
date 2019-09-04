@@ -87,8 +87,28 @@ export const postFileContent = (apiUrl, workspaceId, folderId, contentType, uplo
     })
   })
 
+export const putFileIsArchived = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
 export const putFileIsDeleted = (apiUrl, workspaceId, contentId) => {
   return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putFileRestoreArchived = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

@@ -14,6 +14,7 @@
   "Error while archiving folder": "Error while archiving folder",
   "Error while deleting folder": "Error while deleting folder",
   "Error while restoring folder": "Error while restoring folder",
+  "This folder is archived": "This folder is archived",
   "This folder is deleted": "This folder is deleted",
   "Error saving folder's status, result:": "Error saving folder's status, result:"
 }

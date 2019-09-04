@@ -5,6 +5,7 @@ import {
   WORKSPACE,
   WORKSPACE_CONTENT,
   FOLDER,
+  WORKSPACE_CONTENT_ARCHIVED,
   WORKSPACE_CONTENT_DELETED
 } from '../action-creator.sync.js'
 
@@ -16,6 +17,7 @@ const serializeContent = c => ({
   fileName: c.filename,
   fileExtension: c.file_extension,
   workspaceId: c.workspace_id,
+  isArchived: c.is_archived,
   parentId: c.parent_id,
   isDeleted: c.is_deleted,
   showInUi: c.show_in_ui,
@@ -49,6 +51,12 @@ export default function workspaceContentList (state = [], action) {
 
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
       return state.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
+
+    case `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`:
+      return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
+        ? { ...wsc, isArchived: true }
+        : wsc
+      )
 
     case `${SET}/${WORKSPACE_CONTENT_DELETED}`:
       return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId

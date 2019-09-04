@@ -3,7 +3,7 @@ import Radium from 'radium'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
-const DeleteContent = props => {
+const ArchiveDeleteContent = props => {
   const styleColorBtn = {
     backgroundColor: '#fdfdfd',
     color: '#333',
@@ -17,11 +17,23 @@ const DeleteContent = props => {
       <button
         type='button'
         className='wsContentGeneric__option__menu__action d-none d-sm-block btn iconBtn'
+        onClick={props.onClickArchiveBtn}
+        disabled={props.disabled}
+        title={props.t('Archive')}
+        style={styleColorBtn}
+        key={'archiveDeleteContent__archive'}
+        data-cy='archive__button'
+      >
+        <i className='fa fa-fw fa-archive' />
+      </button>
+      <button
+        type='button'
+        className='wsContentGeneric__option__menu__action d-none d-sm-block btn iconBtn'
         onClick={props.onClickDeleteBtn}
         disabled={props.disabled}
         title={props.t('Delete')}
         style={styleColorBtn}
-        key={'deleteContent__delete'}
+        key={'archiveDeleteContent__delete'}
         data-cy='delete__button'
       >
         <i className='fa fa-fw fa-trash' />
@@ -30,16 +42,18 @@ const DeleteContent = props => {
   )
 }
 
-export default translate()(Radium(DeleteContent))
+export default translate()(Radium(ArchiveDeleteContent))
 
-DeleteContent.propTypes = {
+ArchiveDeleteContent.propTypes = {
   onClickDeleteBtn: PropTypes.func,
+  onClickArchiveBtn: PropTypes.func,
   disabled: PropTypes.bool,
   customColor: PropTypes.string
 }
 
-DeleteContent.defaultProps = {
+ArchiveDeleteContent.defaultProps = {
   onClickDeleteBtn: () => {},
+  onClickArchiveBtn: () => {},
   disabled: false,
   customColor: ''
 }

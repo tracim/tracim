@@ -12,7 +12,7 @@ import {
   PopinFixedRightPart,
   Timeline,
   NewVersionBtn,
-  DeleteContent,
+  ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
   convertBackslashNToBr,
@@ -33,7 +33,9 @@ import {
   postHtmlDocNewComment,
   putHtmlDocContent,
   putHtmlDocStatus,
+  putHtmlDocIsArchived,
   putHtmlDocIsDeleted,
+  putHtmlDocRestoreArchived,
   putHtmlDocRestoreDeleted,
   putHtmlDocRead
 } from '../action.async.js'
@@ -440,6 +442,26 @@ class HtmlDocument extends React.Component {
     }
   }
 
+  handleClickArchive = async () => {
+    const { config, content } = this.state
+
+    const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultArchive.status) {
+      case 204:
+        this.setState(prev => ({ content: { ...prev.content, is_archived: true }, mode: MODE.VIEW }))
+        this.loadContent()
+        break
+      default: GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: this.props.t('Error while archiving document'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
   handleClickDelete = async () => {
     const { config, content } = this.state
 
@@ -453,6 +475,26 @@ class HtmlDocument extends React.Component {
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while deleting document'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
+  handleClickRestoreArchived = async () => {
+    const { config, content } = this.state
+
+    const fetchResultRestore = await putHtmlDocRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultRestore.status) {
+      case 204:
+        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
+        this.loadContent()
+        break
+      default: GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: this.props.t('Error while restoring document'),
           type: 'warning',
           delay: undefined
         }
@@ -500,7 +542,8 @@ class HtmlDocument extends React.Component {
         raw_content: revision.raw_content,
         number: revision.number,
         status: revision.status,
-        is_deleted: prev.is_deleted // delete should always be taken from last version
+        is_archived: prev.is_archived, // archived and delete should always be taken from last version
+        is_deleted: prev.is_deleted
       },
       mode: MODE.REVISION
     }))
@@ -568,15 +611,16 @@ class HtmlDocument extends React.Component {
                   selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                   availableStatus={config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={mode === MODE.REVISION || content.is_deleted}
+                  disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
                 />
               }
 
               {loggedUser.userRoleIdInWorkspace >= 4 &&
-                <DeleteContent
+                <ArchiveDeleteContent
                   customColor={config.hexcolor}
+                  onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={mode === MODE.REVISION || content.is_deleted}
+                  disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
                 />
               }
             </div>
@@ -599,10 +643,12 @@ class HtmlDocument extends React.Component {
             lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
             text={content.raw_content}
             onChangeText={this.handleChangeText}
+            isArchived={content.is_archived}
             isDeleted={content.is_deleted}
             isDeprecated={content.status === config.availableStatuses[3].slug}
             deprecatedStatus={config.availableStatuses[3]}
             isDraftAvailable={mode === MODE.VIEW && loggedUser.userRoleIdInWorkspace >= 2 && this.getLocalStorageItem('rawContent')}
+            onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             onClickShowDraft={this.handleClickNewVersion}
             key={'html-document'}

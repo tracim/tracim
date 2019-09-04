@@ -16,6 +16,7 @@ const props = {
   version: '42',
   lastVersion: '1337',
   text: "Hi, I'm a Html Document.",
+  isArchived: false,
   isDeleted: false,
   isDeprecated: false,
   deprecatedStatus: {
@@ -29,6 +30,7 @@ const props = {
   onClickValidateBtn: () => {},
   onChangeText: () => {},
   onClickCloseEditMode: () => {},
+  onClickRestoreArchived: () => {},
   onClickRestoreDeleted: () => {},
   onClickShowDraft: () => {},
   t: () => {}
@@ -46,6 +48,22 @@ describe('<HtmlDocument />', () => {
     it(`should display the content of the document`, () =>
       expect(wrapper.find('.html-document__contentpage__textnote__text').render().text()).to.contains(props.text)
     )
+
+    describe('with an archived content', () => {
+      const wrapper = mount(
+        <HtmlDocument
+          {...props}
+          isArchived={true}
+        />
+      )
+
+      it(`should display the archived warning`, () =>
+        expect(wrapper.find('.html-document__contentpage__left__wrapper'))
+          .to.have.descendants(DisplayState)
+          .and
+          .have.html().to.contains('fa-archive')
+      )
+    })
 
     describe('with a deleted content', () => {
       const wrapper = mount(

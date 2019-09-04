@@ -85,12 +85,13 @@ class Header extends React.Component {
     const FIRST_PAGE = 1
 
     // INFO - GB - 2019-06-07 - When we do a search, the parameters need to be in default mode.
-    // Respectively, we have del for show_deleted=0 (false) and act for show_active=1 (true)
+    // Respectively, we have arc for show_archived=0 (false), del for show_deleted=0 (false) and act for show_active=1 (true)
     const newUrlSearchObject = {
       t: ALL_CONTENT_TYPES,
       q: searchedKeywords,
       p: FIRST_PAGE,
       nr: props.searchResult.numberResultsByPage,
+      arc: 0,
       del: 0,
       act: 1
     }

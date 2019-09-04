@@ -50,6 +50,7 @@ class SearchResult extends React.Component {
     searchObject.searchedKeywords = parsed.q
     searchObject.numberResultsByPage = parseInt(parsed.nr)
     searchObject.currentPage = parseInt(parsed.p)
+    searchObject.showArchived = !!(parseInt(parsed.arc))
     searchObject.showDeleted = !!(parseInt(parsed.del))
     searchObject.showActive = !!(parseInt(parsed.act))
 
@@ -92,6 +93,7 @@ class SearchResult extends React.Component {
       searchObject.searchedKeywords,
       FIRST_PAGE,
       (searchObject.numberResultsByPage * searchObject.currentPage),
+      searchObject.showArchived,
       searchObject.showDeleted,
       searchObject.showActive
     ))
@@ -142,6 +144,7 @@ class SearchResult extends React.Component {
       props.searchResult.searchedKeywords,
       NEXT_PAGE,
       props.searchResult.numberResultsByPage,
+      searchObject.showArchived,
       searchObject.showDeleted,
       searchObject.showActive
     ))

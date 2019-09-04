@@ -56,7 +56,9 @@ export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
 export const updateUserWorkspaceSubscriptionNotif = (userId, workspaceId, doNotify) =>
   ({ type: `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, userId, workspaceId, doNotify })
 
+export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
+export const setWorkspaceContentArchived = (workspaceId, contentId) => ({ type: `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`, workspaceId, contentId })
 export const setWorkspaceContentDeleted = (workspaceId, contentId) => ({ type: `${SET}/${WORKSPACE_CONTENT_DELETED}`, workspaceId, contentId })
 
 export const WORKSPACE_CONTENT_MOVE = `${MOVE}/${WORKSPACE_CONTENT}`

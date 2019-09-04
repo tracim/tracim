@@ -30,6 +30,7 @@ import {
   CONFIG,
   APP_LIST,
   CONTENT_TYPE_LIST,
+  WORKSPACE_CONTENT_ARCHIVED,
   WORKSPACE_CONTENT_DELETED,
   WORKSPACE_RECENT_ACTIVITY,
   WORKSPACE_READ_STATUS,
@@ -660,6 +661,21 @@ export const getContentTypeList = () => dispatch => {
   })
 }
 
+export const putWorkspaceContentArchived = (workspaceId, contentId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT'
+    },
+    actionName: WORKSPACE_CONTENT_ARCHIVED,
+    dispatch
+  })
+}
+
 export const putWorkspaceContentDeleted = (workspaceId, contentId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`,
@@ -705,9 +721,9 @@ export const getLoggedUserCalendar = () => dispatch => {
   })
 }
 
-export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, pageSize, showDeleted, showActive) => dispatch => {
+export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=0&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedKeywords)}&page_nb=${pageNumber}&size=${pageSize}`,
+    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedKeywords)}&page_nb=${pageNumber}&size=${pageSize}`,
     param: {
       credentials: 'include',
       headers: {

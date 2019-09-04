@@ -5,6 +5,19 @@ import { Checkbox } from 'tracim_frontend_lib'
 const FolderAdvanced = props => {
   return (
     <div className='folder_advanced-content'>
+      {props.isArchived &&
+        <div className='folder_advanced__content__state'>
+          <div className='folder_advanced__content__state__msg'>
+            <i className='fa fa-fw fa-archive' />
+            {props.t('This folder is archived')}
+          </div>
+
+          <button className='folder_advanced__content__state__btnrestore btn' onClick={props.onClickRestoreArchived}>
+            <i className='fa fa-fw fa-archive' />
+            {props.t('Restore')}
+          </button>
+        </div>
+      }
 
       {props.isDeleted &&
         <div className='folder_advanced__content__state'>
@@ -29,7 +42,7 @@ const FolderAdvanced = props => {
           {props.tracimContentTypeList.map(app =>
             <div
               className='folder_advanced__content__form__type'
-              onClick={() => !props.isDeleted && props.onClickApp(app.slug)}
+              onClick={() => !props.isArchived && !props.isDeleted && props.onClickApp(app.slug)}
               key={app.slug}
             >
               <Checkbox
@@ -38,7 +51,7 @@ const FolderAdvanced = props => {
                 onClickCheckbox={() => props.onClickApp(app.slug)}
                 styleLabel={{ margin: '0 8px 0 0' }}
                 styleCheck={{ top: '-5px' }}
-                disabled={props.isDeleted}
+                disabled={props.isArchived || props.isDeleted}
               />
 
               <i
