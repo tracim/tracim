@@ -24,8 +24,9 @@ from tracim_backend.models.data import Workspace
 class UploadPermissionEmailManager(EmailManager):
     def notify_new_upload(
         self,
-        uploader_username,
-        uploader_email,
+        uploader_username: str,
+        uploader_email: str,
+        uploader_message: str,
         workspace_in_context: WorkspaceInContext,
         uploaded_contents: typing.List[ContentInContext],
     ) -> None:
@@ -51,6 +52,7 @@ class UploadPermissionEmailManager(EmailManager):
                 uploader=uploader,
                 translator=translator,
                 uploaded_contents=uploaded_contents,
+                uploader_message=uploader_message,
             )
             send_email_through(
                 config=self.config, sendmail_callable=email_sender.send_mail, message=message
@@ -61,6 +63,7 @@ class UploadPermissionEmailManager(EmailManager):
         workspace_in_context: WorkspaceInContext,
         receiver: UserInContext,
         uploader: EmailUser,
+        uploader_message: str,
         uploaded_contents: typing.List[ContentInContext],
         translator: Translator,
     ) -> Message:
@@ -90,6 +93,7 @@ class UploadPermissionEmailManager(EmailManager):
             "workspace": workspace_in_context,
             "uploader": uploader,
             "uploaded_contents": uploaded_contents,
+            "uploader_message": uploader_message,
         }
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator
