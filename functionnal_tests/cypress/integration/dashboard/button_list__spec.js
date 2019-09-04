@@ -4,7 +4,7 @@ import { PAGES as p } from '../../support/urls_commands'
 let workspaceTest
 
 describe('Dashboard button list', () => {
-  before(function () {
+  before(() => {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
@@ -15,7 +15,7 @@ describe('Dashboard button list', () => {
 
   beforeEach(() => {
     cy.loginAs('administrators')
-    cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceTest.workspace_id}})
+    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceTest.workspace_id } })
   })
 
   afterEach(() => {
@@ -41,10 +41,6 @@ describe('Dashboard button list', () => {
     describe('if agenda is not enabled', () => {
       it('should show button explore content but not agenda', () => {
         cy.enableAgenda(workspaceTest, false)
-        cy.createRandomUser().then(user => {
-          cy.addUserToWorkspace(user.user_id, workspaceTest.workspace_id, 'reader')
-          cy.login(user)
-        })
         cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceTest.workspace_id}})
         cy.get('[data-cy=contentTypeBtn_agenda]').should('not.exist')
         cy.get('[data-cy="contentTypeBtn_contents/all"]')
