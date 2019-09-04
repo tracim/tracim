@@ -17,7 +17,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import synonym
 
 from tracim_backend.models.auth import User
-from tracim_backend.models.data import Content
 from tracim_backend.models.meta import DeclarativeBase
 
 
@@ -57,7 +56,6 @@ class ContentShare(DeclarativeBase):
     )
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     disabled = Column(DateTime, unique=False, nullable=True, default=None)
-    content = relationship("Content", remote_side=[Content.id], backref="shares")
     author = relationship("User", remote_side=[User.user_id])
 
     @classmethod

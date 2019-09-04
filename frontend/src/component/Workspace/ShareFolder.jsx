@@ -46,7 +46,7 @@ class ShareFolder extends React.Component {
         <div
           className='folder__header align-items-center primaryColorBgLightenHover'
           onClick={() => props.onClickShareFolder()}
-          title={props.t('Inbox')}
+          title={props.t('Received files')}
         >
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
@@ -63,7 +63,7 @@ class ShareFolder extends React.Component {
             </div>
 
             <div className='folder__header__name'>
-              {props.t('Inbox')}
+              {props.t('Received files')}
             </div>
           </div>
 

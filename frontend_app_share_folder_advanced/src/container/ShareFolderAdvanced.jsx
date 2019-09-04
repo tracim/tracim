@@ -38,7 +38,7 @@ class ShareFolderAdvanced extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       externalTranslationList: [
-        props.t('Inbox')
+        props.t('Received files')
       ],
       tracimContentTypeList: [],
       currentPageStatus: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT,
@@ -228,6 +228,7 @@ class ShareFolderAdvanced extends React.Component {
   render () {
     const { state } = this
     const customColor = (state.tracimContentTypeList.find(type => type.slug === 'file') || { hexcolor: state.config.hexcolor }).hexcolor
+    const title = this.props.t('Received files')
 
     if (!state.isVisible) return null
 

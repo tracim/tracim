@@ -78,17 +78,17 @@ describe('<CardPopupCreateContent />', () => {
   })
 
   describe('Handlers', () => {
-    it(`onValidate handler should call the proper handler when the Enter key is pressed`, () => {
+    it('should call props.onValidate when handler onValidate is called when the Enter key is pressed', () => {
       wrapper.find(`.createcontent__form__input`).simulate('keyDown', { key: 'Enter', preventDefault: () => {} })
       expect(onValidateCallBack.called).to.equal(true)
     })
 
-    it(`onClose handler should call the proper handler when the Escpae key is pressed`, () => {
+    it('should call props.onClose when handler onClose is called when the Escpae key is pressed', () => {
       wrapper.find(`.createcontent__form__input`).simulate('keyDown', { key: 'Escape', preventDefault: () => {} })
       expect(onCloseCallBack.called).to.equal(true)
     })
 
-    it(`onChangeContentName handler should call the proper handler`, () => {
+    it('should call props.onChangeContentName when handler onChangeContentName is called', () => {
       wrapper.find(`.createcontent__form__input`).simulate('change', { value: 'randomText' })
       expect(onChangeContentNameCallBack.called).to.equal(true)
     })

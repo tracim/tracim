@@ -14,6 +14,7 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
+from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
@@ -79,6 +80,7 @@ class FileController(Controller):
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
     @check_right(can_create_file)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(ContentDigestSchema())
@@ -88,6 +90,11 @@ class FileController(Controller):
         """
         Create a file .This will create 2 new revision.
         """
+        # INFO - G.M - 2019-09-03 - check validation of file here, because marshmallow
+        # required doesn't work correctly with cgi_fieldstorage.
+        # check is done with None because cgi_fieldstorage cannot be converted to bool
+        if hapic_data.files.files is None:
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
@@ -129,6 +136,7 @@ class FileController(Controller):
     @check_right(is_file_content)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(FilePathSchema())
     @hapic.input_files(SimpleFileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
@@ -139,6 +147,11 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
+        # INFO - G.M - 2019-09-03 - check validation of file here, because marshmallow
+        # required doesn't work correctly with cgi_fieldstorage.
+        # check is done with None because cgi_fieldstorage cannot be converted to bool
+        if hapic_data.files.files is None:
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
