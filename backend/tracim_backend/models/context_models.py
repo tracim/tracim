@@ -466,10 +466,14 @@ class WorkspaceUpdate(object):
         label: typing.Optional[str] = None,
         description: typing.Optional[str] = None,
         agenda_enabled: typing.Optional[bool] = None,
+        public_upload_enabled: typing.Optional[bool] = None,
+        public_download_enabled: typing.Optional[bool] = None,
     ) -> None:
         self.label = label
         self.description = description
         self.agenda_enabled = agenda_enabled
+        self.public_upload_enabled = public_upload_enabled
+        self.public_download_enabled = public_download_enabled
 
 
 class WorkspaceCreate(object):
@@ -477,10 +481,19 @@ class WorkspaceCreate(object):
     Update workspace
     """
 
-    def __init__(self, label: str, description: str, agenda_enabled: bool = True) -> None:
+    def __init__(
+        self,
+        label: str,
+        description: str,
+        agenda_enabled: bool = True,
+        public_upload_enabled: bool = True,
+        public_download_enabled: bool = True,
+    ) -> None:
         self.label = label
         self.description = description
         self.agenda_enabled = agenda_enabled
+        self.public_upload_enabled = public_upload_enabled
+        self.public_download_enabled = public_download_enabled
 
 
 class ContentCreation(object):
@@ -680,6 +693,20 @@ class WorkspaceInContext(object):
         returns True if workspace's agenda is enabled
         """
         return self.workspace.agenda_enabled
+
+    @property
+    def public_download_enabled(self) -> bool:
+        """
+        returns True if public download is enabled in this workspace
+        """
+        return self.workspace.public_download_enabled
+
+    @property
+    def public_upload_enabled(self) -> bool:
+        """
+        returns True if public upload is enabled in this workspace
+        """
+        return self.workspace.public_upload_enabled
 
     @property
     def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:

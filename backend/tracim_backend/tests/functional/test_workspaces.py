@@ -175,6 +175,8 @@ class TestWorkspaceEndpoint(object):
             "label": "superworkspace",
             "description": "mysuperdescription",
             "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
         }
         # Before
         res = web_testapp.get("/api/v2/workspaces/1", status=200)
@@ -187,6 +189,8 @@ class TestWorkspaceEndpoint(object):
         assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is True
+        assert workspace["public_upload_enabled"] is True
+        assert workspace["public_download_enabled"] is True
 
         # modify workspace
         res = web_testapp.put_json("/api/v2/workspaces/1", status=200, params=params)
@@ -199,6 +203,8 @@ class TestWorkspaceEndpoint(object):
         assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is False
+        assert workspace["public_upload_enabled"] is False
+        assert workspace["public_download_enabled"] is False
 
         # after
         res = web_testapp.get("/api/v2/workspaces/1", status=200)
@@ -211,6 +217,8 @@ class TestWorkspaceEndpoint(object):
         assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is False
+        assert workspace["public_upload_enabled"] is False
+        assert workspace["public_download_enabled"] is False
 
     def test_api__update_workspace__ok_200__partial_change_label_only(
         self, workspace_api_factory, application_api_factory, web_testapp
@@ -427,12 +435,16 @@ class TestWorkspaceEndpoint(object):
             "label": "superworkspace",
             "description": "mysuperdescription",
             "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
         }
         res = web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
         assert res.json_body
         workspace = res.json_body
         assert workspace["label"] == "superworkspace"
         assert workspace["agenda_enabled"] is False
+        assert workspace["public_upload_enabled"] is False
+        assert workspace["public_download_enabled"] is False
         assert workspace["description"] == "mysuperdescription"
         assert workspace["owner"]["user_id"] == 1
         assert workspace["owner"]["avatar_url"] is None

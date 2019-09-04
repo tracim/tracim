@@ -7,6 +7,7 @@ from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.applications.share.authorization import has_public_download_enabled
 from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.share.models_in_context import ContentShareInContext
@@ -23,9 +24,11 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentShareNotFound
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import TracimFileNotFound
+from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_content_manager
@@ -59,8 +62,10 @@ class ShareController(Controller):
     """
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @check_right(is_content_manager)
     @check_right(is_shareable_content_type)
+    @check_right(has_public_download_enabled)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ShareCreationBodySchema())
     @hapic.output_body(ContentShareSchema(many=True))
@@ -83,8 +88,10 @@ class ShareController(Controller):
         return api.get_content_shares_in_context(shares_content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @check_right(is_contributor)
     @check_right(is_shareable_content_type)
+    @check_right(has_public_download_enabled)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_query(ShareListQuerySchema())
     @hapic.output_body(ContentShareSchema(many=True))
@@ -106,8 +113,10 @@ class ShareController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @check_right(is_content_manager)
     @check_right(is_shareable_content_type)
+    @check_right(has_public_download_enabled)
     @hapic.input_path(ShareIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def disable_content_share(self, context, request: TracimRequest, hapic_data=None) -> None:
@@ -122,6 +131,7 @@ class ShareController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(ShareTokenPathSchema())
     @hapic.output_body(ContentShareInfoSchema())
@@ -142,12 +152,17 @@ class ShareController(Controller):
         content = ContentApi(
             current_user=None, session=request.dbsession, config=app_config
         ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        workspace_api = WorkspaceApi(
+            current_user=None, session=request.dbsession, config=app_config
+        )
+        workspace = workspace_api.get_one(content.workspace_id)
+        workspace_api.check_public_download_enabled(workspace)
         if content.type not in shareables_content_type:
             raise ContentTypeNotAllowed()
-
         return api.get_content_share_in_context(content_share)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(ShareTokenPathSchema())
@@ -169,10 +184,16 @@ class ShareController(Controller):
         content = ContentApi(
             current_user=None, session=request.dbsession, config=app_config
         ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        workspace_api = WorkspaceApi(
+            current_user=None, session=request.dbsession, config=app_config
+        )
+        workspace = workspace_api.get_one(content.workspace_id)
+        workspace_api.check_public_download_enabled(workspace)
         if content.type not in shareables_content_type:
             raise ContentTypeNotAllowed()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(ShareTokenWithFilenamePathSchema())
@@ -186,6 +207,7 @@ class ShareController(Controller):
         return self.guest_download_file(context, request, hapic_data)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(ShareTokenWithFilenamePathSchema())
@@ -216,6 +238,11 @@ class ShareController(Controller):
         content = ContentApi(
             current_user=None, session=request.dbsession, config=app_config
         ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        workspace_api = WorkspaceApi(
+            current_user=None, session=request.dbsession, config=app_config
+        )
+        workspace = workspace_api.get_one(content.workspace_id)
+        workspace_api.check_public_download_enabled(workspace)
         if content.type not in shareables_content_type:
             raise ContentTypeNotAllowed()
 

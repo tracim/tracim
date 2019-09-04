@@ -12,6 +12,8 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspaceNotFound
+from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
+from tracim_backend.exceptions import WorkspacePublicUploadDisabledException
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
@@ -82,6 +84,8 @@ class WorkspaceApi(object):
         label: str = "",
         description: str = "",
         agenda_enabled: bool = True,
+        public_download_enabled: bool = True,
+        public_upload_enabled: bool = True,
         save_now: bool = False,
     ) -> Workspace:
         # TODO - G.M - 2019-04-11 - Fix Circular Import issue between userApi
@@ -102,6 +106,8 @@ class WorkspaceApi(object):
         workspace.label = label
         workspace.description = description
         workspace.agenda_enabled = agenda_enabled
+        workspace.public_download_enabled = public_download_enabled
+        workspace.public_upload_enabled = public_upload_enabled
         workspace.created = datetime.utcnow()
         workspace.updated = datetime.utcnow()
         workspace.owner = self._user
@@ -127,6 +133,8 @@ class WorkspaceApi(object):
         description: typing.Optional[str] = None,
         save_now: bool = False,
         agenda_enabled: typing.Optional[bool] = None,
+        public_upload_enabled: typing.Optional[bool] = None,
+        public_download_enabled: typing.Optional[bool] = None,
     ) -> Workspace:
         """
         Update workspace
@@ -154,6 +162,10 @@ class WorkspaceApi(object):
             workspace.description = description
         if agenda_enabled is not None:
             workspace.agenda_enabled = agenda_enabled
+        if public_upload_enabled is not None:
+            workspace.public_upload_enabled = public_upload_enabled
+        if public_download_enabled is not None:
+            workspace.public_download_enabled = public_download_enabled
         workspace.updated = datetime.utcnow()
         if save_now:
             self.save(workspace)
@@ -344,6 +356,20 @@ class WorkspaceApi(object):
                 except Exception as exc:
                     logger.error(self, "Something goes wrong during agenda create/update")
                     logger.exception(self, exc)
+
+    def check_public_upload_enabled(self, workspace: Workspace) -> None:
+        if not workspace.public_upload_enabled:
+            raise WorkspacePublicUploadDisabledException(
+                'Workspace "{}" has public '
+                "download feature disabled".format(workspace.workspace_id)
+            )
+
+    def check_public_download_enabled(self, workspace: Workspace) -> None:
+        if not workspace.public_download_enabled:
+            raise WorkspacePublicDownloadDisabledException(
+                'Workspace "{}" has public '
+                "download feature disabled".format(workspace.workspace_id)
+            )
 
     def get_base_query(self) -> Query:
         return self._base_query()
