@@ -114,6 +114,10 @@ class NotFound(TracimException):
     pass
 
 
+class NoFileValidationError(TracimException):
+    error_code = ErrorCode.NO_FILE_VALIDATION_ERROR
+
+
 class NoValidSearchEngine(TracimException):
     pass
 

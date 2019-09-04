@@ -48,7 +48,7 @@ describe('<IconButton />', () => {
   })
 
   describe('Handlers', () => {
-    it(`onClick handler should call the proper handler when the icon button is clicked`, () => {
+    it('should call props.onClick when handler onClick is called', () => {
       wrapper.find(`button.${props.className}.btn`).simulate('click')
       expect(onClickCallBack.called).to.equal(true)
     })
