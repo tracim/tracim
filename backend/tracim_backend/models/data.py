@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 from depot.fields.sqlalchemy import UploadedFileField
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
+import sqlalchemy
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -74,8 +75,20 @@ class Workspace(DeclarativeBase):
 
     revisions = relationship("ContentRevisionRO")
     agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
-    public_upload_enabled = Column(Boolean, unique=False, nullable=False, default=False)
-    public_download_enabled = Column(Boolean, unique=False, nullable=False, default=False)
+    public_upload_enabled = Column(
+        Boolean,
+        unique=False,
+        nullable=False,
+        default=False,
+        server_default=sqlalchemy.sql.expression.literal(False),
+    )
+    public_download_enabled = Column(
+        Boolean,
+        unique=False,
+        nullable=False,
+        default=False,
+        server_default=sqlalchemy.sql.expression.literal(False),
+    )
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     owner = relationship("User", remote_side=[User.user_id])
 
