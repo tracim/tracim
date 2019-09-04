@@ -1,14 +1,21 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-import { CUSTOM_EVENT, ProgressBar, handleFetchResult } from 'tracim_frontend_lib'
+import {
+  CUSTOM_EVENT,
+  ProgressBar
+} from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
-import { FETCH_CONFIG, PAGE } from '../helper.js'
-import { getGuestUploadInfos } from '../action-creator.async'
+import {
+  FETCH_CONFIG,
+  PAGE
+} from '../helper.js'
+import { getGuestUploadInfo } from '../action-creator.async'
 
 class GuestUpload extends React.Component {
   constructor (props) {
@@ -40,13 +47,13 @@ class GuestUpload extends React.Component {
 
   async componentDidMount () {
     const { props } = this
-    const request = await getGuestUploadInfos(props.match.params.token)
-    const response = await handleFetchResult(request)
+
+    const response = await props.dispatch(getGuestUploadInfo(props.match.params.token))
 
     switch (response.apiResponse.status) {
       case 200:
         this.setState({
-          hasPassword: response.body.has_password
+          hasPassword: response.json.has_password
         })
         break
       case 400:
@@ -201,4 +208,4 @@ class GuestUpload extends React.Component {
   }
 }
 
-export default translate()(GuestUpload)
+export default connect(() => ({}))(translate()(GuestUpload))

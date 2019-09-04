@@ -776,11 +776,17 @@ export const postDownloadFile = (token, guestPassword) =>
     })
   })
 
-export const getGuestUploadInfos = (token) =>
-  fetch(`${FETCH_CONFIG.apiUrl}/public/guest-upload/${token}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
+export const getGuestUploadInfo = token => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/public/guest-upload/${token}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
     },
-    method: 'GET'
+    actionName: 'GuestUpload',
+    dispatch
   })
+}
