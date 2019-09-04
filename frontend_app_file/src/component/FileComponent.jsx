@@ -10,16 +10,7 @@ import { DisplayState, FileDropzone } from 'tracim_frontend_lib'
 const color = require('color')
 
 export const FileComponent = props =>
-  <div className={classnames('file__contentpage__statewrapper', { 'displayState': props.isArchived || props.isDeleted || props.isDeprecated })}>
-    {props.isArchived && (
-      <DisplayState
-        msg={props.t('This content is archived')}
-        btnType='button'
-        icon='archive'
-        btnLabel={props.t('Restore')}
-        onClickBtn={props.onClickRestoreArchived}
-      />
-    )}
+  <div className={classnames('file__contentpage__statewrapper', { 'displayState': props.isDeleted || props.isDeprecated })}>
 
     {props.isDeleted && (
       <DisplayState

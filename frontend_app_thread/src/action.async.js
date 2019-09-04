@@ -78,28 +78,8 @@ export const putThreadContent = (apiUrl, workspaceId, contentId, label) =>
     })
   })
 
-export const putThreadIsArchived = (apiUrl, workspaceId, contentId) => {
-  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'PUT'
-  })
-}
-
 export const putThreadIsDeleted = (apiUrl, workspaceId, contentId) => {
   return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'PUT'
-  })
-}
-
-export const putThreadRestoreArchived = (apiUrl, workspaceId, contentId) => {
-  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

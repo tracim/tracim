@@ -68,7 +68,6 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           fileExtension: ra.file_extension,
           parentId: ra.parent_id,
           showInUi: ra.show_in_ui,
-          isArchived: ra.is_archived,
           isDeleted: ra.is_deleted,
           statusSlug: ra.status,
           subContentTypeSlug: ra.sub_content_types
@@ -88,7 +87,6 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
             fileExtension: ra.file_extension,
             parentId: ra.parent_id,
             showInUi: ra.show_in_ui,
-            isArchived: ra.is_archived,
             isDeleted: ra.is_deleted,
             statusSlug: ra.status,
             subContentTypeSlug: ra.sub_content_types

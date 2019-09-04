@@ -58,20 +58,10 @@ class Timeline extends React.Component {
           </div>
         }
           <div className='timeline__warning'>
-            {props.isDeprecated && !props.isArchived && !props.isDeleted && (
+            {props.isDeprecated && !props.isDeleted && (
               <DisplayState
                 msg={props.t('This content is deprecated')}
                 icon={props.deprecatedStatus.faIcon}
-              />
-            )}
-
-            {props.isArchived && (
-              <DisplayState
-                msg={props.t('This content is archived')}
-                btnType='button'
-                icon='archive'
-                btnLabel={props.t('Restore')}
-                onClickBtn={props.onClickRestoreArchived}
               />
             )}
 
@@ -201,8 +191,6 @@ Timeline.propTypes = {
   allowClickOnRevision: PropTypes.bool,
   shouldScrollToBottom: PropTypes.bool,
   rightPartOpen: PropTypes.bool,
-  isArchived: PropTypes.bool,
-  onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
   onClickRestoreDeleted: PropTypes.func,
   showTitle: PropTypes.bool
@@ -224,7 +212,6 @@ Timeline.defaultProps = {
   allowClickOnRevision: true,
   shouldScrollToBottom: true,
   rightPartOpen: false,
-  isArchived: false,
   isDeleted: false,
   showTitle: true
 }

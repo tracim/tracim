@@ -142,7 +142,6 @@ class Folder extends React.Component {
                         edit: e => props.onClickExtendedAction.edit(e, props.folderData),
                         move: null,
                         download: e => props.onClickExtendedAction.download(e, props.folderData),
-                        archive: e => props.onClickExtendedAction.archive(e, props.folderData),
                         delete: e => props.onClickExtendedAction.delete(e, props.folderData)
                       }}
                     />
@@ -197,7 +196,6 @@ class Folder extends React.Component {
                 onClickExtendedAction={{
                   edit: e => props.onClickExtendedAction.edit(e, content),
                   download: e => props.onClickExtendedAction.download(e, content),
-                  archive: e => props.onClickExtendedAction.archive(e, content),
                   delete: e => props.onClickExtendedAction.delete(e, content)
                 }}
                 onDropMoveContentItem={props.onDropMoveContentItem}

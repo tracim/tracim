@@ -10,7 +10,7 @@ import {
   handleFetchResult,
   addAllResourceI18n,
   // SelectStatus,
-  ArchiveDeleteContent,
+  DeleteContent,
   CUSTOM_EVENT,
   appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
@@ -20,9 +20,7 @@ import {
   getContentTypeList,
   putFolder,
   // putFolderStatus,
-  putFolderIsArchived,
   putFolderIsDeleted,
-  putFolderRestoreArchived,
   putFolderRestoreDeleted
 } from '../action.async.js'
 
@@ -196,19 +194,6 @@ class FolderAdvanced extends React.Component {
   //   }
   // }
 
-  handleClickArchive = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putFolderIsArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: true } }))
-        this.loadContent()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while archiving folder'), 'warning')
-    }
-  }
-
   handleClickDelete = async () => {
     const { config, content } = this.state
 
@@ -219,19 +204,6 @@ class FolderAdvanced extends React.Component {
         this.loadContent()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting folder'), 'warning')
-    }
-  }
-
-  handleClickRestoreArchived = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putFolderRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
-        this.loadContent()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring folder'), 'warning')
     }
   }
 
@@ -274,16 +246,15 @@ class FolderAdvanced extends React.Component {
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={state.content.is_archived || state.content.is_deleted}
+                  disabled={state.content.is_deleted}
                 />
               */}
 
               {state.loggedUser.userRoleIdInWorkspace >= 4 &&
-                <ArchiveDeleteContent
+                <DeleteContent
                   customColor={state.config.hexcolor}
-                  onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.content.is_archived || state.content.is_deleted}
+                  disabled={state.content.is_deleted}
                 />
               }
             </div>
@@ -295,9 +266,7 @@ class FolderAdvanced extends React.Component {
             folderSubContentType={state.content.sub_content_types || []}
             tracimContentTypeList={state.tracimContentTypeList}
             onClickApp={this.handleClickCheckbox}
-            isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
-            onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
           />
         </PopinFixedContent>
