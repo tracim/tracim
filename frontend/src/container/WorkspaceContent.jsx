@@ -45,8 +45,6 @@ import {
   addWorkspaceContentList,
   setWorkspaceShareFolderContentList,
   addWorkspaceShareFolderContentList,
-  setWorkspaceContentArchived,
-  setWorkspaceContentDeleted,
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
   toggleFolderOpen,
@@ -79,7 +77,7 @@ class WorkspaceContent extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.REFRESH_CONTENT_LIST:
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
-        this.loadContentList(state.workspaceIdInUrl)
+        this.loadAllWorkspaceContent(state.workspaceIdInUrl)
         break
 
       case CUSTOM_EVENT.OPEN_CONTENT_URL:
@@ -304,8 +302,22 @@ class WorkspaceContent extends React.Component {
     const fetchPutContentArchived = await props.dispatch(putWorkspaceContentArchived(content.workspaceId, content.id))
     switch (fetchPutContentArchived.status) {
       case 204:
-        props.dispatch(setWorkspaceContentArchived(content.workspaceId, content.id))
         this.loadContentList(state.workspaceIdInUrl)
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while archiving content'), 'warning'))
+    }
+  }
+
+  handleClickArchiveShareFolderContentItem = async (e, content) => {
+    const { props, state } = this
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    const fetchPutContentArchived = await props.dispatch(putWorkspaceContentArchived(content.workspaceId, content.id))
+    switch (fetchPutContentArchived.status) {
+      case 204:
+        this.loadShareFolderContent(state.workspaceIdInUrl)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while archiving content'), 'warning'))
     }
@@ -316,12 +328,24 @@ class WorkspaceContent extends React.Component {
 
     e.preventDefault()
     e.stopPropagation()
-
     const fetchPutContentDeleted = await props.dispatch(putWorkspaceContentDeleted(content.workspaceId, content.id))
     switch (fetchPutContentDeleted.status) {
       case 204:
-        props.dispatch(setWorkspaceContentDeleted(content.workspaceId, content.id))
         this.loadContentList(state.workspaceIdInUrl)
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
+    }
+  }
+
+  handleClickDeleteShareFolderContentItem = async (e, content) => {
+    const { props, state } = this
+
+    e.preventDefault()
+    e.stopPropagation()
+    const fetchPutContentDeleted = await props.dispatch(putWorkspaceContentDeleted(content.workspaceId, content.id))
+    switch (fetchPutContentDeleted.status) {
+      case 204:
+        this.loadShareFolderContent(state.workspaceIdInUrl)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
     }
@@ -633,8 +657,8 @@ class WorkspaceContent extends React.Component {
                   onClickExtendedAction={{
                     edit: this.handleClickEditContentItem,
                     download: this.handleClickDownloadContentItem,
-                    archive: this.handleClickArchiveContentItem,
-                    delete: this.handleClickDeleteContentItem
+                    archive: this.handleClickArchiveShareFolderContentItem,
+                    delete: this.handleClickDeleteShareFolderContentItem
                   }}
                   onClickShareFolder={this.handleClickShareFolder}
                   contentType={contentType}
