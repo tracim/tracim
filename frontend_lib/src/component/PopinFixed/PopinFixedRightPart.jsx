@@ -29,7 +29,7 @@ class PopinFixedRightPart extends React.Component {
         >
           {props.menuItemList.map(menuItem =>
             <button
-              className={classnames('iconBtn wsContentGeneric__content__right__header__icon nav-item', { 'active': menuItem.id === state.currentChildren })}
+              className={classnames('wsContentGeneric__content__right__header__icon nav-item', { 'active': menuItem.id === state.currentChildren })}
               title={menuItem.label}
               onClick={() => this.handleChangeRightChildren(menuItem.id)}
               style={{ borderColor: props.customColor }}
@@ -38,11 +38,11 @@ class PopinFixedRightPart extends React.Component {
             </button>
           )}
 
-          <div 
+          <div
             className='wsContentGeneric__content__right__header__icon__close'
-            title={props.t(props.rightPartOpen ? 'Close' : 'Open')}
+            title={props.rightPartOpen ? props.t('Close') : props.t('Open')}
           >
-            <i className={classnames('fa fa-fw', { 'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen })} />
+            <i className={classnames('fa fa-fw', { 'fa-chevron-right': props.rightPartOpen, 'fa-chevron-left': !props.rightPartOpen })} />
           </div>
         </div>
 

@@ -153,8 +153,9 @@ class Tracim extends React.Component {
     const { props } = this
 
     const idWsToOpen = openInSidebarId || props.currentWorkspace.id || undefined
+    const showOwnedWorkspace = false
 
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
 
     if (fetchGetWorkspaceList.status === 200) {
       const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({ ...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen }))

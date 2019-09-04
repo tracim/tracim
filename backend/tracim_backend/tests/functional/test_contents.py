@@ -2321,6 +2321,23 @@ class TestFiles(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
+    def test_api__create_file__err_400__no_file_given(
+        self, workspace_api_factory, content_api_factory, session, web_testapp
+    ) -> None:
+        """
+        create one file of a content but no input file given
+        """
+
+        workspace_api = workspace_api_factory.get()
+
+        business_workspace = workspace_api.get_one(1)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id), status=400
+        )
+        assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
+
     def test_api__create_file__ok__200__in_folder(
         self,
         workspace_api_factory,
@@ -2482,6 +2499,34 @@ class TestFiles(object):
         assert res.body == image.getvalue()
         assert res.content_type == "image/png"
         assert res.content_length == len(image.getvalue())
+
+    def test_api__set_file_raw__err_400__no_file_given(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
+        """
+        Set one file of a content to no file: error
+        """
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        session.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.put(
+            "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, "toto.jpg"), status=400
+        )
+        assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
 
     def test_api__set_file_raw__ok_200__filename_already_used(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -4119,3 +4164,79 @@ class TestThreads(object):
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INVALID_STATUS_CHANGE
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_file_size_limit"}], indirect=True
+)
+class TestFileLimitedContentSize(object):
+    def test_api__set_file_raw__err_400__file_size_limit_over_limitation(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
+        """
+        Try set one file of a content with different size according to size limit
+        """
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        business_workspace = workspace_api.create_workspace("Business")
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=None,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        session.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_1000px_png_test_image()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
+            "/api/v2/workspaces/{}/files/{}/raw/{}".format(
+                business_workspace.workspace_id, content_id, image.name
+            ),
+            upload_files=[("files", "test.txt", b"a")],
+            status=204,
+        )
+
+        res = web_testapp.put(
+            "/api/v2/workspaces/{}/files/{}/raw/{}".format(
+                business_workspace.workspace_id, content_id, image.name
+            ),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_MAX_LIMITATION
+
+    def test_api__create_file__err__400__file_size_limit_over_limitation(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, admin_user
+    ) -> None:
+        """
+        try to create one file of a content at workspace root with different size
+        according to size limit
+        """
+
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.create_workspace("Business")
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        res = web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_MAX_LIMITATION
+
+        res = web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id),
+            upload_files=[("files", "test.txt", b"a")],
+            status=200,
+        )

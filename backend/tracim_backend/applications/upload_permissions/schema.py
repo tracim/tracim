@@ -16,6 +16,9 @@ from tracim_backend.applications.upload_permissions.validators import (
 from tracim_backend.applications.upload_permissions.validators import (
     upload_permission_password_validator,
 )
+from tracim_backend.applications.upload_permissions.validators import (
+    upload_username_length_validator,
+)
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserDigestSchema
@@ -72,8 +75,10 @@ class UploadPermissionPasswordBodySchema(marshmallow.Schema):
 
 
 class UploadDataFormSchema(marshmallow.Schema):
-    message = StrippedString()
-    username = StrippedString()
+    message = StrippedString(required=False, allow_none=False)
+    username = StrippedString(
+        required=True, validate=upload_username_length_validator, allow_none=False
+    )
     password = marshmallow.fields.String(
         example="8QLa$<w",
         required=False,
@@ -160,6 +165,10 @@ class UploadPermissionCreationBodySchema(marshmallow.Schema):
     @post_load
     def make_body_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return UploadPermissionCreationBody(**data)
+
+
+class UploadPermissionPublicInfoSchema(marshmallow.Schema):
+    has_password = marshmallow.fields.Boolean(required=True)
 
 
 class UploadPermissionSchema(marshmallow.Schema):
