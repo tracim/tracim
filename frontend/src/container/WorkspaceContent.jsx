@@ -37,7 +37,8 @@ import {
   putWorkspaceContentDeleted,
   getMyselfWorkspaceReadStatusList,
   putFolderRead,
-  putContentItemMove
+  putContentItemMove,
+  getWorkspaceDetail
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -51,7 +52,8 @@ import {
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  moveWorkspaceContent
+  moveWorkspaceContent,
+  setWorkspaceDetail
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -128,6 +130,7 @@ class WorkspaceContent extends React.Component {
 
     this.scrollToActiveContent()
     this.buildBreadcrumbs()
+    this.loadWorkspaceDetail()
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -167,6 +170,22 @@ class WorkspaceContent extends React.Component {
       delay: undefined
     }
   })
+
+  loadWorkspaceDetail = async () => {
+    const { props } = this
+
+    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, props.match.params.idws))
+    switch (fetchWorkspaceDetail.status) {
+      case 200:
+        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
+        break
+      case 400:
+        props.history.push(PAGE.HOME)
+        props.dispatch(newFlashMessage('Unknown shared space'))
+        break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
+    }
+  }
 
   buildBreadcrumbs = () => {
     const { props, state } = this
@@ -606,30 +625,32 @@ class WorkspaceContent extends React.Component {
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />
 
-                <ShareFolder
-                  availableApp={createContentAvailableApp}
-                  isOpen={state.shareFolder.isOpen}
-                  getContentParentList={this.getContentParentList}
-                  onDropMoveContentItem={this.handleDropMoveContent}
-                  onClickFolder={this.handleClickFolder.bind(this)}
-                  onClickCreateContent={this.handleClickCreateContent}
-                  setFolderRead={this.handleSetFolderRead}
-                  userRoleIdInWorkspace={userRoleIdInWorkspace}
-                  uploadedContentList={filteredWorkspaceContentList}
-                  onClickExtendedAction={{
-                    edit: this.handleClickEditContentItem,
-                    download: this.handleClickDownloadContentItem,
-                    archive: this.handleClickArchiveContentItem,
-                    delete: this.handleClickDeleteContentItem
-                  }}
-                  onClickManageAction={this.handleClickManageAction}
-                  onClickShareFolder={this.handleClickShareFolder}
-                  contentType={contentType}
-                  readStatusList={currentWorkspace.contentReadStatusList}
-                  rootContentList={rootContentList}
-                  isLast={isWorkspaceEmpty || isFilteredWorkspaceEmpty}
-                  t={t}
-                />
+                {currentWorkspace.uploadEnabled &&
+                  <ShareFolder
+                    availableApp={createContentAvailableApp}
+                    isOpen={state.shareFolder.isOpen}
+                    getContentParentList={this.getContentParentList}
+                    onDropMoveContentItem={this.handleDropMoveContent}
+                    onClickFolder={this.handleClickFolder.bind(this)}
+                    onClickCreateContent={this.handleClickCreateContent}
+                    setFolderRead={this.handleSetFolderRead}
+                    userRoleIdInWorkspace={userRoleIdInWorkspace}
+                    uploadedContentList={filteredWorkspaceContentList}
+                    onClickExtendedAction={{
+                      edit: this.handleClickEditContentItem,
+                      download: this.handleClickDownloadContentItem,
+                      archive: this.handleClickArchiveContentItem,
+                      delete: this.handleClickDeleteContentItem
+                    }}
+                    onClickManageAction={this.handleClickManageAction}
+                    onClickShareFolder={this.handleClickShareFolder}
+                    contentType={contentType}
+                    readStatusList={currentWorkspace.contentReadStatusList}
+                    rootContentList={rootContentList}
+                    isLast={isWorkspaceEmpty || isFilteredWorkspaceEmpty}
+                    t={t}
+                  />
+                }
 
                 {state.contentLoaded && (isWorkspaceEmpty || isFilteredWorkspaceEmpty)
                   ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
