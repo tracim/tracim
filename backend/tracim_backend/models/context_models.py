@@ -140,7 +140,7 @@ class SetEmail(object):
 
 
 class SimpleFile(object):
-    def __init__(self, files: cgi.FieldStorage) -> None:
+    def __init__(self, files: cgi.FieldStorage = None) -> None:
         self.files = files
 
 
@@ -712,6 +712,10 @@ class WorkspaceInContext(object):
     @property
     def created(self) -> datetime:
         return self.workspace.created
+
+    @property
+    def size(self) -> int:
+        return self.workspace.get_size()
 
 
 class UserRoleWorkspaceInContext(object):

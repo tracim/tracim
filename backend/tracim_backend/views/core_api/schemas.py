@@ -109,6 +109,7 @@ class SimpleFileSchema(marshmallow.Schema):
 
     # TODO - G.M - 2018-10-09 - Set required to True, actually disable because
     # activating it make it failed due to "is not iterable issue.
+    # see https://github.com/tracim/tracim/issues/2350
     files = marshmallow.fields.Raw(required=False, description="a file")
 
     @post_load
@@ -798,6 +799,7 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         format=DATETIME_FORMAT, description="Workspace creation date"
     )
     owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
+    size = marshmallow.fields.Int()
 
     class Meta:
         description = "Full workspace informations"

@@ -43,7 +43,7 @@ describe('<NewVersionBtn />', () => {
   })
 
   describe('Handlers', () => {
-    it('onClick handler should call the proper handler when the button is clicked', () => {
+    it('should call props.onClick when handler onClick is called', () => {
       wrapper.find('button').simulate('click')
       expect(onClickCallBack.called).to.equal(true)
     })
