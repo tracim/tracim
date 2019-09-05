@@ -27,15 +27,17 @@
       border none
       cursor pointer
       margin auto
+      color mediumDarkGrey
       &:focus
         box-shadow 0 0 0 0
         border 0 none
         outline 0
-    &__input
-      resize none
   &__password
     padding 5px 0px
     display flex
+    flex-direction column
+    &__active
+      display flex
     &__wrapper
       display flex
       flex-grow 2
@@ -58,7 +60,7 @@
         border 0 none
         outline 0
     &__link
-      color grey
+      color mediumDarkGrey
       text-decoration underline
       margin-left auto
       padding-right 35px

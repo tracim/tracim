@@ -190,6 +190,7 @@ class GuestUpload extends React.Component {
                   return (
                     <ProgressBar
                       percent={state.progressUpload.percent}
+                      color='inherit'
                     />
                   )
                 default:

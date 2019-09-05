@@ -57,14 +57,14 @@ describe('<BtnSwitch />', () => {
   })
 
   describe('Handlers', () => {
-    it(`onChange handler should call the proper handler`, () => {
+    it('should call props.onChange when handler onChange is called', () => {
       wrapper.setProps({ disabled: false })
       wrapper.find(`input`).simulate('change', { value: 'randomText', preventDefault: () => {}, stopPropagation: () => {} })
       expect(onChangeCallBack.called).to.equal(true)
       onChangeCallBack.resetHistory()
     })
 
-    it(`onClick handler should call the proper handler`, () => {
+    it('should call props.onChange when handler onClick is called', () => {
       wrapper.setProps({ disabled: false })
       wrapper.find(`label`).simulate('click', { preventDefault: () => {}, stopPropagation: () => {} })
       expect(onChangeCallBack.called).to.equal(true)

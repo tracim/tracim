@@ -32,10 +32,10 @@ class ShareDownload extends React.Component {
     this.setState({ currentPageStatus: this.SHARE_STATUS.SHARE_MANAGE })
   }
 
-  handleNewShare = async () => {
+  handleNewShare = async isPasswordActive => {
     const { props } = this
 
-    if (await props.onClickNewShare()) {
+    if (await props.onClickNewShare(isPasswordActive)) {
       this.setState({ currentPageStatus: this.SHARE_STATUS.SHARE_MANAGE })
     }
   }
@@ -63,6 +63,7 @@ class ShareDownload extends React.Component {
             sharePassword={props.sharePassword}
             onChangePassword={props.onChangePassword}
             onClickNewShare={this.handleNewShare}
+            emailNotifActivated={props.emailNotifActivated}
           />
         }
       </div>

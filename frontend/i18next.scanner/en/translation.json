@@ -9,7 +9,7 @@
   "User": "User",
   "Dashboard": "Dashboard",
   "All Contents": "All Contents",
-  "Open": "Open",
+  "Opened": "Opened",
   "Validated": "Validated",
   "Cancelled": "Cancelled",
   "Deprecated": "Deprecated",
@@ -222,12 +222,12 @@
   "Error in the URL": "Error in the URL",
   "Content not found": "Content not found",
   "Workspace not found": "Workspace not found",
-  "Inbox": "Inbox",
+  "Received files": "Received files",
   "Error while loading uploaded files": "Error while loading uploaded files",
   "Error while downloading file": "Error while downloading file",
   "Manage": "Manage",
-  "Error while loading file infos": "Error while loading file infos",
   "Thank you, your import is finished!": "Thank you, your import is finished!",
   "Full name": "Full name",
-  "Error while loading upload infos": "Error while loading upload infos"
+  "Error while loading upload infos": "Error while loading upload infos",
+  "Error while loading file information": "Error while loading file information"
 }

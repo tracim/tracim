@@ -52,7 +52,7 @@ describe('<DisplayState />', function () {
   })
 
   describe('Handlers', () => {
-    it(`onClickBtn handler should call the proper handler when the button is clicked`, () => {
+    it('should call props.onClickBtn when handler onClickBtn is called', () => {
       wrapper.find(`.displaystate__btn`).simulate('click')
       expect(onClickBtnCallBack.called).to.equal(true)
     })

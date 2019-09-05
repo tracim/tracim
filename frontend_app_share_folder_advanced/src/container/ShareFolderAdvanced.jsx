@@ -38,7 +38,7 @@ class ShareFolderAdvanced extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       externalTranslationList: [
-        props.t('Inbox')
+        props.t('Received files')
       ],
       tracimContentTypeList: [],
       currentPageStatus: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT,
@@ -73,22 +73,14 @@ class ShareFolderAdvanced extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
-        this.loadContent()
+        this.loadContentTypeList()
         break
     }
   }
 
   componentDidMount () {
-    this.loadContent()
+    this.loadContentTypeList()
     this.loadImportAuthorizationsList()
-  }
-
-  componentDidUpdate (prevProps, prevState) {
-    const { state } = this
-
-    if (prevState.content.content_id !== state.content.content_id) {
-      this.loadContent()
-    }
   }
 
   componentWillUnmount () {
@@ -105,7 +97,7 @@ class ShareFolderAdvanced extends React.Component {
     }
   })
 
-  loadContent = async () => {
+  loadContentTypeList = async () => {
     const { props, state } = this
 
     const fetchContentTypeList = await handleFetchResult(await getContentTypeList(state.config.apiUrl))
@@ -236,7 +228,7 @@ class ShareFolderAdvanced extends React.Component {
   render () {
     const { state } = this
     const customColor = (state.tracimContentTypeList.find(type => type.slug === 'file') || { hexcolor: state.config.hexcolor }).hexcolor
-    const title = this.props.t('Inbox')
+    const title = this.props.t('Received files')
 
     if (!state.isVisible) return null
 
@@ -246,9 +238,10 @@ class ShareFolderAdvanced extends React.Component {
           customClass={'folderAdvanced'}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          componentTitle={<div>{title}</div>}
+          componentTitle={<div>{this.props.t('Inbox')}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
+          showChangeTitleButton={false}
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>

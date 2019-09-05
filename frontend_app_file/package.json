@@ -51,6 +51,7 @@
     "ignore-styles": "^5.0.1",
     "jsdom": "^15.1.1",
     "mocha": "^6.1.4",
+    "sinon": "^7.4.1",
     "standard": "^12.0.1",
     "standard-loader": "^6.0.1",
     "style-loader": "^0.23.1",
