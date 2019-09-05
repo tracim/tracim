@@ -457,6 +457,8 @@ search.engine = simple
 # Collaborative Document Edition (Collabora, etc)
 ####
 collaborative_document_edition.activated = False
+# software used for collaborative document_edition. "collabora" software value give support for
+# both LibreofficeOnline and Collabora.
 collaborative_document_edition.software = collabora
 # base url where collabora server exist
 collaborative_document_edition.collabora.base_url = http://localhost:9980
