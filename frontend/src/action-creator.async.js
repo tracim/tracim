@@ -34,6 +34,7 @@ import {
   WORKSPACE_CONTENT_DELETED,
   WORKSPACE_RECENT_ACTIVITY,
   WORKSPACE_READ_STATUS,
+  WORKSPACE_CONTENT_SHARE_FOLDER,
   USER_WORKSPACE_DO_NOTIFY,
   USER,
   USER_WORKSPACE_LIST,
@@ -515,14 +516,20 @@ export const getSubFolderShareContentList = (workspaceId, folderIdList) => dispa
   })
 }
 
-export const getShareFolderContentList = (workspaceId) =>
-  fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=upload`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
+export const getShareFolderContentList = (workspaceId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=upload`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
     },
-    method: 'GET'
+    actionName: WORKSPACE_CONTENT_SHARE_FOLDER,
+    dispatch
   })
+}
 
 export const getContentPathList = (workspaceId, contentId, folderIdList) => dispatch => {
   return fetchWrapper({
