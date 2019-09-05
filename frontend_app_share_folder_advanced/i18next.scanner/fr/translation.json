@@ -5,7 +5,7 @@
   "New authorization": "Nouvelle autorisation",
   "Import authorizations": "Autorisations d'importation",
   "No upload link has been created yet": "Aucun lien de téléversement n'a encore été créé",
-  "The password length must be between 6 and 512 characters and the email(s) must be valid": "Le mot de passe doit être comprise entre 6 et 512 caractères et le(s) email(s) doit (doivent) être valide(s)",
+  "The password length must be between 6 and 512 characters and the email(s) must be valid": "Le mot de passe doit être compris entre 6 et 512 caractères et le(s) email(s) doit (doivent) être valide(s)",
   "Email notification are disabled, please manually notify the link": "Les notifications par email sont désactivées, veuillez informer le lien manuellement",
   "Error while creating new share link": "Erreur lors de la création d'un nouveau lien de partage",
   "Enter the email address of the recipient(s)": "Enter the email address of the recipient(s)",

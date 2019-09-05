@@ -64,6 +64,19 @@ basic_setup.session_secret = change_this_value_please!
 ; cors.access-control-allowed-origin = http://localhost:6543,http://localhost:8090
 
 ####
+# LIMITATION
+####
+
+# limit number of sharespaces any user can be owner, 0 mean not limit, default to 0
+; limitation.sharedspace_per_user = 0
+# max upload content length accepted by tracim for file in bytes
+# by default 0 meaning no limit. 104857600 (100MB) is a good value
+; limitation.content_length_file_size = 104857600
+# max size of all files of a workspace in bytes
+# by default 0 meaning no limit. 1073741824(1GB) is a good value
+; limitation.workspace_size = 1073741824
+
+####
 # STORAGE
 ####
 

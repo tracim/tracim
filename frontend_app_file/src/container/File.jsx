@@ -629,7 +629,7 @@ class File extends React.Component {
     }))
   }
 
-  handleClickNewShare = async () => {
+  handleClickNewShare = async isPasswordActive => {
     const { state, props } = this
 
     let shareEmailList = parserStringToList(state.shareEmails)
@@ -653,12 +653,12 @@ class File extends React.Component {
       return false
     }
 
-    if (state.sharePassword !== '' && state.sharePassword.length < 6) {
+    if (isPasswordActive && state.sharePassword.length < 6) {
       this.sendGlobalFlashMessage(props.t('The password is too short (minimum 6 characters)'))
       return false
     }
 
-    if (state.sharePassword !== '' && state.sharePassword.length > 512) {
+    if (isPasswordActive && state.sharePassword.length > 512) {
       this.sendGlobalFlashMessage(props.t('The password is too long (maximum 512 characters)'))
       return false
     }
@@ -668,7 +668,7 @@ class File extends React.Component {
       state.content.workspace_id,
       state.content.content_id,
       shareEmailList,
-      state.sharePassword !== '' ? state.sharePassword : null
+      isPasswordActive ? state.sharePassword : null
     ))
 
     switch (fetchResultPostShareLinks.apiResponse.status) {
@@ -951,6 +951,7 @@ class File extends React.Component {
                   fileType={state.content.file_extension}
                   fileSize={displayFileSize(state.content.size)}
                   filePageNb={state.content.page_nb}
+                  activesShares={state.content.actives_shares}
                   creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                   creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
                   lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
