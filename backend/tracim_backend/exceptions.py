@@ -291,6 +291,10 @@ class FileSizeOverMaxLimitation(TracimException):
     error_code = ErrorCode.FILE_SIZE_OVER_MAX_LIMITATION
 
 
+class FileSizeOverWorkspaceEmptySpace(TracimException):
+    error_code = ErrorCode.FILE_SIZE_OVER_WORKSPACE_EMPTY_SPACE
+
+
 class TracimUnavailablePreviewType(TracimException):
     error_code = ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 

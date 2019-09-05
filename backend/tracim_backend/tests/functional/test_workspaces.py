@@ -450,6 +450,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["owner"]["avatar_url"] is None
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]
+        assert workspace["size"] == 0
         workspace_id = res.json_body["workspace_id"]
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body

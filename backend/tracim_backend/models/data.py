@@ -104,6 +104,18 @@ class Workspace(DeclarativeBase):
 
         return contents
 
+    def get_size(self, include_deleted: bool = False, include_archived: bool = False) -> int:
+        size = 0
+        for revision in self.revisions:
+            # INFO - G.M - 2019-09-02 - Don't count deleted and archived file.
+            if not include_deleted and revision.node.is_deleted:
+                continue
+            if not include_archived and revision.node.is_archived:
+                continue
+            if revision.depot_file:
+                size += revision.depot_file.file.content_length
+        return size
+
     def get_user_role(self, user: User) -> int:
         for role in user.roles:
             if role.workspace.workspace_id == self.workspace_id:

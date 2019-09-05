@@ -48,7 +48,7 @@ const ExtandedAction = props => {
         </div>
         */}
 
-        {props.userRoleIdInWorkspace >= 4 && (
+        {/* {props.userRoleIdInWorkspace >= 4 && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.archive}
@@ -62,7 +62,7 @@ const ExtandedAction = props => {
               {props.t('Archive')}
             </div>
           </div>
-        )}
+        )} */}
 
         {props.userRoleIdInWorkspace >= 4 && (
           <div

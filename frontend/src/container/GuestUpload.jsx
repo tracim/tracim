@@ -1,13 +1,21 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-import { CUSTOM_EVENT, ProgressBar } from 'tracim_frontend_lib'
+import {
+  CUSTOM_EVENT,
+  ProgressBar
+} from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
-import { FETCH_CONFIG } from '../helper.js'
+import {
+  FETCH_CONFIG,
+  PAGE
+} from '../helper.js'
+import { getGuestUploadInfo } from '../action-creator.async'
 
 class GuestUpload extends React.Component {
   constructor (props) {
@@ -20,6 +28,7 @@ class GuestUpload extends React.Component {
     }
 
     this.state = {
+      hasPassword: false,
       guestName: '',
       guestComment: '',
       guestPassword: {
@@ -33,6 +42,27 @@ class GuestUpload extends React.Component {
         display: this.UPLOAD_STATUS.BEFORE_LOAD,
         percent: 0
       }
+    }
+  }
+
+  async componentDidMount () {
+    const { props } = this
+
+    const response = await props.dispatch(getGuestUploadInfo(props.match.params.token))
+
+    switch (response.apiResponse.status) {
+      case 200:
+        this.setState({
+          hasPassword: response.json.has_password
+        })
+        break
+      case 400:
+        this.sendGlobalFlashMessage(props.t('Error in the URL'))
+        props.history.push(PAGE.LOGIN)
+        break
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while loading upload infos'))
+        props.history.push(PAGE.LOGIN)
     }
   }
 
@@ -143,6 +173,7 @@ class GuestUpload extends React.Component {
                   return (
                     <UploadForm
                       guestName={state.guestName}
+                      hasPassword={state.hasPassword}
                       onChangeFullName={this.handleChangeFullName}
                       guestPassword={state.guestPassword}
                       onChangePassword={this.handleChangePassword}
@@ -178,4 +209,4 @@ class GuestUpload extends React.Component {
   }
 }
 
-export default translate()(GuestUpload)
+export default connect(() => ({}))(translate()(GuestUpload))
