@@ -156,7 +156,7 @@ class ShareFolderAdvanced extends React.Component {
     this.setState({ currentPageStatus: this.UPLOAD_STATUS.NEW_UPLOAD })
   }
 
-  handleClickNewUpload = async () => {
+  handleClickNewUpload = async isPasswordActive => {
     const { state, props } = this
 
     let uploadEmailList = parserStringToList(state.uploadEmails)
@@ -175,7 +175,7 @@ class ShareFolderAdvanced extends React.Component {
         state.config.apiUrl,
         state.content.workspace_id,
         uploadEmailList,
-        state.uploadPassword !== '' ? state.uploadPassword : null
+        isPasswordActive ? state.uploadPassword : null
       ))
 
       switch (fetchResultPostImportAuthorizations.apiResponse.status) {
