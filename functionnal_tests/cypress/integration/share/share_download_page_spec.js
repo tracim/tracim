@@ -61,7 +61,7 @@ describe('Open a file', () => {
         it('Should delete the share link',() => {
           cy.get('.shareDownload__email__input').type('email@email.email')
           cy.get('.shareDownload__newBtn').click()
-          cy.get('[data-cy=deleteShareLink]').click()
+          cy.get('[data-cy=deleteShareLink]').should('be.visible').click()
           cy.get('.shareDownload').contains(emptyPhrase).should('be.visible')
         })
 
