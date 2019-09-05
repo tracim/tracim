@@ -55,20 +55,20 @@ describe('Content list', function () {
           .should('not.exist')
       })
 
-      it('button achive should archive content without reload', function () {
-        cy.on('window:before:load', (error, runnable) => {
-          assert.isNotOk(true, 'Page reload when clicking and it should not')
-        })
-        cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
-          .click()
-        cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
-          .contains(ARCHIVE_LABEL).click()
-        cy
-          .get(`.content[title="${TITLE}"]`)
-          .should('not.exist')
-      })
+      // it('button achive should archive content without reload', function () {
+      //   cy.on('window:before:load', (error, runnable) => {
+      //     assert.isNotOk(true, 'Page reload when clicking and it should not')
+      //   })
+      //   cy
+      //     .get(`.content[title="${TITLE}"] .dropdown`)
+      //     .click()
+      //   cy
+      //     .get(`.content[title="${TITLE}"] .dropdown`)
+      //     .contains(ARCHIVE_LABEL).click()
+      //   cy
+      //     .get(`.content[title="${TITLE}"]`)
+      //     .should('not.exist')
+      // })
     })
 
     describe('as user', function () {
