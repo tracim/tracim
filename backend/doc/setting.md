@@ -492,10 +492,13 @@ If there is an update of tracim, use this one to migrate index (experimental, pr
 
 Your data are correctly indexed now, you can go to tracim ui and use search mecanism.
 
-# Collaborative Edition online #
+# Collaborative Edition online (tracim v2.4+)#
 
 ## Collaborative edition server ##
-At the moment tracim is only tested with [Collabora CODE](https://www.collaboraoffice.com/code/), but Tracim is theoretically ready for any software using the protocol `WOPI`.
+
+In tracim 2.4, Collaborative Edition online does support Collabora/libreofficeOnline. It is tested with [Collabora CODE](https://www.collaboraoffice.com/code/).
+We do not support yet other collaborative edition online service but we do support WOPI protocol making support for WOPI compatible software easy.
+
 
 All the informations to set up a `Collabora CODE` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
 
