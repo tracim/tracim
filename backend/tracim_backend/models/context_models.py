@@ -55,6 +55,8 @@ class ConfigModel(object):
         webdav_url: str,
         collaborative_document_edition: CollaborativeDocumentEditionConfig,
         content_length_file_size_limit: int,
+        workspace_size_limit: int,
+        workspaces_number_per_user_limit: int,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -62,6 +64,8 @@ class ConfigModel(object):
         self.webdav_url = webdav_url
         self.collaborative_document_edition = collaborative_document_edition
         self.content_length_file_size_limit = content_length_file_size_limit
+        self.workspace_size_limit = workspace_size_limit
+        self.workspaces_number_per_user_limit = workspaces_number_per_user_limit
 
 
 class ErrorCodeModel(object):
