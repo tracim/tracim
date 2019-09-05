@@ -35,8 +35,8 @@ class ShareLink extends React.Component {
           <div className='shareLink__linkInfos__email'>
             {props.email}
           </div>
-          <div 
-            className='shareLink__linkInfos__link' 
+          <div
+            className='shareLink__linkInfos__link'
             id='shareLink'
             title={props.link}
           >
@@ -44,21 +44,19 @@ class ShareLink extends React.Component {
           </div>
         </div>
 
-        {props.userRoleIdInWorkspace >= 4 &&
-          <button
-            className='iconBtn'
-            key='copy_share_link'
-            style={{
-              ':hover': {
-                color: props.hexcolor
-              }
-            }}
-            title={props.t('Copy link')}
-            onClick={this.handleCopyToClipboard}
-          >
-            <i className='fa fa-fw fa-files-o'/>
-          </button>
-        }
+        <button
+          className='iconBtn'
+          key='copy_share_link'
+          style={{
+            ':hover': {
+              color: props.hexcolor
+            }
+          }}
+          title={props.t('Copy link')}
+          onClick={this.handleCopyToClipboard}
+        >
+          <i className='fa fa-fw fa-files-o'/>
+        </button>
 
         {props.userRoleIdInWorkspace >= 4 &&
           <button
