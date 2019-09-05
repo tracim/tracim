@@ -778,119 +778,78 @@ class File extends React.Component {
 
   getMenuItemList = () => {
     const { props, state } = this
+    const timelineObject = {
+      id: 'timeline',
+      label: props.t('Timeline'),
+      icon: 'fa-history',
+      children: (
+        <Timeline
+          customClass={`${state.config.slug}__contentpage`}
+          customColor={state.config.hexcolor}
+          loggedUser={state.loggedUser}
+          timelineData={state.timeline}
+          newComment={state.newComment}
+          disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
+          availableStatusList={state.config.availableStatuses}
+          wysiwyg={state.timelineWysiwyg}
+          onChangeNewComment={this.handleChangeNewComment}
+          onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+          onClickWysiwygBtn={this.handleToggleWysiwyg}
+          onClickRevisionBtn={this.handleClickShowRevision}
+          shouldScrollToBottom={state.mode !== MODE.REVISION}
+          key={'Timeline'}
+        />
+      )
+    }
+    const propertiesObject = {
+      id: 'properties',
+      label: props.t('Properties'),
+      icon: 'fa-info-circle',
+      children: (
+        <FileProperties
+          color={state.config.hexcolor}
+          fileType={state.content.file_extension}
+          fileSize={displayFileSize(state.content.size)}
+          filePageNb={state.content.page_nb}
+          activesShares={state.content.actives_shares}
+          creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
+          creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
+          lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
+          lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
+          description={state.content.raw_content}
+          displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
+          disableChangeDescription={!state.content.is_editable}
+          onClickValidateNewDescription={this.handleClickValidateNewDescription}
+          key={'FileProperties'}
+        />
+      )
+    }
+
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace > 1) {
-      return [{
-              id: 'timeline',
-              label: props.t('Timeline'),
-              icon: 'fa-history',
-              children: (
-                <Timeline
-                  customClass={`${state.config.slug}__contentpage`}
-                  customColor={state.config.hexcolor}
-                  loggedUser={state.loggedUser}
-                  timelineData={state.timeline}
-                  newComment={state.newComment}
-                  disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
-                  availableStatusList={state.config.availableStatuses}
-                  wysiwyg={state.timelineWysiwyg}
-                  onChangeNewComment={this.handleChangeNewComment}
-                  onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-                  onClickWysiwygBtn={this.handleToggleWysiwyg}
-                  onClickRevisionBtn={this.handleClickShowRevision}
-                  shouldScrollToBottom={state.mode !== MODE.REVISION}
-                  key={'Timeline'}
-                />
-              )
-            }, {
-                id: 'share',
-                label: props.t('Share'),
-                icon: 'fa-share-alt',
-                children: (
-                  <ShareDownload
-                    label={props.t(state.config.label)}
-                    hexcolor={state.config.hexcolor}
-                    shareEmails={state.shareEmails}
-                    onChangeEmails={this.handleChangeEmails}
-                    onKeyDownEnter={this.handleKeyDownEnter}
-                    sharePassword={state.sharePassword}
-                    onChangePassword={this.handleChangePassword}
-                    shareLinkList={state.shareLinkList}
-                    onClickDeleteShareLink={this.handleClickDeleteShareLink}
-                    onClickNewShare={this.handleClickNewShare}
-                    userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-                    emailNotifActivated={state.config.system.config.email_notification_activated}
-                    key={'ShareDownload'}
-                  />
-                )
-            }, {
-              id: 'properties',
-              label: props.t('Properties'),
-              icon: 'fa-info-circle',
-              children: (
-                <FileProperties
-                  color={state.config.hexcolor}
-                  fileType={state.content.file_extension}
-                  fileSize={displayFileSize(state.content.size)}
-                  filePageNb={state.content.page_nb}
-                  activesShares={state.content.actives_shares}
-                  creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                  creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
-                  lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
-                  lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
-                  description={state.content.raw_content}
-                  displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
-                  disableChangeDescription={!state.content.is_editable}
-                  onClickValidateNewDescription={this.handleClickValidateNewDescription}
-                  key={'FileProperties'}
-                />
-              )
-            }]
+      return [ timelineObject, {
+        id: 'share',
+        label: props.t('Share'),
+        icon: 'fa-share-alt',
+        children: (
+          <ShareDownload
+            label={props.t(state.config.label)}
+            hexcolor={state.config.hexcolor}
+            shareEmails={state.shareEmails}
+            onChangeEmails={this.handleChangeEmails}
+            onKeyDownEnter={this.handleKeyDownEnter}
+            sharePassword={state.sharePassword}
+            onChangePassword={this.handleChangePassword}
+            shareLinkList={state.shareLinkList}
+            onClickDeleteShareLink={this.handleClickDeleteShareLink}
+            onClickNewShare={this.handleClickNewShare}
+            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+            emailNotifActivated={state.config.system.config.email_notification_activated}
+            key={'ShareDownload'}
+          />
+        )
+      }, propertiesObject ]
     } else {
-      return [{
-              id: 'timeline',
-              label: props.t('Timeline'),
-              icon: 'fa-history',
-              children: (
-                <Timeline
-                  customClass={`${state.config.slug}__contentpage`}
-                  customColor={state.config.hexcolor}
-                  loggedUser={state.loggedUser}
-                  timelineData={state.timeline}
-                  newComment={state.newComment}
-                  disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
-                  availableStatusList={state.config.availableStatuses}
-                  wysiwyg={state.timelineWysiwyg}
-                  onChangeNewComment={this.handleChangeNewComment}
-                  onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-                  onClickWysiwygBtn={this.handleToggleWysiwyg}
-                  onClickRevisionBtn={this.handleClickShowRevision}
-                  shouldScrollToBottom={state.mode !== MODE.REVISION}
-                  key={'Timeline'}
-                />
-              )
-            }, {
-              id: 'properties',
-              label: props.t('Properties'),
-              icon: 'fa-info-circle',
-              children: (
-                <FileProperties
-                  color={state.config.hexcolor}
-                  fileType={state.content.file_extension}
-                  fileSize={displayFileSize(state.content.size)}
-                  filePageNb={state.content.page_nb}
-                  activesShares={state.content.actives_shares}
-                  creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                  creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
-                  lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
-                  lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
-                  description={state.content.raw_content}
-                  displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
-                  disableChangeDescription={!state.content.is_editable}
-                  onClickValidateNewDescription={this.handleClickValidateNewDescription}
-                  key={'FileProperties'}
-                />
-              )
-            }]
+      return [ timelineObject, propertiesObject ]
     }
   }
 
