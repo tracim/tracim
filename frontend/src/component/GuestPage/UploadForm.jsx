@@ -31,8 +31,10 @@ class UploadForm extends React.Component {
             customClass=''
             type='text'
             placeHolder={props.t('Full name')}
-            value={props.guestName}
+            value={props.guestFullname.value}
             onChange={props.onChangeFullName}
+            isInvalid={props.guestFullname.isInvalid}
+            invalidMsg={props.t('Full name is required')}
           />
 
           {props.hasPassword &&
@@ -93,11 +95,11 @@ class UploadForm extends React.Component {
           </div>
 
           <div className='guestupload__card__form__right__files'>
-            {props.uploadFileList.map(file =>
+            {props.uploadFileList.map((file, index) =>
               <div className='d-flex' key={file.name}>
                 <i className='fa fa-fw fa-file-o m-1' />
 
-                {file.name} ({displayFileSize(file.size)})
+                {index} {file.name} ({displayFileSize(file.size)})
 
                 <button
                   className='iconBtn ml-auto primaryColorFontHover'

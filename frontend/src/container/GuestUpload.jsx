@@ -29,7 +29,10 @@ class GuestUpload extends React.Component {
 
     this.state = {
       hasPassword: false,
-      guestName: '',
+      guestFullname: {
+        value: '',
+        isInvalid: false
+      },
       guestComment: '',
       guestPassword: {
         value: '',
@@ -75,12 +78,28 @@ class GuestUpload extends React.Component {
     }
   })
 
-  handleChangeFullName = e => this.setState({ guestName: e.target.value })
-  handleChangeComment = e => this.setState({ guestComment: e.target.value })
+  handleChangeFullName = e => this.setState({ guestFullname: { value: e.target.value, isInvalid: false } })
+  handleChangeComment = e => this.setState({ guestComment: e.target.value, isInvalid: false })
   handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })
 
   handleAddFile = uploadFileList => {
+    const { props } = this
+
     if (!uploadFileList || !uploadFileList[0]) return
+
+    const alreadyUploadedList = uploadFileList.filter(file => this.state.uploadFileList.some(previousFile => previousFile.name === file.name))
+    if (alreadyUploadedList.length) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: <div>{props.t('Files already uploaded:')}<br /><ul>{alreadyUploadedList.map(file => <li>{file.name}</li>)}</ul></div>,
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+
+    uploadFileList = uploadFileList.filter(file => !this.state.uploadFileList.some(previousFile => previousFile.name === file.name))
 
     this.setState(previousState => ({
       uploadFileList: [
@@ -102,7 +121,7 @@ class GuestUpload extends React.Component {
 
     state.uploadFileList.forEach((uploadFile, index) => {
       formData.append(`file_${index}`, uploadFile)
-      formData.append('username', state.guestName)
+      formData.append('username', state.guestFullname.value)
       formData.append('message', state.guestComment)
       if (state.guestPassword.value !== '') formData.append('password', state.guestPassword.value)
     })
@@ -126,6 +145,23 @@ class GuestUpload extends React.Component {
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
+              case 2001:
+                let errors = []
+                if (jsonResult400.details.username && state.guestFullname.value.length < 1) errors.push(props.t('Full name must be at least 1 character'))
+                if (jsonResult400.details.username && state.guestFullname.value.length > 255) errors.push(props.t('Full name must be less than 255 characters'))
+                if (jsonResult400.details.password && state.guestPassword.value.length < 6) errors.push(props.t('Password must be at least 6 characters'))
+                if (jsonResult400.details.password && state.guestPassword.value.length > 255) errors.push(props.t('Password must be less than 255 characters'))
+
+                GLOBAL_dispatchEvent({
+                  type: CUSTOM_EVENT.ADD_FLASH_MSG,
+                  data: {
+                    msg: <div>{props.t('Errors in form:')}<br /><ul>{errors.map(error => <li>{ error }</li>)}</ul></div>,
+                    type: 'warning',
+                    delay: undefined
+                  }
+                })
+                this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
+                break
               case 3002:
                 this.sendGlobalFlashMessage(props.t('A content with the same name already exists'))
                 this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
@@ -172,8 +208,8 @@ class GuestUpload extends React.Component {
                 case this.UPLOAD_STATUS.BEFORE_LOAD:
                   return (
                     <UploadForm
-                      guestName={state.guestName}
                       hasPassword={state.hasPassword}
+                      guestFullname={state.guestFullname}
                       onChangeFullName={this.handleChangeFullName}
                       guestPassword={state.guestPassword}
                       onChangePassword={this.handleChangePassword}
