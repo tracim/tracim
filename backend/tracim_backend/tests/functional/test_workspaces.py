@@ -14,6 +14,44 @@ from tracim_backend.tests.utils import set_html_document_slug_to_legacy
 
 
 @pytest.mark.usefixtures("base_fixture")
+class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_test_one_workspace_per_user"}], indirect=True
+    )
+    def test_api__create_workspace_err_400__one_workspace_limit(
+        self, web_testapp, admin_user
+    ) -> None:
+        """
+        Test create workspace : workspace limit of 1 workspace
+        """
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"label": "superworkspace", "description": "mysuperdescription"}
+        web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
+        params = {"label": "superworkspace2", "description": "mysuperdescription"}
+        res = web_testapp.post_json("/api/v2/workspaces", status=400, params=params)
+        assert res.json_body["code"] == ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_test_no_workspace_limit_per_user"}], indirect=True
+    )
+    def test_api__create_workspace_err_400__no_workspace_limit(
+        self, web_testapp, admin_user
+    ) -> None:
+        """
+        Test create workspace : workspace limit of 0 workspace -> unlimited
+        """
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"label": "superworkspace", "description": "mysuperdescription"}
+        web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
+        params = {"label": "superworkspace2", "description": "mysuperdescription"}
+        web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
+        params = {"label": "superworkspace3", "description": "mysuperdescription"}
+        web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
+
+
+@pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWorkspaceEndpoint(object):
@@ -396,10 +434,15 @@ class TestWorkspaceEndpoint(object):
         assert workspace["label"] == "superworkspace"
         assert workspace["agenda_enabled"] is False
         assert workspace["description"] == "mysuperdescription"
+        assert workspace["owner"]["user_id"] == 1
+        assert workspace["owner"]["avatar_url"] is None
+        assert workspace["owner"]["public_name"] == "Global manager"
+        assert workspace["owner"]
+        assert workspace["size"] == 0
         workspace_id = res.json_body["workspace_id"]
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
-        assert workspace == workspace_2
+        assert workspace["workspace_id"] == workspace_2["workspace_id"]
 
     def test_api__create_workspace_err_400__label_already_used(self, web_testapp) -> None:
         """
@@ -2147,7 +2190,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
-        assert headers["Subject"][0] == "[TRACIM] [test] test_document2 (Open)"
+        assert headers["Subject"][0] == "[TRACIM] [test] test_document2 (Opened)"
 
 
 @pytest.mark.usefixtures("base_fixture")

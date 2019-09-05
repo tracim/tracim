@@ -1,5 +1,16 @@
 # -*- coding: utf-8 -*-
 import logging
+import time
+
+from colorlog import colorlog
+
+
+class StandardUTCFormatter(logging.Formatter):
+    converter = time.gmtime
+
+
+class ColoredUTCFormatter(colorlog.ColoredFormatter):
+    converter = time.gmtime
 
 
 class Logger(object):

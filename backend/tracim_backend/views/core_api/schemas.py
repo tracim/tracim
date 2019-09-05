@@ -109,6 +109,7 @@ class SimpleFileSchema(marshmallow.Schema):
 
     # TODO - G.M - 2018-10-09 - Set required to True, actually disable because
     # activating it make it failed due to "is not iterable issue.
+    # see https://github.com/tracim/tracim/issues/2350
     files = marshmallow.fields.Raw(required=False, description="a file")
 
     @post_load
@@ -314,6 +315,33 @@ class UserIdPathSchema(marshmallow.Schema):
         description="id of a valid user",
         validate=strictly_positive_int_validator,
     )
+
+
+class UserWorkspaceFilterQuery(object):
+    def __init__(self, show_owned_workspace: int = 1, show_workspace_with_role: int = 1):
+        self.show_owned_workspace = bool(show_owned_workspace)
+        self.show_workspace_with_role = bool(show_workspace_with_role)
+
+
+class UserWorkspaceFilterQuerySchema(marshmallow.Schema):
+    show_owned_workspace = marshmallow.fields.Int(
+        example=1,
+        default=1,
+        description="if set to 1, then show owned workspace in list"
+        " Default is 1, else do no show them",
+        validate=bool_as_int_validator,
+    )
+    show_workspace_with_role = marshmallow.fields.Int(
+        example=1,
+        default=1,
+        description="if set to 1, then show workspace were user as a role in list"
+        " Default is 1, else do no show them",
+        validate=bool_as_int_validator,
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return UserWorkspaceFilterQuery(**data)
 
 
 class WorkspaceIdPathSchema(marshmallow.Schema):
@@ -767,6 +795,11 @@ class WorkspaceDigestSchema(marshmallow.Schema):
 
 class WorkspaceSchema(WorkspaceDigestSchema):
     description = StrippedString(example="All intranet data.")
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Workspace creation date"
+    )
+    owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
+    size = marshmallow.fields.Int()
 
     class Meta:
         description = "Full workspace informations"
@@ -847,7 +880,7 @@ class StatusSchema(marshmallow.Schema):
         description="global_status: open, closed",
         validate=content_global_status_validator,
     )
-    label = StrippedString(example="Open")
+    label = StrippedString(example="Opened")
     fa_icon = StrippedString(example="fa-check")
     hexcolor = StrippedString(example="#0000FF")
 
@@ -1126,3 +1159,4 @@ class ConfigSchema(marshmallow.Schema):
     collaborative_document_edition = marshmallow.fields.Nested(
         CollaborativeDocumentEditionConfigSchema(), allow_none=True
     )
+    content_length_file_size_limit = marshmallow.fields.Integer()

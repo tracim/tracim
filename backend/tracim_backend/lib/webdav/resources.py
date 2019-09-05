@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 import transaction
 from wsgidav import compat
 from wsgidav.dav_error import HTTP_FORBIDDEN
+from wsgidav.dav_error import HTTP_REQUEST_ENTITY_TOO_LARGE
 from wsgidav.dav_error import DAVError
 from wsgidav.dav_provider import DAVCollection
 from wsgidav.dav_provider import DAVNonCollection
@@ -19,7 +20,12 @@ from wsgidav.dav_provider import _DAVResource
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import FileSizeOverMaxLimitation
+from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import TracimException
+from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
+from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import AuthorizationChecker
@@ -40,6 +46,7 @@ from tracim_backend.lib.webdav.design import design_thread
 from tracim_backend.lib.webdav.utils import FakeFileStream
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 
@@ -56,7 +63,7 @@ def webdav_check_right(authorization_checker: AuthorizationChecker):
             try:
                 authorization_checker.check(tracim_context=self.tracim_context)
             except TracimException as exc:
-                raise DAVError(HTTP_FORBIDDEN) from exc
+                raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
             return func(self, *arg, **kwarg)
 
         return wrapper
@@ -91,7 +98,7 @@ class ManageActions(object):
                 self.content_api.execute_update_content_actions(self.content)
                 self.content_api.save(self.content, self._type)
         except TracimException as exc:
-            raise DAVError(HTTP_FORBIDDEN) from exc
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
 
         transaction.commit()
 
@@ -161,7 +168,7 @@ class RootResource(DAVCollection):
         There we don't allow to create files at the root;
         only workspaces (thus collection) can be created.
         """
-        raise DAVError(HTTP_FORBIDDEN)
+        raise DAVError(HTTP_FORBIDDEN, contextinfo="Not allowed to create new root")
 
     @webdav_check_right(is_trusted_user)
     def createCollection(self, name: str):
@@ -176,7 +183,14 @@ class RootResource(DAVCollection):
         # TODO : remove comment here
         # raise DAVError(HTTP_FORBIDDEN)
         workspace_name = webdav_convert_file_name_to_bdd(name)
-        new_workspace = self.workspace_api.create_workspace(workspace_name)
+        try:
+            new_workspace = self.workspace_api.create_workspace(workspace_name)
+        except (
+            UserNotAllowedToCreateMoreWorkspace,
+            EmptyLabelNotAllowed,
+            WorkspaceLabelAlreadyUsed,
+        ) as exc:
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
         self.workspace_api.save(new_workspace)
         self.workspace_api.execute_created_workspace_actions(new_workspace)
         transaction.commit()
@@ -239,6 +253,7 @@ class WorkspaceResource(DAVCollection):
             session=tracim_context.dbsession,
             config=tracim_context.app_config,
             show_temporary=True,
+            namespaces_filter=[ContentNamespaces.CONTENT],
         )
 
         self._file_count = 0
@@ -302,7 +317,10 @@ class WorkspaceResource(DAVCollection):
         resource = self.provider.getResourceInst(path, self.environ)
         if resource:
             content = resource.content
-
+        try:
+            self.content_api.check_upload_size(int(self.environ["CONTENT_LENGTH"]), self.workspace)
+        except (FileSizeOverMaxLimitation, FileSizeOverWorkspaceEmptySpace) as exc:
+            raise DAVError(HTTP_REQUEST_ENTITY_TOO_LARGE, contextinfo=str(exc))
         # return item
         return FakeFileStream(
             session=self.session,
@@ -335,7 +353,7 @@ class WorkspaceResource(DAVCollection):
             )
             self.content_api.execute_created_content_actions(folder)
         except TracimException as exc:
-            raise DAVError(HTTP_FORBIDDEN) from exc
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
 
         self.content_api.save(folder)
 
@@ -358,9 +376,9 @@ class WorkspaceResource(DAVCollection):
         self.tracim_context._current_workspace = self.workspace
         try:
             can_delete_workspace.check(self.tracim_context)
-        except TracimException:
-            raise DAVError(HTTP_FORBIDDEN)
-        raise DAVError(HTTP_FORBIDDEN)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
+        raise DAVError(HTTP_FORBIDDEN, "Workspace deletion is not allowed through webdav")
 
     def supportRecursiveMove(self, destpath):
         return True
@@ -373,8 +391,8 @@ class WorkspaceResource(DAVCollection):
             self.tracim_context._current_workspace = self.workspace
             try:
                 can_modify_workspace.check(self.tracim_context)
-            except TracimException:
-                raise DAVError(HTTP_FORBIDDEN)
+            except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
             try:
                 workspace_api = WorkspaceApi(
@@ -389,8 +407,8 @@ class WorkspaceResource(DAVCollection):
                 self.session.flush()
                 workspace_api.execute_update_workspace_actions(self.workspace)
                 transaction.commit()
-            except TracimException:
-                raise DAVError(HTTP_FORBIDDEN)
+            except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
     def getMemberList(self) -> [_DAVResource]:
         members = []
@@ -500,8 +518,8 @@ class FolderResource(WorkspaceResource):
 
         try:
             checker.check(self.tracim_context)
-        except TracimException:
-            raise DAVError(HTTP_FORBIDDEN)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         # if content is either deleted or archived, we'll check that we try moving it to the parent
         # if yes, then we'll unarchive / undelete them, else the action's not allowed
@@ -567,8 +585,8 @@ class FolderResource(WorkspaceResource):
 
         try:
             checker.check(self.tracim_context)
-        except TracimException:
-            raise DAVError(HTTP_FORBIDDEN)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         destination_workspace = self.tracim_context.candidate_workspace
         try:
@@ -596,7 +614,7 @@ class FolderResource(WorkspaceResource):
                     )
                 self.content_api.execute_update_content_actions(self.content)
         except TracimException as exc:
-            raise DAVError(HTTP_FORBIDDEN) from exc
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
 
         transaction.commit()
 
@@ -604,7 +622,10 @@ class FolderResource(WorkspaceResource):
     def getMemberList(self) -> [_DAVResource]:
         members = []
         content_api = ContentApi(
-            current_user=self.user, config=self.provider.app_config, session=self.session
+            current_user=self.user,
+            config=self.provider.app_config,
+            session=self.session,
+            namespaces_filter=[self.content.content_namespace],
         )
         visible_children = content_api.get_all(
             [self.content.content_id], content_type_list.Any_SLUG, self.workspace
@@ -667,7 +688,10 @@ class FileResource(DAVNonCollection):
         self.user = tracim_context.current_user
         self.session = tracim_context.dbsession
         self.content_api = ContentApi(
-            current_user=self.user, config=tracim_context.app_config, session=self.session
+            current_user=self.user,
+            config=tracim_context.app_config,
+            session=self.session,
+            namespaces_filter=[self.content.content_namespace],
         )
 
         # this is the property that windows client except to check if the file is read-write or read-only,
@@ -706,6 +730,12 @@ class FileResource(DAVNonCollection):
         return self.content.depot_file.file
 
     def beginWrite(self, contentType: str = None) -> FakeFileStream:
+        try:
+            self.content_api.check_upload_size(
+                int(self.environ["CONTENT_LENGTH"]), self.content.workspace
+            )
+        except (FileSizeOverMaxLimitation, FileSizeOverWorkspaceEmptySpace) as exc:
+            raise DAVError(HTTP_REQUEST_ENTITY_TOO_LARGE, contextinfo=str(exc))
         return FakeFileStream(
             content=self.content,
             content_api=self.content_api,
@@ -729,8 +759,8 @@ class FileResource(DAVNonCollection):
 
         try:
             checker.check(self.tracim_context)
-        except TracimException:
-            raise DAVError(HTTP_FORBIDDEN)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         invalid_path = False
 
@@ -812,8 +842,8 @@ class FileResource(DAVNonCollection):
 
         try:
             checker.check(self.tracim_context)
-        except TracimException:
-            raise DAVError(HTTP_FORBIDDEN)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         try:
             with new_revision(content=self.content, tm=transaction.manager, session=self.session):
@@ -852,7 +882,7 @@ class FileResource(DAVNonCollection):
                     )
                 self.content_api.execute_update_content_actions(self.content)
         except TracimException as exc:
-            raise DAVError(HTTP_FORBIDDEN) from exc
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
 
         transaction.commit()
 
@@ -871,8 +901,8 @@ class FileResource(DAVNonCollection):
         self.tracim_context.set_destpath(destpath)
         try:
             can_move_content.check(self.tracim_context)
-        except TracimException:
-            raise DAVError(HTTP_FORBIDDEN)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
         regex_file_extension = re.compile(
@@ -901,7 +931,7 @@ class FileResource(DAVNonCollection):
             )
             self.content_api.execute_created_content_actions(new_content)
         except TracimException as exc:
-            raise DAVError(HTTP_FORBIDDEN) from exc
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
         transaction.commit()
 
     def supportRecursiveMove(self, destpath):

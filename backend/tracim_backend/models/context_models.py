@@ -54,12 +54,14 @@ class ConfigModel(object):
         webdav_enabled: bool,
         webdav_url: str,
         collaborative_document_edition: CollaborativeDocumentEditionConfig,
+        content_length_file_size_limit: int,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
         self.webdav_enabled = webdav_enabled
         self.webdav_url = webdav_url
         self.collaborative_document_edition = collaborative_document_edition
+        self.content_length_file_size_limit = content_length_file_size_limit
 
 
 class ErrorCodeModel(object):
@@ -138,7 +140,7 @@ class SetEmail(object):
 
 
 class SimpleFile(object):
-    def __init__(self, files: cgi.FieldStorage) -> None:
+    def __init__(self, files: cgi.FieldStorage = None) -> None:
         self.files = files
 
 
@@ -698,6 +700,22 @@ class WorkspaceInContext(object):
             workspace_id=self.workspace_id
         )
         return root_frontend_url + workspace_frontend_url
+
+    @property
+    def owner(self) -> typing.Optional[UserInContext]:
+        if self.workspace.owner:
+            return UserInContext(
+                dbsession=self.dbsession, config=self.config, user=self.workspace.owner
+            )
+        return None
+
+    @property
+    def created(self) -> datetime:
+        return self.workspace.created
+
+    @property
+    def size(self) -> int:
+        return self.workspace.get_size()
 
 
 class UserRoleWorkspaceInContext(object):

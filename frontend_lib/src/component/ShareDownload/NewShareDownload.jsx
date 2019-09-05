@@ -2,11 +2,13 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { Popover, PopoverBody } from 'reactstrap'
+import { isMobile } from 'react-device-detect'
 import { generateRandomPassword } from '../../helper.js'
+import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
 const color = require('color')
 
-class NewShareDownload extends React.Component {
+export class NewShareDownload extends React.Component {
   constructor (props) {
     super(props)
 
@@ -36,8 +38,10 @@ class NewShareDownload extends React.Component {
     }
   }
 
-  handleClickSeePasswordInput = () => {
-    this.setState({ isPasswordActive: true })
+  handleTogglePasswordActive = () => {
+    this.setState(prevState => ({
+      isPasswordActive: !prevState.isPasswordActive
+    }))
   }
 
   render () {
@@ -53,7 +57,7 @@ class NewShareDownload extends React.Component {
           <textarea
             className='shareDownload__email__input form-control'
             placeholder={props.t('Enter the email address of the recipient(s)')}
-            rows='10'
+            rows='1'
             value={props.shareEmails}
             onChange={props.onChangeEmails}
             onKeyDown={props.onKeyDownEnter}
@@ -74,6 +78,7 @@ class NewShareDownload extends React.Component {
             isOpen={state.popoverMultipleEmailsOpen}
             target='popoverMultipleEmails'
             toggle={this.handleTogglePopoverMultipleEmails}
+            trigger={isMobile ? 'focus' : 'hover'}
           >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
           </Popover>
@@ -82,46 +87,51 @@ class NewShareDownload extends React.Component {
         {state.isPasswordActive
         ? (
           <div className='shareDownload__password'>
-            <div className='shareDownload__password__wrapper'>
-              <i className='fa fa-fw fa-lock' />
+            <div className='shareDownload__password__active'>
+              <div className='shareDownload__password__wrapper'>
+                <i className='fa fa-fw fa-lock' />
 
-              <input
-                type={state.hidePassword ? 'password' : 'text'}
-                className='shareDownload__password__input form-control'
-                placeholder={props.t('Password to share link (optional)')}
-                value={props.sharePassword}
-                onChange={props.onChangePassword}
-                onFocus={props.onKeyDownEnter}
-              />
+                <input
+                  type={state.hidePassword ? 'password' : 'text'}
+                  className='shareDownload__password__input form-control'
+                  placeholder={props.t('Password to share link')}
+                  value={props.sharePassword}
+                  onChange={props.onChangePassword}
+                  onFocus={props.onKeyDownEnter}
+                />
+
+                <button
+                  type='button'
+                  className='shareDownload__password__icon'
+                  key='seeSharePassword'
+                  title={props.t('Show password')}
+                  style={{ ':hover': { color: props.hexcolor } }}
+                  data-cy='seePassword'
+                  onClick={this.handleTogglePasswordVisibility}
+                >
+                  <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+                </button>
+              </div>
 
               <button
                 type='button'
                 className='shareDownload__password__icon'
-                key='seeSharePassword'
-                title={props.t('Show password')}
+                key='randomSharePassword'
+                title={props.t('Generate random password')}
                 style={{ ':hover': { color: props.hexcolor } }}
-                data-cy='seePassword'
-                onClick={this.handleTogglePasswordVisibility}
+                onClick={this.handleRandomPassword}
               >
-                <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+                <i className='fa fa-fw fa-repeat' />
               </button>
             </div>
-
-            <button
-              type='button'
-              className='shareDownload__password__icon'
-              key='randomSharePassword'
-              title={props.t('Generate random password')}
-              style={{ ':hover': { color: props.hexcolor } }}
-              onClick={this.handleRandomPassword}
-            >
-              <i className='fa fa-fw fa-repeat' />
-            </button>
+            <span className='shareDownload__password__link' onClick={this.handleTogglePasswordActive}>
+              {props.t('Cancel protection by password')}
+            </span>
           </div>
         )
         : (
           <div className='shareDownload__password'>
-            <span className='shareDownload__password__link' onClick={this.handleClickSeePasswordInput}>
+            <span className='shareDownload__password__link' onClick={this.handleTogglePasswordActive}>
               {props.t('Protect by password')}
             </span>
           </div>
@@ -146,8 +156,8 @@ class NewShareDownload extends React.Component {
           <button
             className='shareDownload__newBtn btn highlightBtn'
             key='newShareDownload'
-            onClick={props.onClickNewShare}
-            disabled={props.shareEmails === ''}
+            onClick={() => props.onClickNewShare(state.isPasswordActive)}
+            disabled={props.shareEmails === '' || (state.isPasswordActive && props.sharePassword === '')}
             style={{
               backgroundColor: props.hexcolor,
               ':hover': {
@@ -155,10 +165,21 @@ class NewShareDownload extends React.Component {
               }
             }}
           >
-            {props.t('Create')}
+            {props.t('Validate')}
             <i className='fa fa-fw fa-plus-circle' />
           </button>
         </div>
+
+        {!props.emailNotifActivated && (
+          <div className='shareDownload__emailWarning'>
+            <ComposedIcon
+              mainIcon='envelope'
+              smallIcon='warning'
+              smallIconCustomClass='text-danger'
+            />
+            {props.t('Email notification are disabled, please manually notify the link')}
+          </div>
+        )}
       </div>
     )
   }
