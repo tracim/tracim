@@ -23,8 +23,8 @@ const OptionalFunctionalities = props => {
         <BtnSwitch
           checked={props.downloadEnabled}
           onChange={props.onToggleDownloadEnabled}
-          activeLabel={props.t('Share files activated')}
-          inactiveLabel={props.t('Share files deactivated')}
+          activeLabel={props.t('Download activated')}
+          inactiveLabel={props.t('Download deactivated')}
         />
       </div>
       <div className='formBlock__field workspace_advanced__optionalfunctionalities__content'>
