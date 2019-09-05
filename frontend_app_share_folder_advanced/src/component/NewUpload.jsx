@@ -152,7 +152,7 @@ class NewUpload extends React.Component {
               smallIcon='warning'
               smallIconCustomClass='text-danger'
             />
-            {props.t('Email notification are disabled, please manually notify the link')}
+            {props.t('Email notification are disabled, please manually share the link')}
           </div>
         )}
       </div>
