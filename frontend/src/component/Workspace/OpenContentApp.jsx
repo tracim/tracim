@@ -4,6 +4,7 @@ import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
 import { ROLE, findUserRoleIdInWorkspace } from '../../helper.js'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
 export class OpenContentApp extends React.Component {
@@ -75,6 +76,11 @@ export class OpenContentApp extends React.Component {
 }
 
 const mapStateToProps = ({ user, currentWorkspace, contentType }) => ({
-  user, currentWorkspace, contentType
+  user,
+  currentWorkspace,
+  contentType: [
+    ...contentType,
+    HACK_COLLABORA_CONTENT_TYPE(contentType)
+  ]
 })
 export default withRouter(connect(mapStateToProps)(appFactory(OpenContentApp)))

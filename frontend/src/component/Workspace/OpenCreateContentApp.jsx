@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
+import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 const qs = require('query-string')
 
@@ -39,5 +40,11 @@ export class OpenCreateContentApp extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, contentType }) => ({ user, contentType })
+const mapStateToProps = ({ user, contentType }) => ({
+  user,
+  contentType: [
+    ...contentType,
+    HACK_COLLABORA_CONTENT_TYPE(contentType)
+  ]
+})
 export default withRouter(connect(mapStateToProps)(appFactory(OpenCreateContentApp)))

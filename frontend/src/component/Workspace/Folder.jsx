@@ -15,6 +15,7 @@ import {
   sortWorkspaceContents,
   SHARE_FOLDER_ID
 } from '../../helper.js'
+import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 require('./Folder.styl')
 
@@ -47,7 +48,8 @@ class Folder extends React.Component {
 
     const folderContentList = props.workspaceContentList.filter(c => c.parentId === props.folderData.id)
 
-    const folderAvailableApp = props.availableApp.filter(a => props.folderData.subContentTypeList.includes(a.slug))
+    const folderAvailableApp = props.availableApp
+      .filter(a => props.folderData.subContentTypeList.includes(a.slug) || a.slug === HACK_COLLABORA_CONTENT_TYPE(props.contentType).slug)
 
     return (
       <div
