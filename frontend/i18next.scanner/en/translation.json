@@ -228,5 +228,6 @@
   "Manage": "Manage",
   "Thank you, your import is finished!": "Thank you, your import is finished!",
   "Full name": "Full name",
+  "Error while loading upload infos": "Error while loading upload infos",
   "Error while loading file information": "Error while loading file information"
 }
