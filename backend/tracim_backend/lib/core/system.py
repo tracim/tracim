@@ -37,6 +37,8 @@ class SystemApi(object):
             webdav_url=urljoin(self._config.WEBDAV__BASE_URL, self._config.WEBDAV__ROOT_PATH),
             collaborative_document_edition=collaborative_document_edition_config,
             content_length_file_size_limit=self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE,
+            workspace_size_limit=self._config.LIMITATION__WORKSPACE_SIZE,
+            workspaces_number_per_user_limit=self._config.LIMITATION__SHAREDSPACE_PER_USER,
         )
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:

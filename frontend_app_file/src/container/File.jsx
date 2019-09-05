@@ -32,6 +32,7 @@ import {
   removeExtensionOfFilename,
   PAGE
 } from '../helper.js'
+import { debug } from '../debug.js'
 import {
   deleteShareLink,
   getFileContent,
@@ -58,9 +59,9 @@ class File extends React.Component {
     this.state = {
       appName: 'file',
       isVisible: true,
-      config: props.data ? props.data.config : null,
-      loggedUser: props.data ? props.data.loggedUser : null,
-      content: props.data ? props.data.content : null,
+      config: props.data ? props.data.config : debug.config,
+      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
+      content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
       externalTranslationList: [
         props.t('File'),
@@ -274,6 +275,8 @@ class File extends React.Component {
 
   loadShareLinkList = async () => {
     const { content, config } = this.state
+
+    if (this.state.loggedUser.userRoleIdInWorkspace < 2) return
 
     const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
 
@@ -902,12 +905,12 @@ class File extends React.Component {
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
-            menuItemList={[
-              {
-                id: 'timeline',
-                label: props.t('Timeline'),
-                icon: 'fa-history',
-                children: <Timeline
+            menuItemList={[{
+              id: 'timeline',
+              label: props.t('Timeline'),
+              icon: 'fa-history',
+              children: (
+                <Timeline
                   customClass={`${state.config.slug}__contentpage`}
                   customColor={state.config.hexcolor}
                   loggedUser={state.loggedUser}
@@ -921,32 +924,39 @@ class File extends React.Component {
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== MODE.REVISION}
+                  key={'Timeline'}
                 />
-              },
-              {
+              )
+            }, ...(state.loggedUser.userRoleIdInWorkspace > 1
+              ? [{
                 id: 'share',
                 label: props.t('Share'),
                 icon: 'fa-share-alt',
-                children: <ShareDownload
-                  label={props.t(state.config.label)}
-                  hexcolor={state.config.hexcolor}
-                  shareEmails={state.shareEmails}
-                  onChangeEmails={this.handleChangeEmails}
-                  onKeyDownEnter={this.handleKeyDownEnter}
-                  sharePassword={state.sharePassword}
-                  onChangePassword={this.handleChangePassword}
-                  shareLinkList={state.shareLinkList}
-                  onClickDeleteShareLink={this.handleClickDeleteShareLink}
-                  onClickNewShare={this.handleClickNewShare}
-                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-                  emailNotifActivated={state.config.system.config.email_notification_activated}
-                />
-              },
-              {
-                id: 'properties',
-                label: props.t('Properties'),
-                icon: 'fa-info-circle',
-                children: <FileProperties
+                children: (
+                  <ShareDownload
+                    label={props.t(state.config.label)}
+                    hexcolor={state.config.hexcolor}
+                    shareEmails={state.shareEmails}
+                    onChangeEmails={this.handleChangeEmails}
+                    onKeyDownEnter={this.handleKeyDownEnter}
+                    sharePassword={state.sharePassword}
+                    onChangePassword={this.handleChangePassword}
+                    shareLinkList={state.shareLinkList}
+                    onClickDeleteShareLink={this.handleClickDeleteShareLink}
+                    onClickNewShare={this.handleClickNewShare}
+                    userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                    emailNotifActivated={state.config.system.config.email_notification_activated}
+                    key={'ShareDownload'}
+                  />
+                )
+              }]
+              : []
+            ), {
+              id: 'properties',
+              label: props.t('Properties'),
+              icon: 'fa-info-circle',
+              children: (
+                <FileProperties
                   color={state.config.hexcolor}
                   fileType={state.content.file_extension}
                   fileSize={displayFileSize(state.content.size)}
@@ -960,9 +970,10 @@ class File extends React.Component {
                   displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
                   disableChangeDescription={!state.content.is_editable}
                   onClickValidateNewDescription={this.handleClickValidateNewDescription}
+                  key={'FileProperties'}
                 />
-              }
-            ]}
+              )
+            }]}
           />
         </PopinFixedContent>
       </PopinFixed>

@@ -16,5 +16,7 @@
   "Error while loading tracim's content type list": "Erreur lors du chargement des types de contenus tracim",
   "Error while loading share links list": "Erreur lors du chargement de la liste des liens de partage",
   "Error in the URL": "Erreur dans l'URL",
-  "Error while deleting share link": "Erreur lors de la suppression d'un lien de partage"
+  "Error while deleting share link": "Erreur lors de la suppression d'un lien de partage",
+  "Protect by password": "Protéger par un mot de passe",
+  "Cancel protection by password": "Annuler la protection par mot de passe"
 }

@@ -2,7 +2,8 @@
 
 module.exports = {
   require: [
-    'regenerator-runtime',
+    'core-js/stable',
+    'regenerator-runtime/runtime',
     '@babel/register',
     'ignore-styles',
     'test/setup'

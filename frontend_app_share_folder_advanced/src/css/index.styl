@@ -50,6 +50,9 @@
     margin 0 15px
     padding 10px
     display flex
+    flex-direction column
+    &__active
+      display flex
     &__wrapper
       display flex
       flex-grow 2
@@ -72,6 +75,14 @@
         box-shadow 0 0 0 0
         border 0 none
         outline 0
+    &__link
+      color grey
+      text-decoration underline
+      margin-left auto
+      padding-right 36px
+      cursor pointer
+      &:hover
+        color fontColor
   &__newBtn
     margin-top 15px
     margin-right 55px
