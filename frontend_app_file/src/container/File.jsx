@@ -826,28 +826,32 @@ class File extends React.Component {
     }
 
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace > 1) {
-      return [ timelineObject, {
-        id: 'share',
-        label: props.t('Share'),
-        icon: 'fa-share-alt',
-        children: (
-          <ShareDownload
-            label={props.t(state.config.label)}
-            hexcolor={state.config.hexcolor}
-            shareEmails={state.shareEmails}
-            onChangeEmails={this.handleChangeEmails}
-            onKeyDownEnter={this.handleKeyDownEnter}
-            sharePassword={state.sharePassword}
-            onChangePassword={this.handleChangePassword}
-            shareLinkList={state.shareLinkList}
-            onClickDeleteShareLink={this.handleClickDeleteShareLink}
-            onClickNewShare={this.handleClickNewShare}
-            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-            emailNotifActivated={state.config.system.config.email_notification_activated}
-            key={'ShareDownload'}
-          />
-        )
-      }, propertiesObject ]
+      return [
+        timelineObject,
+        {
+          id: 'share',
+          label: props.t('Share'),
+          icon: 'fa-share-alt',
+          children: (
+            <ShareDownload
+              label={props.t(state.config.label)}
+              hexcolor={state.config.hexcolor}
+              shareEmails={state.shareEmails}
+              onChangeEmails={this.handleChangeEmails}
+              onKeyDownEnter={this.handleKeyDownEnter}
+              sharePassword={state.sharePassword}
+              onChangePassword={this.handleChangePassword}
+              shareLinkList={state.shareLinkList}
+              onClickDeleteShareLink={this.handleClickDeleteShareLink}
+              onClickNewShare={this.handleClickNewShare}
+              userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+              emailNotifActivated={state.config.system.config.email_notification_activated}
+              key={'ShareDownload'}
+            />
+          )
+        },
+        propertiesObject
+      ]
     } else {
       return [ timelineObject, propertiesObject ]
     }
