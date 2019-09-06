@@ -15,7 +15,7 @@ describe("Member's workspace", () => {
     cy.get('[data-cy=memberlist__btnadd]').click()
     cy.createRandomUser()
       .then(user => {
-        cy.get('[data-cy=addmember]').type(user.email)
+        cy.get('[data-cy=addmember]').should('be.visible').type(user.email)
         cy.get('.autocomplete__item__name')
           .contains(user.public_name)
           .click()
@@ -32,7 +32,7 @@ describe("Member's workspace", () => {
     cy.get('[data-cy=memberlist__btnadd]').click()
     cy.createRandomUser()
       .then(user => {
-        cy.get('[data-cy=addmember]').type(user.public_name)
+        cy.get('[data-cy=addmember]').should('be.visible').type(user.public_name)
         cy.get('[data-cy=autocomplete__item__name]')
           .contains(user.public_name)
           .click()
@@ -49,7 +49,7 @@ describe("Member's workspace", () => {
     cy.get('[data-cy=memberlist__btnadd]').click()
     cy.createRandomUser()
       .then(user => {
-        cy.get('[data-cy=addmember]').type(user.email)
+        cy.get('[data-cy=addmember]').should('be.visible').type(user.email)
         cy.get('[data-cy=autocomplete__item__name]')
           .contains(user.public_name)
           .click()
@@ -63,7 +63,7 @@ describe("Member's workspace", () => {
     cy.get('[data-cy=memberlist__btnadd]').click()
     cy.createRandomUser()
       .then(user => {
-        cy.get('[data-cy=addmember]').type(user.email)
+        cy.get('[data-cy=addmember]').should('be.visible').type(user.email)
         cy.get('[data-cy=autocomplete__item__name]')
           .contains(user.public_name)
           .click()
@@ -73,8 +73,8 @@ describe("Member's workspace", () => {
         cy.contains('Validate').click()
         cy.get('.flashmessage__container__close__icon').click()
         cy.get('[data-cy=memberlist__btnadd]').click()
-        cy.get('[data-cy=addmember]').type(user.public_name)
-        cy.get('[data-cy=autocomplete__item__name]')
+        cy.get('[data-cy=addmember]').should('be.visible').type(user.public_name)
+        cy.get('[data-cy=autocomplete__item__name]').should('be.visible')
           .contains('I know this user exist')
           .click()
         cy.get('[data-cy=memberlist]')
@@ -89,7 +89,7 @@ describe("Member's workspace", () => {
     cy.get('[data-cy=memberlist__btnadd]').click()
     cy.createRandomUser()
       .then(user => {
-        cy.get('[data-cy=addmember]').type(user.email)
+        cy.get('[data-cy=addmember]').should('be.visible').type(user.email)
         cy.get('[data-cy=autocomplete__item__name]')
           .contains(user.public_name)
           .click()
