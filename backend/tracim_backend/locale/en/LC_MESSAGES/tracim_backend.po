@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-08-29 09:55+0200\n"
+"POT-Creation-Date: 2019-09-06 10:05+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -53,22 +53,20 @@ msgstr ""
 #: tracim_backend/applications/share/config.py:22
 msgid ""
 "[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
-"users"
+"people"
 msgstr ""
 
 #: tracim_backend/applications/upload_permissions/config.py:14
-msgid ""
-"[{website_title}] {emitter_name} allowed you to upload files in this "
-"shared space \"{workspace_number}\""
+msgid "{emitter_name} invited you to upload files on \"{website_title}\""
 msgstr ""
 
-#: tracim_backend/applications/upload_permissions/config.py:23
+#: tracim_backend/applications/upload_permissions/config.py:21
 msgid ""
-"[{website_title}] You allowed {nb_receivers} users to upload files on "
+"[{website_title}] You invited {nb_receivers} people to upload files on "
 "\"{workspace_name}\""
 msgstr ""
 
-#: tracim_backend/applications/upload_permissions/config.py:32
+#: tracim_backend/applications/upload_permissions/config.py:30
 msgid ""
 "[{website_title}] {uploader_username} shared {nb_uploaded_contents} files"
 " in \"{workspace_name}\""
@@ -209,7 +207,7 @@ msgstr ""
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
 #: tracim_backend/templates/mail/reset_password_body_html.mak:23
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
-#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:30
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:29
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:23
 msgid "powered by tracim software"
@@ -265,48 +263,44 @@ msgid "Hello,"
 msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:6
-msgid "I share a file with you."
+msgid "I share a file with you, download it here:"
 msgstr ""
 
-#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:7
-msgid "You can download this file here:"
-msgstr ""
-
-#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:9
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:8
 msgid ""
 "<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a> "
 "({file_size})"
 msgstr ""
 
-#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:16
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:15
 msgid ""
 "This file is protected by a password, please contact me (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
 msgstr ""
 
-#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:17
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:16
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:13
 msgid "Note: You can also use this link: {url}"
 msgstr ""
 
-#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:19
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:18
 msgid "Note: You can also use this direct link: {direct_url}"
 msgstr ""
 
-#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:22
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:21
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:15
 msgid "Thanks a lot"
 msgstr ""
 
-#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:23
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:22
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:16
 msgid "{username} (through tracim)"
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:2
 msgid ""
-"You allowed the upload in this shared space <a "
-"href={sharedspace_url}>{sharedspace_name}</a> with:"
+"You have invited {nb_receivers} people to upload files in this shared "
+"space <a href={sharedspace_url}>{sharedspace_name}</a>:"
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:10
@@ -316,13 +310,11 @@ msgid ""
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:6
-msgid ""
-"I allowed you to upload file in this shared space (number: "
-"{workspace_id}):"
+msgid "I invited you to upload files here:"
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
-msgid "Upload file"
+msgid "Upload files"
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:10
