@@ -734,6 +734,20 @@ class WorkspaceModifySchema(marshmallow.Schema):
         description="has workspace has an associated agenda ?",
         allow_none=True,
     )
+    public_upload_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="is workspace allowing manager to give access external user"
+        "to upload file into it ?",
+        default=None,
+        allow_none=True,
+    )
+    public_download_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="is workspace allowing manager to give access external user"
+        "to some file into it ?",
+        default=None,
+        allow_none=True,
+    )
 
     @post_load
     def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -747,6 +761,18 @@ class WorkspaceCreationSchema(marshmallow.Schema):
     description = StrippedString(required=True, example="A super description of my workspace.")
     agenda_enabled = marshmallow.fields.Bool(
         required=False, description="has workspace has an associated agenda ?", default=True
+    )
+    public_upload_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="is workspace allowing manager to give access external user"
+        "to upload file into it ?",
+        default=True,
+    )
+    public_download_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="is workspace allowing manager to give access external user"
+        "to some file into it ?",
+        default=True,
     )
 
     @post_load
@@ -788,6 +814,16 @@ class WorkspaceDigestSchema(marshmallow.Schema):
     sidebar_entries = marshmallow.fields.Nested(WorkspaceMenuEntrySchema, many=True)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
     agenda_enabled = marshmallow.fields.Bool(example=True, default=True)
+    public_upload_enabled = marshmallow.fields.Bool(
+        description="is workspace allowing manager to give access external user"
+        "to upload file into it ?",
+        default=True,
+    )
+    public_download_enabled = marshmallow.fields.Bool(
+        description="is workspace allowing manager to give access external user"
+        "to some file into it ?",
+        default=True,
+    )
 
     class Meta:
         description = "Digest of workspace informations"

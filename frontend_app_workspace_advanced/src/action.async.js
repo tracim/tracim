@@ -58,32 +58,29 @@ export const putAgendaEnabled = (apiUrl, workspace, agendaEnabled) =>
     })
   })
 
-// FIXME - G.B. - 2019-08-16 - We still don't have this features at backend
-// https://github.com/tracim/tracim/issues/2215
+export const putUploadEnabled = (apiUrl, workspace, uploadEnabled) =>
+  fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
+    credentials: 'include',
+    headers: { ...FETCH_CONFIG.headers },
+    method: 'PUT',
+    body: JSON.stringify({
+      label: workspace.label,
+      description: workspace.description,
+      public_upload_enabled: uploadEnabled
+    })
+  })
 
-// export const putUploadEnabled = (apiUrl, workspace, uploadEnabled) =>
-//   fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
-//     credentials: 'include',
-//     headers: {...FETCH_CONFIG.headers},
-//     method: 'PUT',
-//     body: JSON.stringify({
-//       label: workspace.label,
-//       description: workspace.description,
-//       upload_enabled: uploadEnabled
-//     })
-//   })
-
-// export const putDownloadEnabled = (apiUrl, workspace, downloadEnabled) =>
-//   fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
-//     credentials: 'include',
-//     headers: {...FETCH_CONFIG.headers},
-//     method: 'PUT',
-//     body: JSON.stringify({
-//       label: workspace.label,
-//       description: workspace.description,
-//       download_enabled: downloadEnabled
-//     })
-//   })
+export const putDownloadEnabled = (apiUrl, workspace, downloadEnabled) =>
+  fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
+    credentials: 'include',
+    headers: { ...FETCH_CONFIG.headers },
+    method: 'PUT',
+    body: JSON.stringify({
+      label: workspace.label,
+      description: workspace.description,
+      public_download_enabled: downloadEnabled
+    })
+  })
 
 export const putMemberRole = (apiUrl, workspaceId, memberId, slugNewRole) =>
   fetch(`${apiUrl}/workspaces/${workspaceId}/members/${memberId}`, {

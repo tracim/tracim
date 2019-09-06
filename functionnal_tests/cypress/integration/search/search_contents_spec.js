@@ -53,6 +53,7 @@ describe('Searching keywords', () => {
       cy.get(contentHtmlDocGetter).should('be.not.visible')
     })
 
+    // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
     // describe('then archiving one document', () => {
     //   describe('and searching the same keyword and validating again', () => {
     //     it('Should not display the archived document', () => {
@@ -82,7 +83,7 @@ describe('Searching keywords', () => {
           cy.get(searchInput).type('{enter}')
 
           cy.get('.content').should('have.length', 1)
-          // cy.get('.searchResult__content__empty').should('be.visible')
+          // cy.get('.searchResult__content__empty').should('be.visible') // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
         })
       })
     })

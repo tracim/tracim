@@ -18,14 +18,13 @@ const OptionalFunctionalities = props => {
           />
         </div>
       )}
-      {/* FIXME - G.B. - 2019-08-16 - We still don't have this features at backend
-          https://github.com/tracim/tracim/issues/2215
+
       <div className='formBlock__field workspace_advanced__optionalfunctionalities__content'>
         <BtnSwitch
           checked={props.downloadEnabled}
           onChange={props.onToggleDownloadEnabled}
-          activeLabel={props.t('Share files activated')}
-          inactiveLabel={props.t('Share files deactivated')}
+          activeLabel={props.t('Download activated')}
+          inactiveLabel={props.t('Download deactivated')}
         />
       </div>
       <div className='formBlock__field workspace_advanced__optionalfunctionalities__content'>
@@ -35,7 +34,7 @@ const OptionalFunctionalities = props => {
           activeLabel={props.t('Upload activated')}
           inactiveLabel={props.t('Upload deactivated')}
         />
-      </div> */}
+      </div>
     </div>
   )
 }
