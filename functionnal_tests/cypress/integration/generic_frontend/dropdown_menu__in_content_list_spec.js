@@ -55,6 +55,7 @@ describe('Content list', function () {
           .should('not.exist')
       })
 
+      // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
       // it('button achive should archive content without reload', function () {
       //   cy.on('window:before:load', (error, runnable) => {
       //     assert.isNotOk(true, 'Page reload when clicking and it should not')
