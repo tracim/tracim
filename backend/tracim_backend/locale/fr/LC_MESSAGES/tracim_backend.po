@@ -62,7 +62,7 @@ msgid ""
 "people"
 msgstr ""
 "[{website_title}] Vous avez partagé  \"{content_filename}\" avec "
-"{nb_receivers} personnes"
+"{nb_receivers} personne(s)"
 
 #: tracim_backend/applications/upload_permissions/config.py:14
 msgid "{emitter_name} invited you to upload files on \"{website_title}\""
