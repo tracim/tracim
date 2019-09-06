@@ -90,6 +90,14 @@ class WorkspaceAgendaDisabledException(TracimException):
     error_code = ErrorCode.WORKSPACE_AGENDA_DISABLED
 
 
+class WorkspacePublicUploadDisabledException(TracimException):
+    error_code = ErrorCode.WORKSPACE_PUBLIC_UPLOAD_DISABLED
+
+
+class WorkspacePublicDownloadDisabledException(TracimException):
+    error_code = ErrorCode.WORKSPACE_PUBLIC_DOWNLOAD_DISABLED
+
+
 class AgendaServerConnectionError(TracimException):
     pass
 
