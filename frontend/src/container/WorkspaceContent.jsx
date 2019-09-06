@@ -57,6 +57,7 @@ import uniq from 'lodash/uniq'
 
 const qs = require('query-string')
 
+// FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
 export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
   label: 'Office Document',
   slug: 'office_document',
@@ -596,6 +597,8 @@ class WorkspaceContent extends React.Component {
       ...contentType
         .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)
         .filter(ct => userRoleIdInWorkspace === 2 ? ct.slug !== CONTENT_TYPE.FOLDER : true),
+
+      // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
       ...(contentType.find(ct => ct.slug === CONTENT_TYPE.FILE)
         ? [HACK_COLLABORA_CONTENT_TYPE(contentType)]
         : []

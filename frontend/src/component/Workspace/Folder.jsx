@@ -49,7 +49,11 @@ class Folder extends React.Component {
     const folderContentList = props.workspaceContentList.filter(c => c.parentId === props.folderData.id)
 
     const folderAvailableApp = props.availableApp
-      .filter(a => props.folderData.subContentTypeList.includes(a.slug) || a.slug === HACK_COLLABORA_CONTENT_TYPE(props.contentType).slug)
+      .filter(a =>
+        props.folderData.subContentTypeList.includes(a.slug) ||
+        // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
+        a.slug === HACK_COLLABORA_CONTENT_TYPE(props.contentType).slug
+      )
 
     return (
       <div

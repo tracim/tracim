@@ -44,6 +44,7 @@ const mapStateToProps = ({ user, contentType }) => ({
   user,
   contentType: [
     ...contentType,
+    // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
     HACK_COLLABORA_CONTENT_TYPE(contentType)
   ]
 })
