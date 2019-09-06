@@ -199,6 +199,7 @@ class PopupCreateOfficeDocument extends React.Component {
           options={this.buildOptions()}
           handleNewSelectedValue={this.setSelectedOption}
           customColor={this.state.config.hexcolor}
+          handleKeyDown={this.handleInputKeyDown}
         />
       </CardPopupCreateContent>
     )

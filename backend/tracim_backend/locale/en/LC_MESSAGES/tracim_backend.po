@@ -29,7 +29,7 @@ msgid "[{website_title}] A password reset has been requested"
 msgstr ""
 
 #: tracim_backend/app_models/contents.py:45
-msgid "Open"
+msgid "Opened"
 msgstr ""
 
 #: tracim_backend/app_models/contents.py:53
@@ -92,11 +92,11 @@ msgstr ""
 msgid "New folder {0}"
 msgstr ""
 
-#: tracim_backend/lib/core/workspace.py:333
+#: tracim_backend/lib/core/workspace.py:334
 msgid "Workspace"
 msgstr "Shared space"
 
-#: tracim_backend/lib/core/workspace.py:336
+#: tracim_backend/lib/core/workspace.py:337
 msgid "Workspace {}"
 msgstr "Shared space {}"
 

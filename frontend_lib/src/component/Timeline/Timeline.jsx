@@ -57,8 +57,7 @@ class Timeline extends React.Component {
             {props.t('Timeline')}
           </div>
         }
-        <div className='timeline__body'>
-          <div className='timeline__body__warning'>
+          <div className='timeline__warning'>
             {props.isDeprecated && !props.isArchived && !props.isDeleted && (
               <DisplayState
                 msg={props.t('This content is deprecated')}
@@ -87,101 +86,99 @@ class Timeline extends React.Component {
             )}
           </div>
 
-          <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__body__messagelist')}>
-            {props.timelineData.map(content => {
-              switch (content.timelineType) {
-                case 'comment':
-                  return <Comment
-                    customClass={props.customClass}
-                    customColor={props.customColor}
-                    author={content.author.public_name}
-                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
-                    createdDistance={content.created}
-                    text={content.raw_content}
-                    fromMe={props.loggedUser.user_id === content.author.user_id}
-                    key={`comment_${content.content_id}`}
-                  />
-
-                case 'revision':
-                  return <Revision
-                    customClass={props.customClass}
-                    customColor={props.customColor}
-                    revisionType={content.revision_type}
-                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
-                    createdDistance={content.created}
-                    number={content.number}
-                    status={props.availableStatusList.find(status => status.slug === content.status)}
-                    authorPublicName={content.author.public_name}
-                    allowClickOnRevision={props.allowClickOnRevision}
-                    onClickRevision={() => props.onClickRevisionBtn(content)}
-                    key={`revision_${content.revision_id}`}
-                  />
-              }
-            })}
-            <li style={{visibility: 'hidden'}} ref={el => { this.timelineBottom = el }} />
-          </ul>
-
-          {props.loggedUser.userRoleIdInWorkspace >= 2 &&
-            <form className={classnames(`${props.customClass}__texteditor`, 'timeline__body__texteditor')}>
-              <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__body__texteditor__textinput')}>
-                <textarea
-                  id='wysiwygTimelineComment'
-                  placeholder={props.t('Your message...')}
-                  value={props.newComment}
-                  onChange={props.onChangeNewComment}
-                  disabled={props.disableComment}
+          <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}>
+          {props.timelineData.map(content => {
+            switch (content.timelineType) {
+              case 'comment':
+                return <Comment
+                  customClass={props.customClass}
+                  customColor={props.customColor}
+                  author={content.author.public_name}
+                  createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                  createdDistance={content.created}
+                  text={content.raw_content}
+                  fromMe={props.loggedUser.user_id === content.author.user_id}
+                  key={`comment_${content.content_id}`}
+              />
+              case 'revision':
+                return <Revision
+                  customClass={props.customClass}
+                  customColor={props.customColor}
+                  revisionType={content.revision_type}
+                  createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                  createdDistance={content.created}
+                  number={content.number}
+                  status={props.availableStatusList.find(status => status.slug === content.status)}
+                  authorPublicName={content.author.public_name}
+                  allowClickOnRevision={props.allowClickOnRevision}
+                  onClickRevision={() => props.onClickRevisionBtn(content)}
+                  key={`revision_${content.revision_id}`}
                 />
-              </div>
+            }
+          })}
+          <li style={{visibility: 'hidden'}} ref={el => { this.timelineBottom = el }} />
+        </ul>
 
-              <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__body__texteditor__wrapper')}>
-                <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'timeline__body__texteditor__advancedtext')}>
-                  <button
-                    type='button'
-                    className={classnames(
-                      `${props.customClass}__texteditor__advancedtext__btn timeline__body__texteditor__advancedtext__btn btn outlineTextBtn`
-                    )}
-                    onClick={props.onClickWysiwygBtn}
-                    disabled={props.disableComment}
-                    style={{
-                      borderColor: props.customColor,
-                      color: '#252525',
-                      ':hover': {
-                        backgroundColor: props.customColor,
-                        color: '#fdfdfd'
-                      }
-                    }}
-                    key={'timeline__comment__advancedtext'}
-                  >
-                    {props.wysiwyg ? props.t('Simple text') : props.t('Rich text')}
-                  </button>
-                </div>
+        {props.loggedUser.userRoleIdInWorkspace >= 2 &&
+          <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
+            <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__texteditor__textinput')}>
+              <textarea
+                id='wysiwygTimelineComment'
+                placeholder={props.t('Your message...')}
+                value={props.newComment}
+                onChange={props.onChangeNewComment}
+                disabled={props.disableComment}
+              />
+            </div>
 
-                <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__body__texteditor__submit')}>
-                  <button
-                    type='button'
-                    className={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__body__texteditor__submit__btn btn highlightBtn')}
-                    onClick={props.onClickValidateNewCommentBtn}
-                    disabled={props.disableComment || props.newComment === ''}
-                    style={{
+            <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__texteditor__wrapper')}>
+              <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'timeline__texteditor__advancedtext')}>
+                <button
+                  type='button'
+                  className={classnames(
+                    `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn btn outlineTextBtn`
+                  )}
+                  onClick={props.onClickWysiwygBtn}
+                  disabled={props.disableComment}
+                  style={{
+                    borderColor: props.customColor,
+                    color: '#252525',
+                    ':hover': {
                       backgroundColor: props.customColor,
-                      color: '#fdfdfd',
-                      ':hover': {
-                        backgroundColor: color(props.customColor).darken(0.15).hex()
-                      }
-                    }}
-                    key={'timeline__comment__send'}
-                  >
-                    {props.t('Send')}
-                    <div
-                      className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__body__texteditor__submit__btn__icon')}>
-                      <i className='fa fa-paper-plane-o' />
-                    </div>
-                  </button>
-                </div>
+                      color: '#fdfdfd'
+                    }
+                  }}
+                  key={'timeline__comment__advancedtext'}
+                >
+                  {props.wysiwyg ? props.t('Simple text') : props.t('Rich text')}
+                </button>
               </div>
-            </form>
-          }
-        </div>
+
+              <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit')}>
+                <button
+                  type='button'
+                  className={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn btn highlightBtn')}
+                  onClick={props.onClickValidateNewCommentBtn}
+                  disabled={props.disableComment || props.newComment === ''}
+                  style={{
+                    backgroundColor: props.customColor,
+                    color: '#fdfdfd',
+                    ':hover': {
+                      backgroundColor: color(props.customColor).darken(0.15).hex()
+                    }
+                  }}
+                  key={'timeline__comment__send'}
+                >
+                  {props.t('Send')}
+                  <div
+                    className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}>
+                    <i className='fa fa-paper-plane-o' />
+                  </div>
+                </button>
+              </div>
+            </div>
+          </form>
+        }
       </div>
     )
   }

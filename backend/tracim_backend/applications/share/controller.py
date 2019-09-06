@@ -6,6 +6,7 @@ from hapic.data import HapicFile
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.share.models_in_context import ContentShareInContext
@@ -14,6 +15,7 @@ from tracim_backend.applications.share.schema import ContentShareSchema
 from tracim_backend.applications.share.schema import ShareCreationBodySchema
 from tracim_backend.applications.share.schema import ShareIdPathSchema
 from tracim_backend.applications.share.schema import ShareListQuerySchema
+from tracim_backend.applications.share.schema import SharePasswordBodySchema
 from tracim_backend.applications.share.schema import SharePasswordFormSchema
 from tracim_backend.applications.share.schema import ShareTokenPathSchema
 from tracim_backend.applications.share.schema import ShareTokenWithFilenamePathSchema
@@ -23,6 +25,7 @@ from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_content_manager
@@ -136,10 +139,38 @@ class ShareController(Controller):
 
         # TODO - G.M - 2019-08-01 - verify in access to content share can be granted
         # we should considered do these check at decorator level
-        if content_share.content.type not in shareables_content_type:
+        content = ContentApi(
+            current_user=None, session=request.dbsession, config=app_config
+        ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        if content.type not in shareables_content_type:
             raise ContentTypeNotAllowed()
 
         return api.get_content_share_in_context(content_share)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
+    @hapic.input_path(ShareTokenPathSchema())
+    @hapic.input_body(SharePasswordBodySchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def guest_download_check(self, context, request: TracimRequest, hapic_data=None) -> None:
+        """
+        Check if share token is correct and password given valid
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ShareLib(current_user=None, session=request.dbsession, config=app_config)
+        content_share = api.get_content_share_by_token(
+            share_token=hapic_data.path.share_token
+        )  # type: ContentShare
+
+        # TODO - G.M - 2019-08-01 - verify in access to content share can be granted
+        # we should considered do these check at decorator level
+        api.check_password(content_share, password=hapic_data.body.password)
+        content = ContentApi(
+            current_user=None, session=request.dbsession, config=app_config
+        ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        if content.type not in shareables_content_type:
+            raise ContentTypeNotAllowed()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
@@ -182,15 +213,18 @@ class ShareController(Controller):
         else:
             password = None
         api.check_password(content_share, password=password)
-        if content_share.content.type not in shareables_content_type:
+        content = ContentApi(
+            current_user=None, session=request.dbsession, config=app_config
+        ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        if content.type not in shareables_content_type:
             raise ContentTypeNotAllowed()
 
         try:
-            file = DepotManager.get().get(content_share.content.depot_file)
+            file = DepotManager.get().get(content.depot_file)
         except IOError as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
-                    content_share.content.revision_id, content_share.content.content_id
+                    content.revision_id, content.content_id
                 )
             ) from exc
         filename = hapic_data.path.filename
@@ -198,14 +232,14 @@ class ShareController(Controller):
         # INFO - G.M - 2019-08-08 - use given filename in all case but none or
         # "raw", when filename returned will be original file one.
         if not filename or filename == "raw":
-            filename = content_share.content.file_name
+            filename = content.file_name
         return HapicFile(
             file_object=file,
             mimetype=file.content_type,
             filename=filename,
             as_attachment=True,
             content_length=file.content_length,
-            last_modified=content_share.content.updated,
+            last_modified=content.updated,
         )
 
     def bind(self, configurator: Configurator) -> None:
@@ -238,6 +272,13 @@ class ShareController(Controller):
             "guest_download_info", "/public/guest-download/{share_token}", request_method="GET"
         )
         configurator.add_view(self.guest_download_info, route_name="guest_download_info")
+
+        configurator.add_route(
+            "guest_download_check",
+            "/public/guest-download/{share_token}/check",
+            request_method="POST",
+        )
+        configurator.add_view(self.guest_download_check, route_name="guest_download_check")
 
         configurator.add_route(
             "guest_download_file_get",
