@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-06 10:05+0200\n"
+"POT-Creation-Date: 2019-09-06 15:05+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -92,11 +92,11 @@ msgstr ""
 msgid "New folder {0}"
 msgstr ""
 
-#: tracim_backend/lib/core/workspace.py:357
+#: tracim_backend/lib/core/workspace.py:383
 msgid "Workspace"
 msgstr "Shared space"
 
-#: tracim_backend/lib/core/workspace.py:360
+#: tracim_backend/lib/core/workspace.py:386
 msgid "Workspace {}"
 msgstr "Shared space {}"
 

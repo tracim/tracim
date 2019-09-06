@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-06 10:05+0200\n"
+"POT-Creation-Date: 2019-09-06 15:05+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -18,17 +18,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: tracim_backend/config.py:346
+#: tracim_backend/config.py:356
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 msgstr ""
 
-#: tracim_backend/config.py:354
+#: tracim_backend/config.py:364
 msgid "[{website_title}] Someone created an account for you"
 msgstr "[{website_title}] Quelqu'un vous a créé un compte"
 
-#: tracim_backend/config.py:363
+#: tracim_backend/config.py:373
 msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] Demande de réinitialisation de mot de passe"
 
@@ -66,7 +66,9 @@ msgstr ""
 
 #: tracim_backend/applications/upload_permissions/config.py:14
 msgid "{emitter_name} invited you to upload files on \"{website_title}\""
-msgstr "{emitter_name} vous a invité à téléverser des fichiers sur \"{website_title}\""
+msgstr ""
+"{emitter_name} vous a invité à téléverser des fichiers sur "
+"\"{website_title}\""
 
 #: tracim_backend/applications/upload_permissions/config.py:21
 msgid ""
@@ -104,11 +106,11 @@ msgstr "Nouveau dossier"
 msgid "New folder {0}"
 msgstr "Nouveau dossier {0}"
 
-#: tracim_backend/lib/core/workspace.py:357
+#: tracim_backend/lib/core/workspace.py:383
 msgid "Workspace"
 msgstr "Espace partagé"
 
-#: tracim_backend/lib/core/workspace.py:360
+#: tracim_backend/lib/core/workspace.py:386
 msgid "Workspace {}"
 msgstr "Espace partagé {0}"
 
