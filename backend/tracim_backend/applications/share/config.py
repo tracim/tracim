@@ -19,7 +19,7 @@ def load_config(app_config: CFG) -> CFG:
     )
     app_config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT = app_config.get_raw_config(
         "email.notification.share_content_to_emitter.subject",
-        _('[{website_title}] You shared "{content_filename}" with {nb_receivers} users'),
+        _('[{website_title}] You shared "{content_filename}" with {nb_receivers} people'),
     )
     return app_config
 

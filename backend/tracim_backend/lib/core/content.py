@@ -37,6 +37,8 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import FileSizeOverMaxLimitation
+from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
@@ -1905,6 +1907,33 @@ class ContentApi(object):
         item.depot_file = FileIntent(new_content, new_filename, new_mimetype)
         item.revision_type = ActionDescription.REVISION
         return item
+
+    def check_upload_size(self, content_length: int, workspace: Workspace) -> None:
+        self._check_size_length_limitation(content_length)
+        self._check_workspace_size_limitation(content_length, workspace)
+
+    def _check_size_length_limitation(self, content_length: int) -> None:
+        # INFO - G.M - 2019-08-23 - 0 mean no size limit
+        if self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE == 0:
+            return
+        elif content_length > self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE:
+            raise FileSizeOverMaxLimitation(
+                'File cannot be added because his size "{}" is higher than max allowed size : "{}"'.format(
+                    content_length, self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE
+                )
+            )
+
+    def _check_workspace_size_limitation(self, content_length: int, workspace: Workspace) -> None:
+        workspace_size = workspace.get_size()
+        # INFO - G.M - 2019-08-23 - 0 mean no size limit
+        if self._config.LIMITATION__WORKSPACE_SIZE == 0:
+            return
+        elif workspace_size > self._config.LIMITATION__WORKSPACE_SIZE:
+            raise FileSizeOverWorkspaceEmptySpace(
+                'File cannot be added (size "{}") because workspace is full: "{}/{}"'.format(
+                    content_length, workspace_size, self._config.LIMITATION__WORKSPACE_SIZE
+                )
+            )
 
     def archive(self, content: Content):
         if self._user:

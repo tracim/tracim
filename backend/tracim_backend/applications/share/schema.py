@@ -2,6 +2,7 @@ import typing
 
 import marshmallow
 from marshmallow import post_load
+from marshmallow.validate import Length
 from marshmallow.validate import OneOf
 
 from tracim_backend.app_models.validator import bool_as_int_validator
@@ -16,7 +17,7 @@ from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
 
-class SharePasswordForm(object):
+class SharePassword(object):
     def __init__(self, password: typing.Optional[str] = None):
         self.password = password
 
@@ -28,7 +29,17 @@ class SharePasswordFormSchema(marshmallow.Schema):
 
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
-        return SharePasswordForm(**data)
+        return SharePassword(**data)
+
+
+class SharePasswordBodySchema(marshmallow.Schema):
+    password = marshmallow.fields.String(
+        required=False, allow_none=True, example="8QLa$<w", validate=share_password_validator
+    )
+
+    @post_load
+    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return SharePassword(**data)
 
 
 class ShareListQuery(object):
@@ -95,7 +106,11 @@ class ShareCreationBody(object):
 
 
 class ShareCreationBodySchema(marshmallow.Schema):
-    emails = marshmallow.fields.List(marshmallow.fields.Email(validate=share_email_validator))
+    emails = marshmallow.fields.List(
+        marshmallow.fields.Email(validate=share_email_validator),
+        validate=Length(min=1),
+        required=True,
+    )
     password = marshmallow.fields.String(
         example="8QLa$<w", required=False, allow_none=True, validate=share_password_validator
     )

@@ -3,6 +3,7 @@ import typing
 
 import marshmallow
 from marshmallow import post_load
+from marshmallow.validate import Length
 from marshmallow.validate import OneOf
 
 from tracim_backend import TracimRequest
@@ -14,6 +15,9 @@ from tracim_backend.applications.upload_permissions.validators import (
 )
 from tracim_backend.applications.upload_permissions.validators import (
     upload_permission_password_validator,
+)
+from tracim_backend.applications.upload_permissions.validators import (
+    upload_username_length_validator,
 )
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import StrippedString
@@ -52,9 +56,29 @@ class UploadDataForm(object):
         self.password = password
 
 
+class UploadPermissionPasswordBody(object):
+    def __init__(self, password: typing.Optional[str] = None):
+        self.password = password
+
+
+class UploadPermissionPasswordBodySchema(marshmallow.Schema):
+    password = marshmallow.fields.String(
+        required=False,
+        allow_none=True,
+        example="8QLa$<w",
+        validate=upload_permission_password_validator,
+    )
+
+    @post_load
+    def make_body_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UploadPermissionPasswordBody(**data)
+
+
 class UploadDataFormSchema(marshmallow.Schema):
-    message = StrippedString()
-    username = StrippedString()
+    message = StrippedString(required=False, allow_none=False)
+    username = StrippedString(
+        required=True, validate=upload_username_length_validator, allow_none=False
+    )
     password = marshmallow.fields.String(
         example="8QLa$<w",
         required=False,
@@ -127,7 +151,9 @@ class UploadPermissionCreationBody(object):
 
 class UploadPermissionCreationBodySchema(marshmallow.Schema):
     emails = marshmallow.fields.List(
-        marshmallow.fields.Email(validate=upload_permission_email_validator)
+        marshmallow.fields.Email(validate=upload_permission_email_validator),
+        validate=Length(min=1),
+        required=True,
     )
     password = marshmallow.fields.String(
         example="8QLa$<w",
@@ -139,6 +165,10 @@ class UploadPermissionCreationBodySchema(marshmallow.Schema):
     @post_load
     def make_body_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return UploadPermissionCreationBody(**data)
+
+
+class UploadPermissionPublicInfoSchema(marshmallow.Schema):
+    has_password = marshmallow.fields.Boolean(required=True)
 
 
 class UploadPermissionSchema(marshmallow.Schema):

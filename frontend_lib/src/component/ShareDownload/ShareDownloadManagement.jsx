@@ -30,9 +30,9 @@ class ShareDownloadManagement extends React.Component {
   render () {
     const { props } = this
     const shareLinkList = props.shareLinkList ? props.shareLinkList : []
-    
+
     return (
-      <div className='shareDownload'>
+      <>
         <div className='shareDownload__management__header'>
           <div className='shareDownload__title'>
             {props.t('{{label}} share', {label: props.label, interpolation: {escapeValue: false}})}
@@ -55,7 +55,7 @@ class ShareDownloadManagement extends React.Component {
           }
         </div>
 
-        {shareLinkList.length > 0 && props.userRoleIdInWorkspace >= 4 &&
+        {shareLinkList.length > 0 && props.userRoleIdInWorkspace >= 2 &&
           shareLinkList.map(shareLink =>
             <ShareLink
               email={shareLink.email}
@@ -69,14 +69,10 @@ class ShareDownloadManagement extends React.Component {
           )
         }
 
-        {shareLinkList.length > 0 && props.userRoleIdInWorkspace < 4 &&
-          <div className='m-auto'>{props.t('This file has {{numberLinks}} share links', { numberLinks: props.shareLinkList.length })}</div>
-        }
-
         {shareLinkList.length <= 0 &&
           <div className='m-auto'>{props.t('No share link has been created yet')}</div>
         }
-      </div>
+      </>
     )
   }
 }

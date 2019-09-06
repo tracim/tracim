@@ -32,6 +32,7 @@ import {
   removeExtensionOfFilename,
   PAGE
 } from '../helper.js'
+import { debug } from '../debug.js'
 import {
   deleteShareLink,
   getFileContent,
@@ -58,9 +59,9 @@ class File extends React.Component {
     this.state = {
       appName: 'file',
       isVisible: true,
-      config: props.data ? props.data.config : null,
-      loggedUser: props.data ? props.data.loggedUser : null,
-      content: props.data ? props.data.content : null,
+      config: props.data ? props.data.config : debug.config,
+      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
+      content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
       externalTranslationList: [
         props.t('File'),
@@ -274,6 +275,8 @@ class File extends React.Component {
 
   loadShareLinkList = async () => {
     const { content, config } = this.state
+
+    if (this.state.loggedUser.userRoleIdInWorkspace < 2) return
 
     const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
 
@@ -629,7 +632,7 @@ class File extends React.Component {
     }))
   }
 
-  handleClickNewShare = async () => {
+  handleClickNewShare = async isPasswordActive => {
     const { state, props } = this
 
     let shareEmailList = parserStringToList(state.shareEmails)
@@ -642,35 +645,54 @@ class File extends React.Component {
     shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
 
     if (invalidEmails.length > 0 || shareEmailList === 0) {
-      this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
-    } else {
-      const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
-        state.config.apiUrl,
-        state.content.workspace_id,
-        state.content.content_id,
-        shareEmailList,
-        state.sharePassword !== '' ? state.sharePassword : null
-      ))
-
-      switch (fetchResultPostShareLinks.apiResponse.status) {
-        case 200:
-          this.setState(prev => ({
-            shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
-            shareEmails: '',
-            sharePassword: ''
-          }))
-          break
-        case 400:
-          switch (fetchResultPostShareLinks.body.code) {
-            case 2001:
-              this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
-              break
-            default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
-          }
-          break
-        default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
-      }
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: <div>{props.t('The following emails are not valid:')}<br />{invalidEmails.join(', ')}</div>,
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return false
     }
+
+    if (isPasswordActive && state.sharePassword.length < 6) {
+      this.sendGlobalFlashMessage(props.t('The password is too short (minimum 6 characters)'))
+      return false
+    }
+
+    if (isPasswordActive && state.sharePassword.length > 512) {
+      this.sendGlobalFlashMessage(props.t('The password is too long (maximum 512 characters)'))
+      return false
+    }
+
+    const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      state.content.content_id,
+      shareEmailList,
+      isPasswordActive ? state.sharePassword : null
+    ))
+
+    switch (fetchResultPostShareLinks.apiResponse.status) {
+      case 200:
+        this.setState(prev => ({
+          shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
+          shareEmails: '',
+          sharePassword: ''
+        }))
+        return true
+      case 400:
+        switch (fetchResultPostShareLinks.body.code) {
+          case 2001:
+            this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
+            break
+          default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+        }
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+    }
+    return false
   }
 
   handleChangeEmails = e => this.setState({ shareEmails: e.target.value })
@@ -883,12 +905,12 @@ class File extends React.Component {
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
-            menuItemList={[
-              {
-                id: 'timeline',
-                label: props.t('Timeline'),
-                icon: 'fa-history',
-                children: <Timeline
+            menuItemList={[{
+              id: 'timeline',
+              label: props.t('Timeline'),
+              icon: 'fa-history',
+              children: (
+                <Timeline
                   customClass={`${state.config.slug}__contentpage`}
                   customColor={state.config.hexcolor}
                   loggedUser={state.loggedUser}
@@ -902,44 +924,56 @@ class File extends React.Component {
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== MODE.REVISION}
+                  key={'Timeline'}
                 />
-              },
-              {
+              )
+            }, ...(state.loggedUser.userRoleIdInWorkspace > 1
+              ? [{
                 id: 'share',
                 label: props.t('Share'),
                 icon: 'fa-share-alt',
-                children: <ShareDownload
-                  label={props.t(state.config.label)}
-                  hexcolor={state.config.hexcolor}
-                  shareEmails={state.shareEmails}
-                  onChangeEmails={this.handleChangeEmails}
-                  onKeyDownEnter={this.handleKeyDownEnter}
-                  sharePassword={state.sharePassword}
-                  onChangePassword={this.handleChangePassword}
-                  shareLinkList={state.shareLinkList}
-                  onClickDeleteShareLink={this.handleClickDeleteShareLink}
-                  onClickNewShare={this.handleClickNewShare}
-                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-                />
-              },
-              {
-                id: 'properties',
-                label: props.t('Properties'),
-                icon: 'fa-info-circle',
-                children: <FileProperties
+                children: (
+                  <ShareDownload
+                    label={props.t(state.config.label)}
+                    hexcolor={state.config.hexcolor}
+                    shareEmails={state.shareEmails}
+                    onChangeEmails={this.handleChangeEmails}
+                    onKeyDownEnter={this.handleKeyDownEnter}
+                    sharePassword={state.sharePassword}
+                    onChangePassword={this.handleChangePassword}
+                    shareLinkList={state.shareLinkList}
+                    onClickDeleteShareLink={this.handleClickDeleteShareLink}
+                    onClickNewShare={this.handleClickNewShare}
+                    userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                    emailNotifActivated={state.config.system.config.email_notification_activated}
+                    key={'ShareDownload'}
+                  />
+                )
+              }]
+              : []
+            ), {
+              id: 'properties',
+              label: props.t('Properties'),
+              icon: 'fa-info-circle',
+              children: (
+                <FileProperties
                   color={state.config.hexcolor}
                   fileType={state.content.file_extension}
                   fileSize={displayFileSize(state.content.size)}
                   filePageNb={state.content.page_nb}
-                  creationDate={displayDistanceDate(state.content.created, state.loggedUser.lang)}
+                  activesShares={state.content.actives_shares}
+                  creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                  creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
                   lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
+                  lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
                   description={state.content.raw_content}
                   displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
                   disableChangeDescription={!state.content.is_editable}
                   onClickValidateNewDescription={this.handleClickValidateNewDescription}
+                  key={'FileProperties'}
                 />
-              }
-            ]}
+              )
+            }]}
           />
         </PopinFixedContent>
       </PopinFixed>

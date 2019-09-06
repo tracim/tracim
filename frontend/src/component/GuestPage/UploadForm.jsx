@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
+import { isMobile } from 'react-device-detect'
 import InputGroupText from '../common/Input/InputGroupText.jsx'
 import InputTextArea from '../common/Input/InputTextArea.jsx'
 import { FileDropzone, displayFileSize } from 'tracim_frontend_lib'
@@ -34,36 +35,39 @@ class UploadForm extends React.Component {
             onChange={props.onChangeFullName}
           />
 
-          <div className='d-flex'>
-            <InputGroupText
-              parentClassName='guestupload__card__form__groupepw'
-              customClass=''
-              icon='fa-lock'
-              type='password'
-              placeHolder={props.t('Password')}
-              invalidMsg={props.t('Invalid password')}
-              isInvalid={props.guestPassword.isInvalid}
-              value={props.guestPassword.value}
-              onChange={props.onChangePassword}
-            />
+          {props.hasPassword &&
+            <div className='d-flex'>
+              <InputGroupText
+                parentClassName='guestupload__card__form__groupepw'
+                customClass=''
+                icon='fa-lock'
+                type='password'
+                placeHolder={props.t('Password')}
+                invalidMsg={props.t('Invalid password')}
+                isInvalid={props.guestPassword.isInvalid}
+                value={props.guestPassword.value}
+                onChange={props.onChangePassword}
+              />
 
-            <button
-              type='button'
-              className='guestupload__card__form__groupepw__question'
-              id='popoverPasswordInfo'
-            >
-              <i className='fa fa-fw fa-question-circle' />
-            </button>
+              <button
+                type='button'
+                className='guestupload__card__form__groupepw__question'
+                id='popoverPasswordInfo'
+              >
+                <i className='fa fa-fw fa-question-circle' />
+              </button>
 
-            <Popover
-              placement='bottom'
-              isOpen={this.state.popoverPasswordInfoOpen}
-              target='popoverPasswordInfo'
-              toggle={this.handleTogglePopoverPasswordInfo}
-            >
-              <PopoverBody>{props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}</PopoverBody>
-            </Popover>
-          </div>
+              <Popover
+                placement='bottom'
+                isOpen={this.state.popoverPasswordInfoOpen}
+                target='popoverPasswordInfo'
+                toggle={this.handleTogglePopoverPasswordInfo}
+                trigger={isMobile ? 'focus' : 'hover'}
+              >
+                <PopoverBody>{props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}</PopoverBody>
+              </Popover>
+            </div>
+          }
 
           <InputTextArea
             placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}

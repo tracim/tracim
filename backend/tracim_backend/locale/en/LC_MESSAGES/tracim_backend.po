@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-08-22 16:49+0200\n"
+"POT-Creation-Date: 2019-09-06 10:05+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -29,7 +29,7 @@ msgid "[{website_title}] A password reset has been requested"
 msgstr ""
 
 #: tracim_backend/app_models/contents.py:45
-msgid "Open"
+msgid "Opened"
 msgstr ""
 
 #: tracim_backend/app_models/contents.py:53
@@ -53,16 +53,16 @@ msgstr ""
 #: tracim_backend/applications/share/config.py:22
 msgid ""
 "[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
-"users"
+"people"
 msgstr ""
 
 #: tracim_backend/applications/upload_permissions/config.py:14
-msgid "{emitter_name} allowed you to upload files on \"{website_title}\""
+msgid "{emitter_name} invited you to upload files on \"{website_title}\""
 msgstr ""
 
 #: tracim_backend/applications/upload_permissions/config.py:21
 msgid ""
-"[{website_title}] You allowed {nb_receivers} users to upload files on "
+"[{website_title}] You invited {nb_receivers} people to upload files on "
 "\"{workspace_name}\""
 msgstr ""
 
@@ -92,11 +92,11 @@ msgstr ""
 msgid "New folder {0}"
 msgstr ""
 
-#: tracim_backend/lib/core/workspace.py:333
+#: tracim_backend/lib/core/workspace.py:334
 msgid "Workspace"
 msgstr "Shared space"
 
-#: tracim_backend/lib/core/workspace.py:336
+#: tracim_backend/lib/core/workspace.py:337
 msgid "Workspace {}"
 msgstr "Shared space {}"
 
@@ -299,8 +299,8 @@ msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:2
 msgid ""
-"You allowed the upload in this shared space <a "
-"href={sharedspace_url}>{sharedspace_name}</a> with:"
+"You have invited {nb_receivers} people to upload files in this shared "
+"space <a href={sharedspace_url}>{sharedspace_name}</a>:"
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:10
@@ -310,7 +310,7 @@ msgid ""
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:6
-msgid "I allowed you to upload files here:"
+msgid "I invited you to upload files here:"
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7

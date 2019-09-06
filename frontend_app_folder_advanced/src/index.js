@@ -12,6 +12,7 @@ const appInterface = {
   isRendered: false,
   renderAppFeature: data => {
     // if loggedUser isn't at least content manager, do not open the advanced folder app
+    console.log(data)
     if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace < 4) return
 
     return ReactDOM.render(

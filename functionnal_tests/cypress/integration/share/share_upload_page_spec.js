@@ -44,7 +44,7 @@ describe('Open the share folder advanced', () => {
 
     describe('and clicking on the Cancel button',() => {
       it('Should redirect to share page',() => {
-        cy.get('.share_folder_advanced__content__btnupload').click()
+        cy.get('.share_folder_advanced__content__btnupload').should('be.visible').click()
         cy.get('.newUpload__btnCancel').click()
         cy.get('.share_folder_advanced__content').contains('Import authorizations').should('be.visible')
       })

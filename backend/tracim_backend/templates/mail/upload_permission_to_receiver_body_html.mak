@@ -3,7 +3,7 @@
 %else:
     <p>${_('Hello,')}</p>
 %endif
-<p>${_( 'I allowed you to upload files here:')|n}</p>
+<p>${_( 'I invited you to upload files here:')|n}</p>
 <a href="${upload_permission.url}" id='call-to-action-button'>${_('Upload files')}</a>
 
 %if upload_permission_password_enabled:
