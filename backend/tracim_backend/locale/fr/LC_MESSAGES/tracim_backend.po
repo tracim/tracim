@@ -341,7 +341,7 @@ msgid ""
 "You have invited {nb_receivers} people to upload files in this shared "
 "space <a href={sharedspace_url}>{sharedspace_name}</a>:"
 msgstr ""
-"Vous avez invité {nb_receivers} personnes à téléverser des fichiers dans "
+"Vous avez invité {nb_receivers} personne(s) à téléverser des fichiers dans "
 "cet espace partagé <a href={sharedspace_url}>{sharedspace_name}</a> :"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:10
