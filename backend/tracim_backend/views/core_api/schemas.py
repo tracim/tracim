@@ -799,6 +799,7 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         format=DATETIME_FORMAT, description="Workspace creation date"
     )
     owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
+    size = marshmallow.fields.Int()
 
     class Meta:
         description = "Full workspace informations"
@@ -1159,3 +1160,5 @@ class ConfigSchema(marshmallow.Schema):
         CollaborativeDocumentEditionConfigSchema(), allow_none=True
     )
     content_length_file_size_limit = marshmallow.fields.Integer()
+    workspace_size_limit = marshmallow.fields.Integer()
+    workspaces_number_per_user_limit = marshmallow.fields.Integer()

@@ -16,5 +16,7 @@
   "Error while loading tracim's content type list": "Error while loading tracim's content type list",
   "Error while loading share links list": "Error while loading share links list",
   "Error in the URL": "Error in the URL",
-  "Error while deleting share link": "Error while deleting share link"
+  "Error while deleting share link": "Error while deleting share link",
+  "Protect by password": "Protect by password",
+  "Cancel protection by password": "Cancel protection by password"
 }

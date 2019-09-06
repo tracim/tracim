@@ -14,6 +14,7 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
+from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
@@ -80,6 +81,7 @@ class FileController(Controller):
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
     @check_right(can_create_file)
     @hapic.input_path(WorkspaceIdPathSchema())
@@ -103,7 +105,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        api.check_upload_size(request.content_length)
+        api.check_upload_size(request.content_length, request.current_workspace)
         _file = hapic_data.files.files
         parent_id = hapic_data.forms.parent_id
         parent = None  # type: typing.Optional['Content']
@@ -136,6 +138,7 @@ class FileController(Controller):
     @check_right(is_file_content)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(FilePathSchema())
     @hapic.input_files(SimpleFileSchema())
@@ -160,8 +163,8 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        api.check_upload_size(request.content_length)
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        api.check_upload_size(request.content_length, content.workspace)
         _file = hapic_data.files.files
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_file_data(

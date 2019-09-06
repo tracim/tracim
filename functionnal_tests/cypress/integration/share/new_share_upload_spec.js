@@ -47,12 +47,20 @@ describe('Open the share folder advanced', () => {
       })
     })
 
-    describe('and writing a password',() => {
-      describe('and clicking at see password',() => {
-        it('Should show the password',() => {
-          cy.get('.newUpload__password__input').type('Password')
-          cy.get('[data-cy=seePassword]').click()
-          cy.get('.newUpload__password__input').should('have.value','Password')
+    describe('and clicking at Protect by password',() => {
+      it('Should show the password input', () => {
+        cy.get('.newUpload__password__link').click()
+        cy.get('.newUpload__password__wrapper').should('be.visible')
+      })
+
+      describe('and writing a password', () => {
+        describe('and clicking at see password', () => {
+          it('Should show the password', () => {
+            cy.get('.newUpload__password__link').click()
+            cy.get('.newUpload__password__input').type('Password')
+            cy.get('[data-cy=seePassword]').click()
+            cy.get('.newUpload__password__input').should('have.value', 'Password')
+          })
         })
       })
     })
