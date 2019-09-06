@@ -40,7 +40,7 @@ describe('Dashboard button list', () => {
 
     describe('if agenda is not enabled', () => {
       it('should show button explore content but not agenda', () => {
-        cy.createRandomUser().then( user => {
+        cy.createRandomUser('administrators').then( user => {
           cy.addUserToWorkspace(user.user_id, workspaceTest.workspace_id, 'workspace-manager')
           cy.login(user)
           cy.enableAgenda(workspaceTest, false)
