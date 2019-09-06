@@ -1,5 +1,5 @@
 export const open = {
-  label: 'Open',
+  label: 'Opened',
   slug: 'open',
   faIcon: 'square-o',
   hexcolor: '#3f52e3',

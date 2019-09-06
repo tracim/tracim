@@ -180,6 +180,9 @@ def webdav_put_new_test_file_helper(
     # This part id a reproduction of
     # wsgidav.request_server.RequestServer#doPUT
 
+    # INFO - G.M - 2019-07-11 - set content_length to correct value according to file_content
+    environ["CONTENT_LENGTH"] = len(file_content)
+
     # Grab parent folder where create file
     parentRes = provider.getResourceInst(wsgidav_util.getUriParent(file_path), environ)
     assert parentRes, "we should found folder for {0}".format(file_path)

@@ -5,16 +5,15 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import DownloadForm from '../component/GuestPage/DownloadForm.jsx'
-import { getFileInfos } from '../action-creator.async.js'
+import {
+  getFileInfos
+} from '../action-creator.async.js'
 import {
   displayFileSize,
   handleFetchResult,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
-import {
-  FETCH_CONFIG,
-  PAGE
-} from '../helper.js'
+import { PAGE } from '../helper.js'
 
 class GuestDownload extends React.Component {
   constructor (props) {
@@ -57,7 +56,7 @@ class GuestDownload extends React.Component {
         props.history.push(PAGE.LOGIN)
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading file infos'))
+        this.sendGlobalFlashMessage(props.t('Error while loading file information'))
         props.history.push(PAGE.LOGIN)
     }
   }
@@ -72,10 +71,6 @@ class GuestDownload extends React.Component {
   })
 
   handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })
-
-  getDownloadUrl = () => {
-    return `${FETCH_CONFIG.apiUrl}/public/guest-download/${this.props.match.params.token}/${this.state.file.fileName}`
-  }
 
   render () {
     const { props, state } = this
@@ -93,7 +88,9 @@ class GuestDownload extends React.Component {
               file={state.file}
               guestPassword={state.guestPassword}
               onChangePassword={this.handleChangePassword}
-              onDownloadFile={this.getDownloadUrl}
+              token={props.match.params.token}
+              downloadUrl={`/api/v2/public/guest-download/${props.match.params.token}/${state.file.fileName}`}
+              onDownloadSubmitted={this.handleDownloadSubmitted}
             />
           </CardBody>
         </Card>

@@ -12,7 +12,8 @@ import {
   PAGE,
   ROLE_OBJECT,
   DRAG_AND_DROP,
-  sortWorkspaceContents
+  sortWorkspaceContents,
+  SHARE_FOLDER_ID
 } from '../../helper.js'
 
 require('./Folder.styl')
@@ -28,6 +29,8 @@ class Folder extends React.Component {
       if (props.folderData.isOpen) return 'fa-folder-open-o'
       return 'fa-folder-o'
     }
+
+    if (props.folderData.parentId === SHARE_FOLDER_ID) return 'fa-times-circle primaryColorFont'
 
     const isHoveringSelfParent = props.draggedItem && props.draggedItem.parentId === props.folderData.id
     if (isHoveringSelfParent) return 'fa-times-circle primaryColorFont'
@@ -93,21 +96,21 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__button'>
-            {props.userRoleIdInWorkspace >= 2 &&
+            {props.userRoleIdInWorkspace >= 2 && (
               <div className='folder__header__button__addbtn'>
-                {folderAvailableApp.length > 0 && (
+                {props.showCreateContentButton && folderAvailableApp.length > 0 && (
                   <div title={props.t('Create in folder')}>
                     <button
-                      className={`
-                        folder__header__button__addbtn__text
-                        btn
-                        outlineTextBtn
-                        primaryColorBorder
-                        primaryColorBgHover
-                        primaryColorBorderDarkenHover
-                        dropdown-toggle
-                        ${props.userRoleIdInWorkspace === 2 ? 'no-margin-right' : ''}
-                      `}
+                      className={classnames(
+                        'folder__header__button__addbtn__text',
+                        'btn',
+                        'outlineTextBtn',
+                        'primaryColorBorder',
+                        'primaryColorBgHover',
+                        'primaryColorBorderDarkenHover',
+                        'dropdown-toggle',
+                        props.userRoleIdInWorkspace === 2 ? 'no-margin-right' : ''
+                      )}
                       type='button'
                       id='dropdownMenuButton'
                       data-toggle='dropdown'
@@ -149,7 +152,7 @@ class Folder extends React.Component {
                   )}
                 </div>
               </div>
-            }
+            )}
           </div>
 
           <div className='folder__header__status' />
@@ -271,4 +274,8 @@ Folder.propTypes = {
   app: PropTypes.array,
   onClickFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired
+}
+
+Folder.defaultProps = {
+  showCreateContentButton: true
 }

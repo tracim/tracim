@@ -254,4 +254,5 @@ stages:
   - static-tests
   - quick-tests
   - backend
+  - frontend
   - functional

@@ -33,7 +33,7 @@ msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] Demande de réinitialisation de mot de passe"
 
 #: tracim_backend/app_models/contents.py:45
-msgid "Open"
+msgid "Opened"
 msgstr "Ouvert"
 
 #: tracim_backend/app_models/contents.py:53
@@ -104,11 +104,11 @@ msgstr "Nouveau dossier"
 msgid "New folder {0}"
 msgstr "Nouveau dossier {0}"
 
-#: tracim_backend/lib/core/workspace.py:333
+#: tracim_backend/lib/core/workspace.py:334
 msgid "Workspace"
 msgstr "Espace partagé"
 
-#: tracim_backend/lib/core/workspace.py:336
+#: tracim_backend/lib/core/workspace.py:337
 msgid "Workspace {}"
 msgstr "Espace partagé {0}"
 
@@ -300,7 +300,7 @@ msgstr "Bonjour,"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:6
 msgid "I share a file with you, download it here:"
-msgstr "J'ai partagé un fichier avec vous, télécharger le ici :"
+msgstr "J'ai partagé un fichier avec vous, téléchargez le ici :"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:8
 msgid ""

@@ -233,6 +233,45 @@ class TestPrivateShareEndpoints(object):
         content = res.json_body
         assert len(content) == 3
 
+    def test_api__add_share__err_400__empty_email_list(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.save(test_file)
+        share_api = share_lib_factory.get()  # type: ShareLib
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"emails": [], "password": "123456"}
+        res = web_testapp.post_json(
+            "/api/v2/workspaces/{}/contents/{}/shares".format(
+                workspace.workspace_id, test_file.content_id
+            ),
+            status=400,
+            params=params,
+        )
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+
     def test_api__add_share__err_400__not_shareable_content(
         self,
         workspace_api_factory,
@@ -881,6 +920,299 @@ class TestGuestDownloadShareEndpoints(object):
         transaction.commit()
         web_testapp.post(
             "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+                share_token=content_share.share_token
+            ),
+            params={"password": "987654321"},
+            status=403,
+        )
+
+    def test_api__guest_download_check__ok_204__nominal_case(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.save(test_file)
+        share_api = share_lib_factory.get()  # type: ShareLib
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
+        content_shares = share_api.get_content_shares(test_file)
+        assert len(content_shares) == 1
+        content_share = content_shares[0]
+        transaction.commit()
+        web_testapp.post_json(
+            "/api/v2/public/guest-download/{share_token}/check".format(
+                share_token=content_share.share_token
+            ),
+            status=204,
+        )
+
+    def test_api__guest_download_check__err_400__content_share_not_found(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        res = web_testapp.post_json(
+            "/api/v2/public/guest-download/{share_token}/check".format(share_token="invalid-token"),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
+
+    def test_api__guest_download_check__err_400__deleted__file(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.delete(test_file)
+        content_api.save(test_file)
+        share_api = share_lib_factory.get()  # type: ShareLib
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
+        content_shares = share_api.get_content_shares(test_file)
+        assert len(content_shares) == 1
+        content_share = content_shares[0]
+        transaction.commit()
+        res = web_testapp.post_json(
+            "/api/v2/public/guest-download/{share_token}/check".format(
+                share_token=content_share.share_token
+            ),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
+
+    def test_api__guest_download_check__err_400__archived__file(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.archive(test_file)
+        content_api.save(test_file)
+        share_api = share_lib_factory.get()  # type: ShareLib
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
+        content_shares = share_api.get_content_shares(test_file)
+        assert len(content_shares) == 1
+        content_share = content_shares[0]
+        transaction.commit()
+        res = web_testapp.post_json(
+            "/api/v2/public/guest-download/{share_token}/check".format(
+                share_token=content_share.share_token
+            ),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
+
+    def test_api__guest_download_check__err_400__not_shareable_type(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_folder = content_api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="Test folder",
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.save(test_folder)
+        share_api = share_lib_factory.get()  # type: ShareLib
+        share_api.share_content(test_folder, emails=["thissharewill@notbe.presentinresponse"])
+        content_shares = share_api.get_content_shares(test_folder)
+        assert len(content_shares) == 1
+        content_share = content_shares[0]
+        transaction.commit()
+        res = web_testapp.post_json(
+            "/api/v2/public/guest-download/{share_token}/check".format(
+                share_token=content_share.share_token
+            ),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
+
+    def test_api__guest_download_check__ok_200__with_password(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.save(test_file)
+        share_api = share_lib_factory.get()  # type: ShareLib
+        share_api.share_content(
+            test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
+        )
+        content_shares = share_api.get_content_shares(test_file)
+        assert len(content_shares) == 1
+        content_share = content_shares[0]
+        transaction.commit()
+        web_testapp.post_json(
+            "/api/v2/public/guest-download/{share_token}/check".format(
+                share_token=content_share.share_token
+            ),
+            params={"password": "123456"},
+            status=204,
+        )
+
+    def test_api__guest_download_check__err_403__no_password(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.save(test_file)
+        share_api = share_lib_factory.get()  # type: ShareLib
+        share_api.share_content(
+            test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
+        )
+        content_shares = share_api.get_content_shares(test_file)
+        assert len(content_shares) == 1
+        content_share = content_shares[0]
+        transaction.commit()
+        web_testapp.post_json(
+            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+                share_token=content_share.share_token
+            ),
+            status=403,
+        )
+
+    def test_api__guest_download_check__err_403__wrong_password(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.save(test_file)
+        share_api = share_lib_factory.get()  # type: ShareLib
+        share_api.share_content(
+            test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
+        )
+        content_shares = share_api.get_content_shares(test_file)
+        assert len(content_shares) == 1
+        content_share = content_shares[0]
+        transaction.commit()
+        web_testapp.post_json(
+            "/api/v2/public/guest-download/{share_token}/check".format(
                 share_token=content_share.share_token
             ),
             params={"password": "987654321"},
