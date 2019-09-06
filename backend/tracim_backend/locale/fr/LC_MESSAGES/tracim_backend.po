@@ -300,7 +300,7 @@ msgstr "Bonjour,"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:6
 msgid "I share a file with you, download it here:"
-msgstr "J'ai partagé un fichier avec vous, télécharger le ici:"
+msgstr "J'ai partagé un fichier avec vous, téléchargez le ici:"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:8
 msgid ""
