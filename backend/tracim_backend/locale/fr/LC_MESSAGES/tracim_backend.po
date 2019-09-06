@@ -66,7 +66,7 @@ msgstr ""
 
 #: tracim_backend/applications/upload_permissions/config.py:14
 msgid "{emitter_name} invited you to upload files on \"{website_title}\""
-msgstr "{emitter_name} vous a invité à téléverser fichiers sur \"{website_title}\""
+msgstr "{emitter_name} vous a invité à téléverser des fichiers sur \"{website_title}\""
 
 #: tracim_backend/applications/upload_permissions/config.py:21
 msgid ""
@@ -300,7 +300,7 @@ msgstr "Bonjour,"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:6
 msgid "I share a file with you, download it here:"
-msgstr "J'ai partagé un fichier avec vous, télécharger le ici:"
+msgstr "J'ai partagé un fichier avec vous, télécharger le ici :"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:8
 msgid ""
@@ -354,7 +354,7 @@ msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:6
 msgid "I invited you to upload files here:"
-msgstr "Je vous ai invité à téléverser des fichiers ici:"
+msgstr "Je vous ai invité à téléverser des fichiers ici :"
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
 msgid "Upload files"
