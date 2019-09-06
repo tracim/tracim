@@ -24,15 +24,8 @@ describe('Dashboard button list', () => {
 
   describe('as a reader', () => {
     describe('if agenda is enabled', () => {
-      beforeEach(() => {
-        cy.createRandomUser().then( user => {
-          cy.addUserToWorkspace(user.user_id, workspaceTest.workspace_id, 'reader')
-          cy.login(user)
-          cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceTest.workspace_id}})
-        })
-      })
-
       it('should show button agenda and explore content', () => {
+        cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceTest.workspace_id}})
         cy.get('[data-cy=contentTypeBtn_agenda]')
         cy.get('[data-cy="contentTypeBtn_contents/all"]')
       })
@@ -40,11 +33,7 @@ describe('Dashboard button list', () => {
 
     describe('if agenda is not enabled', () => {
       it('should show button explore content but not agenda', () => {
-        cy.createRandomUser('administrators').then( user => {
-          cy.addUserToWorkspace(user.user_id, workspaceTest.workspace_id, 'workspace-manager')
-          cy.login(user)
-          cy.enableAgenda(workspaceTest, false)
-        })
+        cy.enableAgenda(workspaceTest, false)
         cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: workspaceTest.workspace_id}})
         cy.get('[data-cy=contentTypeBtn_agenda]').should('not.exist')
         cy.get('[data-cy="contentTypeBtn_contents/all"]')
