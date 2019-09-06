@@ -61,7 +61,7 @@ export const putAgendaEnabled = (apiUrl, workspace, agendaEnabled) =>
 export const putUploadEnabled = (apiUrl, workspace, uploadEnabled) =>
   fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
     credentials: 'include',
-    headers: {...FETCH_CONFIG.headers},
+    headers: { ...FETCH_CONFIG.headers },
     method: 'PUT',
     body: JSON.stringify({
       label: workspace.label,
@@ -73,7 +73,7 @@ export const putUploadEnabled = (apiUrl, workspace, uploadEnabled) =>
 export const putDownloadEnabled = (apiUrl, workspace, downloadEnabled) =>
   fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
     credentials: 'include',
-    headers: {...FETCH_CONFIG.headers},
+    headers: { ...FETCH_CONFIG.headers },
     method: 'PUT',
     body: JSON.stringify({
       label: workspace.label,

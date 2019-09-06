@@ -248,7 +248,7 @@ class WorkspaceAdvanced extends React.Component {
     const oldUploadEnabledValue = state.content.public_upload_enabled
     const newUploadEnabledValue = !state.content.public_upload_enabled
 
-    this.setState(prev => ({content: {...prev.content, public_upload_enabled: newUploadEnabledValue}}))
+    this.setState(prev => ({ content: { ...prev.content, public_upload_enabled: newUploadEnabledValue } }))
     const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))
 
     switch (fetchToggleUploadEnabled.apiResponse.status) {
@@ -260,7 +260,7 @@ class WorkspaceAdvanced extends React.Component {
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
         break
       default:
-        this.setState(prev => ({content: {...prev.content, public_upload_enabled: oldUploadEnabledValue}}))
+        this.setState(prev => ({ content: { ...prev.content, public_upload_enabled: oldUploadEnabledValue } }))
         this.sendGlobalFlashMessage(
           newUploadEnabledValue
             ? props.t('Error while activating upload')
@@ -275,7 +275,7 @@ class WorkspaceAdvanced extends React.Component {
     const oldDownloadEnabledValue = state.content.public_download_enabled
     const newDownloadEnabledValue = !state.content.public_download_enabled
 
-    this.setState(prev => ({content: {...prev.content, public_download_enabled: newDownloadEnabledValue}}))
+    this.setState(prev => ({ content: { ...prev.content, public_download_enabled: newDownloadEnabledValue } }))
     const fetchToggleDownloadEnabled = await handleFetchResult(await putDownloadEnabled(state.config.apiUrl, state.content, newDownloadEnabledValue))
 
     switch (fetchToggleDownloadEnabled.apiResponse.status) {
@@ -287,7 +287,7 @@ class WorkspaceAdvanced extends React.Component {
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
         break
       default:
-        this.setState(prev => ({content: {...prev.content, public_download_enabled: oldDownloadEnabledValue}}))
+        this.setState(prev => ({ content: { ...prev.content, public_download_enabled: oldDownloadEnabledValue } }))
         this.sendGlobalFlashMessage(
           newDownloadEnabledValue
             ? props.t('Error while activating download')
