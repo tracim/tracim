@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-06 10:05+0200\n"
+"POT-Creation-Date: 2019-09-06 13:53+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -18,17 +18,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: tracim_backend/config.py:346
+#: tracim_backend/config.py:356
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 msgstr ""
 
-#: tracim_backend/config.py:354
+#: tracim_backend/config.py:364
 msgid "[{website_title}] Someone created an account for you"
 msgstr "[{website_title}] Quelqu'un vous a créé un compte"
 
-#: tracim_backend/config.py:363
+#: tracim_backend/config.py:373
 msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] Demande de réinitialisation de mot de passe"
 
@@ -66,15 +66,17 @@ msgstr ""
 
 #: tracim_backend/applications/upload_permissions/config.py:14
 msgid "{emitter_name} invited you to upload files on \"{website_title}\""
-msgstr "{emitter_name} vous a invité à téléverser des fichiers sur \"{website_title}\""
+msgstr ""
+"{emitter_name} vous a invité à téléverser des fichiers sur "
+"\"{website_title}\""
 
 #: tracim_backend/applications/upload_permissions/config.py:21
 msgid ""
 "[{website_title}] You invited {nb_receivers} people to upload files on "
 "\"{workspace_name}\""
 msgstr ""
-"[{website_title}] Vous avez invité {nb_receivers} personne(s) à téléverser "
-"des fichiers dans \"{workspace_name}\""
+"[{website_title}] Vous avez invité {nb_receivers} personne(s) à "
+"téléverser des fichiers dans \"{workspace_name}\""
 
 #: tracim_backend/applications/upload_permissions/config.py:30
 msgid ""
@@ -84,31 +86,31 @@ msgstr ""
 "[{website_title}] {uploader_username} a partagé {nb_uploaded_contents} "
 "fichiers dans \"{workspace_name}\""
 
-#: tracim_backend/applications/upload_permissions/lib.py:247
+#: tracim_backend/applications/upload_permissions/lib.py:249
 msgid "Files uploaded by {username} on {date}"
 msgstr "Fichiers téléchargés par {username} le {date}"
 
-#: tracim_backend/applications/upload_permissions/lib.py:260
+#: tracim_backend/applications/upload_permissions/lib.py:262
 msgid "Message from {username}: {message}"
-msgstr "Message de {username}: {message}"
+msgstr "Message de {username} : {message}"
 
-#: tracim_backend/applications/upload_permissions/lib.py:264
+#: tracim_backend/applications/upload_permissions/lib.py:266
 msgid "Uploaded by {username}."
 msgstr "Téléversé par {username}."
 
-#: tracim_backend/lib/core/content.py:2241
+#: tracim_backend/lib/core/content.py:2270
 msgid "New folder"
 msgstr "Nouveau dossier"
 
-#: tracim_backend/lib/core/content.py:2246
+#: tracim_backend/lib/core/content.py:2275
 msgid "New folder {0}"
 msgstr "Nouveau dossier {0}"
 
-#: tracim_backend/lib/core/workspace.py:334
+#: tracim_backend/lib/core/workspace.py:357
 msgid "Workspace"
 msgstr "Espace partagé"
 
-#: tracim_backend/lib/core/workspace.py:337
+#: tracim_backend/lib/core/workspace.py:360
 msgid "Workspace {}"
 msgstr "Espace partagé {0}"
 
@@ -204,14 +206,14 @@ msgstr ""
 "de supprimer cet email dès que vous êtes connecté."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:18
-#: tracim_backend/templates/mail/new_upload_event_body_html.mak:9
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:13
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:13
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:13
 msgid "Enjoy your day :)"
 msgstr "Bonne journée :)"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:19
-#: tracim_backend/templates/mail/new_upload_event_body_html.mak:10
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:14
 #: tracim_backend/templates/mail/reset_password_body_html.mak:16
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:14
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:14
@@ -219,7 +221,7 @@ msgid "Suricat', your digital assistant"
 msgstr "Suricate, votre assistant numérique"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:23
-#: tracim_backend/templates/mail/new_upload_event_body_html.mak:14
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:18
 #: tracim_backend/templates/mail/reset_password_body_html.mak:20
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:18
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:18
@@ -227,7 +229,7 @@ msgid "Suricat', the bot"
 msgstr "Suricate, le robot"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:26
-#: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
 #: tracim_backend/templates/mail/reset_password_body_html.mak:23
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:29
@@ -245,6 +247,10 @@ msgstr ""
 "{username}(<a href=\"{email_link}\">{email}</a>) a partagé un ou "
 "plusieurs fichiers avec vous dans cet espace partagé : <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
+
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:9
+msgid "Message:"
+msgstr "Message :"
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:4
 msgid ""
@@ -341,8 +347,9 @@ msgid ""
 "You have invited {nb_receivers} people to upload files in this shared "
 "space <a href={sharedspace_url}>{sharedspace_name}</a>:"
 msgstr ""
-"Vous avez invité {nb_receivers} personne(s) à téléverser des fichiers dans "
-"cet espace partagé <a href={sharedspace_url}>{sharedspace_name}</a> :"
+"Vous avez invité {nb_receivers} personne(s) à téléverser des fichiers "
+"dans cet espace partagé <a href={sharedspace_url}>{sharedspace_name}</a> "
+":"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:10
 msgid ""
