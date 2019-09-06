@@ -286,10 +286,10 @@ email.notification.reply_to.email = reply+{content_id}@trac.im
 email.notification.references.email = thread+{content_id}@trac.im
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
 email.notification.created_account.subject = [{website_title}] Someone created an account for you
-email.notification.share_content_to_emitter.subject = [{website_title}] You shared "{content_filename}" with {nb_receivers} users
+email.notification.share_content_to_emitter.subject = [{website_title}] You shared "{content_filename}" with {nb_receivers} people
 email.notification.share_content_to_receiver.subject = [{website_title}] {emitter_name} shared the file "{content_filename}" with you
-email.notification.upload_permission_to_emitter.subject = [{website_title}] You allowed {nb_receivers} users to upload files on "{workspace_name}"
-email.notification.upload_permission_to_receiver.subject = {emitter_name} allowed you to upload files on "{website_title}"
+email.notification.upload_permission_to_emitter.subject = [{website_title}] You invited {nb_receivers} people to upload files on "{workspace_name}"
+email.notification.upload_permission_to_receiver.subject = {emitter_name} invited you to upload files on "{website_title}"
 
 ### Templates ###
 email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak

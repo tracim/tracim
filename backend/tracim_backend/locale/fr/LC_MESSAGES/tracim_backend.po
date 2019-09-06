@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-08-22 16:49+0200\n"
+"POT-Creation-Date: 2019-09-06 10:05+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -59,23 +59,22 @@ msgstr ""
 #: tracim_backend/applications/share/config.py:22
 msgid ""
 "[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
-"users"
+"people"
 msgstr ""
 "[{website_title}] Vous avez partagé  \"{content_filename}\" avec "
-"{nb_receivers} utilisateurs"
+"{nb_receivers} personnes"
 
 #: tracim_backend/applications/upload_permissions/config.py:14
-msgid "{emitter_name} allowed you to upload files on \"{website_title}\""
-msgstr ""
-"{emitter_name} vous a autorisé à téléverser fichiers sur \"{website_title}\""
+msgid "{emitter_name} invited you to upload files on \"{website_title}\""
+msgstr "{emitter_name} vous a invité à téléverser fichiers sur \"{website_title}\""
 
 #: tracim_backend/applications/upload_permissions/config.py:21
 msgid ""
-"[{website_title}] You allowed {nb_receivers} users to upload files on "
+"[{website_title}] You invited {nb_receivers} people to upload files on "
 "\"{workspace_name}\""
 msgstr ""
-"[{website_title}] Vous avez autorisé {nb_receivers} utilisateurs à "
-"téléverser des fichiers dans \"{workspace_name}\""
+"[{website_title}] Vous avez invité {nb_receivers} personnes à téléverser "
+"des fichiers dans \"{workspace_name}\""
 
 #: tracim_backend/applications/upload_permissions/config.py:30
 msgid ""
@@ -339,11 +338,11 @@ msgstr "{username} (via Tracim)"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:2
 msgid ""
-"You allowed the upload in this shared space <a "
-"href={sharedspace_url}>{sharedspace_name}</a> with:"
+"You have invited {nb_receivers} people to upload files in this shared "
+"space <a href={sharedspace_url}>{sharedspace_name}</a>:"
 msgstr ""
-"Vous avez autorisé le téléversement dans cet espace partagé <a "
-"href={sharedspace_url}>{sharedspace_name}</a> avec :"
+"Vous avez invité {nb_receivers} personnes à téléverser des fichiers dans "
+"cet espace partagé <a href={sharedspace_url}>{sharedspace_name}</a> :"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:10
 msgid ""
@@ -354,8 +353,8 @@ msgstr ""
 "\"{upload_permission_password}\""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:6
-msgid "I allowed you to upload files here:"
-msgstr "Je vous ai autorisé à téléverser des fichiers ici:"
+msgid "I invited you to upload files here:"
+msgstr "Je vous ai invité à téléverser des fichiers ici:"
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
 msgid "Upload files"
