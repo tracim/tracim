@@ -14,7 +14,7 @@ const ArchiveDeleteContent = props => {
 
   return (
     <div className='d-flex align-items-center'>
-      <button
+      {/* <button
         type='button'
         className='wsContentGeneric__option__menu__action d-none d-sm-block btn iconBtn'
         onClick={props.onClickArchiveBtn}
@@ -25,7 +25,7 @@ const ArchiveDeleteContent = props => {
         data-cy='archive__button'
       >
         <i className='fa fa-fw fa-archive' />
-      </button>
+      </button> */}
       <button
         type='button'
         className='wsContentGeneric__option__menu__action d-none d-sm-block btn iconBtn'

@@ -56,7 +56,7 @@ class GuestDownload extends React.Component {
         props.history.push(PAGE.LOGIN)
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading file infos'))
+        this.sendGlobalFlashMessage(props.t('Error while loading file information'))
         props.history.push(PAGE.LOGIN)
     }
   }

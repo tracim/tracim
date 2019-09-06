@@ -73,22 +73,14 @@ class ShareFolderAdvanced extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
-        this.loadContent()
+        this.loadContentTypeList()
         break
     }
   }
 
   componentDidMount () {
-    this.loadContent()
+    this.loadContentTypeList()
     this.loadImportAuthorizationsList()
-  }
-
-  componentDidUpdate (prevProps, prevState) {
-    const { state } = this
-
-    if (prevState.content.content_id !== state.content.content_id) {
-      this.loadContent()
-    }
   }
 
   componentWillUnmount () {
@@ -105,7 +97,7 @@ class ShareFolderAdvanced extends React.Component {
     }
   })
 
-  loadContent = async () => {
+  loadContentTypeList = async () => {
     const { props, state } = this
 
     const fetchContentTypeList = await handleFetchResult(await getContentTypeList(state.config.apiUrl))
@@ -164,7 +156,7 @@ class ShareFolderAdvanced extends React.Component {
     this.setState({ currentPageStatus: this.UPLOAD_STATUS.NEW_UPLOAD })
   }
 
-  handleClickNewUpload = async () => {
+  handleClickNewUpload = async isPasswordActive => {
     const { state, props } = this
 
     let uploadEmailList = parserStringToList(state.uploadEmails)
@@ -183,7 +175,7 @@ class ShareFolderAdvanced extends React.Component {
         state.config.apiUrl,
         state.content.workspace_id,
         uploadEmailList,
-        state.uploadPassword !== '' ? state.uploadPassword : null
+        isPasswordActive ? state.uploadPassword : null
       ))
 
       switch (fetchResultPostImportAuthorizations.apiResponse.status) {
@@ -246,7 +238,7 @@ class ShareFolderAdvanced extends React.Component {
           customClass={'folderAdvanced'}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          componentTitle={<div>{title}</div>}
+          componentTitle={<div>{this.props.t('Inbox')}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           showChangeTitleButton={false}

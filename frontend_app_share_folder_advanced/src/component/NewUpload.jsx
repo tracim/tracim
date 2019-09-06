@@ -8,12 +8,13 @@ import PropTypes from 'prop-types'
 
 const color = require('color')
 
-class NewUpload extends React.Component {
+export class NewUpload extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       popoverMultipleEmailsOpen: false,
-      hidePassword: true
+      hidePassword: true,
+      isPasswordActive: false
     }
   }
 
@@ -35,6 +36,12 @@ class NewUpload extends React.Component {
     if (this.state.hidePassword) {
       this.handleTogglePasswordVisibility()
     }
+  }
+
+  handleTogglePasswordActive = () => {
+    this.setState(prevState => ({
+      isPasswordActive: !prevState.isPasswordActive
+    }))
   }
 
   render () {
@@ -79,39 +86,59 @@ class NewUpload extends React.Component {
           </Popover>
         </div>
 
-        <div className='newUpload__password'>
-          <div className='newUpload__password__wrapper'>
-            <i className='fa fa-fw fa-lock' />
-            <input
-              type={state.hidePassword ? passwordType : textType}
-              className='newUpload__password__input form-control'
-              placeholder={props.t('Password to share link (optional)')}
-              value={props.uploadPassword}
-              onChange={props.onChangeUploadPassword}
-            />
-            <button
-              type='button'
-              className='newUpload__password__icon'
-              key='seeuploadPassword'
-              title={props.t('Show password')}
-              style={{ ':hover': { color: customColor } }}
-              data-cy='seePassword'
-              onClick={this.handleTogglePasswordVisibility}
-            >
-              <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
-            </button>
-          </div>
-          <button
-            type='button'
-            className='newUpload__password__icon'
-            key='randomuploadPassword'
-            title={props.t('Generate random password')}
-            style={{ ':hover': { color: customColor } }}
-            onClick={this.handleRandomPassword}
-          >
-            <i className='fa fa-fw fa-repeat' />
-          </button>
-        </div>
+        {state.isPasswordActive
+          ? (
+            <div className='newUpload__password'>
+              <div className='newUpload__password__active'>
+                <div className='newUpload__password__wrapper'>
+                  <i className='fa fa-fw fa-lock' />
+
+                  <input
+                    type={state.hidePassword ? passwordType : textType}
+                    className='newUpload__password__input form-control'
+                    placeholder={props.t('Password to share link (optional)')}
+                    value={props.uploadPassword}
+                    onChange={props.onChangeUploadPassword}
+                  />
+
+                  <button
+                    type='button'
+                    className='newUpload__password__icon'
+                    key='seeuploadPassword'
+                    title={props.t('Show password')}
+                    style={{ ':hover': { color: customColor } }}
+                    data-cy='seePassword'
+                    onClick={this.handleTogglePasswordVisibility}
+                  >
+                    <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+                  </button>
+                </div>
+
+                <button
+                  type='button'
+                  className='newUpload__password__icon'
+                  key='randomuploadPassword'
+                  title={props.t('Generate random password')}
+                  style={{ ':hover': { color: customColor } }}
+                  onClick={this.handleRandomPassword}
+                >
+                  <i className='fa fa-fw fa-repeat' />
+                </button>
+              </div>
+
+              <span className='newUpload__password__link' onClick={this.handleTogglePasswordActive}>
+                {props.t('Cancel protection by password')}
+              </span>
+            </div>
+          )
+          : (
+            <div className='newUpload__password'>
+              <span className='newUpload__password__link' onClick={this.handleTogglePasswordActive}>
+                {props.t('Protect by password')}
+              </span>
+            </div>
+          )
+        }
 
         <div className='d-flex'>
           <button
@@ -137,8 +164,8 @@ class NewUpload extends React.Component {
                 backgroundColor: color(customColor).darken(0.15).hex()
               }
             }}
-            onClick={props.onClickNewUpload}
-            disabled={props.uploadEmails === ''}
+            onClick={() => props.onClickNewUpload(state.isPasswordActive)}
+            disabled={props.uploadEmails === '' || (state.isPasswordActive && props.uploadPassword === '')}
           >
             {props.t('New')}
             <i className='fa fa-fw fa-plus-circle' />

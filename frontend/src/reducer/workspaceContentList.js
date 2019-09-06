@@ -9,7 +9,7 @@ import {
   WORKSPACE_CONTENT_DELETED
 } from '../action-creator.sync.js'
 
-const serializeContent = c => ({
+export const serializeContent = c => ({
   id: c.content_id,
   label: c.label,
   slug: c.slug,

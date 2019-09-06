@@ -5,6 +5,7 @@ import flashMessage from './flashMessage.js'
 import user from './user.js'
 import currentWorkspace from './currentWorkspace.js'
 import workspaceContentList from './workspaceContentList.js'
+import workspaceShareFolderContentList from './workspaceShareFolderContentList.js'
 import workspaceList from './workspaceList.js'
 import appList from './appList.js'
 import contentType from './contentType.js'
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   user,
   currentWorkspace,
   workspaceContentList,
+  workspaceShareFolderContentList,
   workspaceList,
   appList,
   contentType,
