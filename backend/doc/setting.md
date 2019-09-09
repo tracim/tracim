@@ -517,7 +517,7 @@ note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like
 `sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always libreoffice/online:master`
 
 
-:information source: All the information to set up a `Collabora CODE/ LibreofficelOnline` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
+:information_source: All the information to set up a `Collabora CODE/ LibreofficelOnline` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
 
 :warning: Be really careful about configuring domain parameter, as [official documentation](https://www.collaboraoffice.com/code/docker/) said, value should be dot escaped, ex: `domain=.*\\.mysuperdomain\\.com`
 
