@@ -26,7 +26,7 @@ class UploadPermissionEmailManager(EmailManager):
         self,
         uploader_username: str,
         uploader_email: str,
-        uploader_message: str,
+        uploader_message: typing.Optional[str],
         workspace_in_context: WorkspaceInContext,
         uploaded_contents: typing.List[ContentInContext],
     ) -> None:
@@ -63,7 +63,7 @@ class UploadPermissionEmailManager(EmailManager):
         workspace_in_context: WorkspaceInContext,
         receiver: UserInContext,
         uploader: EmailUser,
-        uploader_message: str,
+        uploader_message: typing.Optional[str],
         uploaded_contents: typing.List[ContentInContext],
         translator: Translator,
     ) -> Message:

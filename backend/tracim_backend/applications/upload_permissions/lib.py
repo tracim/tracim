@@ -220,7 +220,7 @@ class UploadPermissionLib(object):
         self,
         uploader_username: str,
         uploader_email: str,
-        uploader_message: str,
+        uploader_message: typing.Optional[str],
         workspace_in_context: WorkspaceInContext,
         uploaded_contents: typing.List[ContentInContext],
     ):
@@ -238,7 +238,7 @@ class UploadPermissionLib(object):
         self,
         upload_permission: UploadPermission,
         uploader_username: str,
-        message: str,
+        message: typing.Optional[str],
         files: typing.List[cgi.FieldStorage],
         do_notify: bool = False,
     ):
