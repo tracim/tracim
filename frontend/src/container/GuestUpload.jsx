@@ -81,12 +81,12 @@ class GuestUpload extends React.Component {
   handleChangeComment = e => this.setState({ guestComment: e.target.value, isInvalid: false })
   handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })
 
-  handleAddFile = uploadFileList => {
-    const { props } = this
+  handleAddFile = newFileList => {
+    const { props, state } = this
 
-    if (!uploadFileList || !uploadFileList[0]) return
+    if (!newFileList || !newFileList[0]) return
 
-    const alreadyUploadedList = uploadFileList.filter(file => this.state.uploadFileList.some(previousFile => previousFile.name === file.name))
+    const alreadyUploadedList = newFileList.filter(newFile => state.uploadFileList.some(stateFile => stateFile.name === newFile.name))
     if (alreadyUploadedList.length) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
@@ -98,12 +98,10 @@ class GuestUpload extends React.Component {
       })
     }
 
-    uploadFileList = uploadFileList.filter(file => !this.state.uploadFileList.some(previousFile => previousFile.name === file.name))
-
     this.setState(previousState => ({
       uploadFileList: [
         ...previousState.uploadFileList,
-        ...uploadFileList
+        ...newFileList.filter(newFile => !state.uploadFileList.some(stateFile => stateFile.name === newFile.name))
       ]
     }))
   }
@@ -137,7 +135,7 @@ class GuestUpload extends React.Component {
         }
       })
     }
-    return !(errors.length)
+    return (errors.length === 0)
   }
 
   handleClickSend = async () => {
