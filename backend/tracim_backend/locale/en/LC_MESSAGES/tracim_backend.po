@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-06 10:05+0200\n"
+"POT-Creation-Date: 2019-09-06 15:05+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -14,17 +14,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: tracim_backend/config.py:346
+#: tracim_backend/config.py:356
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 msgstr ""
 
-#: tracim_backend/config.py:354
+#: tracim_backend/config.py:364
 msgid "[{website_title}] Someone created an account for you"
 msgstr ""
 
-#: tracim_backend/config.py:363
+#: tracim_backend/config.py:373
 msgid "[{website_title}] A password reset has been requested"
 msgstr ""
 
@@ -72,31 +72,31 @@ msgid ""
 " in \"{workspace_name}\""
 msgstr ""
 
-#: tracim_backend/applications/upload_permissions/lib.py:247
+#: tracim_backend/applications/upload_permissions/lib.py:249
 msgid "Files uploaded by {username} on {date}"
 msgstr ""
 
-#: tracim_backend/applications/upload_permissions/lib.py:260
+#: tracim_backend/applications/upload_permissions/lib.py:262
 msgid "Message from {username}: {message}"
 msgstr ""
 
-#: tracim_backend/applications/upload_permissions/lib.py:264
+#: tracim_backend/applications/upload_permissions/lib.py:266
 msgid "Uploaded by {username}."
 msgstr ""
 
-#: tracim_backend/lib/core/content.py:2241
+#: tracim_backend/lib/core/content.py:2270
 msgid "New folder"
 msgstr ""
 
-#: tracim_backend/lib/core/content.py:2246
+#: tracim_backend/lib/core/content.py:2275
 msgid "New folder {0}"
 msgstr ""
 
-#: tracim_backend/lib/core/workspace.py:334
+#: tracim_backend/lib/core/workspace.py:383
 msgid "Workspace"
 msgstr "Shared space"
 
-#: tracim_backend/lib/core/workspace.py:337
+#: tracim_backend/lib/core/workspace.py:386
 msgid "Workspace {}"
 msgstr "Shared space {}"
 
@@ -181,14 +181,14 @@ msgid ""
 msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:18
-#: tracim_backend/templates/mail/new_upload_event_body_html.mak:9
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:13
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:13
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:13
 msgid "Enjoy your day :)"
 msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:19
-#: tracim_backend/templates/mail/new_upload_event_body_html.mak:10
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:14
 #: tracim_backend/templates/mail/reset_password_body_html.mak:16
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:14
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:14
@@ -196,7 +196,7 @@ msgid "Suricat', your digital assistant"
 msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:23
-#: tracim_backend/templates/mail/new_upload_event_body_html.mak:14
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:18
 #: tracim_backend/templates/mail/reset_password_body_html.mak:20
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:18
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:18
@@ -204,7 +204,7 @@ msgid "Suricat', the bot"
 msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:26
-#: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
 #: tracim_backend/templates/mail/reset_password_body_html.mak:23
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:29
@@ -218,6 +218,10 @@ msgid ""
 "{username}(<a href=\"{email_link}\">{email}</a>) shared one or several "
 "files with you in this shared space: <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
+msgstr ""
+
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:9
+msgid "Message:"
 msgstr ""
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:4

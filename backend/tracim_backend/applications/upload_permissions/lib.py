@@ -220,6 +220,7 @@ class UploadPermissionLib(object):
         self,
         uploader_username: str,
         uploader_email: str,
+        uploader_message: typing.Optional[str],
         workspace_in_context: WorkspaceInContext,
         uploaded_contents: typing.List[ContentInContext],
     ):
@@ -228,6 +229,7 @@ class UploadPermissionLib(object):
         email_manager.notify_new_upload(
             uploaded_contents=uploaded_contents,
             uploader_username=uploader_username,
+            uploader_message=uploader_message,
             workspace_in_context=workspace_in_context,
             uploader_email=uploader_email,
         )
@@ -236,7 +238,7 @@ class UploadPermissionLib(object):
         self,
         upload_permission: UploadPermission,
         uploader_username: str,
-        message: str,
+        message: typing.Optional[str],
         files: typing.List[cgi.FieldStorage],
         do_notify: bool = False,
     ):
@@ -293,6 +295,7 @@ class UploadPermissionLib(object):
                 workspace_in_context=workspace_lib.get_workspace_with_context(
                     upload_permission.workspace
                 ),
+                uploader_message=message,
                 uploaded_contents=created_contents,
                 uploader_email=upload_permission.email,
             )
