@@ -50,7 +50,7 @@ The other is workspace related and is called "workspace role".
 |                              | Reader | Contributor | Content Manager | Workspace Manager |
 |------------------------------|--------|-------------|-----------------|-------------------|
 | read content                 |  yes   | yes         | yes             | yes               |
-| get workspace members list   |  yes    | yes         | yes             | yes              |
+| get workspace members list   |  yes   | yes         | yes             | yes               |
 |------------------------------|--------|-------------|-----------------|-------------------|
 | create content*              |  no    | yes         | yes             | yes               |
 | edit content                 |  no    | yes         | yes             | yes               |
@@ -68,7 +68,17 @@ The other is workspace related and is called "workspace role".
 | set user workspace role      |  no    | no          | no              | yes               |
 | revoke users (from workspace)|  no    | no          | no              | yes               |
 |------------------------------|--------|-------------|-----------------|-------------------|
-| modify comments              |  no    | owner       | owner             | yes             |
-| delete comments              |  no    | owner       | owner             | yes             |
- 
-  *: folder content not included.
+| modify comments              |  no    | owner       | owner           | yes               |
+| delete comments              |  no    | owner       | owner           | yes               |
+-------------------------------|--------|-------------|-----------------|-------------------|
+| share content**              | no     | no          | yes             | yes               |
+| give upload permission***    | no     | no          | yes             | yes               |
+-------------------------------|--------|-------------|-----------------|-------------------|
+
+ *: folder content not included.
+
+ **: share with link/email to external user. share content feature need to be activated in workspace by
+ workspace manager (see "edit workspace").
+
+ ***: allow with link/email external user to upload some file in workspace inbox. upload permission feature need to be activated in workspace by
+  workspace manager (see "edit workspace").
