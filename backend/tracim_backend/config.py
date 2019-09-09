@@ -863,12 +863,6 @@ class CFG(object):
             main_route="",
             app_config=self,
         )
-        collaborative_document_edition.add_content_type(
-            slug="office_document",
-            label="Office Document",
-            creation_label="Create an office document",
-            available_statuses=content_status_list.get_all(),
-        )
         # INFO - G.M - 2019-08-08 - import app here instead of top of file,
         # to make thing easier later
         # when app will be load dynamycally.

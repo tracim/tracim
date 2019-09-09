@@ -148,6 +148,8 @@ class WorkspaceController(Controller):
             label=hapic_data.body.label,
             description=hapic_data.body.description,
             agenda_enabled=hapic_data.body.agenda_enabled,
+            public_download_enabled=hapic_data.body.public_download_enabled,
+            public_upload_enabled=hapic_data.body.public_upload_enabled,
             save_now=True,
         )
         wapi.execute_update_workspace_actions(request.current_workspace)
@@ -173,6 +175,8 @@ class WorkspaceController(Controller):
             description=hapic_data.body.description,
             save_now=True,
             agenda_enabled=hapic_data.body.agenda_enabled,
+            public_download_enabled=hapic_data.body.public_download_enabled,
+            public_upload_enabled=hapic_data.body.public_upload_enabled,
         )
         wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)

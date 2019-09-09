@@ -20,6 +20,8 @@ import {
   putLabel,
   putDescription,
   putAgendaEnabled,
+  putDownloadEnabled,
+  putUploadEnabled,
   putMemberRole,
   deleteMember,
   getMyselfKnownMember,
@@ -241,63 +243,59 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  // FIXME - G.B. - 2019-08-16 - We still don't have this feature at backend
-  // https://github.com/tracim/tracim/issues/2215
-  // handleToggleUploadEnabled = async () => {
-  //   const { props, state } = this
-  //   const oldUploadEnabledValue = state.content.upload_enabled
-  //   const newUploadEnabledValue = !state.content.upload_enabled
+  handleToggleUploadEnabled = async () => {
+    const { props, state } = this
+    const oldUploadEnabledValue = state.content.public_upload_enabled
+    const newUploadEnabledValue = !state.content.public_upload_enabled
 
-  //   this.setState(prev => ({content: {...prev.content, upload_enabled: newUploadEnabledValue}}))
-  //   const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))
+    this.setState(prev => ({ content: { ...prev.content, public_upload_enabled: newUploadEnabledValue } }))
+    const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))
 
-  //   switch (fetchToggleUploadEnabled.apiResponse.status) {
-  //     case 200:
-  //       this.sendGlobalFlashMessage(
-  //         newUploadEnabledValue ? props.t('Upload activated') : props.t('Upload deactivated'),
-  //         'info'
-  //       )
-  //       GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
-  //       break
-  //     default:
-  //       this.setState(prev => ({content: {...prev.content, upload_enabled: oldUploadEnabledValue}}))
-  //       this.sendGlobalFlashMessage(
-  //         newUploadEnabledValue
-  //           ? props.t('Error while activating upload')
-  //           : props.t('Error while deactivating upload'),
-  //         'warning'
-  //       )
-  //   }
-  // }
+    switch (fetchToggleUploadEnabled.apiResponse.status) {
+      case 200:
+        this.sendGlobalFlashMessage(
+          newUploadEnabledValue ? props.t('Upload activated') : props.t('Upload deactivated'),
+          'info'
+        )
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        break
+      default:
+        this.setState(prev => ({ content: { ...prev.content, public_upload_enabled: oldUploadEnabledValue } }))
+        this.sendGlobalFlashMessage(
+          newUploadEnabledValue
+            ? props.t('Error while activating upload')
+            : props.t('Error while deactivating upload'),
+          'warning'
+        )
+    }
+  }
 
-  // FIXME - G.B. - 2019-08-16 - We still don't have this feature at backend
-  // https://github.com/tracim/tracim/issues/2215
-  // handleToggleDownloadEnabled = async () => {
-  //   const { props, state } = this
-  //   const oldDownloadEnabledValue = state.content.download_enabled
-  //   const newDownloadEnabledValue = !state.content.download_enabled
+  handleToggleDownloadEnabled = async () => {
+    const { props, state } = this
+    const oldDownloadEnabledValue = state.content.public_download_enabled
+    const newDownloadEnabledValue = !state.content.public_download_enabled
 
-  //   this.setState(prev => ({content: {...prev.content, download_enabled: newDownloadEnabledValue}}))
-  //   const fetchToggleDownloadEnabled = await handleFetchResult(await putDownloadEnabled(state.config.apiUrl, state.content, newDownloadEnabledValue))
+    this.setState(prev => ({ content: { ...prev.content, public_download_enabled: newDownloadEnabledValue } }))
+    const fetchToggleDownloadEnabled = await handleFetchResult(await putDownloadEnabled(state.config.apiUrl, state.content, newDownloadEnabledValue))
 
-  //   switch (fetchToggleDownloadEnabled.apiResponse.status) {
-  //     case 200:
-  //       this.sendGlobalFlashMessage(
-  //         newDownloadEnabledValue ? props.t('Download activated') : props.t('Download deactivated'),
-  //         'info'
-  //       )
-  //       GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
-  //       break
-  //     default:
-  //       this.setState(prev => ({content: {...prev.content, download_enabled: oldDownloadEnabledValue}}))
-  //       this.sendGlobalFlashMessage(
-  //         newDownloadEnabledValue
-  //           ? props.t('Error while activating download')
-  //           : props.t('Error while deactivating download'),
-  //         'warning'
-  //       )
-  //   }
-  // }
+    switch (fetchToggleDownloadEnabled.apiResponse.status) {
+      case 200:
+        this.sendGlobalFlashMessage(
+          newDownloadEnabledValue ? props.t('Download activated') : props.t('Download deactivated'),
+          'info'
+        )
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        break
+      default:
+        this.setState(prev => ({ content: { ...prev.content, public_download_enabled: oldDownloadEnabledValue } }))
+        this.sendGlobalFlashMessage(
+          newDownloadEnabledValue
+            ? props.t('Error while activating download')
+            : props.t('Error while deactivating download'),
+          'warning'
+        )
+    }
+  }
 
   handleClickNewMemberRole = slugRole => this.setState(prev => ({ newMember: { ...prev.newMember, role: slugRole } }))
 
@@ -459,7 +457,7 @@ class WorkspaceAdvanced extends React.Component {
     const { state } = this
 
     if (!state.isVisible) return null
-
+    console.log(state.content.public_download_enabled)
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -540,12 +538,10 @@ class WorkspaceAdvanced extends React.Component {
                   appAgendaAvailable={state.content.appAgendaAvailable}
                   agendaEnabled={state.content.agenda_enabled}
                   onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
-                  // FIXME - G.B. - 2019-08-16 - We still don't have this features at backend
-                  // https://github.com/tracim/tracim/issues/2215
-                  // downloadEnabled={state.content.download_enabled}
-                  // onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
-                  // uploadEnabled=={state.content.upload_enabled}
-                  // onToggleUploadEnabled={this.handleToggleUploadEnabled}
+                  downloadEnabled={state.content.public_download_enabled}
+                  onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
+                  uploadEnabled={state.content.public_upload_enabled}
+                  onToggleUploadEnabled={this.handleToggleUploadEnabled}
                 />
               }
             ]}

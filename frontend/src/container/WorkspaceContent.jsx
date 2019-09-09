@@ -37,7 +37,8 @@ import {
   putWorkspaceContentDeleted,
   getMyselfWorkspaceReadStatusList,
   putFolderRead,
-  putContentItemMove
+  putContentItemMove,
+  getWorkspaceDetail
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -51,11 +52,22 @@ import {
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  moveWorkspaceContent
+  moveWorkspaceContent,
+  setWorkspaceDetail
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
 const qs = require('query-string')
+
+// FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
+export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
+  label: 'Collaborative document',
+  slug: 'collaborative_document_edition',
+  faIcon: 'file-o',
+  hexcolor: '#ffc800',
+  creationLabel: 'Create a collaborative document',
+  availableStatuses: contentType[0].availableStatuses
+})
 
 class WorkspaceContent extends React.Component {
   constructor (props) {
@@ -120,6 +132,7 @@ class WorkspaceContent extends React.Component {
     } else wsToLoad = props.match.params.idws
 
     this.loadAllWorkspaceContent(wsToLoad, true)
+    this.loadWorkspaceDetail()
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -170,6 +183,22 @@ class WorkspaceContent extends React.Component {
       delay: undefined
     }
   })
+
+  loadWorkspaceDetail = async () => {
+    const { props } = this
+
+    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, props.match.params.idws))
+    switch (fetchWorkspaceDetail.status) {
+      case 200:
+        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
+        break
+      case 400:
+        props.history.push(PAGE.HOME)
+        props.dispatch(newFlashMessage('Unknown shared space'))
+        break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
+    }
+  }
 
   buildBreadcrumbs = () => {
     const { props, state } = this
@@ -382,7 +411,9 @@ class WorkspaceContent extends React.Component {
   handleClickCreateContent = (e, folderId, contentType) => {
     const { props, state } = this
 
-    const folderOpen = (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
+    const folderOpen = folderId
+      ? (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
+      : false
 
     const urlSearch = qs.parse(props.location.search)
     delete urlSearch.parent_id
@@ -397,7 +428,7 @@ class WorkspaceContent extends React.Component {
       folder_open: newFolderOpenList.join(',')
     }
 
-    if (!folderOpen) this.handleClickFolder(folderId)
+    if (folderId && !folderOpen) this.handleClickFolder(folderId)
 
     props.history.push(`${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`)
   }
@@ -581,9 +612,17 @@ class WorkspaceContent extends React.Component {
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
-    const createContentAvailableApp = contentType
-      .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)
-      .filter(ct => userRoleIdInWorkspace === 2 ? ct.slug !== CONTENT_TYPE.FOLDER : true)
+    const createContentAvailableApp = [
+      ...contentType
+        .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)
+        .filter(ct => userRoleIdInWorkspace === 2 ? ct.slug !== CONTENT_TYPE.FOLDER : true),
+
+      // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
+      ...(contentType.find(ct => ct.slug === CONTENT_TYPE.FILE)
+        ? [HACK_COLLABORA_CONTENT_TYPE(contentType)]
+        : []
+      )
+    ]
 
     const isWorkspaceEmpty = workspaceContentList.length === 0
     const isFilteredWorkspaceEmpty = rootContentList.length === 0
@@ -643,30 +682,32 @@ class WorkspaceContent extends React.Component {
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />
 
-                <ShareFolder
-                  workspaceId={state.workspaceIdInUrl}
-                  availableApp={createContentAvailableApp}
-                  isOpen={state.shareFolder.isOpen}
-                  getContentParentList={this.getContentParentList}
-                  onDropMoveContentItem={this.handleDropMoveContent}
-                  onClickFolder={this.handleClickFolder}
-                  onClickCreateContent={this.handleClickCreateContent}
-                  setFolderRead={this.handleSetFolderRead}
-                  userRoleIdInWorkspace={userRoleIdInWorkspace}
-                  shareFolderContentList={workspaceShareFolderContentList}
-                  onClickExtendedAction={{
-                    edit: this.handleClickEditContentItem,
-                    download: this.handleClickDownloadContentItem,
-                    archive: this.handleClickArchiveShareFolderContentItem,
-                    delete: this.handleClickDeleteShareFolderContentItem
-                  }}
-                  onClickShareFolder={this.handleClickShareFolder}
-                  contentType={contentType}
-                  readStatusList={currentWorkspace.contentReadStatusList}
-                  rootContentList={rootContentList}
-                  isLast={isWorkspaceEmpty || isFilteredWorkspaceEmpty}
-                  t={t}
-                />
+                {currentWorkspace.uploadEnabled &&
+                  <ShareFolder
+                    workspaceId={state.workspaceIdInUrl}
+                    availableApp={createContentAvailableApp}
+                    isOpen={state.shareFolder.isOpen}
+                    getContentParentList={this.getContentParentList}
+                    onDropMoveContentItem={this.handleDropMoveContent}
+                    onClickFolder={this.handleClickFolder}
+                    onClickCreateContent={this.handleClickCreateContent}
+                    setFolderRead={this.handleSetFolderRead}
+                    userRoleIdInWorkspace={userRoleIdInWorkspace}
+                    shareFolderContentList={workspaceShareFolderContentList}
+                    onClickExtendedAction={{
+                      edit: this.handleClickEditContentItem,
+                      download: this.handleClickDownloadContentItem,
+                      archive: this.handleClickArchiveShareFolderContentItem,
+                      delete: this.handleClickDeleteShareFolderContentItem
+                    }}
+                    onClickShareFolder={this.handleClickShareFolder}
+                    contentType={contentType}
+                    readStatusList={currentWorkspace.contentReadStatusList}
+                    rootContentList={rootContentList}
+                    isLast={isWorkspaceEmpty || isFilteredWorkspaceEmpty}
+                    t={t}
+                  />
+                }
 
                 {state.contentLoaded && (isWorkspaceEmpty || isFilteredWorkspaceEmpty)
                   ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
@@ -704,7 +745,7 @@ class WorkspaceContent extends React.Component {
                         fileName={content.fileName}
                         fileExtension={content.fileExtension}
                         faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
-                        isShared={content.activedShares !== 0}
+                        isShared={content.activedShares !== 0 && currentWorkspace.downloadEnabled}
                         statusSlug={content.statusSlug}
                         contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
                         isLast={i === rootContentList.length - 1}

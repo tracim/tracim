@@ -28,11 +28,11 @@ export const FileDropzone = props => {
                   className='filecontent__form__instruction text-center'
                   style={{ color: props.hexcolor }}
                 >
-                  {props.t('Drag and drop your file here')}
+                  {props.multipleFiles ? props.t('Drag and drop your files here') : props.t('Drag and drop your file here')}
                 </div>
 
                 <div className='filecontent__form__text text-center'>
-                  {props.t('You can also import your file by clicking here')}
+                  {props.multipleFiles ? props.t('You can also import your files by clicking here') : props.t('You can also import your file by clicking here')}
                 </div>
               </div>
             )
@@ -62,11 +62,11 @@ export const FileDropzone = props => {
                       className='filecontent__form__instruction text-center'
                       style={{ color: props.hexcolor }}
                     >
-                      {props.t('Drag and drop your file here')}
+                      {props.t('Drag and drop your files here')}
                     </div>
 
                     <div className='filecontent__form__text text-center'>
-                      {props.t('You can also import your file by clicking here')}
+                      {props.t('You can also import your files by clicking here')}
                     </div>
                   </div>
                 )

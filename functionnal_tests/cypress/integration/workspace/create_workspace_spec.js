@@ -13,9 +13,9 @@ describe('Workspace', () => {
   it('should create a new workspace while no others are created', () => {
     const workspaceTitle = 'first workspace'
 
-    cy.get('[data-cy=homepagecard__btn]').click()
-      .get('[data-cy=createcontent__form__input]').type(workspaceTitle)
-      .get('[data-cy=popup__createcontent__form__button]').click()
+    cy.get('[data-cy=homepagecard__btn]').should('be.visible').click()
+      .get('[data-cy=createcontent__form__input]').should('be.visible').type(workspaceTitle)
+      .get('[data-cy=popup__createcontent__form__button]').should('be.visible').click()
     cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: 1 } })
       .get('.dashboard')
       .get('[data-cy="dashboardWorkspaceLabel"]')
@@ -28,9 +28,9 @@ describe('Workspace', () => {
   describe('Dashboard', () => {
     describe('Creating two new workspaces', () => {
       const createOneWorkspace = (cy, workspaceName) => {
-        return cy.get('[data-cy="sidebarCreateWorkspaceBtn"]').click()
-          .get('[data-cy="createcontent__form__input"]').type(workspaceName)
-          .get('[data-cy="popup__createcontent__form__button"]').click()
+        return cy.get('[data-cy="sidebarCreateWorkspaceBtn"]').should('be.visible').click()
+          .get('[data-cy="createcontent__form__input"]').should('be.visible').type(workspaceName)
+          .get('[data-cy="popup__createcontent__form__button"]').should('be.visible').click()
       }
 
       it('should display the new workspaces properly', () => {

@@ -1,3 +1,4 @@
+
 import { PAGES } from '../../support/urls_commands'
 
 const fileTitle = 'FileForSearch'
@@ -34,7 +35,7 @@ describe('Open a file', () => {
       pageName: PAGES.CONTENT_OPEN, 
       params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
     })
-    cy.get('.wsContentGeneric__content__right__header .fa-share-alt').click()
+    cy.get('.wsContentGeneric__content__right__header .fa-share-alt').should('be.visible').click()
   })
 
   afterEach(function () {
@@ -45,30 +46,30 @@ describe('Open a file', () => {
     describe('and clicking on the New button',() => {
       describe('and writing three emails separated by space and clicking Enter',() =>{
         it('Should separate the emails by new line',() => {
-          cy.get(emailInput).type(`${email1} ${email2} ${email3}`).type('{enter}')
+          cy.get(emailInput).type(`${email1} ${email2} ${email3}`).should('be.visible').type('{enter}')
           cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
         })
       })
 
       describe('and writing three emails separated by commas and clicking Enter',() =>{
         it('Should separate the emails by new line',() => {
-          cy.get(emailInput).type(`${email1},${email2},${email3}`).type('{enter}')
+          cy.get(emailInput).type(`${email1},${email2},${email3}`).should('be.visible').type('{enter}')
           cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
         })
       })
 
       describe('and clicking at Protect by password',() => {
         it('Should show the password input',() => {
-          cy.get('.shareDownload__password__link').click()
+          cy.get('.shareDownload__password__link').should('be.visible').click()
           cy.get('.shareDownload__password__wrapper').should('be.visible')
         })
 
         describe('and writing a password',() => {
           describe('and clicking at see password',() => {
             it('Should show the password',() => {
-              cy.get('.shareDownload__password__link').click()
-              cy.get('.shareDownload__password__input').type('Password')
-              cy.get('[data-cy=seePassword]').click()
+              cy.get('.shareDownload__password__link').should('be.visible').click()
+              cy.get('.shareDownload__password__input').should('be.visible').type('Password')
+              cy.get('[data-cy=seePassword]').should('be.visible').click()
               cy.get('.shareDownload__password__input').should('have.value','Password')
             })
           })
@@ -79,7 +80,7 @@ describe('Open a file', () => {
         describe('and clicking at New button',() => {
           it('Should create share link at the main authorizations page',() => {
             cy.get(emailInput).type(`${email1}`)
-            cy.get('.shareDownload__newBtn').click()
+            cy.get('.shareDownload__newBtn').should('be.visible').click()
             cy.get('.shareLink__linkInfos__email').contains(email1).should('be.visible')
           })
         })
