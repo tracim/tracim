@@ -1,5 +1,5 @@
-import {globalManager} from './globalManager.js'
-import {ROLE_OBJECT} from '../../../src/helper.js'
+import { globalManager } from './globalManager.js'
+import { ROLE_OBJECT } from 'tracim_frontend_lib'
 
 const {id, publicName, isActive, doNotify} = globalManager
 

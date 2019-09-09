@@ -80,7 +80,7 @@ class ContentItem extends React.Component {
             </div>
           </div>
 
-          {props.userRoleIdInWorkspace >= 2 && (
+          {props.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && (
             <div className='d-none d-md-block' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
@@ -153,6 +153,6 @@ ContentItem.defaultProps = {
   onClickItem: () => {},
   read: false,
   urlContent: '',
-  userRoleIdInWorkspace: 0,
+  userRoleIdInWorkspace: ROLE_OBJECT.reader.id,
   isShared: false
 }

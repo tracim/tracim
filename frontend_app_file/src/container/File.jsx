@@ -277,7 +277,7 @@ class File extends React.Component {
   loadShareLinkList = async () => {
     const { content, config } = this.state
 
-    if (this.state.loggedUser.userRoleIdInWorkspace < 2) return
+    if (this.state.loggedUser.userRoleIdInWorkspace < ROLE_OBJECT.contributor.id) return
 
     const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
 
@@ -818,7 +818,7 @@ class File extends React.Component {
           lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
           lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
           description={state.content.raw_content}
-          displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
+          displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id}
           disableChangeDescription={!state.content.is_editable}
           onClickValidateNewDescription={this.handleClickValidateNewDescription}
           key={'FileProperties'}
@@ -826,7 +826,7 @@ class File extends React.Component {
       )
     }
 
-    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace > 1) {
+    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace > ROLE_OBJECT.reader.id) {
       return [
         timelineObject,
         {

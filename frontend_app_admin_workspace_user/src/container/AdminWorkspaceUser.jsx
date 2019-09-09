@@ -303,7 +303,7 @@ class AdminWorkspaceUser extends React.Component {
       GLOBAL_renderAppFeature({
         loggedUser: {
           ...state.loggedUser,
-          userRoleIdInWorkspace: ROLE_OBJECT.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force idRoleUserWorkspace to 8
+          userRoleIdInWorkspace: ROLE_OBJECT.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
         },
         config: {
           label: 'Advanced dashboard',

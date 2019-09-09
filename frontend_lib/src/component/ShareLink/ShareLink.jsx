@@ -58,7 +58,7 @@ class ShareLink extends React.Component {
           <i className='fa fa-fw fa-files-o'/>
         </button>
 
-        {props.userRoleIdInWorkspace >= 4 &&
+        {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id &&
           <button
             className='iconBtn'
             key='deleteShareLink'

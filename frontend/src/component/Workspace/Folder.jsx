@@ -102,7 +102,7 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__button'>
-            {props.userRoleIdInWorkspace >= 2 && (
+            {props.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && (
               <div className='folder__header__button__addbtn'>
                 {props.showCreateContentButton && folderAvailableApp.length > 0 && (
                   <div title={props.t('Create in folder')}>
@@ -115,7 +115,7 @@ class Folder extends React.Component {
                         'primaryColorBgHover',
                         'primaryColorBorderDarkenHover',
                         'dropdown-toggle',
-                        props.userRoleIdInWorkspace === 2 ? 'no-margin-right' : ''
+                        props.userRoleIdInWorkspace === ROLE_OBJECT.contributor.id ? 'no-margin-right' : ''
                       )}
                       type='button'
                       id='dropdownMenuButton'
@@ -144,7 +144,7 @@ class Folder extends React.Component {
                 )}
 
                 <div className='d-none d-md-flex' title={props.t('Actions')}>
-                  {props.userRoleIdInWorkspace >= 4 && (
+                  {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
                     <BtnExtandedAction
                       userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                       onClickExtendedAction={{

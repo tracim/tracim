@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { ROLE_OBJECT } from 'tracim_frontend_lib'
 
 const ExtandedAction = props => {
   return (
@@ -21,7 +22,7 @@ const ExtandedAction = props => {
       </button>
 
       <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-        {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace >= 2 && (
+        {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.edit}
@@ -65,7 +66,7 @@ const ExtandedAction = props => {
           </div>
         )} */}
 
-        {props.userRoleIdInWorkspace >= 4 && (
+        {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.delete}
@@ -94,5 +95,5 @@ ExtandedAction.propTypes = {
 }
 
 ExtandedAction.defaultProps = {
-  userRoleIdInWorkspace: 0
+  userRoleIdInWorkspace: ROLE_OBJECT.reader.id
 }

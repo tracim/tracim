@@ -10,6 +10,7 @@ import {
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   ROLE,
+  ROLE_OBJECT,
   PROFILE
 } from 'tracim_frontend_lib'
 import {
@@ -420,7 +421,7 @@ class Dashboard extends React.Component {
     // https://github.com/tracim/tracim/issues/2326
     const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
-        .filter(app => userRoleIdInWorkspace === 2 ? app.slug !== 'contents/folder' : true)
+        .filter(app => userRoleIdInWorkspace === ROLE_OBJECT.contributor.id ? app.slug !== 'contents/folder' : true)
         .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
         .filter(app => app.slug !== 'contents/share_folder')
         .filter(app => app.slug !== 'share_content')
@@ -460,7 +461,7 @@ class Dashboard extends React.Component {
               breadcrumbsList={props.breadcrumbs}
             >
               <div className='dashboard__header__advancedmode'>
-                {userRoleIdInWorkspace >= 8 &&
+                {userRoleIdInWorkspace >= ROLE_OBJECT.workspaceManager.id &&
                   <button
                     type='button'
                     className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
@@ -490,7 +491,7 @@ class Dashboard extends React.Component {
 
                   <div className='dashboard__calltoaction'>
                     {contentTypeButtonList.map(app => {
-                      return (userRoleIdInWorkspace >= 2 || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
+                      return (userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
                         <ContentTypeBtn
                           customClass='dashboard__calltoaction__button'
                           hexcolor={app.hexcolor}

@@ -581,7 +581,7 @@ class WorkspaceContent extends React.Component {
 
     return (
       <div className='workspace__content__fileandfolder__empty'>
-        {userRoleIdInWorkspace > 1 ? creationAllowedMessage : creationNotAllowedMessage}
+        {userRoleIdInWorkspace > ROLE_OBJECT.reader.id ? creationAllowedMessage : creationNotAllowedMessage}
       </div>
     )
   }
@@ -615,7 +615,7 @@ class WorkspaceContent extends React.Component {
     const createContentAvailableApp = [
       ...contentType
         .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)
-        .filter(ct => userRoleIdInWorkspace === 2 ? ct.slug !== CONTENT_TYPE.FOLDER : true),
+        .filter(ct => userRoleIdInWorkspace === ROLE_OBJECT.contributor.id ? ct.slug !== CONTENT_TYPE.FOLDER : true),
 
       // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
       ...(contentType.find(ct => ct.slug === CONTENT_TYPE.FILE)
@@ -668,7 +668,7 @@ class WorkspaceContent extends React.Component {
               icon={this.getIcon(urlFilter)}
               breadcrumbsList={breadcrumbs}
             >
-              {userRoleIdInWorkspace >= 2 && (
+              {userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && (
                 <DropdownCreateButton
                   parentClass='workspace__header__btnaddcontent'
                   folderId={null} // null because it is workspace root content
@@ -765,7 +765,7 @@ class WorkspaceContent extends React.Component {
                   )
                 }
 
-                {userRoleIdInWorkspace >= 2 && workspaceContentList.length >= 10 && (
+                {userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && workspaceContentList.length >= 10 && (
                   <DropdownCreateButton
                     customClass='workspace__content__button'
                     folderId={null}

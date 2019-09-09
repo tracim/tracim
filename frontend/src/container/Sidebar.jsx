@@ -16,7 +16,11 @@ import {
   findUserRoleIdInWorkspace,
   TRACIM_APP_VERSION
 } from '../helper.js'
-import { CUSTOM_EVENT, ROLE } from 'tracim_frontend_lib'
+import {
+  CUSTOM_EVENT,
+  ROLE,
+  PROFILE
+} from 'tracim_frontend_lib'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -120,7 +124,7 @@ class Sidebar extends React.Component {
               </ul>
             </nav>
 
-            {getUserProfile(user.profile).id <= 2 &&
+            {getUserProfile(user.profile).id <= PROFILE.MANAGER.id &&
               <div className='sidebar__content__btnnewworkspace'>
                 <button
                   className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
