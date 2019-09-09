@@ -12,6 +12,7 @@ describe('content :: workspace > dashbord', function () {
   })
 
   it('dashboard__workspaceInfo > recentactivity', function () {
+    cy.get('.recentactivity').scrollIntoView()
     cy.get('.recentactivity .recentactivity__header__title').should('be.visible')
     cy.get('.recentactivity .recentactivity__header__allread').should('be.visible')
     cy.get('.recentactivity .recentactivity__list').should('be.visible')

@@ -9,7 +9,8 @@ import DragHandle from '../DragHandle.jsx'
 import {
   ROLE_OBJECT,
   Badge,
-  ListItemWrapper
+  ListItemWrapper,
+  ComposedIcon
 } from 'tracim_frontend_lib'
 
 class ContentItem extends React.Component {
@@ -33,12 +34,13 @@ class ContentItem extends React.Component {
         contentType={props.contentType}
         isLast={props.isLast}
         key={props.id}
+        id={props.contentId}
       >
         {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
           <DragHandle
             connectDragSource={props.connectDragSource}
             title={props.t('Move this content')}
-            style={{top: '18px', left: '-2px', padding: '0 7px'}}
+            style={{ top: '18px', left: '-2px', padding: '0 7px' }}
           />
         )}
 
@@ -53,9 +55,21 @@ class ContentItem extends React.Component {
           >
             <div className='content__type'
               title={props.t(props.contentType.label)}
-              style={{color: props.contentType.hexcolor}}
+              style={{
+                color: props.contentType.hexcolor,
+                padding: props.isShared ? '0 15px' : '0 25px'
+              }}
             >
-              <i className={`fa fa-fw fa-${props.faIcon}`} />
+              {props.isShared
+                ? <ComposedIcon
+                  mainIcon={props.faIcon}
+                  smallIcon='share-alt'
+                  // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
+                  // https://github.com/tracim/tracim/issues/2098
+                  smallIconStyle={{ color: '#252525' }}
+                />
+                : <i className={`fa fa-${props.faIcon}`} />
+              }
             </div>
 
             <div className='content__name' title={props.label}>
@@ -77,7 +91,7 @@ class ContentItem extends React.Component {
 
           <div
             className='content__status d-sm-flex justify-content-between align-items-center'
-            style={{color: status.hexcolor}}
+            style={{ color: status.hexcolor }}
             title={props.t(status.label)}
           >
             <div className='content__status__text d-none d-sm-block'>
@@ -129,7 +143,8 @@ ContentItem.propTypes = {
   faIcon: PropTypes.string,
   read: PropTypes.bool,
   urlContent: PropTypes.string,
-  userRoleIdInWorkspace: PropTypes.number
+  userRoleIdInWorkspace: PropTypes.number,
+  isShared: PropTypes.bool
 }
 
 ContentItem.defaultProps = {
@@ -138,5 +153,6 @@ ContentItem.defaultProps = {
   onClickItem: () => {},
   read: false,
   urlContent: '',
-  userRoleIdInWorkspace: 0
+  userRoleIdInWorkspace: 0,
+  isShared: false
 }

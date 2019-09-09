@@ -17,10 +17,6 @@ export function lang (state = defaultLang, action) {
     case `${UPDATE}/${LANG}`:
       return action.langList
 
-    // Côme - 2018/07/30 - deprecated, lang active is saved in user reducer
-    // case `Set/${LANG}/Active`:
-    //   return state.map(l => ({...l, active: l.id === action.langId}))
-
     default:
       return state
   }

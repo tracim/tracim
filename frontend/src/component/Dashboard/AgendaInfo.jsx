@@ -47,5 +47,6 @@ AgendaInfo.propTypes = {
 
 AgendaInfo.defaultProps = {
   introText: '',
+  caldavText: '',
   agendaUrl: ''
 }

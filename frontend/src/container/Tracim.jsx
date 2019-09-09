@@ -49,41 +49,43 @@ import {
   setWorkspaceListMemberList
 } from '../action-creator.sync.js'
 import SearchResult from './SearchResult.jsx'
+import GuestUpload from './GuestUpload.jsx'
+import GuestDownload from './GuestDownload.jsx'
 
 class Tracim extends React.Component {
   constructor (props) {
     super(props)
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
     switch (type) {
-      case 'redirect':
+      case CUSTOM_EVENT.REDIRECT:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.history.push(data.url)
         break
-      case 'addFlashMsg':
+      case CUSTOM_EVENT.ADD_FLASH_MSG:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
         break
       case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        this.loadWorkspaceList(data.idOpenInSidebar ? data.idOpenInSidebar : undefined)
+        this.loadWorkspaceList(data.openInSidebarId ? data.openInSidebarId : undefined)
         break
-      case 'disconnectedFromApi':
+      case CUSTOM_EVENT.DISCONNECTED_FROM_API:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
         break
-      case 'refreshWorkspaceList_then_redirect': // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
+      case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST_THEN_REDIRECT: // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
         await this.loadWorkspaceList()
         this.props.history.push(data.url)
         break
-      case 'setBreadcrumbs':
+      case CUSTOM_EVENT.SET_BREADCRUMBS:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(setBreadcrumbs(data.breadcrumbs))
         break
-      case 'appendBreadcrumbs':
+      case CUSTOM_EVENT.APPEND_BREADCRUMBS:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(appendBreadcrumbs(data.breadcrumbs))
         break
@@ -104,21 +106,21 @@ class Tracim extends React.Component {
           logged: true
         }))
 
-        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
 
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
 
         this.loadAppConfig()
         this.loadWorkspaceList()
         break
-      case 401: props.dispatch(setUserConnected({logged: false})); break
-      default: props.dispatch(setUserConnected({logged: false})); break
+      case 401: props.dispatch(setUserConnected({ logged: false })); break
+      default: props.dispatch(setUserConnected({ logged: false })); break
     }
   }
 
   componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   loadAppConfig = async () => {
@@ -128,25 +130,39 @@ class Tracim extends React.Component {
     if (fetchGetConfig.status === 200) props.dispatch(setConfig(fetchGetConfig.json))
 
     const fetchGetAppList = await props.dispatch(getAppList())
-    if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
+    // FIXME - GB - 2019-07-23 - Hack to add the share folder app at appList while he still doesn't exist in backend
+    if (fetchGetAppList.status === 200) {
+      fetchGetAppList.json.push(
+        {
+          hexcolor: '#414548',
+          slug: 'contents/share_folder',
+          config: {},
+          fa_icon: 'share-alt',
+          is_active: true,
+          label: 'Share Folder'
+        }
+      )
+      props.dispatch(setAppList(fetchGetAppList.json))
+    }
 
     const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
-  loadWorkspaceList = async (idOpenInSidebar = undefined) => {
+  loadWorkspaceList = async (openInSidebarId = undefined) => {
     const { props } = this
 
-    const idWsToOpen = idOpenInSidebar || props.currentWorkspace.id || undefined
+    const idWsToOpen = openInSidebarId || props.currentWorkspace.id || undefined
+    const showOwnedWorkspace = false
 
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
 
     if (fetchGetWorkspaceList.status === 200) {
-      const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen}))
+      const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({ ...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen }))
 
       props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
       this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
-      this.setState({workspaceListLoaded: true})
+      this.setState({ workspaceListLoaded: true })
 
       return true
     }
@@ -158,13 +174,13 @@ class Tracim extends React.Component {
 
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
-        idWorkspace: ws.workspace_id,
+        workspaceId: ws.workspace_id,
         fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      idWorkspace: memberList.idWorkspace,
+      workspaceId: memberList.workspaceId,
       memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
     }))
 
@@ -194,7 +210,7 @@ class Tracim extends React.Component {
     // }
 
     if (
-      !unLoggedAllowedPageList.includes(props.location.pathname) && (
+      !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
         !props.system.workspaceListLoaded ||
         !props.system.appListLoaded ||
         !props.system.contentTypeListLoaded
@@ -219,57 +235,58 @@ class Tracim extends React.Component {
 
           <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />} />
 
-          <Route path='/ui/workspaces/:idws?' render={() => [// Workspace Router
-            // @FIXME - CH - 2018-03-26 - the use of array in a render function avoid having to wrap everything into
-            // a wrapper div.
-            // This is required here to avoid having the div.tracim__content in the agendas pages.
-            // To fix this, upgrade React to at least 16.2.0 and use the first class component React.Fragment instead
-            // of the array syntax that is kind of misleading. Also remove the key props
-            <Route exact path={PAGE.WORKSPACE.ROOT} key='workspace_root' render={() =>
-              <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
-            } />,
+          <Route path='/ui/workspaces/:idws?' render={() =>
+            <>
+              <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
+                <Redirect to={{ pathname: PAGE.HOME, state: { from: props.location } }} />
+              } />
 
-            <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} key='workspace_redirect_to_contentlist' render={props2 => // handle '/workspaces/:id' and add '/contents'
-              <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
-            } />,
+              <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
+                <Redirect to={{ pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: { from: props.location } }} />
+              } />
 
-            <Route
-              path={[
-                PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
-                PAGE.WORKSPACE.CONTENT_LIST(':idws')
-              ]}
-              key='workspace_contentlist'
-              render={() =>
+              <Route
+                path={[
+                  PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
+                  PAGE.WORKSPACE.CONTENT_LIST(':idws'),
+                  PAGE.WORKSPACE.SHARE_FOLDER(':idws')
+                ]}
+                render={() =>
+                  <div className='tracim__content fullWidthFullHeight'>
+                    <WorkspaceContent />
+                  </div>
+                }
+              />
+
+              <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} render={() =>
                 <div className='tracim__content fullWidthFullHeight'>
-                  <WorkspaceContent />
+                  <Dashboard />
                 </div>
-              }
-            />,
+              } />
 
-            <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} key='workspace_dashboard' render={() =>
-              <div className='tracim__content fullWidthFullHeight'>
-                <Dashboard />
-              </div>
-            } />,
-
-            <Route path={PAGE.WORKSPACE.AGENDA(':idws')} key='workspace_agenda' render={() =>
-              <AppFullscreenRouter />
-            } />
-          ]} />
+              <Route path={PAGE.WORKSPACE.AGENDA(':idws')} render={() =>
+                <AppFullscreenRouter />
+              } />
+            </>
+          } />
 
           <Route path={PAGE.ACCOUNT} render={() => <Account />} />
 
-          <Route exact path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() => <AdminAccount />} />
+          <Route exact path={PAGE.ADMIN.USER_EDIT(':userid')} render={() => <AdminAccount />} />
 
           <Route exact path={[
             PAGE.ADMIN.USER,
             PAGE.ADMIN.WORKSPACE,
-            PAGE.AGENDA
+            PAGE.AGENDA,
+            PAGE.WORKSPACE.CONTENT_EDITION()
           ]} render={() => <AppFullscreenRouter />} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
           <Route path={PAGE.SEARCH_RESULT} component={SearchResult} />
+
+          <Route path={PAGE.GUEST_UPLOAD(':token')} component={GuestUpload} />
+          <Route path={PAGE.GUEST_DOWNLOAD(':token')} component={GuestDownload} />
 
           {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
           <div id='appFullscreenContainer' />

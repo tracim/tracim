@@ -2,15 +2,15 @@ import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
-import color from 'color'
 import PreviewComponent from './PreviewComponent.jsx'
 import { MODE } from '../helper.js'
-import FileDropzone from './FileDropzone.jsx'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
-import { DisplayState, ROLE_OBJECT } from 'tracim_frontend_lib'
+import { DisplayState, FileDropzone } from 'tracim_frontend_lib'
+
+const color = require('color')
 
 export const FileComponent = props =>
-  <div className={classnames('file__contentpage__statewrapper', {'displayState': props.isArchived || props.isDeleted})}>
+  <div className={classnames('file__contentpage__statewrapper', { 'displayState': props.isArchived || props.isDeleted || props.isDeprecated })}>
     {props.isArchived && (
       <DisplayState
         msg={props.t('This content is archived')}
@@ -47,18 +47,11 @@ export const FileComponent = props =>
         downloadPdfPageUrl={props.downloadPdfPageUrl}
         downloadPdfFullUrl={props.downloadPdfFullUrl}
         previewUrl={props.previewUrl}
-        fileSize={props.fileSize}
         filePageNb={props.filePageNb}
         fileCurrentPage={props.fileCurrentPage}
         lightboxUrlList={props.lightboxUrlList}
-        displayProperty={props.displayProperty}
-        onClickProperty={props.onClickProperty}
-        description={props.description}
-        displayChangeDescriptionBtn={props.loggedUser.idRoleUserWorkspace >= ROLE_OBJECT.contributor.id}
-        disableChangeDescription={!props.isEditable}
         onClickPreviousPage={props.onClickPreviousPage}
         onClickNextPage={props.onClickNextPage}
-        onClickValidateNewDescription={props.onClickValidateNewDescription}
       />
     }
 
@@ -84,7 +77,7 @@ export const FileComponent = props =>
           <button
             type='button'
             className='file__contentpage__dropzone__btn__cancel btn outlineTextBtn nohover'
-            style={{borderColor: props.customColor}}
+            style={{ borderColor: props.customColor }}
             onClick={props.onClickDropzoneCancel}
           >
             {props.t('Cancel')}
@@ -96,7 +89,7 @@ export const FileComponent = props =>
             style={{
               backgroundColor: props.customColor,
               ':hover': {
-                backgroundColor: color(props.customColor).darken(0.15).hexString()
+                backgroundColor: color(props.customColor).darken(0.15).hex()
               }
             }}
             onClick={props.onClickDropzoneValidate}

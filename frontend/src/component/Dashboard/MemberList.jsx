@@ -6,7 +6,7 @@ import { NewMemberForm, Avatar } from 'tracim_frontend_lib'
 require('./MemberList.styl')
 
 export class MemberList extends React.Component {
-  handleClickBtnValidate = async () => await this.props.onClickValidateNewMember() && this.setState({displayNewMemberList: true})
+  handleClickBtnValidate = async () => await this.props.onClickValidateNewMember() && this.setState({ displayNewMemberList: true })
 
   render () {
     const { props } = this
@@ -35,14 +35,14 @@ export class MemberList extends React.Component {
                 onClickBtnValidate={this.handleClickBtnValidate}
                 emailNotifActivated={props.emailNotifActivated}
                 canSendInviteNewUser={props.canSendInviteNewUser}
-                idRoleUserWorkspace={props.idRoleUserWorkspace}
+                userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 autoCompleteClicked={props.autoCompleteClicked}
                 onClickAutoComplete={props.onClickAutoComplete}
               />
             )
             : (
               <div>
-                <ul className={classnames('memberlist__list', {'withAddBtn': props.idRoleUserWorkspace >= 8})}>
+                <ul className={classnames('memberlist__list', { 'withAddBtn': props.userRoleIdInWorkspace >= 8 })}>
                   {props.memberList.map(m =>
                     <li className='memberlist__list__item  primaryColorBgLightenHover' key={m.id}>
                       <div className='memberlist__list__item__avatar'>
@@ -59,7 +59,7 @@ export class MemberList extends React.Component {
                         </div>
                       </div>
 
-                      {props.idRoleUserWorkspace >= 8 && m.id !== props.loggedUser.user_id && (
+                      {props.userRoleIdInWorkspace >= 8 && m.id !== props.loggedUser.user_id && (
                         <div
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}
@@ -71,7 +71,7 @@ export class MemberList extends React.Component {
                   )}
                 </ul>
 
-                {props.idRoleUserWorkspace >= 8 && (
+                {props.userRoleIdInWorkspace >= 8 && (
                   <div className='memberlist__btnadd' data-cy='memberlist__btnadd' onClick={props.onClickAddMemberBtn}>
                     <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
                       <div className='memberlist__btnadd__button__avatar'>

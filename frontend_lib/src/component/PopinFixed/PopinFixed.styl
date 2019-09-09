@@ -96,19 +96,47 @@
       height 100%
     &__right
       transition width 0.4s ease
-      width calc(25% - 10px)
+      width 25%
       height 100%
+      &__header
+        display flex
+        flex-direction column
+        width 65px
+        background-color mediumGrey
+        font-size 20px
+        color darkGrey
+        cursor pointer
+        &__icon
+          cursor pointer
+          border none
+          height 65px
+          background-color mediumGrey
+          &:focus
+            border-color transparent
+            outline 0
+          &.active
+            padding-left 1px
+            background-color lightGrey
+            border-left 5px solid
+          &__close
+            text-align center
+            cursor pointer
+            margin auto 0 15px
 
 .rightPartClose
-  .wsContentGeneric__content__left
-    width calc(50% - 50px)
-  //.wsContentGeneric__content__right
-  //  width 50px // 50px is the width of the rightPart header (eg. timeline__header)
+  .wsContentGeneric__content
+    &__left
+      width calc(50% - 65px) // 65px is the width of the rightPart header
+    &__right__header__icon.active
+      background-color mediumGrey
+      border none
+
+// MEDIAQUERIES
 
 @media (max-width: max-lg)
   .rightPartClose
     .wsContentGeneric__content__left
-      width calc(100% - 20px) // 20px => margin
+      width 100%
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .wsContentGeneric
@@ -116,13 +144,47 @@
       overflow-Y auto
       width 100%
       &__left
-        margin-bottom 20px
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
       &__right
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
 
+
+responsiveColumnStyle()
+  .wsContentGeneric
+    &__content
+      &__right
+        display flex
+        flex-direction column
+        margin 0
+        &__header
+          flex-direction row
+          width 100%
+          height 65px
+          justify-content flex-end
+          &__icon
+            transform none
+            margin 10px
+            padding 10px
+            width 65px
+            & > i
+              margin auto
+            &.active
+              border none
+              border-top 5px solid
+              padding 10px
+            &__close
+              display none
+  .rightPartClose
+    .wsContentGeneric__content__right__header__icon.active
+        background-color lightGrey
+        border none
+        border-top 5px solid
+        padding 10px
+
+@media (min-width: min-lg) and (max-width: max-lg)
+  responsiveColumnStyle()
 
 @media (min-width: min-md) and (max-width: max-md)
   .wsContentGeneric
@@ -130,15 +192,15 @@
       overflow-Y auto
       width 100%
       &__left
-        margin-bottom 20px
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
         &__textnote
           height auto
           overflow-y hidden
       &__right
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
+  responsiveColumnStyle()
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .wsContentGeneric
@@ -149,15 +211,15 @@
       overflow-Y auto
       width 100%
       &__left
-        margin-bottom 20px
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
         &__textnote
           height auto
           overflow-y hidden
       &__right
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
+  responsiveColumnStyle()
 
 @media (max-width: max-xs)
   .wsContentGeneric
@@ -170,12 +232,12 @@
       overflow-Y auto
       width 100%
       &__left
-        margin-bottom 20px
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
         &__textnote
           height auto
           overflow-y hidden
       &__right
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
+  responsiveColumnStyle()

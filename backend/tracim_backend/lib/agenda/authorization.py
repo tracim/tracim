@@ -26,7 +26,7 @@ def add_www_authenticate_header_for_caldav(config):
     config.add_subscriber(add_www_authenticate_header_for_caldav_to_response, NewResponse)
 
 
-def add_www_authenticate_header_for_caldav_to_response(event):
+def add_www_authenticate_header_for_caldav_to_response(event: NewResponse) -> None:
     """
     Add WWW-Authenticate header to response in case of CALDAV_NOT_AUTHENTICATED
     error.
@@ -125,7 +125,7 @@ class CaldavChecker(AuthorizationChecker):
     def __init__(self, checker: AuthorizationChecker) -> None:
         self.checker = checker
 
-    def check(self, tracim_context: TracimContext):
+    def check(self, tracim_context: TracimContext) -> bool:
         try:
             return self.checker.check(tracim_context)
         except NotAuthenticated as exc:

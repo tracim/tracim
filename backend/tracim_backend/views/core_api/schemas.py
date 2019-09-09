@@ -17,6 +17,7 @@ from tracim_backend.app_models.validator import content_status_validator
 from tracim_backend.app_models.validator import not_empty_string_validator
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
+from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -82,6 +83,25 @@ class StrippedString(String):
         return value.strip()
 
 
+class CollaborativeFileTypeSchema(marshmallow.Schema):
+    mimetype = marshmallow.fields.String(
+        example="application/vnd.oasis.opendocument.text",
+        required=True,
+        description="Collabora Online file mimetype",
+    )
+    extension = marshmallow.fields.String(
+        example="odt", required=True, description="Collabora Online file extensions"
+    )
+    associated_action = marshmallow.fields.String(
+        example="edit", required=True, description="Collabora Online action allowed"
+    )
+    url_source = marshmallow.fields.URL(
+        required=True,
+        description="URL of the collabora online editor for this type of file",
+        example="http://localhost:9980/loleaflet/305832f/loleaflet.html",
+    )
+
+
 class SimpleFileSchema(marshmallow.Schema):
     """
     Just a simple schema for file
@@ -89,6 +109,7 @@ class SimpleFileSchema(marshmallow.Schema):
 
     # TODO - G.M - 2018-10-09 - Set required to True, actually disable because
     # activating it make it failed due to "is not iterable issue.
+    # see https://github.com/tracim/tracim/issues/2350
     files = marshmallow.fields.Raw(required=False, description="a file")
 
     @post_load
@@ -296,6 +317,33 @@ class UserIdPathSchema(marshmallow.Schema):
     )
 
 
+class UserWorkspaceFilterQuery(object):
+    def __init__(self, show_owned_workspace: int = 1, show_workspace_with_role: int = 1):
+        self.show_owned_workspace = bool(show_owned_workspace)
+        self.show_workspace_with_role = bool(show_workspace_with_role)
+
+
+class UserWorkspaceFilterQuerySchema(marshmallow.Schema):
+    show_owned_workspace = marshmallow.fields.Int(
+        example=1,
+        default=1,
+        description="if set to 1, then show owned workspace in list"
+        " Default is 1, else do no show them",
+        validate=bool_as_int_validator,
+    )
+    show_workspace_with_role = marshmallow.fields.Int(
+        example=1,
+        default=1,
+        description="if set to 1, then show workspace were user as a role in list"
+        " Default is 1, else do no show them",
+        validate=bool_as_int_validator,
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return UserWorkspaceFilterQuery(**data)
+
+
 class WorkspaceIdPathSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(
         example=4,
@@ -491,6 +539,13 @@ class FilterContentQuerySchema(marshmallow.Schema):
         " return mix of all content of all theses parent_ids",
         default="0",
     )
+    namespaces_filter = StrippedString(
+        validate=regex_string_as_list_of_string,
+        example="content,upload",
+        description="comma list of namespaces allowed",
+        default=None,
+        allow_none=True,
+    )
     complete_path_to_id = marshmallow.fields.Int(
         example=6,
         validate=strictly_positive_int_validator,
@@ -679,6 +734,20 @@ class WorkspaceModifySchema(marshmallow.Schema):
         description="has workspace has an associated agenda ?",
         allow_none=True,
     )
+    public_upload_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="is workspace allowing manager to give access external user"
+        "to upload file into it ?",
+        default=None,
+        allow_none=True,
+    )
+    public_download_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="is workspace allowing manager to give access external user"
+        "to some file into it ?",
+        default=None,
+        allow_none=True,
+    )
 
     @post_load
     def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -692,6 +761,18 @@ class WorkspaceCreationSchema(marshmallow.Schema):
     description = StrippedString(required=True, example="A super description of my workspace.")
     agenda_enabled = marshmallow.fields.Bool(
         required=False, description="has workspace has an associated agenda ?", default=True
+    )
+    public_upload_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="is workspace allowing manager to give access external user"
+        "to upload file into it ?",
+        default=True,
+    )
+    public_download_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="is workspace allowing manager to give access external user"
+        "to some file into it ?",
+        default=True,
     )
 
     @post_load
@@ -733,6 +814,16 @@ class WorkspaceDigestSchema(marshmallow.Schema):
     sidebar_entries = marshmallow.fields.Nested(WorkspaceMenuEntrySchema, many=True)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
     agenda_enabled = marshmallow.fields.Bool(example=True, default=True)
+    public_upload_enabled = marshmallow.fields.Bool(
+        description="is workspace allowing manager to give access external user"
+        "to upload file into it ?",
+        default=True,
+    )
+    public_download_enabled = marshmallow.fields.Bool(
+        description="is workspace allowing manager to give access external user"
+        "to some file into it ?",
+        default=True,
+    )
 
     class Meta:
         description = "Digest of workspace informations"
@@ -740,6 +831,11 @@ class WorkspaceDigestSchema(marshmallow.Schema):
 
 class WorkspaceSchema(WorkspaceDigestSchema):
     description = StrippedString(example="All intranet data.")
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Workspace creation date"
+    )
+    owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
+    size = marshmallow.fields.Int()
 
     class Meta:
         description = "Full workspace informations"
@@ -784,13 +880,6 @@ class AboutSchema(marshmallow.Schema):
     website = marshmallow.fields.URL(allow_none=True)
 
 
-class ConfigSchema(marshmallow.Schema):
-    email_notification_activated = marshmallow.fields.Bool()
-    new_user_invitation_do_notify = marshmallow.fields.Bool()
-    webdav_enabled = marshmallow.fields.Bool()
-    webdav_url = marshmallow.fields.String()
-
-
 class ErrorCodeSchema(marshmallow.Schema):
     name = marshmallow.fields.Str()
     code = marshmallow.fields.Int()
@@ -827,7 +916,7 @@ class StatusSchema(marshmallow.Schema):
         description="global_status: open, closed",
         validate=content_global_status_validator,
     )
-    label = StrippedString(example="Open")
+    label = StrippedString(example="Opened")
     fa_icon = StrippedString(example="fa-check")
     hexcolor = StrippedString(example="#0000FF")
 
@@ -897,6 +986,7 @@ class ContentCreationSchema(marshmallow.Schema):
 
 
 class ContentDigestSchema(marshmallow.Schema):
+    content_namespace = marshmallow.fields.String(example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     slug = StrippedString(example="intervention-report-12")
     parent_id = marshmallow.fields.Int(
@@ -936,6 +1026,9 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Content creation date"
+    )
+    actives_shares = marshmallow.fields.Int(
+        description="number of active share on file", validate=positive_int_validator
     )
 
 
@@ -1018,6 +1111,13 @@ class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
     pass
 
 
+class CollaborativeDocumentEditionConfigSchema(marshmallow.Schema):
+    software = marshmallow.fields.String()
+    supported_file_types = marshmallow.fields.List(
+        marshmallow.fields.Nested(CollaborativeFileTypeSchema())
+    )
+
+
 class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
@@ -1085,3 +1185,16 @@ class SetContentStatusSchema(marshmallow.Schema):
     @post_load
     def set_status(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetContentStatus(**data)
+
+
+class ConfigSchema(marshmallow.Schema):
+    email_notification_activated = marshmallow.fields.Bool()
+    new_user_invitation_do_notify = marshmallow.fields.Bool()
+    webdav_enabled = marshmallow.fields.Bool()
+    webdav_url = marshmallow.fields.String()
+    collaborative_document_edition = marshmallow.fields.Nested(
+        CollaborativeDocumentEditionConfigSchema(), allow_none=True
+    )
+    content_length_file_size_limit = marshmallow.fields.Integer()
+    workspace_size_limit = marshmallow.fields.Integer()
+    workspaces_number_per_user_limit = marshmallow.fields.Integer()

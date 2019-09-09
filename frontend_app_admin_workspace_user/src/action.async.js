@@ -1,4 +1,4 @@
-import { FETCH_CONFIG } from './helper.js'
+import { FETCH_CONFIG } from 'tracim_frontend_lib'
 
 export const getWorkspaceList = (user, apiUrl) =>
   fetch(`${apiUrl}/workspaces`, {
@@ -9,8 +9,8 @@ export const getWorkspaceList = (user, apiUrl) =>
     method: 'GET'
   })
 
-export const getWorkspaceMemberList = (apiUrl, idWorkspace) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/members`, {
+export const getWorkspaceMemberList = (apiUrl, workspaceId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/members`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -18,8 +18,8 @@ export const getWorkspaceMemberList = (apiUrl, idWorkspace) =>
     method: 'GET'
   })
 
-export const getWorkspaceDetail = (apiUrl, idWorkspace) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}`, {
+export const getWorkspaceDetail = (apiUrl, workspaceId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -27,8 +27,8 @@ export const getWorkspaceDetail = (apiUrl, idWorkspace) =>
     method: 'GET'
   })
 
-export const deleteWorkspace = (apiUrl, idWorkspace) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/trashed`, {
+export const deleteWorkspace = (apiUrl, workspaceId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/trashed`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -45,8 +45,8 @@ export const getUserList = apiUrl =>
     method: 'GET'
   })
 
-export const getUserDetail = (apiUrl, idUser) =>
-  fetch(`${apiUrl}/users/${idUser}`, {
+export const getUserDetail = (apiUrl, userId) =>
+  fetch(`${apiUrl}/users/${userId}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -54,8 +54,8 @@ export const getUserDetail = (apiUrl, idUser) =>
     method: 'GET'
   })
 
-export const putUserDisable = (apiUrl, idUser) =>
-  fetch(`${apiUrl}/users/${idUser}/disabled`, {
+export const putUserDisable = (apiUrl, userId) =>
+  fetch(`${apiUrl}/users/${userId}/disabled`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -63,8 +63,8 @@ export const putUserDisable = (apiUrl, idUser) =>
     method: 'PUT'
   })
 
-export const putUserEnable = (apiUrl, idUser) =>
-  fetch(`${apiUrl}/users/${idUser}/enabled`, {
+export const putUserEnable = (apiUrl, userId) =>
+  fetch(`${apiUrl}/users/${userId}/enabled`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -72,8 +72,8 @@ export const putUserEnable = (apiUrl, idUser) =>
     method: 'PUT'
   })
 
-export const putMyselfProfile = (apiUrl, idUser, newProfile) =>
-  fetch(`${apiUrl}/users/${idUser}/profile`, {
+export const putMyselfProfile = (apiUrl, userId, newProfile) =>
+  fetch(`${apiUrl}/users/${userId}/profile`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -84,8 +84,8 @@ export const putMyselfProfile = (apiUrl, idUser, newProfile) =>
     method: 'PUT'
   })
 
-export const putUserProfile = (apiUrl, idUser, newProfile) =>
-  fetch(`${apiUrl}/users/${idUser}/profile`, {
+export const putUserProfile = (apiUrl, userId, newProfile) =>
+  fetch(`${apiUrl}/users/${userId}/profile`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

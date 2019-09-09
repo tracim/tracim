@@ -48,6 +48,7 @@ const ExtandedAction = props => {
         </div>
         */}
 
+        {/* INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
         {props.userRoleIdInWorkspace >= 4 && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
@@ -62,7 +63,7 @@ const ExtandedAction = props => {
               {props.t('Archive')}
             </div>
           </div>
-        )}
+        )} */}
 
         {props.userRoleIdInWorkspace >= 4 && (
           <div

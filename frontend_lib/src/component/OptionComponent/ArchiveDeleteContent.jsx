@@ -1,6 +1,7 @@
 import React from 'react'
 import Radium from 'radium'
 import { translate } from 'react-i18next'
+import PropTypes from 'prop-types'
 
 const ArchiveDeleteContent = props => {
   const styleColorBtn = {
@@ -13,6 +14,7 @@ const ArchiveDeleteContent = props => {
 
   return (
     <div className='d-flex align-items-center'>
+      {/* INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
       <button
         type='button'
         className='wsContentGeneric__option__menu__action d-none d-sm-block btn iconBtn'
@@ -24,7 +26,7 @@ const ArchiveDeleteContent = props => {
         data-cy='archive__button'
       >
         <i className='fa fa-fw fa-archive' />
-      </button>
+      </button> */}
       <button
         type='button'
         className='wsContentGeneric__option__menu__action d-none d-sm-block btn iconBtn'
@@ -42,3 +44,17 @@ const ArchiveDeleteContent = props => {
 }
 
 export default translate()(Radium(ArchiveDeleteContent))
+
+ArchiveDeleteContent.propTypes = {
+  onClickDeleteBtn: PropTypes.func,
+  onClickArchiveBtn: PropTypes.func,
+  disabled: PropTypes.bool,
+  customColor: PropTypes.string
+}
+
+ArchiveDeleteContent.defaultProps = {
+  onClickDeleteBtn: () => {},
+  onClickArchiveBtn: () => {},
+  disabled: false,
+  customColor: ''
+}

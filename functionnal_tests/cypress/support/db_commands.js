@@ -25,10 +25,19 @@ Cypress.Commands.add('addUserToWorkspace', (userId, workspaceId, role = 'contrib
 
 Cypress.Commands.add('execAsAdmin', (user, callback) => {
   cy.logout()
-  cy.loginAs('administrators')
-  const result = callback().then(res => cy.log(res.email))
-  cy.logout()
-  cy.loginAs(user.profile)
+  cy.loginAs('administrators').then( () => {
+    return callback().then(res => cy.log(res.email))
+  }).then( (result) => {
+    cy.logout()
+    cy.login(user)
+  })
+})
+
+Cypress.Commands.add('enableAgenda', (workspace, enabled = true) => {
+  const data = {
+    agenda_enabled: enabled
+  }
+  cy.request('PUT', `/api/v2/workspaces/${workspace.workspace_id}`, data).then(response => response.body)
 })
 
 Cypress.Commands.add('createRandomUser', (profile = 'users') => {
@@ -45,7 +54,10 @@ Cypress.Commands.add('createRandomUser', (profile = 'users') => {
   }
   return cy
     .request('POST', '/api/v2/users', data)
-    .then(response => response.body)
+    .then(response => {
+      response.body.password = '8QLa$<w'
+      return response.body
+  })
 })
 
 Cypress.Commands.add('createUser', (fixturePath = 'baseUser') => {
@@ -225,27 +237,30 @@ Cypress.Commands.add('createFolder', (title, workspaceId, parentId = null) => {
 
 Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspaceId, parentId = null) => {
   let url = `/api/v2/workspaces/${workspaceId}/files`
-  cy.fixture(fixturePath, 'base64').then(fixture => {
-    cy.window().then(window => {
-      Cypress.Blob.base64StringToBlob(fixture, fixtureMime).then(blob => {
-        let form = new FormData()
-        form.set('files', blob, fileTitle)
-        cy
-          .form_request('POST', url, form)
-          .then(response => {
-            if (response === undefined) {
-              // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
-              // end up with an undefined response we need to dig up to find if it's the server or cypress
-              // Issue 1836
-              cy.log(`undefined response for request to url ${url} and file title ${fileTitle}`)
-              cy.wrap(undefined).should('be.undefined')
-            } else {
-              return response.body
-            }
-          })
-      })
+
+  return cy.fixture(fixturePath, 'base64')
+    .then(fixture => Cypress.Blob.base64StringToBlob(fixture, fixtureMime))
+    .then(blob => {
+      let form = new FormData()
+
+      form.set('files', blob, fileTitle)
+
+      return cy.form_request('POST', url, form)
     })
-  })
+})
+
+Cypress.Commands.add('updateFile', (fixturePath, fixtureMime, workspaceId, contentId, fileTitle) => {
+  let url = `/api/v2/workspaces/${workspaceId}/files/${contentId}/raw/${fileTitle}`
+
+  return cy.fixture(fixturePath, 'base64')
+    .then(fixture => Cypress.Blob.base64StringToBlob(fixture, fixtureMime))
+    .then(blob => {
+      let form = new FormData()
+
+      form.set('files', blob, fileTitle)
+
+      return cy.form_request('PUT', url, form)
+    })
 })
 
 Cypress.Commands.add('logInFile', (message, logPath = '/tmp/cypress.log') => {

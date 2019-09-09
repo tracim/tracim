@@ -7,17 +7,18 @@ require('./InputGroupText.styl')
 const InputGroupText = props => {
   return (
     <div className={classnames(`inputGroupText ${props.parentClassName}`, props.customClass, 'form-group')}>
-      <div className={classnames(`inputGroupText__icon ${props.parentClassName}__icon`)}>
-        <i className={classnames('fa fa-fw', props.icon)} />
-      </div>
+      {props.icon !== '' &&
+        <i className={classnames('inputGroupText__icon fa fa-fw', props.icon)} />
+      }
       <input
         type={props.type}
-        className={classnames(`inputGroupText__input ${props.parentClassName}__input`, 'form-control', {'is-invalid': props.isInvalid})}
+        className={classnames(`inputGroupText__input ${props.parentClassName}__input`, 'form-control', { 'is-invalid': props.isInvalid })}
         placeholder={props.placeHolder}
         value={props.value}
         onChange={props.onChange}
         onKeyDown={props.onKeyDown}
         maxLength={props.maxLength}
+        name={props.name}
       />
       <div className={classnames(`${props.parentClassName}__msgerror`, 'invalid-feedback')}>
         {props.invalidMsg}
@@ -44,9 +45,9 @@ InputGroupText.propTypes = {
 
 InputGroupText.defaultProps = {
   customClass: '',
-  icon: false,
+  icon: '',
   placeHolder: '',
-  invalidMsg: false,
+  invalidMsg: '',
   isInvalid: false,
   onChange: () => {},
   onKeyDown: () => {},

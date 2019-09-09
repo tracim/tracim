@@ -7,7 +7,7 @@ module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: isProduction
     ? './src/index.js' // only one instance of babel-polyfill is allowed
-    : ['@babel/polyfill', './src/index.dev.js'],
+    : ['./src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'folder.app.js' : 'folder.app.dev.js',
