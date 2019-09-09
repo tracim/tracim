@@ -492,7 +492,7 @@ If there is an update of tracim, use this one to migrate index (experimental, pr
 
 Your data are correctly indexed now, you can go to tracim ui and use search mecanism.
 
-# Collaborative Edition online (tracim v2.4+)#
+# Collaborative Edition online (tracim v2.4+) #
 
 ## Collaborative edition server ##
 
