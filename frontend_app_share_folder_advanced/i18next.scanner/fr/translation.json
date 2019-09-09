@@ -18,5 +18,6 @@
   "Error in the URL": "Erreur dans l'URL",
   "Error while deleting share link": "Erreur lors de la suppression d'un lien de partage",
   "Protect by password": "Protéger par un mot de passe",
-  "Cancel protection by password": "Annuler la protection par mot de passe"
+  "Cancel protection by password": "Annuler la protection par mot de passe",
+  "Received files": "Fichiers reçus"
 }

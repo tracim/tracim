@@ -229,5 +229,12 @@
   "Thank you, your import is finished!": "Thank you, your import is finished!",
   "Full name": "Full name",
   "Error while loading upload infos": "Error while loading upload infos",
-  "Error while loading file information": "Error while loading file information"
+  "Error while loading file information": "Error while loading file information",
+  "Files already uploaded:": "Files already uploaded:",
+  "Full name must be at least 1 character": "Full name must be at least 1 character",
+  "Full name must be less than 255 characters": "Full name must be less than 255 characters",
+  "Password must be at least 6 characters": "Password must be at least 6 characters",
+  "Password must be less than 255 characters": "Password must be less than 255 characters",
+  "Errors in form:": "Errors in form:",
+  "Full name is required": "Full name is required"
 }

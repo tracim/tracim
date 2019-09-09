@@ -223,12 +223,18 @@
   "Error in the URL": "Erreur dans l'URL",
   "Content not found": "Contenu introuvable",
   "Workspace not found": "Espace partagé introuvable",
-  "Inbox": "Boite de réception",
   "Received files": "Fichiers reçus",
   "Error while loading uploaded files": "Erreur lors du chargement des fichiers téléversés",
   "Error while downloading file": "Erreur lors du téléchargement du fichier",
   "Manage": "Paramétrer",
-  "Error while loading file infos": "Erreur lors du chargement des informations du fichier",
   "Full name": "Nom complet",
-  "Error while loading upload infos": "Erreur lors du chargement des informations du téléversement"
+  "Error while loading upload infos": "Erreur lors du chargement des informations du téléversement",
+  "Error while loading file information": "Erreur lors du chargement des informations du fichier",
+  "Files already uploaded:": "Fichiers déjà téléversés",
+  "Full name must be at least 1 character": "Le nom complet doit comporter au moins 1 caractère",
+  "Full name must be less than 255 characters": "Le nom complet doit comporter moins de 255 caractères.",
+  "Password must be at least 6 characters": "Le mot de passe doit comporter au moins 6 caractères",
+  "Password must be less than 255 characters": "Le mot de passe doit comporter moins de 255 caractères.",
+  "Errors in form:": "Erreurs dans le formulaire",
+  "Full name is required": "Le nom complet est requis"
 }
