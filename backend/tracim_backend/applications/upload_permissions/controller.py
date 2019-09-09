@@ -21,11 +21,13 @@ from tracim_backend.applications.upload_permissions.schema import UploadPermissi
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionTokenPath
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import UploadPermissionNotFound
 from tracim_backend.exceptions import WorkspacePublicUploadDisabledException
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_content_manager
@@ -175,6 +177,7 @@ class UploadPermissionController(Controller):
     @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UploadPermissionTokenPath())
     @hapic.input_forms(UploadDataFormSchema())
     @hapic.input_files(UploadFileSchema())
@@ -203,6 +206,10 @@ class UploadPermissionController(Controller):
         workspace = workspace_api.get_one(upload_permission.workspace_id)
         workspace_api.check_public_upload_enabled(workspace)
         api.check_password(upload_permission, password=hapic_data.forms.password)
+        content_api = ContentApi(current_user=None, session=request.dbsession, config=app_config)
+        content_api.check_workspace_size_limitation(
+            content_length=request.content_length, workspace=workspace
+        )
         api.upload_files(
             upload_permission=upload_permission,
             uploader_username=hapic_data.forms.username,
