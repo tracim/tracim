@@ -497,10 +497,11 @@ Your data are correctly indexed now, you can go to tracim ui and use search meca
 ## Collaborative edition server ##
 
 In tracim 2.4, Collaborative Edition online does support Collabora/libreofficeOnline.
+
 It is tested with Collabora Online (professional version of Collabora) and with [Collabora CODE](https://www.collaboraoffice.com/code/).
 We do not support yet other collaborative edition online service but we do support WOPI protocol making support for WOPI compatible software easy.
 
-To set up a `Collabora CODE` server using docker for testing purpose ([image](https://hub.docker.com/r/collabora/code))
+**To set up a `Collabora CODE` server using docker for testing purpose ([image](https://hub.docker.com/r/collabora/code)):**
 
 note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like `domain=tracim\\.mysuperdomain\\.com`):
 
@@ -510,19 +511,23 @@ note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like
 :warning: Tracim is tested with the version 4.0.5.2, you can use the latest version at your own risk
 
 
-Similar example with LibreofficeOnline(rolling release, unstable :warning:) server using docker ([image](https://hub.docker.com/r/libreoffice/online)):
+**To set up a `LibreofficeOnline` server(rolling release, unstable :warning:) using docker ([image](https://hub.docker.com/r/libreoffice/online)):**
 
 
 `sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always libreoffice/online:master`
 
 
-:information source: All the informations to set up a `Collabora CODE/ LibreofficelOnline` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
+:information source: All the information to set up a `Collabora CODE/ LibreofficelOnline` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
 
-:warning: Be really carefull about configuring domain parameter, as [official documentation](https://www.collaboraoffice.com/code/docker/) said, value should be dot escaped, ex: `domain=.*\\.mysuperdomain\\.com`
+:warning: Be really careful about configuring domain parameter, as [official documentation](https://www.collaboraoffice.com/code/docker/) said, value should be dot escaped, ex: `domain=.*\\.mysuperdomain\\.com`
 
-:information_source: you can add username/password parameter to set collabora admin console too : `-e "username=admin" -e "password=S3cRet"`
+:information_source: you can add username/password parameter to set collabora admin console too :
 
-:information_source: to avoid using automatic ssl/tls encryption in collabora, you should disable this: `-e "extra_params=--o:ssl.enable=false"`
+`-e "username=admin" -e "password=S3cRet"`
+
+:information_source: to avoid using automatic ssl/tls encryption in collabora, you should disable it:
+
+`-e "extra_params=--o:ssl.enable=false"`
 
 
 
