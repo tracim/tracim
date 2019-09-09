@@ -525,6 +525,10 @@ note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like
 
 `-e "username=admin" -e "password=S3cRet"`
 
+admin interface is available at `https://<collabora_host>/loleaflet/dist/admin/admin.html`
+
+with collabora host can be value like `collaboradomain.ndd` or `localhost:9980`
+
 :information_source: to avoid using automatic ssl/tls encryption in collabora, you should disable it:
 
 `-e "extra_params=--o:ssl.enable=false"`
@@ -542,7 +546,9 @@ First you need to enable the edition on the API:
 
 Then you need to indicate the ip adress of the server for the protocol `WOPI`:
 
-`collaborative_document_edition.collabora.base_url = COLLABORA_IP_ADDRESS:PORT`
+`collaborative_document_edition.collabora.base_url = <collabora_base_url>`
+
+with collabora_base_url can be value like `http://localhost:9980` or `http://mycollaboraserver.ndd`
 
 
 Then you can set up default office document templates files, these templates will be the one used to create an empty document using Tracim online app.
