@@ -50,18 +50,19 @@ class GuestUpload extends React.Component {
 
     const response = await props.dispatch(getGuestUploadInfo(props.match.params.token))
 
-    switch (response.apiResponse.status) {
+    switch (response.status) {
       case 200:
-        this.setState({
-          hasPassword: response.json.has_password
-        })
+        this.setState({ hasPassword: response.json.has_password })
         break
       case 400:
-        this.sendGlobalFlashMessage(props.t('Error in the URL'))
+        switch (response.json.code) {
+          case 1008: this.sendGlobalFlashMessage(props.t('Error, this link is invalid or has expired')); break
+          default: this.sendGlobalFlashMessage(props.t('Error in the URL')); break
+        }
         props.history.push(PAGE.LOGIN)
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading upload infos'))
+        this.sendGlobalFlashMessage(props.t('Error while loading upload informations'))
         props.history.push(PAGE.LOGIN)
     }
   }

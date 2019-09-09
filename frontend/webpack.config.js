@@ -34,7 +34,7 @@ module.exports = {
     //   'Access-Control-Allow-Origin': '*'
     // }
   },
-  devtool: isProduction ? false : 'cheap-eval-source-map ',
+  devtool: isProduction ? false : 'eval-source-map ',
   node: { // https://github.com/josephsavona/valuable/issues/9#issuecomment-65000999
     fs: "empty"
   },
