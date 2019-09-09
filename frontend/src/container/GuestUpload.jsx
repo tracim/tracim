@@ -52,8 +52,7 @@ class GuestUpload extends React.Component {
     const { props } = this
 
     const response = await props.dispatch(getGuestUploadInfo(props.match.params.token))
-
-    switch (response.apiResponse.status) {
+    switch (response.status) {
       case 200:
         this.setState({
           hasPassword: response.json.has_password
@@ -115,8 +114,36 @@ class GuestUpload extends React.Component {
     }))
   }
 
+  validateForm = () => {
+    const { props, state } = this
+    let errors = []
+    if (state.guestFullname.value.length < 1) errors.push({ field: 'guestFullname', msg: props.t('Full name must be at least 1 character') })
+    if (state.guestFullname.value.length > 255) errors.push({ field: 'guestFullname', msg: props.t('Full name must be less than 255 characters') })
+    if (state.hasPassword && (state.guestPassword.value.length < 6)) errors.push({ field: 'guestPassword', msg: props.t('Password must be at least 6 characters') })
+    if (state.hasPassword && (state.guestPassword.value.length > 255)) errors.push({ field: 'guestPassword', msg: props.t('Password must be less than 255 characters') })
+    if (state.uploadFileList.length === 0) errors.push({ field: 'uploadFileList', msg: props.t('You must select at least 1 file to upload') })
+    if (errors.length) {
+      // INFO - B.L - Not used now because form's css isn't ready for it use flash message instead
+      // this.setState({
+      //   guestPassword: { value: state.guestPassword.value, isInvalid: errors.some(error => error.key === 'guestPassword') },
+      //   guestFullname: { value: state.guestFullname.value, isInvalid: errors.some(error => error.key === 'guestFullname') }
+      // })
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: <div>{props.t('Errors in form:')}<br /><ul>{errors.map(error => <li key={error.field} >{error.msg}</li>)}</ul></div>,
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+    return !(errors.length)
+  }
+
   handleClickSend = async () => {
     const { props, state } = this
+    if (!this.validateForm()) return false
+
     const formData = new FormData()
 
     state.uploadFileList.forEach((uploadFile, index) => {
@@ -145,23 +172,6 @@ class GuestUpload extends React.Component {
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
-              case 2001:
-                let errors = []
-                if (jsonResult400.details.username && state.guestFullname.value.length < 1) errors.push(props.t('Full name must be at least 1 character'))
-                if (jsonResult400.details.username && state.guestFullname.value.length > 255) errors.push(props.t('Full name must be less than 255 characters'))
-                if (jsonResult400.details.password && state.guestPassword.value.length < 6) errors.push(props.t('Password must be at least 6 characters'))
-                if (jsonResult400.details.password && state.guestPassword.value.length > 255) errors.push(props.t('Password must be less than 255 characters'))
-
-                GLOBAL_dispatchEvent({
-                  type: CUSTOM_EVENT.ADD_FLASH_MSG,
-                  data: {
-                    msg: <div>{props.t('Errors in form:')}<br /><ul>{errors.map(error => <li>{ error }</li>)}</ul></div>,
-                    type: 'warning',
-                    delay: undefined
-                  }
-                })
-                this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
-                break
               case 3002:
                 this.sendGlobalFlashMessage(props.t('A content with the same name already exists'))
                 this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
