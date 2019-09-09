@@ -496,7 +496,7 @@ Your data are correctly indexed now, you can go to tracim ui and use search meca
 
 ## Collaborative edition server ##
 
-In tracim 2.4, Collaborative Edition online does support Collabora/libreofficeOnline.
+In tracim 2.4, Collaborative Edition online does support CollaboraOnline/libreofficeOnline.
 
 It is tested with Collabora Online (professional version of Collabora) and with [Collabora CODE](https://www.collaboraoffice.com/code/).
 We do not support yet other collaborative edition online service but we do support WOPI protocol making support for WOPI compatible software easy.
