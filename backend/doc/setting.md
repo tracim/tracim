@@ -496,17 +496,34 @@ Your data are correctly indexed now, you can go to tracim ui and use search meca
 
 ## Collaborative edition server ##
 
-In tracim 2.4, Collaborative Edition online does support Collabora/libreofficeOnline. It is tested with [Collabora CODE](https://www.collaboraoffice.com/code/).
+In tracim 2.4, Collaborative Edition online does support Collabora/libreofficeOnline.
+It is tested with Collabora Online (professional version of Collabora) and with [Collabora CODE](https://www.collaboraoffice.com/code/).
 We do not support yet other collaborative edition online service but we do support WOPI protocol making support for WOPI compatible software easy.
 
+To set up a `Collabora CODE` server using docker for testing purpose ([image](https://hub.docker.com/r/collabora/code))
 
-All the informations to set up a `Collabora CODE` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
+note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like `domain=tracim\\.mysuperdomain\\.com`):
 
-To set up a `Collabora CODE` server using docker for testing purpose:
 
-`sudo docker run -d -t -p PORT:PORT -e "domain=IP_OF_TRACIM_API" -e "username=admin" -e "password=S3cRet" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.0.4-3`
+`sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.0.5.2`
 
-**Tracim is tested with the version 4.0.4-3, you can use the latest version at your own risk**
+:warning: Tracim is tested with the version 4.0.5.2, you can use the latest version at your own risk
+
+
+Similar example with LibreofficeOnline(rolling release, unstable :warning:) server using docker ([image](https://hub.docker.com/r/libreoffice/online)):
+
+
+`sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always libreoffice/online:master`
+
+
+:information source: All the informations to set up a `Collabora CODE/ LibreofficelOnline` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
+
+:warning: Be really carefull about configuring domain parameter, as [official documentation](https://www.collaboraoffice.com/code/docker/) said, value should be dot escaped, ex: `domain=.*\\.mysuperdomain\\.com`
+
+:information_source: you can add username/password parameter to set collabora admin console too : `-e "username=admin" -e "password=S3cRet"`
+
+:information_source: to avoid using automatic ssl/tls encryption in collabora, you should disable this: `-e "extra_params=--o:ssl.enable=false"`
+
 
 
 ## Configuring tracim in development.ini ##
@@ -535,3 +552,5 @@ But you can change the default directory to use your templates files:
 
 Filenames of the templates inside the directory are not relevant only their extensions matter and need correspond to the software's default extensions.
 For example `CODE` edit `Libre Office` files, so extensions will be `odt`, `odp`, `ods`.
+
+After all theses change in config, you should restart all tracim process (web, webdav, etc...)
