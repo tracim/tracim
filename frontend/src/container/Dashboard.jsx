@@ -438,17 +438,23 @@ class Dashboard extends React.Component {
           const creationLabelWithHACK = (() => {
             switch (app.slug) {
               case 'agenda': return props.t('Open the agenda')
-              case 'collaborative_document_edition': return HACK_COLLABORA_CONTENT_TYPE(props.contentType).creationLabel
+              case 'collaborative_document_edition': return HACK_COLLABORA_CONTENT_TYPE([{}]).creationLabel
               default: return contentType.creationLabel
             }
           })()
+
+          // HACK - CH - 2019-09-10 - hard coding collabora slug from the hack since the collaborative_document has been removed from content type list
+          // See https://github.com/tracim/tracim/issues/2375
+          const slugWithHACK = app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug
+            ? HACK_COLLABORA_CONTENT_TYPE([{}]).slug
+            : contentType.slug
 
           return {
             ...app,
             creationLabel: creationLabelWithHACK,
             route: app.slug === 'agenda'
               ? PAGE.WORKSPACE.AGENDA(props.curWs.id)
-              : `${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`
+              : `${PAGE.WORKSPACE.NEW(props.curWs.id, slugWithHACK)}?parent_id=null`
           }
         })
       : []
