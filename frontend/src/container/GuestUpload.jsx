@@ -84,7 +84,7 @@ class GuestUpload extends React.Component {
   handleAddFile = newFileList => {
     const { props, state } = this
 
-    if (!newFileList || !newFileList[0]) return
+    if (!Array.isArray(newFileList) || (newFileList.length === 0)) return
 
     const alreadyUploadedList = newFileList.filter(newFile => state.uploadFileList.some(stateFile => stateFile.name === newFile.name))
     if (alreadyUploadedList.length) {
