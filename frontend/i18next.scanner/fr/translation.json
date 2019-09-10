@@ -223,12 +223,12 @@
   "Error in the URL": "Erreur dans l'URL",
   "Content not found": "Contenu introuvable",
   "Workspace not found": "Espace partagé introuvable",
-  "Inbox": "Boite de réception",
   "Received files": "Fichiers reçus",
   "Error while loading uploaded files": "Erreur lors du chargement des fichiers téléversés",
   "Error while downloading file": "Erreur lors du téléchargement du fichier",
   "Manage": "Paramétrer",
-  "Error while loading file infos": "Erreur lors du chargement des informations du fichier",
   "Full name": "Nom complet",
-  "Error while loading upload infos": "Erreur lors du chargement des informations du téléversement"
+  "Error while loading file information": "Erreur lors du chargement du fichier",
+  "Error, this link is invalid or has expired": "Erreur, ce lien est invalide ou a expiré",
+  "Error while loading upload informations": "Erreur lors du chargement des informations de téléversement"
 }
