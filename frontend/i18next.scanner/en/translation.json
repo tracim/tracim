@@ -237,5 +237,6 @@
   "Full name is required": "Full name is required",
   "Error while loading file information": "Error while loading file information",
   "Error, this link is invalid or has expired": "Error, this link is invalid or has expired",
-  "Error while loading upload information": "Error while loading upload information"
+  "Error while loading upload information": "Error while loading upload information",
+  "You must select at least 1 file to upload": "You must select at least 1 file to upload"
 }

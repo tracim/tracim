@@ -18,10 +18,6 @@ describe('Guest upload page', () => {
     cy.logout()
   })
 
-  beforeEach(function () {
-    cy.loginAs('administrators')
-  })
-
   afterEach(function () {
     cy.cancelXHR()
   })

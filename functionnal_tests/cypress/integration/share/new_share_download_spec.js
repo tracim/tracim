@@ -26,7 +26,6 @@ describe('Open a file', () => {
           cy.updateFile(fullFilename, contentType, workspaceId, newContent.content_id, newContent.filename)
         })
     })
-    cy.wait(2000)
   })
 
   beforeEach(function () {
@@ -35,7 +34,7 @@ describe('Open a file', () => {
       pageName: PAGES.CONTENT_OPEN, 
       params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
     })
-    cy.get('.wsContentGeneric__content__right__header .fa-share-alt').should('be.visible').click()
+    cy.get('[data-cy=popin_right_part_share]').should('be.visible').click()
   })
 
   afterEach(function () {
