@@ -211,7 +211,7 @@
   "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.",
   "You have not yet chosen any files to upload.": "You have not yet chosen any files to upload.",
   "Send": "Send",
-  "You can now close this page, your recipient will receive the notification of your import.": "You can now close this page, your recipient will receive the notification of your import.",
+  "Your interlocutor has been notified of your upload. You can close this window.": "Your interlocutor has been notified of your upload. You can close this window.",
   "Content manager + add members and edit shared spaces": "Content manager + add members and edit shared spaces",
   "Contributor + create folders and manage contents": "Contributor + create folders and manage contents",
   "Reader + create/modify content": "Reader + create/modify content",
@@ -228,13 +228,14 @@
   "Manage": "Manage",
   "Thank you, your import is finished!": "Thank you, your import is finished!",
   "Full name": "Full name",
-  "Error while loading upload infos": "Error while loading upload infos",
-  "Error while loading file information": "Error while loading file information",
   "Files already uploaded:": "Files already uploaded:",
   "Full name must be at least 1 character": "Full name must be at least 1 character",
   "Full name must be less than 255 characters": "Full name must be less than 255 characters",
   "Password must be at least 6 characters": "Password must be at least 6 characters",
   "Password must be less than 255 characters": "Password must be less than 255 characters",
   "Errors in form:": "Errors in form:",
-  "Full name is required": "Full name is required"
+  "Full name is required": "Full name is required",
+  "Error while loading file information": "Error while loading file information",
+  "Error, this link is invalid or has expired": "Error, this link is invalid or has expired",
+  "Error while loading upload information": "Error while loading upload information"
 }

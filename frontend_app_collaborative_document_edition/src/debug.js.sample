@@ -4,7 +4,7 @@ export const debug = {
   config: {
     ...defaultDebug.config,
     apiUrl: '',
-    slug: 'office_document',
+    slug: 'collaborative_document_edition',
     faIcon: 'paperclip',
     hexcolor: '#ffa500',
     creationLabel: 'Upload a file',

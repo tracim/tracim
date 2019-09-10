@@ -54,16 +54,17 @@ class GuestUpload extends React.Component {
     const response = await props.dispatch(getGuestUploadInfo(props.match.params.token))
     switch (response.status) {
       case 200:
-        this.setState({
-          hasPassword: response.json.has_password
-        })
+        this.setState({ hasPassword: response.json.has_password })
         break
       case 400:
-        this.sendGlobalFlashMessage(props.t('Error in the URL'))
+        switch (response.json.code) {
+          case 1008: this.sendGlobalFlashMessage(props.t('Error, this link is invalid or has expired')); break
+          default: this.sendGlobalFlashMessage(props.t('Error in the URL')); break
+        }
         props.history.push(PAGE.LOGIN)
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading upload infos'))
+        this.sendGlobalFlashMessage(props.t('Error while loading upload information'))
         props.history.push(PAGE.LOGIN)
     }
   }
@@ -240,7 +241,7 @@ class GuestUpload extends React.Component {
                 default:
                   return <ImportConfirmation
                     title={props.t('Thank you, your import is finished!')}
-                    text={props.t('You can now close this page, your recipient will receive the notification of your import.')}
+                    text={props.t('Your interlocutor has been notified of your upload. You can close this window.')}
                   />
               }
             })()}

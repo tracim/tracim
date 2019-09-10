@@ -59,6 +59,16 @@ import uniq from 'lodash/uniq'
 
 const qs = require('query-string')
 
+// FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
+export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
+  label: 'Collaborative document',
+  slug: 'collaborative_document_edition',
+  faIcon: 'file-o',
+  hexcolor: '#ffc800',
+  creationLabel: 'Create a collaborative document',
+  availableStatuses: contentType[0].availableStatuses
+})
+
 class WorkspaceContent extends React.Component {
   constructor (props) {
     super(props)
@@ -401,7 +411,9 @@ class WorkspaceContent extends React.Component {
   handleClickCreateContent = (e, folderId, contentType) => {
     const { props, state } = this
 
-    const folderOpen = (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
+    const folderOpen = folderId
+      ? (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
+      : false
 
     const urlSearch = qs.parse(props.location.search)
     delete urlSearch.parent_id
@@ -416,7 +428,7 @@ class WorkspaceContent extends React.Component {
       folder_open: newFolderOpenList.join(',')
     }
 
-    if (!folderOpen) this.handleClickFolder(folderId)
+    if (folderId && !folderOpen) this.handleClickFolder(folderId)
 
     props.history.push(`${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`)
   }
@@ -600,9 +612,17 @@ class WorkspaceContent extends React.Component {
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
-    const createContentAvailableApp = contentType
-      .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)
-      .filter(ct => userRoleIdInWorkspace === 2 ? ct.slug !== CONTENT_TYPE.FOLDER : true)
+    const createContentAvailableApp = [
+      ...contentType
+        .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)
+        .filter(ct => userRoleIdInWorkspace === 2 ? ct.slug !== CONTENT_TYPE.FOLDER : true),
+
+      // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
+      ...(contentType.find(ct => ct.slug === CONTENT_TYPE.FILE)
+        ? [HACK_COLLABORA_CONTENT_TYPE(contentType)]
+        : []
+      )
+    ]
 
     const isWorkspaceEmpty = workspaceContentList.length === 0
     const isFilteredWorkspaceEmpty = rootContentList.length === 0

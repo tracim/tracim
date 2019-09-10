@@ -44,7 +44,7 @@ class CollaborativeEditionFrame extends React.Component {
 
   async componentDidMount () {
     const { props } = this
-    console.log('%c<CollaboraFrame> did mount', `color: ${this.props.data.config.hexcolor}`, props)
+    console.log('%c<CollaboraFrame> did mount', `color: ${props.data.config.hexcolor}`, props)
     //  // INFO - B.L - 2019/09/03 Collabora fire the event from window we need to listen window.
     window.addEventListener('message', this.handleIframeIsClosing)
     try {

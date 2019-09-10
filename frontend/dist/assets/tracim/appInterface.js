@@ -29,8 +29,8 @@ var getSelectedApp = function (appName) {
         return (appAgenda || {default: {}}).default
       case 'share_folder':
         return (appShareFolderAdvanced || {default: {}}).default
-      case 'office_document':
-        return (appOfficeDocument || {default: {}}).default
+      case 'collaborative_document_edition':
+        return (appCollaborativeDocumentEdition || {default: {}}).default
       default:
         return APP_NOT_LOADED
     }
