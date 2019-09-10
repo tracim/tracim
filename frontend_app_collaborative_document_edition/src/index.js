@@ -18,7 +18,7 @@ require('./css/index.styl')
 const ACTION_EDIT = 'edit'
 
 const appInterface = {
-  name: 'office_document',
+  name: 'collaborative_document_edition',
   isRendered: false,
   renderAppPopupCreation: data => {
     return ReactDOM.render(

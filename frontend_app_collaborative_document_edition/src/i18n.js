@@ -17,6 +17,6 @@ i18n
     resources: {} // init with empty resources, they will come from frontend in app constructor
   })
 
-i18n.idTracim = 'frontend_app_office_document'
+i18n.idTracim = 'frontend_app_collaborative_document_edition'
 
 export default i18n

@@ -173,9 +173,9 @@ npm i --loglevel warn && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
 
-# install app Office Document
-log "cd $DEFAULTDIR/frontend_app_office_document"
-cd $DEFAULTDIR/frontend_app_office_document  || exit 1
+# install app Collaborative document edition
+log "cd $DEFAULTDIR/frontend_app_collaborative_document_edition"
+cd $DEFAULTDIR/frontend_app_collaborative_document_edition  || exit 1
 log "npm i"
 npm i --loglevel warn && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"

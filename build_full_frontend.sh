@@ -100,9 +100,9 @@ log "cd $DEFAULTDIR/frontend_app_agenda"
 cd $DEFAULTDIR/frontend_app_agenda || exit 1
 ./build_agenda.sh $dev
 
-# app Office Document
-log "cd $DEFAULTDIR/frontend_app_office_document"
-cd $DEFAULTDIR/frontend_app_office_document || exit 1
+# app Collaborative document edition
+log "cd $DEFAULTDIR/frontend_app_collaborative_document_edition"
+cd $DEFAULTDIR/frontend_app_collaborative_document_edition || exit 1
 ./build_app.sh $dev
 
 # build Tracimtracim

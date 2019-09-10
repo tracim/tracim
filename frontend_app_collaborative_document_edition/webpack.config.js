@@ -10,9 +10,9 @@ module.exports = {
     : ['./src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'office_document.app.js' : 'office_document.app.dev.js',
+    filename: isProduction ? 'collaborative_document_edition.app.js' : 'collaborative_document_edition.app.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'appOfficeDocument' : undefined,
+    library: isProduction ? 'appCollaborativeDocumentEdition' : undefined,
     libraryTarget: isProduction ? 'var' : undefined
   },
   externals: {},

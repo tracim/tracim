@@ -30,11 +30,11 @@ if [[ $1 = "-d" || $2 = "-d" ]]; then
     dev="-dev"
 fi
 
-log "build frontend_app_office_document"
+log "build frontend_app_collaborative_document_edition"
 npm run build$dev$windoz && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
-cp dist/office_document.app.js ../frontend/dist/app && loggood "success" || logerror "some error"
+cp dist/collaborative_document_edition.app.js ../frontend/dist/app && loggood "success" || logerror "some error"
 log "copying en translation.json"
-cp i18next.scanner/en/translation.json ../frontend/dist/app/office_document_en_translation.json && loggood "success" || logerror "some error"
+cp i18next.scanner/en/translation.json ../frontend/dist/app/collaborative_document_edition_en_translation.json && loggood "success" || logerror "some error"
 log "copying fr translation.json"
-cp i18next.scanner/fr/translation.json ../frontend/dist/app/office_document_fr_translation.json && loggood "success" || logerror "some error"
+cp i18next.scanner/fr/translation.json ../frontend/dist/app/collaborative_document_edition_fr_translation.json && loggood "success" || logerror "some error"
