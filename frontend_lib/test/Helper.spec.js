@@ -4,7 +4,8 @@ import {
   convertBackslashNToBr,
   handleFetchResult,
   generateFetchResponse,
-  appFeatureCustomEventHandlerShowApp
+  appFeatureCustomEventHandlerShowApp,
+  parserStringToList
 } from '../src/helper.js'
 import sinon from 'sinon'
 import { CUSTOM_EVENT } from '../src/customEvent.js'
@@ -100,6 +101,17 @@ describe('helper.js', () => {
           expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json() })
         }).then(done, done)
       })
+    })
+  })
+
+  describe('parserStringToList(string, separatorList)', () => {
+    it('should return a list of substrings within string that were separated by separatorList separators', () => {
+      const string = 'randomEmail@randomEmail.randomEmail,randomEmail@randomEmail.randomEmail;randomEmail@randomEmail.randomEmail'
+      const separatorList = [',', ';']
+
+      const substringList = ['randomEmail@randomEmail.randomEmail', 'randomEmail@randomEmail.randomEmail', 'randomEmail@randomEmail.randomEmail']
+      
+      expect(substringList).to.deep.equal(parserStringToList(string, separatorList))
     })
   })
 })

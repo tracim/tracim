@@ -1150,3 +1150,49 @@ class TestGuestUploadEndpoints(object):
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_workspace_size_limit"}], indirect=True
+)
+class TestGuestUploadEndpointsWorkspaceSizeLimit(object):
+    def test_api__guest_upload_content__ok_200__workspace_size_limit(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        upload_permission_lib = upload_permission_lib_factory.get()
+        upload_permission_lib.add_permission_to_workspace(
+            workspace, emails=["thissharewill@notbe.presentinresponse"]
+        )
+        upload_permissions = upload_permission_lib.get_upload_permissions(workspace)
+        assert len(upload_permissions) == 1
+        upload_permission = upload_permissions[0]
+        transaction.commit()
+        params = {"username": "toto", "message": "hello folk !"}
+        image = create_1000px_png_test_image()
+        res = web_testapp.post(
+            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+                upload_permission_token=upload_permission.token
+            ),
+            status=204,
+            upload_files=[("file_1", image.name, image.getvalue())],
+            params=params,
+        )
+        res = web_testapp.post(
+            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+                upload_permission_token=upload_permission.token
+            ),
+            status=400,
+            upload_files=[("file_1", image.name, image.getvalue())],
+            params=params,
+        )
+        assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_WORKSPACE_EMPTY_SPACE

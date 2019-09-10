@@ -5,6 +5,10 @@
 <li>${'<a href="{url}">{filename}</a> ({file_size})'.format(filename=html_escape(uploaded_content.filename), url=html_escape(uploaded_content.frontend_url), file_size=html_escape(humanize.naturalsize(uploaded_content.size)))|n}</li>
 % endfor
 
+%if uploader_message:
+   <p>${_("Message:").format(username=uploader.username)}</p>
+   <blockquote>${uploader_message}</blockquote>
+%endif
 
 <p>${_("Enjoy your day :)")}</p>
 <p>${_("Suricat', your digital assistant")}</p>
