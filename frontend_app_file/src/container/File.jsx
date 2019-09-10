@@ -601,7 +601,9 @@ class File extends React.Component {
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
               case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
-              default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
+              case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
+              case 6003: this.sendGlobalFlashMessage(props.t("Error, the shared space exceed it's maximum size")); break
+              default: this.sendGlobalFlashMessage(props.t('Error while uploading file')); break
             }
             break
           default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
