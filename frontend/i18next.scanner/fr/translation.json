@@ -230,5 +230,6 @@
   "Full name": "Nom complet",
   "Error while loading file information": "Erreur lors du chargement du fichier",
   "Error, this link is invalid or has expired": "Erreur, ce lien est invalide ou a expiré",
-  "Error while loading upload informations": "Erreur lors du chargement des informations de téléversement"
+  "Error while loading upload informations": "Erreur lors du chargement des informations de téléversement",
+  "Create a collaborative document": "Créer un document collaboratif"
 }
