@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link, withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
+import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
   PAGE,
@@ -65,7 +66,7 @@ export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
   slug: 'collaborative_document_edition',
   faIcon: 'file-o',
   hexcolor: '#ffc800',
-  creationLabel: 'Create a collaborative document',
+  creationLabel: i18n.t('Create a collaborative document'),
   availableStatuses: contentType[0].availableStatuses
 })
 
