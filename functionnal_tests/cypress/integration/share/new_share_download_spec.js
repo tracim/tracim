@@ -13,7 +13,7 @@ const email3 = 'email1@email3.email3'
 let workspaceId
 let contentId
 
-describe('Open a file', () => {
+describe('New share download form', () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
@@ -41,49 +41,33 @@ describe('Open a file', () => {
     cy.cancelXHR()
   })
 
-  describe('and clicking on the share icon', () => {
-    describe('and clicking on the New button',() => {
-      describe('and writing three emails separated by space and clicking Enter',() =>{
-        it('Should separate the emails by new line',() => {
-          cy.get(emailInput).type(`${email1} ${email2} ${email3}`).should('be.visible').type('{enter}')
-          cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
-        })
-      })
+  it('nominal case',() => {
+    cy.get(emailInput).type(`${email1}`)
+    cy.get('.shareDownload__newBtn').should('be.visible').click()
+    cy.get('.shareLink__linkInfos__email').contains(email1).should('be.visible')
+  })
 
-      describe('and writing three emails separated by commas and clicking Enter',() =>{
-        it('Should separate the emails by new line',() => {
-          cy.get(emailInput).type(`${email1},${email2},${email3}`).should('be.visible').type('{enter}')
-          cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
-        })
-      })
+  it('separating emails by space then pressing Enter, should separate the emails by new line',() => {
+    cy.get(emailInput).type(`${email1} ${email2} ${email3}`).should('be.visible').type('{enter}')
+    cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
+  })
 
-      describe('and clicking at Protect by password',() => {
-        it('Should show the password input',() => {
-          cy.get('.shareDownload__password__link').should('be.visible').click()
-          cy.get('.shareDownload__password__wrapper').should('be.visible')
-        })
+  it('separating emails by commas then pressing Enter, should separate the emails by new line',() => {
+    cy.get(emailInput).type(`${email1},${email2},${email3}`).should('be.visible').type('{enter}')
+    cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
+  })
 
-        describe('and writing a password',() => {
-          describe('and clicking at see password',() => {
-            it('Should show the password',() => {
-              cy.get('.shareDownload__password__link').should('be.visible').click()
-              cy.get('.shareDownload__password__input').should('be.visible').type('Password')
-              cy.get('[data-cy=seePassword]').should('be.visible').click()
-              cy.get('.shareDownload__password__input').should('have.value','Password')
-            })
-          })
-        })
-      })
+  describe('protected by password',() => {
+    it('Should include the input',() => {
+      cy.get('.shareDownload__password__link').should('be.visible').click()
+      cy.get('.shareDownload__password__wrapper').should('be.visible')
+    })
 
-      describe('and writing a mail',() => {
-        describe('and clicking at New button',() => {
-          it('Should create share link at the main authorizations page',() => {
-            cy.get(emailInput).type(`${email1}`)
-            cy.get('.shareDownload__newBtn').should('be.visible').click()
-            cy.get('.shareLink__linkInfos__email').contains(email1).should('be.visible')
-          })
-        })
-      })
+    it('Should be possible to unhide the password',() => {
+      cy.get('.shareDownload__password__link').should('be.visible').click()
+      cy.get('.shareDownload__password__input').should('be.visible').type('Password')
+      cy.get('[data-cy=seePassword]').should('be.visible').click()
+      cy.get('.shareDownload__password__input').should('have.value','Password')
     })
   })
 })
