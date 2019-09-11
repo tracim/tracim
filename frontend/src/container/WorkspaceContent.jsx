@@ -151,7 +151,11 @@ class WorkspaceContent extends React.Component {
     const prevFilter = qs.parse(prevProps.location.search).type
     const currentFilter = qs.parse(props.location.search).type
 
-    if (prevState.workspaceIdInUrl !== workspaceId || prevFilter !== currentFilter) {
+    const hasWorkspaceIdChanged = prevState.workspaceIdInUrl !== workspaceId
+
+    if (hasWorkspaceIdChanged) this.loadWorkspaceDetail()
+
+    if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
       this.setState({ workspaceIdInUrl: workspaceId })
       this.loadAllWorkspaceContent(workspaceId, false)
     }
