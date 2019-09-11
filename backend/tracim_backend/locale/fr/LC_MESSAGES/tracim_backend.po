@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-11 15:07+0200\n"
+"POT-Creation-Date: 2019-09-11 16:34+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -88,7 +88,7 @@ msgstr ""
 
 #: tracim_backend/applications/upload_permissions/lib.py:249
 msgid "Files uploaded by {username} on {date}"
-msgstr "Fichiers téléchargés par {username} le {date}"
+msgstr "Fichiers téléversés par {username} le {date}"
 
 #: tracim_backend/applications/upload_permissions/lib.py:262
 msgid "Message from {username}: {message}"
