@@ -2,7 +2,7 @@
 
 .share_folder_advanced
   width 1000px
-  height 100%
+  height calc(100% - 61px) // 61px it's the main header height
   overflow-y auto
   overflow-x hidden
   &__content
@@ -25,7 +25,7 @@
   &__contentpage
     &__content
       width 100%
-      height calc(100% - 63px) // 63px = header height
+      height calc(100% - 63px) // 63px = app header height
 
 .newUpload
   padding 10px
