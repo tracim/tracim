@@ -8,7 +8,6 @@
   "The password length must be between 6 and 512 characters and the email(s) must be valid": "The password length must be between 6 and 512 characters and the email(s) must be valid",
   "Email notification are disabled, please manually share the link": "Email notification are disabled, please manually share the link",
   "Error while creating new share link": "Error while creating new share link",
-  "Enter the email address of the recipient(s)": "Enter the email address of the recipient(s)",
   "Password to share link (optional)": "Password to share link (optional)",
   "Show password": "Show password",
   "Generate random password": "Generate random password",
@@ -18,5 +17,6 @@
   "Error while deleting share link": "Error while deleting share link",
   "Protect by password": "Protect by password",
   "Cancel protection by password": "Cancel protection by password",
-  "Received files": "Received files"
+  "Received files": "Received files",
+  "Recipient's email addresses": "Recipient's email addresses"
 }

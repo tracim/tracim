@@ -58,9 +58,8 @@ export class NewUpload extends React.Component {
 
         <div className='newUpload__email'>
           <textarea
-            type={textType}
             className='newUpload__email__input form-control'
-            placeholder={props.t('Enter the email address of the recipient(s)')}
+            placeholder={props.t("Recipient's email addresses")}
             rows='1'
             value={props.uploadEmails}
             onChange={props.onChangeUploadEmails}
