@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
+import { ROLE_OBJECT } from '../../helper.js'
 
 class ShareLink extends React.Component {
   // INFO - GB - 2019-07-16 - Algorithm based on https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
