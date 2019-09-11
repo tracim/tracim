@@ -3,7 +3,6 @@
   "Cancel": "Cancel",
   "New": "New",
   "New authorization": "New authorization",
-  "Import authorizations": "Import authorizations",
   "No upload link has been created yet": "No upload link has been created yet",
   "The password length must be between 6 and 512 characters and the email(s) must be valid": "The password length must be between 6 and 512 characters and the email(s) must be valid",
   "Email notification are disabled, please manually share the link": "Email notification are disabled, please manually share the link",
@@ -18,5 +17,8 @@
   "Protect by password": "Protect by password",
   "Cancel protection by password": "Cancel protection by password",
   "Received files": "Received files",
-  "Recipient's email addresses": "Recipient's email addresses"
+  "Recipient's email addresses": "Recipient's email addresses",
+  "Public upload links": "Public upload links",
+  "Public upload link has been created. Don't forget to share the password to the recipients.": "Public upload link has been created. Don't forget to share the password to the recipients.",
+  "Public upload link has been created.": "Public upload link has been created."
 }

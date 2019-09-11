@@ -180,12 +180,15 @@ class ShareFolderAdvanced extends React.Component {
 
       switch (fetchResultPostImportAuthorizations.apiResponse.status) {
         case 200:
+          if (isPasswordActive) this.sendGlobalFlashMessage(props.t("Public upload link has been created. Don't forget to share the password to the recipients."), 'info')
+          else this.sendGlobalFlashMessage(props.t('Public upload link has been created.'), 'info')
+
           this.setState(prev => ({
+            currentPageStatus: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT,
             uploadLinkList: [...prev.uploadLinkList, ...fetchResultPostImportAuthorizations.body],
             uploadEmails: '',
             uploadPassword: ''
           }))
-          this.setState({ currentPageStatus: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
           break
         case 400:
           switch (fetchResultPostImportAuthorizations.body.code) {

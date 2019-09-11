@@ -3,7 +3,6 @@
   "Cancel": "Annuler",
   "New": "Nouveau",
   "New authorization": "Nouvelle autorisation",
-  "Import authorizations": "Autorisations de téléversement",
   "No upload link has been created yet": "Aucun lien de téléversement n'a encore été créé",
   "The password length must be between 6 and 512 characters and the email(s) must be valid": "Le mot de passe doit être compris entre 6 et 512 caractères et le(s) email(s) doit (doivent) être valide(s)",
   "Email notification are disabled, please manually share the link": "Les notifications par email sont désactivées, veuillez communiquer le lien manuellement",
@@ -18,5 +17,8 @@
   "Protect by password": "Protéger par un mot de passe",
   "Cancel protection by password": "Annuler la protection par mot de passe",
   "Received files": "Fichiers reçus",
-  "Recipient's email addresses": "Adresses email des destinataires"
+  "Recipient's email addresses": "Adresses email des destinataires",
+  "Public upload links": "Liens publiques de téléversement",
+  "Public upload link has been created. Don't forget to share the password to the recipients.": "Lien public de téléversement créé. N'oubliez pas de partager le mot de passe aux destinataires.",
+  "Public upload link has been created.": "Lien public de téléversement créé."
 }
