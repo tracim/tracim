@@ -9,19 +9,17 @@ const emptyPhrase = 'No upload link has been created yet'
 let workspaceId
 
 describe('Open the share folder advanced', () => {
-  before(function () {
+
+  beforeEach(function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
+    }).then( promise => {
+      cy.visitPage({pageName: PAGES.SHARE_FOLDER, params: {workspaceId: workspaceId}})
     })
-  })
-
-  beforeEach(function () {
-    cy.loginAs('administrators')
-    cy.visitPage({pageName: PAGES.SHARE_FOLDER, params: {workspaceId: workspaceId}})
   })
 
   afterEach(function () {

@@ -14,7 +14,7 @@ let workspaceId
 let contentId
 
 describe('New share download form', () => {
-  before(function () {
+  beforeEach(function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
@@ -23,18 +23,14 @@ describe('New share download form', () => {
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
         .then(newContent => {
           contentId = newContent.content_id
-          cy.updateFile(fullFilename, contentType, workspaceId, newContent.content_id, newContent.filename)
         })
+    }).then(promise => {
+      cy.visitPage({
+        pageName: PAGES.CONTENT_OPEN, 
+        params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
+      })
+      cy.get('[data-cy=popin_right_part_share]').should('be.visible').click()
     })
-  })
-
-  beforeEach(function () {
-    cy.loginAs('administrators')
-    cy.visitPage({
-      pageName: PAGES.CONTENT_OPEN, 
-      params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
-    })
-    cy.get('[data-cy=popin_right_part_share]').should('be.visible').click()
   })
 
   afterEach(function () {
