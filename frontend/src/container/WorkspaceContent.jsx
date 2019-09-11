@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link, withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
+import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
   PAGE,
@@ -61,11 +62,11 @@ const qs = require('query-string')
 
 // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
 export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
-  label: 'Office Document',
-  slug: 'office_document',
+  label: 'Collaborative document',
+  slug: 'collaborative_document_edition',
   faIcon: 'file-o',
   hexcolor: '#ffc800',
-  creationLabel: 'Create an office document',
+  creationLabel: i18n.t('Create a collaborative document'),
   availableStatuses: contentType[0].availableStatuses
 })
 

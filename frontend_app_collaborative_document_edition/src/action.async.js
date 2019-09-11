@@ -1,6 +1,6 @@
 import { FETCH_CONFIG } from './helper.js'
 
-export const postOfficeDocumentFromTemplate = (apiUrl, workspaceId, folderId, contentType, filename, templateName) =>
+export const postCollaborativeDocumentFromTemplate = (apiUrl, workspaceId, folderId, contentType, filename, templateName) =>
   fetch(`${apiUrl}/collaborative-document-edition/workspaces/${workspaceId}/files`, {
     credentials: 'include',
     headers: {
@@ -14,7 +14,7 @@ export const postOfficeDocumentFromTemplate = (apiUrl, workspaceId, folderId, co
     })
   })
 
-export const getOfficeDocumentTemplates = (apiUrl, workspaceId) =>
+export const getCollaborativeDocumentTemplates = (apiUrl, workspaceId) =>
   fetch(`${apiUrl}/collaborative-document-edition/templates`, {
     credentials: 'include',
     headers: {

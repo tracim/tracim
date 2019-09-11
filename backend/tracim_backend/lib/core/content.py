@@ -1910,7 +1910,7 @@ class ContentApi(object):
 
     def check_upload_size(self, content_length: int, workspace: Workspace) -> None:
         self._check_size_length_limitation(content_length)
-        self._check_workspace_size_limitation(content_length, workspace)
+        self.check_workspace_size_limitation(content_length, workspace)
 
     def _check_size_length_limitation(self, content_length: int) -> None:
         # INFO - G.M - 2019-08-23 - 0 mean no size limit
@@ -1923,7 +1923,7 @@ class ContentApi(object):
                 )
             )
 
-    def _check_workspace_size_limitation(self, content_length: int, workspace: Workspace) -> None:
+    def check_workspace_size_limitation(self, content_length: int, workspace: Workspace) -> None:
         workspace_size = workspace.get_size()
         # INFO - G.M - 2019-08-23 - 0 mean no size limit
         if self._config.LIMITATION__WORKSPACE_SIZE == 0:

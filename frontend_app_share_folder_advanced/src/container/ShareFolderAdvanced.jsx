@@ -226,7 +226,7 @@ class ShareFolderAdvanced extends React.Component {
   }
 
   render () {
-    const { state } = this
+    const { props, state } = this
     const customColor = (state.tracimContentTypeList.find(type => type.slug === 'file') || { hexcolor: state.config.hexcolor }).hexcolor
 
     if (!state.isVisible) return null
@@ -237,7 +237,7 @@ class ShareFolderAdvanced extends React.Component {
           customClass={'folderAdvanced'}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          componentTitle={<div>{this.props.t('Received files')}</div>}
+          componentTitle={<div>{props.t('Received files')}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           showChangeTitleButton={false}
@@ -245,24 +245,28 @@ class ShareFolderAdvanced extends React.Component {
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           {state.currentPageStatus === this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
-            ? <UploadFilesManagement
-              customColor={customColor}
-              uploadLinkList={state.uploadLinkList}
-              onClickDeleteImportAuthorization={this.handleClickDeleteImportAuthorization}
-              onClickNewUploadComponent={this.handleClickNewUploadComponent}
-              userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-            />
-            : <NewUpload
-              customColor={customColor}
-              onClickNewUpload={this.handleClickNewUpload}
-              onClickCancelNewUpload={this.handleClickCancelNewUpload}
-              uploadEmails={state.uploadEmails}
-              onChangeUploadEmails={this.handleChangeEmails}
-              uploadPassword={state.uploadPassword}
-              onChangeUploadPassword={this.handleChangePassword}
-              onKeyDownEnter={this.handleKeyDownEnter}
-              emailNotifActivated={state.config.system.config.email_notification_activated}
-            />
+            ? (
+              <UploadFilesManagement
+                customColor={customColor}
+                uploadLinkList={state.uploadLinkList}
+                onClickDeleteImportAuthorization={this.handleClickDeleteImportAuthorization}
+                onClickNewUploadComponent={this.handleClickNewUploadComponent}
+                userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+              />
+            )
+            : (
+              <NewUpload
+                customColor={customColor}
+                onClickNewUpload={this.handleClickNewUpload}
+                onClickCancelNewUpload={this.handleClickCancelNewUpload}
+                uploadEmails={state.uploadEmails}
+                onChangeUploadEmails={this.handleChangeEmails}
+                uploadPassword={state.uploadPassword}
+                onChangeUploadPassword={this.handleChangePassword}
+                onKeyDownEnter={this.handleKeyDownEnter}
+                emailNotifActivated={state.config.system.config.email_notification_activated}
+              />
+            )
           }
         </PopinFixedContent>
       </PopinFixed>

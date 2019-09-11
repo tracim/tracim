@@ -75,7 +75,7 @@ class AppFullscreenRouter extends React.Component {
                 workspace_id: match.params.idws,
                 content_id: match.params.idcts
               }
-              props.renderAppFullscreen({ slug: 'office_document', hexcolor: '#7d4e24' }, props.user, content)
+              props.renderAppFullscreen({ slug: 'collaborative_document_edition', hexcolor: '#7d4e24' }, props.user, content)
               return null
             }} />
           </div>

@@ -80,16 +80,7 @@ RUN \
 # Move some file
     && mv /tracim/frontend/dist/assets/images/logo-tracim.png /tracim/frontend/dist/assets/images/logo-tracim.png.default \
 # Clean frontend installation
-    && rm -rf /tracim/frontend/node_modules \
-    && rm -rf /tracim/frontend_app_admin_workspace_user/node_modules \
-    && rm -rf /tracim/frontend_app_agenda/node_modules \
-    && rm -rf /tracim/frontend_app_file/node_modules \
-    && rm -rf /tracim/frontend_app_folder_advanced/node_modules \
-    && rm -rf /tracim/frontend_app_html-document/node_modules \
-    && rm -rf /tracim/frontend_app_thread/node_modules \
-    && rm -rf /tracim/frontend_app_workspace/node_modules \
-    && rm -rf /tracim/frontend_app_workspace_advanced/node_modules \
-    && rm -rf /tracim/frontend_lib/node_modules \
+    && rm -rf /tracim/frontend*/node_modules \
 # Remove default conf about apache2
     && rm /etc/apache2/sites-enabled/000-default.conf \
 # Purges useless packages

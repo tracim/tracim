@@ -8,8 +8,8 @@ import {
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
-  postOfficeDocumentFromTemplate,
-  getOfficeDocumentTemplates
+  postCollaborativeDocumentFromTemplate,
+  getCollaborativeDocumentTemplates
 } from '../action.async.js'
 import i18n from '../i18n.js'
 import {
@@ -20,11 +20,11 @@ import {
   getExtensionFromFileType
 } from '../helper.js'
 
-class PopupCreateOfficeDocument extends React.Component {
+class PopupCreateCollaborativeDocument extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'office_document',
+      appName: 'collaborative_document_edition',
       config: props.data.config,
       loggedUser: props.data.loggedUser,
       workspaceId: props.data.workspaceId,
@@ -54,7 +54,7 @@ class PopupCreateOfficeDocument extends React.Component {
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<PopupCreateOfficeDocument> Custom event', 'color: #28a745', type, data)
+        console.log('%c<PopupCreateCollaborativeDocument> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
             ...prev.loggedUser,
@@ -93,7 +93,7 @@ class PopupCreateOfficeDocument extends React.Component {
     const { PAGE } = this.props.data.config
     const templateName = getTemplateFromFileType(software, selectedOption.value, availableTemplates)
     const filename = newContentName + getExtensionFromFileType(software, selectedOption.value)
-    const request = postOfficeDocumentFromTemplate(config.apiUrl, workspaceId, folderId, config.slug, filename, templateName)
+    const request = postCollaborativeDocumentFromTemplate(config.apiUrl, workspaceId, folderId, config.slug, filename, templateName)
 
     const response = await handleFetchResult(await request)
 
@@ -135,7 +135,7 @@ class PopupCreateOfficeDocument extends React.Component {
 
   getAvaibleTemplates = async () => {
     const { state } = this
-    const request = getOfficeDocumentTemplates(state.config.apiUrl, state.workspaceId)
+    const request = getCollaborativeDocumentTemplates(state.config.apiUrl, state.workspaceId)
     const response = await handleFetchResult(await request)
     switch (response.apiResponse.status) {
       case 200: return response.body.file_templates
@@ -206,4 +206,4 @@ class PopupCreateOfficeDocument extends React.Component {
   }
 }
 
-export default translate()(PopupCreateOfficeDocument)
+export default translate()(PopupCreateCollaborativeDocument)
