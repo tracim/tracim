@@ -121,7 +121,7 @@ class ShareFolderAdvanced extends React.Component {
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default:
-        this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
+        this.sendGlobalFlashMessage(this.props.t('Error while loading list of public upload links'))
     }
   }
 
@@ -148,7 +148,7 @@ class ShareFolderAdvanced extends React.Component {
       case 400:
         this.sendGlobalFlashMessage(props.t('Error in the URL'))
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while deleting share link'))
+      default: this.sendGlobalFlashMessage(props.t('Error while deleting public upload link'))
     }
   }
 
@@ -168,8 +168,8 @@ class ShareFolderAdvanced extends React.Component {
 
     uploadEmailList = uploadEmailList.filter(uploadEmail => !invalidEmails.includes(uploadEmail))
 
-    if (invalidEmails.length > 0 || uploadEmailList === 0) {
-      this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
+    if (invalidEmails.length > 0) {
+      this.sendGlobalFlashMessage(`${props.t(`Error, these emails are invalid: `)} ${invalidEmails.join(', ')}`)
     } else {
       const fetchResultPostImportAuthorizations = await handleFetchResult(await postImportAuthorizationsList(
         state.config.apiUrl,
@@ -195,10 +195,10 @@ class ShareFolderAdvanced extends React.Component {
             case 2001:
               this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
               break
-            default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+            default: this.sendGlobalFlashMessage(props.t('Error while creating new public upload link'))
           }
           break
-        default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+        default: this.sendGlobalFlashMessage(props.t('Error while creating new public upload link'))
       }
     }
   }

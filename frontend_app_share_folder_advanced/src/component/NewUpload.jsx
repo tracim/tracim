@@ -47,13 +47,11 @@ export class NewUpload extends React.Component {
   render () {
     const { props, state } = this
     const customColor = props.customColor
-    const passwordType = 'password'
-    const textType = 'text'
 
     return (
       <div className='newUpload'>
         <div className='newUpload__title share_folder_advanced__content__title'>
-          {props.t('New authorization')}
+          {props.t('New public upload link')}
         </div>
 
         <div className='newUpload__email'>
@@ -93,9 +91,9 @@ export class NewUpload extends React.Component {
                   <i className='fa fa-fw fa-lock' />
 
                   <input
-                    type={state.hidePassword ? passwordType : textType}
+                    type={state.hidePassword ? 'password' : 'text'}
                     className='newUpload__password__input form-control'
-                    placeholder={props.t('Password to share link (optional)')}
+                    placeholder={props.t('Password of public upload link (optional)')}
                     value={props.uploadPassword}
                     onChange={props.onChangeUploadPassword}
                   />
