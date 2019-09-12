@@ -52,7 +52,8 @@ class Folder extends React.Component {
       .filter(a =>
         props.folderData.subContentTypeList.includes(a.slug) ||
         // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
-        a.slug === HACK_COLLABORA_CONTENT_TYPE(props.contentType).slug
+        // second part of the "&&" is to hide collaborative document if content type file is not available
+        (a.slug === HACK_COLLABORA_CONTENT_TYPE(props.contentType).slug && props.folderData.subContentTypeList.includes('file'))
       )
 
     return (

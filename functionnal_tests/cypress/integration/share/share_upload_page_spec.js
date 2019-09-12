@@ -27,7 +27,7 @@ describe('Open the share folder advanced', () => {
   })
 
   it('Should redirect to share page', () => {
-    cy.get('.share_folder_advanced__content').contains('Import authorizations').should('be.visible')
+    cy.get('.share_folder_advanced__content').contains('Public upload links').should('be.visible')
   })
 
   it('Should have a "no uploads" message', () => {
@@ -39,12 +39,12 @@ describe('Open the share folder advanced', () => {
       cy.get('[data-cy=share_folder_advanced__content__btnupload]').should('be.visible').click()
     })
     it('Should redirect to new share page',() => {
-      cy.get('.newUpload').contains('New authorization').should('be.visible')
+      cy.get('.newUpload').contains('New public upload link').should('be.visible')
     })
 
     it('Clicking on the Cancel button, hould redirect to share page',() => {
       cy.get('.newUpload__btnCancel').should('be.visible').click()
-      cy.get('.share_folder_advanced__content').contains('Import authorizations').should('be.visible')
+      cy.get('.share_folder_advanced__content').contains('Public upload links').should('be.visible')
     })
 
     it('clicking on delete, should delete the share link',() => {
@@ -52,6 +52,7 @@ describe('Open the share folder advanced', () => {
       cy.get('.newUpload__newBtn').should('be.visible').click()
       cy.get('[data-cy=deleteShareLink]').should('be.visible').click()
       cy.get('.share_folder_advanced__content__empty').contains(emptyPhrase).should('be.visible')
+      cy.get('[data-cy=flashmessage]').contains('Public upload link has been created.')
     })
   })
 })

@@ -66,7 +66,7 @@ export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
   slug: 'collaborative_document_edition',
   faIcon: 'file-o',
   hexcolor: '#ffc800',
-  creationLabel: i18n.t('Create a collaborative document'),
+  creationLabel: i18n.t('Create an office document'),
   availableStatuses: contentType[0].availableStatuses
 })
 
