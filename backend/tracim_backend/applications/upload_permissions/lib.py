@@ -5,6 +5,8 @@ from smtplib import SMTPRecipientsRefused
 import typing
 import uuid
 
+from babel.dates import format_date
+from babel.dates import format_time
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
@@ -246,8 +248,11 @@ class UploadPermissionLib(object):
             config=self._config, current_user=upload_permission.author, session=self._session
         )
         _ = content_api.translator.get_translation
-        folder_label = _("Files uploaded by {username} on {date}").format(
-            username=uploader_username, date=datetime.utcnow()
+        current_datetime = datetime.utcnow()
+        folder_label = _("Files uploaded by {username} on {date} at {time}").format(
+            username=uploader_username,
+            date=format_date(current_datetime, locale=content_api.translator.default_lang),
+            time=format_time(current_datetime, locale=content_api.translator.default_lang),
         )
         upload_folder = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
