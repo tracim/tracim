@@ -16,13 +16,15 @@ describe('Open the share folder advanced', () => {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
-    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-      workspaceId = workspace.workspace_id
-      cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
-    }).then(promise => {
-      cy.visitPage({pageName: PAGES.SHARE_FOLDER, params: {workspaceId: workspaceId}})
-      cy.get('.share_folder_advanced__content__btnupload').click()
-    })
+    cy.fixture('baseWorkspace').as('workspace')
+      .then(workspace => {
+        workspaceId = workspace.workspace_id
+        return cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
+      })
+      .then(data => {
+        cy.visitPage({pageName: PAGES.SHARE_FOLDER, params: {workspaceId: workspaceId}})
+        cy.get('.share_folder_advanced__content__btnupload').click()
+      })
   })
 
   afterEach(function () {

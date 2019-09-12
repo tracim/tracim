@@ -238,5 +238,6 @@
   "Full name is required": "Le nom complet est requis",
   "Error, this link is invalid or has expired": "Erreur, ce lien est invalide ou a expiré",
   "Error while loading upload information": "Erreur lors du chargement des informations de téléversement",
-  "You must select at least 1 file to upload": "Vous devez selectionner au moins 1 fichier à téléverser"
+  "You must select at least 1 file to upload": "Vous devez selectionner au moins 1 fichier à téléverser",
+  "Create a collaborative document": "Créer un document collaboratif"
 }

@@ -22,7 +22,7 @@ describe('Open a file', () => {
         .then(newContent => {
           contentId = newContent.content_id
         })
-    }).then(promise => {
+    }).then(data => {
       cy.visitPage({
         pageName: PAGES.CONTENT_OPEN,
         params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
