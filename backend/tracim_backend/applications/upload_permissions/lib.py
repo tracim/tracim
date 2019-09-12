@@ -30,6 +30,7 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
@@ -247,12 +248,13 @@ class UploadPermissionLib(object):
         content_api = ContentApi(
             config=self._config, current_user=upload_permission.author, session=self._session
         )
-        _ = content_api.translator.get_translation
+        translator = Translator(app_config=self._config)
+        _ = translator.get_translation
         current_datetime = datetime.utcnow()
         folder_label = _("Files uploaded by {username} on {date} at {time}").format(
             username=uploader_username,
-            date=format_date(current_datetime, locale=content_api.translator.default_lang),
-            time=format_time(current_datetime, locale=content_api.translator.default_lang),
+            date=format_date(current_datetime, locale=translator.default_lang),
+            time=format_time(current_datetime, locale=translator.default_lang),
         )
         upload_folder = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
