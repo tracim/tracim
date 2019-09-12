@@ -12,7 +12,7 @@ let workspaceId
 let contentId
 
 describe('Open a file', () => {
-  before(function () {
+  beforeEach(function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
@@ -21,18 +21,14 @@ describe('Open a file', () => {
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
         .then(newContent => {
           contentId = newContent.content_id
-          cy.updateFile(fullFilename, contentType, workspaceId, newContent.content_id, newContent.filename)
         })
+    }).then(data => {
+      cy.visitPage({
+        pageName: PAGES.CONTENT_OPEN,
+        params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
+      })
+      cy.get('.wsContentGeneric__content__right__header .fa-share-alt').should('be.visible').click()
     })
-  })
-
-  beforeEach(function () {
-    cy.loginAs('administrators')
-    cy.visitPage({
-      pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
-    })
-    cy.get('.wsContentGeneric__content__right__header .fa-share-alt').should('be.visible').click()
   })
 
   afterEach(function () {

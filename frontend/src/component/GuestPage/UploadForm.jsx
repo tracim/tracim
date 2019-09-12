@@ -20,6 +20,14 @@ class UploadForm extends React.Component {
     }))
   }
 
+  sendButtonIsDisabled = () => {
+    const { props } = this
+    const guestFullnameIsValid = props.guestFullname.value.length && !props.guestFullname.isInvalid
+    const guestPasswordIsValid = !props.hasPassword || (props.guestPassword.value.length && !props.guestPassword.isInvalid)
+    const uploadListIsValid = props.uploadFileList.length > 0
+    return !(guestPasswordIsValid && guestFullnameIsValid && uploadListIsValid)
+  }
+
   render () {
     const { props } = this
 
@@ -31,8 +39,10 @@ class UploadForm extends React.Component {
             customClass=''
             type='text'
             placeHolder={props.t('Full name')}
-            value={props.guestName}
+            value={props.guestFullname.value}
             onChange={props.onChangeFullName}
+            isInvalid={props.guestFullname.isInvalid}
+            invalidMsg={props.t('Full name is required')}
           />
 
           {props.hasPassword &&
@@ -93,7 +103,7 @@ class UploadForm extends React.Component {
           </div>
 
           <div className='guestupload__card__form__right__files'>
-            {props.uploadFileList.map(file =>
+            {props.uploadFileList.map((file, index) =>
               <div className='d-flex' key={file.name}>
                 <i className='fa fa-fw fa-file-o m-1' />
 
@@ -113,6 +123,7 @@ class UploadForm extends React.Component {
           <button type='button'
             className='guestupload__card__form__right__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
             onClick={props.onClickSend}
+            disabled={this.sendButtonIsDisabled()}
           >
             {props.t('Send')} <i className='fa fa-fw fa-paper-plane-o' />
           </button>

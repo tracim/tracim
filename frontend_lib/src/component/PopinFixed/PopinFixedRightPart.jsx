@@ -33,6 +33,7 @@ class PopinFixedRightPart extends React.Component {
               title={menuItem.label}
               onClick={() => this.handleChangeRightChildren(menuItem.id)}
               style={{ borderColor: props.customColor }}
+              data-cy={`popin_right_part_${menuItem.id}`}
             >
               <i className={`fa fa-fw ${menuItem.icon}`} />
             </button>

@@ -229,7 +229,15 @@
   "Manage": "Paramétrer",
   "Full name": "Nom complet",
   "Error while loading file information": "Erreur lors du chargement du fichier",
+  "Files already uploaded:": "Fichiers déjà téléversés",
+  "Full name must be at least 1 character": "Le nom complet doit comporter au moins 1 caractère",
+  "Full name must be less than 255 characters": "Le nom complet doit comporter moins de 255 caractères.",
+  "Password must be at least 6 characters": "Le mot de passe doit comporter au moins 6 caractères",
+  "Password must be less than 255 characters": "Le mot de passe doit comporter moins de 255 caractères.",
+  "Errors in form:": "Erreurs dans le formulaire",
+  "Full name is required": "Le nom complet est requis",
   "Error, this link is invalid or has expired": "Erreur, ce lien est invalide ou a expiré",
-  "Error while loading upload informations": "Erreur lors du chargement des informations de téléversement",
+  "Error while loading upload information": "Erreur lors du chargement des informations de téléversement",
+  "You must select at least 1 file to upload": "Vous devez selectionner au moins 1 fichier à téléverser",
   "Create an office document": "Créer un doc. bureautique"
 }

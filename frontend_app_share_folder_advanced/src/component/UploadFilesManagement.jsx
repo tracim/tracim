@@ -23,6 +23,7 @@ const UploadFilesManagement = props => {
             }
           }}
           onClick={props.onClickNewUploadComponent}
+          data-cy='share_folder_advanced__content__btnupload'
         >
           {props.t('New')}
           <i className='fa fa-fw fa-plus-circle' />

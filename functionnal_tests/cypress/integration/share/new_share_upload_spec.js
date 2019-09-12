@@ -12,20 +12,19 @@ const email3 = 'email1@email3.email3'
 let workspaceId
 
 describe('Open the share folder advanced', () => {
-  before(function () {
+  beforeEach(function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
-    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-      workspaceId = workspace.workspace_id
-      cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
-    })
-  })
-
-  beforeEach(function () {
-    cy.loginAs('administrators')
-    cy.visitPage({pageName: PAGES.SHARE_FOLDER, params: {workspaceId: workspaceId}})
-    cy.get('.share_folder_advanced__content__btnupload').click()
+    cy.fixture('baseWorkspace').as('workspace')
+      .then(workspace => {
+        workspaceId = workspace.workspace_id
+        return cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
+      })
+      .then(data => {
+        cy.visitPage({pageName: PAGES.SHARE_FOLDER, params: {workspaceId: workspaceId}})
+        cy.get('.share_folder_advanced__content__btnupload').click()
+      })
   })
 
   afterEach(function () {
