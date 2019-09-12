@@ -808,7 +808,7 @@ class File extends React.Component {
       children: (
         <FileProperties
           color={state.config.hexcolor}
-          fileType={state.content.file_extension}
+          fileType={state.content.mimetype}
           fileSize={displayFileSize(state.content.size)}
           filePageNb={state.content.page_nb}
           activesShares={state.content.actives_shares}
