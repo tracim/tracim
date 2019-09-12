@@ -51,8 +51,6 @@ import {
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 
-const CONTENT_TYPE_FILE = 'file'
-
 class File extends React.Component {
   constructor (props) {
     super(props)
