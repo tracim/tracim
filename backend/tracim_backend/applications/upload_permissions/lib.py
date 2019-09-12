@@ -22,6 +22,7 @@ from tracim_backend.applications.upload_permissions.models_in_context import (
     UploadPermissionInContext,
 )
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import UploadPermissionNotFound
 from tracim_backend.exceptions import WrongSharePassword
@@ -244,9 +245,12 @@ class UploadPermissionLib(object):
         message: typing.Optional[str],
         files: typing.List[cgi.FieldStorage],
         do_notify: bool = False,
-    ):
+    ) -> typing.List[ContentInContext]:
         content_api = ContentApi(
-            config=self._config, current_user=upload_permission.author, session=self._session
+            config=self._config,
+            current_user=upload_permission.author,
+            session=self._session,
+            namespaces_filter=[ContentNamespaces.UPLOAD],
         )
         translator = Translator(app_config=self._config)
         _ = translator.get_translation
@@ -256,14 +260,21 @@ class UploadPermissionLib(object):
             date=format_date(current_datetime, locale=translator.default_lang),
             time=format_time(current_datetime, locale=translator.default_lang),
         )
-        upload_folder = content_api.create(
-            content_type_slug=content_type_list.Folder.slug,
-            workspace=upload_permission.workspace,
-            label=folder_label,
-            do_notify=False,
-            do_save=True,
-            content_namespace=ContentNamespaces.UPLOAD,
-        )
+
+        try:
+            upload_folder = content_api.create(
+                content_type_slug=content_type_list.Folder.slug,
+                workspace=upload_permission.workspace,
+                label=folder_label,
+                do_notify=False,
+                do_save=True,
+                content_namespace=ContentNamespaces.UPLOAD,
+            )
+        except ContentFilenameAlreadyUsedInFolder:
+            upload_folder = content_api.get_one_by_filename_and_parent_labels(
+                content_label=folder_label, workspace=upload_permission.workspace
+            )
+
         created_contents = []
         if message:
             comment_message = _("Message from {username}: {message}").format(
@@ -271,6 +282,7 @@ class UploadPermissionLib(object):
             )
         else:
             comment_message = _("Uploaded by {username}.").format(username=uploader_username)
+
         for _file in files:
             content = content_api.create(
                 filename=_file.filename,
@@ -293,6 +305,7 @@ class UploadPermissionLib(object):
             )
             created_contents.append(content_api.get_content_in_context(content))
             content_api.execute_created_content_actions(content)
+
         if do_notify:
             workspace_lib = WorkspaceApi(
                 config=self._config, current_user=upload_permission.author, session=self._session
@@ -306,3 +319,5 @@ class UploadPermissionLib(object):
                 uploaded_contents=created_contents,
                 uploader_email=upload_permission.email,
             )
+
+        return created_contents
