@@ -2,6 +2,7 @@ from datetime import datetime
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
 import typing
+from urllib.parse import quote
 import uuid
 
 from sqlalchemy.orm import Query
@@ -20,6 +21,7 @@ from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
@@ -193,7 +195,7 @@ class ShareLib(object):
             api_base_url=self._config.WEBSITE__BASE_URL,
             base_public_api=BASE_PUBLIC_API_V2,
             share_token=content_share.share_token,
-            filename=content.file_name,
+            filename=quote(core_convert_file_name_to_display(content.file_name)),
         )
 
     def save(self, content_share: ContentShare) -> ContentShare:

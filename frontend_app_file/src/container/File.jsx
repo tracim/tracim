@@ -757,19 +757,19 @@ class File extends React.Component {
   getOnlineEditionAction = () => {
     const { state } = this
     try {
-      if (!appOfficeDocument) {
+      if (!appCollaborativeDocumentEdition) {
         return null
       }
-      return appOfficeDocument.default.getOnlineEditionAction(
+      return appCollaborativeDocumentEdition.default.getOnlineEditionAction(
         state.content,
         state.config.system.config.collaborative_document_edition,
         state.loggedUser.userRoleIdInWorkspace
       )
     } catch (error) {
-      // INFO - B.L - 2019/08/05 - if appOfficeDocument is not activated in the backend
+      // INFO - B.L - 2019/08/05 - if appCollaborativeDocumentEdition is not activated in the backend
       // the global variable will not exists and cause a ReferenceError
       if (error instanceof ReferenceError) {
-        console.log('appOfficeDocument is not activated disabling online edition')
+        console.log('appCollaborativeDocumentEdition is not activated disabling online edition')
         return null
       }
       throw error
