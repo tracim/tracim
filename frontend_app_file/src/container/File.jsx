@@ -172,7 +172,10 @@ class File extends React.Component {
       await this.loadContent()
       this.loadTimeline()
       this.buildBreadcrumbs()
-      if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
+      if (state.config.workspace.downloadEnabled) {
+        this.setState({})
+        this.loadShareLinkList()
+      }
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
@@ -283,12 +286,12 @@ class File extends React.Component {
     switch (fetchResultShareLinkList.apiResponse.status) {
       case 200:
         this.setState({
+          shareEmails: '',
+          sharePassword: '',
           shareLinkList: fetchResultShareLinkList.body
         })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
-      default:
-        this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
+      default: this.sendGlobalFlashMessage(this.props.t('Error while loading share links list')); break
     }
   }
 
@@ -347,13 +350,6 @@ class File extends React.Component {
   }
 
   handleClickNewVersion = () => this.setState({ mode: MODE.EDIT })
-
-  handleClickEdit = () => {
-    const { state } = this
-    state.config.history.push(
-      PAGE.WORKSPACE.CONTENT_EDITION(state.content.workspace_id, CONTENT_TYPE_FILE, state.content.content_id)
-    )
-  }
 
   handleClickValidateNewDescription = async newDescription => {
     const { props, state } = this
