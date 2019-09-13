@@ -131,7 +131,34 @@
       background-color mediumGrey
       border none
 
-// MEDIAQUERIES
+responsiveColumnStyle()
+  .wsContentGeneric__content__right
+    display flex
+    flex-direction column
+    margin 0
+    &__header
+      flex-direction row
+      width 100%
+      height 65px
+      justify-content flex-end
+      &__icon
+        transform none
+        padding 10px
+        width 65px
+        & > i
+          margin auto
+        &.active
+          border none
+          border-top 5px solid
+          padding 10px
+        &__close
+          display none
+  .rightPartClose
+    .wsContentGeneric__content__right__header__icon.active
+      background-color lightGrey
+      border none
+      border-top 5px solid
+      padding 10px
 
 @media (max-width: max-lg)
   .rightPartClose
@@ -149,41 +176,6 @@
       &__right
         width 100%
         height auto
-
-
-responsiveColumnStyle()
-  .wsContentGeneric
-    &__content
-      &__right
-        display flex
-        flex-direction column
-        margin 0
-        &__header
-          flex-direction row
-          width 100%
-          height 65px
-          justify-content flex-end
-          &__icon
-            transform none
-            margin 10px
-            padding 10px
-            width 65px
-            & > i
-              margin auto
-            &.active
-              border none
-              border-top 5px solid
-              padding 10px
-            &__close
-              display none
-  .rightPartClose
-    .wsContentGeneric__content__right__header__icon.active
-        background-color lightGrey
-        border none
-        border-top 5px solid
-        padding 10px
-
-@media (min-width: min-lg) and (max-width: max-lg)
   responsiveColumnStyle()
 
 @media (min-width: min-md) and (max-width: max-md)
