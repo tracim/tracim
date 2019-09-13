@@ -22,22 +22,26 @@ class PopinFixedRightPart extends React.Component {
     const { props, state } = this
 
     return (
-      <div className={classnames('wsContentGeneric__content__right', `${props.customClass}__content__right`, 'd-flex')}>
+      <div className={classnames('wsContentGeneric__content__right', `${props.customClass}__content__right`)}>
         <div
-          className={classnames(`${props.customClass}__header`, 'wsContentGeneric__content__right__header nav')} 
+          className={classnames(`${props.customClass}__header`, 'wsContentGeneric__content__right__header nav')}
           onClick={props.toggleRightPart}
         >
-          {props.menuItemList.map(menuItem =>
-            <button
-              className={classnames('wsContentGeneric__content__right__header__icon nav-item', { 'active': menuItem.id === state.currentChildren })}
-              title={menuItem.label}
-              onClick={() => this.handleChangeRightChildren(menuItem.id)}
-              style={{ borderColor: props.customColor }}
-              data-cy={`popin_right_part_${menuItem.id}`}
-            >
-              <i className={`fa fa-fw ${menuItem.icon}`} />
-            </button>
-          )}
+          {props.menuItemList.map(menuItem => {
+            const isMenuActive = menuItem.id === state.currentChildren
+
+            return (
+              <button
+                className={classnames('wsContentGeneric__content__right__header__icon nav-item', { 'active': isMenuActive })}
+                title={menuItem.label}
+                onClick={() => this.handleChangeRightChildren(menuItem.id)}
+                style={{ borderColor: isMenuActive ? props.customColor : 'transparent' }}
+                data-cy={`popin_right_part_${menuItem.id}`}
+              >
+                <i className={`fa fa-fw ${menuItem.icon}`} />
+              </button>
+            )
+          })}
 
           <div
             className='wsContentGeneric__content__right__header__icon__close'

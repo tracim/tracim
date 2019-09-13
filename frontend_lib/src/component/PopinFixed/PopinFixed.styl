@@ -95,6 +95,7 @@
       width 25%
       height 100%
     &__right
+      display flex
       transition width 0.4s ease
       width 25%
       height 100%
@@ -111,13 +112,12 @@
           border none
           height 65px
           background-color mediumGrey
+          border-left 5px solid transparent
           &:focus
             border-color transparent
             outline 0
           &.active
-            padding-left 1px
             background-color lightGrey
-            border-left 5px solid
           &__close
             text-align center
             cursor pointer
@@ -143,22 +143,18 @@ responsiveColumnStyle()
       justify-content flex-end
       &__icon
         transform none
+        border-left-width 0
+        margin-left 5px
         padding 10px
         width 65px
+        border-top 5px solid
         & > i
           margin auto
-        &.active
-          border none
-          border-top 5px solid
-          padding 10px
         &__close
           display none
   .rightPartClose
     .wsContentGeneric__content__right__header__icon.active
-      background-color lightGrey
-      border none
       border-top 5px solid
-      padding 10px
 
 @media (max-width: max-lg)
   .rightPartClose
