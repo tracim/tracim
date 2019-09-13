@@ -55,7 +55,9 @@ describe('Open a file', () => {
     describe('and creating a share link',() => {
       describe('and clicking to delete share link',() => {
         it('Should delete the share link',() => {
-          cy.get('.shareDownload__email__input').should('be.visible').type('email@email.email')
+          // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
+          cy.wait(1000)
+          cy.get('.shareDownload__email__input').type('email@email.email')
           cy.get('.shareDownload__newBtn').should('be.visible').click()
           cy.get('[data-cy=deleteShareLink]').should('be.visible').click()
           cy.get('.shareDownload').contains(emptyPhrase).should('be.visible')
@@ -63,7 +65,9 @@ describe('Open a file', () => {
 
         describe('and clicking on the New button',() => {
           it('Should redirect to new share page at the right part',() => {
-            cy.get('.shareDownload__email__input').should('be.visible').type('email@email.email')
+            cy.wait(1000)
+            // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
+            cy.get('.shareDownload__email__input').type('email@email.email')
             cy.get('.shareDownload__newBtn').should('be.visible').click()
             cy.get('.shareDownload__btn').should('be.visible').click()
             cy.get('.file__contentpage__content__right').contains('New share').should('be.visible')
