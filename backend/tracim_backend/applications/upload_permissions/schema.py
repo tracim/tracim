@@ -20,6 +20,7 @@ from tracim_backend.applications.upload_permissions.validators import (
     upload_username_length_validator,
 )
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
+from tracim_backend.views.core_api.schemas import RFCEmail
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
@@ -151,9 +152,7 @@ class UploadPermissionCreationBody(object):
 
 class UploadPermissionCreationBodySchema(marshmallow.Schema):
     emails = marshmallow.fields.List(
-        marshmallow.fields.Email(validate=upload_permission_email_validator),
-        validate=Length(min=1),
-        required=True,
+        RFCEmail(validate=upload_permission_email_validator), validate=Length(min=1), required=True
     )
     password = marshmallow.fields.String(
         example="8QLa$<w",
@@ -172,7 +171,7 @@ class UploadPermissionPublicInfoSchema(marshmallow.Schema):
 
 
 class UploadPermissionSchema(marshmallow.Schema):
-    email = marshmallow.fields.Email(
+    email = RFCEmail(
         example="hello@tracim.fr", required=True, validate=upload_permission_email_validator
     )
     has_password = marshmallow.fields.Boolean(required=True)
