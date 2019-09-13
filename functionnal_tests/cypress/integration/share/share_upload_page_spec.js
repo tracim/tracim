@@ -48,6 +48,8 @@ describe('Open the share folder advanced', () => {
     })
 
     it('clicking on delete, should delete the share link',() => {
+      // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
+      cy.wait(1000)
       cy.get('.newUpload__email__input').should('be.visible').type('email@email.email')
       cy.get('.newUpload__newBtn').should('be.visible').click()
       cy.get('[data-cy=deleteShareLink]').should('be.visible').click()
