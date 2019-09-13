@@ -38,7 +38,7 @@ class UploadForm extends React.Component {
             parentClassName='guestupload__card__form__fullname'
             customClass=''
             type='text'
-            placeHolder={props.t('Full name')}
+            placeHolder={props.t('Full name (required)')}
             value={props.guestFullname.value}
             onChange={props.onChangeFullName}
             isInvalid={props.guestFullname.isInvalid}
@@ -52,7 +52,7 @@ class UploadForm extends React.Component {
                 customClass=''
                 icon='fa-lock'
                 type='password'
-                placeHolder={props.t('Password')}
+                placeHolder={props.t('Password (required)')}
                 invalidMsg={props.t('Invalid password')}
                 isInvalid={props.guestPassword.isInvalid}
                 value={props.guestPassword.value}

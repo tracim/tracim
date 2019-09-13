@@ -227,7 +227,6 @@
   "Error while loading uploaded files": "Erreur lors du chargement des fichiers téléversés",
   "Error while downloading file": "Erreur lors du téléchargement du fichier",
   "Manage": "Paramétrer",
-  "Full name": "Nom complet",
   "Error while loading file information": "Erreur lors du chargement du fichier",
   "Files already uploaded:": "Fichiers déjà téléversés",
   "Full name must be at least 1 character": "Le nom complet doit comporter au moins 1 caractère",
@@ -239,5 +238,7 @@
   "Error, this link is invalid or has expired": "Erreur, ce lien est invalide ou a expiré",
   "Error while loading upload information": "Erreur lors du chargement des informations de téléversement",
   "You must select at least 1 file to upload": "Vous devez selectionner au moins 1 fichier à téléverser",
-  "Create an office document": "Créer un doc. bureautique"
+  "Create an office document": "Créer un doc. bureautique",
+  "Full name (required)": "Nom complet (requis)",
+  "Password (required)": "Mot de passe (requis)"
 }
