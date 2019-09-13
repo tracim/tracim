@@ -52,7 +52,10 @@ class GuestDownload extends React.Component {
         })
         break
       case 400:
-        this.sendGlobalFlashMessage(props.t('Error in the URL'))
+        switch (response.body.code) {
+          case 1007: this.sendGlobalFlashMessage(props.t('Error, this link is invalid or has expired')); break
+          default: this.sendGlobalFlashMessage(props.t('Error in the URL')); break
+        }
         props.history.push(PAGE.LOGIN)
         break
       default:

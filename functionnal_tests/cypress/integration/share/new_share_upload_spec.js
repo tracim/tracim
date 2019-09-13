@@ -60,6 +60,8 @@ describe('Open the share folder advanced', () => {
         describe('and clicking at see password', () => {
           it('Should show the password', () => {
             cy.get('.newUpload__password__link').click()
+            // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
+            cy.wait(1000)
             cy.get('.newUpload__password__input').type('Password')
             cy.get('[data-cy=seePassword]').click()
             cy.get('.newUpload__password__input').should('have.value', 'Password')
