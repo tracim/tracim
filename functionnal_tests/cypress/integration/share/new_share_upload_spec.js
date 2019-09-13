@@ -32,11 +32,11 @@ describe('Open the share folder advanced', () => {
   })
 
   describe('and clicking on the New button',() => {
-    describe('and writing three emails separated by space and clicking Enter',() =>{
+    describe('and writing three emails separated by ; and clicking Enter',() =>{
       it('Should separate the emails by new line',() => {
         // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
         cy.wait(1000)
-        cy.get(emailInput).type(`${email1} ${email2} ${email3}`).type('{enter}')
+        cy.get(emailInput).type(`${email1};${email2};${email3}`).type('{enter}')
         cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
       })
     })

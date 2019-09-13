@@ -155,7 +155,7 @@ export const displayFileSize = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
-export const parserStringToList = (string, separatorList = [',', ' ', ';', '\n']) => {
+export const parserStringToList = (string, separatorList = [',', ';', '\n']) => {
   let parsedString = string
   separatorList.forEach(separator => {
     parsedString = parsedString.split(separator).join(',')
