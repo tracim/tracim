@@ -24,7 +24,7 @@ const ExtandedAction = props => {
         {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace >= 2 && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
-            onClick={props.onClickExtendedAction.edit}
+            onClick={props.onClickExtendedAction.edit.callback}
             data-cy='extended_action_edit'
           >
             <div className='subdropdown__item__icon mr-3'>
@@ -32,18 +32,18 @@ const ExtandedAction = props => {
             </div>
 
             <div className='subdropdown__item__text'>
-              {props.t('Edit')}
+              {props.onClickExtendedAction.edit.label}
             </div>
           </div>
         )}
 
         {/*
-        <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.download}>
+        <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.download.callback}>
           <div className='subdropdown__item__icon mr-3'>
             <i className='fa fa-fw fa-download' />
           </div>
           <div className='subdropdown__item__text'>
-            {props.t('Download')}
+            {props.onClickExtendedAction.download.label}
           </div>
         </div>
         */}
@@ -52,7 +52,7 @@ const ExtandedAction = props => {
         {props.userRoleIdInWorkspace >= 4 && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
-            onClick={props.onClickExtendedAction.archive}
+            onClick={props.onClickExtendedAction.archive.callback}
             data-cy='extended_action_archive'
           >
             <div className='subdropdown__item__icon mr-3'>
@@ -60,7 +60,7 @@ const ExtandedAction = props => {
             </div>
 
             <div className='subdropdown__item__text'>
-              {props.t('Archive')}
+              {props.onClickExtendedAction.archive.label}
             </div>
           </div>
         )} */}
@@ -68,7 +68,7 @@ const ExtandedAction = props => {
         {props.userRoleIdInWorkspace >= 4 && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
-            onClick={props.onClickExtendedAction.delete}
+            onClick={props.onClickExtendedAction.delete.callback}
             data-cy='extended_action_delete'
           >
             <div className='subdropdown__item__icon mr-3'>
@@ -76,7 +76,7 @@ const ExtandedAction = props => {
             </div>
 
             <div className='subdropdown__item__text'>
-              {props.t('Delete')}
+              {props.onClickExtendedAction.delete.label}
             </div>
           </div>
         )}

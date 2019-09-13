@@ -603,7 +603,7 @@ class WorkspaceContent extends React.Component {
 
   render () {
     const { breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t } = this.props
-    const { state } = this
+    const { state, props } = this
 
     const urlFilter = qs.parse(location.search).type
 
@@ -725,10 +725,23 @@ class WorkspaceContent extends React.Component {
                         getContentParentList={this.getContentParentList}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
                         onClickExtendedAction={{
-                          edit: this.handleClickEditContentItem,
-                          download: this.handleClickDownloadContentItem,
-                          archive: this.handleClickArchiveContentItem,
-                          delete: this.handleClickDeleteContentItem
+                          edit: {
+                            callback: e => this.handleClickEditContentItem(e, content),
+                            label: props.t('Manage')
+                          },
+                          download: {
+                            callback: e => this.handleClickDownloadContentItem(e, content),
+                            label: props.t('Download')
+                          },
+                          archive: {
+                            callback: e => this.handleClickArchiveContentItem(e, content),
+                            label: props.t('Archive')
+                          },
+                          delete: {
+                            callback: e => this.handleClickDeleteContentItem(e, content),
+                            label: props.t('Delete')
+                          },
+                          move: null
                         }}
                         onDropMoveContentItem={this.handleDropMoveContent}
                         onClickFolder={this.handleClickFolder}
@@ -758,10 +771,22 @@ class WorkspaceContent extends React.Component {
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
                         read={currentWorkspace.contentReadStatusList.includes(content.id)}
                         onClickExtendedAction={{
-                          edit: e => this.handleClickEditContentItem(e, content),
-                          download: e => this.handleClickDownloadContentItem(e, content),
-                          archive: e => this.handleClickArchiveContentItem(e, content),
-                          delete: e => this.handleClickDeleteContentItem(e, content)
+                          edit: {
+                            callback: e => this.handleClickEditContentItem(e, content),
+                            label: props.t('Edit')
+                          },
+                          download: {
+                            callback: e => this.handleClickDownloadContentItem(e, content),
+                            label: props.t('Download')
+                          },
+                          archive: {
+                            callback: e => this.handleClickArchiveContentItem(e, content),
+                            label: props.t('Archive')
+                          },
+                          delete: {
+                            callback: e => this.handleClickDeleteContentItem(e, content),
+                            label: props.t('Delete')
+                          }
                         }}
                         onDropMoveContentItem={this.handleDropMoveContent}
                         key={content.id}
