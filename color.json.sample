@@ -4,6 +4,5 @@
   "contents/thread": "#428BCA",
   "contents/file": "#ffa500",
   "contents/folder": "#414548",
-  "agenda": "#ff4b3a",
-  "office_document": "#ffc800"
+  "agenda": "#ff4b3a"
 }
