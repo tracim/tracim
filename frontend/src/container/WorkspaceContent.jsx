@@ -725,23 +725,10 @@ class WorkspaceContent extends React.Component {
                         getContentParentList={this.getContentParentList}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
                         onClickExtendedAction={{
-                          edit: {
-                            callback: e => this.handleClickEditContentItem(e, content),
-                            label: props.t('Manage')
-                          },
-                          download: {
-                            callback: e => this.handleClickDownloadContentItem(e, content),
-                            label: props.t('Download')
-                          },
-                          archive: {
-                            callback: e => this.handleClickArchiveContentItem(e, content),
-                            label: props.t('Archive')
-                          },
-                          delete: {
-                            callback: e => this.handleClickDeleteContentItem(e, content),
-                            label: props.t('Delete')
-                          },
-                          move: null
+                          edit: this.handleClickEditContentItem,
+                          download: this.handleClickDownloadContentItem,
+                          archive: this.handleClickArchiveContentItem,
+                          delete: this.handleClickDeleteContentItem
                         }}
                         onDropMoveContentItem={this.handleDropMoveContent}
                         onClickFolder={this.handleClickFolder}

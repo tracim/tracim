@@ -148,7 +148,24 @@ class Folder extends React.Component {
                   {props.userRoleIdInWorkspace >= 4 && (
                     <BtnExtandedAction
                       userRoleIdInWorkspace={props.userRoleIdInWorkspace}
-                      onClickExtendedAction={props.onClickExtendedAction}
+                      onClickExtendedAction={{
+                        edit: {
+                          callback: e => props.onClickExtendedAction.edit(e, props.folderData),
+                          label: props.t('Edit')
+                        },
+                        download: {
+                          callback: e => props.onClickExtendedAction.download(e, props.folderData),
+                          label: props.t('Download')
+                        },
+                        archive: {
+                          callback: e => props.onClickExtendedAction.archive(e, props.folderData),
+                          label: props.t('Archive')
+                        },
+                        delete: {
+                          callback: e => props.onClickExtendedAction.delete(e, props.folderData),
+                          label: props.t('Delete')
+                        }
+                      }}
                     />
                   )}
                 </div>
