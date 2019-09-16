@@ -4,6 +4,7 @@ import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
 import { ROLE, findUserRoleIdInWorkspace } from '../../helper.js'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
 export class OpenContentApp extends React.Component {
@@ -37,9 +38,16 @@ export class OpenContentApp extends React.Component {
       } else { // open another app
         // if another app is already visible, hide it
         if (appOpenedType !== false) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
+
+        const contentInfomations = {
+          ...contentType.find(ct => ct.slug === contentToOpen.type),
+          workspace: {
+            downloadEnabled: currentWorkspace.downloadEnabled
+          }
+        }
         // open app
         renderAppFeature(
-          contentType.find(ct => ct.slug === contentToOpen.type),
+          contentInfomations,
           user,
           findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE),
           contentToOpen
@@ -75,6 +83,12 @@ export class OpenContentApp extends React.Component {
 }
 
 const mapStateToProps = ({ user, currentWorkspace, contentType }) => ({
-  user, currentWorkspace, contentType
+  user,
+  currentWorkspace,
+  contentType: [
+    ...contentType,
+    // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
+    HACK_COLLABORA_CONTENT_TYPE(contentType)
+  ]
 })
 export default withRouter(connect(mapStateToProps)(appFactory(OpenContentApp)))

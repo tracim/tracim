@@ -9,6 +9,7 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
+  PopinFixedRightPart,
   Timeline,
   NewVersionBtn,
   GenericButton,
@@ -20,18 +21,25 @@ import {
   Badge,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  ShareDownload,
+  displayFileSize,
+  checkEmailValidity,
+  parserStringToList
 } from 'tracim_frontend_lib'
 import {
   MODE,
   removeExtensionOfFilename,
-  displayFileSize,
   PAGE
 } from '../helper.js'
+import { debug } from '../debug.js'
 import {
+  deleteShareLink,
   getFileContent,
   getFileComment,
   getFileRevision,
+  getShareLinksList,
+  postShareLinksList,
   postFileNewComment,
   putFileContent,
   putFileStatus,
@@ -41,8 +49,7 @@ import {
   putFileRestoreDeleted,
   putMyselfFileRead
 } from '../action.async.js'
-
-const CONTENT_TYPE_FILE = 'file'
+import FileProperties from '../component/FileProperties.jsx'
 
 class File extends React.Component {
   constructor (props) {
@@ -50,9 +57,9 @@ class File extends React.Component {
     this.state = {
       appName: 'file',
       isVisible: true,
-      config: props.data ? props.data.config : null,
-      loggedUser: props.data ? props.data.loggedUser : null,
-      content: props.data ? props.data.content : null,
+      config: props.data ? props.data.config : debug.config,
+      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
+      content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
       externalTranslationList: [
         props.t('File'),
@@ -67,12 +74,15 @@ class File extends React.Component {
       fileCurrentPage: 1,
       timelineWysiwyg: false,
       mode: MODE.VIEW,
-      displayProperty: false,
       progressUpload: {
         display: false,
         percent: 0
-      }
+      },
+      shareEmails: '',
+      sharePassword: '',
+      shareLinkList: []
     }
+    this.refContentLeftTop = React.createRef()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -139,7 +149,7 @@ class File extends React.Component {
   async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
 
-    const { appName, content } = this.state
+    const { appName, content, config } = this.state
     const previouslyUnsavedComment = localStorage.getItem(
       generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
     )
@@ -148,6 +158,7 @@ class File extends React.Component {
     await this.loadContent()
     this.loadTimeline()
     this.buildBreadcrumbs()
+    if (config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -160,6 +171,10 @@ class File extends React.Component {
       await this.loadContent()
       this.loadTimeline()
       this.buildBreadcrumbs()
+      if (state.config.workspace.downloadEnabled) {
+        this.setState({})
+        this.loadShareLinkList()
+      }
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
@@ -260,6 +275,25 @@ class File extends React.Component {
     })
   }
 
+  loadShareLinkList = async () => {
+    const { content, config } = this.state
+
+    if (this.state.loggedUser.userRoleIdInWorkspace < 2) return
+
+    const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
+
+    switch (fetchResultShareLinkList.apiResponse.status) {
+      case 200:
+        this.setState({
+          shareEmails: '',
+          sharePassword: '',
+          shareLinkList: fetchResultShareLinkList.body
+        })
+        break
+      default: this.sendGlobalFlashMessage(this.props.t('Error while loading share links list')); break
+    }
+  }
+
   buildBreadcrumbs = () => {
     const { state } = this
 
@@ -300,12 +334,13 @@ class File extends React.Component {
       case 200:
         this.loadContent()
         this.loadTimeline()
+        if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
+          case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
         break
@@ -313,13 +348,9 @@ class File extends React.Component {
     }
   }
 
-  handleClickNewVersion = () => this.setState({ mode: MODE.EDIT })
-
-  handleClickEdit = () => {
-    const { state } = this
-    state.config.history.push(
-      PAGE.WORKSPACE.CONTENT_EDITION(state.content.workspace_id, CONTENT_TYPE_FILE, state.content.content_id)
-    )
+  handleClickNewVersion = () => {
+    this.refContentLeftTop.current.scrollIntoView({ behavior: 'instant' })
+    this.setState({ mode: MODE.EDIT })
   }
 
   handleClickValidateNewDescription = async newDescription => {
@@ -507,8 +538,6 @@ class File extends React.Component {
     this.loadContent(1)
   }
 
-  handleClickProperty = () => this.setState(prev => ({ displayProperty: !prev.displayProperty }))
-
   handleChangeFile = newFile => {
     if (!newFile || !newFile[0]) return
 
@@ -601,6 +630,108 @@ class File extends React.Component {
     }))
   }
 
+  handleClickNewShare = async isPasswordActive => {
+    const { state, props } = this
+
+    let shareEmailList = parserStringToList(state.shareEmails)
+    let invalidEmails = []
+
+    shareEmailList.forEach(shareEmail => {
+      if (!checkEmailValidity(shareEmail)) invalidEmails.push(shareEmail)
+    })
+
+    shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
+
+    if (invalidEmails.length > 0 || shareEmailList === 0) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: <div>{props.t('The following emails are not valid:')}<br />{invalidEmails.join(', ')}</div>,
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return false
+    }
+
+    if (isPasswordActive && state.sharePassword.length < 6) {
+      this.sendGlobalFlashMessage(props.t('The password is too short (minimum 6 characters)'))
+      return false
+    }
+
+    if (isPasswordActive && state.sharePassword.length > 512) {
+      this.sendGlobalFlashMessage(props.t('The password is too long (maximum 512 characters)'))
+      return false
+    }
+
+    const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      state.content.content_id,
+      shareEmailList,
+      isPasswordActive ? state.sharePassword : null
+    ))
+
+    switch (fetchResultPostShareLinks.apiResponse.status) {
+      case 200:
+        this.setState(prev => ({
+          shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
+          shareEmails: '',
+          sharePassword: ''
+        }))
+        return true
+      case 400:
+        switch (fetchResultPostShareLinks.body.code) {
+          case 2001:
+            this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
+            break
+          default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+        }
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+    }
+    return false
+  }
+
+  handleChangeEmails = e => this.setState({ shareEmails: e.target.value })
+  handleChangePassword = e => this.setState({ sharePassword: e.target.value })
+  handleKeyDownEnter = e => {
+    if (e.key === 'Enter') {
+      const emailList = parserStringToList(this.state.shareEmails)
+      let invalidEmails = []
+
+      emailList.forEach(email => {
+        if (!checkEmailValidity(email)) invalidEmails.push(email)
+      })
+
+      if (invalidEmails.length > 0) {
+        this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+      } else {
+        this.setState({ shareEmails: emailList.join('\n') })
+      }
+    }
+  }
+
+  handleClickDeleteShareLink = async shareLinkId => {
+    const { config, content } = this.state
+    const { props } = this
+
+    const fetchResultDeleteShareLink = await handleFetchResult(
+      await deleteShareLink(config.apiUrl, content.workspace_id, content.content_id, shareLinkId)
+    )
+
+    switch (fetchResultDeleteShareLink.status) {
+      case 204:
+        this.loadShareLinkList()
+        break
+      case 400:
+        this.sendGlobalFlashMessage(props.t('Error in the URL'))
+        props.history.push(PAGE.LOGIN)
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while deleting share link'))
+    }
+  }
+
   getDownloadBaseUrl = (apiUrl, content, mode) => {
     const urlRevisionPart = mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
     // FIXME - b.l - refactor urls
@@ -624,22 +755,103 @@ class File extends React.Component {
   getOnlineEditionAction = () => {
     const { state } = this
     try {
-      if (!appOfficeDocument) {
+      if (!appCollaborativeDocumentEdition) {
         return null
       }
-      return appOfficeDocument.default.getOnlineEditionAction(
+      return appCollaborativeDocumentEdition.default.getOnlineEditionAction(
         state.content,
         state.config.system.config.collaborative_document_edition,
         state.loggedUser.userRoleIdInWorkspace
       )
     } catch (error) {
-      // INFO - B.L - 2019/08/05 - if appOfficeDocument is not activated in the backend
+      // INFO - B.L - 2019/08/05 - if appCollaborativeDocumentEdition is not activated in the backend
       // the global variable will not exists and cause a ReferenceError
       if (error instanceof ReferenceError) {
-        console.log('appOfficeDocument is not activated disabling online edition')
+        console.log('appCollaborativeDocumentEdition is not activated disabling online edition')
         return null
       }
       throw error
+    }
+  }
+
+  getMenuItemList = () => {
+    const { props, state } = this
+    const timelineObject = {
+      id: 'timeline',
+      label: props.t('Timeline'),
+      icon: 'fa-history',
+      children: (
+        <Timeline
+          customClass={`${state.config.slug}__contentpage`}
+          customColor={state.config.hexcolor}
+          loggedUser={state.loggedUser}
+          timelineData={state.timeline}
+          newComment={state.newComment}
+          disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
+          availableStatusList={state.config.availableStatuses}
+          wysiwyg={state.timelineWysiwyg}
+          onChangeNewComment={this.handleChangeNewComment}
+          onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+          onClickWysiwygBtn={this.handleToggleWysiwyg}
+          onClickRevisionBtn={this.handleClickShowRevision}
+          shouldScrollToBottom={state.mode !== MODE.REVISION}
+          key={'Timeline'}
+        />
+      )
+    }
+    const propertiesObject = {
+      id: 'properties',
+      label: props.t('Properties'),
+      icon: 'fa-info-circle',
+      children: (
+        <FileProperties
+          color={state.config.hexcolor}
+          fileType={state.content.mimetype}
+          fileSize={displayFileSize(state.content.size)}
+          filePageNb={state.content.page_nb}
+          activesShares={state.content.actives_shares}
+          creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
+          creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
+          lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
+          lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
+          description={state.content.raw_content}
+          displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
+          disableChangeDescription={!state.content.is_editable}
+          onClickValidateNewDescription={this.handleClickValidateNewDescription}
+          key={'FileProperties'}
+        />
+      )
+    }
+
+    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= 4) {
+      return [
+        timelineObject,
+        {
+          id: 'share',
+          label: props.t('Share'),
+          icon: 'fa-share-alt',
+          children: (
+            <ShareDownload
+              label={props.t(state.config.label)}
+              hexcolor={state.config.hexcolor}
+              shareEmails={state.shareEmails}
+              onChangeEmails={this.handleChangeEmails}
+              onKeyDownEnter={this.handleKeyDownEnter}
+              sharePassword={state.sharePassword}
+              onChangePassword={this.handleChangePassword}
+              shareLinkList={state.shareLinkList}
+              onClickDeleteShareLink={this.handleClickDeleteShareLink}
+              onClickNewShare={this.handleClickNewShare}
+              userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+              emailNotifActivated={state.config.system.config.email_notification_activated}
+              key={'ShareDownload'}
+            />
+          )
+        },
+        propertiesObject
+      ]
+    } else {
+      return [ timelineObject, propertiesObject ]
     }
   }
 
@@ -684,7 +896,7 @@ class File extends React.Component {
 
               {onlineEditionAction &&
                 <GenericButton
-                  customClass='wsContentGeneric__option__menu__addversion newversionbtn btn outlineTextBtn'
+                  customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
                   dataCy='wsContentGeneric__option__menu__addversion'
                   customColor={state.config.hexcolor}
                   onClick={onlineEditionAction.callback}
@@ -717,6 +929,7 @@ class File extends React.Component {
                   availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
                   disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
+                  mobileVersion={onlineEditionAction}
                 />
               }
 
@@ -743,18 +956,12 @@ class File extends React.Component {
             loggedUser={state.loggedUser}
             previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
             isJpegAvailable={state.content.has_jpeg_preview}
-            fileSize={displayFileSize(state.content.size)}
             filePageNb={state.content.page_nb}
             fileCurrentPage={state.fileCurrentPage}
-            displayProperty={state.displayProperty}
-            onClickProperty={this.handleClickProperty}
             version={state.content.number}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
-            description={state.content.raw_content}
-            onClickValidateNewDescription={this.handleClickValidateNewDescription}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
-            isEditable={state.content.is_editable}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             onClickRestoreArchived={this.handleClickRestoreArchived}
@@ -772,22 +979,13 @@ class File extends React.Component {
             newFile={state.newFile}
             newFilePreview={state.newFilePreview}
             progressUpload={state.progressUpload}
+            ref={this.refContentLeftTop}
           />
 
-          <Timeline
+          <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
-            loggedUser={state.loggedUser}
-            timelineData={state.timeline}
-            newComment={state.newComment}
-            disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
-            availableStatusList={state.config.availableStatuses}
-            wysiwyg={state.timelineWysiwyg}
-            onChangeNewComment={this.handleChangeNewComment}
-            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            onClickRevisionBtn={this.handleClickShowRevision}
-            shouldScrollToBottom={state.mode !== MODE.REVISION}
+            menuItemList={this.getMenuItemList()}
           />
         </PopinFixedContent>
       </PopinFixed>

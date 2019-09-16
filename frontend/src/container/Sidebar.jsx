@@ -63,7 +63,7 @@ class Sidebar extends React.Component {
       ...unLoggedAllowedPageList,
       ...props.workspaceList.length > 0 ? [] : [PAGE.HOME, '/ui/'] // @fixme - Côme - 2018/11/13 - have a better way than hardcoding '/ui/'
     ]
-      .includes(props.location.pathname)
+      .some(url => props.location.pathname.startsWith(url))
   }
 
   handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))

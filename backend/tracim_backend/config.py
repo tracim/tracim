@@ -141,6 +141,7 @@ class CFG(object):
             ),
         )
         self._load_global_config()
+        self._load_limitation_config()
         self._load_email_config()
         self._load_ldap_config()
         self._load_webdav_config()
@@ -154,6 +155,10 @@ class CFG(object):
         import tracim_backend.applications.share.config as share_app_config
 
         share_app_config.load_config(self)
+
+        import tracim_backend.applications.upload_permissions.config as upload_permissions_config
+
+        upload_permissions_config.load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -177,8 +182,9 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "agenda,"
-            "office_document,"
-            "share_content"
+            "collaborative_document_edition,"
+            "share_content,"
+            "upload_permission"
         )
 
         self.APP__ENABLED = string_to_list(
@@ -276,6 +282,15 @@ class CFG(object):
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
+
+    def _load_limitation_config(self) -> None:
+        self.LIMITATION__SHAREDSPACE_PER_USER = int(
+            self.get_raw_config("limitation.sharedspace_per_user", "0")
+        )
+        self.LIMITATION__CONTENT_LENGTH_FILE_SIZE = int(
+            self.get_raw_config("limitation.content_length_file_size", "0")
+        )
+        self.LIMITATION__WORKSPACE_SIZE = int(self.get_raw_config("limitation.workspace_size", "0"))
 
     def _load_email_config(self) -> None:
         """
@@ -839,20 +854,14 @@ class CFG(object):
             app_config=self,
         )
 
-        office_document = Application(
-            label="Office Document",
-            slug="office_document",
+        collaborative_document_edition = Application(
+            label="Collaborative Document Edition",
+            slug="collaborative_document_edition",
             fa_icon="file-o",
             is_active=self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
             config={},
             main_route="",
             app_config=self,
-        )
-        office_document.add_content_type(
-            slug="office_document",
-            label="Office Document",
-            creation_label="Create an office document",
-            available_statuses=content_status_list.get_all(),
         )
         # INFO - G.M - 2019-08-08 - import app here instead of top of file,
         # to make thing easier later
@@ -860,6 +869,9 @@ class CFG(object):
         import tracim_backend.applications.share.application as share_app
 
         share_content = share_app.get_app(app_config=self)
+        import tracim_backend.applications.upload_permissions.application as upload_permissions_app
+
+        upload_permissions = upload_permissions_app.get_app(app_config=self)
         # process activated app list
         available_apps = OrderedDict(
             [
@@ -869,8 +881,9 @@ class CFG(object):
                 (folder.slug, folder),
                 (markdownpluspage.slug, markdownpluspage),
                 (agenda.slug, agenda),
-                (office_document.slug, office_document),
+                (collaborative_document_edition.slug, collaborative_document_edition),
                 (share_content.slug, share_content),
+                (upload_permissions.slug, upload_permissions),
             ]
         )
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var

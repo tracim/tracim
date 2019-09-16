@@ -18,7 +18,7 @@ class SystemApi(object):
         # TODO - G.M - 2018-09-26 - Set version correctly
         return AboutModel(
             name="Tracim",
-            version="2.3.2_build_030",
+            version="2.4.0_rc6",
             datetime=datetime.datetime.now(),
             website="https://www.tracim.fr",
         )
@@ -36,6 +36,9 @@ class SystemApi(object):
             webdav_enabled=self._config.WEBDAV__UI__ENABLED,
             webdav_url=urljoin(self._config.WEBDAV__BASE_URL, self._config.WEBDAV__ROOT_PATH),
             collaborative_document_edition=collaborative_document_edition_config,
+            content_length_file_size_limit=self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE,
+            workspace_size_limit=self._config.LIMITATION__WORKSPACE_SIZE,
+            workspaces_number_per_user_limit=self._config.LIMITATION__SHAREDSPACE_PER_USER,
         )
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:

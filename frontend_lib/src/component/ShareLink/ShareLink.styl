@@ -1,0 +1,31 @@
+@import "../../css/Variable.styl"
+
+.shareLink
+  display flex
+  height 65px
+  background-color offWhite
+  border-bottom 1px solid mediumGrey
+  margin 0 20px
+  &:last-child
+    border none
+  &__icon
+    font-size 25px
+    margin auto 10px
+    color grey
+    &__unprotected
+      margin-right 10px
+  &__linkInfos
+    margin auto
+    text-overflow ellipsis
+    white-space nowrap
+    overflow hidden
+    &__email
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
+    &__link
+      font-size 14px
+      color grey
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis

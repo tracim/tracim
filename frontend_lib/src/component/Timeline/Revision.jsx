@@ -36,17 +36,17 @@ const Revision = props => {
 
         <span className='revision__data__nb'>{props.number}</span>
 
-        <i className={`fa fa-fw fa-${revisionType.faIcon} revision__data__icon`} style={{color: props.customColor}} />
+        <i className={`fa fa-fw fa-${revisionType.faIcon} revision__data__icon`} />
 
-        <Avatar
-          width={'22px'}
-          publicName={props.authorPublicName}
-          style={{display: 'inline-block', marginRight: '5px', title: props.authorPublicName}}
-        />
-
-        <span className='revision__data__label'>{props.t(showLabel(revisionType, props.status))}</span>
-
-        <span className='revision__data__created' title={props.createdFormated}>{props.createdDistance}</span>
+        <div className='revision__data__infos'>
+          <div className='d-flex'>
+            <span className='revision__data__infos__label'>{props.t(showLabel(revisionType, props.status))}</span>
+            <span className='revision__data__infos__created' title={props.createdFormated}>{props.createdDistance}</span>
+          </div>
+          <span className='revision__data__infos__author'>
+            {props.t('by {{author}}', {author: props.authorPublicName, interpolation: {escapeValue: false}})}
+          </span>
+        </div>      
       </span>
     </li>
   )

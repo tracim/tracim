@@ -53,22 +53,23 @@ describe('Searching keywords', () => {
       cy.get(contentHtmlDocGetter).should('be.not.visible')
     })
 
-    describe('then archiving one document', () => {
-      describe('and searching the same keyword and validating again', () => {
-        it('Should not display the archived document', () => {
-          cy.get(searchInput).type(threadTitle).type('{enter}')
+    // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
+    // describe('then archiving one document', () => {
+    //   describe('and searching the same keyword and validating again', () => {
+    //     it('Should not display the archived document', () => {
+    //       cy.get(searchInput).type(threadTitle).type('{enter}')
 
-          cy.get(contentThreadTitleLongGetter).click()
-          cy.get('[data-cy=archive__button]').click()
+    //       cy.get(contentThreadTitleLongGetter).click()
+    //       cy.get('[data-cy=archive__button]').click()
 
-          cy.get('[data-cy=displaystate]')
-          cy.get(searchInput).type('{enter}')
+    //       cy.get('[data-cy=displaystate]')
+    //       cy.get(searchInput).type('{enter}')
 
-          cy.get(contentThreadGetter).should('be.visible')
-          cy.get(contentThreadTitleLongGetter).should('be.not.visible')
-        })
-      })
-    })
+    //       cy.get(contentThreadGetter).should('be.visible')
+    //       cy.get(contentThreadTitleLongGetter).should('be.not.visible')
+    //     })
+    //   })
+    // })
 
     describe('then deleting one document', () => {
       describe('and searching the same keyword and validating', () => {
@@ -81,7 +82,8 @@ describe('Searching keywords', () => {
           cy.get('[data-cy=displaystate]')
           cy.get(searchInput).type('{enter}')
 
-          cy.get('.searchResult__content__empty').should('be.visible')
+          cy.get('.content').should('have.length', 1)
+          // cy.get('.searchResult__content__empty').should('be.visible') // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
         })
       })
     })

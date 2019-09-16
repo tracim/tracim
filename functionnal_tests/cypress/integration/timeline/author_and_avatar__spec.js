@@ -15,21 +15,20 @@ describe('Author and avatar are shown in timeline', () => {
       })
   })
 
+
   afterEach(() => {
     cy.cancelXHR()
   })
 
-  it('Avatar is shown in timeline after creation (author)', function () {
+  it('Author is shown in timeline after creation', function () {
     cy.loginAs('users')
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_1]').within(() => {
-      cy.get('.avatar-wrapper')
-        .should('have.attr', 'title', this.user.public_name)
-      cy.get('.avatar').should('have.text', 'JD')
+      cy.get('.revision__data__infos__author').contains('John Doe').should('be.visible')
     })
   })
 
-  it('Avatar is shown in timeline after update content (author)', function () {
+  it('Author is shown in timeline after update content', function () {
     cy.updateHtmlDocument(
       this.document.content_id,
       this.document.workspace_id,
@@ -39,13 +38,11 @@ describe('Author and avatar are shown in timeline', () => {
     cy.loginAs('users')
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_2]').within(() => {
-      cy.get('.avatar-wrapper')
-        .should('have.attr', 'title', this.user.public_name)
-      cy.get('.avatar').should('have.text', 'JD')
+      cy.get('.revision__data__infos__author').contains('John Doe').should('be.visible')
     })
   })
 
-  it('Avatar is shown in timeline after changing status (author)', function () {
+  it('Author is shown in timeline after changing status', function () {
     cy.changeHtmlDocumentStatus(
       this.document.content_id,
       this.document.workspace_id,
@@ -54,13 +51,11 @@ describe('Author and avatar are shown in timeline', () => {
     cy.loginAs('users')
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_2]').within(() => {
-      cy.get('.avatar-wrapper')
-        .should('have.attr', 'title', this.user.public_name)
-      cy.get('.avatar').should('have.text', 'JD')
+      cy.get('.revision__data__infos__author').contains('John Doe').should('be.visible')
     })
   })
 
-  it('Avatar is shown in timeline after update content (not author)', function () {
+  it('User is shown in timeline after update content (not author)', function () {
     cy.logout()
     cy.loginAs('administrators')
     cy.updateHtmlDocument(
@@ -71,13 +66,11 @@ describe('Author and avatar are shown in timeline', () => {
     )
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_2]').within(() => {
-      cy.get('.avatar-wrapper')
-        .should('have.attr', 'title', 'Global manager')
-      cy.get('.avatar').should('have.text', 'GM')
+      cy.get('.revision__data__infos__author').contains('Global manager').should('be.visible')
     })
   })
 
-  it('Avatar is shown in timeline after changing status (not author)', function () {
+  it('User is shown in timeline after changing status (not author)', function () {
     cy.logout()
     cy.loginAs('administrators')
     cy.changeHtmlDocumentStatus(
@@ -87,9 +80,7 @@ describe('Author and avatar are shown in timeline', () => {
     )
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_2]').within(() => {
-      cy.get('.avatar-wrapper')
-        .should('have.attr', 'title', 'Global manager')
-      cy.get('.avatar').should('have.text', 'GM')
+      cy.get('.revision__data__infos__author').contains('Global manager').should('be.visible')
     })
   })
 })

@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Avatar from '../Avatar/Avatar.jsx'
-import IconWithWarning from '../Icon/IconWithWarning.jsx'
+import ComposedIcon from '../Icon/ComposedIcon.jsx'
 import PropTypes from 'prop-types'
 
 // require('./NewMemberForm.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -15,7 +15,7 @@ export const NewMemberForm = props => {
       </div>
 
       <div className='memberlist__form__member'>
-        <h4>{props.t('Add a member')}</h4>
+        <div className='memberlist__form__title'>{props.t('Add a member')}</div>
 
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>
@@ -100,8 +100,10 @@ export const NewMemberForm = props => {
               )
               : (
                 <div className='name__adminmsg'>
-                  <IconWithWarning
-                    icon='envelope'
+                  <ComposedIcon
+                    mainIcon='envelope'
+                    smallIcon='warning'
+                    smallIconCustomClass='text-danger'
                   />
                   {props.t("Email notifications are disabled, you can't create new users from here")}
                 </div>

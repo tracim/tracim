@@ -42,7 +42,7 @@ class ContentStatus(object):
 open_status = ContentStatus(
     slug="open",
     global_status=GlobalStatus.OPEN.value,
-    label=_("Open"),
+    label=_("Opened"),
     fa_icon="square-o",
     hexcolor="#3f52e3",
 )

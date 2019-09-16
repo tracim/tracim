@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "^3.3.1",
+    "cypress": "^3.4.1",
     "cypress-file-upload": "^3.2.0",
     "cypress-wait-until": "^1.2.1"
   },

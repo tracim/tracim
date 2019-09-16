@@ -56,7 +56,7 @@ const PROFILE = {
 }
 
 const STATUSES = [{
-  label: 'Open',
+  label: 'Opened',
   slug: 'open',
   faIcon: 'square-o',
   hexcolor: '#3f52e3',
@@ -135,7 +135,7 @@ export const defaultDebug = {
     email: 'osef@algoo.fr',
     lang: 'fr',
     avatar_url: null,
-    idRoleUserWorkspace: 8,
+    userRoleIdInWorkspace: 8,
     created: '2019-06-03T14:28:14Z',
     is_active: true,
     is_deleted: false,

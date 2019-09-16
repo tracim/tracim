@@ -148,7 +148,7 @@ class WOPIController(Controller):
         ):
             api.update_file_data(
                 item=request.current_content,
-                new_mimetype=request.current_content.type,
+                new_mimetype=request.current_content.file_mimetype,
                 new_filename=request.current_content.file_name,
                 new_content=request.body,
             )

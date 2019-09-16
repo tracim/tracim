@@ -1,0 +1,22 @@
+import { defaultDebug } from 'tracim_frontend_lib'
+
+export const debug = {
+  config: {
+    ...defaultDebug.config,
+    apiUrl: '',
+    slug: 'share_folder',
+    faIcon: 'share-alt',
+    hexcolor: '#414548',
+    creationLabel: 'Create a share folder',
+    label: 'Share Folder'
+  },
+  content: {
+    ...defaultDebug.content,
+    content_id: 0,
+    content_type: 'folder',
+    workspace_id: 0
+  },
+  loggedUser: {
+    ...defaultDebug.loggedUser
+  }
+}

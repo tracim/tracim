@@ -58,6 +58,30 @@ export const putAgendaEnabled = (apiUrl, workspace, agendaEnabled) =>
     })
   })
 
+export const putUploadEnabled = (apiUrl, workspace, uploadEnabled) =>
+  fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
+    credentials: 'include',
+    headers: { ...FETCH_CONFIG.headers },
+    method: 'PUT',
+    body: JSON.stringify({
+      label: workspace.label,
+      description: workspace.description,
+      public_upload_enabled: uploadEnabled
+    })
+  })
+
+export const putDownloadEnabled = (apiUrl, workspace, downloadEnabled) =>
+  fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
+    credentials: 'include',
+    headers: { ...FETCH_CONFIG.headers },
+    method: 'PUT',
+    body: JSON.stringify({
+      label: workspace.label,
+      description: workspace.description,
+      public_download_enabled: downloadEnabled
+    })
+  })
+
 export const putMemberRole = (apiUrl, workspaceId, memberId, slugNewRole) =>
   fetch(`${apiUrl}/workspaces/${workspaceId}/members/${memberId}`, {
     credentials: 'include',

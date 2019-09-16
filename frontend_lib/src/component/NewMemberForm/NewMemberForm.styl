@@ -5,7 +5,9 @@
   flex-direction column
   height 100%
   width 100%
-  background-color offWhite
+  &__title
+    font-size 20px
+    margin-bottom 25px
   &__close
     position absolute
     right 20px
@@ -16,6 +18,7 @@
   &__member
     margin 0 0 20px 0
     &__name
+      position relative
       .name__label
         margin 0 0 15px 0
         font-weight bold
@@ -23,9 +26,11 @@
         margin 0 0 0 0
       .name__adminmsg
         margin 10px 0 10px 0
-        color grey
+        font-size 14px
       .autocomplete
         position absolute
+        top 80px
+        left 0
         width 300px
         background-color offWhite
         border-radius 10px
@@ -89,7 +94,9 @@
             display flex
             &__content
               &__description
-                color grey
+                font-size 14px
+              &__name
+                font-weight bold
   &__submitbtn
     display flex
     justify-content flex-end

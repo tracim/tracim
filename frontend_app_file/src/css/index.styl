@@ -21,12 +21,13 @@
   &__contentpage
     width 100%
     &__content
-      height calc(100% - 130px)
+      height calc(100% - 120px)
+      &__left
+        background-color offWhite
     &__statewrapper
       height 100%
-      padding 10px 10px 0px 10px
       overflow-y auto
-      &.displayState ^[1]__preview // render .file__contentpage__statewrapper.displayState .file__contentpage__preview
+      &.displayState > .previewcomponent // render .file__contentpage__statewrapper.displayState .file__contentpage__preview
         height calc(100% - 68px) // 100% - file__contentpage__preview__state height
     &__wrapper
       width 40%
@@ -42,6 +43,12 @@
         justify-content flex-end
         &__cancel
           margin-right 15px
+    &__rightContent
+      width 100%
+    &__messagelist
+      padding 0 20px 10px
+  .selectStatus
+    margin-right 15px
 
 .activeEditionTitle
   .file__header
@@ -51,7 +58,7 @@
       display none
 
 .activeEditionDesc
-  .file__contentpage__preview__property__content__detail
+  .file__contentpage__preview__content__detail
     &__description
       &__editiondesc
         display block
@@ -83,8 +90,6 @@
                 margin-left 35px
                 &__icon
                   margin-left 15px
-      &__content
-        margin 10px
       &__statewrapper
         padding 0
 
@@ -103,14 +108,25 @@
     height calc(100% - headerHeight)
     &__contentpage__content__left
       min-height 250px
+  .newversionbtn
+    & > .genericButton__icon
+      margin 0
+    & > .genericButton__label
+      display none
 
 @media (max-width: max-xs)
   .file
     height calc(100% - headerHeight)
-    &__option__menu__addversion
-      padding 8px 5px
-      & > i
-        display none
+    &__option__menu
+      &__addversion
+        padding 8px 5px
+        & > i
+          display none
+      &__editBtn
+        & > .genericButton__icon
+          margin 0
+        & > .genericButton__label
+          display none
     &__contentpage
       display block
       &__content
@@ -118,7 +134,6 @@
           width 100%
           min-height 250px
         &__right
-          margin 0 10px
           width 100%
       &__statewrapper
         width 100%
@@ -138,3 +153,9 @@
                 margin-left 10px
                 &__icon
                   margin-left 15px
+  .newversionbtn
+    & > .genericButton__icon
+      margin 0
+    & > .genericButton__label
+      display none
+

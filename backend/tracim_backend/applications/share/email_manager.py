@@ -1,3 +1,4 @@
+import email
 from email.message import Message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -10,15 +11,16 @@ from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.models.auth import User
-from tracim_backend.models.data import Content
+from tracim_backend.models.context_models import ContentInContext
 
 
 class ShareEmailManager(EmailManager):
     def notify__share__content(
         self,
         emitter: User,
-        shared_content: Content,
+        shared_content: ContentInContext,
         content_share_receivers: typing.List[ContentShareInContext],
         share_password: str,
     ) -> None:
@@ -71,7 +73,7 @@ class ShareEmailManager(EmailManager):
     def _notify_emitter(
         self,
         emitter: User,
-        shared_content: Content,
+        shared_content: ContentInContext,
         content_share_receivers: typing.List[ContentShareInContext],
         share_password: str,
         translator: Translator,
@@ -88,7 +90,7 @@ class ShareEmailManager(EmailManager):
         )
         message["Subject"] = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
-            content_filename=shared_content.file_name,
+            content_filename=shared_content.filename,
             nb_receivers=len(content_share_receivers),
         )
         message["From"] = self._get_sender()
@@ -117,7 +119,7 @@ class ShareEmailManager(EmailManager):
     def _notify_receiver(
         self,
         emitter: User,
-        shared_content: Content,
+        shared_content: ContentInContext,
         content_share: ContentShareInContext,
         share_password_enabled: bool,
         translator: Translator,
@@ -134,19 +136,22 @@ class ShareEmailManager(EmailManager):
         )
         message["Subject"] = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
-            content_filename=shared_content.file_name,
+            content_filename=shared_content.filename,
             emitter_name=emitter.display_name,
         )
-        message["From"] = self._get_sender()
+        message["From"] = self._get_sender(emitter)
         message["To"] = content_share.email
+        username, address = email.utils.parseaddr(content_share.email)
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML
         )
+        receiver = EmailUser(user_email=content_share.email)
         context = {
             "emitter": emitter,
             "shared_content": shared_content,
             "content_share": content_share,
             "share_password_enabled": share_password_enabled,
+            "receiver": receiver,
         }
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator

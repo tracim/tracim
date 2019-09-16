@@ -2,6 +2,7 @@ import typing
 
 import marshmallow
 from marshmallow import post_load
+from marshmallow.validate import Length
 from marshmallow.validate import OneOf
 
 from tracim_backend.app_models.validator import bool_as_int_validator
@@ -11,29 +12,35 @@ from tracim_backend.applications.share.validators import share_email_validator
 from tracim_backend.applications.share.validators import share_password_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import ContentIdPathSchema
+from tracim_backend.views.core_api.schemas import RFCEmail
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
 
-class TracimSharePasswordHeader(object):
-    def __init__(self, tracim_share_password: typing.Optional[str] = None):
-        self.tracim_share_password = tracim_share_password
+class SharePassword(object):
+    def __init__(self, password: typing.Optional[str] = None):
+        self.password = password
 
 
-class TracimSharePasswordHeaderSchema(marshmallow.Schema):
-    tracim_share_password = marshmallow.fields.String(
-        required=False,
-        allow_none=True,
-        example="8QLa$<w",
-        validate=share_password_validator,
-        load_from="Tracim-Share-Password",
-        dump_to="Tracim-Share-Password",
+class SharePasswordFormSchema(marshmallow.Schema):
+    password = marshmallow.fields.String(
+        required=False, allow_none=True, example="8QLa$<w", validate=share_password_validator
     )
 
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
-        return TracimSharePasswordHeader(**data)
+        return SharePassword(**data)
+
+
+class SharePasswordBodySchema(marshmallow.Schema):
+    password = marshmallow.fields.String(
+        required=False, allow_none=True, example="8QLa$<w", validate=share_password_validator
+    )
+
+    @post_load
+    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return SharePassword(**data)
 
 
 class ShareListQuery(object):
@@ -94,15 +101,17 @@ class ShareTokenWithFilenamePath(object):
 
 
 class ShareCreationBody(object):
-    def __init__(self, emails: typing.List[str], password: str):
+    def __init__(self, emails: typing.List[str], password: typing.Optional[str]):
         self.emails = emails
         self.password = password
 
 
 class ShareCreationBodySchema(marshmallow.Schema):
-    emails = marshmallow.fields.List(marshmallow.fields.Email(validate=share_email_validator))
+    emails = marshmallow.fields.List(
+        RFCEmail(validate=share_email_validator), validate=Length(min=1), required=True
+    )
     password = marshmallow.fields.String(
-        example="8QLa$<w", required=True, validate=share_password_validator
+        example="8QLa$<w", required=False, allow_none=True, validate=share_password_validator
     )
 
     @post_load
@@ -121,7 +130,9 @@ class ShareTokenWithFilenamePathSchema(marshmallow.Schema):
 
 class ContentShareInfoSchema(marshmallow.Schema):
     author = marshmallow.fields.Nested(UserDigestSchema)
-
+    has_password = marshmallow.fields.Boolean(
+        description="is password required to get content share content ?"
+    )
     content_file_extension = StrippedString(example=".txt")
     content_filename = StrippedString(example="nameofthefile.txt")
     content_label = StrippedString(example="nameofthefile")
@@ -147,11 +158,12 @@ class ContentShareInfoSchema(marshmallow.Schema):
 
 
 class ContentShareSchema(marshmallow.Schema):
-    email = marshmallow.fields.Email(
-        example="hello@tracim.fr", required=True, validate=share_email_validator
+    email = RFCEmail(example="hello@tracim.fr", required=True, validate=share_email_validator)
+    share_token = marshmallow.fields.String(
+        description="token of the content_share", example="444b026a068d42d6ab5e12fde08efb7b"
     )
     has_password = marshmallow.fields.Boolean(required=True)
-    share_group_id = marshmallow.fields.String(required=True)
+    share_group_uuid = marshmallow.fields.String(required=True)
     share_id = marshmallow.fields.Int(
         example=4,
         required=True,
@@ -168,9 +180,12 @@ class ContentShareSchema(marshmallow.Schema):
         format=DATETIME_FORMAT, description="Share disabled date", allow_none=True
     )
     is_disabled = marshmallow.fields.Boolean(required=True, description="is this share disabled ?")
-    url = marshmallow.fields.URL(example="/ui/guest-download/<token>")
+    url = marshmallow.fields.URL(
+        example="http://localhost:6543/ui/guest-download/444b026a068d42d6ab5e12fde08efb7b"
+    )
     direct_url = marshmallow.fields.URL(
-        allow_none=True, example="/api/v2/public/guest-download/<token>/<filename>"
+        allow_none=True,
+        example="http://localhost:6543/api/v2/public/guest-download/444b026a068d42d6ab5e12fde08efb7b/myfile.txt",
     )
     author_id = marshmallow.fields.Integer(
         example=3, validate=strictly_positive_int_validator, required=True

@@ -24,7 +24,6 @@
     "radium": "^0.25.2",
     "react": "16.7.0",
     "react-dom": "16.7.0",
-    "react-dropzone": "5.0.1",
     "react-i18next": "7.4.0",
     "react-image-lightbox": "^5.1.0",
     "react-router": "^5.0.1",
@@ -52,6 +51,7 @@
     "ignore-styles": "^5.0.1",
     "jsdom": "^15.1.1",
     "mocha": "^6.1.4",
+    "sinon": "^7.4.1",
     "standard": "^12.0.1",
     "standard-loader": "^6.0.1",
     "style-loader": "^0.23.1",
@@ -78,7 +78,7 @@
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent",
       "CustomEvent",
-      "appOfficeDocument"
+      "appCollaborativeDocumentEdition"
     ],
     "parser": "babel-eslint",
     "ignore": []

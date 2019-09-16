@@ -32,10 +32,13 @@ from tracim_backend.exceptions import ConflictingMoveInChild
 from tracim_backend.exceptions import ConflictingMoveInItself
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
+from tracim_backend.exceptions import ContentNamespaceDoNotMatch
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import FileSizeOverMaxLimitation
+from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
@@ -61,6 +64,7 @@ from tracim_backend.models.context_models import PreviewAllowedDim
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import NodeTreeItem
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -150,6 +154,7 @@ class ContentApi(object):
         all_content_in_treeview: bool = True,
         force_show_all_types: bool = False,
         disable_user_workspaces_filter: bool = False,
+        namespaces_filter: typing.Optional[typing.List[ContentNamespaces]] = None,
     ) -> None:
         self._session = session
         self._user = current_user
@@ -167,6 +172,7 @@ class ContentApi(object):
         if self._user:
             default_lang = self._user.lang
         self.translator = Translator(app_config=self._config, default_lang=default_lang)
+        self.namespaces_filter = namespaces_filter
 
     @contextmanager
     def show(
@@ -284,6 +290,9 @@ class ContentApi(object):
         if not self._show_temporary:
             result = result.filter(Content.is_temporary == False)  # noqa: E711
 
+        if self.namespaces_filter:
+            result = result.filter(Content.content_namespace.in_(self.namespaces_filter))
+
         return result
 
     def __revisions_real_base_query(self, workspace: Workspace = None) -> Query:
@@ -379,6 +388,7 @@ class ContentApi(object):
         self,
         filename: str,
         workspace: Workspace,
+        content_namespace: ContentNamespaces,
         parent: Content = None,
         exclude_content_id: int = None,
     ) -> bool:
@@ -395,8 +405,10 @@ class ContentApi(object):
         # with empty filename like comment.
         assert filename
         assert workspace
+        assert content_namespace
         label, file_extension = os.path.splitext(filename)
         query = self.get_base_query(workspace)
+        query = query.filter(Content.content_namespace == content_namespace)
 
         if parent:
             query = query.filter(Content.parent_id == parent.content_id)
@@ -449,13 +461,16 @@ class ContentApi(object):
         filename: str,
         workspace: Workspace,
         parent: Content = None,
+        content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
         exclude_content_id: int = None,
     ) -> bool:
         """
         Same as _is_filename_available but raise exception instead of
         returning boolean if content filename is already used
         """
-        if self._is_filename_available(filename, workspace, parent, exclude_content_id):
+        if self._is_filename_available(
+            filename, workspace, content_namespace, parent, exclude_content_id
+        ):
             return True
         # INFO - G.M - 2018-10-11 - prepare exception message
         exception_message = (
@@ -481,13 +496,20 @@ class ContentApi(object):
         do_save=False,
         is_temporary: bool = False,
         do_notify=True,
+        content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
     ) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
         assert content_type_slug != content_type_list.Any_SLUG
         assert not (label and filename)
+        assert content_namespace
 
         if (workspace and parent) and workspace.workspace_id != parent.workspace_id:
             raise WorkspacesDoNotMatch("new parent workspace and new workspace should be the same.")
+
+        if (content_namespace and parent) and content_namespace != parent.content_namespace:
+            raise ContentNamespaceDoNotMatch(
+                "parent namespace and content namespace should be the same."
+            )
 
         if content_type_slug == FOLDER_TYPE and not label:
             label = self.generate_folder_label(workspace, parent)
@@ -506,14 +528,14 @@ class ContentApi(object):
             if content_type.file_extension:
                 file_extension = content_type.file_extension
             filename = self._prepare_filename(label, file_extension)
-            self._is_filename_available_or_raise(filename, workspace, parent)
+            self._is_filename_available_or_raise(filename, workspace, parent, content_namespace)
             # TODO - G.M - 2018-10-15 - Set file extension and label
             # explicitly instead of filename in order to have correct
             # label/file-extension separation.
             content.label = label
             content.file_extension = file_extension
         elif filename:
-            self._is_filename_available_or_raise(filename, workspace, parent)
+            self._is_filename_available_or_raise(filename, workspace, parent, content_namespace)
             # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
             content.file_name = filename
@@ -534,6 +556,7 @@ class ContentApi(object):
         content.type = content_type.slug
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
+        content.content_namespace = content_namespace
 
         if do_save:
             self._session.add(content)
@@ -566,6 +589,7 @@ class ContentApi(object):
             content_type_slug=content_type_list.Comment.slug,
             workspace=workspace,
             parent=parent,
+            content_namespace=parent.content_namespace,
             do_notify=False,
             do_save=False,
             label="",
@@ -1394,12 +1418,15 @@ class ContentApi(object):
         self,
         item: Content,
         new_parent: Content = None,
+        new_content_namespace: ContentNamespaces = None,
         must_stay_in_same_workspace: bool = True,
         new_workspace: Workspace = None,
     ) -> None:
-        self._move_current(item, new_parent, must_stay_in_same_workspace, new_workspace)
+        self._move_current(
+            item, new_parent, must_stay_in_same_workspace, new_workspace, new_content_namespace
+        )
         self.save(item)
-        self._move_children_content_to_new_workspace(item, new_workspace)
+        self._move_children_content_to_new_workspace(item, new_workspace, new_content_namespace)
 
     def _move_current(
         self,
@@ -1407,6 +1434,7 @@ class ContentApi(object):
         new_parent: Content = None,
         must_stay_in_same_workspace: bool = True,
         new_workspace: Workspace = None,
+        new_content_namespace: ContentNamespaces = None,
     ) -> None:
         """
         Move only current content, use _move_children_content_to_new_workspace
@@ -1425,6 +1453,13 @@ class ContentApi(object):
         if new_parent and new_parent.workspace_id != new_workspace.workspace_id:
             raise WorkspacesDoNotMatch("new parent workspace and new workspace should be the same.")
 
+        if (
+            new_content_namespace and new_parent
+        ) and new_content_namespace != new_parent.content_namespace:
+            raise ContentNamespaceDoNotMatch(
+                "parent namespace and content namespace should be the same."
+            )
+
         # INFO - G.M - 2018-12-11 - We allow renaming existing wrong file
         # but not adding new content of wrong type.
         if new_parent and new_parent != item.parent:
@@ -1433,6 +1468,13 @@ class ContentApi(object):
         if self._user:
             item.owner = self._user
         item.parent = new_parent
+
+        if new_content_namespace:
+            item.content_namespace = new_content_namespace
+        else:
+            if new_parent:
+                item.content_namespace = new_parent.content_namespace
+
         if new_workspace:
             item.workspace = new_workspace
         else:
@@ -1441,7 +1483,11 @@ class ContentApi(object):
         content_type_slug = item.type
         if item.file_name:
             self._is_filename_available_or_raise(
-                item.file_name, item.workspace, item.parent, exclude_content_id=item.content_id
+                item.file_name,
+                item.workspace,
+                item.parent,
+                content_namespace=item.content_namespace,
+                exclude_content_id=item.content_id,
             )
         elif self._allow_empty_label(content_type_slug):
             # INFO - G.M - 2019-04-29 - special content like "Comment"
@@ -1505,6 +1551,7 @@ class ContentApi(object):
         new_label: str = None,
         new_workspace: Workspace = None,
         new_file_extension: str = None,
+        new_content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> Content:
@@ -1529,15 +1576,25 @@ class ContentApi(object):
         if (new_workspace and new_parent) and new_parent.workspace_id != new_workspace.workspace_id:
             raise WorkspacesDoNotMatch("new parent workspace and new workspace should be the same.")
 
+        if (
+            new_content_namespace and new_parent
+        ) and new_content_namespace != new_parent.content_namespace:
+            raise ContentNamespaceDoNotMatch(
+                "parent namespace and content namespace should be the same."
+            )
+
         if new_parent:
             workspace = new_parent.workspace
             parent = new_parent
+            content_namespace = new_parent.content_namespace
         elif new_workspace:
             workspace = new_workspace
             parent = None
+            content_namespace = new_content_namespace or item.content_namespace
         else:
             workspace = item.workspace
             parent = item.parent
+            content_namespace = new_content_namespace or item.content_namespace
 
         # INFO - G.M - 2018-12-11 - Do not allow copy file in a dir where
         # this kind of content is not allowed.
@@ -1553,7 +1610,9 @@ class ContentApi(object):
         filename = self._prepare_filename(label, file_extension)
         content_type_slug = item.type
         if filename:
-            self._is_filename_available_or_raise(filename, workspace, parent)
+            self._is_filename_available_or_raise(
+                filename, workspace, parent, content_namespace=content_namespace
+            )
         elif self._allow_empty_label(content_type_slug):
             # INFO - G.M - 2019-04-29 - special content like "Comment"
             # which allow empty filename should not
@@ -1566,22 +1625,28 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
-        copy_result = self._copy(item, parent)
+        copy_result = self._copy(item, content_namespace, parent)
         copy_result = self._add_copy_revisions(
-            item,
-            copy_result.new_content,
-            copy_result.original_children_dict,
-            copy_result.new_children_dict,
-            parent,
-            label,
-            workspace,
-            file_extension,
-            do_save,
-            do_notify,
+            original_content=item,
+            new_content=copy_result.new_content,
+            original_content_children=copy_result.original_children_dict,
+            new_content_children=copy_result.new_children_dict,
+            new_parent=parent,
+            new_label=label,
+            new_workspace=workspace,
+            new_file_extension=file_extension,
+            new_content_namespace=content_namespace,
+            do_save=do_save,
+            do_notify=do_notify,
         )
         return copy_result.new_content
 
-    def _copy(self, content: Content, new_parent: Content = None) -> AddCopyRevisionsResult:
+    def _copy(
+        self,
+        content: Content,
+        new_content_namespace: ContentNamespaces = None,
+        new_parent: Content = None,
+    ) -> AddCopyRevisionsResult:
         """
         Create new content for content and his children, recreate all revision in order and
         return all these new content
@@ -1615,7 +1680,7 @@ class ContentApi(object):
                 else:
                     related_parent = new_content_children[rev.parent_id]
             # INFO - G.M - 2019-04-30 - copy of revision itself.
-            cpy_rev = ContentRevisionRO.copy(rev, related_parent)
+            cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
             related_content.revisions.append(cpy_rev)
             self._session.add(related_content)
             self._session.flush()
@@ -1635,6 +1700,7 @@ class ContentApi(object):
         new_label: str = None,
         new_workspace: Workspace = None,
         new_file_extension: str = None,
+        new_content_namespace: ContentNamespaces = None,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> AddCopyRevisionsResult:
@@ -1651,6 +1717,7 @@ class ContentApi(object):
         :return: new content created based on root content,
         dict of new children content and original children content with original content id as key.
         """
+        assert new_content_namespace
         for original_content_id, new_child in new_content_children.items():
             original_child = original_content_children[original_content_id]
             with new_revision(
@@ -1680,6 +1747,7 @@ class ContentApi(object):
             rev.workspace = new_workspace
             rev.label = new_label
             rev.file_extension = new_file_extension
+            rev.content_namespace = new_content_namespace
             rev.revision_type = ActionDescription.COPY
             properties = rev.properties.copy()
             properties["origin"] = {
@@ -1695,22 +1763,30 @@ class ContentApi(object):
             original_children_dict=original_content_children,
         )
 
-    def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
+    def _move_children_content_to_new_workspace(
+        self, item: Content, new_workspace: Workspace, new_content_namespace: ContentNamespaces
+    ) -> None:
         """
         Change workspace_id of all children of content according to new_workspace
         given. This is needed for proper move from one workspace to another
         """
         for child in item.children:
-            if child.workspace_id != new_workspace.workspace_id:
+            if (
+                child.workspace_id != new_workspace.workspace_id
+                or child.content_namespace != new_content_namespace
+            ):
                 with new_revision(session=self._session, tm=transaction.manager, content=child):
                     self.move(
                         child,
                         new_parent=item,
                         new_workspace=new_workspace,
+                        new_content_namespace=new_content_namespace,
                         must_stay_in_same_workspace=False,
                     )
                     self.save(child)
-                self._move_children_content_to_new_workspace(child, new_workspace)
+                self._move_children_content_to_new_workspace(
+                    child, new_workspace, new_content_namespace
+                )
         return
 
     def is_editable(self, item: Content) -> bool:
@@ -1831,6 +1907,33 @@ class ContentApi(object):
         item.depot_file = FileIntent(new_content, new_filename, new_mimetype)
         item.revision_type = ActionDescription.REVISION
         return item
+
+    def check_upload_size(self, content_length: int, workspace: Workspace) -> None:
+        self._check_size_length_limitation(content_length)
+        self.check_workspace_size_limitation(content_length, workspace)
+
+    def _check_size_length_limitation(self, content_length: int) -> None:
+        # INFO - G.M - 2019-08-23 - 0 mean no size limit
+        if self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE == 0:
+            return
+        elif content_length > self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE:
+            raise FileSizeOverMaxLimitation(
+                'File cannot be added because his size "{}" is higher than max allowed size : "{}"'.format(
+                    content_length, self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE
+                )
+            )
+
+    def check_workspace_size_limitation(self, content_length: int, workspace: Workspace) -> None:
+        workspace_size = workspace.get_size()
+        # INFO - G.M - 2019-08-23 - 0 mean no size limit
+        if self._config.LIMITATION__WORKSPACE_SIZE == 0:
+            return
+        elif workspace_size > self._config.LIMITATION__WORKSPACE_SIZE:
+            raise FileSizeOverWorkspaceEmptySpace(
+                'File cannot be added (size "{}") because workspace is full: "{}/{}"'.format(
+                    content_length, workspace_size, self._config.LIMITATION__WORKSPACE_SIZE
+                )
+            )
 
     def archive(self, content: Content):
         if self._user:
