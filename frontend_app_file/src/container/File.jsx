@@ -823,7 +823,7 @@ class File extends React.Component {
       )
     }
 
-    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace > 1) {
+    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= 4) {
       return [
         timelineObject,
         {
