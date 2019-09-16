@@ -94,7 +94,7 @@ export class NewShareDownload extends React.Component {
                 <input
                   type={state.hidePassword ? 'password' : 'text'}
                   className='shareDownload__password__input form-control'
-                  placeholder={props.t('Password to share link')}
+                  placeholder={props.t('Password')}
                   value={props.sharePassword}
                   onChange={props.onChangePassword}
                   onFocus={props.onKeyDownEnter}

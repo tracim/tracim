@@ -21,5 +21,6 @@
   "Error while creating new public upload link": "Error while creating new public upload link",
   "Error, these emails are invalid: ": "Error, these emails are invalid: ",
   "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.",
-  "Password of the link": "Password of the link"
+  "Validate": "Validate",
+  "Password": "Password"
 }

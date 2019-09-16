@@ -93,7 +93,7 @@ export class NewUpload extends React.Component {
                   <input
                     type={state.hidePassword ? 'password' : 'text'}
                     className='newUpload__password__input form-control'
-                    placeholder={props.t('Password of the link')}
+                    placeholder={props.t('Password')}
                     value={props.uploadPassword}
                     onChange={props.onChangeUploadPassword}
                   />

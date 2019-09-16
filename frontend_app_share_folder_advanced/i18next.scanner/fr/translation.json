@@ -21,5 +21,6 @@
   "Error while creating new public upload link": "Erreur lors de la création du lien public de téléversement",
   "Error, these emails are invalid: ": "Erreur, ces emails sont invalides : ",
   "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "Pour ajouter plusieurs destinataires, séparez les adresses email par une virgule, un point-virgule ou un retour à la ligne.",
-  "Password of the link": "Mot de passe du lien"
+  "Validate": "Valider",
+  "Password": "Mot de passe"
 }
