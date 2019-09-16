@@ -38,6 +38,8 @@ describe('New share download form', () => {
   })
 
   it('nominal case',() => {
+    // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
+    cy.wait(1000)
     cy.get(emailInput).type(`${email1}`)
     cy.get('.shareDownload__newBtn').should('be.visible').click()
     cy.get('.shareLink__linkInfos__email').contains(email1).should('be.visible')
@@ -46,7 +48,7 @@ describe('New share download form', () => {
   it('separating emails by space then pressing Enter, should separate the emails by new line',() => {
     // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
     cy.wait(1000)
-    cy.get(emailInput).type(`${email1} ${email2} ${email3}`).should('be.visible').type('{enter}')
+    cy.get(emailInput).type(`${email1},${email2},${email3}`).should('be.visible').type('{enter}')
     cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
   })
 

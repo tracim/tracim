@@ -240,7 +240,7 @@ class GuestUpload extends React.Component {
                   )
                 default:
                   return <ImportConfirmation
-                    title={props.t('Thank you, your import is finished!')}
+                    title={props.t('Thank you, your upload is finished !')}
                     text={props.t('Your interlocutor has been notified of your upload. You can close this window.')}
                   />
               }

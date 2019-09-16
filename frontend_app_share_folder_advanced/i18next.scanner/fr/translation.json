@@ -1,5 +1,4 @@
 {
-  "To add multiple recipients, separate the email addresses with a comma or space.": "Pour ajouter plusieurs destinataires, séparez les adresses email par une virgule ou un espace.",
   "Cancel": "Annuler",
   "New": "Nouveau",
   "No upload link has been created yet": "Aucun lien de téléversement n'a encore été créé",
@@ -17,9 +16,10 @@
   "Public upload link has been created. Don't forget to share the password to the recipients.": "Lien public de téléversement créé. N'oubliez pas de partager le mot de passe aux destinataires.",
   "Public upload link has been created.": "Lien public de téléversement créé.",
   "New public upload link": "Nouveau lien public de téléversement",
-  "Password of public upload link (optional)": "Mot de passe du lien public de téléversement (optionnel)",
   "Error while loading list of public upload links": "Erreur lors du chargement de la liste des liens public de téléversement",
   "Error while deleting public upload link": "Erreur lors de la suppression du lien public de téléversement",
   "Error while creating new public upload link": "Erreur lors de la création du lien public de téléversement",
-  "Error, these emails are invalid: ": "Erreur, ces emails sont invalides : "
+  "Error, these emails are invalid: ": "Erreur, ces emails sont invalides : ",
+  "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "Pour ajouter plusieurs destinataires, séparez les adresses email par une virgule, un point-virgule ou un retour à la ligne.",
+  "Password of the link": "Mot de passe du lien"
 }

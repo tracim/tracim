@@ -79,7 +79,7 @@ export class NewUpload extends React.Component {
             toggle={this.handleTogglePopoverMultipleEmails}
             trigger={isMobile ? 'focus' : 'hover'}
           >
-            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
+            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}</PopoverBody>
           </Popover>
         </div>
 
@@ -93,7 +93,7 @@ export class NewUpload extends React.Component {
                   <input
                     type={state.hidePassword ? 'password' : 'text'}
                     className='newUpload__password__input form-control'
-                    placeholder={props.t('Password of public upload link (optional)')}
+                    placeholder={props.t('Password of the link')}
                     value={props.uploadPassword}
                     onChange={props.onChangeUploadPassword}
                   />

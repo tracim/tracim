@@ -1,5 +1,4 @@
 {
-  "To add multiple recipients, separate the email addresses with a comma or space.": "To add multiple recipients, separate the email addresses with a comma or space.",
   "Cancel": "Cancel",
   "New": "New",
   "No upload link has been created yet": "No upload link has been created yet",
@@ -17,9 +16,10 @@
   "Public upload link has been created. Don't forget to share the password to the recipients.": "Public upload link has been created. Don't forget to share the password to the recipients.",
   "Public upload link has been created.": "Public upload link has been created.",
   "New public upload link": "New public upload link",
-  "Password of public upload link (optional)": "Password of public upload link (optional)",
   "Error while loading list of public upload links": "Error while loading list of public upload links",
   "Error while deleting public upload link": "Error while deleting public upload link",
   "Error while creating new public upload link": "Error while creating new public upload link",
-  "Error, these emails are invalid: ": "Error, these emails are invalid: "
+  "Error, these emails are invalid: ": "Error, these emails are invalid: ",
+  "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.",
+  "Password of the link": "Password of the link"
 }
