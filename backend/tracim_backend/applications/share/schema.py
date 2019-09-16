@@ -12,6 +12,7 @@ from tracim_backend.applications.share.validators import share_email_validator
 from tracim_backend.applications.share.validators import share_password_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import ContentIdPathSchema
+from tracim_backend.views.core_api.schemas import RFCEmail
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
@@ -107,9 +108,7 @@ class ShareCreationBody(object):
 
 class ShareCreationBodySchema(marshmallow.Schema):
     emails = marshmallow.fields.List(
-        marshmallow.fields.Email(validate=share_email_validator),
-        validate=Length(min=1),
-        required=True,
+        RFCEmail(validate=share_email_validator), validate=Length(min=1), required=True
     )
     password = marshmallow.fields.String(
         example="8QLa$<w", required=False, allow_none=True, validate=share_password_validator
@@ -159,9 +158,7 @@ class ContentShareInfoSchema(marshmallow.Schema):
 
 
 class ContentShareSchema(marshmallow.Schema):
-    email = marshmallow.fields.Email(
-        example="hello@tracim.fr", required=True, validate=share_email_validator
-    )
+    email = RFCEmail(example="hello@tracim.fr", required=True, validate=share_email_validator)
     share_token = marshmallow.fields.String(
         description="token of the content_share", example="444b026a068d42d6ab5e12fde08efb7b"
     )

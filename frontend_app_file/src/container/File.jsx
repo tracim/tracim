@@ -82,6 +82,7 @@ class File extends React.Component {
       sharePassword: '',
       shareLinkList: []
     }
+    this.refContentLeftTop = React.createRef()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -347,7 +348,10 @@ class File extends React.Component {
     }
   }
 
-  handleClickNewVersion = () => this.setState({ mode: MODE.EDIT })
+  handleClickNewVersion = () => {
+    this.refContentLeftTop.current.scrollIntoView({ behavior: 'instant' })
+    this.setState({ mode: MODE.EDIT })
+  }
 
   handleClickValidateNewDescription = async newDescription => {
     const { props, state } = this
@@ -975,6 +979,7 @@ class File extends React.Component {
             newFile={state.newFile}
             newFilePreview={state.newFilePreview}
             progressUpload={state.progressUpload}
+            ref={this.refContentLeftTop}
           />
 
           <PopinFixedRightPart

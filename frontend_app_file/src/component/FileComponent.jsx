@@ -9,8 +9,13 @@ import { DisplayState, FileDropzone } from 'tracim_frontend_lib'
 
 const color = require('color')
 
-export const FileComponent = props =>
-  <div className={classnames('file__contentpage__statewrapper', { 'displayState': props.isArchived || props.isDeleted || props.isDeprecated })}>
+export const FileComponent = props => (
+  <div className={classnames(
+    'file__contentpage__statewrapper',
+    { 'displayState': props.isArchived || props.isDeleted || props.isDeprecated }
+  )}>
+    <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
+
     {props.isArchived && (
       <DisplayState
         msg={props.t('This content is archived')}
@@ -101,5 +106,9 @@ export const FileComponent = props =>
       </div>
     }
   </div>
+)
 
-export default translate()(Radium(FileComponent))
+// INFO - CH - 2019-09-13 - FileComponentWithHOC const is used to be able to forward the ref though HOC
+const FileComponentWithHOC = translate()(Radium(FileComponent))
+
+export default React.forwardRef((props, ref) => <FileComponentWithHOC {...props} myForwardedRef={ref} />)

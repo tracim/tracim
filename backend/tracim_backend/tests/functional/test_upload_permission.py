@@ -106,7 +106,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         )
         content = res.json_body
         assert len(content) == 1
-        params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
+        params = {"emails": ["test <test@test.test>", "test2@test2.test2"], "password": "123456"}
         res = web_testapp.post_json(
             "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id),
             params=params,
@@ -120,7 +120,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         assert content[0]["disabled"] is None
         assert content[0]["is_disabled"] is False
         assert content[0]["upload_permission_id"]
-        assert content[0]["email"] == "test@test.test"
+        assert content[0]["email"] == "test <test@test.test>"
         assert content[0]["url"].startswith("http://localhost:6543/ui/guest-upload/")
         assert content[0]["created"]
         assert content[0]["author"]

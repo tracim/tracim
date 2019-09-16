@@ -4,10 +4,12 @@ import typing
 import marshmallow
 from marshmallow import post_load
 from marshmallow.fields import String
+from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
+from tracim_backend.app_models.rfc_email_validator import RFCEmailValidator
 from tracim_backend.app_models.validator import acp_validator
 from tracim_backend.app_models.validator import action_description_validator
 from tracim_backend.app_models.validator import all_content_types_validator
@@ -81,6 +83,29 @@ class StrippedString(String):
         if value:
             value = value.strip()
         return value.strip()
+
+
+class RFCEmail(ValidatedField, String):
+    """A validated email rfc style "john <john@john.ndd>" field.
+    Validation occurs during both serialization and
+    deserialization.
+
+    :param args: The same positional arguments that :class:`String` receives.
+    :param kwargs: The same keyword arguments that :class:`String` receives.
+    """
+
+    default_error_messages = {"invalid": "Not a valid rfc email address."}
+
+    def __init__(self, *args, **kwargs):
+        String.__init__(self, *args, **kwargs)
+        # Insert validation into self.validators so that multiple errors can be
+        # stored.
+        self.validators.insert(0, RFCEmailValidator(error=self.error_messages["invalid"]))
+
+    def _validated(self, value):
+        if value is None:
+            return None
+        return RFCEmailValidator(error=self.error_messages["invalid"])(value)
 
 
 class CollaborativeFileTypeSchema(marshmallow.Schema):
