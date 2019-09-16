@@ -150,7 +150,6 @@ export class NewUpload extends React.Component {
             onClick={props.onClickCancelNewUpload}
           >
             {props.t('Cancel')}
-            <i className='fa fa-fw fa-times' />
           </button>
           <button
             className='newUpload__newBtn btn highlightBtn'
@@ -164,8 +163,7 @@ export class NewUpload extends React.Component {
             onClick={() => props.onClickNewUpload(state.isPasswordActive)}
             disabled={props.uploadEmails === '' || (state.isPasswordActive && props.uploadPassword === '')}
           >
-            {props.t('New')}
-            <i className='fa fa-fw fa-plus-circle' />
+            {props.t('Validate')}
           </button>
         </div>
 

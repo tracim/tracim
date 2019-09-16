@@ -150,7 +150,6 @@ export class NewShareDownload extends React.Component {
             }}
           >
             {props.t('Cancel')}
-            <i className='fa fa-fw fa-times' />
           </button>
 
           <button
@@ -166,7 +165,6 @@ export class NewShareDownload extends React.Component {
             }}
           >
             {props.t('Validate')}
-            <i className='fa fa-fw fa-plus-circle' />
           </button>
         </div>
 
