@@ -451,6 +451,9 @@ class Dashboard extends React.Component {
 
           return {
             ...app,
+            hexcolor: app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug
+              ? HACK_COLLABORA_CONTENT_TYPE([{}]).hexcolor
+              : app.hexcolor,
             creationLabel: creationLabelWithHACK,
             route: app.slug === 'agenda'
               ? PAGE.WORKSPACE.AGENDA(props.curWs.id)
