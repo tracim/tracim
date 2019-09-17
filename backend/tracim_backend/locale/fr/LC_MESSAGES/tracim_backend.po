@@ -53,7 +53,7 @@ msgid ""
 "[{website_title}] {emitter_name} shared the file \"{content_filename}\" "
 "with you"
 msgstr ""
-"[{website_title}] {emitter_name} à partagé le fichier "
+"[{website_title}] {emitter_name} a partagé le fichier "
 "\"{content_filename}\" avec vous"
 
 #: tracim_backend/applications/share/config.py:22
