@@ -85,20 +85,20 @@ class ContentItem extends React.Component {
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={{
                   edit: {
-                    callback: e => props.onClickExtendedAction.edit(e, props.folderData),
-                    label: props.t('Edit')
+                    callback: e => props.onClickExtendedAction.edit.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.edit.label
                   },
                   download: {
-                    callback: e => props.onClickExtendedAction.download(e, props.folderData),
-                    label: props.t('Download')
+                    callback: e => props.onClickExtendedAction.download.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.download.label
                   },
                   archive: {
-                    callback: e => props.onClickExtendedAction.archive(e, props.folderData),
-                    label: props.t('Archive')
+                    callback: e => props.onClickExtendedAction.archive.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.archive.label
                   },
                   delete: {
-                    callback: e => props.onClickExtendedAction.delete(e, props.folderData),
-                    label: props.t('Delete')
+                    callback: e => props.onClickExtendedAction.delete.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.delete.label
                   }
                 }}
               />

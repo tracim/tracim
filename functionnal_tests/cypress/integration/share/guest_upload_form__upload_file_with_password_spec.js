@@ -24,7 +24,7 @@ describe('Guest upload page', () => {
 
   it('should open with a valid token', () => {
     cy.visit(guestUploadUrl)
-    cy.get('.card-header').contains('Upload files')
+    cy.get('.guestupload__card__header')
   })
 
   it('Send button should be disable', () => {
