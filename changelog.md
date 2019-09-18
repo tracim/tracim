@@ -1,19 +1,40 @@
 
-## 2.4 / 2019-08-xx
+## 2.4 / 2019-09-19
 
 ### New Features
 
-- Collabora online / Libreoffice online
-- Public file share (upload and download)
+- CollaboraOnline/LibreofficeOnline
+- Public share (upload and download)
+- New timeline
 
 ### Fixed issues
 
-- Collabora / libreoffice:
-- Public file share:
--
--
--
--
+- CollaboraOnline/libreofficeOnline: #1007, #2072, #2074, #2075, #2080, #2082, #2115, #2153, #2156, #2157, #2158, #2160, #2162, #2167, #2172, #2180, #2190, #2217, #2372, #2389
+- Public share: #2030, #2101, #2181, #2185, #2211, #2226, #2228, #2229, #2231, #2246, #2250, #2251, #2258, #2260, #2293, #2297, #2337, #2339, #2349, #2356
+- Public share download: #2125, #2184, #2186, #2194, #2200, #2221, #2235, #2280, #2306, #2330
+- Public share upload: #2126, #2254, #2255, #2279, #2289, #2303, #2312, #2351, #2253, #2305, #2310, #2322, #2358, #2365, #2366, #2374, #2379, #2382
+- Tracim Public: #2027, #2028, #2029, #2031, #2368
+- Contents list: #1986, #2046, #2232, #2262, #2360
+- App file: #2062, #2174, #2203, #2265, #2273, #2294
+- App folder: #1918, #2087, #2191, #2244
+- Timeline: #2275, #2276, #2282, #2300, #2316
+- Frontend: #1887, #1910, #1956, #1992, #2011, #2064, #2091, #2141, #2149
+- Dashboard: #1774, #2038, #2242
+- UX: #573, #1198, #2076, #2092, #2096, #2121, #2159, #2237, #2299, #2395
+- Search: #1928, #1973
+- Backend/System: #619, #2105, #2132, #2154, #2177, #2224, #2314, #2354
+- Documentation: #2117, #2155
+
+### Known issues
+
+- Debian 9 is released with Firefox ESR v60.8.0. In this version, long title are not limited in upload file popup (issue #2062)
+- Opening file with special characters in label on CollaboraOnline/LibreofficeOnline is not possible (issue #2219)
+- Tracim not support lock mecanism in collaborative edition (issue #2073)
+
+### Other changes
+
+Archive button not more used in Tracim. All archive buttons is hide (#2347)
+
 
 ## 2.3.2 / 2019-08-01
 
