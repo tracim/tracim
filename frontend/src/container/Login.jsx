@@ -69,18 +69,17 @@ class Login extends React.Component {
     if (query.dc && query.dc === '1') {
       props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
       props.history.push(props.location.pathname)
-      return
     }
 
     await this.loadConfig()
   }
 
-  handleChangeLogin = e => this.setState({inputLogin: {...this.state.inputLogin, value: e.target.value}})
-  handleChangePassword = e => this.setState({inputPassword: {...this.state.inputPassword, value: e.target.value}})
+  handleChangeLogin = e => this.setState({ inputLogin: { ...this.state.inputLogin, value: e.target.value } })
+  handleChangePassword = e => this.setState({ inputPassword: { ...this.state.inputPassword, value: e.target.value } })
   handleChangeRememberMe = e => {
     e.preventDefault()
     e.stopPropagation()
-    this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
+    this.setState(prev => ({ inputRememberMe: !prev.inputRememberMe }))
   }
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
@@ -104,10 +103,10 @@ class Login extends React.Component {
 
         if (fetchPostUserLogin.json.lang === null) this.setDefaultUserLang(fetchPostUserLogin.json)
 
-        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
         props.dispatch(setUserConnected(loggedUser))
 
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
         i18n.changeLanguage(loggedUser.lang)
 
         this.loadAppList()
@@ -155,7 +154,9 @@ class Login extends React.Component {
 
   loadWorkspaceList = async () => {
     const { props } = this
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
+    const showOwnedWorkspace = false
+
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
     if (fetchGetWorkspaceList.status === 200) {
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
       this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
@@ -200,10 +201,10 @@ class Login extends React.Component {
 
   render () {
     const { props, state } = this
-    if (props.user.logged) return <Redirect to={{pathname: '/ui'}} />
+    if (props.user.logged) return <Redirect to={{ pathname: '/ui' }} />
 
     return (
-      <section className='loginpage primaryColorBg'>
+      <section className='loginpage'>
         <Card customClass='loginpage__card'>
           <CardHeader customClass='loginpage__card__header primaryColorBgLighten'>
             {props.t('Connection')}
@@ -252,8 +253,8 @@ class Login extends React.Component {
                 <div className='col-12 col-sm-6 d-flex align-items-end'>
                   <Button
                     htmlType='button'
-                    bootstrapType='primary'
-                    customClass='btnSubmit loginpage__card__form__btnsubmit ml-auto'
+                    bootstrapType=''
+                    customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__card__form__btnsubmit ml-auto'
                     label={props.t('Connection')}
                     onClick={this.handleClickSubmit}
                   />

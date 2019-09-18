@@ -34,6 +34,7 @@ import {
   WORKSPACE_CONTENT_DELETED,
   WORKSPACE_RECENT_ACTIVITY,
   WORKSPACE_READ_STATUS,
+  WORKSPACE_CONTENT_SHARE_FOLDER,
   USER_WORKSPACE_DO_NOTIFY,
   USER,
   USER_WORKSPACE_LIST,
@@ -66,8 +67,8 @@ import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
  */
 // Côme - 2018/08/02 - fetchWrapper should come from tracim_lib so that all apps uses the same
 // 08/09/2018 - maybe not since this fetchWrapper also dispatch redux actions whether it succeed or failed
-const fetchWrapper = async ({url, param, actionName, dispatch}) => {
-  dispatch({type: `${param.method}/${actionName}/PENDING`})
+const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
+  dispatch({ type: `${param.method}/${actionName}/PENDING` })
 
   try {
     const fetchResult = await fetch(url, param)
@@ -77,7 +78,9 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
       if (status >= 200 && status <= 299) return fetchResult.json()
       if (status >= 300 && status <= 399) return fetchResult.json()
       if (status === 401) {
-        if (!unLoggedAllowedPageList.includes(document.location.pathname)) {
+        // FIME - GB - 2019-02-08 - Find a better way of handling the list of unLoggedAllowedPageList
+        // https://github.com/tracim/tracim/issues/2144
+        if (!unLoggedAllowedPageList.some(url => document.location.pathname.startsWith(url))) {
           dispatch(setRedirectLogin(document.location.pathname + document.location.search))
           dispatch(setUserDisconnected())
           history.push(`${PAGE.LOGIN}${Cookies.get(COOKIE_FRONTEND.LAST_CONNECTION) ? '?dc=1' : ''}`)
@@ -98,9 +101,9 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
 
     const status = fetchResult.status
     if (status >= 200 && status <= 399) {
-      dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+      dispatch({ type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json })
     } else {
-      dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
+      dispatch({ type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json })
     }
 
     return fetchResult
@@ -109,7 +112,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
       dispatch(newFlashMessage(i18n.t('Server unreachable'), 'danger'))
       console.error(e)
     }
-    return {status: 'failedToFetch'} // Côme - 2018/10/08 - this status is unused, the point is only to return an object with a status attribute
+    return { status: 'failedToFetch' } // Côme - 2018/10/08 - this status is unused, the point is only to return an object with a status attribute
   }
 }
 
@@ -118,7 +121,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
     url: `${FETCH_CONFIG.apiUrl}/auth/login`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
         email: login,
@@ -136,7 +139,7 @@ export const postForgotPassword = email => async dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/request`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
         email: email
@@ -152,7 +155,7 @@ export const postResetPassword = (newPassword, newPassword2, email, token) => as
     url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/modify`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
         email: email,
@@ -171,7 +174,7 @@ export const postUserLogout = () => async dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/auth/logout`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST'
     },
     actionName: USER_LOGOUT,
@@ -194,9 +197,9 @@ export const getUser = userId => async dispatch => {
   })
 }
 
-export const getUserWorkspaceList = userId => async dispatch => {
+export const getUserWorkspaceList = (userId, showOwnedWorkspace) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
     param: {
       credentials: 'include',
       headers: {
@@ -422,9 +425,9 @@ export const putUserWorkspaceDoNotify = (user, workspaceId, doNotify) => dispatc
   })
 }
 
-export const getMyselfWorkspaceList = () => dispatch => {
+export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
     param: {
       credentials: 'include',
       headers: {
@@ -494,6 +497,36 @@ export const getFolderContentList = (workspaceId, folderIdList) => dispatch => {
       method: 'GET'
     },
     actionName: WORKSPACE,
+    dispatch
+  })
+}
+
+export const getSubFolderShareContentList = (workspaceId, folderIdList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=upload&parent_ids=${folderIdList.join(',')}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE,
+    dispatch
+  })
+}
+
+export const getShareFolderContentList = (workspaceId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=upload`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_CONTENT_SHARE_FOLDER,
     dispatch
   })
 }
@@ -569,7 +602,7 @@ export const deleteWorkspaceMember = (user, workspaceId, memberId) => dispatch =
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'DELETE'
     },
     actionName: WORKSPACE_MEMBER_REMOVE,
@@ -582,7 +615,7 @@ export const getFolderContent = (workspaceId, folderId) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?parent_id=${folderId}`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'GET'
     },
     actionName: `${WORKSPACE}/${FOLDER}`,
@@ -725,6 +758,42 @@ export const putContentItemMove = (source, destination) => dispatch => {
       })
     },
     actionName: WORKSPACE_CONTENT_MOVE,
+    dispatch
+  })
+}
+
+export const getFileInfos = (token) =>
+  fetch(`${FETCH_CONFIG.apiUrl}/public/guest-download/${token}`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+
+export const postDownloadFile = (token, guestPassword) =>
+  fetch(`${FETCH_CONFIG.apiUrl}/public/guest-download/${token}/check`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      password: guestPassword
+    })
+  })
+
+export const getGuestUploadInfo = token => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/public/guest-upload/${token}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: 'GuestUpload',
     dispatch
   })
 }

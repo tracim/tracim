@@ -31,7 +31,7 @@ import {
 } from '../helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
-import { IconWithWarning, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { ComposedIcon, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 
@@ -44,18 +44,11 @@ class Header extends React.Component {
     if (prevProps.user.lang !== this.props.user.lang) i18n.changeLanguage(this.props.user.lang)
   }
 
-  handleClickLogo = () => {
-    const { props } = this
-
-    if (props.user.logged) props.history.push(PAGE.HOME)
-    else props.history.push(PAGE.LOGIN)
-  }
-
   handleChangeLang = async langId => {
     const { props } = this
 
     if (props.user.user_id === -1) {
-      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
       i18n.changeLanguage(langId)
       props.dispatch(setUserLang(langId))
       return
@@ -65,7 +58,7 @@ class Header extends React.Component {
     switch (fetchPutUserLang.status) {
       case 200:
         i18n.changeLanguage(langId)
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
         props.dispatch(setUserLang(langId))
         props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, langId)
         break
@@ -103,7 +96,7 @@ class Header extends React.Component {
       act: 1
     }
 
-    props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, {encode: true}))
+    props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, { encode: true }))
   }
 
   render () {
@@ -112,18 +105,20 @@ class Header extends React.Component {
     return (
       <header className='header'>
         <nav className='navbar navbar-expand-lg navbar-light bg-light'>
-          <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
+          <Logo to={props.user.logged ? PAGE.HOME : PAGE.LOGIN} logoSrc={logoHeader} />
 
           <NavbarToggler />
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
             <ul className='header__menu__rightside'>
-              {!unLoggedAllowedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
+              {!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && !props.system.config.email_notification_activated && (
                 <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
-                    <IconWithWarning
-                      icon='envelope'
-                      customClass='slowblink'
+                    <ComposedIcon
+                      mainIcon='envelope'
+                      smallIcon='warning'
+                      mainIconCustomClass='slowblink'
+                      smallIconCustomClass='text-danger'
                     />
                   </div>
                 </li>
@@ -144,7 +139,7 @@ class Header extends React.Component {
                 </li>
               )}
 
-              {!unLoggedAllowedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
+              {!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && props.appList.some(a => a.slug === 'agenda') && (
                 <li className='header__menu__rightside__agenda'>
                   <Link
                     className='btn outlineTextBtn primaryColorBorder nohover'

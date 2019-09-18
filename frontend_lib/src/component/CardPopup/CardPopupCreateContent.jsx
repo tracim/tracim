@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Radium from 'radium'
-import color from 'color'
 import CardPopup from './CardPopup.jsx'
 
 // require('./CardPopupCreateContent.styl') // see https://github.com/tracim/tracim/issues/1156
+const color = require('color')
 
 class PopupCreateContent extends React.Component {
   handleInputKeyDown = e => {
@@ -68,7 +68,7 @@ class PopupCreateContent extends React.Component {
                     color: '#fdfdfd',
                     borderColor: props.customColor,
                     ':hover': {
-                      backgroundColor: color(props.customColor).darken(0.15).hexString()
+                      backgroundColor: color(props.customColor).darken(0.15).hex()
                     }
                   }}
                   disabled={!props.contentName || props.contentName.length === 0}

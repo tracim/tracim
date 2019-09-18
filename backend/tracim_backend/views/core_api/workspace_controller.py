@@ -19,6 +19,7 @@ from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
 from tracim_backend.exceptions import UserIsNotActive
+from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspacesDoNotMatch
@@ -45,6 +46,7 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.views import BASE_API_V2
@@ -146,6 +148,8 @@ class WorkspaceController(Controller):
             label=hapic_data.body.label,
             description=hapic_data.body.description,
             agenda_enabled=hapic_data.body.agenda_enabled,
+            public_download_enabled=hapic_data.body.public_download_enabled,
+            public_upload_enabled=hapic_data.body.public_upload_enabled,
             save_now=True,
         )
         wapi.execute_update_workspace_actions(request.current_workspace)
@@ -154,6 +158,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WorkspaceLabelAlreadyUsed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserNotAllowedToCreateMoreWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_trusted_user)
     @hapic.input_body(WorkspaceCreationSchema())
     @hapic.output_body(WorkspaceSchema())
@@ -170,6 +175,8 @@ class WorkspaceController(Controller):
             description=hapic_data.body.description,
             save_now=True,
             agenda_enabled=hapic_data.body.agenda_enabled,
+            public_download_enabled=hapic_data.body.public_download_enabled,
+            public_upload_enabled=hapic_data.body.public_upload_enabled,
         )
         wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)
@@ -393,6 +400,7 @@ class WorkspaceController(Controller):
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
+            namespaces_filter=content_filter.namespaces_filter or [ContentNamespaces.CONTENT],
             show_archived=content_filter.show_archived,
             show_deleted=content_filter.show_deleted,
             show_active=content_filter.show_active,
@@ -535,6 +543,7 @@ class WorkspaceController(Controller):
                 content,
                 new_parent=new_parent,
                 new_workspace=new_workspace,
+                new_content_namespace=ContentNamespaces.CONTENT,
                 must_stay_in_same_workspace=False,
             )
             api.execute_update_content_actions(content)

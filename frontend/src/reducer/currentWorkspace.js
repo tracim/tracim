@@ -18,6 +18,8 @@ const defaultWorkspace = {
   label: '',
   description: '',
   agendaEnabled: false,
+  downloadEnabled: false,
+  uploadEnabled: false,
   sidebarEntryList: [],
   memberList: [],
   recentActivityList: [],
@@ -36,6 +38,8 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         label: action.workspaceDetail.label,
         description: action.workspaceDetail.description,
         agendaEnabled: action.workspaceDetail.agenda_enabled,
+        downloadEnabled: action.workspaceDetail.public_download_enabled,
+        uploadEnabled: action.workspaceDetail.public_upload_enabled,
         sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => ({
           slug: sbe.slug,
           route: sbe.route,
@@ -115,7 +119,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ? {
           ...state,
           memberList: state.memberList.map(u => u.id === action.userId
-            ? {...u, doNotify: action.doNotify}
+            ? { ...u, doNotify: action.doNotify }
             : u
           )
         }
@@ -130,7 +134,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         }
 
     case `${SET}/${WORKSPACE_AGENDA_URL}`:
-      return {...state, agendaUrl: action.agendaUrl}
+      return { ...state, agendaUrl: action.agendaUrl }
 
     default:
       return state

@@ -21,7 +21,7 @@ const SubDropdownCreateButton = props => {
             <div className={`subdropdown__link__${app.slug}__icon mr-3`}>
               <i
                 className={`fa fa-fw fa-${app.faIcon}`}
-                style={{color: app.hexcolor}}
+                style={{ color: app.hexcolor }}
               />
             </div>
 

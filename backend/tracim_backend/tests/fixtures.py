@@ -34,6 +34,8 @@ from tracim_backend.tests.utils import GroupApiFactory
 from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
+from tracim_backend.tests.utils import ShareLibFactory
+from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
@@ -211,6 +213,16 @@ def workspace_api_factory(session, app_config, admin_user) -> WorkspaceApiFactor
 @pytest.fixture
 def content_api_factory(session, app_config, admin_user) -> ContentApiFactory:
     return ContentApiFactory(session, app_config, admin_user)
+
+
+@pytest.fixture
+def share_lib_factory(session, app_config, admin_user) -> ShareLibFactory:
+    return ShareLibFactory(session, app_config, admin_user)
+
+
+@pytest.fixture
+def upload_permission_lib_factory(session, app_config, admin_user) -> UploadPermissionLibFactory:
+    return UploadPermissionLibFactory(session, app_config, admin_user)
 
 
 @pytest.fixture

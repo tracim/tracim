@@ -47,7 +47,7 @@ class Application(object):
     # TODO - G.M - 2018-08-07 - Refactor slug coherence issue like this one.
     # we probably should not have 2 kind of slug
     @property
-    def minislug(self):
+    def minislug(self) -> str:
         return self.slug.replace("contents/", "")
 
     def add_content_type(
@@ -60,7 +60,7 @@ class Application(object):
         allow_sub_content: bool = False,
         file_extension: typing.Optional[str] = None,
         minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
-    ):
+    ) -> None:
         content_type = ContentType(
             slug=slug,
             fa_icon=self.fa_icon,

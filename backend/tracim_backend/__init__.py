@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
 from copy import deepcopy
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
+from pyramid.router import Router
 import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
@@ -31,11 +33,15 @@ from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.agenda import CaldavAppFactory
 from tracim_backend.lib.agenda.authorization import add_www_authenticate_header_for_caldav
+from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
+    CollaborativeDocumentEditionFactory,
+)
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
 from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
+from tracim_backend.lib.utils.authentification import QueryTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import RemoteAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
@@ -68,7 +74,7 @@ except ImportError:
     from http import client as HTTPStatus
 
 
-def web(global_config, **local_settings):
+def web(global_config: OrderedDict, **local_settings) -> Router:
     """ This function returns a Pyramid WSGI application.
     """
     settings = deepcopy(global_config)
@@ -97,6 +103,7 @@ def web(global_config, **local_settings):
     policies.append(
         CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION__REISSUE_TIME)
     )
+    policies.append(QueryTokenAuthentificationPolicy())
     if app_config.API__KEY:
         policies.append(
             ApiTokenAuthentificationPolicy(
@@ -197,6 +204,39 @@ def web(global_config, **local_settings):
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
+
+    # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+    # to make thing easier later
+    # when app will be load dynamycally.
+    import tracim_backend.applications.share.controller as share_app_controller
+
+    share_app_controller.import_controller(
+        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
+    )
+    import tracim_backend.applications.upload_permissions.controller as upload_permission_controller
+
+    upload_permission_controller.import_controller(
+        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
+    )
+
+    if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
+        # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
+        # import is here because import WOPI of Collabora controller without adding it to
+        # pyramid make trouble in hapic which try to get view related
+        # to controller but failed.
+        from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_controller import (
+            WOPIController,
+        )
+
+        wopi_controller = WOPIController()
+        configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
+        collaborative_document_edition_controller = CollaborativeDocumentEditionFactory().get_controller(
+            app_config
+        )
+        configurator.include(
+            collaborative_document_edition_controller.bind, route_prefix=BASE_API_V2
+        )
+    configurator.scan("tracim_backend.lib.utils.authentification")
     if app_config.CALDAV__ENABLED:
         # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,
         # import is here because import AgendaController without adding it to

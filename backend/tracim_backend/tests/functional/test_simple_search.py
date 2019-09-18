@@ -327,6 +327,90 @@ class TestSimpleSearch(object):
         assert search_result["is_total_hits_accurate"] is False
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
+    @pytest.mark.parametrize(
+        "created_content_name, search_string, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
+        [
+            # created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content
+            # exact syntax
+            (
+                "good practices",
+                "eureka",
+                "good practices",
+                "this is a comment content containing the string: eureka.",
+                "this is another comment content, eureka",
+            )
+        ],
+    )
+    def test_api___simple_search_ok__avoid_duplicate_content(
+        self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        created_content_name,
+        web_testapp,
+        search_string,
+        first_search_result_content_name,
+        first_created_comment_content,
+        second_created_comment_content,
+    ) -> None:
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("trusted-users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        api = content_api_factory.get(current_user=user)
+        content = api.create(
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
+        )
+        api.create_comment(
+            workspace=workspace, parent=content, content=first_created_comment_content, do_save=True
+        )
+        api.create_comment(
+            workspace=workspace,
+            parent=content,
+            content=second_created_comment_content,
+            do_save=True,
+        )
+        api.create(
+            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+        )
+        api.create(
+            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+        )
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        params = {"search_string": search_string, "size": 1, "page_nb": 1}
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == 1
+        assert search_result["is_total_hits_accurate"] is False
+        assert len(search_result["contents"]) == 1
+        assert search_result["contents"][0]["label"] == first_search_result_content_name
+
+        params = {"search_string": search_string, "size": 1, "page_nb": 2}
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == 1
+        assert search_result["is_total_hits_accurate"] is False
+        assert len(search_result["contents"]) == 0
+
     def test_api___simple_search_ok__no_search_string(
         self,
         user_api_factory,

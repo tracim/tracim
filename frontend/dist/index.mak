@@ -3,6 +3,7 @@
   <head>
     <meta charset='utf-8' />
     <meta name='viewport' content='width=device-width, user-scalable=no'>
+
     <title>${website_title}</title>
     <link rel='shortcut icon' type='image/x-icon' href='/assets/favicon.ico' >
     <link rel='manifest' href='/assets/manifest.json'>
@@ -83,9 +84,11 @@
     <script type='text/javascript' src='/assets/tracim.app.js'></script>
 
     <script type='text/javascript' src='/app/workspace.app.js'></script>
+
     % for app in applications:
     <script type='text/javascript' src='/app/${app.minislug}.app.js'></script>
     %endfor
+    <script type='text/javascript' src='/app/share_folder.app.js'></script>
     <script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
     <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
 

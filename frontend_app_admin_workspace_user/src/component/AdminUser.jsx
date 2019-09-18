@@ -8,7 +8,7 @@ import {
   PageTitle,
   PageContent,
   BtnSwitch,
-  IconWithWarning,
+  ComposedIcon,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
@@ -126,9 +126,11 @@ export class AdminUser extends React.Component {
             <div className='adminUser__adduser__emailstate'>
               {!props.emailNotifActivated && (
                 <div>
-                  <IconWithWarning
-                    icon='envelope'
-                    customClass='primaryColorFont'
+                  <ComposedIcon
+                    mainIcon='envelope'
+                    smallIcon='warning'
+                    mainIconCustomClass='primaryColorFont'
+                    smallIconCustomClass='text-danger'
                   />
                   {props.t('Email notification are disabled, please manually notify users of any change')}
                 </div>
@@ -165,7 +167,7 @@ export class AdminUser extends React.Component {
                   const userProfile = getUserProfile(props.profile, u.profile)
                   return (
                     <tr
-                      className={classnames('adminUser__table__tr', {'user-deactivated': !u.is_active})}
+                      className={classnames('adminUser__table__tr', { 'user-deactivated': !u.is_active })}
                       key={u.user_id}
                       data-cy='adminUser__table__tr'
                     >
@@ -181,7 +183,7 @@ export class AdminUser extends React.Component {
                       <td>
                         <i
                           className={`fa fa-fw fa-2x fa-${userProfile.faIcon}`}
-                          style={{color: userProfile.hexcolor}}
+                          style={{ color: userProfile.hexcolor }}
                           title={props.t(userProfile.label)}
                         />
                       </td>

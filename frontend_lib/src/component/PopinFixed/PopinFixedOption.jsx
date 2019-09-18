@@ -7,7 +7,7 @@ const PopinFixedOption = props => {
   return (
     <div
       className={classnames('wsContentGeneric__option', `${props.customClass}__option`)}
-      style={{display: props.display ? 'block' : 'none'}}
+      style={{ display: props.display ? 'block' : 'none' }}
     >
       <div className={classnames('wsContentGeneric__option__menu', `${props.customClass}__option__menu`)}>
         {props.children}
@@ -19,17 +19,11 @@ const PopinFixedOption = props => {
 export default translate()(PopinFixedOption)
 
 PopinFixedOption.propTypes = {
-  selectedStatus: PropTypes.object,
-  availableStatus: PropTypes.array,
-  i18n: PropTypes.object, // translate resource to overrides default one,
-  onClickNewVersionBtn: PropTypes.func,
-  onChangeStatus: PropTypes.func,
+  customClass: PropTypes.string,
   display: PropTypes.bool
 }
 
 PopinFixedOption.defaultProps = {
-  availableStatus: [],
-  i18n: {},
-  onClickNewVersionBtn: () => {},
+  customClass: '',
   display: true
 }

@@ -47,6 +47,9 @@ import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
+import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
+
+const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -145,7 +148,7 @@ class Dashboard extends React.Component {
     switch (fetchCalendar.status) {
       case 200:
         const currentWorkspaceId = parseInt(props.match.params.idws)
-        const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === currentWorkspaceId) || {agenda_url: ''}).agenda_url
+        const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === currentWorkspaceId) || { agenda_url: '' }).agenda_url
         this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
         break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('agenda details')}`, 'warning')); break
@@ -207,13 +210,13 @@ class Dashboard extends React.Component {
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
-  handleClickAddMemberBtn = () => this.setState({displayNewMemberForm: true})
+  handleClickAddMemberBtn = () => this.setState({ displayNewMemberForm: true })
 
-  handleClickCloseAddMemberBtn = () => this.setState({displayNewMemberForm: false})
+  handleClickCloseAddMemberBtn = () => this.setState({ displayNewMemberForm: false })
 
-  handleToggleNotifBtn = () => this.setState(prevState => ({displayNotifBtn: !prevState.displayNotifBtn}))
+  handleToggleNotifBtn = () => this.setState(prevState => ({ displayNotifBtn: !prevState.displayNotifBtn }))
 
-  handleToggleWebdavBtn = () => this.setState(prevState => ({displayWebdavBtn: !prevState.displayWebdavBtn}))
+  handleToggleWebdavBtn = () => this.setState(prevState => ({ displayWebdavBtn: !prevState.displayWebdavBtn }))
 
   handleClickMarkRecentActivityAsRead = async () => {
     const { props } = this
@@ -240,7 +243,7 @@ class Dashboard extends React.Component {
     const { props } = this
     const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(userNameToSearch, props.curWs.id))
     switch (fetchUserKnownMemberList.status) {
-      case 200: this.setState({searchedKnownMemberList: fetchUserKnownMemberList.json}); break
+      case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.json }); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
     }
   }
@@ -259,7 +262,7 @@ class Dashboard extends React.Component {
 
     if (newNameOrEmail.length >= 2) {
       await this.handleSearchUser(newNameOrEmail)
-      this.setState({autoCompleteFormNewMemberActive: true})
+      this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
 
@@ -282,7 +285,7 @@ class Dashboard extends React.Component {
     autoCompleteClicked: true
   })
 
-  handleChangeNewMemberRole = newRole => this.setState(prev => ({newMember: {...prev.newMember, role: newRole}}))
+  handleChangeNewMemberRole = newRole => this.setState(prev => ({ newMember: { ...prev.newMember, role: newRole } }))
 
   handleClickValidateNewMember = async () => {
     const { props, state } = this
@@ -305,7 +308,7 @@ class Dashboard extends React.Component {
     }
 
     if (state.newMember.id === '' && newMemberInKnownMemberList) { // this is to force sending the id of the user to the api if he exists
-      this.setState({newMember: {...state.newMember, id: newMemberInKnownMemberList.user_id}})
+      this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
     const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
@@ -385,13 +388,13 @@ class Dashboard extends React.Component {
         },
         props.user,
         findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
-        {...props.curWs, workspace_id: props.curWs.id}
+        { ...props.curWs, workspace_id: props.curWs.id }
       )
     } else {
-      props.dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), {workspace_id: props.curWs.id})
+      props.dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), { workspace_id: props.curWs.id })
     }
 
-    this.setState({advancedDashboardOpenedId: props.curWs.id})
+    this.setState({ advancedDashboardOpenedId: props.curWs.id })
   }
 
   handleClickAddNotification = async () => {
@@ -417,27 +420,51 @@ class Dashboard extends React.Component {
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
 
+    // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
+    // https://github.com/tracim/tracim/issues/2326
     const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => userRoleIdInWorkspace === 2 ? app.slug !== 'contents/folder' : true)
         .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
+        .filter(app => app.slug !== 'contents/share_folder')
+        .filter(app => app.slug !== 'share_content')
+        .filter(app => app.slug !== 'upload_permission')
         .map(app => {
-          const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
+          const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || { creationLabel: '', slug: '' }
           // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications
           // these endpoints are /system/applications, /system/content_types and key sidebar_entry from /user/me/workspaces
+          // HACK - CH - 2019-09-10 - hard coding collabora creation label from the hack since backend still isn't clear about appList and contentTypeList usage
+          // See https://github.com/tracim/tracim/issues/2375
+          const creationLabelWithHACK = (() => {
+            switch (app.slug) {
+              case 'agenda': return props.t('Open the agenda')
+              case 'collaborative_document_edition': return HACK_COLLABORA_CONTENT_TYPE([{}]).creationLabel
+              default: return contentType.creationLabel
+            }
+          })()
+
+          // HACK - CH - 2019-09-10 - hard coding collabora slug from the hack since the collaborative_document has been removed from content type list
+          // See https://github.com/tracim/tracim/issues/2375
+          const slugWithHACK = app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug
+            ? HACK_COLLABORA_CONTENT_TYPE([{}]).slug
+            : contentType.slug
+
           return {
             ...app,
-            creationLabel: app.slug === 'agenda' ? props.t('Open the agenda') : contentType.creationLabel,
+            hexcolor: app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug
+              ? HACK_COLLABORA_CONTENT_TYPE([{}]).hexcolor
+              : app.hexcolor,
+            creationLabel: creationLabelWithHACK,
             route: app.slug === 'agenda'
               ? PAGE.WORKSPACE.AGENDA(props.curWs.id)
-              : `${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`
+              : `${PAGE.WORKSPACE.NEW(props.curWs.id, slugWithHACK)}?parent_id=null`
           }
         })
       : []
 
     // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
     contentTypeButtonList.push({
-      slug: 'content/all', // INFO - CH - 2019-04-03 - This will be overriden but it avoid a unique key warning
+      slug: 'content/all', // INFO - CH - 2019-04-03 - This will be overridden but it avoid a unique key warning
       ...props.curWs.sidebarEntryList.find(se => se.slug === 'contents/all'),
       creationLabel: props.t('Explore contents'),
       route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id),
@@ -481,12 +508,12 @@ class Dashboard extends React.Component {
 
                   <div
                     className='dashboard__workspace__detail__description'
-                    dangerouslySetInnerHTML={{__html: convertBackslashNToBr(props.curWs.description)}}
+                    dangerouslySetInnerHTML={{ __html: convertBackslashNToBr(props.curWs.description) }}
                   />
 
-                  {userRoleIdInWorkspace >= 2 && (
-                    <div className='dashboard__calltoaction'>
-                      {contentTypeButtonList.map(app =>
+                  <div className='dashboard__calltoaction'>
+                    {contentTypeButtonList.map(app => {
+                      return (userRoleIdInWorkspace >= 2 || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
                         <ContentTypeBtn
                           customClass='dashboard__calltoaction__button'
                           hexcolor={app.hexcolor}
@@ -500,9 +527,9 @@ class Dashboard extends React.Component {
                           appSlug={app.slug}
                           key={app.slug}
                         />
-                      )}
-                    </div>
-                  )}
+                      )
+                    })}
+                  </div>
                 </div>
 
                 <UserStatus

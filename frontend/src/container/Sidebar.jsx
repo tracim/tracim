@@ -63,16 +63,16 @@ class Sidebar extends React.Component {
       ...unLoggedAllowedPageList,
       ...props.workspaceList.length > 0 ? [] : [PAGE.HOME, '/ui/'] // @fixme - Côme - 2018/11/13 - have a better way than hardcoding '/ui/'
     ]
-      .includes(props.location.pathname)
+      .some(url => props.location.pathname.startsWith(url))
   }
 
   handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))
 
   handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
 
-  handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
+  handleClickToggleSidebar = () => this.setState(prev => ({ sidebarClose: !prev.sidebarClose }))
 
-  handleClickScrollUp = () => this.workspaceListTop.scrollIntoView({block: 'start', inline: 'nearest', behavior: 'smooth'})
+  handleClickScrollUp = () => this.workspaceListTop.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
 
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
@@ -83,7 +83,7 @@ class Sidebar extends React.Component {
     if (!this.shouldDisplaySidebar(this.props)) return null
 
     return (
-      <div className={classnames('sidebar', {'sidebarclose': sidebarClose})}>
+      <div className={classnames('sidebar', { 'sidebarclose': sidebarClose })}>
         <div className='sidebar__scrollview'>
           <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
             {sidebarClose
@@ -101,9 +101,9 @@ class Sidebar extends React.Component {
           */}
 
           <div className='sidebar__content'>
-            <div id='sidebar__content__scrolltopmarker' style={{visibility: 'hidden'}} ref={el => { this.workspaceListTop = el }} />
+            <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
-            <nav className={classnames('sidebar__content__navigation', {'sidebarclose': sidebarClose})}>
+            <nav className={classnames('sidebar__content__navigation', { 'sidebarclose': sidebarClose })}>
               <ul className='sidebar__content__navigation__workspace'>
                 { workspaceList.map(ws =>
                   <WorkspaceListItem

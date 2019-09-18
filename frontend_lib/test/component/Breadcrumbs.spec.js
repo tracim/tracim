@@ -1,0 +1,37 @@
+import React from 'react'
+import { expect } from 'chai'
+import { shallow } from 'enzyme'
+import Breadcrumbs from '../../src/component/Breadcrumbs/Breadcrumbs.jsx'
+require('../../src/component/Breadcrumbs/Breadcrumbs.styl')
+
+describe('<Breadcrumbs />', () => {
+  const breadcrumbsList = [{
+    link: <a href='/ui'><i className='fa fa-home' />Home</a>,
+    type: 'CORE'
+  }, {
+    link: <span className='nolink'>First level</span>,
+    type: 'CORE',
+    notALink: true
+  }, {
+    link: <a className='secondlvl' href='/ui/second'>Second level</a>,
+    type: 'CORE'
+  }]
+
+  const wrapper = shallow(
+    <Breadcrumbs breadcrumbsList={breadcrumbsList} />
+  )
+
+  describe('The first level', () => {
+    it('should display "First level"', () => expect(wrapper.find('.nolink')).to.have.text().to.be.equal('First level'))
+    it('should NOT have the class primaryColorFontDarkenHover', () =>
+      expect(wrapper.find('.nolink').parent()).to.have.attr('class').to.not.contains('primaryColorFontDarkenHover')
+    )
+  })
+
+  describe('The second level', () => {
+    it('should display "Second level"', () => expect(wrapper.find('.secondlvl')).to.have.text().to.be.equal('Second level'))
+    it('should have the class primaryColorFontDarkenHover', () =>
+      expect(wrapper.find('.secondlvl').parent()).to.have.attr('class').to.contains('primaryColorFontDarkenHover')
+    )
+  })
+})

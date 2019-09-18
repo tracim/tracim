@@ -22,6 +22,10 @@ const wsEnTranslation = require('../dist/app/workspace_en_translation.json')
 const wsFrTranslation = require('../dist/app/workspace_fr_translation.json')
 const agendaEnTranslation = require('../dist/app/agenda_en_translation.json')
 const agendaFrTranslation = require('../dist/app/agenda_fr_translation.json')
+const collaborativeDocumentEditionEnTranslation = require('../dist/app/collaborative_document_edition_en_translation.json')
+const collaborativeDocumentEditionFrTranslation = require('../dist/app/collaborative_document_edition_fr_translation.json')
+const shareFolderEnTranslation = require('../dist/app/share_folder_en_translation.json')
+const shareFolderFrTranslation = require('../dist/app/share_folder_fr_translation.json')
 
 export const getBrowserLang = () => {
   const browserLang = navigator.language
@@ -42,9 +46,6 @@ i18n
     nsSeparator: false,
     keySeparator: false,
     debug: false,
-    react: {
-      wait: true
-    },
     resources: {
       en: {
         translation: {
@@ -57,7 +58,9 @@ i18n
           ...wsAdvancedEnTranslation, // advanced workspace
           ...adminWsUserEnTranslation, // admin workspace user
           ...wsEnTranslation, // workspace
-          ...agendaEnTranslation // agenda
+          ...agendaEnTranslation, // agenda
+          ...collaborativeDocumentEditionEnTranslation,
+          ...shareFolderEnTranslation // share folder
         }
       },
       fr: {
@@ -71,7 +74,9 @@ i18n
           ...wsAdvancedFrTranslation, // advanced workspace
           ...adminWsUserFrTranslation, // admin workspace user
           ...wsFrTranslation, // workspace
-          ...agendaFrTranslation // agenda
+          ...agendaFrTranslation, // agenda
+          ...collaborativeDocumentEditionFrTranslation,
+          ...shareFolderFrTranslation // share folder
         }
       }
     }

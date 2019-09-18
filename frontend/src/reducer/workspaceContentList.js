@@ -9,7 +9,7 @@ import {
   WORKSPACE_CONTENT_DELETED
 } from '../action-creator.sync.js'
 
-const serializeContent = c => ({
+export const serializeContent = c => ({
   id: c.content_id,
   label: c.label,
   slug: c.slug,
@@ -23,7 +23,9 @@ const serializeContent = c => ({
   showInUi: c.show_in_ui,
   statusSlug: c.status,
   subContentTypeList: c.sub_content_types,
-  isOpen: c.isOpen ? c.isOpen : false // only useful for folder
+  isOpen: c.isOpen ? c.isOpen : false, // only useful for folder
+  activedShares: c.actives_shares,
+  created: c.created
 })
 
 export default function workspaceContentList (state = [], action) {
@@ -48,17 +50,17 @@ export default function workspaceContentList (state = [], action) {
       ]
 
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
-      return state.map(c => c.id === action.folderId ? {...c, isOpen: !c.isOpen} : c)
+      return state.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
 
     case `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`:
       return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
-        ? {...wsc, isArchived: true}
+        ? { ...wsc, isArchived: true }
         : wsc
       )
 
     case `${SET}/${WORKSPACE_CONTENT_DELETED}`:
       return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
-        ? {...wsc, isDeleted: true}
+        ? { ...wsc, isDeleted: true }
         : wsc
       )
 

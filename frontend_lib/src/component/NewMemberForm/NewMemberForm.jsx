@@ -1,7 +1,8 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Avatar from '../Avatar/Avatar.jsx'
-import IconWithWarning from '../Icon/IconWithWarning.jsx'
+import ComposedIcon from '../Icon/ComposedIcon.jsx'
+import PropTypes from 'prop-types'
 
 // require('./NewMemberForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -14,7 +15,7 @@ export const NewMemberForm = props => {
       </div>
 
       <div className='memberlist__form__member'>
-        <h4>{props.t('Add a member')}</h4>
+        <div className='memberlist__form__title'>{props.t('Add a member')}</div>
 
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>
@@ -99,8 +100,10 @@ export const NewMemberForm = props => {
               )
               : (
                 <div className='name__adminmsg'>
-                  <IconWithWarning
-                    icon='envelope'
+                  <ComposedIcon
+                    mainIcon='envelope'
+                    smallIcon='warning'
+                    smallIconCustomClass='text-danger'
                   />
                   {props.t("Email notifications are disabled, you can't create new users from here")}
                 </div>
@@ -131,12 +134,18 @@ export const NewMemberForm = props => {
                 </div>
 
                 <div className='item__text'>
-                  <div className='item__text__icon mr-1' style={{color: r.hexcolor}}>
+                  <div className='item__text__icon mr-1' style={{ color: r.hexcolor }}>
                     <i className={`fa fa-fw fa-${r.faIcon}`} />
                   </div>
 
-                  <div className='item__text__name'>
-                    {props.t(r.label) /* this trad key comes from frontend/helper.js, object ROLE */}
+                  <div className='item__text__content'>
+                    <div className='item__text__content__name'>
+                      {props.t(r.label) /* this trad key comes from frontend/helper.js, object ROLE */}
+                    </div>
+
+                    <div className='item__text__content__description'>
+                      {props.t(r.description) /* this trad key comes from frontend/helper.js, object ROLE */}
+                    </div>
                   </div>
                 </div>
               </label>
@@ -160,3 +169,41 @@ export const NewMemberForm = props => {
 }
 
 export default translate()(NewMemberForm)
+
+NewMemberForm.propTypes = {
+  onClickCloseAddMemberBtn: PropTypes.func,
+  nameOrEmail: PropTypes.string,
+  searchedKnownMemberList: PropTypes.arrayOf(PropTypes.object),
+  isEmail: PropTypes.bool,
+  onClickAutoComplete: PropTypes.func,
+  userRoleIdInWorkspace: PropTypes.number,
+  canSendInviteNewUser: PropTypes.bool,
+  emailNotifActivated: PropTypes.bool,
+  roleList: PropTypes.arrayOf(PropTypes.object),
+  autoCompleteClicked: PropTypes.bool,
+  onClickBtnValidate: PropTypes.func,
+  onChangeRole: PropTypes.func,
+  onClickKnownMember: PropTypes.func,
+  onChangeNameOrEmail: PropTypes.func,
+  autoCompleteActive: PropTypes.bool,
+  role: PropTypes.string
+}
+
+NewMemberForm.defaultProps = {
+  nameOrEmail: '',
+  searchedKnownMemberList: [],
+  isEmail: false,
+  userRoleIdInWorkspace: 0,
+  canSendInviteNewUser: false,
+  emailNotifActivated: false,
+  roleList: [],
+  autoCompleteClicked: false,
+  autoCompleteActive: false,
+  role: '',
+  onClickBtnValidate: () => {},
+  onChangeRole: () => {},
+  onClickKnownMember: () => {},
+  onChangeNameOrEmail: () => {},
+  onClickAutoComplete: () => {},
+  onClickCloseAddMemberBtn: () => {},
+}

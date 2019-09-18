@@ -19,8 +19,8 @@ describe('Content list', function () {
     context('as admin', function () {
       beforeEach(function () {
         cy.loginAs('administrators')
-        cy
-          .fixture('baseWorkspace').as('workspace')
+
+        cy.fixture('baseWorkspace').as('workspace')
           .then((workspace) => {
             cy.createHtmlDocument(TITLE, workspace.workspace_id)
             cy.visit(`/ui/workspaces/${workspace.workspace_id}/contents`)
@@ -31,12 +31,14 @@ describe('Content list', function () {
         cy.on('window:before:load', (error, runnable) => {
           assert.isNotOk(true, 'Page reload when clicking and it should not')
         })
-        cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
+
+        cy.get(`.content[title="${TITLE}"] .dropdown`)
           .click()
-        cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
-          .contains(EDIT_LABEL).click()
+
+        cy.get(`.content[title="${TITLE}"] .dropdown`)
+          .contains(EDIT_LABEL)
+          .click()
+
         cy.get('[data-cy=popinFixed]')
       })
 
@@ -55,20 +57,21 @@ describe('Content list', function () {
           .should('not.exist')
       })
 
-      it('button achive should archive content without reload', function () {
-        cy.on('window:before:load', (error, runnable) => {
-          assert.isNotOk(true, 'Page reload when clicking and it should not')
-        })
-        cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
-          .click()
-        cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
-          .contains(ARCHIVE_LABEL).click()
-        cy
-          .get(`.content[title="${TITLE}"]`)
-          .should('not.exist')
-      })
+      // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
+      // it('button achive should archive content without reload', function () {
+      //   cy.on('window:before:load', (error, runnable) => {
+      //     assert.isNotOk(true, 'Page reload when clicking and it should not')
+      //   })
+      //   cy
+      //     .get(`.content[title="${TITLE}"] .dropdown`)
+      //     .click()
+      //   cy
+      //     .get(`.content[title="${TITLE}"] .dropdown`)
+      //     .contains(ARCHIVE_LABEL).click()
+      //   cy
+      //     .get(`.content[title="${TITLE}"]`)
+      //     .should('not.exist')
+      // })
     })
 
     describe('as user', function () {

@@ -2,6 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -13,19 +14,19 @@ class PopinFixedHeader extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.rawTitle !== this.props.rawTitle) this.setState({editTitleValue: this.props.rawTitle})
+    if (prevProps.rawTitle !== this.props.rawTitle) this.setState({ editTitleValue: this.props.rawTitle })
   }
 
   onChangeTitle = e => {
     const newTitle = e.target.value
-    this.setState({editTitleValue: newTitle})
+    this.setState({ editTitleValue: newTitle })
   }
 
   handleClickChangeTitleBtn = () => {
     const { props, state } = this
     if (state.editTitle) {
       props.onValidateChangeTitle(state.editTitleValue)
-      this.setState(prevState => ({editTitle: !prevState.editTitle}))
+      this.setState(prevState => ({ editTitle: !prevState.editTitle }))
       return
     }
 
@@ -50,11 +51,11 @@ class PopinFixedHeader extends React.Component {
   }
 
   render () {
-    const { customClass, customColor, faIcon, rawTitle, componentTitle, userRoleIdInWorkspace, onClickCloseBtn, disableChangeTitle, t } = this.props
+    const { customClass, customColor, faIcon, rawTitle, componentTitle, userRoleIdInWorkspace, onClickCloseBtn, disableChangeTitle, showChangeTitleButton, t } = this.props
     const { state } = this
 
     return (
-      <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{backgroundColor: customColor}}>
+      <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{ backgroundColor: customColor }}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
           <i className={`fa fa-${faIcon}`} />
         </div>
@@ -84,7 +85,7 @@ class PopinFixedHeader extends React.Component {
           </button>
         }
 
-        {userRoleIdInWorkspace >= 2 &&
+        {userRoleIdInWorkspace >= 2 && showChangeTitleButton &&
           <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickChangeTitleBtn}
@@ -117,7 +118,8 @@ PopinFixedHeader.propTypes = {
   componentTitle: PropTypes.element,
   userRoleIdInWorkspace: PropTypes.number,
   onValidateChangeTitle: PropTypes.func,
-  disableChangeTitle: PropTypes.bool
+  disableChangeTitle: PropTypes.bool,
+  showChangeTitleButton: PropTypes.bool
 }
 
 PopinFixedHeader.defaultProps = {
@@ -127,5 +129,6 @@ PopinFixedHeader.defaultProps = {
   componentTitle: <div />,
   userRoleIdInWorkspace: 1,
   onChangeTitle: () => {},
-  disableChangeTitle: false
+  disableChangeTitle: false,
+  showChangeTitleButton: true
 }

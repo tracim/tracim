@@ -11,7 +11,8 @@ import {
   addAllResourceI18n,
   // SelectStatus,
   ArchiveDeleteContent,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -53,15 +54,18 @@ class FolderAdvanced extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data.content}, isVisible: true}))
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) {
+          this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
+        }
         break
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: false})
+        this.setState({ isVisible: false })
         break
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        this.setState(prev => ({ content: { ...prev.content, ...data }, isVisible: true }))
         break
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
@@ -110,19 +114,19 @@ class FolderAdvanced extends React.Component {
     const fetchContentTypeList = await handleFetchResult(await getContentTypeList(state.config.apiUrl))
 
     switch (fetchFolder.apiResponse.status) {
-      case 200: this.setState({content: fetchFolder.body}); break
+      case 200: this.setState({ content: fetchFolder.body }); break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder details'), 'warning')
     }
 
     switch (fetchContentTypeList.apiResponse.status) {
-      case 200: this.setState({tracimContentTypeList: fetchContentTypeList.body.filter(ct => ct.slug !== 'comment')}); break
+      case 200: this.setState({ tracimContentTypeList: fetchContentTypeList.body.filter(ct => ct.slug !== 'comment') }); break
       default: this.sendGlobalFlashMessage(props.t("Error while loading tracim's content type list"), 'warning')
     }
   }
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
   handleSaveEditLabel = async newLabel => {
@@ -132,7 +136,7 @@ class FolderAdvanced extends React.Component {
     )
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
-        this.setState(prev => ({content: {...prev.content, label: newLabel}}))
+        this.setState(prev => ({ content: { ...prev.content, label: newLabel } }))
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new folder label'), 'warning')
@@ -142,13 +146,27 @@ class FolderAdvanced extends React.Component {
   handleClickCheckbox = async appSlug => {
     const { props, state } = this
 
+    // FIXME - G.B. - 2019-08-14 - We need a sub-app system so you don't have to put the hardcoded strings
+    const APP_FILE_SLUG = 'file'
+    const APP_COLLABORATIVE_DOCUMENT_SLUG = 'collaborative_document_edition'
+
     const oldAvailableAppList = state.content.sub_content_types
 
-    const newAvailableAppList = state.content.sub_content_types.find(c => c === appSlug)
-      ? state.content.sub_content_types.filter(c => c !== appSlug)
-      : [...state.content.sub_content_types, appSlug]
+    let newAvailableAppList = []
 
-    this.setState(prev => ({content: {...prev.content, sub_content_types: newAvailableAppList}}))
+    if (state.content.sub_content_types.find(c => c === appSlug)) {
+      newAvailableAppList = state.content.sub_content_types.filter(c => c !== appSlug)
+      if (appSlug === APP_FILE_SLUG) {
+        newAvailableAppList = newAvailableAppList.filter(c => c !== APP_COLLABORATIVE_DOCUMENT_SLUG)
+      }
+    } else {
+      newAvailableAppList = [...state.content.sub_content_types, appSlug]
+      if (appSlug === APP_COLLABORATIVE_DOCUMENT_SLUG) {
+        newAvailableAppList = [...newAvailableAppList, APP_FILE_SLUG]
+      }
+    }
+
+    this.setState(prev => ({ content: { ...prev.content, sub_content_types: newAvailableAppList } }))
 
     const fetchPutWorkspaceLabel = await handleFetchResult(
       await putFolder(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, '', newAvailableAppList)
@@ -160,7 +178,7 @@ class FolderAdvanced extends React.Component {
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while saving new available apps list'), 'warning')
-        this.setState(prev => ({content: {...prev.content, sub_content_types: oldAvailableAppList}}))
+        this.setState(prev => ({ content: { ...prev.content, sub_content_types: oldAvailableAppList } }))
         break
     }
   }
@@ -184,7 +202,7 @@ class FolderAdvanced extends React.Component {
     const fetchResultArchive = await putFolderIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: true } }))
         this.loadContent()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while archiving folder'), 'warning')
@@ -197,7 +215,7 @@ class FolderAdvanced extends React.Component {
     const fetchResultArchive = await putFolderIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
         this.loadContent()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting folder'), 'warning')
@@ -210,7 +228,7 @@ class FolderAdvanced extends React.Component {
     const fetchResultRestore = await putFolderRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
         this.loadContent()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring folder'), 'warning')
@@ -223,7 +241,7 @@ class FolderAdvanced extends React.Component {
     const fetchResultRestore = await putFolderRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
         this.loadContent()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring folder'), 'warning')

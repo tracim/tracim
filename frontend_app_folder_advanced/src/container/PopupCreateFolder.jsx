@@ -59,7 +59,7 @@ class PopupCreateFolder extends React.Component {
     }
   })
 
-  handleChangeNewFolderName = e => this.setState({newFolderName: e.target.value})
+  handleChangeNewFolderName = e => this.setState({ newFolderName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,

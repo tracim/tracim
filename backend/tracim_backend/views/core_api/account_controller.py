@@ -28,6 +28,7 @@ from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
@@ -156,6 +157,7 @@ class AccountController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_CONTENT_ENDPOINTS])
     @check_right(is_user)
+    @hapic.input_query(UserWorkspaceFilterQuerySchema())
     @hapic.output_body(WorkspaceDigestSchema(many=True))
     def account_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -165,8 +167,11 @@ class AccountController(Controller):
         wapi = WorkspaceApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-
-        workspaces = wapi.get_all_for_user(request.current_user)
+        workspaces = wapi.get_all_for_user(
+            request.current_user,
+            include_owned=hapic_data.query.show_owned_workspace,
+            include_with_role=hapic_data.query.show_workspace_with_role,
+        )
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_CONTENT_ENDPOINTS])

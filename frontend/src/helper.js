@@ -4,6 +4,7 @@ const configEnv = require('../configEnv.json')
 
 const versionFile = require('./version.json')
 export const TRACIM_APP_VERSION = versionFile.tracim_app_version
+export const SHARE_FOLDER_ID = -1
 
 // this function is declared in i18n to avoid cyclic imports and reexported here for consistency
 export { getBrowserLang }
@@ -34,7 +35,9 @@ export const PAGE = {
     AGENDA: (idws = ':idws') => `/ui/workspaces/${idws}/agenda`,
     CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
     CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
-    ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`
+    SHARE_FOLDER: (idws = ':idws') => `/ui/workspaces/${idws}/contents/share_folder`,
+    ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
+    CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',
@@ -48,44 +51,69 @@ export const PAGE = {
     USER: '/ui/admin/user',
     USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
   },
-  SEARCH_RESULT: '/ui/search-result'
+  SEARCH_RESULT: '/ui/search-result',
+  GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
+  GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`
 }
 
-export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF, PAGE.RESET_PASSWORD]
+export const unLoggedAllowedPageList = [
+  PAGE.LOGIN,
+  PAGE.FORGOT_PASSWORD,
+  PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF,
+  PAGE.RESET_PASSWORD,
+  PAGE.GUEST_UPLOAD(''),
+  PAGE.GUEST_DOWNLOAD('')
+]
 
 export const ROLE = [{
   id: 8,
   slug: 'workspace-manager',
   faIcon: 'gavel',
   hexcolor: '#ed0007',
-  tradKey: i18n.t('Shared space manager'), // trad key allow the parser to generate an entry in the json file
-  label: 'Shared space manager' // label must be used in components
+  tradKey: [
+    i18n.t('Shared space manager'),
+    i18n.t('Content manager + add members and edit shared spaces')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Shared space manager', // label must be used in components
+  description: 'Content manager + add members and edit shared spaces'
 }, {
   id: 4,
   slug: 'content-manager',
   faIcon: 'graduation-cap',
   hexcolor: '#f2af2d',
-  tradKey: i18n.t('Content manager'), // trad key allow the parser to generate an entry in the json file
-  label: 'Content manager' // label must be used in components
+  tradKey: [
+    i18n.t('Content manager'),
+    i18n.t('Contributor + create folders and manage contents')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Content manager', // label must be used in components
+  description: 'Contributor + create folders and manage contents'
 }, {
   id: 2,
   slug: 'contributor',
   faIcon: 'pencil',
   hexcolor: '#3145f7',
-  tradKey: i18n.t('Contributor'), // trad key allow the parser to generate an entry in the json file
-  label: 'Contributor' // label must be used in components
+  tradKey: [
+    i18n.t('Contributor'),
+    i18n.t('Reader + create/modify content')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Contributor', // label must be used in components
+  description: 'Reader + create/modify content'
 }, {
   id: 1,
   slug: 'reader',
   faIcon: 'eye',
   hexcolor: '#15d948',
-  tradKey: i18n.t('Reader'), // trad key allow the parser to generate an entry in the json file
-  label: 'Reader' // label must be used in components
+  tradKey: [
+    i18n.t('Reader'),
+    i18n.t('Read contents')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Reader', // label must be used in components
+  description: 'Read contents'
 }]
 
 export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
-  const user = memberList.find(u => u.id === userId) || {role: 'reader'}
-  return (roleList.find(r => user.role === r.slug) || {id: 1}).id
+  const user = memberList.find(u => u.id === userId) || { role: 'reader' }
+  return (roleList.find(r => user.role === r.slug) || { id: 1 }).id
 }
 
 export const ROLE_OBJECT = {
@@ -129,24 +157,36 @@ export const PROFILE = {
     slug: 'administrators',
     faIcon: 'shield',
     hexcolor: '#ed0007',
-    tradKey: i18n.t('Administrator'), // trad key allow the parser to generate an entry in the json file
-    label: 'Administrator' // label must be used in components
+    tradKey: [
+      i18n.t('Administrator'),
+      i18n.t('Trusted user + create users, administration of instance')
+    ], // trad key allow the parser to generate an entry in the json file
+    label: 'Administrator', // label must be used in components
+    description: 'Trusted user + create users, administration of instance'
   },
   MANAGER: {
     id: 2,
     slug: 'trusted-users',
     faIcon: 'graduation-cap',
     hexcolor: '#f2af2d',
-    tradKey: i18n.t('Trusted user'), // trad key allow the parser to generate an entry in the json file
-    label: 'Trusted user' // label must be used in components
+    tradKey: [
+      i18n.t('Trusted user'),
+      i18n.t('User + create shared spaces, add members in shared spaces')
+    ], // trad key allow the parser to generate an entry in the json file
+    label: 'Trusted user', // label must be used in components
+    description: 'User + create shared spaces, add members in shared spaces'
   },
   USER: {
     id: 4,
     slug: 'users',
     faIcon: 'user',
     hexcolor: '#3145f7',
-    tradKey: i18n.t('User'), // trad key allow the parser to generate an entry in the json file
-    label: 'User' // label must be used in components
+    tradKey: [
+      i18n.t('User'),
+      i18n.t('Access to shared spaces where user is member')
+    ], // trad key allow the parser to generate an entry in the json file
+    label: 'User', // label must be used in components
+    description: 'Access to shared spaces where user is member'
   }
 }
 
@@ -182,10 +222,18 @@ export const DRAG_AND_DROP = {
 const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Dashboard'),
   i18n.t('All Contents'),
-  i18n.t('Open'),
+  i18n.t('Opened'),
   i18n.t('Validated'),
   i18n.t('Cancelled'),
   i18n.t('Deprecated')
 ]
 
 export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'
+
+export const sortWorkspaceContents = (a, b) => {
+  if (a.type === 'folder' && b.type !== 'folder') return -1
+  if (b.type === 'folder' && a.type !== 'folder') return 1
+  if (a.label > b.label) return 1
+  if (b.label > a.label) return -1
+  return 0
+}

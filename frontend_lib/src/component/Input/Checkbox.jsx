@@ -50,7 +50,7 @@ export const Checkbox = props =>
   >
     {props.checked && (
       <div
-        className='checboxCustom__checked'
+        className='checkboxCustom__checked'
         style={{
           ...style.checked,
           ...(props.disabled ? style.disabled : {}),

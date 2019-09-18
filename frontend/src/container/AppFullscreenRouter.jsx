@@ -14,7 +14,7 @@ class AppFullscreenRouter extends React.Component {
     }
   }
 
-  componentDidMount = () => this.setState({isMounted: true})
+  componentDidMount = () => this.setState({ isMounted: true })
 
   componentWillUnmount = () => {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
@@ -29,26 +29,26 @@ class AppFullscreenRouter extends React.Component {
         {this.state.isMounted && (// we must wait for the component to be fully mounted to be sure the div#appFullscreenContainer exists in DOM
           <div className='emptyDivForRoute'>
             <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => {
-              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/ui'}} />
+              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{ pathname: '/ui' }} />
 
               const content = {
                 workspaceList: [],
                 userList: []
               }
 
-              props.renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'workspace'}, props.user, content)
+              props.renderAppFullscreen({ slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'workspace' }, props.user, content)
               return null
             }} />
 
             <Route exact path={PAGE.ADMIN.USER} render={() => {
-              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/ui'}} />
+              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{ pathname: '/ui' }} />
 
               const content = {
                 workspaceList: [],
                 userList: []
               }
 
-              props.renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'user'}, props.user, content)
+              props.renderAppFullscreen({ slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'user' }, props.user, content)
               return null
             }} />
 
@@ -57,7 +57,7 @@ class AppFullscreenRouter extends React.Component {
                 workspaceId: null,
                 forceShowSidebar: true
               }
-              props.renderAppFullscreen({slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig}, props.user, {})
+              props.renderAppFullscreen({ slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig }, props.user, {})
               return null
             }} />
 
@@ -66,7 +66,16 @@ class AppFullscreenRouter extends React.Component {
                 workspaceId: props.match.params.idws,
                 forceShowSidebar: false
               }
-              props.renderAppFullscreen({slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig}, props.user, {})
+              props.renderAppFullscreen({ slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig }, props.user, {})
+              return null
+            }} />
+
+            <Route path={PAGE.WORKSPACE.CONTENT_EDITION(':idws', ':idcts')} render={({ match }) => {
+              const content = {
+                workspace_id: match.params.idws,
+                content_id: match.params.idcts
+              }
+              props.renderAppFullscreen({ slug: 'collaborative_document_edition', hexcolor: '#7d4e24' }, props.user, content)
               return null
             }} />
           </div>

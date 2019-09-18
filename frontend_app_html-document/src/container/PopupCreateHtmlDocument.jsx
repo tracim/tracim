@@ -50,7 +50,7 @@ class PopupCreateHtmlDocument extends React.Component {
     }
   }
 
-  handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
+  handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,

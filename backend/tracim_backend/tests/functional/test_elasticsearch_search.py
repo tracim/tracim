@@ -21,6 +21,12 @@ class TestElasticSearchSearch(object):
             ("testdocument", "testdoc", 1, "testdocument"),
             # # autocomplete with multi result (can't check result order now)
             ("testdocument", "test", 2, None),
+            (
+                "a50charslongdocumentnamewithexactlyfiftycharacters",
+                "a50charslongdocumentnamewithexactlyfiftycharacters",
+                1,
+                "a50charslongdocumentnamewithexactlyfiftycharacters",
+            ),
         ],
     )
     def test_api___elasticsearch_search_ok__by_label(

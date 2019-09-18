@@ -1,5 +1,5 @@
 import React from 'react'
-import WorkspaceAdvancedComponent from '../component/WorkspaceAdvancedComponent.jsx'
+import WorkspaceAdvancedConfiguration from '../component/WorkspaceAdvancedConfiguration.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
@@ -9,7 +9,9 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
-  CUSTOM_EVENT
+  PopinFixedRightPart,
+  CUSTOM_EVENT,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -18,6 +20,8 @@ import {
   putLabel,
   putDescription,
   putAgendaEnabled,
+  putDownloadEnabled,
+  putUploadEnabled,
   putMemberRole,
   deleteMember,
   getMyselfKnownMember,
@@ -26,6 +30,8 @@ import {
   getAppList
 } from '../action.async.js'
 import Radium from 'radium'
+import WorkspaceMembersList from '../component/WorkspaceMembersList.jsx'
+import OptionalFunctionalities from '../component/OptionalFunctionalities.jsx'
 
 class WorkspaceAdvanced extends React.Component {
   constructor (props) {
@@ -62,16 +68,21 @@ class WorkspaceAdvanced extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: true})
-        this.loadContent()
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) {
+          this.setState({ isVisible: true })
+          this.buildBreadcrumbs()
+        }
+        // this.setState({ isVisible: true })
+        // this.loadContent()
         break
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: false})
+        this.setState({ isVisible: false })
         break
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        this.setState(prev => ({ content: { ...prev.content, ...data }, isVisible: true }))
         break
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
@@ -149,7 +160,7 @@ class WorkspaceAdvanced extends React.Component {
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
   handleSaveEditLabel = async newLabel => {
@@ -158,7 +169,7 @@ class WorkspaceAdvanced extends React.Component {
 
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
-        this.setState(prev => ({content: {...prev.content, label: newLabel}}))
+        this.setState(prev => ({ content: { ...prev.content, label: newLabel } }))
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
@@ -166,11 +177,11 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  handleClickToggleFormNewMember = () => this.setState(prev => ({displayFormNewMember: !prev.displayFormNewMember}))
+  handleClickToggleFormNewMember = () => this.setState(prev => ({ displayFormNewMember: !prev.displayFormNewMember }))
 
   handleChangeDescription = e => {
     const newDescription = e.target.value
-    this.setState(prev => ({content: {...prev.content, description: newDescription}}))
+    this.setState(prev => ({ content: { ...prev.content, description: newDescription } }))
   }
 
   handleClickValidateNewDescription = async () => {
@@ -181,6 +192,7 @@ class WorkspaceAdvanced extends React.Component {
       case 200:
         this.sendGlobalFlashMessage(props.t('Save successful', 'info'))
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new description', 'warning'))
     }
@@ -195,7 +207,7 @@ class WorkspaceAdvanced extends React.Component {
         this.setState(prev => ({
           content: {
             ...prev.content,
-            memberList: prev.content.memberList.map(m => m.user_id === memberId ? {...m, role: slugNewRole} : m)
+            memberList: prev.content.memberList.map(m => m.user_id === memberId ? { ...m, role: slugNewRole } : m)
           }
         }))
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, data: {} })
@@ -209,7 +221,7 @@ class WorkspaceAdvanced extends React.Component {
     const oldAgendaEnabledValue = state.content.agenda_enabled
     const newAgendaEnabledValue = !state.content.agenda_enabled
 
-    this.setState(prev => ({content: {...prev.content, agenda_enabled: newAgendaEnabledValue}}))
+    this.setState(prev => ({ content: { ...prev.content, agenda_enabled: newAgendaEnabledValue } }))
     const fetchToggleAgendaEnabled = await handleFetchResult(await putAgendaEnabled(state.config.apiUrl, state.content, newAgendaEnabledValue))
 
     switch (fetchToggleAgendaEnabled.apiResponse.status) {
@@ -221,7 +233,7 @@ class WorkspaceAdvanced extends React.Component {
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
         break
       default:
-        this.setState(prev => ({content: {...prev.content, agenda_enabled: oldAgendaEnabledValue}}))
+        this.setState(prev => ({ content: { ...prev.content, agenda_enabled: oldAgendaEnabledValue } }))
         this.sendGlobalFlashMessage(
           newAgendaEnabledValue
             ? props.t('Error while activating agenda')
@@ -231,7 +243,61 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  handleClickNewMemberRole = slugRole => this.setState(prev => ({newMember: {...prev.newMember, role: slugRole}}))
+  handleToggleUploadEnabled = async () => {
+    const { props, state } = this
+    const oldUploadEnabledValue = state.content.public_upload_enabled
+    const newUploadEnabledValue = !state.content.public_upload_enabled
+
+    this.setState(prev => ({ content: { ...prev.content, public_upload_enabled: newUploadEnabledValue } }))
+    const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))
+
+    switch (fetchToggleUploadEnabled.apiResponse.status) {
+      case 200:
+        this.sendGlobalFlashMessage(
+          newUploadEnabledValue ? props.t('Upload activated') : props.t('Upload deactivated'),
+          'info'
+        )
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        break
+      default:
+        this.setState(prev => ({ content: { ...prev.content, public_upload_enabled: oldUploadEnabledValue } }))
+        this.sendGlobalFlashMessage(
+          newUploadEnabledValue
+            ? props.t('Error while activating upload')
+            : props.t('Error while deactivating upload'),
+          'warning'
+        )
+    }
+  }
+
+  handleToggleDownloadEnabled = async () => {
+    const { props, state } = this
+    const oldDownloadEnabledValue = state.content.public_download_enabled
+    const newDownloadEnabledValue = !state.content.public_download_enabled
+
+    this.setState(prev => ({ content: { ...prev.content, public_download_enabled: newDownloadEnabledValue } }))
+    const fetchToggleDownloadEnabled = await handleFetchResult(await putDownloadEnabled(state.config.apiUrl, state.content, newDownloadEnabledValue))
+
+    switch (fetchToggleDownloadEnabled.apiResponse.status) {
+      case 200:
+        this.sendGlobalFlashMessage(
+          newDownloadEnabledValue ? props.t('Download activated') : props.t('Download deactivated'),
+          'info'
+        )
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        break
+      default:
+        this.setState(prev => ({ content: { ...prev.content, public_download_enabled: oldDownloadEnabledValue } }))
+        this.sendGlobalFlashMessage(
+          newDownloadEnabledValue
+            ? props.t('Error while activating download')
+            : props.t('Error while deactivating download'),
+          'warning'
+        )
+    }
+  }
+
+  handleClickNewMemberRole = slugRole => this.setState(prev => ({ newMember: { ...prev.newMember, role: slugRole } }))
 
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
 
@@ -247,7 +313,7 @@ class WorkspaceAdvanced extends React.Component {
 
     if (newNameOrEmail.length >= 2) {
       await this.handleSearchUser(newNameOrEmail)
-      this.setState({autoCompleteFormNewMemberActive: true})
+      this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
 
@@ -274,7 +340,7 @@ class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
     const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, userNameToSearch, state.content.workspace_id))
     switch (fetchUserKnownMemberList.apiResponse.status) {
-      case 200: this.setState({searchedKnownMemberList: fetchUserKnownMemberList.body}); break
+      case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.body }); break
       default: this.sendGlobalFlashMessage(props.t('Error while fetching known members list', 'warning'))
     }
   }
@@ -322,7 +388,7 @@ class WorkspaceAdvanced extends React.Component {
     }
 
     if (state.newMember.id === '' && newMemberInKnownMemberList) { // this is to force sending the id of the user to the api if he exists
-      this.setState({newMember: {...state.newMember, id: newMemberInKnownMemberList.user_id}})
+      this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
     const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
@@ -369,9 +435,9 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  handleClickDeleteWorkspaceBtn = () => this.setState({displayPopupValidateDeleteWorkspace: true})
+  handleClickDeleteWorkspaceBtn = () => this.setState({ displayPopupValidateDeleteWorkspace: true })
 
-  handleClickClosePopupDeleteWorkspace = () => this.setState({displayPopupValidateDeleteWorkspace: false})
+  handleClickClosePopupDeleteWorkspace = () => this.setState({ displayPopupValidateDeleteWorkspace: false })
 
   handleClickValidateDeleteWorkspace = async () => {
     const { props, state } = this
@@ -379,7 +445,7 @@ class WorkspaceAdvanced extends React.Component {
     const fetchDeleteWorkspace = await deleteWorkspace(state.config.apiUrl, state.content.workspace_id)
     switch (fetchDeleteWorkspace.status) {
       case 204:
-        GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST_THEN_REDIRECT, data: {url: '/ui'}})
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST_THEN_REDIRECT, data: { url: '/ui' } })
         // GLOBAL_dispatchEvent({type: 'refreshWorkspaceList', data: {}})
         this.handleClickBtnCloseApp()
         break
@@ -391,7 +457,7 @@ class WorkspaceAdvanced extends React.Component {
     const { state } = this
 
     if (!state.isVisible) return null
-
+    console.log(state.content.public_download_enabled)
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -418,42 +484,67 @@ class WorkspaceAdvanced extends React.Component {
         <PopinFixedContent
           customClass={`${state.config.slug}__contentpage`}
         >
-          <WorkspaceAdvancedComponent
+          <WorkspaceAdvancedConfiguration
             customColor={state.config.hexcolor}
             description={state.content.description}
-            roleList={state.config.roleList}
-            memberList={state.content.memberList}
-            agendaEnabled={state.content.agenda_enabled}
-            appAgendaAvailable={state.content.appAgendaAvailable}
-            displayFormNewMember={state.displayFormNewMember}
-            autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-            newMemberName={state.newMember.nameOrEmail}
-            isEmail={state.newMember.isEmail}
-            newMemberRole={state.newMember.role}
-            searchedKnownMemberList={state.searchedKnownMemberList}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
-            loggedUser={state.loggedUser}
-            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-            canSendInviteNewUser={
-              [state.config.profileObject.ADMINISTRATOR.slug, state.config.profileObject.MANAGER.slug].includes(state.loggedUser.profile)
-            }
-            emailNotifActivated={state.config.system.config.email_notification_activated}
-            autoCompleteClicked={state.autoCompleteClicked}
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
-            onClickNewRole={this.handleClickNewRole}
-            onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-            onClickNewMemberRole={this.handleClickNewMemberRole}
-            onClickDeleteMember={this.handleClickDeleteMember}
-            onClickKnownMember={this.handleClickKnownMember}
-            onClickValidateNewMember={this.handleClickValidateNewMember}
             onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
             onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
             onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
-            onClickAutoComplete={this.handleClickAutoComplete}
             onChangeDescription={this.handleChangeDescription}
-            onChangeNewMemberName={this.handleChangeNewMemberName}
-            onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
             key={'workspace_advanced'}
+          />
+
+          <PopinFixedRightPart
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            menuItemList={[
+              {
+                id: 'members_list',
+                label: this.props.t('Members List'),
+                icon: 'fa-users',
+                children: <WorkspaceMembersList
+                  displayFormNewMember={state.displayFormNewMember}
+                  memberList={state.content.memberList}
+                  roleList={state.config.roleList}
+                  onClickNewRole={this.handleClickNewRole}
+                  loggedUser={state.loggedUser}
+                  onClickDeleteMember={this.handleClickDeleteMember}
+                  onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
+                  newMemberName={state.newMember.nameOrEmail}
+                  isEmail={state.newMember.isEmail}
+                  onChangeNewMemberName={this.handleChangeNewMemberName}
+                  searchedKnownMemberList={state.searchedKnownMemberList}
+                  onClickKnownMember={this.handleClickKnownMember}
+                  newMemberRole={state.newMember.role}
+                  onClickNewMemberRole={this.handleClickNewMemberRole}
+                  onClickValidateNewMember={this.handleClickValidateNewMember}
+                  autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+                  emailNotifActivated={state.config.system.config.email_notification_activated}
+                  canSendInviteNewUser={
+                    [state.config.profileObject.ADMINISTRATOR.slug, state.config.profileObject.MANAGER.slug].includes(state.loggedUser.profile)
+                  }
+                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                  autoCompleteClicked={state.autoCompleteClicked}
+                  onClickAutoComplete={this.handleClickAutoComplete}
+                />
+              },
+              {
+                id: 'optional_functionalities',
+                label: this.props.t('Optional Functionalities'),
+                icon: 'fa-cog',
+                children: <OptionalFunctionalities
+                  appAgendaAvailable={state.content.appAgendaAvailable}
+                  agendaEnabled={state.content.agenda_enabled}
+                  onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
+                  downloadEnabled={state.content.public_download_enabled}
+                  onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
+                  uploadEnabled={state.content.public_upload_enabled}
+                  onToggleUploadEnabled={this.handleToggleUploadEnabled}
+                />
+              }
+            ]}
           />
         </PopinFixedContent>
       </PopinFixed>

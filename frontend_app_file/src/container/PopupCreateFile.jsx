@@ -1,12 +1,12 @@
 import React from 'react'
+import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
   addAllResourceI18n,
+  FileDropzone,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
-import i18n from '../i18n.js'
-import FileDropzone from '../component/FileDropzone.jsx'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
 // https://github.com/tracim/tracim/issues/2066
@@ -72,14 +72,14 @@ class PopupCreateFile extends React.Component {
       return
     }
 
-    this.setState({uploadFile: fileToSave})
+    this.setState({ uploadFile: fileToSave })
 
     var reader = new FileReader()
     reader.onload = e => {
-      this.setState({uploadFilePreview: e.total > 0 ? e.target.result : false})
+      this.setState({ uploadFilePreview: e.total > 0 ? e.target.result : false })
       const img = new Image()
       img.src = e.target.result
-      img.onerror = () => this.setState({uploadFilePreview: false})
+      img.onerror = () => this.setState({ uploadFilePreview: false })
     }
     reader.readAsDataURL(fileToSave)
   }
@@ -116,10 +116,10 @@ class PopupCreateFile extends React.Component {
 
     // fetch still doesn't handle event progress. So we need to use old school xhr object
     const xhr = new XMLHttpRequest()
-    xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
-    const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: true, percent: Math.round(e.loaded / e.total * 100)}})
+    xhr.upload.addEventListener('loadstart', () => this.setState({ progressUpload: { display: false, percent: 0 } }), false)
+    const uploadInProgress = e => e.lengthComputable && this.setState({ progressUpload: { display: true, percent: Math.round(e.loaded / e.total * 100) } })
     xhr.upload.addEventListener('progress', uploadInProgress, false)
-    xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
+    xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: false, percent: 0 } }), false)
 
     xhr.open('POST', `${state.config.apiUrl}/workspaces/${state.workspaceId}/files`, true)
 
@@ -187,7 +187,7 @@ class PopupCreateFile extends React.Component {
         contentName={state.uploadFile ? 'allowValidate' : ''} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
         btnValidateLabel={props.t('Validate and create')}
-        customStyle={{top: 'calc(50% - 177px)'}}
+        customStyle={{ top: 'calc(50% - 177px)' }}
       >
         <div>
           {state.progressUpload.display &&
