@@ -16,7 +16,7 @@ Test  tracim on your computer with docker:
 ```
 mkdir -p ~/tracim/etc
 mkdir -p ~/tracim/var
-docker run -e DATABASE_TYPE=sqlite -e START_CALDAV=1 -p 8080:80 -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
+docker run -e DATABASE_TYPE=sqlite -p 8080:80 -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 ```
 
 Then visit the url http://localhost:8080 and login in to tracim:
@@ -39,6 +39,17 @@ Tracim is distributed under the terms of 3 distinct licenses:
 In order to contribute to tracim source_code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
 
 ## Advanced - Install tracim from the sources
+
+OS compatibility (tested on):
+
+- Debian:
+  - Jessie (8)
+  - Stretch (9)
+  - Buster (10)
+- Ubuntu:
+  - Trusty (14.04)
+  - Xenia (16.04)
+  - Bionic (18.04)
 
 ### Get the source
 

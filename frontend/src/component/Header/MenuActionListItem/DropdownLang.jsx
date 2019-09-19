@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 require('./DropdownLang.styl')
 
 const DropdownLang = props => {
-  const activeLang = props.langList.find(l => l.id === props.idLangActive)
+  const activeLang = props.langList.find(l => l.id === props.langActiveId)
   return (
     <li className='dropdownlang'>
       <div className='dropdownlang__dropdown dropdown'>
@@ -21,7 +21,7 @@ const DropdownLang = props => {
         </button>
 
         <div className='dropdownlang__dropdown__subdropdown dropdown-menu' aria-labelledby='headerDropdownMenuButton'>
-          {props.langList.filter(l => l.id !== props.idLangActive).map(l =>
+          {props.langList.filter(l => l.id !== props.langActiveId).map(l =>
             <div
               className='dropdownlang__dropdown__subdropdown__link primaryColorBgLightenHover dropdown-item'
               onClick={() => props.onChangeLang(l.id)}
@@ -40,6 +40,6 @@ export default DropdownLang
 
 DropdownLang.propTypes = {
   langList: PropTypes.array.isRequired,
-  idLangActive: PropTypes.string.isRequired,
+  langActiveId: PropTypes.string.isRequired,
   onChangeLang: PropTypes.func.isRequired
 }

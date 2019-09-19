@@ -63,7 +63,9 @@ folderopen()
       .folder__header__triangleborder
         border-top-color inherit
         &__triangle
-          border-top-color inherit
+          // INFO - CH - 2019-08-07 - In the HTML, the .folder__header__triangleborder__triangle class also has .primaryColorFontLighten
+          // So it always has it's font in the primary color but only uses it as border color on mousehover through "currentColor"
+          border-top-color currentColor
     &__triangleborder
       display none
       position absolute
@@ -100,6 +102,8 @@ folderopen()
       color darkGrey
       text-align center
     &__name
+      flex 1
+      width 0 // INFO - CH - 2019-07-04 - this allows the text-overflow ellipsis
       margin 0 15px 0 0
       padding 5px
       white-space nowrap

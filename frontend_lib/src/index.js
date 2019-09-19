@@ -6,10 +6,17 @@ import {
   convertBackslashNToBr,
   revisionTypeList,
   generateLocalStorageContentId,
+  generateRandomPassword,
   appFeatureCustomEventHandlerShowApp,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  FETCH_CONFIG,
+  displayFileSize,
+  parserStringToList,
+  checkEmailValidity
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
+
+import { defaultDebug } from './debug.js'
 
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
@@ -17,6 +24,7 @@ import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
+import PopinFixedRightPart from './component/PopinFixed/PopinFixedRightPart.jsx'
 
 import Avatar from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
@@ -46,17 +54,31 @@ import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
 
 import IconButton from './component/Button/IconButton.jsx'
-import IconWithWarning from './component/Icon/IconWithWarning.jsx'
+import ComposedIcon from './component/Icon/ComposedIcon.jsx'
+
+import GenericButton from './component/Button/GenericButton.jsx'
+
 import DisplayState from './component/DisplayState/DisplayState.jsx'
+
+import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
+
+import ShareDownload from './component/ShareDownload/ShareDownload.jsx'
+import ShareLink from './component/ShareLink/ShareLink.jsx'
+
+import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
+
+import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
-    case 'allApp_changeLang': i18n.changeLanguage(data); break
+    case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+      i18n.changeLanguage(data)
+      break
     default: break
   }
 }
 
-document.addEventListener('appCustomEvent', customEventReducer)
+document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, customEventReducer)
 
 export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
@@ -68,11 +90,13 @@ export {
   convertBackslashNToBr,
   revisionTypeList,
   generateLocalStorageContentId,
+  generateRandomPassword,
   Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
+  PopinFixedRightPart,
   Avatar,
   Badge,
   Timeline,
@@ -86,15 +110,26 @@ export {
   CardPopup,
   CardPopupCreateContent,
   NewVersionBtn,
+  GenericButton,
   ArchiveDeleteContent,
   SelectStatus,
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
   CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
+  FETCH_CONFIG,
+  displayFileSize,
+  parserStringToList,
+  checkEmailValidity,
+  defaultDebug,
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,
   IconButton,
-  IconWithWarning,
-  DisplayState
+  ComposedIcon,
+  DisplayState,
+  FileDropzone,
+  ShareLink,
+  ShareDownload,
+  ProgressBar,
+  RadioBtnGroup
 }

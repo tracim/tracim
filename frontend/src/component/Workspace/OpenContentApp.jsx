@@ -4,12 +4,13 @@ import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
 import { ROLE, findUserRoleIdInWorkspace } from '../../helper.js'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
     const {
-      idWorkspace,
+      workspaceId,
       appOpenedType,
       user,
       currentWorkspace,
@@ -19,27 +20,34 @@ export class OpenContentApp extends React.Component {
       match
     } = this.props
 
-    if (isNaN(idWorkspace) || idWorkspace === -1) return
+    if (isNaN(workspaceId) || workspaceId === -1) return
 
     if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents') {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
 
       const contentToOpen = {
         content_id: parseInt(match.params.idcts),
-        workspace_id: parseInt(idWorkspace),
+        workspace_id: parseInt(workspaceId),
         type: match.params.type
       }
 
       console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
       if (appOpenedType === contentToOpen.type) { // app already open
-        dispatchCustomEvent(`${contentToOpen.type}_reloadContent`, contentToOpen)
+        dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(contentToOpen.type), contentToOpen)
       } else { // open another app
         // if another app is already visible, hide it
-        if (appOpenedType !== false) dispatchCustomEvent(`${appOpenedType}_hideApp`, {})
+        if (appOpenedType !== false) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
+
+        const contentInfomations = {
+          ...contentType.find(ct => ct.slug === contentToOpen.type),
+          workspace: {
+            downloadEnabled: currentWorkspace.downloadEnabled
+          }
+        }
         // open app
         renderAppFeature(
-          contentType.find(ct => ct.slug === contentToOpen.type),
+          contentInfomations,
           user,
           findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE),
           contentToOpen
@@ -75,6 +83,12 @@ export class OpenContentApp extends React.Component {
 }
 
 const mapStateToProps = ({ user, currentWorkspace, contentType }) => ({
-  user, currentWorkspace, contentType
+  user,
+  currentWorkspace,
+  contentType: [
+    ...contentType,
+    // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
+    HACK_COLLABORA_CONTENT_TYPE(contentType)
+  ]
 })
 export default withRouter(connect(mapStateToProps)(appFactory(OpenContentApp)))

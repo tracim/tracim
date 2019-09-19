@@ -64,10 +64,14 @@
             &__item
               display flex
               align-items center
+              margin-bottom 0px
               margin-top 10px
               cursor pointer
-              & > input
-                cursor pointer
+              &__content
+                &__description
+                  color grey
+                & > input
+                  cursor pointer
   &__delimiter
     margin 50px auto
   &__table
@@ -78,9 +82,10 @@
       &.user-deactivated
         color #bbb
       &__td-link
-        cursor pointer
         & > a
           color fontColor
+          width 100%
+          display block
         &:not(:hover)
           color inherit
         & > i
@@ -102,12 +107,14 @@
     & .table
       &__id
         width 5%
+        text-align right
       &__sharedSpace
         width 15%
       &__description
         width 60%
       &__memberCount
         width 10%
+        text-align right
       &__delete
         width 10%
 

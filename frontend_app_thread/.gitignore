@@ -2,6 +2,7 @@
 .idea/
 .git/
 node_modules/
+src/debug.js
 dist/thread.app.js
 dist/thread.app.js.map
 dist/thread.app.dev.js

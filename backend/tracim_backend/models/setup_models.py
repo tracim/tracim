@@ -12,6 +12,8 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 import zope.sqlalchemy
 
+from tracim_backend.applications.share.models import ContentShare  # noqa: F401
+from tracim_backend.applications.upload_permissions.models import UploadPermission  # noqa: F401
 from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.models.auth import Group  # noqa: F401
 from tracim_backend.models.auth import Permission  # noqa: F401
@@ -29,7 +31,7 @@ if typing.TYPE_CHECKING:
 configure_mappers()
 
 
-def get_engine(app_config: "CFG", prefix="sqlalchemy.") -> Engine:
+def get_engine(app_config: "CFG", prefix="sqlalchemy.", **kwargs) -> Engine:
     sqlalchemy_params = sliced_dict(
         app_config.__dict__, beginning_key_string=prefix.upper().replace(".", "__")
     )
@@ -40,7 +42,7 @@ def get_engine(app_config: "CFG", prefix="sqlalchemy.") -> Engine:
         new_key = key.lower().replace("__", ".")
         new_config[new_key] = value
 
-    return engine_from_config(new_config, prefix=prefix)
+    return engine_from_config(new_config, prefix=prefix, **kwargs)
 
 
 def get_session_factory(engine) -> sessionmaker:

@@ -2,5 +2,6 @@
 .idea/
 .git/
 node_modules/
+src/debug.js
 dist/folder.app.js
 dist/folder_advanced.app.dev.js

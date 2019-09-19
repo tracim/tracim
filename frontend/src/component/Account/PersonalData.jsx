@@ -17,11 +17,11 @@ export class PersonalData extends React.Component {
     }
   }
 
-  handleChangeName = e => this.setState({newName: e.target.value})
+  handleChangeName = e => this.setState({ newName: e.target.value })
 
-  handleChangeEmail = e => this.setState({newEmail: e.target.value})
+  handleChangeEmail = e => this.setState({ newEmail: e.target.value })
 
-  handleChangeCheckPassword = e => this.setState({checkPassword: e.target.value})
+  handleChangeCheckPassword = e => this.setState({ checkPassword: e.target.value })
 
   handleClickSubmit = async () => {
     const { props, state } = this

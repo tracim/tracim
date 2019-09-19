@@ -15,6 +15,7 @@ from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
+from tracim_backend.lib.collaborative_document_edition.data import COLLABORA_DOCUMENT_EDITION_SLUG
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
@@ -140,11 +141,24 @@ class CFG(object):
             ),
         )
         self._load_global_config()
+        self._load_limitation_config()
         self._load_email_config()
         self._load_ldap_config()
         self._load_webdav_config()
         self._load_caldav_config()
         self._load_search_config()
+        self._load_collaborative_document_edition_config()
+
+        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+        # to make thing easier later
+        # when app will be load dynamycally.
+        import tracim_backend.applications.share.config as share_app_config
+
+        share_app_config.load_config(self)
+
+        import tracim_backend.applications.upload_permissions.config as upload_permissions_config
+
+        upload_permissions_config.load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -167,7 +181,10 @@ class CFG(object):
             "contents/file,"
             "contents/html-document,"
             "contents/folder,"
-            "agenda"
+            "agenda,"
+            "collaborative_document_edition,"
+            "share_content,"
+            "upload_permission"
         )
 
         self.APP__ENABLED = string_to_list(
@@ -180,7 +197,6 @@ class CFG(object):
         self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir")
         self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name")
         self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir")
-
         self.AUTH_TYPES = string_to_list(
             self.get_raw_config("auth_types", "internal"),
             separator=",",
@@ -266,6 +282,15 @@ class CFG(object):
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
+
+    def _load_limitation_config(self) -> None:
+        self.LIMITATION__SHAREDSPACE_PER_USER = int(
+            self.get_raw_config("limitation.sharedspace_per_user", "0")
+        )
+        self.LIMITATION__CONTENT_LENGTH_FILE_SIZE = int(
+            self.get_raw_config("limitation.content_length_file_size", "0")
+        )
+        self.LIMITATION__WORKSPACE_SIZE = int(self.get_raw_config("limitation.workspace_size", "0"))
 
     def _load_email_config(self) -> None:
         """
@@ -523,11 +548,37 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
+        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST = string_to_list(
+            self.get_raw_config("search.elasticsearch.ingest.mimetype_blacklist", ""),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
+        self.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT = int(
+            self.get_raw_config("search.elasticsearch.ingest.size_limit", "52428800")
+        )
         self.SEARCH__ELASTICSEARCH__HOST = self.get_raw_config(
             "search.elasticsearch.host", "localhost"
         )
         self.SEARCH__ELASTICSEARCH__PORT = int(
             self.get_raw_config("search.elasticsearch.port", "9200")
+        )
+        self.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT = int(
+            self.get_raw_config("search.elasticsearch.request_timeout", "60")
+        )
+
+    def _load_collaborative_document_edition_config(self):
+        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
+            self.get_raw_config("collaborative_document_edition.activated", "false")
+        )
+        self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE = self.get_raw_config(
+            "collaborative_document_edition.software"
+        )
+        self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = self.get_raw_config(
+            "collaborative_document_edition.collabora.base_url"
+        )
+        self.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = self.get_raw_config(
+            "collaborative_document_edition.file_template_dir"
         )
 
     # INFO - G.M - 2019-04-05 - Config validation methods
@@ -540,6 +591,23 @@ class CFG(object):
         self._check_email_config_validity()
         self._check_caldav_config_validity()
         self._check_search_config_validity()
+        self._check_collaborative_document_edition_config_validity()
+
+        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+        # to make thing easier later
+        # when app will be load dynamycally.
+        import tracim_backend.applications.share.config as share_app_config
+
+        share_app_config.check_config(self)
+
+    def _check_collaborative_document_edition_config_validity(self) -> None:
+        if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
+            if self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
+                self.check_mandatory_param(
+                    "COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL",
+                    self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL,
+                    when_str="if collabora feature is activated",
+                )
 
     def _check_global_config_validity(self) -> None:
         """
@@ -786,6 +854,24 @@ class CFG(object):
             app_config=self,
         )
 
+        collaborative_document_edition = Application(
+            label="Collaborative Document Edition",
+            slug="collaborative_document_edition",
+            fa_icon="file-o",
+            is_active=self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
+            config={},
+            main_route="",
+            app_config=self,
+        )
+        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
+        # to make thing easier later
+        # when app will be load dynamycally.
+        import tracim_backend.applications.share.application as share_app
+
+        share_content = share_app.get_app(app_config=self)
+        import tracim_backend.applications.upload_permissions.application as upload_permissions_app
+
+        upload_permissions = upload_permissions_app.get_app(app_config=self)
         # process activated app list
         available_apps = OrderedDict(
             [
@@ -795,6 +881,9 @@ class CFG(object):
                 (folder.slug, folder),
                 (markdownpluspage.slug, markdownpluspage),
                 (agenda.slug, agenda),
+                (collaborative_document_edition.slug, collaborative_document_edition),
+                (share_content.slug, share_content),
+                (upload_permissions.slug, upload_permissions),
             ]
         )
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var

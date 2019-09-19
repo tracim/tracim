@@ -18,6 +18,8 @@ const defaultWorkspace = {
   label: '',
   description: '',
   agendaEnabled: false,
+  downloadEnabled: false,
+  uploadEnabled: false,
   sidebarEntryList: [],
   memberList: [],
   recentActivityList: [],
@@ -36,6 +38,8 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         label: action.workspaceDetail.label,
         description: action.workspaceDetail.description,
         agendaEnabled: action.workspaceDetail.agenda_enabled,
+        downloadEnabled: action.workspaceDetail.public_download_enabled,
+        uploadEnabled: action.workspaceDetail.public_upload_enabled,
         sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => ({
           slug: sbe.slug,
           route: sbe.route,
@@ -66,7 +70,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           label: ra.label,
           type: ra.content_type,
           fileExtension: ra.file_extension,
-          idParent: ra.parent_id,
+          parentId: ra.parent_id,
           showInUi: ra.show_in_ui,
           isArchived: ra.is_archived,
           isDeleted: ra.is_deleted,
@@ -85,7 +89,8 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
             slug: ra.slug,
             label: ra.label,
             type: ra.content_type,
-            idParent: ra.parent_id,
+            fileExtension: ra.file_extension,
+            parentId: ra.parent_id,
             showInUi: ra.show_in_ui,
             isArchived: ra.is_archived,
             isDeleted: ra.is_deleted,
@@ -106,30 +111,30 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
     case `${REMOVE}/${WORKSPACE_MEMBER}`:
       return {
         ...state,
-        memberList: state.memberList.filter(m => m.id !== action.idMember)
+        memberList: state.memberList.filter(m => m.id !== action.memberId)
       }
 
     case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`:
-      return action.idWorkspace === state.id
+      return action.workspaceId === state.id
         ? {
           ...state,
-          memberList: state.memberList.map(u => u.id === action.idUser
-            ? {...u, doNotify: action.doNotify}
+          memberList: state.memberList.map(u => u.id === action.userId
+            ? { ...u, doNotify: action.doNotify }
             : u
           )
         }
         : state
 
     case `${SET}/${FOLDER_READ}`:
-      return state.contentReadStatusList.includes(action.idFolder)
+      return state.contentReadStatusList.includes(action.folderId)
         ? state
         : {
           ...state,
-          contentReadStatusList: [...state.contentReadStatusList, action.idFolder]
+          contentReadStatusList: [...state.contentReadStatusList, action.folderId]
         }
 
     case `${SET}/${WORKSPACE_AGENDA_URL}`:
-      return {...state, agendaUrl: action.agendaUrl}
+      return { ...state, agendaUrl: action.agendaUrl }
 
     default:
       return state

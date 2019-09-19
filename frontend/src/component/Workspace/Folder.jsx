@@ -11,8 +11,11 @@ import DragHandle from '../DragHandle.jsx'
 import {
   PAGE,
   ROLE_OBJECT,
-  DRAG_AND_DROP
+  DRAG_AND_DROP,
+  sortWorkspaceContents,
+  SHARE_FOLDER_ID
 } from '../../helper.js'
+import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 require('./Folder.styl')
 
@@ -28,6 +31,8 @@ class Folder extends React.Component {
       return 'fa-folder-o'
     }
 
+    if (props.folderData.parentId === SHARE_FOLDER_ID) return 'fa-times-circle primaryColorFont'
+
     const isHoveringSelfParent = props.draggedItem && props.draggedItem.parentId === props.folderData.id
     if (isHoveringSelfParent) return 'fa-times-circle primaryColorFont'
 
@@ -41,9 +46,15 @@ class Folder extends React.Component {
   render () {
     const { props } = this
 
-    const folderContentList = props.workspaceContentList.filter(c => c.idParent === props.folderData.id)
+    const folderContentList = props.workspaceContentList.filter(c => c.parentId === props.folderData.id)
 
-    const folderAvailableApp = props.availableApp.filter(a => props.folderData.subContentTypeList.includes(a.slug))
+    const folderAvailableApp = props.availableApp
+      .filter(a =>
+        props.folderData.subContentTypeList.includes(a.slug) ||
+        // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
+        // second part of the "&&" is to hide collaborative document if content type file is not available
+        (a.slug === HACK_COLLABORA_CONTENT_TYPE(props.contentType).slug && props.folderData.subContentTypeList.includes('file'))
+      )
 
     return (
       <div
@@ -53,24 +64,25 @@ class Folder extends React.Component {
           'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
         data-cy={`folder_${props.folderData.id}`}
+        id={props.folderData.id}
       >
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
-          className='folder__header align-items-center primaryColorBgLightenHover primaryColorBorderLightenHover'
+          className='folder__header align-items-center primaryColorBgLightenHover'
           onClick={() => props.onClickFolder(props.folderData.id)}
           ref={props.connectDropTarget}
           title={props.folderData.label}
         >
           <div className='folder__header__triangleborder'>
-            <div className='folder__header__triangleborder__triangle' />
+            <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
           </div>
 
           {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
             <DragHandle
               connectDragSource={props.connectDragSource}
               title={props.t('Move this folder')}
-              style={{top: '18px', left: '-2px', padding: '0 7px'}}
+              style={{ top: '18px', left: '-2px', padding: '0 7px' }}
             />
           )}
 
@@ -80,7 +92,7 @@ class Folder extends React.Component {
           >
             <div className='folder__header__icon'
               title={props.t('Folder')}
-              style={{color: props.contentType.find(c => c.slug === 'folder').hexcolor}}
+              style={{ color: props.contentType.find(c => c.slug === 'folder').hexcolor }}
             >
               <i className={classnames('fa fa-fw', this.calculateIcon())} />
             </div>
@@ -91,21 +103,21 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__button'>
-            {props.userRoleIdInWorkspace >= 2 &&
+            {props.userRoleIdInWorkspace >= 2 && (
               <div className='folder__header__button__addbtn'>
-                {folderAvailableApp.length > 0 && (
+                {props.showCreateContentButton && folderAvailableApp.length > 0 && (
                   <div title={props.t('Create in folder')}>
                     <button
-                      className={`
-                        folder__header__button__addbtn__text
-                        btn
-                        outlineTextBtn
-                        primaryColorBorder
-                        primaryColorBgHover
-                        primaryColorBorderDarkenHover
-                        dropdown-toggle
-                        ${props.userRoleIdInWorkspace === 2 ? 'no-margin-right' : ''}
-                      `}
+                      className={classnames(
+                        'folder__header__button__addbtn__text',
+                        'btn',
+                        'outlineTextBtn',
+                        'primaryColorBorder',
+                        'primaryColorBgHover',
+                        'primaryColorBorderDarkenHover',
+                        'dropdown-toggle',
+                        props.userRoleIdInWorkspace === 2 ? 'no-margin-right' : ''
+                      )}
                       type='button'
                       id='dropdownMenuButton'
                       data-toggle='dropdown'
@@ -124,9 +136,9 @@ class Folder extends React.Component {
 
                     <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                       <SubDropdownCreateButton
-                        idFolder={props.folderData.id}
+                        folderId={props.folderData.id}
                         availableApp={folderAvailableApp}
-                        onClickCreateContent={(e, idFolder, slug) => props.onClickCreateContent(e, idFolder, slug)}
+                        onClickCreateContent={(e, folderId, slug) => props.onClickCreateContent(e, folderId, slug)}
                       />
                     </div>
                   </div>
@@ -137,17 +149,28 @@ class Folder extends React.Component {
                     <BtnExtandedAction
                       userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                       onClickExtendedAction={{
-                        edit: e => props.onClickExtendedAction.edit(e, props.folderData),
-                        move: null,
-                        download: e => props.onClickExtendedAction.download(e, props.folderData),
-                        archive: e => props.onClickExtendedAction.archive(e, props.folderData),
-                        delete: e => props.onClickExtendedAction.delete(e, props.folderData)
+                        edit: {
+                          callback: e => props.onClickExtendedAction.edit(e, props.folderData),
+                          label: props.t('Edit')
+                        },
+                        download: {
+                          callback: e => props.onClickExtendedAction.download(e, props.folderData),
+                          label: props.t('Download')
+                        },
+                        archive: {
+                          callback: e => props.onClickExtendedAction.archive(e, props.folderData),
+                          label: props.t('Archive')
+                        },
+                        delete: {
+                          callback: e => props.onClickExtendedAction.delete(e, props.folderData),
+                          label: props.t('Delete')
+                        }
                       }}
                     />
                   )}
                 </div>
               </div>
-            }
+            )}
           </div>
 
           <div className='folder__header__status' />
@@ -155,7 +178,7 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {folderContentList.map((content, i) => content.type === 'folder'
+          {folderContentList.sort(sortWorkspaceContents).map((content, i) => content.type === 'folder'
             ? (
               <FolderContainer
                 availableApp={props.availableApp}
@@ -179,17 +202,18 @@ class Folder extends React.Component {
             : (
               <ContentItem
                 contentId={content.id}
-                workspaceId={content.idWorkspace}
-                parentId={content.idParent}
+                workspaceId={content.workspaceId}
+                parentId={content.parentId}
                 label={content.label}
                 type={content.type}
                 fileName={content.fileName}
                 fileExtension={content.fileExtension}
                 faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
+                isShared={content.activedShares !== 0}
                 statusSlug={content.statusSlug}
                 read={props.readStatusList.includes(content.id)}
                 contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
-                urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${props.location.search}`}
+                urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${props.location.search}`}
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={{
                   edit: e => props.onClickExtendedAction.edit(e, content),
@@ -212,9 +236,9 @@ class Folder extends React.Component {
 const folderDragAndDropTarget = {
   drop: props => {
     return {
-      workspaceId: props.folderData.idWorkspace,
+      workspaceId: props.folderData.workspaceId,
       contentId: props.folderData.id,
-      parentId: props.folderData.idParent
+      parentId: props.folderData.parentId
     }
   }
 }
@@ -223,7 +247,7 @@ const folderDragAndDropTargetCollect = (connect, monitor) => {
   return {
     connectDropTarget: connect.dropTarget(),
     canDrop: monitor.canDrop(),
-    isOver: monitor.isOver({shallow: false}),
+    isOver: monitor.isOver({ shallow: false }),
     draggedItem: monitor.getItem()
   }
 }
@@ -231,9 +255,9 @@ const folderDragAndDropTargetCollect = (connect, monitor) => {
 const folderDragAndDropSource = {
   beginDrag: props => {
     return {
-      workspaceId: props.folderData.idWorkspace,
+      workspaceId: props.folderData.workspaceId,
       contentId: props.folderData.id,
-      parentId: props.folderData.idParent || 0
+      parentId: props.folderData.parentId || 0
     }
   },
   endDrag: (props, monitor) => {
@@ -268,4 +292,8 @@ Folder.propTypes = {
   app: PropTypes.array,
   onClickFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired
+}
+
+Folder.defaultProps = {
+  showCreateContentButton: true
 }

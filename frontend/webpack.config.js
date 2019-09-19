@@ -6,7 +6,7 @@ console.log('isPoduction: ', isProduction)
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
-    app: ['@babel/polyfill', './src/index.js']
+    app: ['./src/index.js']
   },
   output: {
     path: path.resolve(__dirname, 'dist/assets'),
@@ -34,7 +34,7 @@ module.exports = {
     //   'Access-Control-Allow-Origin': '*'
     // }
   },
-  devtool: isProduction ? false : 'cheap-eval-source-map ',
+  devtool: isProduction ? false : 'eval-source-map ',
   node: { // https://github.com/josephsavona/valuable/issues/9#issuecomment-65000999
     fs: "empty"
   },

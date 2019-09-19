@@ -35,8 +35,8 @@ module.exports = {
   },
   externals: isProduction
     ? {
-      react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
-      'react-dom': {commonjs: 'react-dom', commonjs2: 'react-dom', amd: 'react-dom', root: '_'},
+      // react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
+      // 'react-dom': {commonjs: 'react-dom', commonjs2: 'react-dom', amd: 'react-dom', root: '_'},
       'react-i18next': {commonjs: 'react-i18next', commonjs2: 'react-i18next', amd: 'react-i18next', root: '_'},
       classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
       'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'},

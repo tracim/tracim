@@ -12,7 +12,7 @@ class Search extends React.Component {
     }
   }
 
-  handleNewSearch = e => this.setState({searchedKeywords: e.target.value})
+  handleNewSearch = e => this.setState({ searchedKeywords: e.target.value })
 
   handleClickSearch = () => {
     this.props.onClickSearch(this.state.searchedKeywords)

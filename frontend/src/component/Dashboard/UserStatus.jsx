@@ -4,8 +4,8 @@ import { ROLE } from '../../helper.js'
 require('./UserStatus.styl')
 
 export const UserStatus = props => {
-  const mySelf = props.curWs.memberList.find(m => m.id === props.user.user_id) || {role: ''}
-  const myRole = ROLE.find(r => r.slug === mySelf.role) || {faIcon: '', hexcolor: '', label: ''}
+  const mySelf = props.curWs.memberList.find(m => m.id === props.user.user_id) || { role: '' }
+  const myRole = ROLE.find(r => r.slug === mySelf.role) || { faIcon: '', hexcolor: '', label: '' }
 
   return (
     <div className='userstatus notched primaryColorBorder'>
@@ -15,13 +15,13 @@ export const UserStatus = props => {
 
       <div className='userstatus__role'>
         <div className='userstatus__role__icon'>
-          <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
+          <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{ color: myRole.hexcolor }} />
         </div>
 
         <div
           className='userstatus__role__text'
           title={props.t('Your role in the shared space')}
-          style={{color: myRole.hexcolor}}
+          style={{ color: myRole.hexcolor }}
         >
           {props.t(myRole.label)}
         </div>

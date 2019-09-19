@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import color from 'color'
 
 // require('./Avatar.styl') // see https://github.com/tracim/tracim/issues/1156
+const color = require('color')
 
 export class Avatar extends React.Component {
   stringToHashCode = str => str.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)
@@ -15,7 +15,7 @@ export class Avatar extends React.Component {
   generateColorFromName = publicName => {
     // code from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
     const str = this.intToRGB(this.stringToHashCode(publicName))
-    return color('#' + str).desaturate(0.90).hexString()
+    return color('#' + str).desaturate(0.90).hex()
   }
 
   getTwoLetter = name => {
@@ -38,7 +38,7 @@ export class Avatar extends React.Component {
     const fontSize = (widthInt => (widthInt / 2) % 2 === 0 ? widthInt : widthInt + 2)(parseInt(props.width)) / 2
 
     return (
-      <div className='avatar-wrapper' style={{...props.style}} title={props.publicName}>
+      <div className='avatar-wrapper' style={{ ...props.style }} title={props.publicName}>
         <div
           className='avatar'
           data-cy='avatar'

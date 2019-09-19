@@ -1,22 +1,18 @@
-from parameterized import parameterized
+import pytest
 import transaction
 
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.setup_models import get_tm_session
-from tracim_backend.tests import FunctionalTest
+from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-class TestSimpleSearch(FunctionalTest):
-    config_section = "functional_test_simple_search"
-
-    @parameterized.expand(
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_simple_search"}], indirect=True
+)
+class TestSimpleSearch(object):
+    @pytest.mark.parametrize(
+        "created_content_name, search_string, nb_content_result, first_search_result_content_name",
         [
             # created_content_name, search_string, nb_content_result, first_search_result_content_name
             # exact syntax
@@ -27,19 +23,24 @@ class TestSimpleSearch(FunctionalTest):
             ("testdocument", "test", 2, "test"),
             # regex style *[text]
             ("content", "content", 2, "another content"),
-        ]
+        ],
     )
     def test_api___simple_search_ok__by_label(
         self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        web_testapp,
+        content_api_factory,
         created_content_name,
         search_string,
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -48,13 +49,11 @@ class TestSimpleSearch(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -72,16 +71,17 @@ class TestSimpleSearch(FunctionalTest):
         )
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "created_content_name, search_string, nb_content_result, first_search_result_content_name",
         [
             # created_content_name, search_string, nb_content_result, first_search_result_content_name
             # exact syntax
@@ -90,19 +90,24 @@ class TestSimpleSearch(FunctionalTest):
             ("good practices", "html", 3, "discussion"),
             ("good practices", "thread", 1, "discussion"),
             ("good practices", "document", 2, "report"),
-        ]
+        ],
     )
     def test_api___simple_search_ok__by_filename(
         self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
         created_content_name,
         search_string,
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -111,13 +116,11 @@ class TestSimpleSearch(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -132,16 +135,17 @@ class TestSimpleSearch(FunctionalTest):
         )
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "created_content_name, created_content_body, search_string, nb_content_result,first_search_result_content_name",
         [
             # created_content_name, created_content_body, search_string, nb_content_result, first_search_result_content_name
             # exact syntax
@@ -167,20 +171,26 @@ class TestSimpleSearch(FunctionalTest):
                 1,
                 "good practices",
             ),
-        ]
+        ],
     )
     def test_api___simple_search_ok__by_content(
         self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        session,
         created_content_name,
         created_content_body,
         search_string,
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -189,20 +199,18 @@ class TestSimpleSearch(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label=created_content_name,
             do_save=True,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=content):
+        with new_revision(session=session, tm=transaction.manager, content=content):
             api.update_content(
                 content, new_label=created_content_name, new_content=created_content_body
             )
@@ -215,16 +223,17 @@ class TestSimpleSearch(FunctionalTest):
         )
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
         [
             # created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content
             # exact syntax
@@ -253,10 +262,16 @@ class TestSimpleSearch(FunctionalTest):
                 "this is a comment content containing the string: eureka.",
                 "this is another comment content containing eureka string",
             ),
-        ]
+        ],
     )
     def test_api___simple_search_ok__by_comment_content(
         self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
         created_content_name,
         search_string,
         nb_content_result,
@@ -264,10 +279,9 @@ class TestSimpleSearch(FunctionalTest):
         first_created_comment_content,
         second_created_comment_content,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -276,13 +290,11 @@ class TestSimpleSearch(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -306,20 +318,45 @@ class TestSimpleSearch(FunctionalTest):
         )
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
-    def test_api___simple_search_ok__no_search_string(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+    @pytest.mark.parametrize(
+        "created_content_name, search_string, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
+        [
+            # created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content
+            # exact syntax
+            (
+                "good practices",
+                "eureka",
+                "good practices",
+                "this is a comment content containing the string: eureka.",
+                "this is another comment content, eureka",
+            )
+        ],
+    )
+    def test_api___simple_search_ok__avoid_duplicate_content(
+        self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        created_content_name,
+        web_testapp,
+        search_string,
+        first_search_result_content_name,
+        first_created_comment_content,
+        second_created_comment_content,
+    ) -> None:
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -328,31 +365,102 @@ class TestSimpleSearch(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = content_api_factory.get(current_user=user)
+        content = api.create(
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
+        )
+        api.create_comment(
+            workspace=workspace, parent=content, content=first_created_comment_content, do_save=True
+        )
+        api.create_comment(
+            workspace=workspace,
+            parent=content,
+            content=second_created_comment_content,
+            do_save=True,
+        )
+        api.create(
+            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+        )
+        api.create(
+            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+        )
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        params = {"search_string": search_string, "size": 1, "page_nb": 1}
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == 1
+        assert search_result["is_total_hits_accurate"] is False
+        assert len(search_result["contents"]) == 1
+        assert search_result["contents"][0]["label"] == first_search_result_content_name
+
+        params = {"search_string": search_string, "size": 1, "page_nb": 2}
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == 1
+        assert search_result["is_total_hits_accurate"] is False
+        assert len(search_result["contents"]) == 0
+
+    def test_api___simple_search_ok__no_search_string(
+        self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+    ) -> None:
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("trusted-users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document", workspace=workspace, label="test", do_save=True
         )
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 0
         assert search_result["is_total_hits_accurate"] is True
         assert len(search_result["contents"]) == 0
 
-    def test_api___simple_search_ok__filter_by_content_type(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+    def test_api___simple_search_ok__filter_by_content_type(
+        self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        content_api_factory,
+        workspace_api_factory,
+        web_testapp,
+    ) -> None:
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -361,13 +469,11 @@ class TestSimpleSearch(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -396,8 +502,8 @@ class TestSimpleSearch(FunctionalTest):
 
         # get all
         params = {"search_string": "stringtosearch"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 4
@@ -405,8 +511,8 @@ class TestSimpleSearch(FunctionalTest):
         assert len(search_result["contents"]) == 4
 
         params = {"search_string": "stringtosearch", "content_types": "html-document"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 2
@@ -416,8 +522,8 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result["contents"][1]["label"] == "stringtosearch doc"
 
         params = {"search_string": "stringtosearch", "content_types": "html-document,thread"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 3
@@ -428,8 +534,8 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result["contents"][2]["label"] == "stringtosearch doc"
 
         params = {"search_string": "stringtosearch", "content_types": "folder"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
@@ -437,11 +543,19 @@ class TestSimpleSearch(FunctionalTest):
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["label"] == "stringtosearch folder"
 
-    def test_api___simple_search_ok__filter_by_deleted_archived_active(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+    def test_api___simple_search_ok__filter_by_deleted_archived_active(
+        self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+    ) -> None:
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -450,13 +564,11 @@ class TestSimpleSearch(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -475,7 +587,7 @@ class TestSimpleSearch(FunctionalTest):
             label="stringtosearch deleted",
             do_save=True,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=deleted_content):
+        with new_revision(session=session, tm=transaction.manager, content=deleted_content):
             api.delete(deleted_content)
         api.save(deleted_content)
         archived_content = api.create(
@@ -484,7 +596,7 @@ class TestSimpleSearch(FunctionalTest):
             label="stringtosearch archived",
             do_save=True,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=archived_content):
+        with new_revision(session=session, tm=transaction.manager, content=archived_content):
             api.archive(archived_content)
         api.save(archived_content)
         transaction.commit()
@@ -496,8 +608,8 @@ class TestSimpleSearch(FunctionalTest):
             "show_archived": 1,
             "show_active": 1,
         }
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 4
@@ -506,8 +618,8 @@ class TestSimpleSearch(FunctionalTest):
 
         # get only active
         params = {"search_string": "stringtosearch"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         default_search_result = res.json_body
         assert default_search_result
         assert default_search_result["total_hits"] == 2
@@ -522,8 +634,8 @@ class TestSimpleSearch(FunctionalTest):
             "show_deleted": 0,
             "show_archived": 0,
         }
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         only_active_search_result = res.json_body
         assert only_active_search_result == default_search_result
 
@@ -533,8 +645,8 @@ class TestSimpleSearch(FunctionalTest):
             "show_deleted": 1,
             "show_archived": 0,
         }
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 3
@@ -550,8 +662,8 @@ class TestSimpleSearch(FunctionalTest):
             "show_deleted": 0,
             "show_archived": 1,
         }
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1

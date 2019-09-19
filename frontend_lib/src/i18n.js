@@ -16,9 +16,6 @@ i18n
     // interpolation: {
     //   escapeValue: false, // not needed for react!!
     // },
-    react: {
-      wait: true
-    },
     resources: {
       en: {
         translation: en
@@ -29,6 +26,6 @@ i18n
     }
   })
 
-i18n.idTracim = 'frontend_lib'
+i18n.tracimId = 'frontend_lib'
 
 export default i18n

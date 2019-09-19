@@ -12,7 +12,8 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -51,7 +52,7 @@ class Account extends React.Component {
     }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
 
     this.state = {
-      idUserToEdit: props.match.params.iduser,
+      userToEditId: props.match.params.userid,
       userToEdit: {
         public_name: '',
         auth_type: 'internal'
@@ -60,12 +61,12 @@ class Account extends React.Component {
       subComponentMenu: builtSubComponentMenu
     }
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
     }
   }
 
@@ -78,7 +79,7 @@ class Account extends React.Component {
   getUserDetail = async () => {
     const { props, state } = this
 
-    const fetchGetUser = await props.dispatch(getUser(state.idUserToEdit))
+    const fetchGetUser = await props.dispatch(getUser(state.userToEditId))
 
     switch (fetchGetUser.status) {
       case 200:
@@ -94,8 +95,9 @@ class Account extends React.Component {
 
   getUserWorkspaceList = async () => {
     const { props, state } = this
+    const showOwnedWorkspace = false
 
-    const fetchGetUserWorkspaceList = await props.dispatch(getUserWorkspaceList(state.idUserToEdit))
+    const fetchGetUserWorkspaceList = await props.dispatch(getUserWorkspaceList(state.userToEditId, showOwnedWorkspace))
 
     switch (fetchGetUserWorkspaceList.status) {
       case 200: this.getUserWorkspaceListMemberList(fetchGetUserWorkspaceList.json); break
@@ -128,13 +130,13 @@ class Account extends React.Component {
 
     const fetchWorkspaceListMemberList = await Promise.all(
       wsList.map(async ws => ({
-        idWorkspace: ws.workspace_id,
+        workspaceId: ws.workspace_id,
         fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(wsMemberList => ({
-      idWorkspace: wsMemberList.idWorkspace,
+      workspaceId: wsMemberList.workspaceId,
       memberList: wsMemberList.fetchMemberList.status === 200
         ? wsMemberList.fetchMemberList.json
         : [] // handle error ?
@@ -144,13 +146,19 @@ class Account extends React.Component {
       userToEditWorkspaceList: wsList.map(ws => ({
         ...ws,
         id: ws.workspace_id, // duplicate id to be able use <Notification /> easily
-        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.idWorkspace).memberList
+        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.workspaceId).memberList.map(m => ({
+          id: m.user_id,
+          publicName: m.user.public_name,
+          role: m.role,
+          isActive: m.is_active,
+          doNotify: m.do_notify
+        }))
       }))
     })
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
-    subComponentMenu: prev.subComponentMenu.map(m => ({...m, active: m.name === subMenuItemName}))
+    subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
   }))
 
   handleSubmitNameOrEmail = async (newName, newEmail, checkPassword) => {
@@ -165,7 +173,7 @@ class Account extends React.Component {
       const fetchPutUserName = await props.dispatch(putUserName(state.userToEdit, newName))
       switch (fetchPutUserName.status) {
         case 200:
-          this.setState(prev => ({userToEdit: {...prev.userToEdit, public_name: newName}}))
+          this.setState(prev => ({ userToEdit: { ...prev.userToEdit, public_name: newName } }))
           if (newEmail === '') {
             props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
             return true
@@ -180,7 +188,7 @@ class Account extends React.Component {
       const fetchPutUserEmail = await props.dispatch(putUserEmail(state.userToEdit, newEmail, checkPassword))
       switch (fetchPutUserEmail.status) {
         case 200:
-          this.setState(prev => ({userToEdit: {...prev.userToEdit, email: newEmail}}))
+          this.setState(prev => ({ userToEdit: { ...prev.userToEdit, email: newEmail } }))
           if (newName !== '') props.dispatch(newFlashMessage(props.t('Name and email has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Email has been changed'), 'info'))
           return true
@@ -191,16 +199,18 @@ class Account extends React.Component {
     return false
   }
 
-  handleChangeSubscriptionNotif = async (idWorkspace, doNotify) => {
+  handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
     const { props, state } = this
 
-    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(state.userToEdit, idWorkspace, doNotify))
+    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(state.userToEdit, workspaceId, doNotify))
     switch (fetchPutUserWorkspaceDoNotify.status) {
-      case 204: this.setState(prev => ({
-        userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === idWorkspace
-          ? {...ws, memberList: ws.memberList.map(u => u.user_id === state.userToEdit.user_id ? {...u, do_notify: doNotify} : u)}
-          : ws
-        )}))
+      case 204:
+        this.setState(prev => ({
+          userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === workspaceId
+            ? { ...ws, memberList: ws.memberList.map(u => u.id === state.userToEdit.user_id ? { ...u, doNotify: doNotify } : u) }
+            : ws
+          )
+        }))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
@@ -224,10 +234,13 @@ class Account extends React.Component {
   setTitle () {
     const { props, state } = this
 
-    return <div dangerouslySetInnerHTML={
-      {__html: props.t('{{userName}} account edition',
-        {userName: state.userToEdit.public_name, interpolation: {escapeValue: false}}
-      )}} />
+    return (
+      <div
+        dangerouslySetInnerHTML={{
+          __html: props.t('{{userName}} account edition', { userName: state.userToEdit.public_name, interpolation: { escapeValue: false } })
+        }}
+      />
+    )
   }
 
   render () {
@@ -257,7 +270,7 @@ class Account extends React.Component {
 
                 <div className='account__userpreference__setting'>
                   {(() => {
-                    switch (state.subComponentMenu.find(({active}) => active).name) {
+                    switch (state.subComponentMenu.find(({ active }) => active).name) {
                       case 'personalData':
                         return <PersonalData
                           userAuthType={state.userToEdit.auth_type}
@@ -267,7 +280,7 @@ class Account extends React.Component {
 
                       case 'notification':
                         return <Notification
-                          idUserLogged={parseInt(state.idUserToEdit)}
+                          userLoggedId={parseInt(state.userToEditId)}
                           workspaceList={state.userToEditWorkspaceList}
                           onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                         />

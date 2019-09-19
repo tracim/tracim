@@ -35,9 +35,9 @@ export class ResetPassword extends React.Component {
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
 
-  handleChangePassword = e => this.setState({newPassword: e.target.value})
+  handleChangePassword = e => this.setState({ newPassword: e.target.value })
 
-  handleChangePassword2 = e => this.setState({newPassword2: e.target.value})
+  handleChangePassword2 = e => this.setState({ newPassword2: e.target.value })
 
   handleClickSubmit = async () => {
     const { props, state } = this
@@ -76,7 +76,7 @@ export class ResetPassword extends React.Component {
     const { props, state } = this
 
     return (
-      <section className='resetpassword primaryColorBg'>
+      <section className='resetpassword'>
         <Card customClass='resetpassword__card'>
           <CardHeader customClass='resetpassword__card__header primaryColorBgLighten text-center'>
             {props.t('Reset password')}
@@ -114,7 +114,7 @@ export class ResetPassword extends React.Component {
                 <Button
                   htmlType='button'
                   bootstrapType=''
-                  customClass='btnSubmit resetpassword__card__body__btnsubmit ml-auto'
+                  customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover resetpassword__card__body__btnsubmit ml-auto'
                   label={props.t('Validate')}
                   onClick={this.handleClickSubmit}
                 />

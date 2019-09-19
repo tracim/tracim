@@ -1,4 +1,60 @@
 
+## 2.4 / 2019-09-19
+
+### New Features
+
+- Online document edition through CollaboraOnline/LibreofficeOnline integration
+- Public file share in download (allow remote users to access to a file stored in tracim, eventually through a password protected access)
+- Public file upload (allow remote users to upload to tracim their files, eventually through a password protected access)
+- Content meta-information panel (timeline, info) UI rework
+- Space Limitations (experimental) - allow some controls on file/workspace sizes, number of workspace per user, etc
+
+### Fixed issues
+
+- Content Listing: #1986, #2046, #2232, #2262, #2360
+- File App: #2062, #2174, #2203, #2265, #2273, #2294
+- Folder App: #1918, #2087, #2191, #2244
+- Timeline: #2275, #2276, #2282, #2300, #2316
+- Dashboard: #1774, #2038, #2242
+- Search: #1928, #1973
+- Backend & system: #619, #2105, #2132, #2154, #2177, #2224, #2314, #2354
+- Documentation: #2117, #2155
+- General: #1887, #1910, #1956, #1992, #2011, #2064, #2091, #2141, #2149
+- General UX: #573, #1198, #2076, #2092, #2096, #2121, #2159, #2237, #2299, #2395
+
+
+### Known issues
+
+- Debian 9 is released with Firefox ESR v60.8.0. In this version, long title are not limited in upload file popup (issue #2062)
+- Opening file with special characters in label on CollaboraOnline/LibreofficeOnline is not possible (issue #2219)
+- Tracim not support lock mecanism in collaborative edition (issue #2073)
+
+### Other changes
+
+Archive button not more used in Tracim. All archive buttons is hide (#2347)
+
+
+## 2.3.2 / 2019-08-01
+
+### Fixed issues
+
+- Email notifications: #2134
+
+
+## 2.3.1 / 2019-07-05
+
+### Fixed issues
+
+- Search: #2001, #2016, #2025
+- Docker: #2005, #2054
+- Timeline: #2032
+- Shared spaces: #2058
+- User management: #1470, #2034
+- Email: #2036
+- Content preview: #2022
+- Security: #2060
+
+
 ## 2.3.0 / 2019-06-21
 
 ### New Features
@@ -27,7 +83,7 @@
 - Drag & Drop: #789, #1669, #1958, #1974
 - UX: #1512, #1521, #1743, #1757, #1758, #1776, #1781, #1802, #1843, #1844, #1845, #1926, #1939, #1943, #1962, #1964, #1970, #1972, #1981, #1983, #1990
 - Agenda: #1663, #1811, #1819, #1847, #1852, #1929
-- Sharedspace: #1770, #1977
+- Shared space: #1770, #1977
 - Content: #1154, #1553, #1815, #1818
 - Backend config: #1525, #1835, #1888, #1896, #1902, #1930
 - Backend: #1109, #1524, #1661, #1676, #1812, #1880, #1866, #1937
@@ -72,7 +128,7 @@ website.server_name parameter is now deleted in config file and code. Not more u
 - Contents: #818, #827, #943, #1067, #1097, #1105, #1507, #1509, #1563, #1624, #1648, #1693, #1712, #1745, #1788, #1804
 - Sidebar: #1177, #1571
 - Backend config file: #987, #1475, #1495, #1550, #1626, #1665, #1689, #1690, #1696, #1752
-- Email: #1489, #1491, #1649 
+- Email: #1489, #1491, #1649
 - Security related: #1617
 - Preview-generator: #1126, #1472
 - Webdav: #1335, #1499, #1652
