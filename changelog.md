@@ -1,5 +1,11 @@
 
-## 2.4 / 2019-09-19
+
+# 2.4.1 /2019-09-20
+
+### Fixed issues
+- migration issue introduced with 2.4.0
+
+## 2.4.0 / 2019-09-19
 
 ### New Features
 
