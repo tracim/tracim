@@ -6,6 +6,8 @@ Create Date: 2019-07-10 11:04:00.497200
 
 """
 # revision identifiers, used by Alembic.
+import typing
+
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import Column
@@ -49,6 +51,15 @@ class TemporaryRoles(DeclarativeBase):
     workspace = relationship("TemporaryWorkspaces", back_populates="roles")
 
 
+class TemporaryUserGroup(DeclarativeBase):
+    """ temporary sqlalchemy object to help migration"""
+
+    __tablename__ = "user_group"
+
+    group_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, primary_key=True)
+
+
 class TemporaryWorkspaces(DeclarativeBase):
     """ temporary sqlalchemy object to help migration"""
 
@@ -64,11 +75,11 @@ class TemporaryWorkspaces(DeclarativeBase):
     )
 
     @property
-    def owner_id_role(self) -> int:
+    def owner_id_role(self) -> typing.Optional[int]:
         for role in self.roles:
             if role.role == 8:
                 return role.user_id
-        raise Exception("All workspaces should have a workspace manager !")
+        return None
 
 
 def upgrade() -> None:
@@ -78,9 +89,16 @@ def upgrade() -> None:
     # INFO - G.M - 2019-08-19 - add owner_id to all workspaces
     connection = op.get_bind()
     session = Session(bind=connection)
-    workspaces = session.query(TemporaryWorkspaces).join(TemporaryRoles)
+    # INFO - G.M - 2019-09-20 - get one tracim admin as fallback
+    admin_user_id = (
+        session.query(TemporaryUserGroup.user_id)
+        .filter(TemporaryUserGroup.group_id == 3)
+        .order_by(TemporaryUserGroup.user_id)
+        .all()[0][0]
+    )
+    workspaces = session.query(TemporaryWorkspaces).join(TemporaryRoles, isouter=True)
     for workspace in workspaces:
-        workspace.owner_id = workspace.owner_id_role
+        workspace.owner_id = workspace.owner_id_role or admin_user_id
         session.add(workspace)
     session.commit()
     # INFO - G.M - 2019-08-19 - make owner id not nullable
