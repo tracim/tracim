@@ -3,7 +3,7 @@
 # 2.4.2 / 2019-09-24
 
 ### Fixed issues
-- Timeline: Missing css rule about break-word for comment
+- Timeline: Missing css rule about word-break for comment
 
 
 # 2.4.1 / 2019-09-20
