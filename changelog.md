@@ -1,9 +1,16 @@
 
 
-# 2.4.1 /2019-09-20
+# 2.4.2 / 2019-09-24
 
 ### Fixed issues
-- migration issue introduced with 2.4.0
+- Timeline: Missing css rule about word-break for comment
+
+
+# 2.4.1 / 2019-09-20
+
+### Fixed issues
+- Migration issue introduced with 2.4.0
+
 
 ## 2.4.0 / 2019-09-19
 
