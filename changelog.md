@@ -1,5 +1,12 @@
 
 
+# 2.4.3 / 2019-09-26
+
+### Fixed issues
+- Docker: #2445
+- Content Listing: extended action button not working correctly
+
+
 # 2.4.2 / 2019-09-24
 
 ### Fixed issues
