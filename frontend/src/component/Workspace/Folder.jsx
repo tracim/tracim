@@ -216,10 +216,22 @@ class Folder extends React.Component {
                 urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${props.location.search}`}
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={{
-                  edit: e => props.onClickExtendedAction.edit(e, content),
-                  download: e => props.onClickExtendedAction.download(e, content),
-                  archive: e => props.onClickExtendedAction.archive(e, content),
-                  delete: e => props.onClickExtendedAction.delete(e, content)
+                  edit: {
+                    callback: e => props.onClickExtendedAction.edit(e, content),
+                    label: props.t('Edit')
+                  },
+                  download: {
+                    callback: e => props.onClickExtendedAction.download(e, content),
+                    label: props.t('Download')
+                  },
+                  archive: {
+                    callback: e => props.onClickExtendedAction.archive(e, content),
+                    label: props.t('Archive')
+                  },
+                  delete: {
+                    callback: e => props.onClickExtendedAction.delete(e, content),
+                    label: props.t('Delete')
+                  }
                 }}
                 onDropMoveContentItem={props.onDropMoveContentItem}
                 isLast={props.isLast && i === folderContentList.length - 1}
