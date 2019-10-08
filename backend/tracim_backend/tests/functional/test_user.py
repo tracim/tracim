@@ -2766,6 +2766,39 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
     Tests for GET /api/v2/users/{user_id}
     """
 
+    def test_api__get_user__ok_200__admin(self, user_api_factory, group_api_factory, web_testapp):
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["user_id"] == user_id
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "bob"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["is_deleted"] is False
+        assert res["lang"] == "fr"
+        assert res["allowed_space"] == 134217728
+
     def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
@@ -2829,6 +2862,7 @@ class TestUserEndpoint(object):
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
         assert res["lang"] == "fr"
+        assert res["allowed_space"] == 0
 
     def test_api__get_user__ok_200__user_itself(
         self, user_api_factory, group_api_factory, web_testapp
@@ -2862,6 +2896,7 @@ class TestUserEndpoint(object):
         assert res["public_name"] == "bob"
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
+        assert res["allowed_space"] == 0
 
     def test_api__get_user__err_403__other_normal_user(
         self, user_api_factory, group_api_factory, web_testapp
