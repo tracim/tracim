@@ -193,6 +193,8 @@ auth_types = internal
 user.auth_token.validity = 604800
 ## user reset_password token lifetime (default to 900s -> 15 minutes)
 user.reset_password.token_lifetime = 900
+## Default profile of created user, valid values are users, trusted-users, administrators
+; user.default_profile = users
 
 ####
 # IHM
