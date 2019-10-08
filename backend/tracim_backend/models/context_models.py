@@ -188,6 +188,15 @@ class UserProfile(object):
         self.profile = profile
 
 
+class UserAllowedSpace(object):
+    """
+    allowed space of user
+    """
+
+    def __init__(self, allowed_space: int) -> None:
+        self.allowed_space = allowed_space
+
+
 class UserCreation(object):
     """
     Just some user infos

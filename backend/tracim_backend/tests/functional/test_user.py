@@ -4571,6 +4571,99 @@ class TestSetUserProfileEndpoint(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestSetUserAllowedSpaceEndpoint(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for PUT /api/v2/users/{user_id}/allowed_space
+    """
+
+    def test_api__set_user_allowed_space__ok_200__admin(
+        self, user_api_factory, group_api_factory, web_testapp
+    ):
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # check before
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["user_id"] == user_id
+        assert res["allowed_space"] == 0
+        # Set params
+        params = {"allowed_space": 134217728}
+        web_testapp.put_json(
+            "/api/v2/users/{}/allowed_space".format(user_id), params=params, status=204
+        )
+        # Check After
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["user_id"] == user_id
+        assert res["allowed_space"] == 134217728
+
+    def test_api__set_user_allowed_space__err_403__other_normal_user(
+        self, user_api_factory, group_api_factory, web_testapp
+    ):
+        """
+        Set user allowed_space of user normal user as normal user
+        Return 403 error because of no right to do this as simple user
+        """
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="test",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user2)
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
+        # Set params
+        params = {"allowed_space": 134217728}
+        res = web_testapp.put_json(
+            "/api/v2/users/{}/allowed_space".format(user_id), params=params, status=403
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestSetUserEnableDisableEndpoints(object):
     # -*- coding: utf-8 -*-
     """
