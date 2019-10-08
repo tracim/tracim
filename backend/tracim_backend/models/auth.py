@@ -91,6 +91,7 @@ class AuthType(enum.Enum):
 class Profile(enum.Enum):
     """This model is the "max" group associated to a given user."""
 
+    NOBODY = (0, "nobody")
     USER = (1, "users")
     TRUSTED_USER = (2, "trusted-users")
     ADMIN = (3, "administrators")
@@ -100,8 +101,8 @@ class Profile(enum.Enum):
         self.slug = slug
 
     @classmethod
-    def get_all_slugs(self):
-        return [item.slug for item in list(Profile)]
+    def get_all_valid_slugs(self):
+        return [item.slug for item in list(Profile) if item.id > 0]
 
     @classmethod
     def get_profile_from_id(self, id: int):

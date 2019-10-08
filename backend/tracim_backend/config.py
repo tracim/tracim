@@ -677,9 +677,9 @@ class CFG(object):
                 "FRONTEND__DIST_FOLDER_PATH", self.FRONTEND__DIST_FOLDER_PATH
             )
 
-        if self.USER__DEFAULT_PROFILE not in Profile.get_all_slugs():
+        if self.USER__DEFAULT_PROFILE not in Profile.get_all_valid_slugs():
             profile_str_list = ", ".join(
-                ['"{}"'.format(profile_name) for profile_name in Profile.get_all_slugs()]
+                ['"{}"'.format(profile_name) for profile_name in Profile.get_all_valid_slugs()]
             )
             raise ConfigurationError(
                 'ERROR user.default_profile given "{}" is invalid,'

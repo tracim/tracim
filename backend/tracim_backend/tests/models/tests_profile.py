@@ -12,18 +12,18 @@ class TestProfile(object):
 
     def test_profile__ok__all_list(self):
         profiles = list(Profile)
-        assert len(profiles) == 3
+        assert len(profiles) == 4
         for profile in profiles:
             assert profile
             assert profile.slug
             assert isinstance(profile.slug, str)
-            assert profile.id
+            assert profile.id or profile.id == 0
         assert Profile["ADMIN"]
         assert Profile["USER"]
         assert Profile["TRUSTED_USER"]
 
     def test_profile__ok__get_profile_slugs__ok__nominal_case(self):
-        profile_slugs = Profile.get_all_slugs()
+        profile_slugs = Profile.get_all_valid_slugs()
         assert set(profile_slugs) == {"administrators", "users", "trusted-users"}
 
     def test_profile__ok__get_profile__from_slug__ok__nominal_case(self):
