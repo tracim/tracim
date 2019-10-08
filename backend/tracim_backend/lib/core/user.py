@@ -159,7 +159,7 @@ class UserApi(object):
         exclude_user_ids: typing.List[int] = None,
         exclude_workspace_ids: typing.List[int] = None,
         nb_elem: typing.List[int] = DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT,
-        filter_results: bool = False,
+        filter_results: bool = True,
     ) -> typing.Iterable[User]:
         """
         Return list of know user by current UserApi user.
