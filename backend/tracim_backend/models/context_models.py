@@ -621,7 +621,7 @@ class UserInContext(object):
 
     @property
     def profile(self) -> Profile:
-        return self.user.profile.name
+        return self.user.profile.slug
 
     @property
     def is_deleted(self) -> bool:

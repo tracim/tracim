@@ -639,7 +639,7 @@ class TestFakeLDAPUserApi(object):
         assert user.email == "hubert@planetexpress.com"
         assert user.auth_type == AuthType.LDAP
         assert user.display_name == "Hubert"
-        assert user.profile.name == "trusted-users"
+        assert user.profile.slug == "trusted-users"
 
     @pytest.mark.ldap
     def test_unit__authenticate_user___ok__new_user_ldap_auth(self, session, app_config):
@@ -655,7 +655,7 @@ class TestFakeLDAPUserApi(object):
         assert user.email == "hubert@planetexpress.com"
         assert user.auth_type == AuthType.LDAP
         assert user.display_name == "Hubert"
-        assert user.profile.name == "users"
+        assert user.profile.slug == "users"
 
     @pytest.mark.ldap
     def test__unit__create_user__err__external_auth_ldap_with_password(self, session, app_config):
