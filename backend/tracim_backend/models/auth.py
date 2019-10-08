@@ -104,15 +104,15 @@ class Profile(enum.Enum):
         return [item.slug for item in list(Profile)]
 
     @classmethod
-    def get_profile_by_id(self, id: int):
+    def get_profile_from_id(self, id: int):
         profiles = [item for item in list(Profile) if item.id == id]
         if len(profiles) != 1:
             raise ProfileDoesNotExist()
         return profiles[0]
 
     @classmethod
-    def get_profile_by_name(self, name: str):
-        profiles = [item for item in list(Profile) if item.name == name]
+    def get_profile_from_slug(self, slug: str):
+        profiles = [item for item in list(Profile) if item.slug == slug]
         if len(profiles) != 1:
             raise ProfileDoesNotExist()
         return profiles[0]
@@ -234,7 +234,7 @@ class User(DeclarativeBase):
         profile_id = 0
         if len(self.groups) > 0:
             profile_id = max(group.group_id for group in self.groups)
-        return Profile.get_profile_by_id(profile_id)
+        return Profile.get_profile_from_id(profile_id)
 
     @classmethod
     def by_email_address(cls, email, dbsession):
