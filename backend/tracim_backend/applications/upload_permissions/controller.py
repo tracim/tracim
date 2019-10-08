@@ -212,6 +212,9 @@ class UploadPermissionController(Controller):
         content_api.check_workspace_size_limitation(
             content_length=request.content_length, workspace=workspace
         )
+        content_api.check_owner_size_limitation(
+            content_length=request.content_length, workspace=workspace
+        )
         api.upload_files(
             upload_permission=upload_permission,
             uploader_username=hapic_data.forms.username,
