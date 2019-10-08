@@ -58,6 +58,8 @@ from tracim_backend.models.context_models import TypeUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 
+DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT = 5
+
 
 class UserApi(object):
     def __init__(
@@ -156,12 +158,15 @@ class UserApi(object):
         acp: str,
         exclude_user_ids: typing.List[int] = None,
         exclude_workspace_ids: typing.List[int] = None,
+        nb_elem: typing.List[int] = DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT,
     ) -> typing.Iterable[User]:
         """
         Return list of know user by current UserApi user.
         :param acp: autocomplete filter by name/email
         :param exclude_user_ids: user id to exclude from result
         :param exclude_workspace_ids: workspace user to exclude from result
+        :nb_elem: number of user to return, default value should be low for
+        security and privacy reasons
         :return: List of found users
         """
         if len(acp) < 2:
@@ -202,6 +207,7 @@ class UserApi(object):
             query = query.filter(User.user_id.in_(users_in_workspaces))
         if exclude_user_ids:
             query = query.filter(~User.user_id.in_(exclude_user_ids))
+        query = query.limit(nb_elem)
         return query.all()
 
     def find(
