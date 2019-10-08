@@ -198,7 +198,7 @@ user.reset_password.token_lifetime = 900
 ## member with no common workspace. if false, it can access to these informations.
 ## This is used by search mecanism for invitation of user in workspace.
 ## default value to true.
-; known_member.filter = true
+; known_members.filter = true
 ####
 # IHM
 ####
