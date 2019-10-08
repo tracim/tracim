@@ -22,6 +22,7 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
+from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
 from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
@@ -319,7 +320,11 @@ class WorkspaceResource(DAVCollection):
             content = resource.content
         try:
             self.content_api.check_upload_size(int(self.environ["CONTENT_LENGTH"]), self.workspace)
-        except (FileSizeOverMaxLimitation, FileSizeOverWorkspaceEmptySpace) as exc:
+        except (
+            FileSizeOverMaxLimitation,
+            FileSizeOverWorkspaceEmptySpace,
+            FileSizeOverOwnerEmptySpace,
+        ) as exc:
             raise DAVError(HTTP_REQUEST_ENTITY_TOO_LARGE, contextinfo=str(exc))
         # return item
         return FakeFileStream(
@@ -734,7 +739,11 @@ class FileResource(DAVNonCollection):
             self.content_api.check_upload_size(
                 int(self.environ["CONTENT_LENGTH"]), self.content.workspace
             )
-        except (FileSizeOverMaxLimitation, FileSizeOverWorkspaceEmptySpace) as exc:
+        except (
+            FileSizeOverMaxLimitation,
+            FileSizeOverWorkspaceEmptySpace,
+            FileSizeOverOwnerEmptySpace,
+        ) as exc:
             raise DAVError(HTTP_REQUEST_ENTITY_TOO_LARGE, contextinfo=str(exc))
         return FakeFileStream(
             content=self.content,

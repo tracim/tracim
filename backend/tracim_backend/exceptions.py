@@ -295,6 +295,10 @@ class FileSizeOverWorkspaceEmptySpace(TracimException):
     error_code = ErrorCode.FILE_SIZE_OVER_WORKSPACE_EMPTY_SPACE
 
 
+class FileSizeOverOwnerEmptySpace(TracimException):
+    error_code = ErrorCode.FILE_SIZE_OVER_OWNER_EMPTY_SPACE
+
+
 class TracimUnavailablePreviewType(TracimException):
     error_code = ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 

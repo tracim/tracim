@@ -198,6 +198,13 @@ class WorkspaceApi(object):
     def get_all(self):
         return self._base_query().all()
 
+    def get_user_used_space(self, user: User) -> int:
+        workspaces = self.get_all_for_user(user, include_owned=True, include_with_role=False)
+        used_space = 0
+        for workspace in workspaces:
+            used_space += workspace.get_size()
+        return used_space
+
     def _get_workspaces_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
         return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
