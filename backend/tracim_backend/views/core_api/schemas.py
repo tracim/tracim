@@ -30,7 +30,6 @@ from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.auth import Group
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
@@ -297,7 +296,7 @@ class UserCreationSchema(marshmallow.Schema):
         validate=user_profile_validator,
         example="trusted-users",
         required=False,
-        default=Group.TIM_USER_GROUPNAME,
+        allow_none=True,
         description=FIELD_PROFILE_DESC,
     )
     timezone = StrippedString(
