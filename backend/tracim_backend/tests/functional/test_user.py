@@ -3665,6 +3665,92 @@ class TestKnownMembersEndpoint(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_known_member_filter_disabled"}], indirect=True
+)
+class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/{user_id}
+    """
+
+    def test_api__get_user__ok_200__show_all_members(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        web_testapp,
+    ):
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="bob2",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user3 = uapi.create_user(
+            email="test3@test3.test3",
+            password="password",
+            name="bob3",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        uapi.save(test_user3)
+
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        role_api = role_api_factory.get()
+        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        params = {"acp": "test"}
+        res = web_testapp.get(
+            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+
+        assert len(res) == 3
+        assert res[0]["user_id"] == test_user.user_id
+        assert res[0]["public_name"] == test_user.display_name
+        assert res[0]["avatar_url"] is None
+
+        assert res[1]["user_id"] == test_user2.user_id
+        assert res[1]["public_name"] == test_user2.display_name
+        assert res[1]["avatar_url"] is None
+
+        assert res[2]["user_id"] == test_user3.user_id
+        assert res[2]["public_name"] == test_user3.display_name
+        assert res[2]["avatar_url"] is None
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
     "config_section", [{"name": "functional_ldap_and_internal_test"}], indirect=True
 )
 class TestSetEmailPasswordLdapEndpoint(object):

@@ -255,6 +255,7 @@ class CFG(object):
                 )
             )
 
+        self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "true"))
         self.DEBUG = asbool(self.get_raw_config("debug", "false"))
 
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(

@@ -194,6 +194,11 @@ user.auth_token.validity = 604800
 ## user reset_password token lifetime (default to 900s -> 15 minutes)
 user.reset_password.token_lifetime = 900
 
+## active or disable filter on known user, if activate user cannot see at all informations about
+## member with no common workspace. if false, it can access to these informations.
+## This is used by search mecanism for invitation of user in workspace.
+## default value to true.
+; known_member.filter = true
 ####
 # IHM
 ####
