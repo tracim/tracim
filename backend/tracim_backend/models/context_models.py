@@ -202,6 +202,7 @@ class UserCreation(object):
         profile: str = None,
         lang: str = None,
         email_notification: bool = True,
+        allowed_space: typing.Optional[int] = None,
     ) -> None:
         self.email = email
         # INFO - G.M - 2018-08-16 - cleartext password, default value
@@ -212,6 +213,7 @@ class UserCreation(object):
         self.lang = lang or None
         self.profile = profile or Group.TIM_USER_GROUPNAME
         self.email_notification = email_notification
+        self.allowed_space = allowed_space
 
 
 class WorkspaceAndContentPath(object):
@@ -637,6 +639,10 @@ class UserInContext(object):
     @property
     def auth_type(self) -> str:
         return self.user.auth_type.value
+
+    @property
+    def allowed_space(self) -> int:
+        return self.user.allowed_space
 
 
 class WorkspaceInContext(object):

@@ -2757,6 +2757,40 @@ class TestUserWorkspaceEndpoint(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_allowed_space_limitation"}], indirect=True
+)
+class TestUserEndpointWithAllowedSpaceLimitation(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/{user_id}
+    """
+
+    def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test user"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["lang"] == "fr"
+        assert res["allowed_space"] == 134217728
+
+
+@pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserEndpoint(object):
     # -*- coding: utf-8 -*-
@@ -2880,6 +2914,32 @@ class TestUserEndpoint(object):
         res = web_testapp.post_json("/api/v2/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test user"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["lang"] == "fr"
+        assert res["allowed_space"] == 0
+
+    def test_api__create_user__ok_200__full_admin_with_allowed_space(
+        self, web_testapp, user_api_factory
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "allowed_space": 134217728,
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
         user_id = res["user_id"]
         assert res["created"]
         assert res["is_active"] is True
@@ -2888,11 +2948,13 @@ class TestUserEndpoint(object):
         assert res["public_name"] == "test user"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
+        assert res["allowed_space"] == 134217728
 
         uapi = user_api_factory.get()
         user = uapi.get_one(user_id)
         assert user.email == "test@test.test"
         assert user.validate_password("mysuperpassword")
+        assert user.allowed_space == 134217728
 
     def test_api__create_user__ok_200__email_treated_as_lowercase(self, web_testapp):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))

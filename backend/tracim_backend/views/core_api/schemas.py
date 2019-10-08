@@ -210,6 +210,12 @@ class UserSchema(UserDigestSchema):
         example=AuthType.INTERNAL.value,
         description="authentication system of the user",
     )
+    allowed_space = marshmallow.fields.Integer(
+        allow_none=True,
+        required=False,
+        descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+    )
 
     class Meta:
         description = "Representation of a tracim user account"
@@ -322,6 +328,12 @@ class UserCreationSchema(marshmallow.Schema):
         default=None,
     )
     email_notification = marshmallow.fields.Bool(example=True, required=False, default=True)
+    allowed_space = marshmallow.fields.Integer(
+        allow_none=True,
+        required=False,
+        descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+    )
 
     @post_load
     def create_user(self, data: typing.Dict[str, typing.Any]) -> object:

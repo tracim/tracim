@@ -247,6 +247,7 @@ class UserController(Controller):
             lang=hapic_data.body.lang,
             name=hapic_data.body.public_name,
             do_notify=hapic_data.body.email_notification,
+            allowed_space=hapic_data.body.allowed_space,
             groups=groups,
             do_save=True,
         )
