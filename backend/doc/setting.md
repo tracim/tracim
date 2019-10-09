@@ -36,6 +36,7 @@ Priority order is (from less to most priority):
 |TRACIM_USER__AUTH_TOKEN__VALIDITY|user.auth_token.validity      |USER__AUTH_TOKEN__VALIDITY    |
 |TRACIM_USER__RESET_PASSWORD__VALIDITY|user.reset_password.validity  |USER__RESET_PASSWORD__VALIDITY|
 |TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME|user.reset_password.token_lifetime|USER__RESET_PASSWORD__TOKEN_LIFETIME|
+|TRACIM_USER__DEFAULT_PROFILE  |user.default_profile          |USER__DEFAULT_PROFILE         |
 |TRACIM_DEBUG                  |debug                         |DEBUG                         |
 |TRACIM_PREVIEW__JPG__RESTRICTED_DIMS|preview.jpg.restricted_dims   |PREVIEW__JPG__RESTRICTED_DIMS |
 |TRACIM_PREVIEW__JPG__ALLOWED_DIMS|preview.jpg.allowed_dims      |PREVIEW__JPG__ALLOWED_DIMS    |

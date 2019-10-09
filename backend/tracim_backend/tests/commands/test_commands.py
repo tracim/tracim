@@ -87,7 +87,7 @@ class TestCommands(object):
         new_user = api.get_one_by_email("command_test@user")
         assert new_user.email == "command_test@user"
         assert new_user.validate_password("new_password")
-        assert new_user.profile.name == "users"
+        assert new_user.profile.slug == "users"
 
     def test_func__user_create_command__ok__in_admin_group(
         self, session, user_api_factory, hapic
@@ -123,7 +123,7 @@ class TestCommands(object):
         new_user = api.get_one_by_email("command_test@user")
         assert new_user.email == "command_test@user"
         assert new_user.validate_password("new_password")
-        assert new_user.profile.name == "administrators"
+        assert new_user.profile.slug == "administrators"
 
     def test_func__user_create_command__err__in_unknown_group(self, hapic, session) -> None:
         """
@@ -310,7 +310,7 @@ class TestCommands(object):
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
-        assert user.profile.name == "administrators"
+        assert user.profile.slug == "administrators"
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
         # TracimCLI need reseted context when ran.
@@ -337,7 +337,7 @@ class TestCommands(object):
         assert new_user.email == "admin@admin.admin"
         assert new_user.validate_password("new_password")
         assert not new_user.validate_password("admin@admin.admin")
-        assert new_user.profile.name == "trusted-users"
+        assert new_user.profile.slug == "trusted-users"
 
     def test__init__db__ok_db_already_exist(self, hapic, session, user_api_factory):
         """

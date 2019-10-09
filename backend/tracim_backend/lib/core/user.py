@@ -778,7 +778,7 @@ class UserApi(object):
             gapi = GroupApi(
                 current_user=self._user, session=self._session, config=self._config  # User
             )
-            groups = [gapi.get_one(Group.TIM_USER)]
+            groups = [gapi.get_one_with_name(self._config.USER__DEFAULT_PROFILE)]
         for group in groups:
             user.groups.append(group)
 
