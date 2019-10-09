@@ -913,6 +913,15 @@ class FileResource(DAVNonCollection):
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
+        content_in_context = self.content_api.get_content_in_context(self.content)
+        try:
+            self.content_api.check_upload_size(content_in_context.size or 0, self.content.workspace)
+        except (
+            FileSizeOverMaxLimitation,
+            FileSizeOverWorkspaceEmptySpace,
+            FileSizeOverOwnerEmptySpace,
+        ) as exc:
+            raise DAVError(HTTP_REQUEST_ENTITY_TOO_LARGE, contextinfo=str(exc))
         new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
         regex_file_extension = re.compile(
             "(?P<label>.*){}".format(re.escape(self.content.file_extension))
