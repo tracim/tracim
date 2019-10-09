@@ -313,8 +313,8 @@ class TestUserApi(object):
         with pytest.raises(TooShortAutocompleteString):
             api.get_known_user("e")
 
-    def test_unit__get_known__user__admin__by_email(self, session, app_config):
-        api = UserApi(current_user=None, session=session, config=app_config)
+    def test_unit__get_known__user__admin__by_email(self, session, app_config, admin_user):
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
 
         users = api.get_known_user("email")
@@ -332,7 +332,7 @@ class TestUserApi(object):
         assert len(users) == 0
 
     def test_unit__get_known__user__same_workspaces_users_by_name(
-        self, session, app_config, role_api_factory, workspace_api_factory
+        self, session, app_config, role_api_factory, workspace_api_factory, admin_user
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
@@ -353,9 +353,9 @@ class TestUserApi(object):
         assert users[1] == u2
 
     def test_unit__get_known__user__distinct_workspaces_users_by_name__exclude_workspace(
-        self, session, app_config, workspace_api_factory, role_api_factory
+        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
     ):
-        api = UserApi(current_user=None, session=session, config=app_config)
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
         u3 = api.create_user(
@@ -376,9 +376,9 @@ class TestUserApi(object):
         assert users[0] == u2
 
     def test_unit__get_known__user__distinct_workspaces_users_by_name__exclude_workspace_and_name(
-        self, session, app_config, workspace_api_factory, role_api_factory
+        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
     ):
-        api = UserApi(current_user=None, session=session, config=app_config)
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
         u3 = api.create_user(
@@ -427,9 +427,9 @@ class TestUserApi(object):
         assert users[1] == u2
 
     def test_unit__get_known__user__same_workspaces_users_by_name__exclude_user(
-        self, session, app_config, workspace_api_factory, role_api_factory
+        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
     ):
-        api = UserApi(current_user=None, session=session, config=app_config)
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
         u3 = api.create_user(
@@ -447,9 +447,9 @@ class TestUserApi(object):
         assert users[0] == u2
 
     def test_unit__get_known__user__same_workspaces_users_by_email(
-        self, session, app_config, workspace_api_factory, role_api_factory
+        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
     ):
-        api = UserApi(current_user=None, session=session, config=app_config)
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
         u3 = api.create_user(
@@ -467,8 +467,8 @@ class TestUserApi(object):
         assert users[0] == u1
         assert users[1] == u2
 
-    def test_unit__get_known__user__admin__by_name(self, session, app_config):
-        api = UserApi(current_user=None, session=session, config=app_config)
+    def test_unit__get_known__user__admin__by_name(self, session, app_config, admin_user):
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
 
         users = api.get_known_user("nam")
