@@ -4397,7 +4397,8 @@ class TestOwnerLimitedContentSize(object):
         try to create one file of a content at workspace root with different size
         according to size limit
         """
-
+        admin_user.allowed_space = 200
+        transaction.commit()
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.create_workspace("Business")
         marketing_workspace = workspace_api.create_workspace("Marketing")
