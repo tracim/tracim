@@ -20,12 +20,46 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
 @pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "base_test_default_profile_trusted_user"}], indirect=True
+)
+class TestUserApiWithCustomDefaultProfileForUser(object):
+    def test_unit__create_minimal_user__ok__nominal_case(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user("bob@bob")
+        assert u.email == "bob@bob"
+        assert u.display_name == "bob"
+        assert u.profile.slug == "trusted-users"
+
+    @pytest.mark.internal_auth
+    def test__unit__create__user__ok_nominal_case(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_user(
+            email="bob@bob",
+            password="password",
+            name="bob",
+            timezone="+2",
+            lang="en",
+            do_save=True,
+            do_notify=False,
+        )
+        assert u is not None
+        assert u.email == "bob@bob"
+        assert u.validate_password("password")
+        assert u.display_name == "bob"
+        assert u.timezone == "+2"
+        assert u.lang == "en"
+        assert u.profile.slug == "trusted-users"
+
+
+@pytest.mark.usefixtures("base_fixture")
 class TestUserApi(object):
     def test_unit__create_minimal_user__ok__nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         assert u.email == "bob@bob"
         assert u.display_name == "bob"
+        assert u.profile.slug == "users"
 
     def test_unit__create_minimal_user__ok__email_treated_as_lowercase(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
@@ -274,6 +308,7 @@ class TestUserApi(object):
         assert u.display_name == "bob"
         assert u.timezone == "+2"
         assert u.lang == "en"
+        assert u.profile.slug == "users"
 
     def test_unit__user_with_email_exists__ok__nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
@@ -639,7 +674,7 @@ class TestFakeLDAPUserApi(object):
         assert user.email == "hubert@planetexpress.com"
         assert user.auth_type == AuthType.LDAP
         assert user.display_name == "Hubert"
-        assert user.profile.name == "trusted-users"
+        assert user.profile.slug == "trusted-users"
 
     @pytest.mark.ldap
     def test_unit__authenticate_user___ok__new_user_ldap_auth(self, session, app_config):
@@ -655,7 +690,7 @@ class TestFakeLDAPUserApi(object):
         assert user.email == "hubert@planetexpress.com"
         assert user.auth_type == AuthType.LDAP
         assert user.display_name == "Hubert"
-        assert user.profile.name == "users"
+        assert user.profile.slug == "users"
 
     @pytest.mark.ldap
     def test__unit__create_user__err__external_auth_ldap_with_password(self, session, app_config):

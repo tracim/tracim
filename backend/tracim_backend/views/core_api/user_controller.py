@@ -235,7 +235,10 @@ class UserController(Controller):
         gapi = GroupApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        groups = [gapi.get_one_with_name(hapic_data.body.profile)]
+        if hapic_data.body.profile:
+            groups = [gapi.get_one_with_name(hapic_data.body.profile)]
+        else:
+            groups = []
         password = hapic_data.body.password
         if not password and hapic_data.body.email_notification:
             password = password_generator()

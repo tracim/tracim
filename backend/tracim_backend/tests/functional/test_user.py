@@ -2824,6 +2824,49 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section",
+    [{"name": "functional_test_with_trusted_user_as_default_profile"}],
+    indirect=True,
+)
+class TestUserEndpointTrustedUserDefaultProfile(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/{user_id}
+    """
+
+    def test_api__create_user__ok_200__full_admin_default_profile(
+        self, web_testapp, user_api_factory
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": None,
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        user_id = res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "trusted-users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test user"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["lang"] == "fr"
+
+        uapi = user_api_factory.get()
+        user = uapi.get_one(user_id)
+        assert user.email == "test@test.test"
+        assert user.validate_password("mysuperpassword")
+
+
+@pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserEndpoint(object):
     # -*- coding: utf-8 -*-
@@ -2990,6 +3033,36 @@ class TestUserEndpoint(object):
         assert user.email == "test@test.test"
         assert user.validate_password("mysuperpassword")
         assert user.allowed_space == 134217728
+
+    def test_api__create_user__ok_200__full_admin_default_profile(
+        self, web_testapp, user_api_factory
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": None,
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        user_id = res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test user"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["lang"] == "fr"
+
+        uapi = user_api_factory.get()
+        user = uapi.get_one(user_id)
+        assert user.email == "test@test.test"
+        assert user.validate_password("mysuperpassword")
 
     def test_api__create_user__ok_200__email_treated_as_lowercase(self, web_testapp):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))

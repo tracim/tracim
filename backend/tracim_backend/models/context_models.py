@@ -25,7 +25,6 @@ from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import string_to_list
-from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
@@ -220,7 +219,7 @@ class UserCreation(object):
         self.public_name = public_name or None
         self.timezone = timezone or ""
         self.lang = lang or None
-        self.profile = profile or Group.TIM_USER_GROUPNAME
+        self.profile = profile or None
         self.email_notification = email_notification
         self.allowed_space = allowed_space
 
@@ -632,7 +631,7 @@ class UserInContext(object):
 
     @property
     def profile(self) -> Profile:
-        return self.user.profile.name
+        return self.user.profile.slug
 
     @property
     def is_deleted(self) -> bool:
