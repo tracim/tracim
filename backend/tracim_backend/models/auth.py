@@ -101,19 +101,19 @@ class Profile(enum.Enum):
         self.slug = slug
 
     @classmethod
-    def get_all_valid_slugs(self):
-        return [item.slug for item in list(Profile) if item.id > 0]
+    def get_all_valid_slugs(cls):
+        return [item.slug for item in list(cls) if item.id > 0]
 
     @classmethod
-    def get_profile_from_id(self, id: int):
-        profiles = [item for item in list(Profile) if item.id == id]
+    def get_profile_from_id(cls, id: int):
+        profiles = [item for item in list(cls) if item.id == id]
         if len(profiles) != 1:
             raise ProfileDoesNotExist()
         return profiles[0]
 
     @classmethod
-    def get_profile_from_slug(self, slug: str):
-        profiles = [item for item in list(Profile) if item.slug == slug]
+    def get_profile_from_slug(cls, slug: str):
+        profiles = [item for item in list(cls) if item.slug == slug]
         if len(profiles) != 1:
             raise ProfileDoesNotExist()
         return profiles[0]
