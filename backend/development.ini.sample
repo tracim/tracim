@@ -196,6 +196,11 @@ user.reset_password.token_lifetime = 900
 ## Default profile of created user, valid values are users, trusted-users, administrators
 ; user.default_profile = users
 
+## active or disable filter on known user, if activate user cannot see at all informations about
+## member with no common workspace. if false, it can access to these informations.
+## This is used by search mecanism for invitation of user in workspace.
+## default value to true.
+; known_members.filter = true
 ####
 # IHM
 ####
