@@ -25,6 +25,7 @@ from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.roles import WorkspaceRoles
 
@@ -254,6 +255,7 @@ class CFG(object):
                     "user.reset_password.token_lifetime", defaut_reset_password_validity
                 )
             )
+        self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
 
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "true"))
         self.DEBUG = asbool(self.get_raw_config("debug", "false"))
@@ -674,6 +676,15 @@ class CFG(object):
             )
             self.check_directory_path_param(
                 "FRONTEND__DIST_FOLDER_PATH", self.FRONTEND__DIST_FOLDER_PATH
+            )
+
+        if self.USER__DEFAULT_PROFILE not in Profile.get_all_valid_slugs():
+            profile_str_list = ", ".join(
+                ['"{}"'.format(profile_name) for profile_name in Profile.get_all_valid_slugs()]
+            )
+            raise ConfigurationError(
+                'ERROR user.default_profile given "{}" is invalid,'
+                "valids values are {}.".format(self.USER__DEFAULT_PROFILE, profile_str_list)
             )
 
     def _check_email_config_validity(self) -> None:
