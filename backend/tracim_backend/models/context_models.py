@@ -653,6 +653,13 @@ class UserInContext(object):
     def allowed_space(self) -> int:
         return self.user.allowed_space
 
+    @property
+    def used_space(self) -> int:
+        from tracim_backend.lib.core.workspace import WorkspaceApi
+
+        wapi = WorkspaceApi(current_user=None, session=self.dbsession, config=self.config)
+        return wapi.get_user_used_space(self.user)
+
 
 class WorkspaceInContext(object):
     """
