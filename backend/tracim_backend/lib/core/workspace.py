@@ -186,16 +186,27 @@ class WorkspaceApi(object):
         get workspace according to label given, if multiple workspace have
         same label, return first one found.
         """
-        result = self._base_query().filter(Workspace.label == label).all()
+        # INFO - G.M - 2019-10-10 - result should be ordered same way as get_all() method,
+        # to unsure working
+        result = self.default_order_workspace(
+            self._base_query().filter(Workspace.label == label)
+        ).all()
         if len(result) == 0:
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(id)
             )
 
-        return self._base_query().filter(Workspace.label == label).all()[0]
+        return result[0]
+
+    def default_order_workspace(self, query: Query) -> Query:
+        """
+        Order workspace in a standardized way to ensure order is same between get_one_by_label
+        and other methods like get_all, this is required for webdav support to work correctly
+        """
+        return query.order_by(Workspace.workspace_id)
 
     def get_all(self):
-        return self._base_query().order_by(Workspace.workspace_id).all()
+        return self.default_order_workspace(self._base_query()).all()
 
     def _get_workspaces_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
         return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
