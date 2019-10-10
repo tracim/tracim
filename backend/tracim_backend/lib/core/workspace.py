@@ -10,7 +10,6 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
-from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
 from tracim_backend.exceptions import WorkspacePublicUploadDisabledException
@@ -98,10 +97,6 @@ class WorkspaceApi(object):
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
 
-        if self._session.query(Workspace).filter(Workspace.label == label).count() > 0:
-            raise WorkspaceLabelAlreadyUsed(
-                "A workspace with label {} already exist.".format(label)
-            )
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
@@ -147,16 +142,6 @@ class WorkspaceApi(object):
         if label is not None:
             if label == "":
                 raise EmptyLabelNotAllowed("Workspace label cannot be empty")
-            if (
-                self._session.query(Workspace)
-                .filter(Workspace.label == label)
-                .filter(Workspace.workspace_id != workspace.workspace_id)
-                .count()
-                > 0
-            ):
-                raise WorkspaceLabelAlreadyUsed(
-                    "A workspace with label {} already exist.".format(label)
-                )
             workspace.label = label
         if description is not None:
             workspace.description = description

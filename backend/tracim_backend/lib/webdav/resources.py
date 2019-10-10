@@ -25,7 +25,6 @@ from tracim_backend.exceptions import FileSizeOverMaxLimitation
 from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
-from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import AuthorizationChecker
@@ -185,11 +184,7 @@ class RootResource(DAVCollection):
         workspace_name = webdav_convert_file_name_to_bdd(name)
         try:
             new_workspace = self.workspace_api.create_workspace(workspace_name)
-        except (
-            UserNotAllowedToCreateMoreWorkspace,
-            EmptyLabelNotAllowed,
-            WorkspaceLabelAlreadyUsed,
-        ) as exc:
+        except (UserNotAllowedToCreateMoreWorkspace, EmptyLabelNotAllowed) as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
         self.workspace_api.save(new_workspace)
         self.workspace_api.execute_created_workspace_actions(new_workspace)
