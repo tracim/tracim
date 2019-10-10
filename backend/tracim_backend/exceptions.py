@@ -419,10 +419,6 @@ class ContentFilenameAlreadyUsedInFolder(TracimException):
     error_code = ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
 
-class WorkspaceLabelAlreadyUsed(TracimException):
-    error_code = ErrorCode.WORKSPACE_LABEL_ALREADY_USED
-
-
 class ParentNotFound(NotFound):
     error_code = ErrorCode.PARENT_NOT_FOUND
 

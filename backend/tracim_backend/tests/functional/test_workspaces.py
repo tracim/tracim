@@ -377,9 +377,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is True
 
-    def test_api__update_workspace__err_400__workspace_label_already_used(
-        self, web_testapp
-    ) -> None:
+    def test_api__update_workspace__ok_200__workspace_label_already_used(self, web_testapp) -> None:
         """
         Test update workspace with empty label
         """
@@ -409,11 +407,8 @@ class TestWorkspaceEndpoint(object):
         )
         # INFO - G.M - 2019-05-21 - updating one workspace to another workspace name is not allowed
         res = web_testapp.put_json(
-            "/api/v2/workspaces/{}".format(workspace2_id), status=400, params=params
+            "/api/v2/workspaces/{}".format(workspace2_id), status=200, params=params
         )
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.WORKSPACE_LABEL_ALREADY_USED
 
     def test_api__update_workspace__err_400__empty_label(self, web_testapp) -> None:
         """
@@ -456,17 +451,14 @@ class TestWorkspaceEndpoint(object):
         workspace_2 = res.json_body
         assert workspace["workspace_id"] == workspace_2["workspace_id"]
 
-    def test_api__create_workspace_err_400__label_already_used(self, web_testapp) -> None:
+    def test_api__create_workspace__ok_200__label_already_used(self, web_testapp) -> None:
         """
         Test create workspace : label already used
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "superworkspace", "description": "mysuperdescription"}
         web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
-        res = web_testapp.post_json("/api/v2/workspaces", status=400, params=params)
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.WORKSPACE_LABEL_ALREADY_USED
+        web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
 
     def test_api__create_workspace__err_400__empty_label(self, web_testapp) -> None:
         """
