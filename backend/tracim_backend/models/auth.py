@@ -174,6 +174,7 @@ class User(DeclarativeBase):
     MAX_LANG_LENGTH = 3
     MAX_AUTH_TOKEN_LENGTH = 255
     MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH = 255
+    DEFAULT_ALLOWED_SPACE = 0
 
     __tablename__ = "users"
     # INFO - G.M - 2018-10-24 - force table to use utf8 instead of
@@ -211,6 +212,7 @@ class User(DeclarativeBase):
         Unicode(MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH), nullable=True, default=None
     )
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
+    allowed_space = Column(Integer, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
 
     @hybrid_property
     def email_address(self):

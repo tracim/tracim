@@ -187,6 +187,15 @@ class UserProfile(object):
         self.profile = profile
 
 
+class UserAllowedSpace(object):
+    """
+    allowed space of user
+    """
+
+    def __init__(self, allowed_space: int) -> None:
+        self.allowed_space = allowed_space
+
+
 class UserCreation(object):
     """
     Just some user infos
@@ -201,6 +210,7 @@ class UserCreation(object):
         profile: str = None,
         lang: str = None,
         email_notification: bool = True,
+        allowed_space: typing.Optional[int] = None,
     ) -> None:
         self.email = email
         # INFO - G.M - 2018-08-16 - cleartext password, default value
@@ -211,6 +221,7 @@ class UserCreation(object):
         self.lang = lang or None
         self.profile = profile or None
         self.email_notification = email_notification
+        self.allowed_space = allowed_space
 
 
 class WorkspaceAndContentPath(object):
@@ -636,6 +647,17 @@ class UserInContext(object):
     @property
     def auth_type(self) -> str:
         return self.user.auth_type.value
+
+    @property
+    def allowed_space(self) -> int:
+        return self.user.allowed_space
+
+    @property
+    def used_space(self) -> int:
+        from tracim_backend.lib.core.workspace import WorkspaceApi
+
+        wapi = WorkspaceApi(current_user=None, session=self.dbsession, config=self.config)
+        return wapi.get_user_used_space(self.user)
 
 
 class WorkspaceInContext(object):

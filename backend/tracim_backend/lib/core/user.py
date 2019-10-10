@@ -643,6 +643,7 @@ class UserApi(object):
         lang: str = None,
         auth_type: AuthType = None,
         groups: typing.Optional[typing.List[Group]] = None,
+        allowed_space: typing.Optional[int] = None,
         do_save=True,
     ) -> User:
         validator = TracimValidator()
@@ -699,6 +700,9 @@ class UserApi(object):
                 if group not in user.groups:
                     user.groups.append(group)
 
+        if allowed_space is not None:
+            user.allowed_space = allowed_space
+
         if do_save:
             self.save(user)
 
@@ -729,6 +733,7 @@ class UserApi(object):
         lang: str = None,
         auth_type: AuthType = AuthType.UNKNOWN,
         groups=[],
+        allowed_space: typing.Optional[int] = None,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> User:
@@ -737,6 +742,8 @@ class UserApi(object):
                 "Can't create user with invitation mail because " "notification are disabled."
             )
         new_user = self.create_minimal_user(email, groups, save_now=False)
+        if allowed_space is None:
+            allowed_space = self._config.LIMITATION__USER_DEFAULT_ALLOWED_SPACE
         self.update(
             user=new_user,
             name=name,
@@ -744,6 +751,7 @@ class UserApi(object):
             auth_type=auth_type,
             password=password,
             timezone=timezone,
+            allowed_space=allowed_space,
             lang=lang,
             do_save=False,
         )
