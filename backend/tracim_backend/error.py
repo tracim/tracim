@@ -77,11 +77,6 @@ class ErrorCode(IntEnum):
     USER_CANT_DELETE_HIMSELF = 3004
     USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE = 3005
     USER_CANT_CHANGE_IS_OWN_PROFILE = 3006
-    # TODO - G.M - 2019-10-10 - remove WORKSPACE_LABEL_ALREADY_USED error
-    # 3007 error code is now deprecated. Let this code
-    # here now to avoid reusing it soon (frontend may should use it and create a
-    # another exception with same value may cause weird result)
-    WORKSPACE_LABEL_ALREADY_USED = 3007
     USER_ROLE_ALREADY_EXIST = 3008
     CONFLICTING_MOVE_IN_ITSELF = 3009
     CONFLICTING_MOVE_IN_CHILD = 3010
