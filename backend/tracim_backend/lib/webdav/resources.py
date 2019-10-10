@@ -644,7 +644,6 @@ class FolderResource(WorkspaceResource):
 
         transaction.commit()
 
-    @webdav_check_right(is_reader)
     def getMemberList(self) -> [_DAVResource]:
         members = []
         content_api = ContentApi(
