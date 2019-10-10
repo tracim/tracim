@@ -166,22 +166,23 @@ class WorkspaceApi(object):
             ) from exc
 
     def get_one_by_label(self, label: str) -> Workspace:
-        try:
-            return self._base_query().filter(Workspace.label == label).one()
-        except NoResultFound as exc:
+        splitted_label = label.split("~~", maxsplit=1)
+        if len(splitted_label) == 2 and splitted_label[1].isdecimal():
+            return self.get_one(splitted_label[1])
+        else:
+            return self._get_one_by_label(label)
+
+    def _get_one_by_label(self, label: str) -> Workspace:
+        result = self._base_query().filter(Workspace.label == label).all()
+        if len(result) == 0:
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(id)
-            ) from exc
+            )
 
-    """
-    def get_one_for_current_user(self, id):
-        return self._base_query().filter(Workspace.workspace_id==id).\
-            session.query(ZKContact).filter(ZKContact.groups.any(ZKGroup.id.in_([1,2,3])))
-            filter(sqla.).one()
-    """
+        return self._base_query().filter(Workspace.label == label).all()[0]
 
     def get_all(self):
-        return self._base_query().all()
+        return self._base_query().order_by(Workspace.workspace_id).all()
 
     def _get_workspaces_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
         return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()

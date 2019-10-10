@@ -132,10 +132,15 @@ class RootResource(DAVCollection):
 
         Though for perfomance issue, we're not using this function anymore
         """
-        return [
-            webdav_convert_file_name_to_display(workspace.label)
-            for workspace in self.workspace_api.get_all()
-        ]
+        members_names = []
+        for workspace in self.workspace_api.get_all():
+            if webdav_convert_file_name_to_display(workspace.label) in members_names:
+                label = "{workspace_label}~~{workspace_id}".format(
+                    workspace_label=workspace.label, workspace_id=workspace.workspace_id
+                )
+            else:
+                label = workspace.label
+            members_names.append(webdav_convert_file_name_to_display(label))
 
     @webdav_check_right(is_user)
     def getMember(self, label: str) -> DAVCollection:
@@ -154,7 +159,11 @@ class RootResource(DAVCollection):
             )
             # return item
             return WorkspaceResource(
-                workspace_path, self.environ, workspace, tracim_context=self.tracim_context
+                path=workspace_path,
+                environ=self.environ,
+                workspace=workspace,
+                tracim_context=self.tracim_context,
+                label=workspace.label,
             )
         except AttributeError:
             return None
@@ -198,7 +207,11 @@ class RootResource(DAVCollection):
 
         # create item
         return WorkspaceResource(
-            workspace_path, self.environ, new_workspace, tracim_context=self.tracim_context
+            path=workspace_path,
+            environ=self.environ,
+            workspace=new_workspace,
+            tracim_context=self.tracim_context,
+            label=new_workspace.label,
         )
 
     @webdav_check_right(is_user)
@@ -209,9 +222,16 @@ class RootResource(DAVCollection):
         """
 
         members = []
+        members_names = []
         for workspace in self.workspace_api.get_all():
+            if webdav_convert_file_name_to_display(workspace.label) in members_names:
+                label = "{workspace_label}~~{workspace_id}".format(
+                    workspace_label=workspace.label, workspace_id=workspace.workspace_id
+                )
+            else:
+                label = workspace.label
             # fix path
-            workspace_label = webdav_convert_file_name_to_display(workspace.label)
+            workspace_label = webdav_convert_file_name_to_display(label)
             path = add_trailing_slash(self.path)
             # return item
             workspace_path = "{}{}".format(path, workspace_label)
@@ -221,8 +241,10 @@ class RootResource(DAVCollection):
                     environ=self.environ,
                     workspace=workspace,
                     tracim_context=self.tracim_context,
+                    label=label,
                 )
             )
+            members_names.append(workspace_label)
 
         return members
 
@@ -234,7 +256,12 @@ class WorkspaceResource(DAVCollection):
     """
 
     def __init__(
-        self, path: str, environ: dict, workspace: Workspace, tracim_context: "WebdavTracimContext"
+        self,
+        label: str,
+        path: str,
+        environ: dict,
+        workspace: Workspace,
+        tracim_context: "WebdavTracimContext",
     ) -> None:
         super(WorkspaceResource, self).__init__(path, environ)
 
@@ -243,6 +270,7 @@ class WorkspaceResource(DAVCollection):
         self.tracim_context = tracim_context
         self.user = tracim_context.current_user
         self.session = tracim_context.dbsession
+        self.label = label
         self.content_api = ContentApi(
             current_user=self.user,
             session=tracim_context.dbsession,
@@ -263,7 +291,7 @@ class WorkspaceResource(DAVCollection):
         return mktime(self.workspace.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return webdav_convert_file_name_to_display(self.workspace.label)
+        return webdav_convert_file_name_to_display(self.label)
 
     def getDisplayInfo(self):
         return {"type": "workspace".capitalize()}
@@ -462,7 +490,11 @@ class FolderResource(WorkspaceResource):
         tracim_context: "WebdavTracimContext",
     ):
         super(FolderResource, self).__init__(
-            path=path, environ=environ, workspace=workspace, tracim_context=tracim_context
+            path=path,
+            environ=environ,
+            workspace=workspace,
+            tracim_context=tracim_context,
+            label=workspace.label,
         )
         self.content = content
 
