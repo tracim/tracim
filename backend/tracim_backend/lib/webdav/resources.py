@@ -513,7 +513,6 @@ class FolderResource(WorkspaceResource):
     def getDisplayInfo(self):
         return {"type": self.content.type.capitalize()}
 
-    @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
@@ -748,7 +747,6 @@ class FileResource(DAVNonCollection):
     def getDisplayInfo(self):
         return {"type": self.content.type.capitalize()}
 
-    @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
