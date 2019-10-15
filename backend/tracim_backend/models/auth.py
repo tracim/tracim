@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 import uuid
 
 import sqlalchemy
+from sqlalchemy import BigInteger
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
@@ -212,7 +213,7 @@ class User(DeclarativeBase):
         Unicode(MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH), nullable=True, default=None
     )
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
-    allowed_space = Column(Integer, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
+    allowed_space = Column(BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
 
     @hybrid_property
     def email_address(self):
