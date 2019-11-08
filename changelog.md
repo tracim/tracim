@@ -1,5 +1,11 @@
 
 
+# 2.4.4 / 2019-11-08
+
+### Fixed issues
+- Preview-generator: #2503, #2492
+
+
 # 2.4.3 / 2019-09-26
 
 ### Fixed issues
