@@ -51,6 +51,8 @@ RUN \
     python3-pip \
     python3-venv \
     qpdf \
+    ufraw-batch \
+    ffmpeg \
     redis-server \
     supervisor \
     uwsgi \

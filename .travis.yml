@@ -37,6 +37,8 @@ _install_backend: &_install_backend
         - libfile-mimeinfo-perl
         - poppler-utils
         - qpdf
+        - ffmpeg
+        - ufraw-batch
         - libldap2-dev
         - libsasl2-dev
         - docker-ce

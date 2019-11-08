@@ -26,6 +26,8 @@ on Debian Stretch (9) with sudo:
     python3-pip \
     python3-venv \
     qpdf \
+    ufraw-batch \
+    ffmpeg \
     redis-server \
     zlib1g-dev
 
