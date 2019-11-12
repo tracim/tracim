@@ -1,3 +1,5 @@
+import { PAGES as p } from '../../support/urls_commands.js'
+
 describe('content :: home_page', function () {
   before(() => {
     cy.resetDB()
@@ -6,7 +8,9 @@ describe('content :: home_page', function () {
 
   beforeEach(function () {
     cy.loginAs('users')
-    cy.visit('/ui')
+    cy.visitPage({
+      pageName: p.HOME
+    })
     cy.get('.sidebar__content__navigation__workspace__item__number').click()
   })
   it('', function () {
