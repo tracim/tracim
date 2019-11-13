@@ -73,9 +73,10 @@ RUN \
 # Go in backend folder
     && cd backend \
 # install backend
-    && pip3 install -r requirements.txt \
-    && pip3 install -e ".[postgresql]" \
-    && pip3 install -e ".[mysql]" \
+    && python3 -m pip install -U pip setuptools wheel \
+    && python3 -m pip install -r requirements.txt \
+    && python3 -m pip install -e ".[postgresql]" \
+    && python3 -m pip install -e ".[mysql]" \
     && npm install i18next-conv -g \
     && ./update_i18n_json_file.sh \
     && cd ../../ \
