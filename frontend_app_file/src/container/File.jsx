@@ -168,7 +168,10 @@ class File extends React.Component {
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
-      await this.loadContent()
+      this.setState({
+        fileCurrentPage: 1
+      })
+      await this.loadContent(1)
       this.loadTimeline()
       this.buildBreadcrumbs()
       if (state.config.workspace.downloadEnabled) {
