@@ -59,7 +59,7 @@ _install_backend: &_install_backend
     - ls -R /tmp/test
   install:
     - cd $TRAVIS_BUILD_DIR/backend
-    - pip install --upgrade pip setuptools
+    - pip install --upgrade pip setuptools wheel
 
     - pip install -r "requirements.txt"
     # postgresql
@@ -128,7 +128,7 @@ jobs:
     #    before_install:
     #      - cd backend
     #    install:
-    #      - pip install --upgrade pip setuptools
+    #      - pip install --upgrade pip setuptools wheel
     #      - pip install pip-tools
     #    before_script:
     #      - mv requirements.txt requirements_from_source.txt

@@ -40,7 +40,7 @@ function setup_pyenv {
 
 function install_backend_python_packages {
     log "install pip and setuptools"
-    pip install --upgrade pip setuptools && loggood "install pip and setuptools success" || logerror "failed to install pip and setuptools"
+    pip install --upgrade pip setuptools wheel && loggood "install pip and setuptools success" || logerror "failed to install pip and setuptools"
     log "install dependencies from requirements.txt"
     pip install -r "requirements.txt" && loggood "install requirements.txt success" || logerror "failed to install requirements.txt"
     log "install tracim-backend (sqlite_backend)..."
