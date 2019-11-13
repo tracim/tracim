@@ -21,7 +21,7 @@ env:
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
 sudo: false
 language: python
-dist: trusty
+dist: bionic
 python:
   - "3.6"
 
