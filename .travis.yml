@@ -21,7 +21,7 @@ env:
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
 sudo: false
 language: python
-dist: trusty
+dist: bionic
 python:
   - "3.6"
 
@@ -37,6 +37,8 @@ _install_backend: &_install_backend
         - libfile-mimeinfo-perl
         - poppler-utils
         - qpdf
+        - ffmpeg
+        - ufraw-batch
         - libldap2-dev
         - libsasl2-dev
         - docker-ce
@@ -57,7 +59,7 @@ _install_backend: &_install_backend
     - ls -R /tmp/test
   install:
     - cd $TRAVIS_BUILD_DIR/backend
-    - pip install --upgrade pip setuptools
+    - pip install --upgrade pip setuptools wheel
 
     - pip install -r "requirements.txt"
     # postgresql
@@ -126,7 +128,7 @@ jobs:
     #    before_install:
     #      - cd backend
     #    install:
-    #      - pip install --upgrade pip setuptools
+    #      - pip install --upgrade pip setuptools wheel
     #      - pip install pip-tools
     #    before_script:
     #      - mv requirements.txt requirements_from_source.txt
