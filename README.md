@@ -47,7 +47,7 @@ OS compatibility (tested on):
   - Stretch (9)
   - Buster (10)
 - Ubuntu:
-  - Trusty (14.04)
+  - Trusty (14.04) - need manual modification to install tracim, see https://github.com/tracim/tracim/issues/2514
   - Xenia (16.04)
   - Bionic (18.04)
 

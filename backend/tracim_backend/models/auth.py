@@ -318,9 +318,11 @@ class User(DeclarativeBase):
 
     # Reset Password Tokens #
     def generate_reset_password_token(self) -> str:
-        reset_password_token, self.reset_password_token_created, self.reset_password_token_hash = self._generate_token(
-            create_hash=True
-        )
+        (
+            reset_password_token,
+            self.reset_password_token_created,
+            self.reset_password_token_hash,
+        ) = self._generate_token(create_hash=True)
         return reset_password_token
 
     def validate_reset_password_token(self, token, validity_seconds) -> bool:

@@ -1,5 +1,18 @@
 
 
+# 2.4.4 / 2019-11-13
+
+### New Features
+
+- Preview of 3D files (*.stl), videos (10 image per each video) are now available
+
+### Fixed issues
+- Preview-generator: #2503, #2492
+
+### Known issues
+- Manual modification to install tracim on Ubuntu Trusty (14.04) is necessary (#2514)
+
+
 # 2.4.3 / 2019-09-26
 
 ### Fixed issues
