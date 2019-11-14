@@ -9,6 +9,9 @@
 ### Fixed issues
 - Preview-generator: #2503, #2492
 
+### Known issues
+- Manual modification to install tracim on Ubuntu Trusty (14.04) is necessary (#2514)
+
 
 # 2.4.3 / 2019-09-26
 
