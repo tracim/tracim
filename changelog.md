@@ -4,7 +4,7 @@
 
 ### New Features
 
-- Preview of 3D files (*.stl), videos (10 image per each video) and raw images formats are now available
+- Preview of 3D files (*.stl), videos (10 image per each video) are now available
 
 ### Fixed issues
 - Preview-generator: #2503, #2492
