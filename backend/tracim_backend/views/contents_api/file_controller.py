@@ -14,6 +14,7 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
+from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
 from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import PageOfPreviewNotFound
@@ -82,6 +83,7 @@ class FileController(Controller):
     @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverOwnerEmptySpace, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
     @check_right(can_create_file)
     @hapic.input_path(WorkspaceIdPathSchema())
@@ -139,6 +141,7 @@ class FileController(Controller):
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverOwnerEmptySpace, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(FilePathSchema())
     @hapic.input_files(SimpleFileSchema())

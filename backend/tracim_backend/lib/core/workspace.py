@@ -10,7 +10,6 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
-from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
 from tracim_backend.exceptions import WorkspacePublicUploadDisabledException
@@ -98,10 +97,6 @@ class WorkspaceApi(object):
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
 
-        if self._session.query(Workspace).filter(Workspace.label == label).count() > 0:
-            raise WorkspaceLabelAlreadyUsed(
-                "A workspace with label {} already exist.".format(label)
-            )
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
@@ -147,16 +142,6 @@ class WorkspaceApi(object):
         if label is not None:
             if label == "":
                 raise EmptyLabelNotAllowed("Workspace label cannot be empty")
-            if (
-                self._session.query(Workspace)
-                .filter(Workspace.label == label)
-                .filter(Workspace.workspace_id != workspace.workspace_id)
-                .count()
-                > 0
-            ):
-                raise WorkspaceLabelAlreadyUsed(
-                    "A workspace with label {} already exist.".format(label)
-                )
             workspace.label = label
         if description is not None:
             workspace.description = description
@@ -181,22 +166,54 @@ class WorkspaceApi(object):
             ) from exc
 
     def get_one_by_label(self, label: str) -> Workspace:
-        try:
-            return self._base_query().filter(Workspace.label == label).one()
-        except NoResultFound as exc:
+        """
+        Get one workspace by label, handle both direct
+        and "~~{workspace_id}" end form, to allow getting a specific workspace when
+        workspace_name is ambiguous (multiple workspace with same label)
+        :param label: label of workspace or "label~~{workspace_name} form.
+        :return: workspace found according to label given
+        """
+        splitted_label = label.split("~~", maxsplit=1)
+        # INFO - G.M - 2019-10-10 - unambiguous form with workspace id
+        if len(splitted_label) == 2 and splitted_label[1].isdecimal():
+            return self.get_one(splitted_label[1])
+        # INFO - G.M - 2019-10-10 - Ambiguous form with workspace label
+        else:
+            return self._get_one_by_label(label)
+
+    def _get_one_by_label(self, label: str) -> Workspace:
+        """
+        get workspace according to label given, if multiple workspace have
+        same label, return first one found.
+        """
+        # INFO - G.M - 2019-10-10 - result should be ordered same way as get_all() method,
+        # to unsure working
+        result = self.default_order_workspace(
+            self._base_query().filter(Workspace.label == label)
+        ).all()
+        if len(result) == 0:
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(id)
-            ) from exc
+            )
 
-    """
-    def get_one_for_current_user(self, id):
-        return self._base_query().filter(Workspace.workspace_id==id).\
-            session.query(ZKContact).filter(ZKContact.groups.any(ZKGroup.id.in_([1,2,3])))
-            filter(sqla.).one()
-    """
+        return result[0]
+
+    def default_order_workspace(self, query: Query) -> Query:
+        """
+        Order workspace in a standardized way to ensure order is same between get_one_by_label
+        and other methods like get_all, this is required for webdav support to work correctly
+        """
+        return query.order_by(Workspace.workspace_id)
 
     def get_all(self):
-        return self._base_query().all()
+        return self.default_order_workspace(self._base_query()).all()
+
+    def get_user_used_space(self, user: User) -> int:
+        workspaces = self.get_all_for_user(user, include_owned=True, include_with_role=False)
+        used_space = 0
+        for workspace in workspaces:
+            used_space += workspace.get_size()
+        return used_space
 
     def _get_workspaces_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
         return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
