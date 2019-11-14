@@ -70,6 +70,16 @@ class AppFullscreenRouter extends React.Component {
               return null
             }} />
 
+            <Route path={PAGE.WORKSPACE.GALLERY(':idws', ':idFolder')} render={() => {
+              const galleryConfig = {
+                workspaceId: props.match.params.idws,
+                idFolder: props.match.params.idFolder,
+                forceShowSidebar: false
+              }
+              props.renderAppFullscreen({ slug: 'gallery', hexcolor: '#7d4e24', appConfig: galleryConfig }, props.user, {})
+              return null
+            }} />
+
             <Route path={PAGE.WORKSPACE.CONTENT_EDITION(':idws', ':idcts')} render={({ match }) => {
               const content = {
                 workspace_id: match.params.idws,

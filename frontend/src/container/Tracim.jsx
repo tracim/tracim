@@ -267,6 +267,10 @@ class Tracim extends React.Component {
               <Route path={PAGE.WORKSPACE.AGENDA(':idws')} render={() =>
                 <AppFullscreenRouter />
               } />
+
+              <Route path={PAGE.WORKSPACE.GALLERY(':idws', ':idFolder')} render={() =>
+                <AppFullscreenRouter />
+              } />
             </>
           } />
 

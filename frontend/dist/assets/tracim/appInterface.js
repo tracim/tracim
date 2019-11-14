@@ -11,6 +11,8 @@ var getSelectedApp = function (appName) {
   // see https://github.com/tracim/tracim/issues/1954
   try {
     switch (appName) {
+      case 'gallery':
+        return (appGallery || {default: {}}).default
       case 'html-document':
         return (appHtmlDocument || {default: {}}).default
       case 'thread':

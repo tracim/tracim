@@ -16,6 +16,7 @@ import {
   SHARE_FOLDER_ID
 } from '../../helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
+import { Link } from 'react-router-dom'
 
 require('./Folder.styl')
 
@@ -105,6 +106,21 @@ class Folder extends React.Component {
           <div className='folder__header__button'>
             {props.userRoleIdInWorkspace >= 2 && (
               <div className='folder__header__button__addbtn'>
+                <Link
+                  className={classnames(
+                    'folder__header__button__addbtn__text',
+                    'btn',
+                    'outlineTextBtn',
+                    'primaryColorBorder',
+                    'primaryColorBgHover',
+                    'primaryColorBorderDarkenHover'
+                  )}
+                  type='button'
+                  onClick={e => e.stopPropagation()}
+                  to={PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId, props.folderData.id)}
+                >
+                  Gallery
+                </Link>
                 {props.showCreateContentButton && folderAvailableApp.length > 0 && (
                   <div title={props.t('Create in folder')}>
                     <button
