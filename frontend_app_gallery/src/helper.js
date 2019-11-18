@@ -5,6 +5,11 @@ export const removeExtensionOfFilename = filename => filename.split('.').splice(
 export const getPreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, height, width) =>
   `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview/jpg/${height}x${width}/${filenameNoExtension + '.jpg'}?page=1&revision_id=${revisionId}`
 
+export const DIRECTION = {
+  LEFT: 'left',
+  RIGHT: 'right'
+}
+
 export const debug = {
   config: {
     label: 'Admin workspace user',

@@ -13,8 +13,9 @@ import {
 import { debug } from '../helper.js'
 import { Link } from 'react-router-dom'
 import { getFolderContentList, getWorkspaceDetail, getFileContent, getFolderDetail } from '../action.async'
-import Carousel from '../component/Carousel.jsx'
-import { removeExtensionOfFilename, getPreviewUrl } from '../helper.js'
+import Carousel from '../component/CarouselVDeux.jsx'
+import Thumbnail from '../component/Thumbnail.jsx'
+import { removeExtensionOfFilename, getPreviewUrl, DIRECTION } from '../helper.js'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
@@ -36,7 +37,8 @@ class Gallery extends React.Component {
       imagesPreviews: [],
       carouselPosition: 0,
       fileCurrentPage: 1,
-      fileName: 'unknown'
+      fileName: 'unknown',
+      fileSelected: 0,
     }
 
     // i18n has been init, add resources from frontend
@@ -165,7 +167,8 @@ class Gallery extends React.Component {
 
     // FIXME use global const
     const pageForPreview = 1
-    const firstPreviews = (imagesPreviews.length < 3) ? imagesPreviews.length : 3
+    // const firstPreviews = (imagesPreviews.length < 3) ? imagesPreviews.length : 3
+    const firstPreviews = imagesPreviews.length
     for (let i = 0; i < firstPreviews; i++) {
       const fetchFileContent = await handleFetchResult(
         await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, imagesPreviews[i].contentId)
@@ -174,6 +177,7 @@ class Gallery extends React.Component {
         case 200:
           const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
           const previewUrl = getPreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, imagesPreviews[i].contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 700, 500)
+          const previewUrlForThumbnail = getPreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, imagesPreviews[i].contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 150, 150)
           const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, j) =>
             // FIXME - b.l - refactor urls
             `${state.config.apiUrl}/workspaces/${state.config.appConfig.workspaceId}/files/${imagesPreviews[i].contentId}/revisions/${fetchFileContent.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${j + 1}`
@@ -183,7 +187,8 @@ class Gallery extends React.Component {
             ...imagesPreviews[i],
             src: previewUrl,
             fileName: fetchFileContent.body.filename,
-            lightBoxUrlList
+            lightBoxUrlList,
+            previewUrlForThumbnail
           }
         // default: this.sendGlobalFlashMessage(props.t('Error while loading file content'))
       }
@@ -208,41 +213,44 @@ class Gallery extends React.Component {
     }
   }
 
-  onCarouselPositionChange = async (position) => {
-    const { state } = this
-    const imageIndexToLoad = position + 2
-    if (!state.imagesPreviews[imageIndexToLoad] || state.imagesPreviews[imageIndexToLoad].src != '' || state.carouselPosition > position) {
-      this.setState({ carouselPosition: position })
-      return
-    }
-
-    const fetchFileContent = await handleFetchResult(
-      await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, this.state.imagesPreviews[imageIndexToLoad].contentId)
-    )
-    switch (fetchFileContent.apiResponse.status) {
-      case 200:
-        const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
-        const previewUrl = getPreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, state.imagesPreviews[imageIndexToLoad].contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 700, 500)
-        const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, i) =>
-          // FIXME - b.l - refactor urls
-          `${state.config.apiUrl}/workspaces/${state.config.appConfig.workspaceId}/files/${state.imagesPreviews[imageIndexToLoad].contentId}/revisions/${fetchFileContent.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
-        )
-        let imagesPreviews = [...this.state.imagesPreviews]
-        imagesPreviews[imageIndexToLoad].src = previewUrl
-        imagesPreviews[imageIndexToLoad].fileName = fetchFileContent.body.filename
-        imagesPreviews[imageIndexToLoad].lightBoxUrlList = lightBoxUrlList
-        this.setState({ imagesPreviews, carouselPosition: position })
-      // default:
-      //   this.sendGlobalFlashMessage(props.t('Error while loading file content'))
-    }
-  }
+  // onCarouselPositionChange = async (position) => {
+  //   const { state } = this
+  //
+  //   this.setState
+  //
+  //   // const imageIndexToLoad = position + 2
+  //   // if (!state.imagesPreviews[imageIndexToLoad] || state.imagesPreviews[imageIndexToLoad].src != '' || state.carouselPosition > position) {
+  //   //   this.setState({ carouselPosition: position })
+  //   //   return
+  //   // }
+  //   //
+  //   // const fetchFileContent = await handleFetchResult(
+  //   //   await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, this.state.imagesPreviews[imageIndexToLoad].contentId)
+  //   // )
+  //   // switch (fetchFileContent.apiResponse.status) {
+  //   //   case 200:
+  //   //     const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
+  //   //     const previewUrl = getPreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, state.imagesPreviews[imageIndexToLoad].contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 700, 500)
+  //   //     const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, i) =>
+  //   //       // FIXME - b.l - refactor urls
+  //   //       `${state.config.apiUrl}/workspaces/${state.config.appConfig.workspaceId}/files/${state.imagesPreviews[imageIndexToLoad].contentId}/revisions/${fetchFileContent.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
+  //   //     )
+  //   //     let imagesPreviews = [...this.state.imagesPreviews]
+  //   //     imagesPreviews[imageIndexToLoad].src = previewUrl
+  //   //     imagesPreviews[imageIndexToLoad].fileName = fetchFileContent.body.filename
+  //   //     imagesPreviews[imageIndexToLoad].lightBoxUrlList = lightBoxUrlList
+  //   //     this.setState({ imagesPreviews, carouselPosition: position })
+  //   //   // default:
+  //   //   //   this.sendGlobalFlashMessage(props.t('Error while loading file content'))
+  //   // }
+  // }
 
   handleClickHideImageRaw = () => {
     this.setState({ displayLightbox: false })
   }
 
-  handleClickShowImageRaw = () => {
-    this.setState({ displayLightbox: true })
+  handleClickShowImageRaw = (fileSelected) => {
+    this.setState({ displayLightbox: true, fileSelected })
   }
 
   handleClickPreviousNextPage = previousNext => {
@@ -275,16 +283,16 @@ class Gallery extends React.Component {
             <Carousel
               selectedItem={state.carouselPosition}
               slides={state.imagesPreviews}
-              onCarouselPositionChange={this.onCarouselPositionChange}
+              onCarouselPositionChange={(carouselPosition) => this.setState({ carouselPosition })}
               handleClickShowImageRaw={this.handleClickShowImageRaw}
             />
 
             {state.displayLightbox
               ? (
                 <Lightbox
-                  prevSrc={state.imagesPreviews[state.carouselPosition].lightBoxUrlList[state.fileCurrentPage - 2]}
-                  mainSrc={state.imagesPreviews[state.carouselPosition].lightBoxUrlList[state.fileCurrentPage - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
-                  nextSrc={state.imagesPreviews[state.carouselPosition].lightBoxUrlList[state.fileCurrentPage]}
+                  prevSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[state.fileCurrentPage - 2]}
+                  mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[state.fileCurrentPage - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
+                  nextSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[state.fileCurrentPage]}
                   onCloseRequest={this.handleClickHideImageRaw}
                   onMovePrevRequest={() => {this.handleClickPreviousNextPage('previous')}}
                   onMoveNextRequest={() => {this.handleClickPreviousNextPage('next')}}

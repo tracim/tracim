@@ -8,13 +8,55 @@
 .pageContentGeneric.agendaPage
   height calc(100% - 135px)
 
-.carousel .slide img
-  width auto
+//.carousel .slide img
+//  width auto
+//
+//.carousel.carousel-slider .control-arrow
+//  &:hover
+//    background #7D4E24
+//    opacity 0.7
+//
+//.carousel-status fa fa-chevron-right
+//  z-index 10*
 
-.carousel.carousel-slider .control-arrow
-  &:hover
-    background #7D4E24
-    opacity 0.7
+// HACK
+.slick-prev
+  left 0
+  &::before
+    color #F96332
+    font-size 30px
+.slick-next
+  right 0
+  &::before
+    font-size 30px
+    color #F96332
 
-.carousel-status
-  z-index 10
+
+.carousel__item__preview
+  &__content
+    cursor pointer
+    text-align: center
+    display: block
+    & img
+      display inline
+      box-shadow 0 0 15px 1px rgba(0,0,0,0.75)
+      margin-bottom 50px
+      margin-top 15px
+
+.thumbnail__item__preview__content
+  cursor pointer
+  text-align center
+  display block
+  height 150px
+  &__image
+    height 154px
+    width 154px
+    margin 0 auto
+    border 1px solid #ababab
+    box-shadow 0 4px 8px 0 rgba(0,0,0,0.2)
+    &:hover
+      box-shadow 0 8px 16px 0 rgba(0,0,0,0.2)
+    & img
+      margin 0 auto
+    &__selected
+      border 2px solid #F96332

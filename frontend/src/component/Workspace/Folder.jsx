@@ -109,13 +109,13 @@ class Folder extends React.Component {
                 <Link
                   className={classnames(
                     'folder__header__button__addbtn__text',
+                    'folder__header__button__addbtn__text__link',
                     'btn',
                     'outlineTextBtn',
                     'primaryColorBorder',
                     'primaryColorBgHover',
                     'primaryColorBorderDarkenHover'
                   )}
-                  type='button'
                   onClick={e => e.stopPropagation()}
                   to={PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId, props.folderData.id)}
                 >
