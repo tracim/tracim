@@ -40,14 +40,14 @@ In order to contribute to tracim source_code, please read [CONTRIBUTING.md](./CO
 
 ## Advanced - Install tracim from the sources
 
-OS compatibility (tested on):
+OS compatibility (tested on with python >= 3.5):
 
 - Debian:
   - Jessie (8)
   - Stretch (9)
   - Buster (10)
 - Ubuntu:
-  - Trusty (14.04)
+  - Trusty (14.04) - need manual modification to install tracim, see https://github.com/tracim/tracim/issues/2514
   - Xenia (16.04)
   - Bionic (18.04)
 

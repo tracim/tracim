@@ -231,6 +231,7 @@ class WorkspaceAdvanced extends React.Component {
           'info'
         )
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       default:
         this.setState(prev => ({ content: { ...prev.content, agenda_enabled: oldAgendaEnabledValue } }))
@@ -258,6 +259,7 @@ class WorkspaceAdvanced extends React.Component {
           'info'
         )
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       default:
         this.setState(prev => ({ content: { ...prev.content, public_upload_enabled: oldUploadEnabledValue } }))
@@ -285,6 +287,7 @@ class WorkspaceAdvanced extends React.Component {
           'info'
         )
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       default:
         this.setState(prev => ({ content: { ...prev.content, public_download_enabled: oldDownloadEnabledValue } }))
@@ -358,6 +361,7 @@ class WorkspaceAdvanced extends React.Component {
         }))
         this.sendGlobalFlashMessage(props.t('Member removed', 'info'))
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while removing member', 'warning'))
     }
@@ -414,6 +418,7 @@ class WorkspaceAdvanced extends React.Component {
         })
         this.sendGlobalFlashMessage(props.t('Member added', 'info'))
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       case 400:
         switch (fetchWorkspaceNewMember.body.code) {

@@ -67,7 +67,7 @@ class ContentItem extends React.Component {
                   // https://github.com/tracim/tracim/issues/2098
                   smallIconStyle={{ color: '#252525' }}
                 />
-                : <i className={`fa fa-${props.faIcon}`} />
+                : <i className={`fa fa-fw fa-${props.faIcon}`} />
               }
             </div>
 
