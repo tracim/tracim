@@ -169,6 +169,23 @@ class UserDigestSchema(marshmallow.Schema):
     public_name = StrippedString(example="John Doe")
 
 
+class UserSpaceInfoSchema(UserDigestSchema):
+    allowed_space = marshmallow.fields.Integer(
+        validate=positive_int_validator,
+        allow_none=True,
+        required=False,
+        descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces.",
+    )
+    used_space = marshmallow.fields.Integer(
+        validate=positive_int_validator,
+        allow_none=True,
+        required=False,
+        descriptions="used space per user in bytes. this apply on sum of user owned workspace size."
+        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces.",
+    )
+
+
 class UserSchema(UserDigestSchema):
     """
     Complete user schema

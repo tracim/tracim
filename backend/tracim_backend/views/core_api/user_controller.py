@@ -38,6 +38,7 @@ from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import UserSpaceInfoSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
@@ -100,6 +101,20 @@ class UserController(Controller):
     def user(self, context, request: TracimRequest, hapic_data=None):
         """
         Get user infos.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return uapi.get_user_with_context(request.candidate_user)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(UserSpaceInfoSchema())
+    def user_space_info(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get user space infos.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
@@ -548,6 +563,12 @@ class UserController(Controller):
         # user info
         configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # noqa: W605
         configurator.add_view(self.user, route_name="user")
+
+        # user space info
+        configurator.add_route(
+            "user_space_info", "/users/{user_id:\d+}/space_info", request_method="GET"
+        )  # noqa: W605
+        configurator.add_view(self.user_space_info, route_name="user_space_info")
 
         # users lists
         configurator.add_route("users", "/users", request_method="GET")
