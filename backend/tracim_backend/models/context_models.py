@@ -766,8 +766,12 @@ class WorkspaceInContext(object):
         return self.workspace.created
 
     @property
-    def size(self) -> int:
+    def used_space(self) -> int:
         return self.workspace.get_size()
+
+    @property
+    def allowed_space(self) -> int:
+        return self.config.LIMITATION__WORKSPACE_SIZE
 
 
 class UserRoleWorkspaceInContext(object):

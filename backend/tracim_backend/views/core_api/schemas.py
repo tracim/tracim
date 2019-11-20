@@ -892,10 +892,17 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         format=DATETIME_FORMAT, description="Workspace creation date"
     )
     owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
-    size = marshmallow.fields.Int()
 
     class Meta:
         description = "Full workspace informations"
+
+
+class WorkspaceSpaceInfoSchema(marshmallow.Schema):
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    slug = StrippedString(example="intranet")
+    label = StrippedString(example="Intranet")
+    used_space = marshmallow.fields.Int(description="used space in the workspace")
+    allowed_space = marshmallow.fields.Int()
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):

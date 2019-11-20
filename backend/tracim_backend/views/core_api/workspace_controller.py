@@ -66,6 +66,7 @@ from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.core_api.schemas import WorkspaceModifySchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSpaceInfoSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ALL_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ARCHIVE_AND_RESTORE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
@@ -103,6 +104,20 @@ class WorkspaceController(Controller):
     def workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get workspace informations
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        wapi = WorkspaceApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return wapi.get_workspace_with_context(request.current_workspace)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
+    @check_right(can_see_workspace_information)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.output_body(WorkspaceSpaceInfoSchema())
+    def workspace_space_info(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get workspace space info
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
@@ -657,6 +672,11 @@ class WorkspaceController(Controller):
         # Workspace
         configurator.add_route("workspace", "/workspaces/{workspace_id}", request_method="GET")
         configurator.add_view(self.workspace, route_name="workspace")
+        # Workspace space
+        configurator.add_route(
+            "workspace_space_info", "/workspaces/{workspace_id}/space_info", request_method="GET"
+        )
+        configurator.add_view(self.workspace_space_info, route_name="workspace_space_info")
         # Create workspace
         configurator.add_route("create_workspace", "/workspaces", request_method="POST")
         configurator.add_view(self.create_workspace, route_name="create_workspace")
