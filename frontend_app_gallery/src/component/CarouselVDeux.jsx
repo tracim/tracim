@@ -1,13 +1,11 @@
 import React from 'react'
-import { translate } from 'react-i18next'
-import i18n from '../i18n.js'
-import PropTypes from 'prop-types'
-import PreviewComponent from './PreviewComponent.jsx'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 import classnames from 'classnames'
-import { DIRECTION } from '../helper'
+import MainPreview from './MainPreview.jsx'
+import PropTypes from 'prop-types'
+import ThumbnailPreview from './ThumbnailPreview.jsx'
 
 function SampleNextArrow(props) {
   const { className, style, onClick } = props
@@ -38,6 +36,7 @@ class Carousel extends React.Component {
       nav1: null,
       nav2: null
     }
+    this.autoPlay = false
   }
 
   componentDidMount() {
@@ -47,71 +46,80 @@ class Carousel extends React.Component {
     })
   }
 
-  goToSlide(index) {
-    // this.mainSlider.slickGoTo(index, false)
-    // this.props.onCarouselPositionChange(index)
-    // this.thumbnailSlider.slickGoTo(index, false)
+  onMainSliderPositionChange(newPosition) {
+    console.log('newPosition : ', newPosition)
+    if (newPosition === this.props.fileSelected) return
+    this.props.onCarouselPositionChange(newPosition)
   }
 
-  onMainSliderPositionChange(oldPosition, newPosition) {
-    // this.thumbnailSlider.slickGoTo(position, true)
-    this.props.onCarouselPositionChange(newPosition)
+  onSlickPlayClick (play) {
+    this.autoPlay = play
+    if (play) {
+      this.mainSlider.slickPlay()
+    } else {
+      this.mainSlider.slickPause()
+    }
   }
 
   render() {
     const { props } = this
-    console.log('RENDER', props.selectedItem)
+
+    // if (this.mainSlider && !this.autoPlay) this.mainSlider.slickGoTo(props.fileSelected)
+
     const settings = {
       infinite: true,
-      speed: 500,
+      speed: props.disableAnimation ? 0 : 500,
       slidesToShow: 1,
       slidesToScroll: 1,
       centerMode: true,
       swipe: false,
       lazyLoad: 'progressive',
-      beforeChange: this.onMainSliderPositionChange.bind(this),
+      afterChange: this.onMainSliderPositionChange.bind(this),
       centerPadding: '0px',
       nextArrow: <SampleNextArrow />,
-      prevArrow: <SamplePrevArrow />
+      prevArrow: <SamplePrevArrow />,
+      autoplaySpeed: 1000,
+      autoPlay: this.autoPlay
     }
-    // , props.selectedItem === index ? 'thumbnail__item__preview__content__selected' : null
 
     return (
       <div>
         <div>
+          <button onClick={() => this.onSlickPlayClick(true)}>PLAY</button>
+          <button onClick={() => this.onSlickPlayClick(false)}>Pause</button>
           <Slider
             asNavFor={this.state.nav2}
             ref={slider => (this.mainSlider = slider)}
             {...settings}
           >
             {props.slides.map((slide, index) => (
-              <div className='carousel__item__preview'>
-                <span class='carousel__item__preview__content'>
-                  <img src={slide.src} onClick={() => props.handleClickShowImageRaw(index)}/>
-                  {/*<p className="carousel__item__preview__legend">{slide.fileName}</p>*/}
-                </span>
-              </div>
+              <MainPreview
+                loggedUser={props.loggedUser}
+                previewSrc={slide.src}
+                index={index}
+                onFileDeleted={props.onFileDeleted}
+                handleClickShowImageRaw={props.handleClickShowImageRaw}
+              />
             ))}
           </Slider>
         </div>
         <Slider
           asNavFor={this.state.nav1}
           ref={slider => (this.thumbnailSlider = slider)}
-          slidesToShow={7}
+          slidesToShow={props.slides.length > 6 ? 7 : props.slides.length}
           focusOnSelect
           centerMode
           swipe={false}
           centerPadding={'0px'}
-          infinite
+          infinite={true}
           speed={200}
           arrows={false}
+          className={'carousel__top'}
         >
-          {props.slides.map((slide, index) => (
-            <div className={'thumbnail__item__preview__content'} onClick={() => this.goToSlide(index)}>
-              <div className={classnames('thumbnail__item__preview__content__image', props.selectedItem === index ? 'thumbnail__item__preview__content__image__selected' : null)}>
-              <img src={slide.previewUrlForThumbnail} />
-              </div>
-            </div>
+          {props.slides.map((slide) => (
+            <ThumbnailPreview
+              previewSrc={slide.previewUrlForThumbnail}
+            />
           ))}
         </Slider>
       </div>

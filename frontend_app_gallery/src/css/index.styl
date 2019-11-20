@@ -1,62 +1,76 @@
-#agendaIframe
-  width 100%
-  height 100%
-  border none
 
-.pageWrapperGeneric.agendaPage
-  height 100%
-.pageContentGeneric.agendaPage
-  height calc(100% - 135px)
-
-//.carousel .slide img
-//  width auto
-//
-//.carousel.carousel-slider .control-arrow
-//  &:hover
-//    background #7D4E24
-//    opacity 0.7
-//
-//.carousel-status fa fa-chevron-right
-//  z-index 10*
-
-// HACK
+// HACK EASY TO FIX : CUSTOM ARROWS
 .slick-prev
   left 0
+  z-index 20
   &::before
     color #F96332
     font-size 30px
 .slick-next
   right 0
+  z-index 20
   &::before
     font-size 30px
     color #F96332
+.carousel__top .slick-current
+  & img
+    border 3px #7D4E24 solid
+
 
 
 .carousel__item__preview
   &__content
-    cursor pointer
-    text-align: center
     display: block
-    & img
-      display inline
-      box-shadow 0 0 15px 1px rgba(0,0,0,0.75)
-      margin-bottom 50px
-      margin-top 15px
+    text-align: center
+    &__image
+      margin 20px 0
+      display flex
+      min-height 500px
+      & img
+        object-fit contain
+        cursor pointer
+        margin auto
+        box-shadow 0 4px 8px 0 rgba(0,0,0,0.4)
 
 .thumbnail__item__preview__content
-  cursor pointer
-  text-align center
   display block
   height 150px
+  cursor pointer
+  text-align center
   &__image
-    height 154px
-    width 154px
+    display flex
+    align-items center
+    height 150px
+    width 150px
     margin 0 auto
-    border 1px solid #ababab
-    box-shadow 0 4px 8px 0 rgba(0,0,0,0.2)
-    &:hover
-      box-shadow 0 8px 16px 0 rgba(0,0,0,0.2)
     & img
       margin 0 auto
-    &__selected
-      border 2px solid #F96332
+      box-shadow 0 4px 8px 0 rgba(0,0,0,0.4)
+      &:hover
+        box-shadow 0 8px 16px 0 rgba(0,0,0,0.6)
+
+// VTROIS
+//.originalClassVTrois img
+//  margin 0 auto
+//  display block
+//  height 500px
+//  width 90%
+//  object-fit contain
+//
+//.image-gallery {
+//  width: 100%;
+//  height: auto;
+//}
+//
+//.image-gallery-slide img {
+//  width 100%
+//  height 500px
+//  max-height 70vh
+//  object-fit contain
+//  overflow hidden
+//  object-position center center
+//}
+//
+//.fullscreen .image-gallery-slide img {
+//  height 100%
+//}

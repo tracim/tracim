@@ -38,7 +38,7 @@ export const PAGE = {
     SHARE_FOLDER: (idws = ':idws') => `/ui/workspaces/${idws}/contents/share_folder`,
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
     CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
-    GALLERY: (idws = ':idws', idFolder = ':idFolder') => `/ui/workspaces/${idws}/gallery/${idFolder}`
+    GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',

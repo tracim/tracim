@@ -438,6 +438,7 @@ class Dashboard extends React.Component {
           const creationLabelWithHACK = (() => {
             switch (app.slug) {
               case 'agenda': return props.t('Open the agenda')
+              case 'gallery': return props.t('Open the gallery')
               case 'collaborative_document_edition': return HACK_COLLABORA_CONTENT_TYPE([{}]).creationLabel
               default: return contentType.creationLabel
             }
@@ -448,7 +449,7 @@ class Dashboard extends React.Component {
           const slugWithHACK = app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug
             ? HACK_COLLABORA_CONTENT_TYPE([{}]).slug
             : contentType.slug
-
+          if (app.slug === 'gallery') console.log('galleryApp', app)
           return {
             ...app,
             hexcolor: app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug
@@ -457,7 +458,9 @@ class Dashboard extends React.Component {
             creationLabel: creationLabelWithHACK,
             route: app.slug === 'agenda'
               ? PAGE.WORKSPACE.AGENDA(props.curWs.id)
-              : `${PAGE.WORKSPACE.NEW(props.curWs.id, slugWithHACK)}?parent_id=null`
+              : app.slug === 'gallery'
+                ? PAGE.WORKSPACE.GALLERY(props.curWs.id)
+                : `${PAGE.WORKSPACE.NEW(props.curWs.id, slugWithHACK)}?parent_id=null`
           }
         })
       : []

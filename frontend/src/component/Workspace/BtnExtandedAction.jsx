@@ -1,8 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { PAGE } from '../../helper'
+import { Link } from 'react-router-dom'
 
 const ExtandedAction = props => {
+  console.log('folderData', props.folderData)
+
   return (
     <div
       className='extandedaction dropdown'
@@ -81,6 +85,21 @@ const ExtandedAction = props => {
           </div>
         )}
 
+        {props.folderData && (
+          <Link
+            className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
+            onClick={e => e.stopPropagation()}
+            to={`${PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId)}?folder_ids=${props.folderData.id}`}
+          >
+            <div className='subdropdown__item__icon mr-3'>
+              <i className='fa fa-fw fa-picture-o' />
+            </div>
+
+            <div className='subdropdown__item__text'>
+              {props.t('Gallery')}
+            </div>
+          </Link>
+        )}
       </div>
     </div>
   )

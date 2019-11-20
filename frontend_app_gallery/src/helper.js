@@ -2,14 +2,6 @@ import i18n from './i18n.js'
 
 export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
 
-export const getPreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, height, width) =>
-  `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview/jpg/${height}x${width}/${filenameNoExtension + '.jpg'}?page=1&revision_id=${revisionId}`
-
-export const DIRECTION = {
-  LEFT: 'left',
-  RIGHT: 'right'
-}
-
 export const debug = {
   config: {
     label: 'Admin workspace user',
@@ -17,7 +9,7 @@ export const debug = {
     faIcon: 'file-text-o',
     hexcolor: '#7d4e24',
     type: 'user', // 'user' or 'workspace'
-    translation: {en: {}, fr: {}},
+    translation: { en: {}, fr: {} },
     apiUrl: 'http://localhost:6543/api/v2',
     apiHeader: {
       'Accept': 'application/json',

@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
+  getFilePreviewUrl,
   CUSTOM_EVENT,
   PageTitle,
   PageWrapper,
@@ -10,15 +11,22 @@ import {
   handleFetchResult,
   BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
-import { debug } from '../helper.js'
 import { Link } from 'react-router-dom'
-import { getFolderContentList, getWorkspaceDetail, getFileContent, getFolderDetail } from '../action.async'
+import {
+  getFolderContentList,
+  getWorkspaceDetail,
+  getFileContent,
+  getFolderDetail,
+  putFileIsDeleted,
+  getWorkspaceContentList
+} from '../action.async'
 import Carousel from '../component/CarouselVDeux.jsx'
-import Thumbnail from '../component/Thumbnail.jsx'
-import { removeExtensionOfFilename, getPreviewUrl, DIRECTION } from '../helper.js'
+import { removeExtensionOfFilename, debug } from '../helper.js'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
+
+const qs = require('query-string')
 
 class Gallery extends React.Component {
   constructor (props) {
@@ -30,15 +38,13 @@ class Gallery extends React.Component {
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
-      userWorkspaceList: [],
-      userWorkspaceListLoaded: false,
       breadcrumbsList: [],
       appMounted: false,
+      folderId: qs.parse(props.data.config.history.location.search).folder_ids,
       imagesPreviews: [],
-      carouselPosition: 0,
       fileCurrentPage: 1,
       fileName: 'unknown',
-      fileSelected: 0,
+      fileSelected: 0
     }
 
     // i18n has been init, add resources from frontend
@@ -55,7 +61,7 @@ class Gallery extends React.Component {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Gallery> Custom event', 'color: #28a745', type, data)
         if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
-          this.setState({config: data.config})
+          this.setState({ config: data.config })
         }
         break
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -79,8 +85,8 @@ class Gallery extends React.Component {
 
     console.log('%c<Gallery> did mount', `color: ${state.config.hexcolor}`)
 
-    await this.loadFolderDetail(state.config.appConfig.workspaceId, state.config.appConfig.idFolder)
-    await this.loadGalleryList(state.config.appConfig.workspaceId, state.config.appConfig.idFolder)
+    if (state.folderId) await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
+    await this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
     if (state.config.appConfig.workspaceId !== null) await this.loadWorkspaceData()
     this.buildBreadcrumbs()
   }
@@ -92,6 +98,9 @@ class Gallery extends React.Component {
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
       await this.loadWorkspaceData()
+      this.buildBreadcrumbs()
+    }
+    if (prevState.fileSelected !== state.fileSelected) {
       this.buildBreadcrumbs()
     }
   }
@@ -107,13 +116,18 @@ class Gallery extends React.Component {
     const breadcrumbsList = [{
       link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
-    }]
-
-    breadcrumbsList.push({
+    }, {
       link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{state.content.workspaceLabel}</Link>,
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN
-    }, {
-      link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/gallery/${state.config.appConfig.idFolder}`}>{state.fileName}</Link>,
+    }]
+    if (state.folderId) {
+      breadcrumbsList.push({
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/gallery?folder_ids=${state.folderId}`}>{state.fileName}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      })
+    }
+    breadcrumbsList.push({
+      link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}>{state.imagesPreviews[state.fileSelected].fileName}</Link>,
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN
     })
 
@@ -121,7 +135,7 @@ class Gallery extends React.Component {
     // app crash telling it cannot render a Link outside a router
     // see https://github.com/tracim/tracim/issues/1637
     // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
-    this.setState({breadcrumbsList: breadcrumbsList})
+    this.setState({ breadcrumbsList: breadcrumbsList })
   }
 
   loadFolderDetail = async (workspaceId, folderId) => {
@@ -142,19 +156,29 @@ class Gallery extends React.Component {
   loadGalleryList = async (workspaceId, folderId) => {
     const { state, props } = this
 
-    const fetchContentList = await handleFetchResult(
-      await getFolderContentList(state.config.apiUrl, workspaceId, folderId)
-    )
+    let fetchContentList
+    if (folderId) {
+      fetchContentList = await handleFetchResult(
+        await getFolderContentList(state.config.apiUrl, workspaceId, folderId)
+      )
+    } else {
+      fetchContentList = await handleFetchResult(
+        await getWorkspaceContentList(state.config.apiUrl, workspaceId)
+      )
+    }
+
+    console.log('Reponse attendu', fetchContentList)
 
     switch (fetchContentList.apiResponse.status) {
       case 200:
-        let imagesPreviews = []
+        let images = []
         fetchContentList.body.forEach(content => {
           if (content.content_type === 'file') {
-            imagesPreviews.push({ src: '', contentId: content.content_id})
+            images.push({ src: '', contentId: content.content_id })
           }
         })
-        await this.loadFirstPreview(imagesPreviews)
+        const imagesPreviews = await this.loadPreview(images)
+
         this.setState({ imagesPreviews })
 
         break
@@ -162,41 +186,38 @@ class Gallery extends React.Component {
     }
   }
 
-  loadFirstPreview = async (imagesPreviews) => {
-    const { state, props } = this
+  loadPreview = async (images) => {
+    const { state } = this
 
     // FIXME use global const
     const pageForPreview = 1
-    // const firstPreviews = (imagesPreviews.length < 3) ? imagesPreviews.length : 3
-    const firstPreviews = imagesPreviews.length
-    for (let i = 0; i < firstPreviews; i++) {
+    return await Promise.all(images.map(async (image) => {
       const fetchFileContent = await handleFetchResult(
-        await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, imagesPreviews[i].contentId)
+        await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId)
       )
       switch (fetchFileContent.apiResponse.status) {
         case 200:
           const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
-          const previewUrl = getPreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, imagesPreviews[i].contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 700, 500)
-          const previewUrlForThumbnail = getPreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, imagesPreviews[i].contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 150, 150)
+          const previewUrl = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 1400, 500)
+          const previewUrlForThumbnail = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 150, 150)
           const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, j) =>
-            // FIXME - b.l - refactor urls
-            `${state.config.apiUrl}/workspaces/${state.config.appConfig.workspaceId}/files/${imagesPreviews[i].contentId}/revisions/${fetchFileContent.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${j + 1}`
+            getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, j + 1, 1920, 1080)
           )
 
-          imagesPreviews[i] = {
-            ...imagesPreviews[i],
+          return ({
+            ...image,
             src: previewUrl,
             fileName: fetchFileContent.body.filename,
             lightBoxUrlList,
             previewUrlForThumbnail
-          }
+          })
         // default: this.sendGlobalFlashMessage(props.t('Error while loading file content'))
       }
-    }
+    }))
   }
 
   loadWorkspaceData = async () => {
-    const { state, props } = this
+    const { state } = this
 
     const fetchResultWorkspaceDetail = await handleFetchResult(
       await getWorkspaceDetail(state.config.apiUrl, state.config.appConfig.workspaceId)
@@ -213,38 +234,6 @@ class Gallery extends React.Component {
     }
   }
 
-  // onCarouselPositionChange = async (position) => {
-  //   const { state } = this
-  //
-  //   this.setState
-  //
-  //   // const imageIndexToLoad = position + 2
-  //   // if (!state.imagesPreviews[imageIndexToLoad] || state.imagesPreviews[imageIndexToLoad].src != '' || state.carouselPosition > position) {
-  //   //   this.setState({ carouselPosition: position })
-  //   //   return
-  //   // }
-  //   //
-  //   // const fetchFileContent = await handleFetchResult(
-  //   //   await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, this.state.imagesPreviews[imageIndexToLoad].contentId)
-  //   // )
-  //   // switch (fetchFileContent.apiResponse.status) {
-  //   //   case 200:
-  //   //     const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
-  //   //     const previewUrl = getPreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, state.imagesPreviews[imageIndexToLoad].contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 700, 500)
-  //   //     const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, i) =>
-  //   //       // FIXME - b.l - refactor urls
-  //   //       `${state.config.apiUrl}/workspaces/${state.config.appConfig.workspaceId}/files/${state.imagesPreviews[imageIndexToLoad].contentId}/revisions/${fetchFileContent.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
-  //   //     )
-  //   //     let imagesPreviews = [...this.state.imagesPreviews]
-  //   //     imagesPreviews[imageIndexToLoad].src = previewUrl
-  //   //     imagesPreviews[imageIndexToLoad].fileName = fetchFileContent.body.filename
-  //   //     imagesPreviews[imageIndexToLoad].lightBoxUrlList = lightBoxUrlList
-  //   //     this.setState({ imagesPreviews, carouselPosition: position })
-  //   //   // default:
-  //   //   //   this.sendGlobalFlashMessage(props.t('Error while loading file content'))
-  //   // }
-  // }
-
   handleClickHideImageRaw = () => {
     this.setState({ displayLightbox: false })
   }
@@ -257,47 +246,91 @@ class Gallery extends React.Component {
     const { state } = this
 
     if (!['previous', 'next'].includes(previousNext)) return
-    if (previousNext === 'previous' && state.fileCurrentPage === 0) return
-    if (previousNext === 'next' && state.fileCurrentPage > state.imagesPreviews[state.carouselPosition].lightBoxUrlList.length) return
 
-    const nextPageNumber = previousNext === 'previous' ? state.fileCurrentPage - 1 : state.fileCurrentPage + 1
+    let nextPageNumber = previousNext === 'previous' ? state.fileSelected - 1 : state.fileSelected + 1
 
-    this.setState(prev => ({
-      fileCurrentPage: nextPageNumber,
-    }))
+    if (previousNext === 'next' && state.fileSelected === state.imagesPreviews.length - 1) nextPageNumber = 0
+    if (previousNext === 'previous' && state.fileSelected === 0) nextPageNumber = state.imagesPreviews.length - 1
+
+    console.log('NEXT', nextPageNumber)
+    this.setState({
+      fileSelected: nextPageNumber
+    })
+  }
+
+  getPreviousImage = () => {
+    const { state } = this
+
+    console.log('PreviousImage', state.fileSelected)
+    if (state.fileSelected === 0) return state.imagesPreviews[state.imagesPreviews.length - 1].lightBoxUrlList[0]
+    return state.imagesPreviews[state.fileSelected - 1].lightBoxUrlList[0]
+  }
+
+  getNextImage = () => {
+    const { state } = this
+
+    console.log('NextImage', state.fileSelected)
+    if (state.fileSelected === state.imagesPreviews.length - 1) return state.imagesPreviews[0].lightBoxUrlList[0]
+    return state.imagesPreviews[state.fileSelected + 1].lightBoxUrlList[0]
+  }
+
+  onCarouselPositionChange = (fileSelected) => {
+    console.log('CarouselPositionChange', fileSelected)
+    this.setState({ fileSelected })
+  }
+
+  deleteFile = async (filePosition) => {
+    const { state } = this
+    const contentIdToDelete = state.imagesPreviews[filePosition].contentId
+    const putResult = await handleFetchResult(
+      await putFileIsDeleted(state.config.apiUrl, state.config.appConfig.workspaceId, state.imagesPreviews[filePosition].contentId)
+    )
+    switch (putResult.status) {
+      case 204:
+        const newImagesPreviews = this.state.imagesPreviews.filter((image) => (image.contentId !== contentIdToDelete))
+        this.setState({
+          imagesPreviews: newImagesPreviews
+        })
+      default:
+    }
   }
 
   render () {
     const { state } = this
     return (
       <div>
-        <PageWrapper customClass='agendaPage'>
+        <PageWrapper customClass='galleryPage'>
           <PageTitle
             parentClass='galleryPage'
-            title={state.fileName}
+            title={state.folderId ? state.fileName : state.content.workspaceLabel}
             icon={'picture-o'}
             breadcrumbsList={state.breadcrumbsList}
           />
 
-          <PageContent parentClass='agendaPage'>
+          <PageContent parentClass='galleryPage'>
+
             <Carousel
-              selectedItem={state.carouselPosition}
+              fileSelected={state.fileSelected}
               slides={state.imagesPreviews}
-              onCarouselPositionChange={(carouselPosition) => this.setState({ carouselPosition })}
+              onCarouselPositionChange={this.onCarouselPositionChange}
               handleClickShowImageRaw={this.handleClickShowImageRaw}
+              onFileDeleted={this.deleteFile}
+              loggedUser={state.loggedUser}
+              disableAnimation={state.displayLightbox}
             />
 
             {state.displayLightbox
               ? (
                 <Lightbox
-                  prevSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[state.fileCurrentPage - 2]}
-                  mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[state.fileCurrentPage - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
-                  nextSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[state.fileCurrentPage]}
+                  prevSrc={this.getPreviousImage()}
+                  mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
+                  nextSrc={this.getNextImage()}
                   onCloseRequest={this.handleClickHideImageRaw}
-                  onMovePrevRequest={() => {this.handleClickPreviousNextPage('previous')}}
-                  onMoveNextRequest={() => {this.handleClickPreviousNextPage('next')}}
+                  onMovePrevRequest={() => { this.handleClickPreviousNextPage('previous') }}
+                  onMoveNextRequest={() => { this.handleClickPreviousNextPage('next') }}
                   // imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
-                  imagePadding={55}
+                  imagePadding={10}
+                  wrapperClassName={'maclass'}
                 />
               )
               : null

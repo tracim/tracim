@@ -167,7 +167,10 @@ export const parserStringToList = (string, separatorList = [',', ';', '\n']) => 
 export const checkEmailValidity = email => {
   const parts = email.split('@')
   if (parts.length !== 2) return false
-  
+
   const domainParts = parts[1].split('.')
   return domainParts.length === 2
 }
+
+export const getFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) =>
+  `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview/jpg/${width}x${height}/${filenameNoExtension + '.jpg'}?page=${page}`

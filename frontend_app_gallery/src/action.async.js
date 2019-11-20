@@ -38,6 +38,16 @@ export const getWorkspaceDetail = (apiUrl, workspaceId) => {
   })
 }
 
+export const getWorkspaceContentList = (apiUrl, workspaceId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents?parent_ids=0`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+}
+
 export const getWorkspaceMemberList = (apiUrl, workspaceId) => {
   return fetch(`${apiUrl}/workspaces/${workspaceId}/members`, {
     credentials: 'include',
@@ -45,5 +55,15 @@ export const getWorkspaceMemberList = (apiUrl, workspaceId) => {
       ...FETCH_CONFIG.headers
     },
     method: 'GET'
+  })
+}
+
+export const putFileIsDeleted = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
   })
 }

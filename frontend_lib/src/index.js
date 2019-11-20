@@ -12,7 +12,8 @@ import {
   FETCH_CONFIG,
   displayFileSize,
   parserStringToList,
-  checkEmailValidity
+  checkEmailValidity,
+  getFilePreviewUrl
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -91,6 +92,7 @@ export {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
+  getFilePreviewUrl,
   Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,

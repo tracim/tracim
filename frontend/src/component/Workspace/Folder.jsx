@@ -16,7 +16,6 @@ import {
   SHARE_FOLDER_ID
 } from '../../helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
-import { Link } from 'react-router-dom'
 
 require('./Folder.styl')
 
@@ -104,89 +103,70 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__button'>
-            {props.userRoleIdInWorkspace >= 2 && (
-              <div className='folder__header__button__addbtn'>
-                <Link
-                  className={classnames(
-                    'folder__header__button__addbtn__text',
-                    'folder__header__button__addbtn__text__link',
-                    'btn',
-                    'outlineTextBtn',
-                    'primaryColorBorder',
-                    'primaryColorBgHover',
-                    'primaryColorBorderDarkenHover'
-                  )}
-                  onClick={e => e.stopPropagation()}
-                  to={PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId, props.folderData.id)}
-                >
-                  Gallery
-                </Link>
-                {props.showCreateContentButton && folderAvailableApp.length > 0 && (
-                  <div title={props.t('Create in folder')}>
-                    <button
-                      className={classnames(
-                        'folder__header__button__addbtn__text',
-                        'btn',
-                        'outlineTextBtn',
-                        'primaryColorBorder',
-                        'primaryColorBgHover',
-                        'primaryColorBorderDarkenHover',
-                        'dropdown-toggle',
-                        props.userRoleIdInWorkspace === 2 ? 'no-margin-right' : ''
-                      )}
-                      type='button'
-                      id='dropdownMenuButton'
-                      data-toggle='dropdown'
-                      aria-haspopup='true'
-                      aria-expanded='false'
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <span className='folder__header__button__addbtn__text-desktop'>
-                        {`${props.t('Create in folder')}...`}
-                      </span>
+            <div className='folder__header__button__addbtn'>
+              {props.userRoleIdInWorkspace >= 2 && props.showCreateContentButton && folderAvailableApp.length > 0 && (
+                <div title={props.t('Create in folder')}>
+                  <button
+                    className={classnames(
+                      'folder__header__button__addbtn__text',
+                      'btn',
+                      'outlineTextBtn',
+                      'primaryColorBorder',
+                      'primaryColorBgHover',
+                      'primaryColorBorderDarkenHover',
+                      'dropdown-toggle',
+                      props.userRoleIdInWorkspace === 2 ? 'no-margin-right' : ''
+                    )}
+                    type='button'
+                    id='dropdownMenuButton'
+                    data-toggle='dropdown'
+                    aria-haspopup='true'
+                    aria-expanded='false'
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <span className='folder__header__button__addbtn__text-desktop'>
+                      {`${props.t('Create in folder')}...`}
+                    </span>
 
-                      <span className='folder__header__button__addbtn__text-responsive'>
-                        <i className='folder__header__button__addbtn__text-responsive__iconplus fa fa-plus' />
-                      </span>
-                    </button>
+                    <span className='folder__header__button__addbtn__text-responsive'>
+                      <i className='folder__header__button__addbtn__text-responsive__iconplus fa fa-plus' />
+                    </span>
+                  </button>
 
-                    <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                      <SubDropdownCreateButton
-                        folderId={props.folderData.id}
-                        availableApp={folderAvailableApp}
-                        onClickCreateContent={(e, folderId, slug) => props.onClickCreateContent(e, folderId, slug)}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className='d-none d-md-flex' title={props.t('Actions')}>
-                  {props.userRoleIdInWorkspace >= 4 && (
-                    <BtnExtandedAction
-                      userRoleIdInWorkspace={props.userRoleIdInWorkspace}
-                      onClickExtendedAction={{
-                        edit: {
-                          callback: e => props.onClickExtendedAction.edit(e, props.folderData),
-                          label: props.t('Edit')
-                        },
-                        download: {
-                          callback: e => props.onClickExtendedAction.download(e, props.folderData),
-                          label: props.t('Download')
-                        },
-                        archive: {
-                          callback: e => props.onClickExtendedAction.archive(e, props.folderData),
-                          label: props.t('Archive')
-                        },
-                        delete: {
-                          callback: e => props.onClickExtendedAction.delete(e, props.folderData),
-                          label: props.t('Delete')
-                        }
-                      }}
+                  <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                    <SubDropdownCreateButton
+                      folderId={props.folderData.id}
+                      availableApp={folderAvailableApp}
+                      onClickCreateContent={(e, folderId, slug) => props.onClickCreateContent(e, folderId, slug)}
                     />
-                  )}
+                  </div>
                 </div>
+              )}
+              <div className='d-none d-md-flex' title={props.t('Actions')}>
+                <BtnExtandedAction
+                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+                  onClickExtendedAction={{
+                    edit: {
+                      callback: e => props.onClickExtendedAction.edit(e, props.folderData),
+                      label: props.t('Edit')
+                    },
+                    download: {
+                      callback: e => props.onClickExtendedAction.download(e, props.folderData),
+                      label: props.t('Download')
+                    },
+                    archive: {
+                      callback: e => props.onClickExtendedAction.archive(e, props.folderData),
+                      label: props.t('Archive')
+                    },
+                    delete: {
+                      callback: e => props.onClickExtendedAction.delete(e, props.folderData),
+                      label: props.t('Delete')
+                    }
+                  }}
+                  folderData={props.folderData}
+                />
               </div>
-            )}
+            </div>
           </div>
 
           <div className='folder__header__status' />
