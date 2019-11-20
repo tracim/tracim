@@ -101,7 +101,7 @@ class ShareTokenWithFilenamePath(object):
 
 
 class ShareCreationBody(object):
-    def __init__(self, emails: typing.List[str], password: typing.Optional[str]):
+    def __init__(self, emails: typing.List[str], password: typing.Optional[str] = None):
         self.emails = emails
         self.password = password
 
