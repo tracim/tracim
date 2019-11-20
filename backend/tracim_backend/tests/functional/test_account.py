@@ -1005,6 +1005,50 @@ class TestAccountWorkspaceEndpoint(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestAccountAllowedSpaceEndpoint(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/me/allowed_space
+    """
+
+    def test_api__get_user_allowed_space__ok_200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        res = web_testapp.get("/api/v2/users/me/allowed_space", status=200)
+        res = res.json_body
+        assert res["used_space"] == 0
+        assert res["public_name"] == "bob"
+        assert res["avatar_url"] is None
+        assert res["allowed_space"] == 0
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestAccountEndpoint(object):
     # -*- coding: utf-8 -*-
     """

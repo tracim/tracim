@@ -54,6 +54,56 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestWorkspaceAllowedSpaceEndpoint(object):
+    """
+    Tests for /api/v2/workspaces/{workspace_id}/allowed_space endpoint
+    """
+
+    def test_api__get_workspace_allowed_space__ok_200__nominal_case(
+        self,
+        web_testapp,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        application_api_factory,
+    ) -> None:
+        """
+        Check obtain workspace reachable for user.
+        """
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.get_one(workspace.workspace_id)
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/allowed_space".format(workspace.workspace_id), status=200
+        )
+        res = res.json_body
+        assert res["used_space"] == 0
+        assert res["workspace_id"] == workspace.workspace_id
+        assert res["label"] == "test"
+        assert res["allowed_space"] == 0
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWorkspaceEndpoint(object):
     """
     Tests for /api/v2/workspaces/{workspace_id} endpoint
