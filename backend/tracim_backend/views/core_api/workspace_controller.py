@@ -57,6 +57,7 @@ from tracim_backend.views.core_api.schemas import ContentMoveSchema
 from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import RoleUpdateSchema
+from tracim_backend.views.core_api.schemas import WorkspaceAllowedSpaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
@@ -66,7 +67,6 @@ from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.core_api.schemas import WorkspaceModifySchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
-from tracim_backend.views.core_api.schemas import WorkspaceSpaceInfoSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ALL_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ARCHIVE_AND_RESTORE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
@@ -114,8 +114,8 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @check_right(can_see_workspace_information)
     @hapic.input_path(WorkspaceIdPathSchema())
-    @hapic.output_body(WorkspaceSpaceInfoSchema())
-    def workspace_space_info(self, context, request: TracimRequest, hapic_data=None):
+    @hapic.output_body(WorkspaceAllowedSpaceSchema())
+    def workspace_allowed_space(self, context, request: TracimRequest, hapic_data=None):
         """
         Get workspace space info
         """
@@ -674,9 +674,11 @@ class WorkspaceController(Controller):
         configurator.add_view(self.workspace, route_name="workspace")
         # Workspace space
         configurator.add_route(
-            "workspace_space_info", "/workspaces/{workspace_id}/space_info", request_method="GET"
+            "workspace_allowed_space",
+            "/workspaces/{workspace_id}/allowed_space",
+            request_method="GET",
         )
-        configurator.add_view(self.workspace_space_info, route_name="workspace_space_info")
+        configurator.add_view(self.workspace_allowed_space, route_name="workspace_allowed_space")
         # Create workspace
         configurator.add_route("create_workspace", "/workspaces", request_method="POST")
         configurator.add_view(self.create_workspace, route_name="create_workspace")
