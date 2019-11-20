@@ -171,18 +171,12 @@ class UserDigestSchema(marshmallow.Schema):
 
 class UserSpaceInfoSchema(UserDigestSchema):
     allowed_space = marshmallow.fields.Integer(
-        validate=positive_int_validator,
-        allow_none=True,
-        required=False,
         descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces.",
+        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces. 0 mean no limit"
     )
     used_space = marshmallow.fields.Integer(
-        validate=positive_int_validator,
-        allow_none=True,
-        required=False,
         descriptions="used space per user in bytes. this apply on sum of user owned workspace size."
-        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces.",
+        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces."
     )
 
 
@@ -232,7 +226,7 @@ class UserSchema(UserDigestSchema):
         allow_none=True,
         required=False,
         descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     class Meta:
@@ -315,7 +309,7 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
         allow_none=True,
         required=False,
         descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit.",
     )
 
     @post_load
@@ -369,7 +363,7 @@ class UserCreationSchema(marshmallow.Schema):
         allow_none=True,
         required=False,
         descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     @post_load
@@ -918,8 +912,16 @@ class WorkspaceSpaceInfoSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
-    used_space = marshmallow.fields.Int(description="used space in the workspace")
-    allowed_space = marshmallow.fields.Int()
+    used_space = marshmallow.fields.Int(
+        description="used space in the workspace. "
+        "if owner allowed space limit or  workspace allowed_space limit is reach,"
+        "no file can be created/updated in this workspace."
+    )
+    allowed_space = marshmallow.fields.Int(
+        description="allowed space in workspace in bytes. "
+        "if limit is reach, no file can be created/updated "
+        "in any user owned workspaces. 0 mean no limit."
+    )
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):
