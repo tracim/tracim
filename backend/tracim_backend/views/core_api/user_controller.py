@@ -31,6 +31,7 @@ from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
+from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
@@ -141,6 +142,7 @@ class UserController(Controller):
             acp=hapic_data.query.acp,
             exclude_user_ids=hapic_data.query.exclude_user_ids,
             exclude_workspace_ids=hapic_data.query.exclude_workspace_ids,
+            filter_results=app_config.KNOWN_MEMBERS__FILTER,
         )
         context_users = [uapi.get_user_with_context(user) for user in users]
         return context_users
@@ -234,7 +236,10 @@ class UserController(Controller):
         gapi = GroupApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        groups = [gapi.get_one_with_name(hapic_data.body.profile)]
+        if hapic_data.body.profile:
+            groups = [gapi.get_one_with_name(hapic_data.body.profile)]
+        else:
+            groups = []
         password = hapic_data.body.password
         if not password and hapic_data.body.email_notification:
             password = password_generator()
@@ -247,6 +252,7 @@ class UserController(Controller):
             lang=hapic_data.body.lang,
             name=hapic_data.body.public_name,
             do_notify=hapic_data.body.email_notification,
+            allowed_space=hapic_data.body.allowed_space,
             groups=groups,
             do_save=True,
         )
@@ -340,6 +346,27 @@ class UserController(Controller):
             user=request.candidate_user,
             auth_type=request.candidate_user.auth_type,
             groups=groups,
+            do_save=True,
+        )
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(is_administrator)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(SetUserAllowedSpaceSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_allowed_space(self, context, request: TracimRequest, hapic_data=None):
+        """
+        set user allowed_space
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        uapi.update(
+            user=request.candidate_user,
+            auth_type=request.candidate_user.auth_type,
+            allowed_space=hapic_data.body.allowed_space,
             do_save=True,
         )
         return
@@ -587,6 +614,14 @@ class UserController(Controller):
             "set_user_profile", "/users/{user_id:\d+}/profile", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_profile, route_name="set_user_profile")
+
+        # set user allowed_space
+        configurator.add_route(
+            "set_user_allowed_space",
+            "/users/{user_id:\d+}/allowed_space",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.set_allowed_space, route_name="set_user_allowed_space")
 
         # user content
         configurator.add_route(

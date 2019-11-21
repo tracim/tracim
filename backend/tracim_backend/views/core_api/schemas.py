@@ -30,7 +30,6 @@ from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.auth import Group
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
@@ -59,6 +58,7 @@ from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SimpleFile
 from tracim_backend.models.context_models import TextBasedContentUpdate
+from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserInfos
 from tracim_backend.models.context_models import UserProfile
@@ -210,6 +210,13 @@ class UserSchema(UserDigestSchema):
         example=AuthType.INTERNAL.value,
         description="authentication system of the user",
     )
+    allowed_space = marshmallow.fields.Integer(
+        validate=positive_int_validator,
+        allow_none=True,
+        required=False,
+        descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+    )
 
     class Meta:
         description = "Representation of a tracim user account"
@@ -281,6 +288,24 @@ class SetUserProfileSchema(marshmallow.Schema):
         return UserProfile(**data)
 
 
+class SetUserAllowedSpaceSchema(marshmallow.Schema):
+    """
+    Schema used for setting user allowed space. This schema is for write access only
+    """
+
+    allowed_space = marshmallow.fields.Integer(
+        validate=positive_int_validator,
+        allow_none=True,
+        required=False,
+        descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+    )
+
+    @post_load
+    def create_user_allowed_space(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UserAllowedSpace(**data)
+
+
 class UserCreationSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True, example="hello@tracim.fr", validate=user_email_validator
@@ -297,7 +322,7 @@ class UserCreationSchema(marshmallow.Schema):
         validate=user_profile_validator,
         example="trusted-users",
         required=False,
-        default=Group.TIM_USER_GROUPNAME,
+        allow_none=True,
         description=FIELD_PROFILE_DESC,
     )
     timezone = StrippedString(
@@ -322,6 +347,13 @@ class UserCreationSchema(marshmallow.Schema):
         default=None,
     )
     email_notification = marshmallow.fields.Bool(example=True, required=False, default=True)
+    allowed_space = marshmallow.fields.Integer(
+        validate=positive_int_validator,
+        allow_none=True,
+        required=False,
+        descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+    )
 
     @post_load
     def create_user(self, data: typing.Dict[str, typing.Any]) -> object:

@@ -295,6 +295,10 @@ class FileSizeOverWorkspaceEmptySpace(TracimException):
     error_code = ErrorCode.FILE_SIZE_OVER_WORKSPACE_EMPTY_SPACE
 
 
+class FileSizeOverOwnerEmptySpace(TracimException):
+    error_code = ErrorCode.FILE_SIZE_OVER_OWNER_EMPTY_SPACE
+
+
 class TracimUnavailablePreviewType(TracimException):
     error_code = ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 
@@ -391,6 +395,10 @@ class RoleDoesNotExist(TracimException):
     pass
 
 
+class ProfileDoesNotExist(TracimException):
+    pass
+
+
 class UserRoleNotFound(TracimException):
     error_code = ErrorCode.USER_ROLE_NOT_FOUND
 
@@ -409,10 +417,6 @@ class InconsistentDatabase(TracimException):
 
 class ContentFilenameAlreadyUsedInFolder(TracimException):
     error_code = ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
-
-
-class WorkspaceLabelAlreadyUsed(TracimException):
-    error_code = ErrorCode.WORKSPACE_LABEL_ALREADY_USED
 
 
 class ParentNotFound(NotFound):

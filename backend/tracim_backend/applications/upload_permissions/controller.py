@@ -21,6 +21,7 @@ from tracim_backend.applications.upload_permissions.schema import UploadPermissi
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionTokenPath
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
 from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import UploadPermissionNotFound
@@ -178,6 +179,7 @@ class UploadPermissionController(Controller):
     @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverOwnerEmptySpace, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UploadPermissionTokenPath())
     @hapic.input_forms(UploadDataFormSchema())
     @hapic.input_files(UploadFileSchema())
@@ -208,6 +210,9 @@ class UploadPermissionController(Controller):
         api.check_password(upload_permission, password=hapic_data.forms.password)
         content_api = ContentApi(current_user=None, session=request.dbsession, config=app_config)
         content_api.check_workspace_size_limitation(
+            content_length=request.content_length, workspace=workspace
+        )
+        content_api.check_owner_size_limitation(
             content_length=request.content_length, workspace=workspace
         )
         api.upload_files(

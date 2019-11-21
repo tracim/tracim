@@ -107,7 +107,6 @@ class PopupCreateWorkspace extends React.Component {
         break
       case 400:
         switch (fetchSaveNewWorkspace.body.code) {
-          case 3007: this.sendGlobalFlashMessage(props.t('A shared space with that name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space')); break
         }
         break

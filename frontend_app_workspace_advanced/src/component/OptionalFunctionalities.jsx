@@ -9,7 +9,7 @@ const OptionalFunctionalities = props => {
         {props.t('Optional functionalities')}
       </div>
       {props.appAgendaAvailable && (
-        <div className='formBlock__field workspace_advanced__optionalfunctionalities__content'>
+        <div className='formBlock__field workspace_advanced__optionalfunctionalities__content' data-cy='agenda_enabled'>
           <BtnSwitch
             checked={props.agendaEnabled}
             onChange={props.onToggleAgendaEnabled}
@@ -19,7 +19,7 @@ const OptionalFunctionalities = props => {
         </div>
       )}
 
-      <div className='formBlock__field workspace_advanced__optionalfunctionalities__content'>
+      <div className='formBlock__field workspace_advanced__optionalfunctionalities__content' data-cy='download_enabled'>
         <BtnSwitch
           checked={props.downloadEnabled}
           onChange={props.onToggleDownloadEnabled}
@@ -27,7 +27,7 @@ const OptionalFunctionalities = props => {
           inactiveLabel={props.t('Download deactivated')}
         />
       </div>
-      <div className='formBlock__field workspace_advanced__optionalfunctionalities__content'>
+      <div className='formBlock__field workspace_advanced__optionalfunctionalities__content' data-cy='upload_enabled'>
         <BtnSwitch
           checked={props.uploadEnabled}
           onChange={props.onToggleUploadEnabled}
