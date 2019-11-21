@@ -2899,8 +2899,8 @@ class TestUserDiskSpace(object):
         res = web_testapp.get("/api/v2/users/{}/disk_space".format(user_id), status=200)
         res = res.json_body
         assert res["used_space"] == 0
-        assert res["public_name"] == "bob"
-        assert res["avatar_url"] is None
+        assert res["user"]["public_name"] == "bob"
+        assert res["user"]["avatar_url"] is None
         assert res["allowed_space"] == 0
 
 

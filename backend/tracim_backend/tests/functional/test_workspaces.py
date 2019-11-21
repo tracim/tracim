@@ -97,7 +97,8 @@ class TestWorkspaceDiskSpaceEndpoint(object):
         res = res.json_body
         assert res["used_space"] == 0
         assert res["workspace_id"] == workspace.workspace_id
-        assert res["label"] == "test"
+        assert res["workspace"]["label"] == "test"
+        assert res["workspace"]["slug"] == "test"
         assert res["allowed_space"] == 0
 
 

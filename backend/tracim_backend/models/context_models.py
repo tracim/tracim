@@ -598,6 +598,10 @@ class UserInContext(object):
     # Default
 
     @property
+    def user_in_context(self) -> "UserInContext":
+        return self
+
+    @property
     def email(self) -> str:
         return self.user.email
 
@@ -669,6 +673,10 @@ class WorkspaceInContext(object):
         self.workspace = workspace
         self.dbsession = dbsession
         self.config = config
+
+    @property
+    def workspace_in_context(self) -> "WorkspaceInContext":
+        return self
 
     @property
     def workspace_id(self) -> int:
