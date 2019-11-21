@@ -17,26 +17,50 @@
     border 3px #7D4E24 solid
 
 
-
-.carousel__item__preview
-  &__content
-    display: block
-    text-align: center
-    &__image
-      margin 20px 0
-      display flex
-      min-height 500px
-      & img
-        object-fit contain
-        cursor pointer
-        margin auto
-        box-shadow 0 4px 8px 0 rgba(0,0,0,0.4)
+.carousel
+  &__item__preview
+    &__content
+      display: block
+      text-align: center
+      &__image
+        margin 20px 0
+        display flex
+        min-height 500px
+        & img
+          object-fit contain
+          cursor pointer
+          margin auto
+          box-shadow 0 4px 8px 0 rgba(0,0,0,0.4)
+  &__arrow
+    display block
+    position absolute
+    cursor pointer
+    height 100%
+    width 5%
+    margin-top 20px
+    margin-bottom 30px
+    top 0
+    z-index 1
+    & i
+      transform translateY(-50%)
+      transform translateX(-50%)
+      position absolute
+      top 50%
+      left 50%
+      font-size 40px
+    &:hover
+      background-color: rgba(0, 0, 0, 0.1)
+    &__next
+      right 0
+    &__prev
+      left 0
 
 .thumbnail__item__preview__content
   display block
   height 150px
   cursor pointer
   text-align center
+  margin 16px 0
   &__image
     display flex
     align-items center
@@ -48,6 +72,25 @@
       box-shadow 0 4px 8px 0 rgba(0,0,0,0.4)
       &:hover
         box-shadow 0 8px 16px 0 rgba(0,0,0,0.6)
+
+.gallery
+  &__action__button
+    text-align center
+    &__lightbox i
+      color #fff
+
+.galleryPage
+  height 100%
+  overflow auto
+
+.rotate90
+  width 500px
+  transform rotate(90deg)
+.rotate180
+  transform rotate(180deg)
+.rotate270
+  width 500px
+  transform rotate(270deg)
 
 // VTROIS
 //.originalClassVTrois img

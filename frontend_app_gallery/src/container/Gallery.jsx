@@ -20,11 +20,13 @@ import {
   putFileIsDeleted,
   getWorkspaceContentList
 } from '../action.async'
-import Carousel from '../component/CarouselVDeux.jsx'
+import Carousel from '../component/Carousel.jsx'
 import { removeExtensionOfFilename, debug } from '../helper.js'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
+import Fullscreen from 'react-full-screen'
+import classnames from 'classnames'
 
 const qs = require('query-string')
 
@@ -44,7 +46,9 @@ class Gallery extends React.Component {
       imagesPreviews: [],
       fileCurrentPage: 1,
       fileName: 'unknown',
-      fileSelected: 0
+      fileSelected: 0,
+      autoPlay: null,
+      fullscreen: false
     }
 
     // i18n has been init, add resources from frontend
@@ -167,8 +171,6 @@ class Gallery extends React.Component {
       )
     }
 
-    console.log('Reponse attendu', fetchContentList)
-
     switch (fetchContentList.apiResponse.status) {
       case 200:
         let images = []
@@ -191,7 +193,7 @@ class Gallery extends React.Component {
 
     // FIXME use global const
     const pageForPreview = 1
-    return await Promise.all(images.map(async (image) => {
+    return Promise.all(images.map(async (image) => {
       const fetchFileContent = await handleFetchResult(
         await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId)
       )
@@ -235,7 +237,7 @@ class Gallery extends React.Component {
   }
 
   handleClickHideImageRaw = () => {
-    this.setState({ displayLightbox: false })
+    this.setState({ displayLightbox: false, fullscreen: false })
   }
 
   handleClickShowImageRaw = (fileSelected) => {
@@ -252,7 +254,6 @@ class Gallery extends React.Component {
     if (previousNext === 'next' && state.fileSelected === state.imagesPreviews.length - 1) nextPageNumber = 0
     if (previousNext === 'previous' && state.fileSelected === 0) nextPageNumber = state.imagesPreviews.length - 1
 
-    console.log('NEXT', nextPageNumber)
     this.setState({
       fileSelected: nextPageNumber
     })
@@ -261,7 +262,8 @@ class Gallery extends React.Component {
   getPreviousImage = () => {
     const { state } = this
 
-    console.log('PreviousImage', state.fileSelected)
+    if (state.imagesPreviews.length === 1) return
+
     if (state.fileSelected === 0) return state.imagesPreviews[state.imagesPreviews.length - 1].lightBoxUrlList[0]
     return state.imagesPreviews[state.fileSelected - 1].lightBoxUrlList[0]
   }
@@ -269,13 +271,13 @@ class Gallery extends React.Component {
   getNextImage = () => {
     const { state } = this
 
-    console.log('NextImage', state.fileSelected)
+    if (state.imagesPreviews.length === 1) return
+
     if (state.fileSelected === state.imagesPreviews.length - 1) return state.imagesPreviews[0].lightBoxUrlList[0]
     return state.imagesPreviews[state.fileSelected + 1].lightBoxUrlList[0]
   }
 
   onCarouselPositionChange = (fileSelected) => {
-    console.log('CarouselPositionChange', fileSelected)
     this.setState({ fileSelected })
   }
 
@@ -291,53 +293,92 @@ class Gallery extends React.Component {
         this.setState({
           imagesPreviews: newImagesPreviews
         })
+        break
       default:
+    }
+  }
+
+  onSlickPlayClick (play) {
+    if (play) {
+      this.setState({
+        autoPlay: setInterval(() => this.handleClickPreviousNextPage('next'), 3000)
+      })
+    } else {
+      clearInterval(this.state.autoPlay)
+      this.setState({
+        autoPlay: null
+      })
     }
   }
 
   render () {
     const { state } = this
     return (
-      <div>
-        <PageWrapper customClass='galleryPage'>
-          <PageTitle
-            parentClass='galleryPage'
-            title={state.folderId ? state.fileName : state.content.workspaceLabel}
-            icon={'picture-o'}
-            breadcrumbsList={state.breadcrumbsList}
+      <PageWrapper customClass='galleryPage'>
+        <PageTitle
+          title={state.folderId ? state.fileName : state.content.workspaceLabel}
+          icon={'picture-o'}
+          breadcrumbsList={state.breadcrumbsList}
+        />
+
+        <PageContent>
+          <div className={'gallery__action__button'}>
+            {!state.autoPlay ? (
+              <button className={'btn iconBtn'} onClick={() => this.onSlickPlayClick(true)} title={'Play'}>
+                <i className={'fa fa-fw fa-play'} />
+              </button>
+            ) : (
+              <button className={'btn iconBtn'} onClick={() => this.onSlickPlayClick(false)} title={'Pause'}>
+                <i className={'fa fa-fw fa-pause'} />
+              </button>
+            )}
+          </div>
+
+          <Carousel
+            fileSelected={state.fileSelected}
+            slides={state.imagesPreviews}
+            onCarouselPositionChange={this.onCarouselPositionChange}
+            handleClickShowImageRaw={this.handleClickShowImageRaw}
+            onFileDeleted={this.deleteFile}
+            loggedUser={state.loggedUser}
+            disableAnimation={state.displayLightbox}
           />
+          <Fullscreen
+            enabled={this.state.fullscreen}
+            onChange={fullscreen => this.setState({ fullscreen })}
+          >
+            <div ref={modalRoot => (this.modalRoot = modalRoot)} />
+          </Fullscreen>
+          {state.displayLightbox
+            ? (
+              <Lightbox
+                prevSrc={this.getPreviousImage()}
+                mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
+                nextSrc={this.getNextImage()}
+                onCloseRequest={this.handleClickHideImageRaw}
+                onMovePrevRequest={() => { this.handleClickPreviousNextPage('previous') }}
+                onMoveNextRequest={() => { this.handleClickPreviousNextPage('next') }}
+                // imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
+                imagePadding={10}
+                wrapperClassName={'maclass'}
+                reactModalProps={{ parentSelector: () => this.modalRoot }}
+                toolbarButtons={[
+                  <div className={'gallery__action__button__lightbox'}>
+                    <button className={'btn iconBtn'} onClick={() => this.onSlickPlayClick(!state.autoPlay)} title={'Pause'}>
+                      <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                    </button>
 
-          <PageContent parentClass='galleryPage'>
-
-            <Carousel
-              fileSelected={state.fileSelected}
-              slides={state.imagesPreviews}
-              onCarouselPositionChange={this.onCarouselPositionChange}
-              handleClickShowImageRaw={this.handleClickShowImageRaw}
-              onFileDeleted={this.deleteFile}
-              loggedUser={state.loggedUser}
-              disableAnimation={state.displayLightbox}
-            />
-
-            {state.displayLightbox
-              ? (
-                <Lightbox
-                  prevSrc={this.getPreviousImage()}
-                  mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
-                  nextSrc={this.getNextImage()}
-                  onCloseRequest={this.handleClickHideImageRaw}
-                  onMovePrevRequest={() => { this.handleClickPreviousNextPage('previous') }}
-                  onMoveNextRequest={() => { this.handleClickPreviousNextPage('next') }}
-                  // imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
-                  imagePadding={10}
-                  wrapperClassName={'maclass'}
-                />
-              )
-              : null
-            }
-          </PageContent>
-        </PageWrapper>
-      </div>
+                    <button className={'btn iconBtn'} onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))} title={'Fullscreen active'}>
+                      <i className={'fa fa-fw fa-arrows-alt'} />
+                    </button>
+                  </div>
+                ]}
+              />
+            )
+            : null
+          }
+        </PageContent>
+      </PageWrapper>
     )
   }
 }

@@ -2,6 +2,11 @@ import i18n from './i18n.js'
 
 export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
 
+export const DIRECTION = {
+  LEFT: 'left',
+  RIGHT: 'right'
+}
+
 export const debug = {
   config: {
     label: 'Admin workspace user',

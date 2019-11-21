@@ -25,6 +25,7 @@
     "radium": "^0.25.2",
     "react": "16.7.0",
     "react-dom": "16.7.0",
+    "react-full-screen": "^0.2.4",
     "react-i18next": "7.4.0",
     "react-image-gallery": "^0.9.1",
     "react-image-lightbox": "^5.1.0",
