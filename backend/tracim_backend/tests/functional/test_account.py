@@ -1005,13 +1005,13 @@ class TestAccountWorkspaceEndpoint(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
-class TestAccountAllowedSpaceEndpoint(object):
+class TestAccountDiskSpaceEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users/me/allowed_space
+    Tests for GET /api/v2/users/me/disk_space
     """
 
-    def test_api__get_user_allowed_space__ok_200__nominal(
+    def test_api__get_user_disk_space__ok_200__nominal(
         self,
         workspace_api_factory,
         user_api_factory,
@@ -1039,7 +1039,7 @@ class TestAccountAllowedSpaceEndpoint(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = web_testapp.get("/api/v2/users/me/allowed_space", status=200)
+        res = web_testapp.get("/api/v2/users/me/disk_space", status=200)
         res = res.json_body
         assert res["used_space"] == 0
         assert res["public_name"] == "bob"

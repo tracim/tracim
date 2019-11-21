@@ -2868,13 +2868,13 @@ class TestUserEndpointTrustedUserDefaultProfile(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
-class TestUserAllowedSpace(object):
+class TestUserDiskSpace(object):
     # -*- coding: utf-8 -*-
     """
     Tests for GET /api/v2/users/{user_id}/allowed_space
     """
 
-    def test_api__get_user_allowed_space__ok_200__admin(
+    def test_api__get_user_disk_space__ok_200__admin(
         self, user_api_factory, group_api_factory, web_testapp
     ):
 
@@ -2896,7 +2896,7 @@ class TestUserAllowedSpace(object):
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/users/{}/allowed_space".format(user_id), status=200)
+        res = web_testapp.get("/api/v2/users/{}/disk_space".format(user_id), status=200)
         res = res.json_body
         assert res["used_space"] == 0
         assert res["public_name"] == "bob"

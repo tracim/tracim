@@ -54,12 +54,12 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
-class TestWorkspaceAllowedSpaceEndpoint(object):
+class TestWorkspaceDiskSpaceEndpoint(object):
     """
-    Tests for /api/v2/workspaces/{workspace_id}/allowed_space endpoint
+    Tests for /api/v2/workspaces/{workspace_id}/disk_space endpoint
     """
 
-    def test_api__get_workspace_allowed_space__ok_200__nominal_case(
+    def test_api__get_workspace_disk_space__ok_200__nominal_case(
         self,
         web_testapp,
         user_api_factory,
@@ -92,7 +92,7 @@ class TestWorkspaceAllowedSpaceEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/allowed_space".format(workspace.workspace_id), status=200
+            "/api/v2/workspaces/{}/disk_space".format(workspace.workspace_id), status=200
         )
         res = res.json_body
         assert res["used_space"] == 0

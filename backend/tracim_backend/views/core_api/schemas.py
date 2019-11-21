@@ -169,7 +169,7 @@ class UserDigestSchema(marshmallow.Schema):
     public_name = StrippedString(example="John Doe")
 
 
-class UserAllowedSpaceSchema(UserDigestSchema):
+class UserDiskSpaceSchema(UserDigestSchema):
     allowed_space = marshmallow.fields.Integer(
         descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
         "if user_space > allowed_space, no file can be created/updated in any user owned workspaces. 0 mean no limit"
@@ -908,7 +908,7 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         description = "Full workspace informations"
 
 
-class WorkspaceAllowedSpaceSchema(marshmallow.Schema):
+class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")

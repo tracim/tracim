@@ -34,9 +34,9 @@ from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
-from tracim_backend.views.core_api.schemas import UserAllowedSpaceSchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
+from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
@@ -111,8 +111,8 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.output_body(UserAllowedSpaceSchema())
-    def user_allowed_space(self, context, request: TracimRequest, hapic_data=None):
+    @hapic.output_body(UserDiskSpaceSchema())
+    def user_disk_space(self, context, request: TracimRequest, hapic_data=None):
         """
         Get user space infos.
         """
@@ -566,9 +566,9 @@ class UserController(Controller):
 
         # user space info
         configurator.add_route(
-            "user_allowed_space", "/users/{user_id:\d+}/allowed_space", request_method="GET"
+            "user_disk_space", "/users/{user_id:\d+}/disk_space", request_method="GET"
         )  # noqa: W605
-        configurator.add_view(self.user_allowed_space, route_name="user_allowed_space")
+        configurator.add_view(self.user_disk_space, route_name="user_disk_space")
 
         # users lists
         configurator.add_route("users", "/users", request_method="GET")
