@@ -1,8 +1,10 @@
+import { SELECTORS as s } from '../../support/generic_selector_commands'
+
 const DOCUMENT_TITLE = 'A new document'
 const DOCUMENT_RAW_CONTENT = 'Content of the document'
 const DOCUMENT_HTML_CONTENT = `<p>${DOCUMENT_RAW_CONTENT}</p>`
 
-context('Known users as a workspace-manager', function () {
+describe('Known users as a workspace-manager', function () {
   beforeEach(function () {
     cy.resetDB()
     cy.setupBaseDB()
@@ -21,7 +23,7 @@ context('Known users as a workspace-manager', function () {
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
     cy.get('.wsContentGeneric__header__close').click()
-    cy.contains(DOCUMENT_TITLE).click()
+    cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: DOCUMENT_TITLE } }).click()
 
     cy.waitForTinyMCELoaded().then(() => {
       cy.assertTinyMCEIsActive()
