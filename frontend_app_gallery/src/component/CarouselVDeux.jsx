@@ -46,6 +46,13 @@ class Carousel extends React.Component {
     })
   }
 
+  componentDidUpdate () {
+    if (this.autoPlay) {
+      console.log('play')
+      this.onSlickPlayClick(true)
+    }
+  }
+
   onMainSliderPositionChange(newPosition) {
     console.log('newPosition : ', newPosition)
     if (newPosition === this.props.fileSelected) return
@@ -53,6 +60,9 @@ class Carousel extends React.Component {
   }
 
   onSlickPlayClick (play) {
+    // this.setState({
+    //   autoPlay: play
+    // })
     this.autoPlay = play
     if (play) {
       this.mainSlider.slickPlay()
@@ -61,10 +71,16 @@ class Carousel extends React.Component {
     }
   }
 
+  // TEST
+  // ENDTEST
+
   render() {
     const { props } = this
 
-    // if (this.mainSlider && !this.autoPlay) this.mainSlider.slickGoTo(props.fileSelected)
+    if (this.mainSlider && !this.state.autoPlay) {
+      console.log('SLICKTOGO')
+      this.mainSlider.slickGoTo(props.fileSelected)
+    }
 
     const settings = {
       infinite: true,
@@ -79,7 +95,7 @@ class Carousel extends React.Component {
       nextArrow: <SampleNextArrow />,
       prevArrow: <SamplePrevArrow />,
       autoplaySpeed: 1000,
-      autoPlay: this.autoPlay
+      autoPlay: true
     }
 
     return (
