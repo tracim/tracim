@@ -10,6 +10,7 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import set_html_document_slug_to_legacy
 
 
@@ -53,7 +54,9 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
-@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_workspace_size_limit"}], indirect=True
+)
 class TestWorkspaceDiskSpaceEndpoint(object):
     """
     Tests for /api/v2/workspaces/{workspace_id}/disk_space endpoint
@@ -67,6 +70,9 @@ class TestWorkspaceDiskSpaceEndpoint(object):
         workspace_api_factory,
         role_api_factory,
         application_api_factory,
+        content_type_list,
+        content_api_factory,
+        session,
     ) -> None:
         """
         Check obtain workspace reachable for user.
@@ -85,21 +91,26 @@ class TestWorkspaceDiskSpaceEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.get_one(workspace.workspace_id)
         transaction.commit()
-
+        image = create_1000px_png_test_image()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=200,
+        )
         res = web_testapp.get(
             "/api/v2/workspaces/{}/disk_space".format(workspace.workspace_id), status=200
         )
         res = res.json_body
-        assert res["used_space"] == 0
+        assert res["used_space"] == 6210
         assert res["workspace_id"] == workspace.workspace_id
         assert res["workspace"]["label"] == "test"
         assert res["workspace"]["slug"] == "test"
-        assert res["allowed_space"] == 0
+        assert res["allowed_space"] == 200
 
 
 @pytest.mark.usefixtures("base_fixture")

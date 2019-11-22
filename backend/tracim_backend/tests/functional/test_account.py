@@ -10,6 +10,7 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import create_1000px_png_test_image
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -1004,7 +1005,9 @@ class TestAccountWorkspaceEndpoint(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_allowed_space_limitation"}], indirect=True
+)
 class TestAccountDiskSpaceEndpoint(object):
     # -*- coding: utf-8 -*-
     """
@@ -1027,7 +1030,7 @@ class TestAccountDiskSpaceEndpoint(object):
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
-            password="password",
+            password="test@test.test",
             name="bob",
             groups=groups,
             timezone="Europe/Paris",
@@ -1036,15 +1039,22 @@ class TestAccountDiskSpaceEndpoint(object):
             do_notify=False,
         )
         uapi.save(test_user)
+        workspace_api = workspace_api_factory.get(current_user=test_user, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
-
-        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        image = create_1000px_png_test_image()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=200,
+        )
         res = web_testapp.get("/api/v2/users/me/disk_space", status=200)
         res = res.json_body
-        assert res["used_space"] == 0
+        assert res["used_space"] == 6210
         assert res["user"]["public_name"] == "bob"
         assert res["user"]["avatar_url"] is None
-        assert res["allowed_space"] == 0
+        assert res["allowed_space"] == 134217728
 
 
 @pytest.mark.usefixtures("base_fixture")
