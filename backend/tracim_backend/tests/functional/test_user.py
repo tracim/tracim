@@ -11,6 +11,7 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import create_1000px_png_test_image
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -2864,6 +2865,53 @@ class TestUserEndpointTrustedUserDefaultProfile(object):
         user = uapi.get_one(user_id)
         assert user.email == "test@test.test"
         assert user.validate_password("mysuperpassword")
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_allowed_space_limitation"}], indirect=True
+)
+class TestUserDiskSpace(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/{user_id}/allowed_space
+    """
+
+    def test_api__get_user_disk_space__ok_200__admin(
+        self, user_api_factory, group_api_factory, web_testapp, workspace_api_factory
+    ):
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="test@test.test",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        workspace_api = workspace_api_factory.get(current_user=test_user, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+        image = create_1000px_png_test_image()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=200,
+        )
+        res = web_testapp.get("/api/v2/users/{}/disk_space".format(user_id), status=200)
+        res = res.json_body
+        assert res["used_space"] == 6210
+        assert res["user"]["public_name"] == "bob"
+        assert res["user"]["avatar_url"] is None
+        assert res["allowed_space"] == 134217728
 
 
 @pytest.mark.usefixtures("base_fixture")

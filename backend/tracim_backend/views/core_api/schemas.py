@@ -169,6 +169,19 @@ class UserDigestSchema(marshmallow.Schema):
     public_name = StrippedString(example="John Doe")
 
 
+class UserDiskSpaceSchema(UserDigestSchema):
+    user_id = marshmallow.fields.Int(dump_only=True, example=3)
+    allowed_space = marshmallow.fields.Integer(
+        descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces. 0 mean no limit"
+    )
+    used_space = marshmallow.fields.Integer(
+        descriptions="used space per user in bytes. this apply on sum of user owned workspace size."
+        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces."
+    )
+    user = marshmallow.fields.Nested(UserDigestSchema(), attribute="user_in_context")
+
+
 class UserSchema(UserDigestSchema):
     """
     Complete user schema
@@ -215,7 +228,7 @@ class UserSchema(UserDigestSchema):
         allow_none=True,
         required=False,
         descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     class Meta:
@@ -298,7 +311,7 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
         allow_none=True,
         required=False,
         descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit.",
     )
 
     @post_load
@@ -352,7 +365,7 @@ class UserCreationSchema(marshmallow.Schema):
         allow_none=True,
         required=False,
         descriptions="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces.",
+        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     @post_load
@@ -864,10 +877,13 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
         description = "Entry element of a workspace menu"
 
 
-class WorkspaceDigestSchema(marshmallow.Schema):
+class WorkspaceMinimalSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
+
+
+class WorkspaceDigestSchema(WorkspaceMinimalSchema):
     sidebar_entries = marshmallow.fields.Nested(WorkspaceMenuEntrySchema, many=True)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
     agenda_enabled = marshmallow.fields.Bool(example=True, default=True)
@@ -892,10 +908,26 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         format=DATETIME_FORMAT, description="Workspace creation date"
     )
     owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
-    size = marshmallow.fields.Int()
 
     class Meta:
         description = "Full workspace informations"
+
+
+class WorkspaceDiskSpaceSchema(marshmallow.Schema):
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    used_space = marshmallow.fields.Int(
+        description="used space in the workspace. "
+        "if owner allowed space limit or  workspace allowed_space limit is reach,"
+        "no file can be created/updated in this workspace."
+    )
+    allowed_space = marshmallow.fields.Int(
+        description="allowed space in workspace in bytes. "
+        "if limit is reach, no file can be created/updated "
+        "in any user owned workspaces. 0 mean no limit."
+    )
+    workspace = marshmallow.fields.Nested(
+        WorkspaceMinimalSchema(), attribute="workspace_in_context"
+    )
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):
