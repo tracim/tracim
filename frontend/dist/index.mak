@@ -92,6 +92,10 @@
     <script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
     <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
 
+    % for custom_app_file in custom_app_files:
+    <script type='text/javascript' src='/custom_app/${custom_app_file.name}'></script>
+    % endfor
+
     <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
     <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>
     <script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js'></script>
