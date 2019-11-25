@@ -19,12 +19,14 @@ APP_FRONTEND_PATH = "app/{minislug}.app.js"
 
 
 class FrontendController(Controller):
-    def __init__(self, dist_folder_path: str, custom_app_folder_path: typing.Optional[str]):
+    def __init__(self, dist_folder_path: str, custom_toolbox_folder_path: typing.Optional[str]):
         self.dist_folder_path = dist_folder_path
-        self.custom_app_folder_path = custom_app_folder_path
-        self.custom_app_files = []  # typing.List[DirEntry]
-        if custom_app_folder_path:
-            self.custom_app_files = self._get_custom_apps_files(self.custom_app_folder_path)
+        self.custom_toolbox_folder_path = custom_toolbox_folder_path
+        self.custom_toolbox_files = []  # typing.List[DirEntry]
+        if custom_toolbox_folder_path:
+            self.custom_toolbox_files = self._get_custom_toolboxes_files(
+                self.custom_toolbox_folder_path
+            )
 
     def _get_index_file_path(self) -> str:
         index_file_path = os.path.join(self.dist_folder_path, INDEX_PAGE_NAME)
@@ -32,13 +34,13 @@ class FrontendController(Controller):
             raise FileNotFoundError()
         return index_file_path
 
-    def _get_custom_apps_files(self, custom_app_dir: str) -> typing.List[DirEntry]:
-        custom_app_files = []
-        scanned_dir = os.scandir(custom_app_dir)
+    def _get_custom_toolboxes_files(self, custom_toolbox_dir: str) -> typing.List[DirEntry]:
+        custom_toolbox_files = []
+        scanned_dir = os.scandir(custom_toolbox_dir)
         for entry in scanned_dir:
             if entry.name.endswith(".js") and entry.is_file():
-                custom_app_files.append(entry)
-        return custom_app_files
+                custom_toolbox_files.append(entry)
+        return custom_toolbox_files
 
     def not_found_view(self, context, request: TracimRequest):
         raise PageNotFound("{} is not a valid path".format(request.path)) from context
@@ -64,7 +66,7 @@ class FrontendController(Controller):
                 "colors": {"primary": ExtendedColor(app_config.APPS_COLORS["primary"])},
                 "applications": frontend_apps,
                 "website_title": app_config.WEBSITE__TITLE,
-                "custom_app_files": self.custom_app_files,
+                "custom_toolbox_files": self.custom_toolbox_files,
             },
         )
 
@@ -86,5 +88,7 @@ class FrontendController(Controller):
                 name=dirname, path=os.path.join(self.dist_folder_path, dirname)
             )
 
-        if self.custom_app_folder_path:
-            configurator.add_static_view(name="custom_app", path=self.custom_app_folder_path)
+        if self.custom_toolbox_folder_path:
+            configurator.add_static_view(
+                name="custom_toolbox", path=self.custom_toolbox_folder_path
+            )

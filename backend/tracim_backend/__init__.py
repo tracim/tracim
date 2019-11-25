@@ -271,7 +271,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     if app_config.FRONTEND__SERVE:
         configurator.include("pyramid_mako")
         frontend_controller = FrontendController(
-            app_config.FRONTEND__DIST_FOLDER_PATH, app_config.FRONTEND__CUSTOM_APP_FOLDER_PATH
+            app_config.FRONTEND__DIST_FOLDER_PATH, app_config.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH
         )
         configurator.include(frontend_controller.bind)
 
