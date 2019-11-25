@@ -34,10 +34,10 @@ class FrontendController(Controller):
 
     def _get_custom_apps_files(self, custom_app_dir: str) -> typing.List[DirEntry]:
         custom_app_files = []
-        with os.scandir(custom_app_dir) as scanned_dir:
-            for entry in scanned_dir:
-                if entry.name.endswith(".js") and entry.is_file():
-                    custom_app_files.append(entry)
+        scanned_dir = os.scandir(custom_app_dir)
+        for entry in scanned_dir:
+            if entry.name.endswith(".js") and entry.is_file():
+                custom_app_files.append(entry)
         return custom_app_files
 
     def not_found_view(self, context, request: TracimRequest):
