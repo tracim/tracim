@@ -83,6 +83,8 @@
     <script type='text/javascript' src='/assets/tracim.vendors~app.js'></script>
     <script type='text/javascript' src='/assets/tracim.app.js'></script>
 
+    <script type='text/javascript' src='/assets/tracim/instanceSpecificLibrary.js'></script>
+
     <script type='text/javascript' src='/app/workspace.app.js'></script>
 
     % for app in applications:
