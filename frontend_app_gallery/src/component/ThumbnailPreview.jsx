@@ -5,7 +5,10 @@ import classnames from 'classnames'
 export const ThumbnailPreview = (props) => (
   <div className={'thumbnail__item__preview__content'}>
     <div className={classnames('thumbnail__item__preview__content__image')}>
-      <img src={props.previewSrc} />
+      <img
+        src={props.previewSrc}
+        className={`rotate${props.rotationAngle}`}
+      />
     </div>
   </div>
 )
@@ -13,5 +16,6 @@ export const ThumbnailPreview = (props) => (
 export default ThumbnailPreview
 
 ThumbnailPreview.propTypes = {
-  previewSrc: PropTypes.string
+  previewSrc: PropTypes.string,
+  rotationAngle: PropTypes.number
 }

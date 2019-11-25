@@ -8,6 +8,7 @@ import {
   PageTitle,
   PageWrapper,
   PageContent,
+  CardPopup,
   handleFetchResult,
   BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
@@ -22,11 +23,11 @@ import {
 } from '../action.async'
 import Carousel from '../component/Carousel.jsx'
 import { removeExtensionOfFilename, debug } from '../helper.js'
-import 'react-responsive-carousel/lib/styles/carousel.min.css'
-import Lightbox from 'react-image-lightbox'
+import ReactImageLightbox, {changeAngle} from '../component/Lightbox.js'
 import 'react-image-lightbox/style.css'
 import Fullscreen from 'react-full-screen'
 import classnames from 'classnames'
+import { DIRECTION } from '../helper'
 
 const qs = require('query-string')
 
@@ -48,7 +49,8 @@ class Gallery extends React.Component {
       fileName: 'unknown',
       fileSelected: 0,
       autoPlay: null,
-      fullscreen: false
+      fullscreen: false,
+      displayPopupDelete: false
     }
 
     // i18n has been init, add resources from frontend
@@ -200,7 +202,7 @@ class Gallery extends React.Component {
       switch (fetchFileContent.apiResponse.status) {
         case 200:
           const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
-          const previewUrl = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 1400, 500)
+          const previewUrl = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 1400, 1400)
           const previewUrlForThumbnail = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 150, 150)
           const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, j) =>
             getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, j + 1, 1920, 1080)
@@ -211,7 +213,8 @@ class Gallery extends React.Component {
             src: previewUrl,
             fileName: fetchFileContent.body.filename,
             lightBoxUrlList,
-            previewUrlForThumbnail
+            previewUrlForThumbnail,
+            rotationAngle: 0
           })
         // default: this.sendGlobalFlashMessage(props.t('Error while loading file content'))
       }
@@ -281,6 +284,18 @@ class Gallery extends React.Component {
     this.setState({ fileSelected })
   }
 
+  handleOpenDeleteFilePopup = () => {
+    this.setState({
+      displayPopupDelete: true
+    })
+  }
+
+  handleCloseDeleteFilePopup = () => {
+    this.setState({
+      displayPopupDelete: false
+    })
+  }
+
   deleteFile = async (filePosition) => {
     const { state } = this
     const contentIdToDelete = state.imagesPreviews[filePosition].contentId
@@ -311,8 +326,36 @@ class Gallery extends React.Component {
     }
   }
 
-  render () {
+  rotateImg (fileSelected, direction) {
     const { state } = this
+
+    const imagesPreviews = state.imagesPreviews
+    let rotationAngle
+    switch (imagesPreviews[fileSelected].rotationAngle) {
+      case (0):
+        rotationAngle = direction === DIRECTION.RIGHT ? 90 : 270
+        break
+      case (90):
+        rotationAngle = direction === DIRECTION.RIGHT ? 180 : 0
+        break
+      case (180):
+        rotationAngle = direction === DIRECTION.RIGHT ? 270 : 90
+        break
+      case (270):
+        rotationAngle = direction === DIRECTION.RIGHT ? 0 : 180
+        break
+      default:
+    }
+    imagesPreviews[fileSelected].rotationAngle = rotationAngle
+    this.setState({ imagesPreviews })
+  }
+
+  render () {
+    const { state, props } = this
+
+    if(state.imagesPreviews[state.fileSelected]) changeAngle(state.imagesPreviews[state.fileSelected].rotationAngle)
+
+
     return (
       <PageWrapper customClass='galleryPage'>
         <PageTitle
@@ -322,14 +365,22 @@ class Gallery extends React.Component {
         />
 
         <PageContent>
-          <div className={'gallery__action__button'}>
-            {!state.autoPlay ? (
-              <button className={'btn iconBtn'} onClick={() => this.onSlickPlayClick(true)} title={'Play'}>
-                <i className={'fa fa-fw fa-play'} />
-              </button>
-            ) : (
-              <button className={'btn iconBtn'} onClick={() => this.onSlickPlayClick(false)} title={'Pause'}>
-                <i className={'fa fa-fw fa-pause'} />
+          <div className='gallery__action__button'>
+            <button className='btn iconBtn' onClick={() => this.onSlickPlayClick(!state.autoPlay)} title={'Auto Play'}>
+              <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+            </button>
+
+            <button className='btn iconBtn gallery__action__button__rotation__left' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}>
+              <i className={'fa fa-fw fa-reply'} />
+            </button>
+
+            <button className='btn iconBtn gallery__action__button__rotation__right' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}>
+              <i className={'fa fa-fw fa-share'} />
+            </button>
+
+            {state.loggedUser.userRoleIdInWorkspace >= 4 && (
+              <button className='btn iconBtn' onClick={this.handleOpenDeleteFilePopup} title={props.t('Supprimer')}>
+                <i className={'fa fa-fw fa-trash'} />
               </button>
             )}
           </div>
@@ -339,44 +390,79 @@ class Gallery extends React.Component {
             slides={state.imagesPreviews}
             onCarouselPositionChange={this.onCarouselPositionChange}
             handleClickShowImageRaw={this.handleClickShowImageRaw}
-            onFileDeleted={this.deleteFile}
             loggedUser={state.loggedUser}
             disableAnimation={state.displayLightbox}
           />
+
           <Fullscreen
             enabled={this.state.fullscreen}
             onChange={fullscreen => this.setState({ fullscreen })}
           >
             <div ref={modalRoot => (this.modalRoot = modalRoot)} />
           </Fullscreen>
-          {state.displayLightbox
-            ? (
-              <Lightbox
-                prevSrc={this.getPreviousImage()}
-                mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
-                nextSrc={this.getNextImage()}
-                onCloseRequest={this.handleClickHideImageRaw}
-                onMovePrevRequest={() => { this.handleClickPreviousNextPage('previous') }}
-                onMoveNextRequest={() => { this.handleClickPreviousNextPage('next') }}
-                // imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
-                imagePadding={10}
-                wrapperClassName={'maclass'}
-                reactModalProps={{ parentSelector: () => this.modalRoot }}
-                toolbarButtons={[
-                  <div className={'gallery__action__button__lightbox'}>
-                    <button className={'btn iconBtn'} onClick={() => this.onSlickPlayClick(!state.autoPlay)} title={'Pause'}>
-                      <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
-                    </button>
 
-                    <button className={'btn iconBtn'} onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))} title={'Fullscreen active'}>
-                      <i className={'fa fa-fw fa-arrows-alt'} />
-                    </button>
-                  </div>
-                ]}
-              />
-            )
-            : null
-          }
+          {state.displayLightbox && (
+            <ReactImageLightbox
+              prevSrc={this.getPreviousImage()}
+              mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
+              nextSrc={this.getNextImage()}
+              onCloseRequest={this.handleClickHideImageRaw}
+              onMovePrevRequest={() => { this.handleClickPreviousNextPage('previous') }}
+              onMoveNextRequest={() => { this.handleClickPreviousNextPage('next') }}
+              // imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
+              imagePadding={10}
+              wrapperClassName={'maclass'}
+              reactModalProps={{ parentSelector: () => this.modalRoot }}
+              toolbarButtons={[
+                <div className={'gallery__action__button__lightbox'}>
+                  <button className={'btn iconBtn'} onClick={() => this.onSlickPlayClick(!state.autoPlay)} title={'Pause'}>
+                    <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                  </button>
+
+                  <button className={'btn iconBtn'} onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))} title={'Fullscreen active'}>
+                    <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
+                  </button>
+
+                  <button className='btn iconBtn gallery__action__button__rotation__left' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}>
+                    <i className={'fa fa-fw fa-reply'} />
+                  </button>
+
+                  <button className='btn iconBtn gallery__action__button__rotation__right' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}>
+                    <i className={'fa fa-fw fa-share'} />
+                  </button>
+                </div>
+              ]}
+            />
+          )}
+
+          {state.displayPopupDelete && (
+            <CardPopup
+              customClass='gallery__delete__file__popup'
+              customHeaderClass='primaryColorBg'
+              onClose={this.handleCloseDeleteFilePopup}
+            >
+              <div className='gallery__delete__file__popup__body'>
+                <div className='gallery__delete__file__popup__body__msg'>{props.t('Are you sure ?')}</div>
+                <div className='gallery__delete__file__popup__body__btn'>
+                  <button
+                    type='button'
+                    className='btn outlineTextBtn primaryColorBorder primaryColorFont nohover'
+                    onClick={this.handleCloseDeleteFilePopup}
+                  >
+                    {props.t('Cancel')}
+                  </button>
+
+                  <button
+                    type='button'
+                    className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
+                    onClick={() => this.deleteFile(this.state.fileSelected)}
+                  >
+                    {props.t('Delete')}
+                  </button>
+                </div>
+              </div>
+            </CardPopup>
+          )}
         </PageContent>
       </PageWrapper>
     )

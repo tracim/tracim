@@ -1,23 +1,7 @@
-
-// HACK EASY TO FIX : CUSTOM ARROWS
-.slick-prev
-  left 0
-  z-index 20
-  &::before
-    color #F96332
-    font-size 30px
-.slick-next
-  right 0
-  z-index 20
-  &::before
-    font-size 30px
-    color #F96332
-.carousel__top .slick-current
-  & img
-    border 3px #7D4E24 solid
-
-
 .carousel
+  &__thumbnail .slick-current
+    & img
+      border 3px #7D4E24 solid
   &__item__preview
     &__content
       display: block
@@ -27,6 +11,7 @@
         display flex
         min-height 500px
         & img
+          max-height 500px
           object-fit contain
           cursor pointer
           margin auto
@@ -37,8 +22,6 @@
     cursor pointer
     height 100%
     width 5%
-    margin-top 20px
-    margin-bottom 30px
     top 0
     z-index 1
     & i
@@ -49,11 +32,12 @@
       left 50%
       font-size 40px
     &:hover
-      background-color: rgba(0, 0, 0, 0.1)
+      background-color rgba(0, 0, 0, 0.1)
+      border-radius 10px
     &__next
-      right 0
+      right -20px
     &__prev
-      left 0
+      left -20px
 
 .thumbnail__item__preview__content
   display block
@@ -76,44 +60,34 @@
 .gallery
   &__action__button
     text-align center
+    & button:hover
+      background-color: rgba(0, 0, 0, 0.1)
     &__lightbox i
       color #fff
+    &__rotation
+      &__left i
+        transform rotate(270deg)
+      &__right i
+        transform rotate(90deg)
 
 .galleryPage
   height 100%
   overflow auto
 
 .rotate90
-  width 500px
   transform rotate(90deg)
 .rotate180
   transform rotate(180deg)
 .rotate270
-  width 500px
   transform rotate(270deg)
 
-// VTROIS
-//.originalClassVTrois img
-//  margin 0 auto
-//  display block
-//  height 500px
-//  width 90%
-//  object-fit contain
-//
-//.image-gallery {
-//  width: 100%;
-//  height: auto;
-//}
-//
-//.image-gallery-slide img {
-//  width 100%
-//  height 500px
-//  max-height 70vh
-//  object-fit contain
-//  overflow hidden
-//  object-position center center
-//}
-//
-//.fullscreen .image-gallery-slide img {
-//  height 100%
-//}
+.gallery__delete__file__popup
+  & .cardPopup__container
+    width 400px
+  &__body
+    width 100%
+    &__btn
+      display flex
+      justify-content flex-end
+      .btn:first-child
+        margin-right 15px

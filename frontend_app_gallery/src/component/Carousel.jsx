@@ -53,6 +53,7 @@ class Carousel extends React.Component {
       lazyLoad: 'progressive',
       afterChange: this.onMainSliderPositionChange.bind(this),
       centerPadding: '0px',
+      className: 'carousel__main',
       nextArrow: <CarouselArrow direction={DIRECTION.RIGHT} />,
       prevArrow: <CarouselArrow direction={DIRECTION.LEFT} />
     }
@@ -66,7 +67,20 @@ class Carousel extends React.Component {
       infinite: true,
       speed: 200,
       arrows: false,
-      className: 'carousel__top'
+      className: 'carousel__thumbnail',
+      responsive: [
+        {
+          breakpoint: 1100,
+          settings: {
+            slidesToShow: 5
+          }
+        }, {
+          breakpoint: 900,
+          settings: {
+            slidesToShow: 3
+          }
+        }
+      ]
     }
 
     return (
@@ -82,8 +96,8 @@ class Carousel extends React.Component {
                 loggedUser={props.loggedUser}
                 previewSrc={slide.src}
                 index={index}
-                onFileDeleted={props.onFileDeleted}
                 handleClickShowImageRaw={props.handleClickShowImageRaw}
+                rotationAngle={slide.rotationAngle}
               />
             ))}
           </Slider>
@@ -96,6 +110,7 @@ class Carousel extends React.Component {
           {props.slides.map((slide) => (
             <ThumbnailPreview
               previewSrc={slide.previewUrlForThumbnail}
+              rotationAngle={slide.rotationAngle}
             />
           ))}
         </Slider>
