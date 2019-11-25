@@ -43,7 +43,7 @@ class AgendaFilterQuerySchema(marshmallow.Schema):
     agenda_types = StrippedString(
         validate=regex_string_as_list_of_string,
         example="private,workspace",
-        descriptions="comma separated list of types of agenda, can contain any value in {}".format(
+        description="comma separated list of types of agenda, can contain any value in {}".format(
             [agenda_type.value for agenda_type in AgendaType]
         ),
     )
