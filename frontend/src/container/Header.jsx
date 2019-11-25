@@ -130,7 +130,7 @@ class Header extends React.Component {
               )}
 
               <li
-                id='publicInstanceSpecificHeaderBtn'
+                id='customToolboxHeaderBtn'
                 className='header__menu__rightside__specificBtn'
               />
 

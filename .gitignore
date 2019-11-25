@@ -2,7 +2,7 @@
 frontend/dist/app/
 frontend/dist/tracim.app.entry.js
 frontend/dist/asset/tracim/tracim.vendor.bundle.js
-frontend/dist/asset/tracim/instanceSpecificLibrary.js
+frontend/dist/asset/tracim/customToolbox.js
 npm-debug.log
 package-lock.json
 color.json
