@@ -22,12 +22,11 @@ import {
   getWorkspaceContentList
 } from '../action.async'
 import Carousel from '../component/Carousel.jsx'
-import { removeExtensionOfFilename, debug } from '../helper.js'
-import ReactImageLightbox, {changeAngle} from '../component/Lightbox.js'
+import { removeExtensionOfFilename, debug, DIRECTION } from '../helper.js'
+import ReactImageLightbox, { changeAngle } from '../Lightbox.js'
 import 'react-image-lightbox/style.css'
 import Fullscreen from 'react-full-screen'
 import classnames from 'classnames'
-import { DIRECTION } from '../helper'
 
 const qs = require('query-string')
 
@@ -66,8 +65,11 @@ class Gallery extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Gallery> Custom event', 'color: #28a745', type, data)
-        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
-          this.setState({ config: data.config })
+        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || qs.parse(data.config.history.location.search).folder_ids !== state.folderId) {
+          this.setState({
+            config: data.config,
+            folderId: qs.parse(data.config.history.location.search).folder_ids
+          })
         }
         break
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -102,7 +104,9 @@ class Gallery extends React.Component {
 
     console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
-    if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
+    if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || prevState.folderId !== state.folderId) {
+      if (state.folderId) await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
+      await this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
       await this.loadWorkspaceData()
       this.buildBreadcrumbs()
     }
@@ -186,15 +190,13 @@ class Gallery extends React.Component {
         this.setState({ imagesPreviews })
 
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading shared space list'))
+      default: this.sendGlobalFlashMessage(props.t('Error while loading content list'))
     }
   }
 
   loadPreview = async (images) => {
-    const { state } = this
+    const { state, props } = this
 
-    // FIXME use global const
-    const pageForPreview = 1
     return Promise.all(images.map(async (image) => {
       const fetchFileContent = await handleFetchResult(
         await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId)
@@ -202,27 +204,29 @@ class Gallery extends React.Component {
       switch (fetchFileContent.apiResponse.status) {
         case 200:
           const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
-          const previewUrl = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 1400, 1400)
-          const previewUrlForThumbnail = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, pageForPreview, 150, 150)
+          const previewUrl = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 1400, 1400)
+          const previewUrlForThumbnail = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 150, 150)
           const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, j) =>
             getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, j + 1, 1920, 1080)
           )
 
-          return ({
+          return {
             ...image,
             src: previewUrl,
             fileName: fetchFileContent.body.filename,
             lightBoxUrlList,
             previewUrlForThumbnail,
             rotationAngle: 0
-          })
-        // default: this.sendGlobalFlashMessage(props.t('Error while loading file content'))
+          }
+        default:
+          this.sendGlobalFlashMessage(props.t('Error while loading file preview'))
+          return {}
       }
     }))
   }
 
   loadWorkspaceData = async () => {
-    const { state } = this
+    const { state, props } = this
 
     const fetchResultWorkspaceDetail = await handleFetchResult(
       await getWorkspaceDetail(state.config.apiUrl, state.config.appConfig.workspaceId)
@@ -235,7 +239,9 @@ class Gallery extends React.Component {
             workspaceLabel: fetchResultWorkspaceDetail.body.label
           }
         })
-      // default: this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
+        break
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
     }
   }
 
@@ -250,19 +256,17 @@ class Gallery extends React.Component {
   handleClickPreviousNextPage = previousNext => {
     const { state } = this
 
-    if (!['previous', 'next'].includes(previousNext)) return
+    let nextPageNumber = previousNext === DIRECTION.LEFT ? state.fileSelected - 1 : state.fileSelected + 1
 
-    let nextPageNumber = previousNext === 'previous' ? state.fileSelected - 1 : state.fileSelected + 1
-
-    if (previousNext === 'next' && state.fileSelected === state.imagesPreviews.length - 1) nextPageNumber = 0
-    if (previousNext === 'previous' && state.fileSelected === 0) nextPageNumber = state.imagesPreviews.length - 1
+    if (previousNext === DIRECTION.RIGHT && state.fileSelected === state.imagesPreviews.length - 1) nextPageNumber = 0
+    if (previousNext === DIRECTION.LEFT && state.fileSelected === 0) nextPageNumber = state.imagesPreviews.length - 1
 
     this.setState({
       fileSelected: nextPageNumber
     })
   }
 
-  getPreviousImage = () => {
+  getPreviousImageUrl = () => {
     const { state } = this
 
     if (state.imagesPreviews.length === 1) return
@@ -271,7 +275,7 @@ class Gallery extends React.Component {
     return state.imagesPreviews[state.fileSelected - 1].lightBoxUrlList[0]
   }
 
-  getNextImage = () => {
+  getNextImageUrl = () => {
     const { state } = this
 
     if (state.imagesPreviews.length === 1) return
@@ -306,7 +310,8 @@ class Gallery extends React.Component {
       case 204:
         const newImagesPreviews = this.state.imagesPreviews.filter((image) => (image.contentId !== contentIdToDelete))
         this.setState({
-          imagesPreviews: newImagesPreviews
+          imagesPreviews: newImagesPreviews,
+          displayPopupDelete: false
         })
         break
       default:
@@ -353,8 +358,7 @@ class Gallery extends React.Component {
   render () {
     const { state, props } = this
 
-    if(state.imagesPreviews[state.fileSelected]) changeAngle(state.imagesPreviews[state.fileSelected].rotationAngle)
-
+    if (state.imagesPreviews[state.fileSelected]) changeAngle(state.imagesPreviews[state.fileSelected].rotationAngle)
 
     return (
       <PageWrapper customClass='galleryPage'>
@@ -367,20 +371,20 @@ class Gallery extends React.Component {
         <PageContent>
           <div className='gallery__action__button'>
             <button className='btn iconBtn' onClick={() => this.onSlickPlayClick(!state.autoPlay)} title={'Auto Play'}>
-              <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+              {state.autoPlay ? props.t('Pause') : props.t('Play')}<i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
             </button>
 
             <button className='btn iconBtn gallery__action__button__rotation__left' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}>
-              <i className={'fa fa-fw fa-reply'} />
+              {props.t('Rotate left')}<i className={'fa fa-fw fa-reply'} />
             </button>
 
             <button className='btn iconBtn gallery__action__button__rotation__right' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}>
-              <i className={'fa fa-fw fa-share'} />
+              {props.t('Rotate right')}<i className={'fa fa-fw fa-share'} />
             </button>
 
             {state.loggedUser.userRoleIdInWorkspace >= 4 && (
               <button className='btn iconBtn' onClick={this.handleOpenDeleteFilePopup} title={props.t('Supprimer')}>
-                <i className={'fa fa-fw fa-trash'} />
+                {props.t('Delete')}<i className={'fa fa-fw fa-trash'} />
               </button>
             )}
           </div>
@@ -403,15 +407,14 @@ class Gallery extends React.Component {
 
           {state.displayLightbox && (
             <ReactImageLightbox
-              prevSrc={this.getPreviousImage()}
-              mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
-              nextSrc={this.getNextImage()}
+              prevSrc={this.getPreviousImageUrl()}
+              mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]}
+              nextSrc={this.getNextImageUrl()}
               onCloseRequest={this.handleClickHideImageRaw}
-              onMovePrevRequest={() => { this.handleClickPreviousNextPage('previous') }}
-              onMoveNextRequest={() => { this.handleClickPreviousNextPage('next') }}
+              onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
+              onMoveNextRequest={() => { this.handleClickPreviousNextPage(DIRECTION.RIGHT) }}
               // imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
               imagePadding={10}
-              wrapperClassName={'maclass'}
               reactModalProps={{ parentSelector: () => this.modalRoot }}
               toolbarButtons={[
                 <div className={'gallery__action__button__lightbox'}>

@@ -21,14 +21,11 @@ class MainPreview extends React.Component {
           <div className='carousel__item__preview__content__image'>
             <img
               src={props.previewSrc}
-              className={`rotate${props.rotationAngle}`}
+              className={`img-thumbnail rotate${props.rotationAngle}`}
               onClick={() => props.handleClickShowImageRaw(props.index)}
               onLoad={this.onLoad.bind(this)}
               width={width && this.width > width ? width : null}
             />
-          </div>
-          <div className='carousel__item__preview__content__bottom'>
-
           </div>
         </span>
       </div>

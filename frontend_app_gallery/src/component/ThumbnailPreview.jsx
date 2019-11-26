@@ -7,7 +7,7 @@ export const ThumbnailPreview = (props) => (
     <div className={classnames('thumbnail__item__preview__content__image')}>
       <img
         src={props.previewSrc}
-        className={`rotate${props.rotationAngle}`}
+        className={`img-thumbnail rotate${props.rotationAngle}`}
       />
     </div>
   </div>

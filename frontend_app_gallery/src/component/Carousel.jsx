@@ -26,7 +26,6 @@ class Carousel extends React.Component {
 
   onMainSliderPositionChange (newPosition) {
     this.position = newPosition
-    if (newPosition === this.props.fileSelected) return
     this.props.onCarouselPositionChange(newPosition)
   }
 
@@ -50,6 +49,7 @@ class Carousel extends React.Component {
       slidesToScroll: 1,
       centerMode: true,
       swipe: false,
+      arrows: !props.disableAnimation,
       lazyLoad: 'progressive',
       afterChange: this.onMainSliderPositionChange.bind(this),
       centerPadding: '0px',
@@ -84,24 +84,22 @@ class Carousel extends React.Component {
     }
 
     return (
-      <div>
-        <div>
-          <Slider
-            asNavFor={this.state.thumbnailSlider}
-            ref={slider => (this.mainSlider = slider)}
-            {...mainSliderProps}
-          >
-            {props.slides.map((slide, index) => (
-              <MainPreview
-                loggedUser={props.loggedUser}
-                previewSrc={slide.src}
-                index={index}
-                handleClickShowImageRaw={props.handleClickShowImageRaw}
-                rotationAngle={slide.rotationAngle}
-              />
-            ))}
-          </Slider>
-        </div>
+      <>
+        <Slider
+          asNavFor={this.state.thumbnailSlider}
+          ref={slider => (this.mainSlider = slider)}
+          {...mainSliderProps}
+        >
+          {props.slides.map((slide, index) => (
+            <MainPreview
+              loggedUser={props.loggedUser}
+              previewSrc={slide.src}
+              index={index}
+              handleClickShowImageRaw={props.handleClickShowImageRaw}
+              rotationAngle={slide.rotationAngle}
+            />
+          ))}
+        </Slider>
         <Slider
           asNavFor={this.state.mainSlider}
           ref={slider => (this.thumbnailSlider = slider)}
@@ -114,7 +112,7 @@ class Carousel extends React.Component {
             />
           ))}
         </Slider>
-      </div>
+      </>
     )
   }
 }

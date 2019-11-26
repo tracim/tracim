@@ -1,7 +1,7 @@
 .carousel
   &__thumbnail .slick-current
     & img
-      border 3px #7D4E24 solid
+      background-color #7d4e24
   &__item__preview
     &__content
       display: block
@@ -21,7 +21,7 @@
     position absolute
     cursor pointer
     height 100%
-    width 5%
+    width 60px
     top 0
     z-index 1
     & i
@@ -62,6 +62,8 @@
     text-align center
     & button:hover
       background-color: rgba(0, 0, 0, 0.1)
+    & i
+      margin-left 10px
     &__lightbox i
       color #fff
     &__rotation
@@ -74,12 +76,18 @@
   height 100%
   overflow auto
 
+.rotate0
+  transform rotate(0deg)
+  transition none
 .rotate90
   transform rotate(90deg)
+  transition none
 .rotate180
   transform rotate(180deg)
+  transition none
 .rotate270
   transform rotate(270deg)
+  transition none
 
 .gallery__delete__file__popup
   & .cardPopup__container

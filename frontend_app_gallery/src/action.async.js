@@ -48,16 +48,6 @@ export const getWorkspaceContentList = (apiUrl, workspaceId) => {
   })
 }
 
-export const getWorkspaceMemberList = (apiUrl, workspaceId) => {
-  return fetch(`${apiUrl}/workspaces/${workspaceId}/members`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-}
-
 export const putFileIsDeleted = (apiUrl, workspaceId, contentId) => {
   return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`, {
     credentials: 'include',
