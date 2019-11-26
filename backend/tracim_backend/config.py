@@ -285,6 +285,7 @@ class CFG(object):
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
+        self.PLUGIN__FOLDER_PATH = self.get_raw_config("plugin.folder_path", None)
 
     def _load_limitation_config(self) -> None:
         self.LIMITATION__SHAREDSPACE_PER_USER = int(

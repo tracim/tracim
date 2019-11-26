@@ -52,6 +52,7 @@ from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
+from tracim_backend.plugin_manager import PluginManager
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
 from tracim_backend.views.contents_api.comment_controller import CommentController
@@ -272,6 +273,14 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         configurator.include("pyramid_mako")
         frontend_controller = FrontendController(app_config.FRONTEND__DIST_FOLDER_PATH)
         configurator.include(frontend_controller.bind)
+
+    plugin_manager = PluginManager(prefix="tracim_backend_")
+    # INFO - G.M - 2019-11-27 - if a plugin path is provided, load plugins from this path
+    if app_config.PLUGIN__FOLDER_PATH:
+        plugin_manager.add_plugin_path(app_config.PLUGIN__FOLDER_PATH)
+    plugin_manager.load_plugins()
+    # INFO - G.M - 2019-11-27 - Include plugin custom web code
+    plugin_manager.web_include(configurator, app_config)
 
     hapic.add_documentation_view("/api/v2/doc", "Tracim v2 API", "API of Tracim v2")
     return configurator.make_wsgi_app()
