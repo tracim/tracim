@@ -8,6 +8,8 @@
 ### Fixed issues
 - Backend: #2518, #2526
 
+### Breaking change api
+- remove "size" parameter from create/update/get/get all workspaces endpoint
 
 # 2.4.5 / 2019-11-21
 
