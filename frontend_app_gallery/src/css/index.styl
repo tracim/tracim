@@ -1,35 +1,48 @@
 .carousel
-  &__thumbnail .slick-current
-    & img
-      background-color #7d4e24
+  &__thumbnail
+    & .slick-current
+      & img
+        background-color #7d4e24
+    &__item__preview__content__image
+      height 150px
+      width 150px
+      margin 16px auto
+      display flex
+      align-items center
+      cursor pointer
+      & img
+        margin 0 auto
+        box-shadow 0 0 8px 4px rgba(0,0,0,0.2)
+        border none
+        &:hover
+          box-shadow 0 0 16px 4px rgba(0,0,0,0.3)
   &__item__preview
     &__content
       display: block
       text-align: center
       &__image
+        min-height 500px
         margin 20px 0
         display flex
-        min-height 500px
         & img
           max-height 500px
+          margin auto
           object-fit contain
           cursor pointer
-          margin auto
-          box-shadow 0 4px 8px 0 rgba(0,0,0,0.4)
+          box-shadow 0 0 8px 2px rgba(0,0,0,0.2)
   &__arrow
-    display block
     position absolute
-    cursor pointer
     height 100%
     width 60px
+    cursor pointer
+    display block
     top 0
     z-index 1
     & i
-      transform translateY(-50%)
-      transform translateX(-50%)
       position absolute
-      top 50%
+      top calc(50% - 20px)
       left 50%
+      transform translateX(-50%)
       font-size 40px
     &:hover
       background-color rgba(0, 0, 0, 0.1)
@@ -39,42 +52,30 @@
     &__prev
       left -20px
 
-.thumbnail__item__preview__content
-  display block
-  height 150px
-  cursor pointer
-  text-align center
-  margin 16px 0
-  &__image
-    display flex
-    align-items center
-    height 150px
-    width 150px
-    margin 0 auto
-    & img
-      margin 0 auto
-      box-shadow 0 4px 8px 0 rgba(0,0,0,0.4)
-      &:hover
-        box-shadow 0 8px 16px 0 rgba(0,0,0,0.6)
-
 .gallery
+  height 100%
+  overflow auto
   &__action__button
     text-align center
     & button:hover
       background-color: rgba(0, 0, 0, 0.1)
     & i
       margin-left 10px
-    &__lightbox i
-      color #fff
     &__rotation
       &__left i
         transform rotate(270deg)
       &__right i
         transform rotate(90deg)
-
-.galleryPage
-  height 100%
-  overflow auto
+  &__delete__file__popup
+    & .cardPopup__container
+      width 400px
+    &__body
+      width 100%
+      &__btn
+        display flex
+        justify-content flex-end
+        .btn:first-child
+          margin-right 15px
 
 .rotate0
   transform rotate(0deg)
@@ -89,13 +90,12 @@
   transform rotate(270deg)
   transition none
 
-.gallery__delete__file__popup
-  & .cardPopup__container
-    width 400px
-  &__body
-    width 100%
-    &__btn
-      display flex
-      justify-content flex-end
-      .btn:first-child
-        margin-right 15px
+.ril__caption, .ril__toolbar
+  background none
+
+.ril__toolbarRightSide button
+  margin 2px
+  border-radius 0.25rem
+  background-color rgba(0, 0, 0, 0.5)
+  font-size 1.1rem
+  color #929292

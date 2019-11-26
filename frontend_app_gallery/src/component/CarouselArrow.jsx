@@ -1,11 +1,10 @@
 import React from 'react'
 import classnames from 'classnames'
+import { translate } from 'react-i18next'
 import { DIRECTION } from '../helper'
 import PropTypes from 'prop-types'
-import MainPreview from './MainPreview'
 
 const CarouselArrow = (props) => {
-  const { onClick } = props
   return (
     <div
       className={classnames(
@@ -13,16 +12,22 @@ const CarouselArrow = (props) => {
         'carousel__arrow__next',
         props.direction === DIRECTION.RIGHT ? 'carousel__arrow__next' : 'carousel__arrow__prev'
       )}
-      onClick={onClick}
+      onClick={props.onClick}
+      title={props.direction === DIRECTION.RIGHT ? props.t('Next') : props.t('Previous')}
     >
       <i className={classnames('fa', props.direction === DIRECTION.RIGHT ? 'fa-chevron-right' : 'fa-chevron-left')} />
     </div>
   )
 }
 
-export default CarouselArrow
+export default translate()(CarouselArrow)
 
-MainPreview.propTypes = {
+CarouselArrow.propTypes = {
   onClick: PropTypes.func,
-  direction: PropTypes.string
+  direction: PropTypes.string.isRequired
+}
+
+CarouselArrow.defaultProps = {
+  onClick: () => {},
+  direction: DIRECTION.RIGHT
 }

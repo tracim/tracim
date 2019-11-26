@@ -1,3 +1,18 @@
 {
-
+  "Next": "Image suivante",
+  "Previous": "Image précédente",
+  "Home": "Accueil",
+  "Pause": "Pause",
+  "Play": "Lecture",
+  "Rotate left": "Tourner à gauche",
+  "Rotate right": "Tourner à droite",
+  "Delete": "Supprimer",
+  "Disable fullscreen": "Désactiver le plein écran",
+  "Enable fullscreen": "Activer le plein écran",
+  "Are you sure ?": "Êtes-vous sûr ?",
+  "Cancel": "Annuler",
+  "Error while loading folder detail": "Erreur lors du chargement du dossier",
+  "Error while loading content list": "Erreur lors du chargement de la liste des contenus",
+  "Error while loading file preview": "Erreur lors du chargement de l'apércu du fichier",
+  "Error while loading shared space detail": "Erreur lors du chargement des détails de l'espace partagé"
 }

@@ -43,8 +43,10 @@ class Carousel extends React.Component {
     }
 
     const mainSliderProps = {
+      asNavFor: this.state.thumbnailSlider,
+      ref: slider => (this.mainSlider = slider),
       infinite: true,
-      speed: props.disableAnimation ? 0 : 500,
+      speed: props.disableAnimation ? 0 : 400,
       slidesToShow: 1,
       slidesToScroll: 1,
       centerMode: true,
@@ -59,13 +61,15 @@ class Carousel extends React.Component {
     }
 
     const thumbnailSliderProps = {
+      asNavFor: this.state.mainSlider,
+      ref: slider => (this.thumbnailSlider = slider),
       slidesToShow: props.slides.length > 6 ? 7 : props.slides.length,
       focusOnSelect: true,
       centerMode: true,
       swipe: false,
       centerPadding: '0px',
       infinite: true,
-      speed: 200,
+      speed: props.disableAnimation ? 0 : 400,
       arrows: false,
       className: 'carousel__thumbnail',
       responsive: [
@@ -86,8 +90,6 @@ class Carousel extends React.Component {
     return (
       <>
         <Slider
-          asNavFor={this.state.thumbnailSlider}
-          ref={slider => (this.mainSlider = slider)}
           {...mainSliderProps}
         >
           {props.slides.map((slide, index) => (
@@ -101,8 +103,6 @@ class Carousel extends React.Component {
           ))}
         </Slider>
         <Slider
-          asNavFor={this.state.mainSlider}
-          ref={slider => (this.thumbnailSlider = slider)}
           {...thumbnailSliderProps}
         >
           {props.slides.map((slide) => (
@@ -120,16 +120,20 @@ class Carousel extends React.Component {
 export default Carousel
 
 Carousel.propTypes = {
-  slides: PropTypes.array,
+  slides: PropTypes.array.isRequired,
+  handleClickShowImageRaw: PropTypes.func.isRequired,
+  fileSelected: PropTypes.number.isRequired,
+  onFileDeleted: PropTypes.func.isRequired,
   loggedUser: PropTypes.object,
-  handleClickShowImageRaw: PropTypes.func,
-  onFileDeleted: PropTypes.func,
-  disableAnimation: PropTypes.bool,
-  fileSelected: PropTypes.number
+  disableAnimation: PropTypes.bool
 }
 
 Carousel.defaultProps = {
   slides: [],
   onCarouselPositionChange: () => {},
-  handleClickShowImageRaw: () => {}
+  handleClickShowImageRaw: () => {},
+  onFileDeleted: () => {},
+  loggedUser: {},
+  disableAnimation: false,
+  fileSlected: 0
 }

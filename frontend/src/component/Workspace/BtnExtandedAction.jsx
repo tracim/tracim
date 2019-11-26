@@ -5,8 +5,6 @@ import { PAGE } from '../../helper'
 import { Link } from 'react-router-dom'
 
 const ExtandedAction = props => {
-  console.log('folderData', props.folderData)
-
   return (
     <div
       className='extandedaction dropdown'

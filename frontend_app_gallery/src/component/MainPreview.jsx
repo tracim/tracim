@@ -38,7 +38,15 @@ export default MainPreview
 MainPreview.propTypes = {
   loggedUser: PropTypes.object,
   previewSrc: PropTypes.string,
-  index: PropTypes.string,
+  index: PropTypes.number,
   handleClickShowImageRaw: PropTypes.func,
   rotationAngle: PropTypes.number
+}
+
+MainPreview.defaultProps = {
+  loggedUser: {},
+  previewSrc: '',
+  index: 0,
+  handleClickShowImageRaw: () => {},
+  rotationAngle: 0
 }

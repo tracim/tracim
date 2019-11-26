@@ -3,7 +3,7 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
-  getFilePreviewUrl,
+  buildFilePreviewUrl,
   CUSTOM_EVENT,
   PageTitle,
   PageWrapper,
@@ -23,7 +23,7 @@ import {
 } from '../action.async'
 import Carousel from '../component/Carousel.jsx'
 import { removeExtensionOfFilename, debug, DIRECTION } from '../helper.js'
-import ReactImageLightbox, { changeAngle } from '../Lightbox.js'
+import ReactImageLightbox, { LightboxRotation } from '../Lightbox.js'
 import 'react-image-lightbox/style.css'
 import Fullscreen from 'react-full-screen'
 import classnames from 'classnames'
@@ -55,6 +55,8 @@ class Gallery extends React.Component {
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
+
+    this.lightboxRotation = new LightboxRotation()
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
@@ -204,10 +206,10 @@ class Gallery extends React.Component {
       switch (fetchFileContent.apiResponse.status) {
         case 200:
           const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
-          const previewUrl = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 1400, 1400)
-          const previewUrlForThumbnail = getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 150, 150)
+          const previewUrl = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 1400, 1400)
+          const previewUrlForThumbnail = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 150, 150)
           const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, j) =>
-            getFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, j + 1, 1920, 1080)
+            buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, j + 1, 1920, 1920)
           )
 
           return {
@@ -244,6 +246,15 @@ class Gallery extends React.Component {
         this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
     }
   }
+
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
 
   handleClickHideImageRaw = () => {
     this.setState({ displayLightbox: false, fullscreen: false })
@@ -358,10 +369,10 @@ class Gallery extends React.Component {
   render () {
     const { state, props } = this
 
-    if (state.imagesPreviews[state.fileSelected]) changeAngle(state.imagesPreviews[state.fileSelected].rotationAngle)
+    if (state.imagesPreviews[state.fileSelected]) this.lightboxRotation.changeAngle(state.imagesPreviews[state.fileSelected].rotationAngle)
 
     return (
-      <PageWrapper customClass='galleryPage'>
+      <PageWrapper customClass='gallery'>
         <PageTitle
           title={state.folderId ? state.fileName : state.content.workspaceLabel}
           icon={'picture-o'}
@@ -370,7 +381,7 @@ class Gallery extends React.Component {
 
         <PageContent>
           <div className='gallery__action__button'>
-            <button className='btn iconBtn' onClick={() => this.onSlickPlayClick(!state.autoPlay)} title={'Auto Play'}>
+            <button className='btn iconBtn' onClick={() => this.onSlickPlayClick(!state.autoPlay)}>
               {state.autoPlay ? props.t('Pause') : props.t('Play')}<i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
             </button>
 
@@ -383,7 +394,7 @@ class Gallery extends React.Component {
             </button>
 
             {state.loggedUser.userRoleIdInWorkspace >= 4 && (
-              <button className='btn iconBtn' onClick={this.handleOpenDeleteFilePopup} title={props.t('Supprimer')}>
+              <button className='btn iconBtn' onClick={this.handleOpenDeleteFilePopup}>
                 {props.t('Delete')}<i className={'fa fa-fw fa-trash'} />
               </button>
             )}
@@ -413,24 +424,23 @@ class Gallery extends React.Component {
               onCloseRequest={this.handleClickHideImageRaw}
               onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
               onMoveNextRequest={() => { this.handleClickPreviousNextPage(DIRECTION.RIGHT) }}
-              // imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
               imagePadding={10}
               reactModalProps={{ parentSelector: () => this.modalRoot }}
               toolbarButtons={[
                 <div className={'gallery__action__button__lightbox'}>
-                  <button className={'btn iconBtn'} onClick={() => this.onSlickPlayClick(!state.autoPlay)} title={'Pause'}>
+                  <button className={'btn iconBtn'} onClick={() => this.onSlickPlayClick(!state.autoPlay)} title={state.autoPlay ? props.t('Pause') : props.t('Play')}>
                     <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
                   </button>
 
-                  <button className={'btn iconBtn'} onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))} title={'Fullscreen active'}>
+                  <button className={'btn iconBtn'} onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))} title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}>
                     <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
                   </button>
 
-                  <button className='btn iconBtn gallery__action__button__rotation__left' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}>
+                  <button className='btn iconBtn gallery__action__button__rotation__left' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)} title={props.t('Rotate left')}>
                     <i className={'fa fa-fw fa-reply'} />
                   </button>
 
-                  <button className='btn iconBtn gallery__action__button__rotation__right' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}>
+                  <button className='btn iconBtn gallery__action__button__rotation__right' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)} title={props.t('Rotate right')}>
                     <i className={'fa fa-fw fa-share'} />
                   </button>
                 </div>

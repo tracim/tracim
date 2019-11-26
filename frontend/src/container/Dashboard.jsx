@@ -435,6 +435,7 @@ class Dashboard extends React.Component {
           // these endpoints are /system/applications, /system/content_types and key sidebar_entry from /user/me/workspaces
           // HACK - CH - 2019-09-10 - hard coding collabora creation label from the hack since backend still isn't clear about appList and contentTypeList usage
           // See https://github.com/tracim/tracim/issues/2375
+          // HACK - GM - 2019-11-26 - hard coding gallery creation label because gallery don't have a content_type
           const creationLabelWithHACK = (() => {
             switch (app.slug) {
               case 'agenda': return props.t('Open the agenda')
@@ -449,7 +450,7 @@ class Dashboard extends React.Component {
           const slugWithHACK = app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug
             ? HACK_COLLABORA_CONTENT_TYPE([{}]).slug
             : contentType.slug
-          if (app.slug === 'gallery') console.log('galleryApp', app)
+
           return {
             ...app,
             hexcolor: app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug

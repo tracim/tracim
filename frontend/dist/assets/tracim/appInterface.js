@@ -11,8 +11,6 @@ var getSelectedApp = function (appName) {
   // see https://github.com/tracim/tracim/issues/1954
   try {
     switch (appName) {
-      case 'gallery':
-        return (appGallery || {default: {}}).default
       case 'html-document':
         return (appHtmlDocument || {default: {}}).default
       case 'thread':
@@ -33,6 +31,8 @@ var getSelectedApp = function (appName) {
         return (appShareFolderAdvanced || {default: {}}).default
       case 'collaborative_document_edition':
         return (appCollaborativeDocumentEdition || {default: {}}).default
+      case 'gallery':
+        return (appGallery || {default: {}}).default
       default:
         return APP_NOT_LOADED
     }

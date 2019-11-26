@@ -71,7 +71,6 @@ class AppFullscreenRouter extends React.Component {
             }} />
 
             <Route path={PAGE.WORKSPACE.GALLERY(':idws')} render={() => {
-              console.log(props.match.params)
               const galleryConfig = {
                 workspaceId: props.match.params.idws,
                 forceShowSidebar: false
