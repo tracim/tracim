@@ -31,8 +31,9 @@ describe('recentactivity in dashboard page', function () {
 
   describe('With one recent activity', function () {
     it('should show the activity and a button to see more', function () {
-      cy.createThread(threadTitle, workspaceId)
+      cy.get('.dashboard__workspaceInfo').scrollIntoView()
       cy.get('.recentactivity .recentactivity__list .recentactivity__empty').should('be.visible')
+      cy.createThread(threadTitle, workspaceId)
       cy.get('.recentactivity .recentactivity__list button.recentactivity__more__btn').should('be.visible')
     })
   })
