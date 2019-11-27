@@ -102,16 +102,18 @@ class Carousel extends React.Component {
               index={index}
               handleClickShowImageRaw={props.handleClickShowImageRaw}
               rotationAngle={slide.rotationAngle}
+              key={`mainPreview_${index}`}
             />
           ))}
         </Slider>
         <Slider
           {...thumbnailSliderProps}
         >
-          {props.slides.map((slide) => (
+          {props.slides.map((slide, i) => (
             <ThumbnailPreview
               previewSrc={slide.previewUrlForThumbnail}
               rotationAngle={slide.rotationAngle}
+              key={`thumbnailPreview_${i}`}
             />
           ))}
         </Slider>

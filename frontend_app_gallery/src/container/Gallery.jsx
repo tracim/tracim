@@ -23,7 +23,8 @@ import {
   getWorkspaceContentList
 } from '../action.async'
 import Carousel from '../component/Carousel.jsx'
-import { debug, DIRECTION } from '../helper.js'
+import { DIRECTION } from '../helper.js'
+import { debug } from '../debug.js'
 import ReactImageLightbox, { LightboxRotation } from '../Lightbox.js'
 import 'react-image-lightbox/style.css'
 import Fullscreen from 'react-full-screen'

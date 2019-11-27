@@ -16,7 +16,8 @@ export const debug = {
   content: {
     ...defaultDebug.content,
     content_type: 'file',
-    workspace_id: 0
+    workspace_id: 0,
+    workspaceLabel: ''
   },
   loggedUser: {
     ...defaultDebug.loggedUser
