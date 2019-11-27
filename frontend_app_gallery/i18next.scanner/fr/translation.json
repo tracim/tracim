@@ -1,6 +1,6 @@
 {
-  "Next": "Image suivante",
-  "Previous": "Image précédente",
+  "Next": "Suivante",
+  "Previous": "Précédente",
   "Home": "Accueil",
   "Pause": "Pause",
   "Play": "Lecture",
@@ -13,6 +13,7 @@
   "Cancel": "Annuler",
   "Error while loading folder detail": "Erreur lors du chargement du dossier",
   "Error while loading content list": "Erreur lors du chargement de la liste des contenus",
-  "Error while loading file preview": "Erreur lors du chargement de l'apércu du fichier",
-  "Error while loading shared space detail": "Erreur lors du chargement des détails de l'espace partagé"
+  "Error while loading file preview": "Erreur lors du chargement de l'aperçu du fichier",
+  "Error while loading shared space detail": "Erreur lors du chargement des détails de l'espace partagé",
+  "Error while deleting document": "Erreur lors de la suppression d'un document"
 }

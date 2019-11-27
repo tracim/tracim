@@ -2,17 +2,24 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 class MainPreview extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {}
+  }
+
   onLoad ({ target: img }) {
-    this.height = img.height
-    this.width = img.width
+    this.setState({
+      height: img.height,
+      width: img.width
+    })
   }
 
   render () {
     const { props } = this
 
-    let width = this.width
+    let width = this.state.width
     if (props.rotationAngle === 90 || props.rotationAngle === 270) {
-      width = this.height
+      width = this.state.height
     }
 
     return (
@@ -22,9 +29,9 @@ class MainPreview extends React.Component {
             <img
               src={props.previewSrc}
               className={`img-thumbnail rotate${props.rotationAngle}`}
-              onClick={() => props.handleClickShowImageRaw(props.index)}
+              onClick={props.handleClickShowImageRaw}
               onLoad={this.onLoad.bind(this)}
-              width={width && this.width > width ? width : null}
+              width={width && this.state.width > width ? width : null}
             />
           </div>
         </span>

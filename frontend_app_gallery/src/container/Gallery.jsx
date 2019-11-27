@@ -4,6 +4,7 @@ import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
   buildFilePreviewUrl,
+  removeExtensionOfFilename,
   CUSTOM_EVENT,
   PageTitle,
   PageWrapper,
@@ -22,7 +23,7 @@ import {
   getWorkspaceContentList
 } from '../action.async'
 import Carousel from '../component/Carousel.jsx'
-import { removeExtensionOfFilename, debug, DIRECTION } from '../helper.js'
+import { debug, DIRECTION } from '../helper.js'
 import ReactImageLightbox, { LightboxRotation } from '../Lightbox.js'
 import 'react-image-lightbox/style.css'
 import Fullscreen from 'react-full-screen'
@@ -67,10 +68,11 @@ class Gallery extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Gallery> Custom event', 'color: #28a745', type, data)
-        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || qs.parse(data.config.history.location.search).folder_ids !== state.folderId) {
+        const currentFolderId = qs.parse(data.config.history.location.search).folder_ids
+        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || currentFolderId !== state.folderId) {
           this.setState({
             config: data.config,
-            folderId: qs.parse(data.config.history.location.search).folder_ids
+            folderId: currentFolderId
           })
         }
         break
@@ -95,9 +97,9 @@ class Gallery extends React.Component {
 
     console.log('%c<Gallery> did mount', `color: ${state.config.hexcolor}`)
 
-    if (state.folderId) await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
-    await this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
-    if (state.config.appConfig.workspaceId !== null) await this.loadWorkspaceData()
+    if (state.folderId) this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
+    this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
+    if (state.config.appConfig.workspaceId !== null) this.loadWorkspaceData()
     this.buildBreadcrumbs()
   }
 
@@ -107,9 +109,9 @@ class Gallery extends React.Component {
     console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || prevState.folderId !== state.folderId) {
-      if (state.folderId) await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
-      await this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
-      await this.loadWorkspaceData()
+      if (state.folderId) this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
+      this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
+      this.loadWorkspaceData()
       this.buildBreadcrumbs()
     }
     if (prevState.fileSelected !== state.fileSelected) {
@@ -181,11 +183,9 @@ class Gallery extends React.Component {
 
     switch (fetchContentList.apiResponse.status) {
       case 200:
-        let images = []
-        fetchContentList.body.forEach(content => {
-          if (content.content_type === 'file') {
-            images.push({ src: '', contentId: content.content_id })
-          }
+
+        const images = fetchContentList.body.map(content => {
+          if (content.content_type === 'file') return { src: '', contentId: content.content_id }
         })
         const imagesPreviews = await this.loadPreview(images)
 
@@ -260,8 +260,8 @@ class Gallery extends React.Component {
     this.setState({ displayLightbox: false, fullscreen: false })
   }
 
-  handleClickShowImageRaw = (fileSelected) => {
-    this.setState({ displayLightbox: true, fileSelected })
+  handleClickShowImageRaw = () => {
+    this.setState({ displayLightbox: true })
   }
 
   handleClickPreviousNextPage = previousNext => {
@@ -325,14 +325,14 @@ class Gallery extends React.Component {
           displayPopupDelete: false
         })
         break
-      default:
+      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
     }
   }
 
-  onSlickPlayClick (play) {
+  onClickSlickPlay (play) {
     if (play) {
       this.setState({
-        autoPlay: setInterval(() => this.handleClickPreviousNextPage('next'), 3000)
+        autoPlay: setInterval(() => this.handleClickPreviousNextPage(DIRECTION.RIGHT), 3000)
       })
     } else {
       clearInterval(this.state.autoPlay)
@@ -381,7 +381,7 @@ class Gallery extends React.Component {
 
         <PageContent>
           <div className='gallery__action__button'>
-            <button className='btn iconBtn' onClick={() => this.onSlickPlayClick(!state.autoPlay)}>
+            <button className='btn iconBtn' onClick={() => this.onClickSlickPlay(!state.autoPlay)}>
               {state.autoPlay ? props.t('Pause') : props.t('Play')}<i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
             </button>
 
@@ -428,19 +428,35 @@ class Gallery extends React.Component {
               reactModalProps={{ parentSelector: () => this.modalRoot }}
               toolbarButtons={[
                 <div className={'gallery__action__button__lightbox'}>
-                  <button className={'btn iconBtn'} onClick={() => this.onSlickPlayClick(!state.autoPlay)} title={state.autoPlay ? props.t('Pause') : props.t('Play')}>
+                  <button
+                    className={'btn iconBtn'}
+                    onClick={() => this.onClickSlickPlay(!state.autoPlay)}
+                    title={state.autoPlay ? props.t('Pause') : props.t('Play')}
+                  >
                     <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
                   </button>
 
-                  <button className={'btn iconBtn'} onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))} title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}>
+                  <button
+                    className={'btn iconBtn'}
+                    onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))}
+                    title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}
+                  >
                     <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
                   </button>
 
-                  <button className='btn iconBtn gallery__action__button__rotation__left' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)} title={props.t('Rotate left')}>
+                  <button
+                    className='btn iconBtn gallery__action__button__rotation__left'
+                    onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
+                    title={props.t('Rotate left')}
+                  >
                     <i className={'fa fa-fw fa-reply'} />
                   </button>
 
-                  <button className='btn iconBtn gallery__action__button__rotation__right' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)} title={props.t('Rotate right')}>
+                  <button
+                    className='btn iconBtn gallery__action__button__rotation__right'
+                    onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
+                    title={props.t('Rotate right')}
+                  >
                     <i className={'fa fa-fw fa-share'} />
                   </button>
                 </div>

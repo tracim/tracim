@@ -11,21 +11,14 @@ import { DIRECTION } from '../helper'
 class Carousel extends React.Component {
   constructor (props) {
     super(props)
+
     this.state = {
-      mainSlider: null,
-      thumbnailSlider: null
+      oldPosition: 0
     }
   }
 
-  componentDidMount () {
-    this.setState({
-      mainSlider: this.mainSlider,
-      thumbnailSlider: this.thumbnailSlider
-    })
-  }
-
   onMainSliderPositionChange (newPosition) {
-    this.position = newPosition
+    this.setState({ oldPosition: newPosition })
     this.props.onCarouselPositionChange(newPosition)
   }
 
@@ -33,9 +26,9 @@ class Carousel extends React.Component {
     const { props } = this
 
     if (this.mainSlider) {
-      if (this.position === props.slides.length - 1 && props.fileSelected === 0) {
+      if (this.state.oldPosition === props.slides.length - 1 && props.fileSelected === 0) {
         this.mainSlider.slickNext()
-      } else if (this.position === 0 && props.fileSelected === props.slides.length - 1) {
+      } else if (this.state.oldPosition === 0 && props.fileSelected === props.slides.length - 1) {
         this.mainSlider.slickPrev()
       } else {
         this.mainSlider.slickGoTo(props.fileSelected)
@@ -43,7 +36,7 @@ class Carousel extends React.Component {
     }
 
     const mainSliderProps = {
-      asNavFor: this.state.thumbnailSlider,
+      asNavFor: this.thumbnailSlider,
       ref: slider => (this.mainSlider = slider),
       infinite: true,
       speed: props.disableAnimation ? 0 : 400,
@@ -61,7 +54,7 @@ class Carousel extends React.Component {
     }
 
     const thumbnailSliderProps = {
-      asNavFor: this.state.mainSlider,
+      asNavFor: this.mainSlider,
       ref: slider => (this.thumbnailSlider = slider),
       slidesToShow: props.slides.length > 6 ? 7 : props.slides.length,
       focusOnSelect: true,
@@ -74,12 +67,12 @@ class Carousel extends React.Component {
       className: 'carousel__thumbnail',
       responsive: [
         {
-          breakpoint: 1100,
+          breakpoint: 1199,
           settings: {
             slidesToShow: 5
           }
         }, {
-          breakpoint: 900,
+          breakpoint: 991,
           settings: {
             slidesToShow: 3
           }

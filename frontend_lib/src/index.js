@@ -13,7 +13,8 @@ import {
   displayFileSize,
   parserStringToList,
   checkEmailValidity,
-  buildFilePreviewUrl
+  buildFilePreviewUrl,
+  removeExtensionOfFilename
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -93,6 +94,7 @@ export {
   generateLocalStorageContentId,
   generateRandomPassword,
   buildFilePreviewUrl,
+  removeExtensionOfFilename,
   Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,

@@ -9,8 +9,7 @@ const CarouselArrow = (props) => {
     <div
       className={classnames(
         'carousel__arrow',
-        'carousel__arrow__next',
-        props.direction === DIRECTION.RIGHT ? 'carousel__arrow__next' : 'carousel__arrow__prev'
+        props.direction === DIRECTION.RIGHT ? 'arrownext' : 'arrowprev'
       )}
       onClick={props.onClick}
       title={props.direction === DIRECTION.RIGHT ? props.t('Next') : props.t('Previous')}

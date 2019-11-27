@@ -451,17 +451,21 @@ class Dashboard extends React.Component {
             ? HACK_COLLABORA_CONTENT_TYPE([{}]).slug
             : contentType.slug
 
+          const route = (() => {
+            switch (app.slug) {
+              case 'agenda': return PAGE.WORKSPACE.AGENDA(props.curWs.id)
+              case 'gallery': return PAGE.WORKSPACE.GALLERY(props.curWs.id)
+              default: return `${PAGE.WORKSPACE.NEW(props.curWs.id, slugWithHACK)}?parent_id=null`
+            }
+          })()
+
           return {
             ...app,
             hexcolor: app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug
               ? HACK_COLLABORA_CONTENT_TYPE([{}]).hexcolor
               : app.hexcolor,
             creationLabel: creationLabelWithHACK,
-            route: app.slug === 'agenda'
-              ? PAGE.WORKSPACE.AGENDA(props.curWs.id)
-              : app.slug === 'gallery'
-                ? PAGE.WORKSPACE.GALLERY(props.curWs.id)
-                : `${PAGE.WORKSPACE.NEW(props.curWs.id, slugWithHACK)}?parent_id=null`
+            route: route
           }
         })
       : []
