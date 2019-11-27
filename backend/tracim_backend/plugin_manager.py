@@ -60,6 +60,16 @@ class TracimPluginManager(object):
         return self.plugins
 
 
+def init_plugin_manager(app_config: CFG) -> TracimPluginManager:
+    plugin_manager = TracimPluginManager(prefix="tracim_backend_")
+    # INFO - G.M - 2019-11-27 - if a plugin path is provided, load plugins from this path
+    if app_config.PLUGIN__FOLDER_PATH:
+        plugin_manager.add_plugin_path(app_config.PLUGIN__FOLDER_PATH)
+    plugin_manager.load_plugins()
+    plugin_manager.register_all()
+    return plugin_manager
+
+
 class PluginSpec(object):
     @hookspec
     def web_include(self, configurator: Configurator, app_config: CFG) -> None:
@@ -68,6 +78,14 @@ class PluginSpec(object):
         at module root
         :param configurator: Tracim pyramid configurator
         :param app_config: current tracim config
+        :return: nothing
+        """
+        pass
+
+    @hookspec
+    def on_whoami(self) -> None:
+        """
+        event when we do a whoami endpoint
         :return: nothing
         """
         pass

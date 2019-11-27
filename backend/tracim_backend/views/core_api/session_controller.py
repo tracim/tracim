@@ -61,6 +61,7 @@ class SessionController(Controller):
         If user is not authenticated or the session has expired, a 401 is returned.
         This is the recommanded way to check if the user is already authenticated
         """
+        request.event_manager.hook.on_whoami()
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(request.current_user, session=request.dbsession, config=app_config)
         user = uapi.get_current_user()  # User

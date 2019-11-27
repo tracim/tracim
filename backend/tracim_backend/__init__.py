@@ -52,7 +52,7 @@ from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
-from tracim_backend.plugin_manager import TracimPluginManager
+from tracim_backend.plugin_manager import init_plugin_manager
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
 from tracim_backend.views.contents_api.comment_controller import CommentController
@@ -84,6 +84,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_config = CFG(settings)
     app_config.configure_filedepot()
     settings["CFG"] = app_config
+    plugin_manager = init_plugin_manager(app_config)
+    settings["event_manager"] = plugin_manager.event_manager
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
     tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
@@ -274,12 +276,6 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         frontend_controller = FrontendController(app_config.FRONTEND__DIST_FOLDER_PATH)
         configurator.include(frontend_controller.bind)
 
-    plugin_manager = TracimPluginManager(prefix="tracim_backend_")
-    # INFO - G.M - 2019-11-27 - if a plugin path is provided, load plugins from this path
-    if app_config.PLUGIN__FOLDER_PATH:
-        plugin_manager.add_plugin_path(app_config.PLUGIN__FOLDER_PATH)
-    plugin_manager.load_plugins()
-    plugin_manager.register_all()
     # INFO - G.M - 2019-11-27 - Include plugin custom web code
     plugin_manager.event_manager.hook.web_include(configurator=configurator, app_config=app_config)
 

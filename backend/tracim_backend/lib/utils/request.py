@@ -2,6 +2,7 @@
 from json import JSONDecodeError
 import typing
 
+import pluggy
 from pyramid.request import Request
 from sqlalchemy.orm import Session
 
@@ -253,6 +254,10 @@ class TracimRequest(TracimContext, Request):
     @property
     def app_config(self) -> CFG:
         return self.registry.settings["CFG"]
+
+    @property
+    def event_manager(self) -> pluggy.PluginManager:
+        return self.registry.settings["event_manager"]
 
     def _cleanup(self, request: "TracimRequest") -> None:
         """
