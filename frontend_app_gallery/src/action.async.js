@@ -1,7 +1,7 @@
 import { FETCH_CONFIG } from 'tracim_frontend_lib'
 
 export const getFolderContentList = (apiUrl, workspaceId, folderIdList) => {
-  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents?parent_ids=${folderIdList}`, {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents?parent_ids=${folderIdList}&namespaces_filter=upload,content`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

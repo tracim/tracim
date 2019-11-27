@@ -1,8 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
 .git/
-dist/app
-dist/assets
 dist/gallery.app.js
 dist/gallery.bundle.app.js
 node_modules/

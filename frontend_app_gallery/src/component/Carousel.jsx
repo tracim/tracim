@@ -1,5 +1,6 @@
 import React from 'react'
 import Slider from 'react-slick'
+import { translate } from 'react-i18next'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 import MainPreview from './MainPreview.jsx'
@@ -13,7 +14,7 @@ class Carousel extends React.Component {
     super(props)
 
     this.state = {
-      oldPosition: 0
+      oldPosition: props.fileSelected
     }
   }
 
@@ -23,9 +24,15 @@ class Carousel extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
-    if (this.mainSlider) {
+    if (props.slides.length === 0) {
+      return (
+        <div className='gallery__noContent'>{props.t('This folder has no previewable content')}</div>
+      )
+    }
+
+    if (this.mainSlider && state.oldPosition !== props.fileSelected) {
       if (this.state.oldPosition === props.slides.length - 1 && props.fileSelected === 0) {
         this.mainSlider.slickNext()
       } else if (this.state.oldPosition === 0 && props.fileSelected === props.slides.length - 1) {
@@ -42,7 +49,9 @@ class Carousel extends React.Component {
       speed: props.disableAnimation ? 0 : 400,
       slidesToShow: 1,
       slidesToScroll: 1,
+      adaptiveHeight: true,
       centerMode: true,
+      initialSlide: props.fileSelected,
       swipe: false,
       arrows: !props.disableAnimation,
       lazyLoad: 'progressive',
@@ -59,6 +68,7 @@ class Carousel extends React.Component {
       slidesToShow: props.slides.length > 6 ? 7 : props.slides.length,
       focusOnSelect: true,
       centerMode: true,
+      initialSlide: props.fileSelected,
       swipe: false,
       centerPadding: '0px',
       infinite: true,
@@ -67,14 +77,14 @@ class Carousel extends React.Component {
       className: 'carousel__thumbnail',
       responsive: [
         {
-          breakpoint: 1199,
+          breakpoint: 1200,
           settings: {
-            slidesToShow: 5
+            slidesToShow: props.slides.length > 4 ? 5 : props.slides.length
           }
         }, {
-          breakpoint: 991,
+          breakpoint: 992,
           settings: {
-            slidesToShow: 3
+            slidesToShow: props.slides.length > 2 ? 3 : props.slides.length
           }
         }
       ]
@@ -110,7 +120,7 @@ class Carousel extends React.Component {
   }
 }
 
-export default Carousel
+export default translate()(Carousel)
 
 Carousel.propTypes = {
   slides: PropTypes.array.isRequired,

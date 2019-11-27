@@ -4,7 +4,10 @@ import PropTypes from 'prop-types'
 class MainPreview extends React.Component {
   constructor (props) {
     super(props)
-    this.state = {}
+    this.state = {
+      height: 0,
+      width: 0
+    }
   }
 
   onLoad ({ target: img }) {

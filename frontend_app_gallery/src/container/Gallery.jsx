@@ -46,7 +46,7 @@ class Gallery extends React.Component {
       folderId: qs.parse(props.data.config.history.location.search).folder_ids,
       imagesPreviews: [],
       fileCurrentPage: 1,
-      fileName: 'unknown',
+      fileName: '',
       fileSelected: 0,
       autoPlay: null,
       fullscreen: false,
@@ -97,9 +97,9 @@ class Gallery extends React.Component {
 
     console.log('%c<Gallery> did mount', `color: ${state.config.hexcolor}`)
 
-    if (state.folderId) this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
-    this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
-    if (state.config.appConfig.workspaceId !== null) this.loadWorkspaceData()
+    if (state.folderId) await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
+    await this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
+    if (state.config.appConfig.workspaceId !== null) await this.loadWorkspaceData()
     this.buildBreadcrumbs()
   }
 
@@ -109,9 +109,9 @@ class Gallery extends React.Component {
     console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || prevState.folderId !== state.folderId) {
-      if (state.folderId) this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
-      this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
-      this.loadWorkspaceData()
+      if (state.folderId) await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
+      await this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
+      await this.loadWorkspaceData()
       this.buildBreadcrumbs()
     }
     if (prevState.fileSelected !== state.fileSelected) {
@@ -136,14 +136,17 @@ class Gallery extends React.Component {
     }]
     if (state.folderId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/gallery?folder_ids=${state.folderId}`}>{state.fileName}</Link>,
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId}`}>{state.fileName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
-    breadcrumbsList.push({
-      link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}>{state.imagesPreviews[state.fileSelected].fileName}</Link>,
-      type: BREADCRUMBS_TYPE.APP_FULLSCREEN
-    })
+    if (state.imagesPreviews && state.imagesPreviews.length > 0) {
+      breadcrumbsList.push({
+        link: <Link
+          to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}>{state.imagesPreviews[state.fileSelected].fileName}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      })
+    }
 
     // FIXME - CH - 2019/04/25 - We should keep redux breadcrumbs sync with fullscreen apps but when do the setBreadcrumbs,
     // app crash telling it cannot render a Link outside a router
@@ -183,10 +186,8 @@ class Gallery extends React.Component {
 
     switch (fetchContentList.apiResponse.status) {
       case 200:
+        const images = fetchContentList.body.filter(c => c.content_type === 'file').map(c => ({ src: '', contentId: c.content_id }))
 
-        const images = fetchContentList.body.map(content => {
-          if (content.content_type === 'file') return { src: '', contentId: content.content_id }
-        })
         const imagesPreviews = await this.loadPreview(images)
 
         this.setState({ imagesPreviews })
@@ -199,12 +200,14 @@ class Gallery extends React.Component {
   loadPreview = async (images) => {
     const { state, props } = this
 
-    return Promise.all(images.map(async (image) => {
+    return (await Promise.all(images.map(async (image) => {
       const fetchFileContent = await handleFetchResult(
         await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId)
       )
       switch (fetchFileContent.apiResponse.status) {
         case 200:
+          if (!fetchFileContent.body.has_jpeg_preview) return false
+
           const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
           const previewUrl = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 1400, 1400)
           const previewUrlForThumbnail = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 150, 150)
@@ -224,7 +227,7 @@ class Gallery extends React.Component {
           this.sendGlobalFlashMessage(props.t('Error while loading file preview'))
           return {}
       }
-    }))
+    }))).filter(i => i !== false)
   }
 
   loadWorkspaceData = async () => {
@@ -296,6 +299,7 @@ class Gallery extends React.Component {
   }
 
   onCarouselPositionChange = (fileSelected) => {
+    if (fileSelected < 0) return
     this.setState({ fileSelected })
   }
 
@@ -314,9 +318,8 @@ class Gallery extends React.Component {
   deleteFile = async (filePosition) => {
     const { state } = this
     const contentIdToDelete = state.imagesPreviews[filePosition].contentId
-    const putResult = await handleFetchResult(
-      await putFileIsDeleted(state.config.apiUrl, state.config.appConfig.workspaceId, state.imagesPreviews[filePosition].contentId)
-    )
+    const putResult = await putFileIsDeleted(state.config.apiUrl, state.config.appConfig.workspaceId, state.imagesPreviews[filePosition].contentId)
+
     switch (putResult.status) {
       case 204:
         const newImagesPreviews = this.state.imagesPreviews.filter((image) => (image.contentId !== contentIdToDelete))
@@ -325,7 +328,12 @@ class Gallery extends React.Component {
           displayPopupDelete: false
         })
         break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
+      case 403:
+        this.sendGlobalFlashMessage(this.props.t('Insufficient permissions'))
+        break
+      default:
+        this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
+        break
     }
   }
 
@@ -381,23 +389,25 @@ class Gallery extends React.Component {
 
         <PageContent>
           <div className='gallery__action__button'>
-            <button className='btn iconBtn' onClick={() => this.onClickSlickPlay(!state.autoPlay)}>
-              {state.autoPlay ? props.t('Pause') : props.t('Play')}<i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+            <button className='btn outlineTextBtn nohover primaryColorBorder' onClick={() => this.onClickSlickPlay(!state.autoPlay)}>
+              <span class='gallery__action__button__text'>{state.autoPlay ? props.t('Pause') : props.t('Play')}</span><i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
             </button>
 
-            <button className='btn iconBtn gallery__action__button__rotation__left' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}>
-              {props.t('Rotate left')}<i className={'fa fa-fw fa-reply'} />
+            <button className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__left' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}>
+              <span className='gallery__action__button__text'>{props.t('Rotate left')}</span><i className={'fa fa-fw fa-reply'} />
             </button>
 
-            <button className='btn iconBtn gallery__action__button__rotation__right' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}>
-              {props.t('Rotate right')}<i className={'fa fa-fw fa-share'} />
+            <button className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__right' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}>
+              <span className='gallery__action__button__text'>{props.t('Rotate right')}</span><i className={'fa fa-fw fa-share'} />
             </button>
 
-            {state.loggedUser.userRoleIdInWorkspace >= 4 && (
-              <button className='btn iconBtn' onClick={this.handleOpenDeleteFilePopup}>
-                {props.t('Delete')}<i className={'fa fa-fw fa-trash'} />
-              </button>
-            )}
+            {/*
+              INFO - CH - there is a bug with the property userRoleIdInWorkspace that comes from frontend, it might be it's default value which is 1
+              So we won't use it for now and always display the delete button which will return 401 if user can't delete content
+            */}
+            <button className='btn outlineTextBtn nohover primaryColorBorder' onClick={this.handleOpenDeleteFilePopup}>
+              <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className={'fa fa-fw fa-trash'} />
+            </button>
           </div>
 
           <Carousel
