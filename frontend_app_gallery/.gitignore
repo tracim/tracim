@@ -6,3 +6,4 @@ dist/assets
 dist/gallery.app.js
 dist/gallery.bundle.app.js
 node_modules/
+src/debug.js
