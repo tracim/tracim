@@ -391,7 +391,7 @@ class Gallery extends React.Component {
         <PageContent>
           <div className='gallery__action__button'>
             <button className='btn outlineTextBtn nohover primaryColorBorder' onClick={() => this.onClickSlickPlay(!state.autoPlay)}>
-              <span class='gallery__action__button__text'>{state.autoPlay ? props.t('Pause') : props.t('Play')}</span><i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+              <span className='gallery__action__button__text'>{state.autoPlay ? props.t('Pause') : props.t('Play')}</span><i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
             </button>
 
             <button className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__left' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}>
