@@ -226,7 +226,7 @@ class Gallery extends React.Component {
           }
         default:
           this.sendGlobalFlashMessage(props.t('Error while loading file preview'))
-          return {}
+          return false
       }
     }))).filter(i => i !== false)
   }
