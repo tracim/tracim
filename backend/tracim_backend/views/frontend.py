@@ -1,5 +1,4 @@
 import os
-from os import DirEntry
 import typing
 
 from pyramid.config import Configurator
@@ -22,7 +21,7 @@ class FrontendController(Controller):
     def __init__(self, dist_folder_path: str, custom_toolbox_folder_path: typing.Optional[str]):
         self.dist_folder_path = dist_folder_path
         self.custom_toolbox_folder_path = custom_toolbox_folder_path
-        self.custom_toolbox_files = []  # typing.List[DirEntry]
+        self.custom_toolbox_files = []  # typing.List["os.DirEntry"]
         if custom_toolbox_folder_path:
             self.custom_toolbox_files = self._get_custom_toolboxes_files(
                 self.custom_toolbox_folder_path
@@ -34,7 +33,7 @@ class FrontendController(Controller):
             raise FileNotFoundError()
         return index_file_path
 
-    def _get_custom_toolboxes_files(self, custom_toolbox_dir: str) -> typing.List[DirEntry]:
+    def _get_custom_toolboxes_files(self, custom_toolbox_dir: str) -> typing.List["os.DirEntry"]:
         custom_toolbox_files = []
         scanned_dir = os.scandir(custom_toolbox_dir)
         for entry in scanned_dir:
