@@ -36,6 +36,7 @@ from tracim_backend.lib.agenda.authorization import add_www_authenticate_header_
 from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
     CollaborativeDocumentEditionFactory,
 )
+from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -52,7 +53,6 @@ from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
-from tracim_backend.plugin_manager import init_plugin_manager
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
 from tracim_backend.views.contents_api.comment_controller import CommentController

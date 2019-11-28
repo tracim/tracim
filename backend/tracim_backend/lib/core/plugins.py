@@ -5,11 +5,12 @@ import types
 import typing
 
 import pluggy
-from pyramid.config import Configurator
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.utils.utils import find_all_submodule_path
 
 EVENT_NAMESPACE = "tracim_event"
+HOOKSPEC_FILE_SUFFIX = "hookspec"
 hookspec = pluggy.HookspecMarker(EVENT_NAMESPACE)
 hookimpl = pluggy.HookimplMarker(EVENT_NAMESPACE)
 
@@ -21,10 +22,27 @@ class TracimPluginManager(object):
         self.plugins = {}
         self.event_manager = self._setup_pluggy_event_manager()
 
+    def _load_spec(self, event_manager: pluggy.PluginManager):
+        """
+        Load all hookspec files
+        """
+
+        # INFO - G.M - 2019-11-28 - import root module,
+        # currently "tracim_backend"
+        root_module_name = self.__module__.split(".")[0]
+        root_module = importlib.import_module(root_module_name)
+        # INFO - G.M - 2019-11-28 - get all submodules recursively,
+        # find those with with hookspec suffix, import them and add them
+        # to valid hookspec
+        for module_path in find_all_submodule_path(root_module):
+            if module_path.endswith(HOOKSPEC_FILE_SUFFIX):
+                module = importlib.import_module(module_path)
+                event_manager.add_hookspecs(module)
+
     def _setup_pluggy_event_manager(self) -> pluggy.PluginManager:
-        plugin_manager = pluggy.PluginManager(EVENT_NAMESPACE)
-        plugin_manager.add_hookspecs(PluginSpec)
-        return plugin_manager
+        event_manager = pluggy.PluginManager(EVENT_NAMESPACE)
+        self._load_spec(event_manager)
+        return event_manager
 
     def register(self, module: types.ModuleType):
         self.event_manager.register(module)
@@ -67,25 +85,5 @@ def init_plugin_manager(app_config: CFG) -> TracimPluginManager:
         plugin_manager.add_plugin_path(app_config.PLUGIN__FOLDER_PATH)
     plugin_manager.load_plugins()
     plugin_manager.register_all()
+    plugin_manager.event_manager.hook.on_plugins_loaded(plugin_manager=plugin_manager)
     return plugin_manager
-
-
-class PluginSpec(object):
-    @hookspec
-    def web_include(self, configurator: Configurator, app_config: CFG) -> None:
-        """
-        Allow to including custom web code in plugin if web_include method is provided
-        at module root
-        :param configurator: Tracim pyramid configurator
-        :param app_config: current tracim config
-        :return: nothing
-        """
-        pass
-
-    @hookspec
-    def on_whoami(self) -> None:
-        """
-        event when we do a whoami endpoint
-        :return: nothing
-        """
-        pass

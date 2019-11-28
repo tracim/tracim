@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import datetime
 import email
+import importlib
 import os
 from os.path import normpath as base_normpath
+import pkgutil
 import random
 import string
+import sys
+import types
 import typing
 from urllib.parse import urlencode
 from urllib.parse import urljoin
@@ -386,3 +390,26 @@ class EmailUser(object):
     @property
     def email_link(self) -> str:
         return "mailto:{email_address}".format(email_address=self.email_address)
+
+
+def find_all_submodule_path(module: types.ModuleType) -> typing.List[str]:
+    """
+    get all submodules path of a module
+    like "tracim_backend.lib.core.plugin"
+    see https://stackoverflow.com/a/49023460
+    :param module: module to check
+    :return: list of absolute path of module name
+    """
+    path_list = []
+    spec_list = []
+    for importer, modname, ispkg in pkgutil.walk_packages(module.__path__):
+        import_path = f"{module.__name__}.{modname}"
+        if ispkg:
+            spec = pkgutil._get_spec(importer, modname)
+            importlib._bootstrap._load(spec)
+            spec_list.append(spec)
+        else:
+            path_list.append(import_path)
+    for spec in spec_list:
+        del sys.modules[spec.name]
+    return path_list
