@@ -3,5 +3,5 @@
 node_modules/
 dist/assets/tracim.app.js
 dist/assets/tracim.vendors~app.js
-dist/assets/tracim/instanceSpecificLibrary.js
+dist/assets/tracim/customToolbox.js
 configEnv.json
