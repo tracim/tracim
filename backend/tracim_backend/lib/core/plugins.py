@@ -10,7 +10,7 @@ from tracim_backend.config import CFG
 from tracim_backend.lib.utils.utils import find_all_submodule_path
 
 EVENT_NAMESPACE = "tracim_event"
-HOOKSPEC_FILE_SUFFIX = "hookspec"
+HOOKSPEC_FILES_SUFFIX = "hookspec"
 hookspec = pluggy.HookspecMarker(EVENT_NAMESPACE)
 hookimpl = pluggy.HookimplMarker(EVENT_NAMESPACE)
 
@@ -35,7 +35,7 @@ class TracimPluginManager(object):
         # find those with with hookspec suffix, import them and add them
         # to valid hookspec
         for module_path in find_all_submodule_path(root_module):
-            if module_path.endswith(HOOKSPEC_FILE_SUFFIX):
+            if module_path.endswith(HOOKSPEC_FILES_SUFFIX):
                 module = importlib.import_module(module_path)
                 event_manager.add_hookspecs(module)
 
