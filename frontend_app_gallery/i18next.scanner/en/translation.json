@@ -15,5 +15,7 @@
   "Error while loading content list": "Error while loading content list",
   "Error while loading file preview": "Error while loading file preview",
   "Error while loading shared space detail": "Error while loading shared space detail",
-  "Error while deleting document": "Error while deleting document"
+  "Error while deleting document": "Error while deleting document",
+  "This folder has no previewable content": "This folder has no previewable content",
+  "Insufficient permissions": "Insufficient permissions"
 }
