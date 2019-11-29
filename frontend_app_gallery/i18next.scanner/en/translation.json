@@ -1,0 +1,22 @@
+{
+  "Next": "Next",
+  "Previous": "Previous",
+  "Home": "Home",
+  "Pause": "Pause",
+  "Play": "Play",
+  "Rotate left": "Rotate left",
+  "Rotate right": "Rotate right",
+  "Delete": "Delete",
+  "Disable fullscreen": "Disable fullscreen",
+  "Enable fullscreen": "Enable fullscreen",
+  "Are you sure ?": "Are you sure ?",
+  "Cancel": "Cancel",
+  "Error while loading folder detail": "Error while loading folder detail",
+  "Error while loading content list": "Error while loading content list",
+  "Error while loading file preview": "Error while loading file preview",
+  "Error while loading shared space detail": "Error while loading shared space detail",
+  "Error while deleting document": "Error while deleting document",
+  "This folder has no previewable content": "This folder has no previewable content",
+  "Insufficient permissions": "Insufficient permissions",
+  "Open raw file": "Open raw file"
+}
