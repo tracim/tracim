@@ -14,8 +14,17 @@ class Carousel extends React.Component {
     super(props)
 
     this.state = {
-      oldPosition: props.fileSelected
+      oldPosition: props.fileSelected,
+      thumbnailSlider: null,
+      mainSlider: null
     }
+  }
+
+  componentDidMount () {
+    this.setState({
+      mainSlider: this.mainSlider,
+      thumbnailSlider: this.thumbnailSlider
+    })
   }
 
   onMainSliderPositionChange (newPosition) {
@@ -43,13 +52,13 @@ class Carousel extends React.Component {
     }
 
     const mainSliderProps = {
-      asNavFor: this.thumbnailSlider,
+      asNavFor: this.state.thumbnailSlider,
       ref: slider => (this.mainSlider = slider),
       infinite: true,
       speed: props.disableAnimation ? 0 : 300,
       slidesToShow: 1,
       slidesToScroll: 1,
-      centerMode: true,
+      centerMode: false,
       initialSlide: props.fileSelected,
       swipe: false,
       arrows: !props.disableAnimation,
@@ -62,7 +71,7 @@ class Carousel extends React.Component {
     }
 
     const thumbnailSliderProps = {
-      asNavFor: this.mainSlider,
+      asNavFor: this.state.mainSlider,
       ref: slider => (this.thumbnailSlider = slider),
       slidesToShow: props.slides.length > 6 ? 7 : props.slides.length,
       focusOnSelect: true,
