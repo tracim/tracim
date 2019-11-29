@@ -1,0 +1,22 @@
+{
+  "Next": "Suivante",
+  "Previous": "Précédente",
+  "Home": "Accueil",
+  "Pause": "Pause",
+  "Play": "Lecture",
+  "Rotate left": "Tourner à gauche",
+  "Rotate right": "Tourner à droite",
+  "Delete": "Supprimer",
+  "Disable fullscreen": "Désactiver le plein écran",
+  "Enable fullscreen": "Activer le plein écran",
+  "Are you sure ?": "Êtes-vous sûr ?",
+  "Cancel": "Annuler",
+  "Error while loading folder detail": "Erreur lors du chargement du dossier",
+  "Error while loading content list": "Erreur lors du chargement de la liste des contenus",
+  "Error while loading file preview": "Erreur lors du chargement de l'aperçu du fichier",
+  "Error while loading shared space detail": "Erreur lors du chargement des détails de l'espace partagé",
+  "Error while deleting document": "Erreur lors de la suppression d'un document",
+  "This folder has no previewable content": "Ce dossier ne contient pas de contenu prévisualisable",
+  "Insufficient permissions": "Droits insuffisants",
+  "Open raw file": "Ourvir le fichier original"
+}

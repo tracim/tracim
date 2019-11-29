@@ -278,7 +278,8 @@ class Tracim extends React.Component {
             PAGE.ADMIN.USER,
             PAGE.ADMIN.WORKSPACE,
             PAGE.AGENDA,
-            PAGE.WORKSPACE.CONTENT_EDITION()
+            PAGE.WORKSPACE.CONTENT_EDITION(),
+            PAGE.WORKSPACE.GALLERY()
           ]} render={() => <AppFullscreenRouter />} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}

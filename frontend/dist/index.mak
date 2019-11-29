@@ -91,6 +91,7 @@
     <script type='text/javascript' src='/app/share_folder.app.js'></script>
     <script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
     <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
+    <script type='text/javascript' src='/app/gallery.app.js'></script>
 
     <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
     <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>
