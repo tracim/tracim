@@ -415,16 +415,16 @@ class Gallery extends React.Component {
               className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__left'
               onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
             >
-              <span className='gallery__action__button__text'>{props.t('Rotate left')}</span>
-              <i className={'fa fa-fw fa-reply'} />
+              <span className='gallery__action__button__text'>{props.t('Rotate 90° left')}</span>
+              <i className={'fa fa-fw fa-undo'} />
             </button>
 
             <button
               className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__right'
               onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
             >
-              <span className='gallery__action__button__text'>{props.t('Rotate right')}</span>
-              <i className={'fa fa-fw fa-share'} />
+              <span className='gallery__action__button__text'>{props.t('Rotate 90° right')}</span>
+              <i className={'fa fa-fw fa-undo'} />
             </button>
 
             {/*
@@ -492,17 +492,17 @@ class Gallery extends React.Component {
                   <button
                     className='btn iconBtn gallery__action__button__lightbox__rotation__left'
                     onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
-                    title={props.t('Rotate left')}
+                    title={props.t('Rotate 90° left')}
                   >
-                    <i className={'fa fa-fw fa-reply'} />
+                    <i className={'fa fa-fw fa-undo'} />
                   </button>
 
                   <button
                     className='btn iconBtn gallery__action__button__lightbox__rotation__right'
                     onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
-                    title={props.t('Rotate right')}
+                    title={props.t('Rotate 90° right')}
                   >
-                    <i className={'fa fa-fw fa-share'} />
+                    <i className={'fa fa-fw fa-undo'} />
                   </button>
 
                   <a

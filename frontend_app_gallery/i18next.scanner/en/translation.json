@@ -4,8 +4,6 @@
   "Home": "Home",
   "Pause": "Pause",
   "Play": "Play",
-  "Rotate left": "Rotate left",
-  "Rotate right": "Rotate right",
   "Delete": "Delete",
   "Disable fullscreen": "Disable fullscreen",
   "Enable fullscreen": "Enable fullscreen",
@@ -19,5 +17,7 @@
   "Insufficient permissions": "Insufficient permissions",
   "Open raw file": "Open raw file",
   "There isn't any previewable content at that shared space's root.": "There isn't any previewable content at that shared space's root.",
-  "There isn't any previewable content at that folder's root.": "There isn't any previewable content at that folder's root."
+  "There isn't any previewable content at that folder's root.": "There isn't any previewable content at that folder's root.",
+  "Rotate 90° left": "Rotate 90° left",
+  "Rotate 90° right": "Rotate 90° right"
 }
