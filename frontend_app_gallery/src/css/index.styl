@@ -65,13 +65,12 @@
     & i
       margin-left 10px
     &__lightbox
-      & button
+      & > button
         padding 5px 8.5px
+        cursor pointer
       &__rotation
-        &__left > i
-          transform rotate(270deg)
         &__right > i
-          transform rotate(90deg)
+          transform scaleX(-1)
       &__openRawContent
         // INFO - GM - 2019-11-29 - Copy the style of lightbox button because it is a <a> tag
         margin 2px
@@ -82,6 +81,8 @@
         background-color rgba(0, 0, 0, 0.5)
         &:hover
           color #929292
+    &__rotation__right > i
+      transform scaleX(-1)
   &__delete__file__popup
     & .cardPopup__container
       width 400px
