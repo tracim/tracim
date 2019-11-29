@@ -7,7 +7,7 @@
         background-color #7d4e24
     &__item__preview__content__image
       height 150px
-      margin 16px 10px
+      margin 16px
       display flex
       align-items center
       cursor pointer
@@ -18,14 +18,17 @@
         &:hover
           box-shadow 0 0 16px 4px rgba(0,0,0,0.3)
   &__item__preview
+    height 100%
     &__content
+      height 100%
       display: block
       text-align: center
       &__image
-        margin 20px 8px
+        padding 8px
         display flex
+        height 100%
         & img
-          max-height 500px
+          max-height 100%
           margin auto
           object-fit contain
           cursor pointer
@@ -104,6 +107,12 @@
   background-color rgba(0, 0, 0, 0.5)
   font-size 1.1rem
   color #929292
+
+.slick-slide > div
+  height 100%
+
+.carousel__main .slick-track
+  height 60vh
 
 // MEDIAQUERIES
 

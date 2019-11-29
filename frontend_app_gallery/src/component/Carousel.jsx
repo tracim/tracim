@@ -49,7 +49,6 @@ class Carousel extends React.Component {
       speed: props.disableAnimation ? 0 : 300,
       slidesToShow: 1,
       slidesToScroll: 1,
-      adaptiveHeight: true,
       centerMode: true,
       initialSlide: props.fileSelected,
       swipe: false,
