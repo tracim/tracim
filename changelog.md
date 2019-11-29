@@ -6,6 +6,7 @@
 - Application gallery
 
 ### Fixed issues
+- Preview-generator: #2532
 - Backend: #2518, #2526
 
 ### Breaking change api
