@@ -12,6 +12,7 @@
 ### Breaking change api
 - remove "size" parameter from create/update/get/get all workspaces endpoint
 
+
 # 2.4.5 / 2019-11-21
 
 ### New Features
