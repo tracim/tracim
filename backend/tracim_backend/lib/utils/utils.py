@@ -400,16 +400,19 @@ def find_all_submodule_path(module: types.ModuleType) -> typing.List[str]:
     :param module: module to check
     :return: list of absolute path of module name
     """
-    path_list = []
-    spec_list = []
-    for importer, modname, ispkg in pkgutil.walk_packages(module.__path__):
-        import_path = f"{module.__name__}.{modname}"
-        if ispkg:
-            spec = pkgutil._get_spec(importer, modname)
+    module_path_list = []
+    module_spec_list = []
+    for importer, submodule_relative_path, is_package in pkgutil.walk_packages(module.__path__):
+        submodule_path = "{module_name}.{submodule_relative_path}".format(
+            module_name=module.__name__, submodule_relative_path=submodule_relative_path
+        )
+        if is_package:
+            spec = pkgutil._get_spec(importer, submodule_relative_path)
             importlib._bootstrap._load(spec)
-            spec_list.append(spec)
+            module_spec_list.append(spec)
         else:
-            path_list.append(import_path)
-    for spec in spec_list:
+            module_path_list.append(submodule_path)
+    for spec in module_spec_list:
+        # INFO - G.M - 2019-11-29 - remove submodule from loaded modules
         del sys.modules[spec.name]
-    return path_list
+    return module_path_list
