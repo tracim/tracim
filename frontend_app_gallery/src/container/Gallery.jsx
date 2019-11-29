@@ -44,7 +44,7 @@ class Gallery extends React.Component {
       content: props.data ? props.data.content : debug.content,
       breadcrumbsList: [],
       appMounted: false,
-      folderId: qs.parse(props.data.config.history.location.search).folder_ids,
+      folderId: qs.parse(props.data.config.history.location.search).folder_ids || 0,
       imagesPreviews: [],
       fileCurrentPage: 1,
       fileName: '',
@@ -401,16 +401,30 @@ class Gallery extends React.Component {
 
         <PageContent>
           <div className='gallery__action__button'>
-            <button className='btn outlineTextBtn nohover primaryColorBorder' onClick={() => this.onClickSlickPlay(!state.autoPlay)}>
-              <span className='gallery__action__button__text'>{state.autoPlay ? props.t('Pause') : props.t('Play')}</span><i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+            <button
+              className='btn outlineTextBtn nohover primaryColorBorder'
+              onClick={() => this.onClickSlickPlay(!state.autoPlay)}
+            >
+              <span className='gallery__action__button__text'>
+                {state.autoPlay ? props.t('Pause') : props.t('Play')}
+              </span>
+              <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
             </button>
 
-            <button className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__left' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}>
-              <span className='gallery__action__button__text'>{props.t('Rotate left')}</span><i className={'fa fa-fw fa-reply'} />
+            <button
+              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__left'
+              onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
+            >
+              <span className='gallery__action__button__text'>{props.t('Rotate left')}</span>
+              <i className={'fa fa-fw fa-reply'} />
             </button>
 
-            <button className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__right' onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}>
-              <span className='gallery__action__button__text'>{props.t('Rotate right')}</span><i className={'fa fa-fw fa-share'} />
+            <button
+              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__right'
+              onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
+            >
+              <span className='gallery__action__button__text'>{props.t('Rotate right')}</span>
+              <i className={'fa fa-fw fa-share'} />
             </button>
 
             {/*
@@ -431,6 +445,7 @@ class Gallery extends React.Component {
                 handleClickShowImageRaw={this.handleClickShowImageRaw}
                 loggedUser={state.loggedUser}
                 disableAnimation={state.displayLightbox}
+                isWorkspaceRoot={state.folderId === 0}
               />
             ) : (
               <div className='gallery__loader'>
@@ -496,7 +511,7 @@ class Gallery extends React.Component {
                     href={this.getRawFileUrlSelectedFile()}
                     target='_blank'
                   >
-                    <i className={'fa fa-fw fa-share-square'} />
+                    <i className={'fa fa-fw fa-download'} />
                   </a>
                 </div>
               ]}

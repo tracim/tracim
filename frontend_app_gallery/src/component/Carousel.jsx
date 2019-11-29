@@ -27,9 +27,9 @@ class Carousel extends React.Component {
     const { props, state } = this
 
     if (props.slides.length === 0) {
-      return (
-        <div className='gallery__noContent'>{props.t('This folder has no previewable content')}</div>
-      )
+      return props.isWorkspaceRoot
+        ? <div className='gallery__noContent'>{props.t("There isn't any previewable content at that shared space's root.")}</div>
+        : <div className='gallery__noContent'>{props.t("There isn't any previewable content at that folder's root.")}</div>
     }
 
     if (this.mainSlider && state.oldPosition !== props.fileSelected) {
@@ -131,7 +131,8 @@ Carousel.propTypes = {
   fileSelected: PropTypes.number.isRequired,
   onFileDeleted: PropTypes.func.isRequired,
   loggedUser: PropTypes.object,
-  disableAnimation: PropTypes.bool
+  disableAnimation: PropTypes.bool,
+  isWorkspaceRoot: PropTypes.bool
 }
 
 Carousel.defaultProps = {
@@ -141,5 +142,6 @@ Carousel.defaultProps = {
   onFileDeleted: () => {},
   loggedUser: {},
   disableAnimation: false,
-  fileSlected: 0
+  fileSelected: 0,
+  isWorkspaceRoot: true
 }
