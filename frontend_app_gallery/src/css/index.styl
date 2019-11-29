@@ -62,19 +62,18 @@
     text-align center
     & button
       margin 5px
-    & button:hover
-      background-color rgba(0, 0, 0, 0.1)
     & i
       margin-left 10px
     &__lightbox
       & button
         padding 5px 8.5px
       &__rotation
-        &__left i
+        &__left > i
           transform rotate(270deg)
-        &__right i
+        &__right > i
           transform rotate(90deg)
       &__openRawContent
+        // Copy the style of lightbox button because it is a <a> tag
         margin 2px
         padding 5px 8.5px
         font-size 1.1rem

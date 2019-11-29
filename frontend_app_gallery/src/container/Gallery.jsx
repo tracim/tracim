@@ -380,7 +380,7 @@ class Gallery extends React.Component {
   getRawFileUrlSelectedFile () {
     const { state } = this
 
-    if (!state.imagesPreviews) return
+    if (state.imagesPreviews.length === 0 || !state.imagesPreviews[state.fileSelected]) return
 
     return state.imagesPreviews[state.fileSelected].rawFileUrl
   }
@@ -485,7 +485,7 @@ class Gallery extends React.Component {
                     className='btn iconBtn gallery__action__button__lightbox__openRawContent'
                     title={props.t('Open raw file')}
                     href={this.getRawFileUrlSelectedFile()}
-                    target={'_blank'}
+                    target='_blank'
                   >
                     <i className={'fa fa-fw fa-share-square'} />
                   </a>
