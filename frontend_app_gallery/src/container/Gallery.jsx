@@ -23,7 +23,7 @@ import {
   getWorkspaceContentList
 } from '../action.async'
 import Carousel from '../component/Carousel.jsx'
-import { DIRECTION } from '../helper.js'
+import { DIRECTION, buildRawFileUrl } from '../helper.js'
 import { debug } from '../debug.js'
 import ReactImageLightbox, { LightboxRotation } from '../Lightbox.js'
 import 'react-image-lightbox/style.css'
@@ -215,6 +215,7 @@ class Gallery extends React.Component {
           const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, j) =>
             buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, j + 1, 1920, 1920)
           )
+          const rawFileUrl = buildRawFileUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.filename)
 
           return {
             ...image,
@@ -222,7 +223,8 @@ class Gallery extends React.Component {
             fileName: fetchFileContent.body.filename,
             lightBoxUrlList,
             previewUrlForThumbnail,
-            rotationAngle: 0
+            rotationAngle: 0,
+            rawFileUrl
           }
         default:
           this.sendGlobalFlashMessage(props.t('Error while loading file preview'))
@@ -375,6 +377,14 @@ class Gallery extends React.Component {
     this.setState({ imagesPreviews })
   }
 
+  getRawFileUrlSelectedFile () {
+    const { state } = this
+
+    if (!state.imagesPreviews) return
+
+    return state.imagesPreviews[state.fileSelected].rawFileUrl
+  }
+
   render () {
     const { state, props } = this
 
@@ -456,7 +466,7 @@ class Gallery extends React.Component {
                   </button>
 
                   <button
-                    className='btn iconBtn gallery__action__button__rotation__left'
+                    className='btn iconBtn gallery__action__button__lightbox__rotation__left'
                     onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
                     title={props.t('Rotate left')}
                   >
@@ -464,12 +474,21 @@ class Gallery extends React.Component {
                   </button>
 
                   <button
-                    className='btn iconBtn gallery__action__button__rotation__right'
+                    className='btn iconBtn gallery__action__button__lightbox__rotation__right'
                     onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
                     title={props.t('Rotate right')}
                   >
                     <i className={'fa fa-fw fa-share'} />
                   </button>
+
+                  <a
+                    className='btn iconBtn gallery__action__button__lightbox__openRawContent'
+                    title={props.t('Open raw file')}
+                    href={this.getRawFileUrlSelectedFile()}
+                    target={'_blank'}
+                  >
+                    <i className={'fa fa-fw fa-share-square'} />
+                  </a>
                 </div>
               ]}
             />

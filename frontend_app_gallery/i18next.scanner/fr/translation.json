@@ -17,5 +17,6 @@
   "Error while loading shared space detail": "Erreur lors du chargement des détails de l'espace partagé",
   "Error while deleting document": "Erreur lors de la suppression d'un document",
   "This folder has no previewable content": "Ce dossier ne contient pas de contenu prévisualisable",
-  "Insufficient permissions": "Droits insuffisants"
+  "Insufficient permissions": "Droits insuffisants",
+  "Open raw file": "Ourvir le fichier original"
 }
