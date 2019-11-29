@@ -65,7 +65,6 @@ class Carousel extends React.Component {
       ref: slider => (this.thumbnailSlider = slider),
       slidesToShow: props.slides.length > 6 ? 7 : props.slides.length,
       focusOnSelect: true,
-      centerMode: true,
       initialSlide: props.fileSelected,
       swipe: false,
       lazyLoad: 'progressive',
@@ -103,6 +102,7 @@ class Carousel extends React.Component {
               handleClickShowImageRaw={props.handleClickShowImageRaw}
               rotationAngle={slide.rotationAngle}
               key={`mainPreview_${index}`}
+              fileName={slide.fileName}
             />
           ))}
         </Slider>
@@ -114,6 +114,7 @@ class Carousel extends React.Component {
               previewSrc={slide.previewUrlForThumbnail}
               rotationAngle={slide.rotationAngle}
               key={`thumbnailPreview_${i}`}
+              fileName={slide.fileName}
             />
           ))}
         </Slider>

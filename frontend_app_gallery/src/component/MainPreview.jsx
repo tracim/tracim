@@ -1,40 +1,50 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 
 class MainPreview extends React.Component {
   constructor (props) {
     super(props)
+
     this.state = {
       height: 0,
-      width: 0
+      width: 0,
+      imageLoaded: false
     }
   }
 
   onLoad ({ target: img }) {
     this.setState({
       height: img.height,
-      width: img.width
+      width: img.width,
+      imageLoaded: true
     })
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
-    let width = this.state.width
+    let width = state.width
     if (props.rotationAngle === 90 || props.rotationAngle === 270) {
-      width = this.state.height
+      width = state.height
     }
 
     return (
       <div className='carousel__item__preview'>
         <span className='carousel__item__preview__content'>
+          {!state.imageLoaded && (
+            <div className='gallery__loader'>
+              <i className='fa fa-spinner fa-spin gallery__loader__icon' />
+            </div>
+          )}
           <div className='carousel__item__preview__content__image'>
             <img
               src={props.previewSrc}
-              className={`img-thumbnail rotate${props.rotationAngle}`}
+              className={classnames(`rotate${props.rotationAngle}`, state.imageLoaded ? 'img-thumbnail' : null)}
               onClick={props.handleClickShowImageRaw}
               onLoad={this.onLoad.bind(this)}
-              width={width && this.state.width > width ? width : null}
+              width={width && state.width > width ? width : null}
+              alt={props.fileName}
             />
           </div>
         </span>

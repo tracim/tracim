@@ -51,7 +51,8 @@ class Gallery extends React.Component {
       fileSelected: 0,
       autoPlay: null,
       fullscreen: false,
-      displayPopupDelete: false
+      displayPopupDelete: false,
+      imagesPreviewsLoaded: false
     }
 
     // i18n has been init, add resources from frontend
@@ -191,7 +192,7 @@ class Gallery extends React.Component {
 
         const imagesPreviews = await this.loadPreview(images)
 
-        this.setState({ imagesPreviews })
+        this.setState({ imagesPreviews, imagesPreviewsLoaded: true })
 
         break
       default: this.sendGlobalFlashMessage(props.t('Error while loading content list'))
@@ -421,14 +422,20 @@ class Gallery extends React.Component {
             </button>
           </div>
 
-          <Carousel
-            fileSelected={state.fileSelected}
-            slides={state.imagesPreviews}
-            onCarouselPositionChange={this.onCarouselPositionChange}
-            handleClickShowImageRaw={this.handleClickShowImageRaw}
-            loggedUser={state.loggedUser}
-            disableAnimation={state.displayLightbox}
-          />
+          {state.imagesPreviewsLoaded ? (
+            <Carousel
+              fileSelected={state.fileSelected}
+              slides={state.imagesPreviews}
+              onCarouselPositionChange={this.onCarouselPositionChange}
+              handleClickShowImageRaw={this.handleClickShowImageRaw}
+              loggedUser={state.loggedUser}
+              disableAnimation={state.displayLightbox}
+            />
+          ) : (
+            <div className='gallery__loader'>
+              <i className='fa fa-spinner fa-spin gallery__loader__icon' />
+            </div>
+          )}
 
           <Fullscreen
             enabled={this.state.fullscreen}
