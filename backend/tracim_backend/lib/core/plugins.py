@@ -22,22 +22,32 @@ class TracimPluginManager(object):
         self.plugins = {}
         self.event_manager = self._setup_pluggy_event_manager()
 
-    def _load_spec(self, event_manager: pluggy.PluginManager) -> None:
-        """
-        Load all hookspec files
-        """
-
+    @classmethod
+    def get_all_hookspec_module_path(cls):
+        hookspec_module_paths = []
         # INFO - G.M - 2019-11-28 - import root module,
         # currently "tracim_backend"
-        root_module_name = self.__module__.split(".")[0]
+        root_module_name = cls.__module__.split(".")[0]
         root_module = importlib.import_module(root_module_name)
         # INFO - G.M - 2019-11-28 - get all submodules recursively,
         # find those with with hookspec suffix, import them and add them
         # to valid hookspec
         for module_path in find_all_submodule_path(root_module):
             if module_path.endswith(HOOKSPEC_FILES_SUFFIX):
-                module = importlib.import_module(module_path)
-                event_manager.add_hookspecs(module)
+                hookspec_module_paths.append(module_path)
+        return hookspec_module_paths
+
+    def _load_spec(self, event_manager: pluggy.PluginManager) -> None:
+        """
+        Load all hookspec modules
+        """
+
+        # INFO - G.M - 2019-11-28 - get all submodules recursively,
+        # find those with with hookspec suffix, import them and add them
+        # to valid hookspec
+        for hookspec_module_path in self.get_all_hookspec_module_path():
+            module = importlib.import_module(hookspec_module_path)
+            event_manager.add_hookspecs(module)
 
     def _setup_pluggy_event_manager(self) -> pluggy.PluginManager:
         event_manager = pluggy.PluginManager(EVENT_NAMESPACE)
