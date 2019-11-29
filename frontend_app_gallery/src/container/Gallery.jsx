@@ -454,7 +454,7 @@ class Gallery extends React.Component {
               onCloseRequest={this.handleClickHideImageRaw}
               onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
               onMoveNextRequest={() => { this.handleClickPreviousNextPage(DIRECTION.RIGHT) }}
-              imagePadding={10}
+              imagePadding={0}
               reactModalProps={{ parentSelector: () => this.modalRoot }}
               toolbarButtons={[
                 <div className={'gallery__action__button__lightbox'}>

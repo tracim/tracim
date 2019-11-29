@@ -53,6 +53,7 @@ class Carousel extends React.Component {
       initialSlide: props.fileSelected,
       swipe: false,
       arrows: !props.disableAnimation,
+      afterChange: this.onMainSliderPositionChange.bind(this),
       lazyLoad: 'ondemand',
       centerPadding: '0px',
       className: 'carousel__main',
@@ -71,7 +72,6 @@ class Carousel extends React.Component {
       centerPadding: '0px',
       infinite: true,
       speed: props.disableAnimation ? 0 : 300,
-      afterChange: this.onMainSliderPositionChange.bind(this),
       arrows: false,
       className: 'carousel__thumbnail',
       responsive: [
