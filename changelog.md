@@ -1,5 +1,18 @@
 
 
+# 2.5.0 / 2019-11-29
+
+### New Features
+- Application gallery
+
+### Fixed issues
+- Preview-generator: #2532
+- Backend: #2518, #2526
+
+### Breaking change api
+- remove "size" parameter from create/update/get/get all workspaces endpoint
+
+
 # 2.4.5 / 2019-11-21
 
 ### New Features
