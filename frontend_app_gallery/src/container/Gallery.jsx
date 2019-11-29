@@ -422,20 +422,22 @@ class Gallery extends React.Component {
             </button>
           </div>
 
-          {state.imagesPreviewsLoaded ? (
-            <Carousel
-              fileSelected={state.fileSelected}
-              slides={state.imagesPreviews}
-              onCarouselPositionChange={this.onCarouselPositionChange}
-              handleClickShowImageRaw={this.handleClickShowImageRaw}
-              loggedUser={state.loggedUser}
-              disableAnimation={state.displayLightbox}
-            />
-          ) : (
-            <div className='gallery__loader'>
-              <i className='fa fa-spinner fa-spin gallery__loader__icon' />
-            </div>
-          )}
+          {state.imagesPreviewsLoaded
+            ? (
+              <Carousel
+                fileSelected={state.fileSelected}
+                slides={state.imagesPreviews}
+                onCarouselPositionChange={this.onCarouselPositionChange}
+                handleClickShowImageRaw={this.handleClickShowImageRaw}
+                loggedUser={state.loggedUser}
+                disableAnimation={state.displayLightbox}
+              />
+            ) : (
+              <div className='gallery__loader'>
+                <i className='fa fa-spinner fa-spin gallery__loader__icon' />
+              </div>
+            )
+          }
 
           <Fullscreen
             enabled={this.state.fullscreen}
