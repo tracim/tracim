@@ -22,7 +22,7 @@ class TracimPluginManager(object):
         self.plugins = {}
         self.event_manager = self._setup_pluggy_event_manager()
 
-    def _load_spec(self, event_manager: pluggy.PluginManager):
+    def _load_spec(self, event_manager: pluggy.PluginManager) -> None:
         """
         Load all hookspec files
         """
@@ -44,10 +44,10 @@ class TracimPluginManager(object):
         self._load_spec(event_manager)
         return event_manager
 
-    def register(self, module: types.ModuleType):
+    def register(self, module: types.ModuleType) -> None:
         self.event_manager.register(module)
 
-    def register_all(self):
+    def register_all(self) -> None:
         for module_name, module in self.plugins.items():
             self.register(module)
 
