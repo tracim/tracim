@@ -4,11 +4,9 @@
   "Home": "Accueil",
   "Pause": "Pause",
   "Play": "Lecture",
-  "Rotate left": "Tourner à gauche",
-  "Rotate right": "Tourner à droite",
   "Delete": "Supprimer",
   "Disable fullscreen": "Désactiver le plein écran",
-  "Enable fullscreen": "Activer le plein écran",
+  "Enable fullscreen": "Afficher en plein écran",
   "Are you sure ?": "Êtes-vous sûr ?",
   "Cancel": "Annuler",
   "Error while loading folder detail": "Erreur lors du chargement du dossier",
@@ -16,7 +14,10 @@
   "Error while loading file preview": "Erreur lors du chargement de l'aperçu du fichier",
   "Error while loading shared space detail": "Erreur lors du chargement des détails de l'espace partagé",
   "Error while deleting document": "Erreur lors de la suppression d'un document",
-  "This folder has no previewable content": "Ce dossier ne contient pas de contenu prévisualisable",
   "Insufficient permissions": "Droits insuffisants",
-  "Open raw file": "Ourvir le fichier original"
+  "Open raw file": "Ouvrir le fichier original",
+  "There isn't any previewable content at that shared space's root.": "Il n'y a pas de contenu affichable à la racine de cet espace partagé.",
+  "There isn't any previewable content at that folder's root.": "il n'y a pas de contenu affichable à la racine de ce dossier.",
+  "Rotate 90° left": "Pivoter de 90° à gauche",
+  "Rotate 90° right": "Pivoter de 90° à droite"
 }

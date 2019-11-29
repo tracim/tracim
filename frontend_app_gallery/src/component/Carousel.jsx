@@ -14,8 +14,17 @@ class Carousel extends React.Component {
     super(props)
 
     this.state = {
-      oldPosition: props.fileSelected
+      oldPosition: props.fileSelected,
+      thumbnailSlider: null,
+      mainSlider: null
     }
+  }
+
+  componentDidMount () {
+    this.setState({
+      mainSlider: this.mainSlider,
+      thumbnailSlider: this.thumbnailSlider
+    })
   }
 
   onMainSliderPositionChange (newPosition) {
@@ -27,9 +36,9 @@ class Carousel extends React.Component {
     const { props, state } = this
 
     if (props.slides.length === 0) {
-      return (
-        <div className='gallery__noContent'>{props.t('This folder has no previewable content')}</div>
-      )
+      return props.isWorkspaceRoot
+        ? <div className='gallery__noContent'>{props.t("There isn't any previewable content at that shared space's root.")}</div>
+        : <div className='gallery__noContent'>{props.t("There isn't any previewable content at that folder's root.")}</div>
     }
 
     if (this.mainSlider && state.oldPosition !== props.fileSelected) {
@@ -43,16 +52,17 @@ class Carousel extends React.Component {
     }
 
     const mainSliderProps = {
-      asNavFor: this.thumbnailSlider,
+      asNavFor: this.state.thumbnailSlider,
       ref: slider => (this.mainSlider = slider),
       infinite: true,
       speed: props.disableAnimation ? 0 : 300,
       slidesToShow: 1,
       slidesToScroll: 1,
-      centerMode: true,
+      centerMode: false,
       initialSlide: props.fileSelected,
       swipe: false,
       arrows: !props.disableAnimation,
+      afterChange: this.onMainSliderPositionChange.bind(this),
       lazyLoad: 'ondemand',
       centerPadding: '0px',
       className: 'carousel__main',
@@ -61,7 +71,7 @@ class Carousel extends React.Component {
     }
 
     const thumbnailSliderProps = {
-      asNavFor: this.mainSlider,
+      asNavFor: this.state.mainSlider,
       ref: slider => (this.thumbnailSlider = slider),
       slidesToShow: props.slides.length > 6 ? 7 : props.slides.length,
       focusOnSelect: true,
@@ -71,7 +81,6 @@ class Carousel extends React.Component {
       centerPadding: '0px',
       infinite: true,
       speed: props.disableAnimation ? 0 : 300,
-      afterChange: this.onMainSliderPositionChange.bind(this),
       arrows: false,
       className: 'carousel__thumbnail',
       responsive: [
@@ -131,7 +140,8 @@ Carousel.propTypes = {
   fileSelected: PropTypes.number.isRequired,
   onFileDeleted: PropTypes.func.isRequired,
   loggedUser: PropTypes.object,
-  disableAnimation: PropTypes.bool
+  disableAnimation: PropTypes.bool,
+  isWorkspaceRoot: PropTypes.bool
 }
 
 Carousel.defaultProps = {
@@ -141,5 +151,6 @@ Carousel.defaultProps = {
   onFileDeleted: () => {},
   loggedUser: {},
   disableAnimation: false,
-  fileSlected: 0
+  fileSelected: 0,
+  isWorkspaceRoot: true
 }
