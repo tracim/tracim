@@ -65,7 +65,10 @@ class CFG(object):
     """Object used for easy access to config file parameters."""
 
     def __init__(self, settings: typing.Dict[str, typing.Any]):
-        self.settings = settings
+        # INFO - G.M - 2019-12-02 - Store own settings original dict, with copy
+        # to avoid issue when serializing CFG object. settings dict is completed
+        # with object in some context
+        self.settings = settings.copy()
         self.config_naming = []  # type: typing.List[ConfigParam]
         logger.debug(self, "CONFIG_PROCESS:1: load config from settings")
         self.load_config()
