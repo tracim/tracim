@@ -18,7 +18,7 @@ APP_FRONTEND_PATH = "app/{minislug}.app.js"
 
 
 class FrontendController(Controller):
-    def __init__(self, dist_folder_path: str, custom_toolbox_folder_path: typing.Optional[str]):
+    def __init__(self, dist_folder_path: str, custom_toolbox_folder_path: typing.Optional[str]) -> None:
         self.dist_folder_path = dist_folder_path
         self.custom_toolbox_folder_path = custom_toolbox_folder_path
         self.custom_toolbox_files = []  # typing.List["os.DirEntry"]
