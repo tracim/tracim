@@ -21,7 +21,7 @@ class FrontendController(Controller):
     def __init__(self, dist_folder_path: str, custom_toolbox_folder_path: typing.Optional[str]) -> None:
         self.dist_folder_path = dist_folder_path
         self.custom_toolbox_folder_path = custom_toolbox_folder_path
-        self.custom_toolbox_files = []  # typing.List["os.DirEntry"]
+        self.custom_toolbox_files = []  # type: typing.List["os.DirEntry"]
         if custom_toolbox_folder_path:
             self.custom_toolbox_files = self._get_custom_toolboxes_files(
                 self.custom_toolbox_folder_path
