@@ -1,3 +1,4 @@
+import collections
 import importlib
 import pkgutil
 import sys
@@ -58,7 +59,10 @@ class TracimPluginManager(object):
         self.event_dispatcher.register(module)
 
     def register_all(self) -> None:
-        for module_name, module in self.plugins.items():
+        # INFO - G.M - 2019-12-02 - sort plugins by name here to have predictable
+        # order for plugin registration according to plugin_name.
+        sorted_plugins = collections.OrderedDict(sorted(self.plugins.items()))
+        for module_name, module in sorted_plugins.items():
             self.register(module)
 
     def add_plugin_path(self, plugin_folder: str) -> None:

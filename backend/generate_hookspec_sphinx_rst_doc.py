@@ -24,6 +24,9 @@ You can add it by:
 
 To make a plugin, you just need to use available event hook methods and import ``tracim_backend.lib.core.plugins.hookimpl``.
 
+Order of plugin running is LIFO (Last In, First Out) by default as in ``pluggy``. In Tracim, we load all plugin sorted by name one by one, that's means that ``tracim_backend_test_2`` hooks
+will be runned before ``tracim_backend_test_1`` hooks unless to explictly use ``tryfirst`` or ``trylast`` parameters of pluggy hookspec.
+
 Plugin hook mecanism in tracim is based on ``pluggy``, if you need more information about how plugin
 mecanism do work in Tracim, you can check `pluggy documentation <https://pluggy.readthedocs.io/en/latest/>`_ .
 
