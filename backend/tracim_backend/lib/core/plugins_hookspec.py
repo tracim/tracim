@@ -19,9 +19,15 @@ def on_plugins_loaded(plugin_manager: TracimPluginManager) -> None:
 
 
 @hookspec(historic=True)
-def add_new_hooks(plugin_manager):
+def add_new_hooks(plugin_manager: TracimPluginManager) -> None:
     """
-    Called after plugin registration, allow to add new hook to tracim
-    :param pluginmanager:
-    :return:
+    Called after plugin registration, allow to add new hook to tracim.
+    Hooks can be used like this to implement new specfile:
+
+    >>> @hookimpl
+    >>> def add_new_hooks(plugin_manager: TracimPluginManager):
+    >>>     plugin_manager.event_dispatcher.add_hookspecs(myplugin.spec)
+
+    :param pluginmanager: plugin manager of tracim
+    :return: nothing
     """
