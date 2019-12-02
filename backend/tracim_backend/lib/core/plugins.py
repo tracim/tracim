@@ -94,6 +94,9 @@ def init_plugin_manager(app_config: CFG) -> TracimPluginManager:
     if app_config.PLUGIN__FOLDER_PATH:
         plugin_manager.add_plugin_path(app_config.PLUGIN__FOLDER_PATH)
     plugin_manager.load_plugins()
+    plugin_manager.event_dispatcher.hook.add_new_hooks.call_historic(
+        kwargs=dict(plugin_manager=plugin_manager)
+    )
     plugin_manager.register_all()
     plugin_manager.event_dispatcher.hook.on_plugins_loaded(plugin_manager=plugin_manager)
     return plugin_manager

@@ -16,3 +16,12 @@ def on_plugins_loaded(plugin_manager: TracimPluginManager) -> None:
     :return: nothing
     """
     pass
+
+
+@hookspec(historic=True)
+def add_new_hooks(plugin_manager):
+    """
+    Called after plugin registration, allow to add new hook to tracim
+    :param pluginmanager:
+    :return:
+    """
