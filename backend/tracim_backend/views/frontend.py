@@ -82,12 +82,12 @@ class FrontendController(Controller):
         configurator.add_route("index", INDEX_PAGE_NAME, request_method="GET")
         configurator.add_view(self.index, route_name="index")
 
+        if self.custom_toolbox_folder_path:
+            configurator.add_static_view(
+                name="assets/custom_toolbox", path=self.custom_toolbox_folder_path
+            )
+
         for dirname in os.listdir(self.dist_folder_path):
             configurator.add_static_view(
                 name=dirname, path=os.path.join(self.dist_folder_path, dirname)
-            )
-
-        if self.custom_toolbox_folder_path:
-            configurator.add_static_view(
-                name="custom_toolbox", path=self.custom_toolbox_folder_path
             )

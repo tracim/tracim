@@ -93,7 +93,7 @@
     <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
 
     % for custom_toolbox_file in custom_toolbox_files:
-    <script type='text/javascript' src='/custom_toolbox/${custom_toolbox_file.name}'></script>
+    <script type='text/javascript' src='/assets/custom_toolbox/${custom_toolbox_file.name}'></script>
     % endfor
 
     <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>

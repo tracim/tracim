@@ -226,7 +226,7 @@ frontend.serve = True
 ; frontend.dist_folder_path = /home/user/tracim/frontend/dist
 # if you need to add custom javascript code into Tracim, you can use custom toolbox
 # feature. you add your javascript in this folder, all content
-# of this folder will be serve in /custom_toolbox
+# of this folder will be serve in /assets/custom_toolbox
 # and all javascript ".js" file will be added to index.html file.
 ; frontend.custom_toolbox_folder_path = /tmp/custom_toolbox
 
