@@ -24,6 +24,9 @@ You can add it by:
 
 To make a plugin, you just need to use available event hook methods and import ``tracim_backend.lib.core.plugins.hookimpl``.
 
+Plugin hook mecanism in tracim is based on ``pluggy``, if you need more information about how plugin
+mecanism do work in Tracim, you can check `pluggy documentation <https://pluggy.readthedocs.io/en/latest/>`_ .
+
 Hello World Plugin example
 --------------------------
 
