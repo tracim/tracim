@@ -20,7 +20,7 @@ class TracimPluginManager(object):
         self.prefix = prefix
         self.loaded_plugin = False
         self.plugins = {}
-        self.event_manager = self._setup_pluggy_event_manager()
+        self.event_dispatcher = self._setup_pluggy_event_dispatcher()
 
     @classmethod
     def get_all_hookspec_module_path(cls):
@@ -37,7 +37,7 @@ class TracimPluginManager(object):
                 hookspec_module_paths.append(module_path)
         return hookspec_module_paths
 
-    def _load_spec(self, event_manager: pluggy.PluginManager) -> None:
+    def _load_spec(self, event_dispatcher: pluggy.PluginManager) -> None:
         """
         Load all hookspec modules
         """
@@ -47,15 +47,15 @@ class TracimPluginManager(object):
         # to valid hookspec
         for hookspec_module_path in self.get_all_hookspec_module_path():
             module = importlib.import_module(hookspec_module_path)
-            event_manager.add_hookspecs(module)
+            event_dispatcher.add_hookspecs(module)
 
-    def _setup_pluggy_event_manager(self) -> pluggy.PluginManager:
-        event_manager = pluggy.PluginManager(EVENT_NAMESPACE)
-        self._load_spec(event_manager)
-        return event_manager
+    def _setup_pluggy_event_dispatcher(self) -> pluggy.PluginManager:
+        event_dispatcher = pluggy.PluginManager(EVENT_NAMESPACE)
+        self._load_spec(event_dispatcher)
+        return event_dispatcher
 
     def register(self, module: types.ModuleType) -> None:
-        self.event_manager.register(module)
+        self.event_dispatcher.register(module)
 
     def register_all(self) -> None:
         for module_name, module in self.plugins.items():
@@ -95,5 +95,5 @@ def init_plugin_manager(app_config: CFG) -> TracimPluginManager:
         plugin_manager.add_plugin_path(app_config.PLUGIN__FOLDER_PATH)
     plugin_manager.load_plugins()
     plugin_manager.register_all()
-    plugin_manager.event_manager.hook.on_plugins_loaded(plugin_manager=plugin_manager)
+    plugin_manager.event_dispatcher.hook.on_plugins_loaded(plugin_manager=plugin_manager)
     return plugin_manager

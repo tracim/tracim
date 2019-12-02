@@ -256,8 +256,8 @@ class TracimRequest(TracimContext, Request):
         return self.registry.settings["CFG"]
 
     @property
-    def event_manager(self) -> pluggy.PluginManager:
-        return self.registry.settings["event_manager"]
+    def event_dispatcher(self) -> pluggy.PluginManager:
+        return self.registry.settings["event_dispatcher"]
 
     def _cleanup(self, request: "TracimRequest") -> None:
         """

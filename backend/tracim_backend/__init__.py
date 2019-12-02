@@ -85,7 +85,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_config.configure_filedepot()
     settings["CFG"] = app_config
     plugin_manager = init_plugin_manager(app_config)
-    settings["event_manager"] = plugin_manager.event_manager
+    settings["event_dispatcher"] = plugin_manager.event_dispatcher
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
     tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
@@ -277,7 +277,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         configurator.include(frontend_controller.bind)
 
     # INFO - G.M - 2019-11-27 - Include plugin custom web code
-    plugin_manager.event_manager.hook.web_include(configurator=configurator, app_config=app_config)
+    plugin_manager.event_dispatcher.hook.web_include(
+        configurator=configurator, app_config=app_config
+    )
 
     hapic.add_documentation_view("/api/v2/doc", "Tracim v2 API", "API of Tracim v2")
     return configurator.make_wsgi_app()
