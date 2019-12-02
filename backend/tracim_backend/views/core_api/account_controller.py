@@ -27,6 +27,7 @@ from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
+from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
@@ -56,6 +57,19 @@ class AccountController(Controller):
     def account(self, context, request: TracimRequest, hapic_data=None):
         """
         Get user infos.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return uapi.get_user_with_context(request.current_user)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.output_body(UserDiskSpaceSchema())
+    def account_disk_space(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get user space infos.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
@@ -346,8 +360,11 @@ class AccountController(Controller):
         # account info
         configurator.add_route("account", "/users/me", request_method="GET")
         configurator.add_view(self.account, route_name="account")
-        #
-        #
+
+        # account space info
+        configurator.add_route("account_disk_space", "/users/me/disk_space", request_method="GET")
+        configurator.add_view(self.account_disk_space, route_name="account_disk_space")
+
         # known members lists
         configurator.add_route(
             "account_known_members", "/users/me/known_members", request_method="GET"

@@ -173,6 +173,14 @@ npm i --loglevel warn && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
 
+# install app Gallery
+log "cd $DEFAULTDIR/frontend_app_gallery"
+cd $DEFAULTDIR/frontend_app_gallery  || exit 1
+log "npm i"
+npm i --loglevel warn && loggood "success" || logerror "some error"
+log "npm link tracim_frontend_lib"
+npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+
 # install app Collaborative document edition
 log "cd $DEFAULTDIR/frontend_app_collaborative_document_edition"
 cd $DEFAULTDIR/frontend_app_collaborative_document_edition  || exit 1

@@ -4,5 +4,6 @@
   "contents/thread": "#428BCA",
   "contents/file": "#ffa500",
   "contents/folder": "#414548",
-  "agenda": "#ff4b3a"
+  "agenda": "#ff4b3a",
+  "gallery": "#999999"
 }

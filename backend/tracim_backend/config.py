@@ -185,7 +185,8 @@ class CFG(object):
             "agenda,"
             "collaborative_document_edition,"
             "share_content,"
-            "upload_permission"
+            "upload_permission,"
+            "gallery"
         )
 
         self.APP__ENABLED = string_to_list(
@@ -869,6 +870,16 @@ class CFG(object):
             app_config=self,
         )
 
+        gallery = Application(
+            label="Gallery",
+            slug="gallery",
+            fa_icon="picture-o",
+            is_active=True,
+            config={},
+            main_route="/ui/workspaces/{workspace_id}/gallery",
+            app_config=self,
+        )
+
         collaborative_document_edition = Application(
             label="Collaborative Document Edition",
             slug="collaborative_document_edition",
@@ -896,6 +907,7 @@ class CFG(object):
                 (folder.slug, folder),
                 (markdownpluspage.slug, markdownpluspage),
                 (agenda.slug, agenda),
+                (gallery.slug, gallery),
                 (collaborative_document_edition.slug, collaborative_document_edition),
                 (share_content.slug, share_content),
                 (upload_permissions.slug, upload_permissions),
