@@ -83,8 +83,6 @@
     <script type='text/javascript' src='/assets/tracim.vendors~app.js'></script>
     <script type='text/javascript' src='/assets/tracim.app.js'></script>
 
-    <script type='text/javascript' src='/assets/tracim/customToolbox.js'></script>
-
     <script type='text/javascript' src='/app/workspace.app.js'></script>
 
     % for app in applications:
@@ -94,6 +92,10 @@
     <script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
     <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
     <script type='text/javascript' src='/app/gallery.app.js'></script>
+
+    % for custom_toolbox_file in custom_toolbox_files:
+    <script type='text/javascript' src='/assets/custom_toolbox/${custom_toolbox_file.name}'></script>
+    % endfor
 
     <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
     <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>

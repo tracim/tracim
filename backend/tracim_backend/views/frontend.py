@@ -1,4 +1,5 @@
 import os
+import typing
 
 from pyramid.config import Configurator
 from pyramid.renderers import render_to_response
@@ -17,14 +18,30 @@ APP_FRONTEND_PATH = "app/{minislug}.app.js"
 
 
 class FrontendController(Controller):
-    def __init__(self, dist_folder_path: str):
+    def __init__(
+        self, dist_folder_path: str, custom_toolbox_folder_path: typing.Optional[str]
+    ) -> None:
         self.dist_folder_path = dist_folder_path
+        self.custom_toolbox_folder_path = custom_toolbox_folder_path
+        self.custom_toolbox_files = []  # type: typing.List["os.DirEntry"]
+        if custom_toolbox_folder_path:
+            self.custom_toolbox_files = self._get_custom_toolboxes_files(
+                self.custom_toolbox_folder_path
+            )
 
-    def _get_index_file_path(self):
+    def _get_index_file_path(self) -> str:
         index_file_path = os.path.join(self.dist_folder_path, INDEX_PAGE_NAME)
         if not os.path.exists(index_file_path):
             raise FileNotFoundError()
         return index_file_path
+
+    def _get_custom_toolboxes_files(self, custom_toolbox_dir: str) -> typing.List["os.DirEntry"]:
+        custom_toolbox_files = []
+        scanned_dir = os.scandir(custom_toolbox_dir)
+        for entry in scanned_dir:
+            if entry.name.endswith(".js") and entry.is_file():
+                custom_toolbox_files.append(entry)
+        return custom_toolbox_files
 
     def not_found_view(self, context, request: TracimRequest):
         raise PageNotFound("{} is not a valid path".format(request.path)) from context
@@ -50,6 +67,7 @@ class FrontendController(Controller):
                 "colors": {"primary": ExtendedColor(app_config.APPS_COLORS["primary"])},
                 "applications": frontend_apps,
                 "website_title": app_config.WEBSITE__TITLE,
+                "custom_toolbox_files": self.custom_toolbox_files,
             },
         )
 
@@ -65,6 +83,11 @@ class FrontendController(Controller):
         configurator.add_view(self.ui, route_name="ui")
         configurator.add_route("index", INDEX_PAGE_NAME, request_method="GET")
         configurator.add_view(self.index, route_name="index")
+
+        if self.custom_toolbox_folder_path:
+            configurator.add_static_view(
+                name="assets/custom_toolbox", path=self.custom_toolbox_folder_path
+            )
 
         for dirname in os.listdir(self.dist_folder_path):
             configurator.add_static_view(
