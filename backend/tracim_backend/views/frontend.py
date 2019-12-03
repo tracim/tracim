@@ -86,7 +86,7 @@ class FrontendController(Controller):
 
         if self.custom_toolbox_folder_path:
             configurator.add_static_view(
-                name="assets/custom_toolbox", path=self.custom_toolbox_folder_path
+                name="custom_toolbox-assets", path=self.custom_toolbox_folder_path
             )
 
         for dirname in os.listdir(self.dist_folder_path):
