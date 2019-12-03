@@ -287,6 +287,10 @@ class CFG(object):
             "frontend.dist_folder_path", frontend_dist_folder
         )
 
+        self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
+            "frontend.custom_toolbox_folder_path", None
+        )
+
     def _load_limitation_config(self) -> None:
         self.LIMITATION__SHAREDSPACE_PER_USER = int(
             self.get_raw_config("limitation.sharedspace_per_user", "0")

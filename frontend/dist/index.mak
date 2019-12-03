@@ -93,6 +93,10 @@
     <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
     <script type='text/javascript' src='/app/gallery.app.js'></script>
 
+    % for custom_toolbox_file in custom_toolbox_files:
+    <script type='text/javascript' src='/assets/custom_toolbox/${custom_toolbox_file.name}'></script>
+    % endfor
+
     <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
     <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>
     <script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js'></script>

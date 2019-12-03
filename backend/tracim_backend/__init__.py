@@ -270,7 +270,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(search_controller.bind, route_prefix=BASE_API_V2)
     if app_config.FRONTEND__SERVE:
         configurator.include("pyramid_mako")
-        frontend_controller = FrontendController(app_config.FRONTEND__DIST_FOLDER_PATH)
+        frontend_controller = FrontendController(
+            app_config.FRONTEND__DIST_FOLDER_PATH, app_config.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH
+        )
         configurator.include(frontend_controller.bind)
 
     hapic.add_documentation_view("/api/v2/doc", "Tracim v2 API", "API of Tracim v2")
