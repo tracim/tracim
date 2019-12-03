@@ -72,7 +72,9 @@ requires = [
     # text-formatting
     'humanize',
     # logging
-    'colorlog'
+    'colorlog',
+    # plugin
+    'pluggy'
 ]
 
 tests_require = [
