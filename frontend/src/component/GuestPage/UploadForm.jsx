@@ -74,7 +74,9 @@ class UploadForm extends React.Component {
                 toggle={this.handleTogglePopoverPasswordInfo}
                 trigger={isMobile ? 'focus' : 'hover'}
               >
-                <PopoverBody>{props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}</PopoverBody>
+                <PopoverBody>
+                  {props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}
+                </PopoverBody>
               </Popover>
             </div>
           }
