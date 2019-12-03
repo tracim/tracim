@@ -17,14 +17,14 @@ hookimpl = pluggy.HookimplMarker(EVENT_NAMESPACE)
 
 
 class TracimPluginManager(object):
-    def __init__(self, prefix: str):
-        self.prefix = prefix
-        self.loaded_plugin = False
-        self.plugins = {}
-        self.event_dispatcher = self._setup_pluggy_event_dispatcher()
+    def __init__(self, prefix: str) -> None:
+        self.prefix = prefix  # type: str
+        self.loaded_plugin = False  # type: bool
+        self.plugins = {}  # type: typing.Dict[str, types.ModuleType]
+        self.event_dispatcher = self._create_pluggy_event_dispatcher()  # type: pluggy.PluginManager
 
     @classmethod
-    def get_all_hookspec_module_path(cls):
+    def get_all_hookspec_module_path(cls) -> typing.List[str]:
         hookspec_module_paths = []
         # INFO - G.M - 2019-11-28 - import root module,
         # currently "tracim_backend"
@@ -50,7 +50,7 @@ class TracimPluginManager(object):
             module = importlib.import_module(hookspec_module_path)
             event_dispatcher.add_hookspecs(module)
 
-    def _setup_pluggy_event_dispatcher(self) -> pluggy.PluginManager:
+    def _create_pluggy_event_dispatcher(self) -> pluggy.PluginManager:
         event_dispatcher = pluggy.PluginManager(EVENT_NAMESPACE)
         self._load_spec(event_dispatcher)
         return event_dispatcher
