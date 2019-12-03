@@ -71,7 +71,8 @@ class TracimPluginManager(object):
         :param plugin_folder: folder path (should be absolute path) where plugin should be stored
         :return:
         """
-        sys.path.append(plugin_folder)
+        if plugin_folder not in sys.path:
+            sys.path.append(plugin_folder)
 
     def load_plugins(self, force=False) -> typing.Dict[str, types.ModuleType]:
         """
