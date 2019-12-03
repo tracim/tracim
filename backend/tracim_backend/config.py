@@ -188,7 +188,8 @@ class CFG(object):
             "agenda,"
             "collaborative_document_edition,"
             "share_content,"
-            "upload_permission"
+            "upload_permission,"
+            "gallery"
         )
 
         self.APP__ENABLED = string_to_list(
@@ -289,6 +290,10 @@ class CFG(object):
             "frontend.dist_folder_path", frontend_dist_folder
         )
         self.PLUGIN__FOLDER_PATH = self.get_raw_config("plugin.folder_path", None)
+
+        self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
+            "frontend.custom_toolbox_folder_path", None
+        )
 
     def _load_limitation_config(self) -> None:
         self.LIMITATION__SHAREDSPACE_PER_USER = int(
@@ -873,6 +878,16 @@ class CFG(object):
             app_config=self,
         )
 
+        gallery = Application(
+            label="Gallery",
+            slug="gallery",
+            fa_icon="picture-o",
+            is_active=True,
+            config={},
+            main_route="/ui/workspaces/{workspace_id}/gallery",
+            app_config=self,
+        )
+
         collaborative_document_edition = Application(
             label="Collaborative Document Edition",
             slug="collaborative_document_edition",
@@ -900,6 +915,7 @@ class CFG(object):
                 (folder.slug, folder),
                 (markdownpluspage.slug, markdownpluspage),
                 (agenda.slug, agenda),
+                (gallery.slug, gallery),
                 (collaborative_document_edition.slug, collaborative_document_edition),
                 (share_content.slug, share_content),
                 (upload_permissions.slug, upload_permissions),
