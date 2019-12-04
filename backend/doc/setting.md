@@ -36,15 +36,20 @@ Priority order is (from less to most priority):
 |TRACIM_USER__AUTH_TOKEN__VALIDITY|user.auth_token.validity      |USER__AUTH_TOKEN__VALIDITY    |
 |TRACIM_USER__RESET_PASSWORD__VALIDITY|user.reset_password.validity  |USER__RESET_PASSWORD__VALIDITY|
 |TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME|user.reset_password.token_lifetime|USER__RESET_PASSWORD__TOKEN_LIFETIME|
+|TRACIM_USER__DEFAULT_PROFILE  |user.default_profile          |USER__DEFAULT_PROFILE         |
+|TRACIM_KNOWN_MEMBERS__FILTER  |known_members.filter          |KNOWN_MEMBERS__FILTER         |
 |TRACIM_DEBUG                  |debug                         |DEBUG                         |
 |TRACIM_PREVIEW__JPG__RESTRICTED_DIMS|preview.jpg.restricted_dims   |PREVIEW__JPG__RESTRICTED_DIMS |
 |TRACIM_PREVIEW__JPG__ALLOWED_DIMS|preview.jpg.allowed_dims      |PREVIEW__JPG__ALLOWED_DIMS    |
 |TRACIM_FRONTEND__SERVE        |frontend.serve                |FRONTEND__SERVE               |
 |TRACIM_BACKEND__I18N_FOLDER_PATH|backend.i18n_folder_path      |BACKEND__I18N_FOLDER_PATH     |
 |TRACIM_FRONTEND__DIST_FOLDER_PATH|frontend.dist_folder_path     |FRONTEND__DIST_FOLDER_PATH    |
+|TRACIM_PLUGIN__FOLDER_PATH    |plugin.folder_path            |PLUGIN__FOLDER_PATH           |
+|TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH|frontend.custom_toolbox_folder_path|FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH|
 |TRACIM_LIMITATION__SHAREDSPACE_PER_USER|limitation.sharedspace_per_user|LIMITATION__SHAREDSPACE_PER_USER|
 |TRACIM_LIMITATION__CONTENT_LENGTH_FILE_SIZE|limitation.content_length_file_size|LIMITATION__CONTENT_LENGTH_FILE_SIZE|
 |TRACIM_LIMITATION__WORKSPACE_SIZE|limitation.workspace_size     |LIMITATION__WORKSPACE_SIZE    |
+|TRACIM_LIMITATION__USER_DEFAULT_ALLOWED_SPACE|limitation.user_default_allowed_space|LIMITATION__USER_DEFAULT_ALLOWED_SPACE|
 |TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION|email.notification.enabled_on_invitation|EMAIL__NOTIFICATION__ENABLED_ON_INVITATION|
 |TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL|email.notification.from.email |EMAIL__NOTIFICATION__FROM__EMAIL|
 |TRACIM_EMAIL__NOTIFICATION__FROM|email.notification.from       |EMAIL__NOTIFICATION__FROM     |

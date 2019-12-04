@@ -2,20 +2,19 @@
 
 .share_folder_advanced
   width 1000px
-  height 100%
-  overflow-y auto
-  overflow-x hidden
+  height calc(100% - 61px) // 61px it's the main header height
   &__content
     width 1000px
     padding 10px 0
+    overflow auto
     &__title
       display flex
       justify-content space-between
-      padding 10px 0 10px 10px
+      align-items center
+      margin 10px 20px
+      padding-bottom 10px
       border-bottom 1px solid grey
       font-size 20px
-      font-weight 400
-      margin 0 20px 20px 10px
     &__btnupload
       margin auto 0
     &__empty
@@ -25,7 +24,9 @@
   &__contentpage
     &__content
       width 100%
-      height calc(100% - 63px) // 63px = header height
+      height calc(100% - 63px) // 63px = app header height
+      overflow-y auto
+      overflow-x hidden
 
 .newUpload
   padding 10px

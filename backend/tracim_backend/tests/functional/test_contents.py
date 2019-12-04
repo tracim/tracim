@@ -4315,3 +4315,115 @@ class TestWorkspaceLimitedContentSize(object):
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_WORKSPACE_EMPTY_SPACE
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestOwnerLimitedContentSize(object):
+    def test_api__set_file_raw__err_400__file_size_limit_over_limitation(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Try set one file of a content with different size according to size limit
+        """
+        admin_user.allowed_space = 200
+        transaction.commit()
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        business_workspace = workspace_api.create_workspace("Business")
+        marketing_workspace = workspace_api.create_workspace("Marketing")
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=None,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        test_file2 = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=marketing_workspace,
+            parent=None,
+            label="Test file2",
+            do_save=True,
+            do_notify=False,
+        )
+        session.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_1000px_png_test_image()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
+            "/api/v2/workspaces/{}/files/{}/raw/{}".format(
+                business_workspace.workspace_id, content_id, image.name
+            ),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+
+        res = web_testapp.put(
+            "/api/v2/workspaces/{}/files/{}/raw/{}".format(
+                business_workspace.workspace_id, content_id, image.name
+            ),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_OWNER_EMPTY_SPACE
+
+        content_id = int(test_file2.content_id)
+        res = web_testapp.put(
+            "/api/v2/workspaces/{}/files/{}/raw/{}".format(
+                marketing_workspace.workspace_id, content_id, image.name
+            ),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_OWNER_EMPTY_SPACE
+
+    def test_api__create_file__err__400__file_size_limit_over_limitation(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, admin_user
+    ) -> None:
+        """
+        try to create one file of a content at workspace root with different size
+        according to size limit
+        """
+        admin_user.allowed_space = 200
+        transaction.commit()
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.create_workspace("Business")
+        marketing_workspace = workspace_api.create_workspace("Marketing")
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        res = web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=200,
+        )
+        res = web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_OWNER_EMPTY_SPACE
+
+        res = web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(marketing_workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_OWNER_EMPTY_SPACE

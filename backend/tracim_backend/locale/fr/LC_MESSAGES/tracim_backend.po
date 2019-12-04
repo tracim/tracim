@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-06 15:05+0200\n"
+"POT-Creation-Date: 2019-09-12 10:01+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -53,7 +53,7 @@ msgid ""
 "[{website_title}] {emitter_name} shared the file \"{content_filename}\" "
 "with you"
 msgstr ""
-"[{website_title}] {emitter_name} à partagé le fichier "
+"[{website_title}] {emitter_name} a partagé le fichier "
 "\"{content_filename}\" avec vous"
 
 #: tracim_backend/applications/share/config.py:22
@@ -86,15 +86,15 @@ msgstr ""
 "[{website_title}] {uploader_username} a partagé {nb_uploaded_contents} "
 "fichiers dans \"{workspace_name}\""
 
-#: tracim_backend/applications/upload_permissions/lib.py:249
-msgid "Files uploaded by {username} on {date}"
-msgstr "Fichiers téléchargés par {username} le {date}"
+#: tracim_backend/applications/upload_permissions/lib.py:252
+msgid "Files uploaded by {username} on {date} at {time}"
+msgstr "Fichiers téléversés par {username} le {date} à {time}"
 
-#: tracim_backend/applications/upload_permissions/lib.py:262
+#: tracim_backend/applications/upload_permissions/lib.py:267
 msgid "Message from {username}: {message}"
 msgstr "Message de {username} : {message}"
 
-#: tracim_backend/applications/upload_permissions/lib.py:266
+#: tracim_backend/applications/upload_permissions/lib.py:271
 msgid "Uploaded by {username}."
 msgstr "Téléversé par {username}."
 
@@ -240,11 +240,11 @@ msgstr "généré par le logiciel tracim"
 
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:2
 msgid ""
-"{username}(<a href=\"{email_link}\">{email}</a>) shared one or several "
+"{username} (<a href=\"{email_link}\">{email}</a>) shared one or several "
 "files with you in this shared space: <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
 msgstr ""
-"{username}(<a href=\"{email_link}\">{email}</a>) a partagé un ou "
+"{username} (<a href=\"{email_link}\">{email}</a>) a partagé un ou "
 "plusieurs fichiers avec vous dans cet espace partagé : <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
 

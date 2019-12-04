@@ -11,6 +11,7 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|basic_setup.caldav_storage_dir = .*|basic_setup.caldav_storage_dir = /var/tracim/data/radicale_storage|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.preview_cache_dir = .*|basic_setup.preview_cache_dir = /var/tracim/data/preview|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = /var/tracim/data|g" /etc/tracim/development.ini
+    sed -i "s|basic_setup.file_template_dir = .*|basic_setup.file_template_dir = /tracim/backend/tracim_backend/templates/open_documents|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.api_key =.*|basic_setup.api_key = $KEY|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/development.ini
     sed -i "s|email.template_dir = .*|email.template_dir = /tracim/backend/tracim_backend/templates/mail|g" /etc/tracim/development.ini
@@ -21,6 +22,8 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|; email.async.redis.host = .*|email.async.redis.host = localhost|g" /etc/tracim/development.ini
     sed -i "s|; email.async.redis.port = .*|email.async.redis.port = 6379|g" /etc/tracim/development.ini
     sed -i "s|; email.async.redis.db = .*|email.async.redis.db = 0|g" /etc/tracim/development.ini
+    sed -i "s|; plugin.folder_path = .*|plugin.folder_path = /etc/tracim/plugins|g" /etc/tracim/development.ini
+    sed -i "s|; frontend.custom_toolbox_folder_path = .*|frontend.custom_toolbox_folder_path = /etc/tracim/custom_toolbox|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in
       mysql)
         sed -i "s|basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = $DATABASE_TYPE+pymysql://$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME$DATABASE_SUFFIX|g" /etc/tracim/development.ini ;;
@@ -67,6 +70,14 @@ if [ ! -f /etc/tracim/logo.png ]; then
 fi
 if [ ! -L /tracim/frontend/dist/assets/images/logo-tracim.png ]; then
     ln -s /etc/tracim/logo.png /tracim/frontend/dist/assets/images/logo-tracim.png
+fi
+
+# Create folder for plugins (backend) and custom_toolbox (frontend)
+if [ ! -d /etc/tracim/plugins ]; then
+    mkdir /etc/tracim/plugins -p
+fi
+if [ ! -d /etc/tracim/custom_toolbox ]; then
+    mkdir /etc/tracim/custom_toolbox -p
 fi
 
 # Create logs, folder and assets directories

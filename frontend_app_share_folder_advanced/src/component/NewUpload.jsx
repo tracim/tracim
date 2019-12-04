@@ -47,20 +47,17 @@ export class NewUpload extends React.Component {
   render () {
     const { props, state } = this
     const customColor = props.customColor
-    const passwordType = 'password'
-    const textType = 'text'
 
     return (
       <div className='newUpload'>
         <div className='newUpload__title share_folder_advanced__content__title'>
-          {props.t('New authorization')}
+          {props.t('New public upload link')}
         </div>
 
         <div className='newUpload__email'>
           <textarea
-            type={textType}
             className='newUpload__email__input form-control'
-            placeholder={props.t('Enter the email address of the recipient(s)')}
+            placeholder={props.t("Recipient's email addresses")}
             rows='1'
             value={props.uploadEmails}
             onChange={props.onChangeUploadEmails}
@@ -82,7 +79,7 @@ export class NewUpload extends React.Component {
             toggle={this.handleTogglePopoverMultipleEmails}
             trigger={isMobile ? 'focus' : 'hover'}
           >
-            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
+            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}</PopoverBody>
           </Popover>
         </div>
 
@@ -94,9 +91,9 @@ export class NewUpload extends React.Component {
                   <i className='fa fa-fw fa-lock' />
 
                   <input
-                    type={state.hidePassword ? passwordType : textType}
+                    type={state.hidePassword ? 'password' : 'text'}
                     className='newUpload__password__input form-control'
-                    placeholder={props.t('Password to share link (optional)')}
+                    placeholder={props.t('Password')}
                     value={props.uploadPassword}
                     onChange={props.onChangeUploadPassword}
                   />
@@ -153,7 +150,6 @@ export class NewUpload extends React.Component {
             onClick={props.onClickCancelNewUpload}
           >
             {props.t('Cancel')}
-            <i className='fa fa-fw fa-times' />
           </button>
           <button
             className='newUpload__newBtn btn highlightBtn'
@@ -167,8 +163,7 @@ export class NewUpload extends React.Component {
             onClick={() => props.onClickNewUpload(state.isPasswordActive)}
             disabled={props.uploadEmails === '' || (state.isPasswordActive && props.uploadPassword === '')}
           >
-            {props.t('New')}
-            <i className='fa fa-fw fa-plus-circle' />
+            {props.t('Validate')}
           </button>
         </div>
 

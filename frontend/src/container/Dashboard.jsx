@@ -47,6 +47,7 @@ import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
+import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
 
 const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
 
@@ -432,19 +433,46 @@ class Dashboard extends React.Component {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || { creationLabel: '', slug: '' }
           // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications
           // these endpoints are /system/applications, /system/content_types and key sidebar_entry from /user/me/workspaces
+          // HACK - CH - 2019-09-10 - hard coding collabora creation label from the hack since backend still isn't clear about appList and contentTypeList usage
+          // See https://github.com/tracim/tracim/issues/2375
+          // HACK - GM - 2019-11-26 - hard coding gallery creation label because gallery don't have a content_type
+          const creationLabelWithHACK = (() => {
+            switch (app.slug) {
+              case 'agenda': return props.t('Open the agenda')
+              case 'gallery': return props.t('Open the gallery')
+              case 'collaborative_document_edition': return HACK_COLLABORA_CONTENT_TYPE([{}]).creationLabel
+              default: return contentType.creationLabel
+            }
+          })()
+
+          // HACK - CH - 2019-09-10 - hard coding collabora slug from the hack since the collaborative_document has been removed from content type list
+          // See https://github.com/tracim/tracim/issues/2375
+          const slugWithHACK = app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug
+            ? HACK_COLLABORA_CONTENT_TYPE([{}]).slug
+            : contentType.slug
+
+          const route = (() => {
+            switch (app.slug) {
+              case 'agenda': return PAGE.WORKSPACE.AGENDA(props.curWs.id)
+              case 'gallery': return PAGE.WORKSPACE.GALLERY(props.curWs.id)
+              default: return `${PAGE.WORKSPACE.NEW(props.curWs.id, slugWithHACK)}?parent_id=null`
+            }
+          })()
+
           return {
             ...app,
-            creationLabel: app.slug === 'agenda' ? props.t('Open the agenda') : contentType.creationLabel,
-            route: app.slug === 'agenda'
-              ? PAGE.WORKSPACE.AGENDA(props.curWs.id)
-              : `${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`
+            hexcolor: app.slug === HACK_COLLABORA_CONTENT_TYPE([{}]).slug
+              ? HACK_COLLABORA_CONTENT_TYPE([{}]).hexcolor
+              : app.hexcolor,
+            creationLabel: creationLabelWithHACK,
+            route: route
           }
         })
       : []
 
     // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
     contentTypeButtonList.push({
-      slug: 'content/all', // INFO - CH - 2019-04-03 - This will be overriden but it avoid a unique key warning
+      slug: 'content/all', // INFO - CH - 2019-04-03 - This will be overridden but it avoid a unique key warning
       ...props.curWs.sidebarEntryList.find(se => se.slug === 'contents/all'),
       creationLabel: props.t('Explore contents'),
       route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id),

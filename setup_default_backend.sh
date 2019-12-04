@@ -25,7 +25,7 @@ function logerror {
 function install_backend_system_dep {
     log "install base debian-packaged-dep for backend..."
     $SUDO apt update
-    PACKAGE_LIST='python3 python3-venv python3-dev python3-pip redis-server zlib1g-dev libjpeg-dev imagemagick libmagickwand-dev libpq-dev ghostscript libfile-mimeinfo-perl poppler-utils libimage-exiftool-perl qpdf libldap2-dev libsasl2-dev libreoffice inkscape'
+    PACKAGE_LIST='python3 python3-venv python3-dev python3-pip redis-server zlib1g-dev libjpeg-dev imagemagick libmagickwand-dev libpq-dev ghostscript libfile-mimeinfo-perl poppler-utils libimage-exiftool-perl qpdf libldap2-dev libsasl2-dev libreoffice inkscape ufraw-batch ffmpeg'
     for PACKAGE in $PACKAGE_LIST
     do
         $SUDO apt install -y $PACKAGE && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
@@ -40,7 +40,7 @@ function setup_pyenv {
 
 function install_backend_python_packages {
     log "install pip and setuptools"
-    pip install --upgrade pip setuptools && loggood "install pip and setuptools success" || logerror "failed to install pip and setuptools"
+    pip install --upgrade pip setuptools wheel && loggood "install pip and setuptools success" || logerror "failed to install pip and setuptools"
     log "install dependencies from requirements.txt"
     pip install -r "requirements.txt" && loggood "install requirements.txt success" || logerror "failed to install requirements.txt"
     log "install tracim-backend (sqlite_backend)..."

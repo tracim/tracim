@@ -3,6 +3,9 @@ import { translate } from 'react-i18next'
 import Radium from 'radium'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
+// INFO - CH - 2019-09-16 - READ ME:
+// For this component to behave properly regarding responsive and text-overflow ellispsis, the parent of this component
+// should have a css rule: `overflow: auto` (overflow-x is fine too)
 class ShareLink extends React.Component {
   // INFO - GB - 2019-07-16 - Algorithm based on https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
   handleCopyToClipboard = () => {

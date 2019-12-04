@@ -11,7 +11,7 @@ const UploadFilesManagement = props => {
   return (
     <div className='share_folder_advanced__content'>
       <div className='share_folder_advanced__content__title'>
-        {props.t('Import authorizations')}
+        { props.t('Public upload links') }
 
         <button
           className='share_folder_advanced__content__btnupload btn highlightBtn'
@@ -23,11 +23,13 @@ const UploadFilesManagement = props => {
             }
           }}
           onClick={props.onClickNewUploadComponent}
+          data-cy='share_folder_advanced__content__btnupload'
         >
           {props.t('New')}
           <i className='fa fa-fw fa-plus-circle' />
         </button>
       </div>
+
       {props.uploadLinkList.length > 0
         ? props.uploadLinkList.map(shareLink =>
           <ShareLink
@@ -39,9 +41,11 @@ const UploadFilesManagement = props => {
             userRoleIdInWorkspace={props.userRoleIdInWorkspace}
           />
         )
-        : <div className='share_folder_advanced__content__empty'>
-          {props.t('No upload link has been created yet')}
-        </div>
+        : (
+          <div className='share_folder_advanced__content__empty'>
+            {props.t('No upload link has been created yet')}
+          </div>
+        )
       }
     </div>
   )

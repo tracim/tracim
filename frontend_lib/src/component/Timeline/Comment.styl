@@ -4,19 +4,9 @@
   &.sent
     padding-left 5%
     margin-left auto
-    & ^[0]__body a // renders .comment.sent .comment__body a
-      text-decoration underline
-      color #fff
-      &:hover
-        font-weight bold
   &.received
     padding-right 5%
     margin-right auto
-    & ^[0]__body a // renders .comment.received .comment__body a
-      text-decoration underline
-      color inherit
-      &:hover
-        font-weight bold
   &__body
     border-radius 5px
     padding 15px 15px 15px 20px
@@ -31,7 +21,6 @@
     &__text
       margin-left 20px
       margin-top 10px
-      word-break break-all
   p
     margin 0
     & img

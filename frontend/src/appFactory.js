@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom'
 import { FETCH_CONFIG, ROLE, PROFILE, PAGE, findUserRoleIdInWorkspace } from './helper.js'
 import i18n from './i18n.js'
 
-const mapStateToProps = ({ system, currentWorkspace }) => ({ system, currentWorkspace })
+const mapStateToProps = ({ system, currentWorkspace, workspaceList }) => ({ system, currentWorkspace, workspaceList })
 
 export function appFactory (WrappedComponent) {
   return withRouter(connect(mapStateToProps)(class AppFactory extends React.Component {
