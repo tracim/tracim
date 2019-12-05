@@ -158,7 +158,7 @@ class PopupCreateFile extends React.Component {
             switch (jsonResult400.code) {
               case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
               case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
-              case 6003: this.sendGlobalFlashMessage(props.t("Error, the shared space exceed it's maximum size")); break
+              case 6003: this.sendGlobalFlashMessage(props.t("Error, the shared space exceed its maximum size")); break
             }
             break
           default: this.sendGlobalFlashMessage(props.t('Error while creating file')); break
