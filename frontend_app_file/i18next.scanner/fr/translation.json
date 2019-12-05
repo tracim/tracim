@@ -55,5 +55,5 @@
   "Validate and create": "Valider et créer",
   "Number of shares:": "Nombre de partages :",
   "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximale autorisée",
-  "Error, the shared space exceed it's maximum size": "Erreur, l'espace partagé dépasse sa taille maximale"
+  "Error, the shared space exceed its maximum size": "Erreur, l'espace partagé dépasse sa taille maximale"
 }
