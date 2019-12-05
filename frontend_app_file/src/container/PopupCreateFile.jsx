@@ -56,6 +56,15 @@ class PopupCreateFile extends React.Component {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
+
   handleChangeFile = newFile => {
     if (!newFile || !newFile[0]) return
 
@@ -108,7 +117,7 @@ class PopupCreateFile extends React.Component {
   }
 
   handleValidate = async () => {
-    const { state } = this
+    const { props, state } = this
 
     const formData = new FormData()
     formData.append('files', state.uploadFile)
@@ -147,26 +156,12 @@ class PopupCreateFile extends React.Component {
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
-              case 3002:
-                GLOBAL_dispatchEvent({
-                  type: CUSTOM_EVENT.ADD_FLASH_MSG,
-                  data: {
-                    msg: this.props.t('A content with the same name already exists'),
-                    type: 'warning',
-                    delay: undefined
-                  }
-                })
-                break
+              case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
+              case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
+              case 6003: this.sendGlobalFlashMessage(props.t("Error, the shared space exceed its maximum size")); break
             }
             break
-          default: GLOBAL_dispatchEvent({
-            type: CUSTOM_EVENT.ADD_FLASH_MSG,
-            data: {
-              msg: this.props.t('Error while creating file'),
-              type: 'warning',
-              delay: undefined
-            }
-          })
+          default: this.sendGlobalFlashMessage(props.t('Error while creating file')); break
         }
       }
     }
