@@ -4,5 +4,5 @@
   "New shared space": "Nouvel espace partagé",
   "A shared space with that name already exists": "Un espace partagé avec ce nom existe déjà",
   "Error while saving new shared space": "Erreur lors de la sauvegarde de l'espace partagé",
-  "You cannot create anymore shared space": "Vous ne pouvez pas créer plus d'espaces de travail"
+  "You cannot create anymore shared space": "Vous ne pouvez pas créer d'espaces partagé supplémentaire"
 }
