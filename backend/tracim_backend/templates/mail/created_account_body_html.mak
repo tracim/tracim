@@ -2,7 +2,11 @@
 <% a_link='<a href="{url}">{url}</a>'.format(url=html_escape(login_url)) %>
 <p>${_('Hello {username},').format(username=user.display_name)}</p>
 
-<p>${_('Someone invited you to join <i>{website_title}</i>.').format(website_title=html_escape(config.WEBSITE__TITLE))| n}</p>
+%if origin_user:
+    <p>${_('{origin_user_name} invited you to join <i>{website_title}</i>.').format(origin_user_name=html_escape(origin_user.display_name), website_title=html_escape(config.WEBSITE__TITLE))| n}</p>
+%else:
+    <p>${_('Someone invited you to join <i>{website_title}</i>.').format(website_title=html_escape(config.WEBSITE__TITLE))| n}</p>
+%endif
 
 <p>${_('Your credentials are:')}</p>
 
