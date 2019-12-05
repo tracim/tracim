@@ -758,7 +758,9 @@ class UserApi(object):
         if do_notify:
             try:
                 email_manager = get_email_manager(self._config, self._session)
-                email_manager.notify_created_account(new_user, password=password)
+                email_manager.notify_created_account(
+                    new_user, password=password, origin_user=self._user
+                )
             # FIXME - G.M - 2018-11-02 - hack: accept bad recipient user creation
             # this should be fixed to find a solution to allow "fake" email but
             # also have clear error case for valid mail.
