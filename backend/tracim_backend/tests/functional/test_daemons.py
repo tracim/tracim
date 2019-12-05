@@ -34,7 +34,7 @@ class TestMailNotifyDaemon(object):
         # check mail received
         response = mailhog.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
+        assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "bob <bob@bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
