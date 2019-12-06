@@ -242,5 +242,8 @@
   "Password (required)": "Password (required)",
   "Thank you, your upload is finished !": "Thank you, your upload is finished !",
   "Open the gallery": "Open the gallery",
-  "Gallery": "Gallery"
+  "Gallery": "Gallery",
+  "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
+  "Error, the shared space exceed its maximum size": "Error, the shared space exceed its maximum size",
+  "Upload impossible, the destination storage capacity has been reached": "Upload impossible, the destination storage capacity has been reached"
 }
