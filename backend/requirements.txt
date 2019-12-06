@@ -37,6 +37,7 @@ humanize==0.5.1
 hupper==1.4.2             # via pyramid
 idna==2.8                 # via requests
 imapclient==2.1.0
+importlib-metadata==0.23  # via pluggy
 jsmin==2.2.2              # via wsgidav
 ldap3==2.5.1              # via pyramid-ldap3
 lxml==4.2.5
@@ -44,6 +45,7 @@ mako==1.0.7
 markdown==3.0.1
 markupsafe==1.1.0         # via mako
 marshmallow==2.16.3
+more-itertools==7.2.0     # via zipp
 multidict==4.5.2          # via hapic
 packaging==18.0           # via preview-generator
 pastedeploy==2.0.0        # via plaster-pastedeploy
@@ -53,6 +55,7 @@ pdf2image==1.1.0          # via preview-generator
 pillow==5.3.0             # via cairosvg, pdf2image, preview-generator
 plaster-pastedeploy==0.6
 plaster==1.0              # via plaster-pastedeploy, pyramid
+pluggy==0.13.1
 prettytable==0.7.2        # via cliff
 preview-generator==0.13
 pyasn1==0.4.4             # via ldap3
@@ -100,6 +103,7 @@ webencodings==0.5.1       # via tinycss2
 webob==1.8.4              # via pyramid
 wsgidav==2.4.1
 xvfbwrapper==0.2.9        # via preview-generator
+zipp==0.6.0               # via importlib-metadata
 zope.deprecation==4.3.0   # via pyramid
 zope.interface==4.6.0     # via pyramid, pyramid-retry, transaction, zope.sqlalchemy
 zope.sqlalchemy==1.0

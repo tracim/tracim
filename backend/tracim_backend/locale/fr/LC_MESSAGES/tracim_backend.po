@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-12 10:01+0200\n"
+"POT-Creation-Date: 2019-12-05 16:12+0100\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -18,17 +18,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: tracim_backend/config.py:356
+#: tracim_backend/config.py:371
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 msgstr ""
 
-#: tracim_backend/config.py:364
+#: tracim_backend/config.py:379
 msgid "[{website_title}] Someone created an account for you"
 msgstr "[{website_title}] Quelqu'un vous a créé un compte"
 
-#: tracim_backend/config.py:373
+#: tracim_backend/config.py:388
 msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] Demande de réinitialisation de mot de passe"
 
@@ -86,31 +86,31 @@ msgstr ""
 "[{website_title}] {uploader_username} a partagé {nb_uploaded_contents} "
 "fichiers dans \"{workspace_name}\""
 
-#: tracim_backend/applications/upload_permissions/lib.py:252
+#: tracim_backend/applications/upload_permissions/lib.py:258
 msgid "Files uploaded by {username} on {date} at {time}"
 msgstr "Fichiers téléversés par {username} le {date} à {time}"
 
-#: tracim_backend/applications/upload_permissions/lib.py:267
+#: tracim_backend/applications/upload_permissions/lib.py:280
 msgid "Message from {username}: {message}"
 msgstr "Message de {username} : {message}"
 
-#: tracim_backend/applications/upload_permissions/lib.py:271
+#: tracim_backend/applications/upload_permissions/lib.py:284
 msgid "Uploaded by {username}."
 msgstr "Téléversé par {username}."
 
-#: tracim_backend/lib/core/content.py:2270
+#: tracim_backend/lib/core/content.py:2287
 msgid "New folder"
 msgstr "Nouveau dossier"
 
-#: tracim_backend/lib/core/content.py:2275
+#: tracim_backend/lib/core/content.py:2292
 msgid "New folder {0}"
 msgstr "Nouveau dossier {0}"
 
-#: tracim_backend/lib/core/workspace.py:383
+#: tracim_backend/lib/core/workspace.py:400
 msgid "Workspace"
 msgstr "Espace partagé"
 
-#: tracim_backend/lib/core/workspace.py:386
+#: tracim_backend/lib/core/workspace.py:403
 msgid "Workspace {}"
 msgstr "Espace partagé {0}"
 
@@ -172,23 +172,27 @@ msgstr ""
 msgid "Hello {username},"
 msgstr "Bonjour {username},"
 
-#: tracim_backend/templates/mail/created_account_body_html.mak:5
+#: tracim_backend/templates/mail/created_account_body_html.mak:6
+msgid "{origin_user_name} invited you to join <i>{website_title}</i>."
+msgstr "{origin_user_name} vous a invité à rejoindre <i>{website_title}<i>."
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:8
 msgid "Someone invited you to join <i>{website_title}</i>."
 msgstr "Quelqu'un vous a invité à rejoindre <i>{website_title}<i>."
 
-#: tracim_backend/templates/mail/created_account_body_html.mak:7
+#: tracim_backend/templates/mail/created_account_body_html.mak:11
 msgid "Your credentials are:"
 msgstr "Vos identifiants sont :"
 
-#: tracim_backend/templates/mail/created_account_body_html.mak:10
+#: tracim_backend/templates/mail/created_account_body_html.mak:14
 msgid "login: {email_address}"
 msgstr "login : {email_address}"
 
-#: tracim_backend/templates/mail/created_account_body_html.mak:11
+#: tracim_backend/templates/mail/created_account_body_html.mak:15
 msgid "password: {password}"
 msgstr "mot de passe : {password}"
 
-#: tracim_backend/templates/mail/created_account_body_html.mak:15
+#: tracim_backend/templates/mail/created_account_body_html.mak:19
 msgid ""
 "Let start to discuss, share files, agenda and documentation with "
 "collaborators by logging into your shared space: {a_link}"
@@ -197,7 +201,7 @@ msgstr ""
 "avec vos collaborateurs en vous connectant dans votre espace partagé : "
 "{a_link}"
 
-#: tracim_backend/templates/mail/created_account_body_html.mak:17
+#: tracim_backend/templates/mail/created_account_body_html.mak:21
 msgid ""
 "note: as soon as you are connected, we strongly recommend that you change"
 " your password and delete this email."
@@ -205,14 +209,14 @@ msgstr ""
 "note : nous vous recommandons fortement de changer votre mot de passe et "
 "de supprimer cet email dès que vous êtes connecté."
 
-#: tracim_backend/templates/mail/created_account_body_html.mak:18
+#: tracim_backend/templates/mail/created_account_body_html.mak:22
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:13
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:13
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:13
 msgid "Enjoy your day :)"
 msgstr "Bonne journée :)"
 
-#: tracim_backend/templates/mail/created_account_body_html.mak:19
+#: tracim_backend/templates/mail/created_account_body_html.mak:23
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:14
 #: tracim_backend/templates/mail/reset_password_body_html.mak:16
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:14
@@ -220,7 +224,7 @@ msgstr "Bonne journée :)"
 msgid "Suricat', your digital assistant"
 msgstr "Suricate, votre assistant numérique"
 
-#: tracim_backend/templates/mail/created_account_body_html.mak:23
+#: tracim_backend/templates/mail/created_account_body_html.mak:27
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:18
 #: tracim_backend/templates/mail/reset_password_body_html.mak:20
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:18
@@ -228,7 +232,7 @@ msgstr "Suricate, votre assistant numérique"
 msgid "Suricat', the bot"
 msgstr "Suricate, le robot"
 
-#: tracim_backend/templates/mail/created_account_body_html.mak:26
+#: tracim_backend/templates/mail/created_account_body_html.mak:30
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
 #: tracim_backend/templates/mail/reset_password_body_html.mak:23
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21

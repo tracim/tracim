@@ -1,5 +1,16 @@
 
 
+# 2.5.1 / 2019-12-06
+
+### New Features
+- Custom_toolbox feature is now available - beta
+
+### Fixed issues
+- Email: #2565
+- Frontend: #2345
+- Backend: #2558
+
+
 # 2.5.0 / 2019-11-29
 
 ### New Features

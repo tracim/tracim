@@ -1,3 +1,7 @@
+# Tracim
+
+![logo_tracim](logo_tracim.png)
+
 develop branch status:
 [![Build Status](https://travis-ci.org/tracim/tracim.svg?branch=develop)](https://travis-ci.org/tracim/tracim)
 [![Coverage Status](https://coveralls.io/repos/github/tracim/tracim/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim?branch=develop)

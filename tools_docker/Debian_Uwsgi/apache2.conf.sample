@@ -30,6 +30,9 @@
     ProxyPass /api http://127.0.0.1:8080/api
     ProxyPassReverse /api http://127.0.0.1:8080/api
 
+    ProxyPass /custom_toolbox-assets http://127.0.0.1:8080/custom_toolbox-assets
+    ProxyPassReverse /custom_toolbox-assets http://127.0.0.1:8080/custom_toolbox-assets
+
     ProxyPassMatch ^/$ http://localhost:8080
     ProxyPassReverse ^/$ http://127.0.0.1:8080
 

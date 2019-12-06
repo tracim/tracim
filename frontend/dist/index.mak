@@ -5,7 +5,9 @@
     <meta name='viewport' content='width=device-width, user-scalable=no'>
 
     <title>${website_title}</title>
-    <link rel='shortcut icon' type='image/x-icon' href='/assets/favicon.ico' >
+    <link rel="icon" type="image/png" sizes="64x64" href="/assets/images/favicon/tracim_64x64.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/tracim_32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/tracim_16x16.png">
     <link rel='manifest' href='/assets/manifest.json'>
 
     <link rel='stylesheet' type='text/css' href='/assets/font/font-awesome-4.7.0/css/font-awesome.css'>
@@ -79,6 +81,10 @@
 
     <script type='text/javascript' src='/assets/tracim/appInterface.js'></script>
     <script type='text/javascript' src='/assets/tracim/tinymceInit.js'></script>
+
+    % for custom_toolbox_file in custom_toolbox_files:
+    <script type='text/javascript' src='/custom_toolbox-assets/${custom_toolbox_file.name}'></script>
+    % endfor
 
     <script type='text/javascript' src='/assets/tracim.vendors~app.js'></script>
     <script type='text/javascript' src='/assets/tracim.app.js'></script>

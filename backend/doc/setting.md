@@ -44,6 +44,8 @@ Priority order is (from less to most priority):
 |TRACIM_FRONTEND__SERVE        |frontend.serve                |FRONTEND__SERVE               |
 |TRACIM_BACKEND__I18N_FOLDER_PATH|backend.i18n_folder_path      |BACKEND__I18N_FOLDER_PATH     |
 |TRACIM_FRONTEND__DIST_FOLDER_PATH|frontend.dist_folder_path     |FRONTEND__DIST_FOLDER_PATH    |
+|TRACIM_PLUGIN__FOLDER_PATH    |plugin.folder_path            |PLUGIN__FOLDER_PATH           |
+|TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH|frontend.custom_toolbox_folder_path|FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH|
 |TRACIM_LIMITATION__SHAREDSPACE_PER_USER|limitation.sharedspace_per_user|LIMITATION__SHAREDSPACE_PER_USER|
 |TRACIM_LIMITATION__CONTENT_LENGTH_FILE_SIZE|limitation.content_length_file_size|LIMITATION__CONTENT_LENGTH_FILE_SIZE|
 |TRACIM_LIMITATION__WORKSPACE_SIZE|limitation.workspace_size     |LIMITATION__WORKSPACE_SIZE    |

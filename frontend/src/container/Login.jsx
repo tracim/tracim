@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
+import appFactory from '../appFactory.js'
 import i18n from '../i18n.js'
 import * as Cookies from 'js-cookie'
 import Card from '../component/common/Card/Card.jsx'
@@ -10,6 +11,7 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setUserConnected,
@@ -105,6 +107,7 @@ class Login extends React.Component {
 
         Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
         props.dispatch(setUserConnected(loggedUser))
+        props.dispatchCustomEvent(CUSTOM_EVENT.USER_CONNECTED, fetchPostUserLogin.json)
 
         Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
         i18n.changeLanguage(loggedUser.lang)
@@ -271,4 +274,4 @@ class Login extends React.Component {
 }
 
 const mapStateToProps = ({ user, system, breadcrumbs }) => ({ user, system, breadcrumbs })
-export default withRouter(connect(mapStateToProps)(translate()(Login)))
+export default withRouter(connect(mapStateToProps)(translate()(appFactory(Login))))

@@ -2097,7 +2097,7 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
+        assert headers["From"][0] == "test via Tracim <test_user_from+5@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
@@ -2168,7 +2168,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
+        assert headers["From"][0] == "test via Tracim <test_user_from+5@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
@@ -2291,7 +2291,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
+        assert headers["From"][0] == "test via Tracim <test_user_from+5@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
         # check for notification to new user, user should not be notified

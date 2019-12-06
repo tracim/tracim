@@ -242,5 +242,8 @@
   "Password (required)": "Mot de passe (requis)",
   "Thank you, your upload is finished !": "Merci, votre téléversement est terminé !",
   "Open the gallery": "Ouvrir la galerie",
-  "Gallery": "Galerie"
+  "Gallery": "Galerie",
+  "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximum autorisée",
+  "Error, the shared space exceed its maximum size": "Erreur, l'espace partagé dépasse la taille maximum autorisée",
+  "Upload impossible, the destination storage capacity has been reached": "Téléversement impossible, la capacité de stockage de la destination a été atteinte"
 }

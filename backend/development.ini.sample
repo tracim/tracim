@@ -58,6 +58,13 @@ basic_setup.session_secret = change_this_value_please!
 ## example of app.enabled config explicit list config
 ; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder
 
+### Plugins ###
+# if provided, this allow tracim to load package from this dir and if package follow
+# the convention "tracim_backend_{plugin_name}", hooks provided inside the package will
+# be loaded, allowing to add new feature to an existing tracim.
+; plugin.folder_path = %(here)s/plugins
+
+
 ## CORS Special config
 # you can override access control allowed origin here with list of comma separated
 # base_url, by default only website.base_url and api.base_url are allowed
@@ -224,6 +231,11 @@ frontend.serve = True
 # will try to get it automatically according to tracim repository
 # organisation.
 ; frontend.dist_folder_path = /home/user/tracim/frontend/dist
+# if you need to add custom javascript code into Tracim, you can use custom toolbox
+# feature. you add your javascript in this folder, all content
+# of this folder will be serve in /custom_toolbox-assets
+# and all javascript ".js" file will be added to index.html file.
+; frontend.custom_toolbox_folder_path = /tmp/custom_toolbox
 
 ### Color ###
 # check for color.json file in tracim, check by default in tracim parent
