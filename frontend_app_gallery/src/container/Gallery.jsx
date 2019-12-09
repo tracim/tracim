@@ -45,6 +45,7 @@ class Gallery extends React.Component {
       breadcrumbsList: [],
       appMounted: false,
       folderId: qs.parse(props.data.config.history.location.search).folder_ids || 0,
+      folderParentsId: [],
       imagesPreviews: [],
       fileCurrentPage: 1,
       fileName: '',
@@ -138,7 +139,7 @@ class Gallery extends React.Component {
     }]
     if (state.folderId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId}`}>{state.fileName}</Link>,
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${state.folderParentsId.join(',')}`}>{state.fileName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
@@ -160,13 +161,29 @@ class Gallery extends React.Component {
   loadFolderDetail = async (workspaceId, folderId) => {
     const { state, props } = this
 
-    const fetchContentDetail = await handleFetchResult(
+    let fetchContentDetail = await handleFetchResult(
       await getFolderDetail(state.config.apiUrl, workspaceId, folderId)
     )
 
     switch (fetchContentDetail.apiResponse.status) {
       case 200:
-        this.setState({ fileName: fetchContentDetail.body.filename })
+        const fileName = fetchContentDetail.body.filename
+        let folderParentsId = fetchContentDetail.body.parent_id ? [fetchContentDetail.body.parent_id] : []
+
+        while (fetchContentDetail.body.parent_id !== null) {
+          fetchContentDetail = await handleFetchResult(
+            await getFolderDetail(state.config.apiUrl, workspaceId, fetchContentDetail.body.parent_id)
+          )
+          switch (fetchContentDetail.apiResponse.status) {
+            case 200:
+              folderParentsId.push(fetchContentDetail.body.parent_id)
+              break
+            default:
+              this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
+          }
+        }
+
+        this.setState({ fileName, folderParentsId })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
     }
