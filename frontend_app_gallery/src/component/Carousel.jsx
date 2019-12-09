@@ -9,7 +9,7 @@ import ThumbnailPreview from './ThumbnailPreview.jsx'
 import CarouselArrow from './CarouselArrow'
 import { DIRECTION } from '../helper'
 
-class Carousel extends React.Component {
+export class Carousel extends React.Component {
   constructor (props) {
     super(props)
 

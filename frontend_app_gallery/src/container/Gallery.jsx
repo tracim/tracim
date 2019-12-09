@@ -32,7 +32,7 @@ import classnames from 'classnames'
 
 const qs = require('query-string')
 
-class Gallery extends React.Component {
+export class Gallery extends React.Component {
   constructor (props) {
     super(props)
 
@@ -44,10 +44,10 @@ class Gallery extends React.Component {
       content: props.data ? props.data.content : debug.content,
       breadcrumbsList: [],
       appMounted: false,
-      folderId: qs.parse(props.data.config.history.location.search).folder_ids || 0,
+      folderId: props.data ? qs.parse(props.data.config.history.location.search).folder_ids || 0 : debug.config.folderId,
       imagesPreviews: [],
       fileCurrentPage: 1,
-      fileName: '',
+      folderName: '',
       fileSelected: 0,
       autoPlay: null,
       fullscreen: false,
@@ -138,14 +138,14 @@ class Gallery extends React.Component {
     }]
     if (state.folderId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId}`}>{state.fileName}</Link>,
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId}`}>{state.folderName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
     if (state.imagesPreviews && state.imagesPreviews.length > 0) {
       breadcrumbsList.push({
         link: <Link
-          to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}>{state.imagesPreviews[state.fileSelected].fileName}</Link>,
+          to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}>{state.imagesPreviews[state.fileSelected].folderName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
@@ -166,7 +166,7 @@ class Gallery extends React.Component {
 
     switch (fetchContentDetail.apiResponse.status) {
       case 200:
-        this.setState({ fileName: fetchContentDetail.body.filename })
+        this.setState({ folderName: fetchContentDetail.body.folderName })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
     }
@@ -287,7 +287,7 @@ class Gallery extends React.Component {
   getPreviousImageUrl = () => {
     const { state } = this
 
-    if (state.imagesPreviews.length === 1) return
+    if (state.imagesPreviews.length <= 1) return
 
     if (state.fileSelected === 0) return state.imagesPreviews[state.imagesPreviews.length - 1].lightBoxUrlList[0]
     return state.imagesPreviews[state.fileSelected - 1].lightBoxUrlList[0]
@@ -296,7 +296,7 @@ class Gallery extends React.Component {
   getNextImageUrl = () => {
     const { state } = this
 
-    if (state.imagesPreviews.length === 1) return
+    if (state.imagesPreviews.length <= 1) return
 
     if (state.fileSelected === state.imagesPreviews.length - 1) return state.imagesPreviews[0].lightBoxUrlList[0]
     return state.imagesPreviews[state.fileSelected + 1].lightBoxUrlList[0]
@@ -357,8 +357,10 @@ class Gallery extends React.Component {
   rotateImg (fileSelected, direction) {
     const { state } = this
 
+    if (fileSelected < 0 || fileSelected >= state.imagesPreviews.length || !direction) return
+
     const imagesPreviews = state.imagesPreviews
-    let rotationAngle
+    let rotationAngle = 0
     switch (imagesPreviews[fileSelected].rotationAngle) {
       case (0):
         rotationAngle = direction === DIRECTION.RIGHT ? 90 : 270
@@ -394,7 +396,7 @@ class Gallery extends React.Component {
     return (
       <PageWrapper customClass='gallery'>
         <PageTitle
-          title={state.folderId ? state.fileName : state.content.workspaceLabel}
+          title={state.folderId ? state.folderName : state.content.workspaceLabel}
           icon={'picture-o'}
           breadcrumbsList={state.breadcrumbsList}
         />

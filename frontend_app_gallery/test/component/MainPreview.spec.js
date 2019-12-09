@@ -14,4 +14,8 @@ describe('<MainPreview />', () => {
   describe('static design', () => {
 
   })
+
+  describe('function tests', () => {
+
+  })
 })
