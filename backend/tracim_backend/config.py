@@ -164,6 +164,9 @@ class CFG(object):
 
         upload_permissions_config.load_config(self)
 
+    def _here_replace(self, value: str) -> str:
+        return value.replace("%(here)s", self.settings["here"])
+
     def _load_global_config(self) -> None:
         """
         Load generic config
@@ -171,7 +174,8 @@ class CFG(object):
         ###
         # General
         ###
-        self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", "")
+        default_sqlalchemy_url = self._here_replace("sqlite:///%(here)s/tracim.sqlite")
+        self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", default_sqlalchemy_url)
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_v2_folder = os.path.dirname(backend_folder)
@@ -198,10 +202,11 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
-
-        self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir")
-        self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name")
-        self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir")
+        default_depot_storage_dir = self._here_replace("%(here)s/depot")
+        self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir", default_depot_storage_dir)
+        self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name", "tracim")
+        default_preview_cache_dir = self._here_replace("%(here)s/previews")
+        self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir", default_preview_cache_dir)
         self.AUTH_TYPES = string_to_list(
             self.get_raw_config("auth_types", "internal"),
             separator=",",
@@ -217,12 +222,14 @@ class CFG(object):
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
         self.SESSION__REISSUE_TIME = int(self.get_raw_config("session.reissue_time", "120"))
-        self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir")
-        self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir")
-        self.WEBSITE__TITLE = self.get_raw_config("website.title", "TRACIM")
+        default_session_data_dir = self._here_replace("%(here)s/sessions_data")
+        default_session_lock_dir = self._here_replace("%(here)s/sessions_data")
+        self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
+        self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
+        self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
 
         # base url of the frontend
-        self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "")
+        self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "http://localhost:6543")
 
         self.API__BASE_URL = self.get_raw_config("api.base_url", self.WEBSITE__BASE_URL)
 
@@ -261,11 +268,11 @@ class CFG(object):
             )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
 
-        self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "true"))
-        self.DEBUG = asbool(self.get_raw_config("debug", "false"))
+        self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
+        self.DEBUG = asbool(self.get_raw_config("debug", "False"))
 
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
-            self.get_raw_config("preview.jpg.restricted_dims", "false")
+            self.get_raw_config("preview.jpg.restricted_dims", "False")
         )
         self.PREVIEW__JPG__ALLOWED_DIMS = string_to_list(
             self.get_raw_config("preview.jpg.allowed_dims", "256x256"),
@@ -273,7 +280,7 @@ class CFG(object):
             separator=",",
         )
 
-        self.FRONTEND__SERVE = asbool(self.get_raw_config("frontend.serve", "false"))
+        self.FRONTEND__SERVE = asbool(self.get_raw_config("frontend.serve", "True"))
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
         # is probably in frontend subfolder
         # of tracim_v2 parent of both backend and frontend
@@ -289,7 +296,10 @@ class CFG(object):
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
-        self.PLUGIN__FOLDER_PATH = self.get_raw_config("plugin.folder_path", None)
+        default_plugin_folder_path = self._here_replace("%(here)s/plugins")
+        self.PLUGIN__FOLDER_PATH = self.get_raw_config(
+            "plugin.folder_path", default_plugin_folder_path
+        )
 
         self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
             "frontend.custom_toolbox_folder_path", None
@@ -316,7 +326,7 @@ class CFG(object):
         # EMAIL related stuff (notification, reply)
         ##
         self.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION = asbool(
-            self.get_raw_config("email.notification.enabled_on_invitation", "true")
+            self.get_raw_config("email.notification.enabled_on_invitation", "True")
         )
 
         # TODO - G.M - 2019-04-05 - keep as parameters
@@ -340,9 +350,7 @@ class CFG(object):
             # 'folder' --folder is skipped
         ]
 
-        self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config(
-            "email.notification.from.email", "noreply+{user_id}@trac.im"
-        )
+        self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config("email.notification.from.email")
         self.EMAIL__NOTIFICATION__FROM = self.get_raw_config("email.notification.from")
         if self.get_raw_config("email.notification.from"):
             raise ConfigurationError(
@@ -361,9 +369,10 @@ class CFG(object):
             "email.notification.references.email"
         )
         # Content update notification
-
+        template_dir = self._here_replace("%(here)s/tracim_backend/templates/mail")
         self.EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML = self.get_raw_config(
-            "email.notification.content_update.template.html"
+            "email.notification.content_update.template.html",
+            "{}/{}".format(template_dir, "content_update_body_html.mak"),
         )
 
         self.EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT = self.get_raw_config(
@@ -372,7 +381,8 @@ class CFG(object):
         )
         # Created account notification
         self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML = self.get_raw_config(
-            "email.notification.created_account.template.html"
+            "email.notification.created_account.template.html",
+            "{}/{}".format(template_dir, "created_account_body_html.mak"),
         )
         self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT = self.get_raw_config(
             "email.notification.created_account.subject",
@@ -381,7 +391,8 @@ class CFG(object):
 
         # Reset password notification
         self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML = self.get_raw_config(
-            "email.notification.reset_password_request.template.html"
+            "email.notification.reset_password_request.template.html",
+            "{}/{}".format(template_dir, "reset_password_body_html.mak"),
         )
         self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT = self.get_raw_config(
             "email.notification.reset_password_request.subject",
@@ -392,7 +403,7 @@ class CFG(object):
         # asynchronously see issue https://github.com/tracim/tracim/issues/1345
         self.EMAIL__NOTIFICATION__PROCESSING_MODE = "sync"
         self.EMAIL__NOTIFICATION__ACTIVATED = asbool(
-            self.get_raw_config("email.notification.activated")
+            self.get_raw_config("email.notification.activated", "False")
         )
 
         self.EMAIL__NOTIFICATION__SMTP__SERVER = self.get_raw_config(
@@ -404,7 +415,7 @@ class CFG(object):
             "email.notification.smtp.password", secret=True
         )
 
-        self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config("email.reply.activated", "false"))
+        self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config("email.reply.activated", "False"))
 
         self.EMAIL__REPLY__IMAP__SERVER = self.get_raw_config("email.reply.imap.server")
         self.EMAIL__REPLY__IMAP__PORT = self.get_raw_config("email.reply.imap.port")
@@ -412,24 +423,28 @@ class CFG(object):
         self.EMAIL__REPLY__IMAP__PASSWORD = self.get_raw_config(
             "email.reply.imap.password", secret=True
         )
-        self.EMAIL__REPLY__IMAP__FOLDER = self.get_raw_config("email.reply.imap.folder")
+        self.EMAIL__REPLY__IMAP__FOLDER = self.get_raw_config("email.reply.imap.folder", "INBOX")
         self.EMAIL__REPLY__CHECK__HEARTBEAT = int(
             self.get_raw_config("email.reply.check.heartbeat", "60")
         )
-        self.EMAIL__REPLY__IMAP__USE_SSL = asbool(self.get_raw_config("email.reply.imap.use_ssl"))
+        self.EMAIL__REPLY__IMAP__USE_SSL = asbool(
+            self.get_raw_config("email.reply.imap.use_ssl", "True")
+        )
         self.EMAIL__REPLY__IMAP__USE_IDLE = asbool(
-            self.get_raw_config("email.reply.imap.use_idle", "true")
+            self.get_raw_config("email.reply.imap.use_idle", "True")
         )
         self.EMAIL__REPLY__CONNECTION__MAX_LIFETIME = int(
             self.get_raw_config("email.reply.connection.max_lifetime", "600")  # 10 minutes
         )
         self.EMAIL__REPLY__USE_HTML_PARSING = asbool(
-            self.get_raw_config("email.reply.use_html_parsing", "true")
+            self.get_raw_config("email.reply.use_html_parsing", "True")
         )
         self.EMAIL__REPLY__USE_TXT_PARSING = asbool(
-            self.get_raw_config("email.reply.use_txt_parsing", "true")
+            self.get_raw_config("email.reply.use_txt_parsing", "True")
         )
-        self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config("email.reply.lockfile_path", "")
+        self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config(
+            "email.reply.lockfile_path", self._here_replace("%(here)s/email_fetcher.lock")
+        )
 
         self.EMAIL__PROCESSING_MODE = self.get_raw_config("email.processing_mode", "sync").upper()
 
@@ -453,13 +468,13 @@ class CFG(object):
         wsgidav_website = "https://github.com/mar10/wsgidav/"
         wsgidav_name = "WsgiDAV"
 
-        self.WEBDAV__UI__ENABLED = asbool(self.get_raw_config("webdav.ui.enabled", "true"))
-        self.WEBDAV__BASE_URL = self.get_raw_config("webdav.base_url", "")
+        self.WEBDAV__UI__ENABLED = asbool(self.get_raw_config("webdav.ui.enabled", "True"))
+        self.WEBDAV__BASE_URL = self.get_raw_config("webdav.base_url", "http://localhost:3030")
         self.WEBDAV__VERBOSE__LEVEL = int(self.get_raw_config("webdav.verbose.level", "1"))
         self.WEBDAV__ROOT_PATH = self.get_raw_config("webdav.root_path", "/")
         self.WEBDAV__BLOCK_SIZE = int(self.get_raw_config("webdav.block_size", "8192"))
         self.WEBDAV__DIR_BROWSER__ENABLED = asbool(
-            self.get_raw_config("webdav.dir_browser.enabled", "true")
+            self.get_raw_config("webdav.dir_browser.enabled", "True")
         )
         default_webdav_footnote = (
             '<a href="{instance_url}">{instance_name}</a>.'
@@ -491,12 +506,13 @@ class CFG(object):
         """
         load config for caldav related stuff
         """
-        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "false"))
+        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "False"))
         self.CALDAV__RADICALE_PROXY__BASE_URL = self.get_raw_config(
-            "caldav.radicale_proxy.base_url", None
+            "caldav.radicale_proxy.base_url", "http://localhost:5232"
         )
+        default_caldav_storage_dir = self._here_replace("%(here)s/radicale_storage")
         self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = self.get_raw_config(
-            "caldav.radicale.storage.filesystem_folder"
+            "caldav.radicale.storage.filesystem_folder", default_caldav_storage_dir
         )
         self.CALDAV__RADICALE__AGENDA_DIR = "agenda"
         self.CALDAV__RADICALE__WORKSPACE_SUBDIR = "workspace"
@@ -513,19 +529,19 @@ class CFG(object):
         """
         Load config for ldap related stuff
         """
-        self.LDAP_URL = self.get_raw_config("ldap_url", "dc=directory,dc=fsf,dc=org")
+        self.LDAP_URL = self.get_raw_config("ldap_url", "ldap://localhost:389")
         self.LDAP_BASE_URL = self.get_raw_config("ldap_base_url", "dc=directory,dc=fsf,dc=org")
         self.LDAP_BIND_DN = self.get_raw_config(
             "ldap_bind_dn", "cn=admin, dc=directory,dc=fsf,dc=org"
         )
-        self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", secret=True)
-        self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "false"))
+        self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", "toor", secret=True)
+        self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
         self.LDAP_USER_BASE_DN = self.get_raw_config(
-            "ldap_user_base_dn", "ou=people, dc=directory,dc=fsf,dc=org"
+            "ldap_user_base_dn", "ou=Users, dc=directory,dc=fsf,dc=org"
         )
         self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config("ldap_login_attribute", "mail")
         # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
-        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute")
+        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "givenName")
         # TODO - G.M - 2018-12-05 - [ldap_profile]
         # support for profile attribute disabled
         # Should be reenabled later probably with a better code
@@ -584,7 +600,7 @@ class CFG(object):
 
     def _load_collaborative_document_edition_config(self):
         self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
-            self.get_raw_config("collaborative_document_edition.activated", "false")
+            self.get_raw_config("collaborative_document_edition.activated", "False")
         )
         self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE = self.get_raw_config(
             "collaborative_document_edition.software"
@@ -592,8 +608,11 @@ class CFG(object):
         self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = self.get_raw_config(
             "collaborative_document_edition.collabora.base_url"
         )
+        default_file_template_dir = "%(here)s/tracim_backend/templates/open_documents".replace(
+            "%(here)s", self.settings["here"]
+        )
         self.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = self.get_raw_config(
-            "collaborative_document_edition.file_template_dir"
+            "collaborative_document_edition.file_template_dir", default_file_template_dir
         )
 
     # INFO - G.M - 2019-04-05 - Config validation methods

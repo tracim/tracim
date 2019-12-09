@@ -6,15 +6,18 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 
 
 def load_config(app_config: CFG) -> CFG:
+    template_dir = app_config._here_replace("%(here)s/tracim_backend/templates/mail")
     app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML = app_config.get_raw_config(
-        "email.notification.upload_permission_to_receiver.template.html"
+        "email.notification.upload_permission_to_receiver.template.html",
+        "{}/{}".format(template_dir, "upload_permission_to_receiver_body_html.mak"),
     )
     app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT = app_config.get_raw_config(
         "email.notification.upload_permission_to_receiver.subject",
         _('{emitter_name} invited you to upload files on "{website_title}"'),
     )
     app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML = app_config.get_raw_config(
-        "email.notification.upload_permission_to_emitter.template.html"
+        "email.notification.upload_permission_to_emitter.template.html",
+        "{}/{}".format(template_dir, "upload_permission_to_emitter_body_html.mak"),
     )
     app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT = app_config.get_raw_config(
         "email.notification.upload_permission_to_emitter.subject",
@@ -23,7 +26,8 @@ def load_config(app_config: CFG) -> CFG:
         ),
     )
     app_config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML = app_config.get_raw_config(
-        "email.notification.new_upload_event.template.html"
+        "email.notification.new_upload_event.template.html",
+        "{}/{}".format(template_dir, "new_upload_event_body_html.mak"),
     )
     app_config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT = app_config.get_raw_config(
         "email.notification.new_upload_event.subject",

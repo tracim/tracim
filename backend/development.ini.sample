@@ -16,7 +16,7 @@
 
 ## global info (need for email and links)
 basic_setup.website_title = Tracim
-basic_setup.website_base_url =  http://localhost:6543
+basic_setup.website_base_url = http://localhost:6543
 basic_setup.listen = localhost:6543
 ## storage path/connection
 basic_setup.sqlalchemy_url = sqlite:///%(here)s/tracim.sqlite
@@ -281,10 +281,10 @@ email.notification.activated = False
 
 
 ### SMTP ###
-email.notification.smtp.server = your_smtp_server
-email.notification.smtp.port = 25
-email.notification.smtp.user = your_smtp_user
-email.notification.smtp.password = your_smtp_password
+; email.notification.smtp.server = your_smtp_server
+; email.notification.smtp.port = 25
+; email.notification.smtp.user = your_smtp_user
+; email.notification.smtp.password = your_smtp_password
 
 ### Headers ###
 email.notification.from.default_label = Tracim Notifications
@@ -307,18 +307,18 @@ email.notification.from.default_label = Tracim Notifications
 ; email.notification.reply_to.email = reply+cid{content_id}@domainname.tld
 
 ## valid variable is 'user_id' for 'from' header
-email.notification.from.email = noreply+{user_id}@trac.im
+; email.notification.from.email = noreply+{user_id}@trac.im
 
 # tagging reply_to header of email with content_id is needed for working
 # email_reply feature
 ## valid variable is 'content_id' for 'reply_to' header
-email.notification.reply_to.email = reply+{content_id}@trac.im
+; email.notification.reply_to.email = reply+{content_id}@trac.im
 # tagging reference header of email with content_id is nice to have
 # all modification to a same content in a same email client thread
 # Note: reference doesn't need to be an existing email account but should
 # be a email like string.
 ## valid variable is 'content_id' for 'references' header
-email.notification.references.email = thread+{content_id}@trac.im
+; email.notification.references.email = thread+{content_id}@trac.im
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
 email.notification.created_account.subject = [{website_title}] Someone created an account for you
 email.notification.share_content_to_emitter.subject = [{website_title}] You shared "{content_filename}" with {nb_receivers} people
@@ -352,15 +352,15 @@ email.reply.activated = False
 ### IMAP ###
 # Tracim email reply feature will read all mails in following IMAP,
 # to be able to transform email responses into Tracim app comments.
-email.reply.imap.server = your_imap_server
-email.reply.imap.port = 993
-email.reply.imap.user = your_imap_user
-email.reply.imap.password = your_imap_password
+; email.reply.imap.server = your_imap_server
+; email.reply.imap.port = 993
+; email.reply.imap.user = your_imap_user
+; email.reply.imap.password = your_imap_password
 email.reply.imap.folder = INBOX
 email.reply.imap.use_ssl = True
 # IMAP IDLE feature is for real-time notifications (its not necessary to use function send & receive)
 # if this option is available in your imap server, change this parameter to True
-email.reply.imap.use_idle = False
+email.reply.imap.use_idle = True
 
 ### Connection ###
 ## Delay in seconds for re-new connection
@@ -414,7 +414,7 @@ webdav.listen = localhost:3030
 ####
 
 ### Main Config for Caldav ##
-caldav.enabled = True
+caldav.enabled = False
 
 ### Radicale Proxy config ##
 ## path to tracim radicale server, usually at localhost:port
@@ -481,10 +481,10 @@ search.engine = simple
 collaborative_document_edition.activated = False
 # software used for collaborative document_edition. "collabora" software value give support for
 # both CollaboraOnline and LibreofficeOnline.
-collaborative_document_edition.software = collabora
+; collaborative_document_edition.software = collabora
 # base url where collabora server exist
-collaborative_document_edition.collabora.base_url = http://localhost:9980
-collaborative_document_edition.file_template_dir =  %(basic_setup.file_template_dir)s
+; collaborative_document_edition.collabora.base_url = http://localhost:9980
+; collaborative_document_edition.file_template_dir =  %(basic_setup.file_template_dir)s
 
 
 ##############################
