@@ -231,6 +231,7 @@ class ElasticSearchHelper(object):
 class RadicaleServerHelper(object):
     def __init__(self, config_uri, config_section):
         settings = plaster.get_settings(config_uri, config_section)
+        settings["here"] = os.path.dirname(os.path.abspath(TEST_CONFIG_FILE_PATH))
         app_factory = CaldavAppFactory(**settings)
         app = app_factory.get_wsgi_app()
         self.radicale_server = multiprocessing.Process(

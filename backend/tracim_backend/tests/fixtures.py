@@ -1,4 +1,5 @@
 import logging
+import os
 import typing
 
 from depot.manager import DepotManager
@@ -60,7 +61,9 @@ def config_section(request) -> str:
 
 @pytest.fixture
 def settings(config_uri, config_section):
-    return plaster.get_settings(config_uri, config_section)
+    _settings = plaster.get_settings(config_uri, config_section)
+    _settings["here"] = os.path.dirname(os.path.abspath(TEST_CONFIG_FILE_PATH))
+    return _settings
 
 
 @pytest.fixture
@@ -315,6 +318,7 @@ def radicale_server(config_uri, config_section) -> RadicaleServerHelper:
 def webdav_testapp(config_uri, config_section) -> TestApp:
     DepotManager._clear()
     settings = plaster.get_settings(config_uri, config_section)
+    settings["here"] = os.path.dirname(os.path.abspath(TEST_CONFIG_FILE_PATH))
     app_factory = WebdavAppFactory(**settings)
     app = app_factory.get_wsgi_app()
     return TestApp(app)
