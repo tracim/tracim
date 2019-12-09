@@ -62,6 +62,21 @@ class Gallery extends React.Component {
     this.lightboxRotation = new LightboxRotation()
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+
+    let timeout
+    document.onmousemove = () => {
+      clearTimeout(timeout)
+      if (this.state.displayLightbox) {
+        document.getElementsByClassName('ril__toolbar')[0].style.transform = 'translateY(0px)'
+        document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
+      }
+      timeout = setTimeout(() => {
+        if (this.state.displayLightbox) {
+          document.getElementsByClassName('ril__toolbar')[0].style.transform = 'translateY(-50px)'
+          document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
+        }
+      }, 2000)
+    }
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
