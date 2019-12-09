@@ -446,6 +446,7 @@ class Gallery extends React.Component {
                 loggedUser={state.loggedUser}
                 disableAnimation={state.displayLightbox}
                 isWorkspaceRoot={state.folderId === 0}
+                autoPlay={state.autoPlay}
               />
             ) : (
               <div className='gallery__loader'>

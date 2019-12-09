@@ -63,7 +63,7 @@ class Carousel extends React.Component {
       swipe: false,
       arrows: !props.disableAnimation,
       afterChange: this.onMainSliderPositionChange.bind(this),
-      lazyLoad: 'ondemand',
+      lazyLoad: props.autoPlay ? 'progressive' : 'ondemand',
       centerPadding: '0px',
       className: 'carousel__main',
       nextArrow: <CarouselArrow direction={DIRECTION.RIGHT} />,
