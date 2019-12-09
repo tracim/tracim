@@ -20,6 +20,9 @@ fi
 # Create file with all docker variable about TRACIM parameter
 printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 
+# Add variable for using xvfb with uwsgi
+echo "DISPLAY=:99.0" >> /var/tracim/data/tracim_env_variables
+
 case "$DATABASE_TYPE" in
   mysql)
     # Ensure DATABASE_PORT is set
@@ -120,6 +123,9 @@ tracimcli search index-create -c /etc/tracim/development.ini
 
 # Reload apache config
 service apache2 restart
+
+# starting xvfb for preview-generator
+Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
 # Start tracim
 set +e
