@@ -183,12 +183,11 @@ class Gallery extends React.Component {
           fetchContentDetail = await handleFetchResult(
             await getFolderDetail(state.config.apiUrl, workspaceId, fetchContentDetail.body.parent_id)
           )
-          switch (fetchContentDetail.apiResponse.status) {
-            case 200:
-              folderParentsId.push(fetchContentDetail.body.parent_id)
-              break
-            default:
-              this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
+          if (fetchContentDetail.apiResponse.status === 200) {
+            folderParentsId.push(fetchContentDetail.body.parent_id)
+          } else {
+            this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
+            break
           }
         }
 
