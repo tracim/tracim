@@ -533,7 +533,7 @@ class CFG(object):
         Load config for ldap related stuff
         """
         self.LDAP_URL = self.get_raw_config("ldap_url", "ldap://localhost:389")
-        self.LDAP_BASE_URL = self.get_raw_config("ldap_base_url")
+        self.LDAP_BASE_DN = self.get_raw_config("ldap_base_dn")
         self.LDAP_BIND_DN = self.get_raw_config("ldap_bind_dn")
         self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", secret=True)
         self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
@@ -839,9 +839,7 @@ class CFG(object):
                 "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method"
             )
             self.check_mandatory_param(
-                "LDAP_BASE_URL",
-                self.LDAP_BASE_URL,
-                when_str="when ldap is in available auth method",
+                "LDAP_BASE_DN", self.LDAP_BASE_DN, when_str="when ldap is in available auth method"
             )
             self.check_mandatory_param(
                 "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method"
