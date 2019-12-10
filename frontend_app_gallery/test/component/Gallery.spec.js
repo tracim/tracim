@@ -5,10 +5,6 @@ import { Gallery as GalleryWithoutHOC } from '../../src/container/Gallery.jsx'
 import { DIRECTION } from '../../src/helper'
 
 describe('<Gallery />', () => {
-  const props = {
-
-  }
-
   const stateMock = {
     config: {
       apiUrl: '',
@@ -73,10 +69,33 @@ describe('<Gallery />', () => {
     ]
   }
 
-  const wrapper = shallow(<GalleryWithoutHOC { ...props } t={tradKey => tradKey}/>)
+  const wrapper = shallow(<GalleryWithoutHOC t={tradKey => tradKey}/>)
   wrapper.setState(stateMock)
-  describe('static design', () => {
 
+  describe('static design', () => {
+    describe('rotation buttons', () => {
+      it('should rotate the right image when rotation buttons are clicked', () => {
+        const fileSelected = 1
+        wrapper.setState({ imagesPreviews: stateMock.imagesPreviews, fileSelected })
+        wrapper.find('.gallery__action__button > button.gallery__action__button__rotation__left').simulate('click')
+        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(270)
+        wrapper.find('.gallery__action__button > button.gallery__action__button__rotation__right').simulate('click')
+        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(0)
+      })
+    })
+
+    describe('play button', () => {
+      it('should start the slideshow when the button play is clicked', () => {
+        wrapper.find('.gallery__action__button__play').simulate('click')
+        expect(wrapper.find('.gallery__action__button__play > i.fa.fa-pause')).to.be.lengthOf(1)
+        expect(wrapper.state().autoPlay).to.be.a('object')
+      })
+      it('should stop the slideshow when the button pause is clicked', () =>  {
+        wrapper.find('.gallery__action__button__play').simulate('click')
+        expect(wrapper.find('.gallery__action__button__play > i.fa.fa-play')).to.be.lengthOf(1)
+        expect(wrapper.state().autoPlay).to.be.a('null')
+      })
+    })
   })
 
   describe('functions tests', () => {

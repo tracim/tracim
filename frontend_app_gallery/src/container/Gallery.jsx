@@ -404,7 +404,7 @@ export class Gallery extends React.Component {
         <PageContent>
           <div className='gallery__action__button'>
             <button
-              className='btn outlineTextBtn nohover primaryColorBorder'
+              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__play'
               onClick={() => this.onClickSlickPlay(!state.autoPlay)}
             >
               <span className='gallery__action__button__text'>
@@ -433,7 +433,7 @@ export class Gallery extends React.Component {
               INFO - CH - there is a bug with the property userRoleIdInWorkspace that comes from frontend, it might be it's default value which is 1
               So we won't use it for now and always display the delete button which will return 401 if user can't delete content
             */}
-            <button className='btn outlineTextBtn nohover primaryColorBorder' onClick={this.handleOpenDeleteFilePopup}>
+            <button className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__delete' onClick={this.handleOpenDeleteFilePopup}>
               <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className={'fa fa-fw fa-trash'} />
             </button>
           </div>
