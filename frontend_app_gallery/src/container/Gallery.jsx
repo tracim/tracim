@@ -53,7 +53,8 @@ class Gallery extends React.Component {
       autoPlay: null,
       fullscreen: false,
       displayPopupDelete: false,
-      imagesPreviewsLoaded: false
+      imagesPreviewsLoaded: false,
+      breadcrumbsLoaded: false
     }
 
     // i18n has been init, add resources from frontend
@@ -100,10 +101,8 @@ class Gallery extends React.Component {
 
     console.log('%c<Gallery> did mount', `color: ${state.config.hexcolor}`)
 
-    if (state.folderId) await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
-    await this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
-    if (state.config.appConfig.workspaceId !== null) await this.loadWorkspaceData()
-    this.buildBreadcrumbs()
+    this.loadContentDetails()
+    this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -112,13 +111,11 @@ class Gallery extends React.Component {
     console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || prevState.folderId !== state.folderId) {
-      if (state.folderId) await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
-      await this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
-      await this.loadWorkspaceData()
-      this.buildBreadcrumbs()
-    }
-    if (prevState.fileSelected !== state.fileSelected) {
-      this.buildBreadcrumbs()
+      this.loadContentDetails()
+      this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
+    } else if (prevState.fileSelected !== state.fileSelected || (prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded || prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded)) {
+      const breadcrumbsList = this.buildBreadcrumbs(state.workspaceLabel, state.folderDetail, true)
+      this.setState({ breadcrumbsList })
     }
   }
 
@@ -127,23 +124,35 @@ class Gallery extends React.Component {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  buildBreadcrumbs = () => {
+  async loadContentDetails () {
+    const { state } = this
+
+    const workspaceLabel = await this.loadWorkspaceData()
+    let folderDetail
+    if (state.folderId) {
+      folderDetail = await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
+    }
+    const breadcrumbsList = await this.buildBreadcrumbs(workspaceLabel, folderDetail, false)
+    this.setState({ breadcrumbsList, breadcrumbsLoaded: true, folderDetail, workspaceLabel })
+  }
+
+  buildBreadcrumbs = (workspaceLabel, folderDetail, includeFile) => {
     const { props, state } = this
 
     const breadcrumbsList = [{
       link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
     }, {
-      link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{state.content.workspaceLabel}</Link>,
+      link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{workspaceLabel}</Link>,
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN
     }]
-    if (state.folderId) {
+    if (folderDetail) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${state.folderParentsId.join(',')}`}>{state.fileName}</Link>,
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentsId.join(',')}`}>{folderDetail.fileName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
-    if (state.imagesPreviews && state.imagesPreviews.length > 0) {
+    if (includeFile && state.imagesPreviews && state.imagesPreviews.length > 0) {
       breadcrumbsList.push({
         link: <Link
           to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}>{state.imagesPreviews[state.fileSelected].fileName}</Link>,
@@ -155,7 +164,7 @@ class Gallery extends React.Component {
     // app crash telling it cannot render a Link outside a router
     // see https://github.com/tracim/tracim/issues/1637
     // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
-    this.setState({ breadcrumbsList: breadcrumbsList })
+    return breadcrumbsList
   }
 
   loadFolderDetail = async (workspaceId, folderId) => {
@@ -183,8 +192,7 @@ class Gallery extends React.Component {
           }
         }
 
-        this.setState({ fileName, folderParentsId })
-        break
+        return { fileName, folderParentsId }
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
     }
   }
@@ -260,12 +268,7 @@ class Gallery extends React.Component {
 
     switch (fetchResultWorkspaceDetail.apiResponse.status) {
       case 200:
-        this.setState({
-          content: {
-            workspaceLabel: fetchResultWorkspaceDetail.body.label
-          }
-        })
-        break
+        return fetchResultWorkspaceDetail.body.label
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
     }
@@ -411,7 +414,7 @@ class Gallery extends React.Component {
     return (
       <PageWrapper customClass='gallery'>
         <PageTitle
-          title={state.folderId ? state.fileName : state.content.workspaceLabel}
+          title={state.folderDetail ? state.folderDetail.fileName : state.workspaceLabel}
           icon={'picture-o'}
           breadcrumbsList={state.breadcrumbsList}
         />
