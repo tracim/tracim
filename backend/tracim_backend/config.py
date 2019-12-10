@@ -533,15 +533,11 @@ class CFG(object):
         Load config for ldap related stuff
         """
         self.LDAP_URL = self.get_raw_config("ldap_url", "ldap://localhost:389")
-        self.LDAP_BASE_URL = self.get_raw_config("ldap_base_url", "dc=directory,dc=fsf,dc=org")
-        self.LDAP_BIND_DN = self.get_raw_config(
-            "ldap_bind_dn", "cn=admin, dc=directory,dc=fsf,dc=org"
-        )
-        self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", "toor", secret=True)
+        self.LDAP_BASE_URL = self.get_raw_config("ldap_base_url")
+        self.LDAP_BIND_DN = self.get_raw_config("ldap_bind_dn")
+        self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", secret=True)
         self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
-        self.LDAP_USER_BASE_DN = self.get_raw_config(
-            "ldap_user_base_dn", "ou=Users, dc=directory,dc=fsf,dc=org"
-        )
+        self.LDAP_USER_BASE_DN = self.get_raw_config("ldap_user_base_dn")
         self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config("ldap_login_attribute", "mail")
         # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
         self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "givenName")
@@ -626,6 +622,7 @@ class CFG(object):
         """
         self._check_global_config_validity()
         self._check_email_config_validity()
+        self._check_ldap_config_validity()
         self._check_caldav_config_validity()
         self._check_search_config_validity()
         self._check_collaborative_document_edition_config_validity()
@@ -738,10 +735,81 @@ class CFG(object):
                 self.EMAIL__REPLY__LOCKFILE_PATH,
                 when_str="when email reply is activated",
             )
-        # INFO - G.M - 2019-02-01 - check if template are available,
-        # do not allow running with email_notification_activated
-        # if templates needed are not available
+
+        if self.EMAIL__REPLY__ACTIVATED:
+            # INFO - G.M - 2019-12-10 - check imap config provided
+            self.check_mandatory_param(
+                "EMAIL__REPLY__IMAP__SERVER",
+                self.EMAIL__REPLY__IMAP__SERVER,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__REPLY__IMAP__PORT",
+                self.EMAIL__REPLY__IMAP__PORT,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__REPLY__IMAP__USER",
+                self.EMAIL__REPLY__IMAP__USER,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__REPLY__IMAP__PASSWORD",
+                self.EMAIL__REPLY__IMAP__PASSWORD,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__REPLY__IMAP__FOLDER",
+                self.EMAIL__REPLY__IMAP__FOLDER,
+                when_str="when email notification is activated",
+            )
+
         if self.EMAIL__NOTIFICATION__ACTIVATED:
+            # INFO - G.M - 2019-12-10 - check smtp config provided
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__SMTP__SERVER",
+                self.EMAIL__NOTIFICATION__SMTP__SERVER,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__SMTP__PORT",
+                self.EMAIL__NOTIFICATION__SMTP__PORT,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__SMTP__USER",
+                self.EMAIL__NOTIFICATION__SMTP__USER,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__SMTP__PASSWORD",
+                self.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+                when_str="when email notification is activated",
+            )
+            # INFO - G.M - 2019-12-10 - check value provided for headers
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__FROM__EMAIL",
+                self.EMAIL__NOTIFICATION__FROM__EMAIL,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
+                self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__REPLY_TO__EMAIL",
+                self.EMAIL__NOTIFICATION__REPLY_TO__EMAIL,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__REFERENCES__EMAIL",
+                self.EMAIL__NOTIFICATION__REFERENCES__EMAIL,
+                when_str="when email notification is activated",
+            )
+            # INFO - G.M - 2019-02-01 - check if template are available,
+            # do not allow running with email_notification_activated
+            # if templates needed are not available
             templates = {
                 "content_update notification": self.EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML,
                 "created account": self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML,
@@ -763,6 +831,40 @@ class CFG(object):
                 'be "{}" or "{}", not "{}"'.format(
                     self.CST.ASYNC, self.CST.SYNC, self.EMAIL__PROCESSING_MODE
                 )
+            )
+
+    def _check_ldap_config_validity(self):
+        if AuthType.LDAP in self.AUTH_TYPES:
+            self.check_mandatory_param(
+                "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method"
+            )
+            self.check_mandatory_param(
+                "LDAP_BASE_URL",
+                self.LDAP_BASE_URL,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method"
+            )
+            self.check_mandatory_param(
+                "LDAP_BIND_PASS",
+                self.LDAP_BIND_PASS,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_USER_BASE_DN",
+                self.LDAP_USER_BASE_DN,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_LOGIN_ATTRIBUTE",
+                self.LDAP_LOGIN_ATTRIBUTE,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_NAME_ATTRIBUTE",
+                self.LDAP_NAME_ATTRIBUTE,
+                when_str="when ldap is in available auth method",
             )
 
     def _check_caldav_config_validity(self) -> None:
