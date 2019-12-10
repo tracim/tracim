@@ -2099,7 +2099,7 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "test via Tracim <test_user_from+5@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
-        assert headers["Subject"][0] == "[TRACIM] Created account"
+        assert headers["Subject"][0] == "[Tracim] Created account"
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -2170,7 +2170,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "test via Tracim <test_user_from+5@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
-        assert headers["Subject"][0] == "[TRACIM] Created account"
+        assert headers["Subject"][0] == "[Tracim] Created account"
 
     def test_api__create_workspace_member_role__err_400__user_not_found_as_simple_user(
         self,
@@ -2293,7 +2293,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "test via Tracim <test_user_from+5@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
-        assert headers["Subject"][0] == "[TRACIM] Created account"
+        assert headers["Subject"][0] == "[Tracim] Created account"
         # check for notification to new user, user should not be notified
         # until it connected to tracim.
         mailhog.cleanup_mailhog()
@@ -2328,7 +2328,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
-        assert headers["Subject"][0] == "[TRACIM] [test] test_document2 (Opened)"
+        assert headers["Subject"][0] == "[Tracim] [test] test_document2 (Opened)"
 
 
 @pytest.mark.usefixtures("base_fixture")
