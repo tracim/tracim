@@ -6,7 +6,7 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 
 
 def load_config(app_config: CFG) -> CFG:
-    template_dir = app_config._here_replace("%(here)s/tracim_backend/templates/mail")
+    template_dir = app_config.here_macro_replace("%(here)s/tracim_backend/templates/mail")
     app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML = app_config.get_raw_config(
         "email.notification.upload_permission_to_receiver.template.html",
         "{}/{}".format(template_dir, "upload_permission_to_receiver_body_html.mak"),

@@ -164,7 +164,10 @@ class CFG(object):
 
         upload_permissions_config.load_config(self)
 
-    def _here_replace(self, value: str) -> str:
+    def here_macro_replace(self, value: str) -> str:
+        """
+        "replace "%(here)s" by localisation of the config file.
+        """
         return value.replace("%(here)s", self.settings["here"])
 
     def _load_global_config(self) -> None:
@@ -174,7 +177,7 @@ class CFG(object):
         ###
         # General
         ###
-        default_sqlalchemy_url = self._here_replace("sqlite:///%(here)s/tracim.sqlite")
+        default_sqlalchemy_url = self.here_macro_replace("sqlite:///%(here)s/tracim.sqlite")
         self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", default_sqlalchemy_url)
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -202,10 +205,10 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
-        default_depot_storage_dir = self._here_replace("%(here)s/depot")
+        default_depot_storage_dir = self.here_macro_replace("%(here)s/depot")
         self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir", default_depot_storage_dir)
         self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name", "tracim")
-        default_preview_cache_dir = self._here_replace("%(here)s/previews")
+        default_preview_cache_dir = self.here_macro_replace("%(here)s/previews")
         self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir", default_preview_cache_dir)
         self.AUTH_TYPES = string_to_list(
             self.get_raw_config("auth_types", "internal"),
@@ -222,8 +225,8 @@ class CFG(object):
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
         self.SESSION__REISSUE_TIME = int(self.get_raw_config("session.reissue_time", "120"))
-        default_session_data_dir = self._here_replace("%(here)s/sessions_data")
-        default_session_lock_dir = self._here_replace("%(here)s/sessions_data")
+        default_session_data_dir = self.here_macro_replace("%(here)s/sessions_data")
+        default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_data")
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
@@ -296,7 +299,7 @@ class CFG(object):
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
-        default_plugin_folder_path = self._here_replace("%(here)s/plugins")
+        default_plugin_folder_path = self.here_macro_replace("%(here)s/plugins")
         self.PLUGIN__FOLDER_PATH = self.get_raw_config(
             "plugin.folder_path", default_plugin_folder_path
         )
@@ -369,7 +372,7 @@ class CFG(object):
             "email.notification.references.email"
         )
         # Content update notification
-        template_dir = self._here_replace("%(here)s/tracim_backend/templates/mail")
+        template_dir = self.here_macro_replace("%(here)s/tracim_backend/templates/mail")
         self.EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML = self.get_raw_config(
             "email.notification.content_update.template.html",
             "{}/{}".format(template_dir, "content_update_body_html.mak"),
@@ -443,7 +446,7 @@ class CFG(object):
             self.get_raw_config("email.reply.use_txt_parsing", "True")
         )
         self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config(
-            "email.reply.lockfile_path", self._here_replace("%(here)s/email_fetcher.lock")
+            "email.reply.lockfile_path", self.here_macro_replace("%(here)s/email_fetcher.lock")
         )
 
         self.EMAIL__PROCESSING_MODE = self.get_raw_config("email.processing_mode", "sync").upper()
@@ -510,7 +513,7 @@ class CFG(object):
         self.CALDAV__RADICALE_PROXY__BASE_URL = self.get_raw_config(
             "caldav.radicale_proxy.base_url", "http://localhost:5232"
         )
-        default_caldav_storage_dir = self._here_replace("%(here)s/radicale_storage")
+        default_caldav_storage_dir = self.here_macro_replace("%(here)s/radicale_storage")
         self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = self.get_raw_config(
             "caldav.radicale.storage.filesystem_folder", default_caldav_storage_dir
         )
@@ -608,8 +611,8 @@ class CFG(object):
         self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = self.get_raw_config(
             "collaborative_document_edition.collabora.base_url"
         )
-        default_file_template_dir = "%(here)s/tracim_backend/templates/open_documents".replace(
-            "%(here)s", self.settings["here"]
+        default_file_template_dir = self.here_macro_replace(
+            "%(here)s/tracim_backend/templates/open_documents"
         )
         self.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = self.get_raw_config(
             "collaborative_document_edition.file_template_dir", default_file_template_dir
