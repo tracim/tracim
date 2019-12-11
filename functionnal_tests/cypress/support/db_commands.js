@@ -244,6 +244,7 @@ Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspa
       let form = new FormData()
 
       form.set('files', blob, fileTitle)
+      if (parentId) form.set('parent_id', parentId)
 
       return cy.form_request('POST', url, form)
     })
