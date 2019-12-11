@@ -45,10 +45,9 @@ class Gallery extends React.Component {
       breadcrumbsList: [],
       appMounted: false,
       folderId: qs.parse(props.data.config.history.location.search).folder_ids || 0,
-      folderParentsId: [],
+      folderDetail: {},
       imagesPreviews: [],
       fileCurrentPage: 1,
-      fileName: '',
       fileSelected: 0,
       autoPlay: null,
       fullscreen: false,
@@ -101,8 +100,9 @@ class Gallery extends React.Component {
 
     console.log('%c<Gallery> did mount', `color: ${state.config.hexcolor}`)
 
-    this.loadContentDetails()
     this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
+    const contentDetail = await this.loadContentDetails()
+    this.buildBreadcrumbs(contentDetail.workspaceLabel, contentDetail.folderDetail, false)
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -111,11 +111,12 @@ class Gallery extends React.Component {
     console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || prevState.folderId !== state.folderId) {
-      this.loadContentDetails()
+      this.setState({ imagesPreviewsLoaded: false, imagesPreviews: [] })
       this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
-    } else if (prevState.fileSelected !== state.fileSelected || (prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded || prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded)) {
-      const breadcrumbsList = this.buildBreadcrumbs(state.workspaceLabel, state.folderDetail, true)
-      this.setState({ breadcrumbsList })
+      const contentDetail = await this.loadContentDetails()
+      this.buildBreadcrumbs(contentDetail.workspaceLabel, contentDetail.folderDetail, false)
+    } else if (prevState.fileSelected !== state.fileSelected || prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded || prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded) {
+      this.buildBreadcrumbs(state.workspaceLabel, state.folderDetail, true)
     }
   }
 
@@ -127,13 +128,14 @@ class Gallery extends React.Component {
   async loadContentDetails () {
     const { state } = this
 
-    const workspaceLabel = await this.loadWorkspaceData()
-    let folderDetail
+    const contentDetail = {}
+
+    contentDetail.workspaceLabel = await this.loadWorkspaceLabel()
     if (state.folderId) {
-      folderDetail = await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
+      contentDetail.folderDetail = await this.loadFolderDetailAndParentsDetails(state.config.appConfig.workspaceId, state.folderId)
     }
-    const breadcrumbsList = await this.buildBreadcrumbs(workspaceLabel, folderDetail, false)
-    this.setState({ breadcrumbsList, breadcrumbsLoaded: true, folderDetail, workspaceLabel })
+    this.setState({ folderDetail: contentDetail.folderDetail, workspaceLabel: contentDetail.workspaceLabel })
+    return contentDetail
   }
 
   buildBreadcrumbs = (workspaceLabel, folderDetail, includeFile) => {
@@ -164,11 +166,13 @@ class Gallery extends React.Component {
     // app crash telling it cannot render a Link outside a router
     // see https://github.com/tracim/tracim/issues/1637
     // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
-    return breadcrumbsList
+    this.setState({ breadcrumbsList, breadcrumbsLoaded: !includeFile })
   }
 
-  loadFolderDetail = async (workspaceId, folderId) => {
+  loadFolderDetailAndParentsDetails = async (workspaceId, folderId) => {
     const { state, props } = this
+
+    const folderDetail = {}
 
     let fetchContentDetail = await handleFetchResult(
       await getFolderDetail(state.config.apiUrl, workspaceId, folderId)
@@ -176,22 +180,29 @@ class Gallery extends React.Component {
 
     switch (fetchContentDetail.apiResponse.status) {
       case 200:
-        const fileName = fetchContentDetail.body.filename
-        let folderParentsId = fetchContentDetail.body.parent_id ? [fetchContentDetail.body.parent_id] : []
+        folderDetail.fileName = fetchContentDetail.body.filename
+        folderDetail.folderParentsId = fetchContentDetail.body.parent_id ? [fetchContentDetail.body.parent_id] : []
 
-        while (fetchContentDetail.body.parent_id !== null) {
+        let fetchLoopCondition = fetchContentDetail.body.parent_id !== null
+        while (fetchLoopCondition) {
+          const prevParentId = fetchContentDetail.body.parent_id
+
           fetchContentDetail = await handleFetchResult(
-            await getFolderDetail(state.config.apiUrl, workspaceId, fetchContentDetail.body.parent_id)
+            await getFolderDetail(state.config.apiUrl, workspaceId, prevParentId)
           )
           if (fetchContentDetail.apiResponse.status === 200) {
-            folderParentsId.push(fetchContentDetail.body.parent_id)
+            if (fetchContentDetail.body.parent_id === null || prevParentId === fetchContentDetail.body.parent_id) {
+              fetchLoopCondition = false
+            } else {
+              folderDetail.folderParentsId.push(fetchContentDetail.body.parent_id)
+            }
           } else {
             this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
             break
           }
         }
 
-        return { fileName, folderParentsId }
+        return folderDetail
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
     }
   }
@@ -258,7 +269,7 @@ class Gallery extends React.Component {
     }))).filter(i => i !== false)
   }
 
-  loadWorkspaceData = async () => {
+  loadWorkspaceLabel = async () => {
     const { state, props } = this
 
     const fetchResultWorkspaceDetail = await handleFetchResult(
