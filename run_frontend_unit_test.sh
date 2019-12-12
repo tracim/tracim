@@ -52,6 +52,9 @@ npm run test && loggood "success" || (logerror "some error" && STATUS=1)
 cd $DEFAULTDIR/frontend_app_agenda || exit 1
 npm run test && loggood "success" || (logerror "some error" && STATUS=1)
 
+cd $DEFAULTDIR/frontend_app_gallery || exit 1
+npm run test && loggood "success" || (logerror "some error" && STATUS=1)
+
 cd $DEFAULTDIR/frontend_app_admin_workspace_user || exit 1
 npm run test && loggood "success" || (logerror "some error" && STATUS=1)
 
