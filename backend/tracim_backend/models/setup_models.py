@@ -21,6 +21,7 @@ from tracim_backend.models.auth import User  # noqa: F401
 from tracim_backend.models.data import Content  # noqa: F401
 from tracim_backend.models.data import ContentRevisionRO  # noqa: F401
 from tracim_backend.models.meta import DeclarativeBase  # noqa: F401
+from tracim_backend.models.tracim_session import TracimSession
 
 if typing.TYPE_CHECKING:
     # INFO - G.M - 2019-05-03 - import for type-checking only, setted here to
@@ -46,13 +47,13 @@ def get_engine(app_config: "CFG", prefix="sqlalchemy.", **kwargs) -> Engine:
 
 
 def get_session_factory(engine) -> sessionmaker:
-    factory = sessionmaker(expire_on_commit=False)
+    factory = sessionmaker(expire_on_commit=False, class_=TracimSession)
     factory.configure(bind=engine)
     return factory
 
 
 def get_scoped_session_factory(engine) -> scoped_session:
-    factory = scoped_session(sessionmaker(expire_on_commit=False))
+    factory = scoped_session(sessionmaker(expire_on_commit=False, class_=TracimSession))
     factory.configure(bind=engine)
     return factory
 
