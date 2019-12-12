@@ -124,7 +124,7 @@ describe('App Gallery', function () {
     })
     it('should start the autoPlay when the autoPlay is clicked', () => {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.gallery__action__button__auto__play`)
+        .get(`[data-cy=gallery__action__button__auto__play]`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
@@ -182,7 +182,7 @@ describe('App Gallery', function () {
     })
     it('should enable fullscreen when the fullscreen button is clicked', () => {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.gallery__action__button__lightbox__fullscreen`)
+        .get(`[data-cy=gallery__action__button__lightbox__fullscreen]`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.fullscreen.fullscreen-enabled`)
@@ -204,7 +204,7 @@ describe('App Gallery', function () {
         .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`button.gallery__action__button__delete`)
+        .get(`[data-cy=gallery__action__button__delete]`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.gallery__delete__file__popup`)
