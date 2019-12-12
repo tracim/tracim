@@ -4,18 +4,23 @@ import { SELECTORS as s } from '../../support/generic_selector_commands.js'
 describe('App Gallery', function () {
   let workspaceId
   let folder1 = { label: 'first Folder' }
-  const fileTitle1 = 'fileTest1'
-  const fullFilename1 = 'Linux-Free-PNG.png'
-  const contentType1 = 'image/png'
-  let firstContentId1
-  const fileTitle2 = 'fileTest2'
-  const fullFilename2 = 'Linux-Free-PNG.png'
-  const contentType2 = 'image/png'
-  let firstContentId2
-  const fileTitle3 = 'fileTest3'
-  const fullFilename3 = 'artikodin.png'
-  const contentType3 = 'image/png'
-  let firstContentId3
+  const files = [{
+      title: 'fileTest1',
+      fullFilename: 'Linux-Free-PNG.png',
+      contentType: 'image/png'
+    }, {
+      title: 'fileTest2',
+      fullFilename: 'Linux-Free-PNG.png',
+      contentType: 'image/png'
+    }, {
+      title: 'fileTest3',
+      fullFilename: 'artikodin.png',
+      contentType: 'image/png'
+    }, {
+      title: 'fileTest4',
+      fullFilename: 'artikodin.png',
+      contentType: 'image/png'
+  }]
 
   before(function () {
     cy.resetDB()
@@ -24,20 +29,20 @@ describe('App Gallery', function () {
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
 
-      cy.createFile(fullFilename1, contentType1, fileTitle1, workspace.workspace_id)
-        .then(newContent => firstContentId1 = newContent.content_id)
+      cy.createFile(files[0].fullFilename, files[0].contentType, files[0].title, workspace.workspace_id)
+        .then(newContent => files[0].id = newContent.content_id)
 
-      cy.createFile(fullFilename2, contentType2, fileTitle2, workspace.workspace_id)
-        .then(newContent => firstContentId2 = newContent.content_id)
+      cy.createFile(files[1].fullFilename, files[1].contentType, files[1].title, workspace.workspace_id)
+        .then(newContent => files[1].id  = newContent.content_id)
 
-      cy.createFile(fullFilename3, contentType3, fileTitle3, workspace.workspace_id)
-        .then(newContent => firstContentId3 = newContent.content_id)
+      cy.createFile(files[2].fullFilename, files[2].contentType, files[2].title, workspace.workspace_id)
+        .then(newContent => files[2].id = newContent.content_id)
 
 
       cy.createFolder(folder1.label, workspaceId).then(f => {
         folder1 = f
-        cy.createFile(fullFilename3, contentType3, fileTitle3, workspace.workspace_id, folder1.content_id)
-          .then(newContent => firstContentId3 = newContent.content_id)
+        cy.createFile(files[3].fullFilename, files[3].contentType, files[3].title, workspace.workspace_id, folder1.content_id)
+          .then(newContent => files[3].id = newContent.content_id)
       })
 
     })
@@ -83,7 +88,7 @@ describe('App Gallery', function () {
         .find('[data-cy=extended_action_gallery]')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle3}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[3].title}']`)
         .should('be.visible')
     })
   })
@@ -100,13 +105,13 @@ describe('App Gallery', function () {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle1}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .find('.carousel__arrow.arrowprev')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle3}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[2].title}']`)
         .should('be.visible')
     })
     it('Get next image with the right arrow', () => {
@@ -114,7 +119,7 @@ describe('App Gallery', function () {
         .find('.carousel__arrow.arrownext')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle1}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
         .should('be.visible')
     })
     it('should start the autoPlay when the autoPlay is clicked', () => {
@@ -122,7 +127,7 @@ describe('App Gallery', function () {
         .get(`.gallery__action__button__auto__play`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle1}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
         .should('be.visible')
     })
   })
@@ -138,13 +143,13 @@ describe('App Gallery', function () {
 
     it('the image should be rotated to the left when the right rotate button is clicked', () => {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle1}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`button.gallery__action__button__rotation__left`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle1}'].rotate270`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}'].rotate270`)
         .should('be.visible')
     })
 
@@ -153,7 +158,7 @@ describe('App Gallery', function () {
         .get(`button.gallery__action__button__rotation__right`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle1}'].rotate0`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}'].rotate0`)
         .should('be.visible')
     })
   })
@@ -169,7 +174,7 @@ describe('App Gallery', function () {
 
     it('should be able to open the lightbox', () => {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle1}']:visible`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']:visible`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.gallery__action__button__lightbox`)
@@ -196,7 +201,7 @@ describe('App Gallery', function () {
 
     it('should be able to delete a file', () => {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle1}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`button.gallery__action__button__delete`)
@@ -208,7 +213,7 @@ describe('App Gallery', function () {
         .get(`[data-cy=gallery__delete__file__popup__body__btn__delete]`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${fileTitle1}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
         .should('be.not.visible')
     })
   })
