@@ -47,7 +47,7 @@ export class Gallery extends React.Component {
       folderId: props.data ? qs.parse(props.data.config.history.location.search).folder_ids || 0 : debug.config.folderId,
       imagesPreviews: [],
       fileCurrentPage: 1,
-      folderName: '',
+      fileName: '',
       fileSelected: 0,
       autoPlay: null,
       fullscreen: false,
@@ -138,14 +138,14 @@ export class Gallery extends React.Component {
     }]
     if (state.folderId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId}`}>{state.folderName}</Link>,
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId}`}>{state.fileName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
     if (state.imagesPreviews && state.imagesPreviews.length > 0) {
       breadcrumbsList.push({
         link: <Link
-          to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}>{state.imagesPreviews[state.fileSelected].folderName}</Link>,
+          to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}>{state.imagesPreviews[state.fileSelected].fileName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
@@ -166,7 +166,7 @@ export class Gallery extends React.Component {
 
     switch (fetchContentDetail.apiResponse.status) {
       case 200:
-        this.setState({ folderName: fetchContentDetail.body.folderName })
+        this.setState({ fileName: fetchContentDetail.body.fileName })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
     }
@@ -396,7 +396,7 @@ export class Gallery extends React.Component {
     return (
       <PageWrapper customClass='gallery'>
         <PageTitle
-          title={state.folderId ? state.folderName : state.content.workspaceLabel}
+          title={state.folderId ? state.fileName : state.content.workspaceLabel}
           icon={'picture-o'}
           breadcrumbsList={state.breadcrumbsList}
         />
