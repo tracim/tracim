@@ -36,11 +36,11 @@ describe('<Carousel />', () => {
       })
 
       it('should display the right message when it is a folder', () => {
-        expect(wrapper.find('.gallery__noContent').text()).to.contain(`There isn't any previewable content at that folder's root.`)
+        expect(wrapper.find('.gallery__noContent').text()).to.contain("There isn't any previewable content at that folder's root.")
       })
       it('should display the right message when it is a workspace root', () => {
         wrapper.setProps({ isWorkspaceRoot: true })
-        expect(wrapper.find('.gallery__noContent').text()).to.contain(`There isn't any previewable content at that shared space's root.`)
+        expect(wrapper.find('.gallery__noContent').text()).to.contain("There isn't any previewable content at that shared space's root.")
       })
     })
   })
