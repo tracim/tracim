@@ -4,18 +4,28 @@ import { shallow } from 'enzyme'
 import { Carousel as CarouselWithoutHOC } from '../../src/component/Carousel.jsx'
 import sinon from 'sinon'
 
-describe('<MainPreview />', () => {
+describe('<Carousel />', () => {
   const onCarouselPositionChange = sinon.spy()
 
   const props = {
-    onCarouselPositionChange: onCarouselPositionChange
+    onCarouselPositionChange: onCarouselPositionChange,
+    isWorkspaceRoot: false,
+    slides: []
   }
 
 
   const wrapper = shallow(<CarouselWithoutHOC {...props} t={tradKey => tradKey} />)
 
   describe('static design', () => {
-
+    describe('empty slide list message', () => {
+      it('should display the right message when it is a folder', () => {
+        expect(wrapper.find('.gallery__noContent').text()).to.contain('There isn\'t any previewable content at that folder\'s root.')
+      })
+      it('should display the right message when it is a workspace root', () => {
+        wrapper.setProps({ isWorkspaceRoot: true })
+        expect(wrapper.find('.gallery__noContent').text()).to.contain('There isn\'t any previewable content at that shared space\'s root.')
+      })
+    })
   })
 
   describe('function tests', () => {
