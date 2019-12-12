@@ -44,7 +44,7 @@ export class Gallery extends React.Component {
       content: props.data ? props.data.content : debug.content,
       breadcrumbsList: [],
       appMounted: false,
-      folderId: qs.parse(props.data.config.history.location.search).folder_ids || 0,
+      folderId: props.data ? qs.parse(props.data.config.history.location.search).folder_ids || 0 : debug.config.folderId,
       imagesPreviews: [],
       fileCurrentPage: 1,
       fileName: '',
@@ -166,7 +166,7 @@ export class Gallery extends React.Component {
 
     switch (fetchContentDetail.apiResponse.status) {
       case 200:
-        this.setState({ fileName: fetchContentDetail.body.fileName })
+        this.setState({ fileName: fetchContentDetail.body.filename })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
     }
