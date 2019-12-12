@@ -1,0 +1,7 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/
+.git/
+dist/gallery.app.js
+dist/gallery.bundle.app.js
+node_modules/
+src/debug.js

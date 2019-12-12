@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 import uuid
 
 import sqlalchemy
+from sqlalchemy import BigInteger
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
@@ -32,6 +33,7 @@ from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
 
 from tracim_backend.exceptions import ExpiredResetPasswordToken
+from tracim_backend.exceptions import ProfileDoesNotExist
 from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.meta import metadata
@@ -87,14 +89,45 @@ class AuthType(enum.Enum):
     REMOTE = "remote"
 
 
+class Profile(enum.Enum):
+    """This model is the "max" group associated to a given user."""
+
+    NOBODY = (0, "nobody")
+    USER = (1, "users")
+    TRUSTED_USER = (2, "trusted-users")
+    ADMIN = (3, "administrators")
+
+    def __init__(self, profile_id: int, slug: str):
+        self.id = profile_id
+        self.slug = slug
+
+    @classmethod
+    def get_all_valid_slugs(cls):
+        return [item.slug for item in list(cls) if item.id > 0]
+
+    @classmethod
+    def get_profile_from_id(cls, id: int):
+        profiles = [item for item in list(cls) if item.id == id]
+        if len(profiles) != 1:
+            raise ProfileDoesNotExist()
+        return profiles[0]
+
+    @classmethod
+    def get_profile_from_slug(cls, slug: str):
+        profiles = [item for item in list(cls) if item.slug == slug]
+        if len(profiles) != 1:
+            raise ProfileDoesNotExist()
+        return profiles[0]
+
+
 class Group(DeclarativeBase):
 
-    TIM_NOBODY = 0
-    TIM_USER = 1
-    TIM_MANAGER = 2
-    TIM_ADMIN = 3
+    # TODO - G.M - 2019-10-08 - remove use of this legacy code
+    # (needed for retrocompat)
+    TIM_USER = Profile.USER.id
+    TIM_MANAGER = Profile.TRUSTED_USER.id
+    TIM_ADMIN = Profile.ADMIN.id
 
-    TIM_NOBODY_GROUPNAME = "nobody"
     TIM_USER_GROUPNAME = "users"
     TIM_MANAGER_GROUPNAME = "trusted-users"
     TIM_ADMIN_GROUPNAME = "administrators"
@@ -121,32 +154,6 @@ class Group(DeclarativeBase):
         return dbsession.query(cls).filter_by(group_name=group_name).first()
 
 
-class Profile(object):
-    """This model is the "max" group associated to a given user."""
-
-    _NAME = [
-        Group.TIM_NOBODY_GROUPNAME,
-        Group.TIM_USER_GROUPNAME,
-        Group.TIM_MANAGER_GROUPNAME,
-        Group.TIM_ADMIN_GROUPNAME,
-    ]
-
-    _IDS = [Group.TIM_NOBODY, Group.TIM_USER, Group.TIM_MANAGER, Group.TIM_ADMIN]
-
-    # TODO - G.M - 18-04-2018 [Cleanup] Drop this
-    # _LABEL = [l_('Nobody'),
-    #           l_('Users'),
-    #           l_('Global managers'),
-    #           l_('Administrators')]
-
-    def __init__(self, profile_id):
-        assert isinstance(profile_id, int)
-        self.id = profile_id
-        self.name = Profile._NAME[profile_id]
-        # TODO - G.M - 18-04-2018 [Cleanup] Drop this
-        # self.label = Profile._LABEL[profile_id]
-
-
 class User(DeclarativeBase):
     """
     User definition.
@@ -168,6 +175,7 @@ class User(DeclarativeBase):
     MAX_LANG_LENGTH = 3
     MAX_AUTH_TOKEN_LENGTH = 255
     MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH = 255
+    DEFAULT_ALLOWED_SPACE = 0
 
     __tablename__ = "users"
     # INFO - G.M - 2018-10-24 - force table to use utf8 instead of
@@ -205,6 +213,7 @@ class User(DeclarativeBase):
         Unicode(MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH), nullable=True, default=None
     )
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
+    allowed_space = Column(BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
 
     @hybrid_property
     def email_address(self):
@@ -229,7 +238,7 @@ class User(DeclarativeBase):
         profile_id = 0
         if len(self.groups) > 0:
             profile_id = max(group.group_id for group in self.groups)
-        return Profile(profile_id)
+        return Profile.get_profile_from_id(profile_id)
 
     @classmethod
     def by_email_address(cls, email, dbsession):
@@ -318,9 +327,11 @@ class User(DeclarativeBase):
 
     # Reset Password Tokens #
     def generate_reset_password_token(self) -> str:
-        reset_password_token, self.reset_password_token_created, self.reset_password_token_hash = self._generate_token(
-            create_hash=True
-        )
+        (
+            reset_password_token,
+            self.reset_password_token_created,
+            self.reset_password_token_hash,
+        ) = self._generate_token(create_hash=True)
         return reset_password_token
 
     def validate_reset_password_token(self, token, validity_seconds) -> bool:

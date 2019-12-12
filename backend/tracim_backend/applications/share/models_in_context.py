@@ -3,8 +3,10 @@ import typing
 
 from sqlalchemy.orm import Session
 
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.config import CFG
+from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserInContext
@@ -20,6 +22,14 @@ class ContentShareInContext(object):
         self._user = user
 
     @property
+    def email_user(self) -> EmailUser:
+        return EmailUser(user_email=self.content_share.email)
+
+    @property
+    def share_token(self) -> str:
+        return self.content_share.share_token
+
+    @property
     def content_id(self) -> int:
         return self.content_share.content_id
 
@@ -28,8 +38,8 @@ class ContentShareInContext(object):
         return self.content_share.share_id
 
     @property
-    def share_group_id(self) -> str:
-        return self.content_share.share_group_id
+    def share_group_uuid(self) -> str:
+        return self.content_share.share_group_uuid
 
     @property
     def email(self) -> str:
@@ -83,7 +93,10 @@ class ContentShareInContext(object):
         from tracim_backend.lib.core.content import ContentApi
 
         content_api = ContentApi(config=self.config, session=self.dbsession, current_user=None)
-        return content_api.get_content_in_context(self.content_share.content)
+        content = content_api.get_one(
+            content_id=self.content_share.content_id, content_type=content_type_list.Any_SLUG
+        )
+        return content_api.get_content_in_context(content)
 
     @property
     def content_size(self) -> int:

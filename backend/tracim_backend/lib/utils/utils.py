@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 import datetime
+import email
+import importlib
 import os
 from os.path import normpath as base_normpath
+import pkgutil
 import random
 import string
+import sys
+import types
 import typing
 from urllib.parse import urlencode
 from urllib.parse import urljoin
@@ -365,3 +370,49 @@ def is_file_readable(path: str) -> bool:
     if not os.access(path=path, mode=os.R_OK, effective_ids=os.supports_effective_ids):
         raise NotReadableFile("{} is not a readable file".format(path))
     return True
+
+
+class EmailUser(object):
+    """
+    Useful object to handle more easily different way to deal with email address and username
+    """
+
+    def __init__(self, user_email: str, username: typing.Optional[str] = None) -> None:
+        assert user_email
+        email_username, email_address = email.utils.parseaddr(user_email)
+        self.username = username or email_username or ""
+        self.email_address = email_address
+
+    @property
+    def full_email_address(self) -> str:
+        return email.utils.formataddr((self.username, self.email_address))
+
+    @property
+    def email_link(self) -> str:
+        return "mailto:{email_address}".format(email_address=self.email_address)
+
+
+def find_all_submodule_path(module: types.ModuleType) -> typing.List[str]:
+    """
+    get all submodules path of a module
+    like "tracim_backend.lib.core.plugin"
+    see https://stackoverflow.com/a/49023460
+    :param module: module to check
+    :return: list of absolute path of module name
+    """
+    module_path_list = []
+    module_spec_list = []
+    for importer, submodule_relative_path, is_package in pkgutil.walk_packages(module.__path__):
+        submodule_path = "{module_name}.{submodule_relative_path}".format(
+            module_name=module.__name__, submodule_relative_path=submodule_relative_path
+        )
+        if is_package:
+            spec = pkgutil._get_spec(importer, submodule_relative_path)
+            importlib._bootstrap._load(spec)
+            module_spec_list.append(spec)
+        else:
+            module_path_list.append(submodule_path)
+    for spec in module_spec_list:
+        # INFO - G.M - 2019-11-29 - remove submodule from loaded modules
+        del sys.modules[spec.name]
+    return module_path_list

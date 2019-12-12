@@ -35,6 +35,7 @@ import {
   WORKSPACE_CONTENT_DELETED,
   WORKSPACE_RECENT_ACTIVITY,
   WORKSPACE_READ_STATUS,
+  WORKSPACE_CONTENT_SHARE_FOLDER,
   USER_WORKSPACE_DO_NOTIFY,
   USER,
   USER_WORKSPACE_LIST,
@@ -77,7 +78,9 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
       if (status >= 200 && status <= 299) return fetchResult.json()
       if (status >= 300 && status <= 399) return fetchResult.json()
       if (status === 401) {
-        if (!unLoggedAllowedPageList.includes(document.location.pathname)) {
+        // FIME - GB - 2019-02-08 - Find a better way of handling the list of unLoggedAllowedPageList
+        // https://github.com/tracim/tracim/issues/2144
+        if (!unLoggedAllowedPageList.some(url => document.location.pathname.startsWith(url))) {
           dispatch(setRedirectLogin(document.location.pathname + document.location.search))
           dispatch(setUserDisconnected())
           history.push(`${PAGE.LOGIN}${Cookies.get(COOKIE_FRONTEND.LAST_CONNECTION) ? '?dc=1' : ''}`)
@@ -194,9 +197,9 @@ export const getUser = userId => async dispatch => {
   })
 }
 
-export const getUserWorkspaceList = userId => async dispatch => {
+export const getUserWorkspaceList = (userId, showOwnedWorkspace) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
     param: {
       credentials: 'include',
       headers: {
@@ -422,9 +425,9 @@ export const putUserWorkspaceDoNotify = (user, workspaceId, doNotify) => dispatc
   })
 }
 
-export const getMyselfWorkspaceList = () => dispatch => {
+export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
     param: {
       credentials: 'include',
       headers: {
@@ -494,6 +497,36 @@ export const getFolderContentList = (workspaceId, folderIdList) => dispatch => {
       method: 'GET'
     },
     actionName: WORKSPACE,
+    dispatch
+  })
+}
+
+export const getSubFolderShareContentList = (workspaceId, folderIdList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=upload&parent_ids=${folderIdList.join(',')}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE,
+    dispatch
+  })
+}
+
+export const getShareFolderContentList = (workspaceId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=upload`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_CONTENT_SHARE_FOLDER,
     dispatch
   })
 }
@@ -725,6 +758,42 @@ export const putContentItemMove = (source, destination) => dispatch => {
       })
     },
     actionName: WORKSPACE_CONTENT_MOVE,
+    dispatch
+  })
+}
+
+export const getFileInfos = (token) =>
+  fetch(`${FETCH_CONFIG.apiUrl}/public/guest-download/${token}`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+
+export const postDownloadFile = (token, guestPassword) =>
+  fetch(`${FETCH_CONFIG.apiUrl}/public/guest-download/${token}/check`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      password: guestPassword
+    })
+  })
+
+export const getGuestUploadInfo = token => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/public/guest-upload/${token}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: 'GuestUpload',
     dispatch
   })
 }

@@ -70,12 +70,21 @@ export class AppFullscreenRouter extends React.Component {
               return null
             }} />
 
+            <Route path={PAGE.WORKSPACE.GALLERY(':idws')} render={() => {
+              const galleryConfig = {
+                workspaceId: props.match.params.idws,
+                forceShowSidebar: false
+              }
+              props.renderAppFullscreen({ slug: 'gallery', hexcolor: '#7d4e24', appConfig: galleryConfig }, props.user, {})
+              return null
+            }} />
+
             <Route path={PAGE.WORKSPACE.CONTENT_EDITION(':idws', ':idcts')} render={({ match }) => {
               const content = {
                 workspace_id: match.params.idws,
                 content_id: match.params.idcts
               }
-              props.renderAppFullscreen({ slug: 'office_document', hexcolor: '#7d4e24' }, props.user, content)
+              props.renderAppFullscreen({ slug: 'collaborative_document_edition', hexcolor: '#7d4e24' }, props.user, content)
               return null
             }} />
           </div>

@@ -10,6 +10,7 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import create_1000px_png_test_image
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -873,13 +874,95 @@ class TestAccountDisableWorkspaceNotification(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestAccountWorkspaceEndpoint(object):
     """
     Tests for /api/v2/users/me/workspaces
     """
 
+    def test_api__get_user_workspaces__ok_200__with_filter(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        admin_user,
+        application_api_factory,
+        web_testapp,
+        group_api_factory,
+        role_api_factory,
+    ):
+        """
+        Check obtain all workspaces reachables for user with different filter
+        """
+
+        workspace_api = workspace_api_factory.get()
+        owned_and_role_workspace = workspace_api.create_workspace(label="owned_and_role")
+        owned_only_workspace = workspace_api.create_workspace("owned_only")
+        user_api = user_api_factory.get()
+        user_api.create_user("toto@toto.toto", do_notify=False)
+        group_api = group_api_factory.get()
+        groups = [group_api.get_one_with_name("administrators")]
+        test_user = user_api.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api_test_user = workspace_api_factory.get(test_user)
+        role_only_workspace = workspace_api_test_user.create_workspace(label="role_only")
+        rapi = role_api_factory.get()
+        rapi.create_one(admin_user, role_only_workspace, UserRoleInWorkspace.READER, False)
+        rapi.create_one(
+            test_user, owned_only_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        )
+        transaction.commit()
+        rapi_test_user = role_api_factory.get(test_user)
+        rapi_test_user.delete_one(admin_user.user_id, owned_only_workspace.workspace_id)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {}
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200, params=params)
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "1"}
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200, params=params)
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "0"}
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200, params=params)
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "0", "show_owned_workspace": "1"}
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200, params=params)
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "0", "show_owned_workspace": "0"}
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200, params=params)
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == set()
+
+    @pytest.mark.usefixtures("default_content_fixture")
     def test_api__get_account_workspaces__ok_200__nominal_case(
         self,
         workspace_api_factory,
@@ -904,7 +987,7 @@ class TestAccountWorkspaceEndpoint(object):
             workspace=workspace
         )  # nope8
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/users/1/workspaces", status=200)
+        res = web_testapp.get("/api/v2/users/me/workspaces", status=200)
         res = res.json_body
         workspace = res[0]
         assert workspace["workspace_id"] == 1
@@ -919,6 +1002,59 @@ class TestAccountWorkspaceEndpoint(object):
             workspace["sidebar_entries"][counter]["route"] = sidebar_entry.route
             workspace["sidebar_entries"][counter]["hexcolor"] = sidebar_entry.hexcolor
             workspace["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_allowed_space_limitation"}], indirect=True
+)
+class TestAccountDiskSpaceEndpoint(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/me/disk_space
+    """
+
+    def test_api__get_user_disk_space__ok_200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="test@test.test",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        workspace_api = workspace_api_factory.get(current_user=test_user, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        transaction.commit()
+        image = create_1000px_png_test_image()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=200,
+        )
+        res = web_testapp.get("/api/v2/users/me/disk_space", status=200)
+        res = res.json_body
+        assert res["used_space"] == 6210
+        assert res["user"]["public_name"] == "bob"
+        assert res["user"]["avatar_url"] is None
+        assert res["allowed_space"] == 134217728
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -969,6 +1105,84 @@ class TestAccountEndpoint(object):
         assert res["public_name"] == "bob"
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_known_member_filter_disabled"}], indirect=True
+)
+class TestAccountKnownMembersEndpointKnownMembersFilterDisabled(object):
+    def test_api__get_user__ok_200__show_all_members(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="bob2",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user3 = uapi.create_user(
+            email="test3@test3.test3",
+            password="password",
+            name="bob3",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        uapi.save(test_user3)
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        role_api = role_api_factory.get()
+        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        params = {"acp": "test"}
+        res = web_testapp.get("/api/v2/users/me/known_members", status=200, params=params)
+        res = res.json_body
+        assert len(res) == 3
+        assert res[0]["user_id"] == test_user.user_id
+        assert res[0]["public_name"] == test_user.display_name
+        assert res[0]["avatar_url"] is None
+
+        assert res[1]["user_id"] == test_user2.user_id
+        assert res[1]["public_name"] == test_user2.display_name
+        assert res[1]["avatar_url"] is None
+
+        assert res[2]["user_id"] == test_user3.user_id
+        assert res[2]["public_name"] == test_user3.display_name
+        assert res[2]["avatar_url"] is None
 
 
 @pytest.mark.usefixtures("base_fixture")

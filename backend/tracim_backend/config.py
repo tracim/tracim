@@ -25,6 +25,7 @@ from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.roles import WorkspaceRoles
 
@@ -64,7 +65,10 @@ class CFG(object):
     """Object used for easy access to config file parameters."""
 
     def __init__(self, settings: typing.Dict[str, typing.Any]):
-        self.settings = settings
+        # INFO - G.M - 2019-12-02 - Store own settings original dict, with copy
+        # to avoid issue when serializing CFG object. settings dict is completed
+        # with object in some context
+        self.settings = settings.copy()
         self.config_naming = []  # type: typing.List[ConfigParam]
         logger.debug(self, "CONFIG_PROCESS:1: load config from settings")
         self.load_config()
@@ -141,6 +145,7 @@ class CFG(object):
             ),
         )
         self._load_global_config()
+        self._load_limitation_config()
         self._load_email_config()
         self._load_ldap_config()
         self._load_webdav_config()
@@ -154,6 +159,10 @@ class CFG(object):
         import tracim_backend.applications.share.config as share_app_config
 
         share_app_config.load_config(self)
+
+        import tracim_backend.applications.upload_permissions.config as upload_permissions_config
+
+        upload_permissions_config.load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -177,8 +186,10 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "agenda,"
-            "office_document,"
-            "share_content"
+            "collaborative_document_edition,"
+            "share_content,"
+            "upload_permission,"
+            "gallery"
         )
 
         self.APP__ENABLED = string_to_list(
@@ -248,7 +259,9 @@ class CFG(object):
                     "user.reset_password.token_lifetime", defaut_reset_password_validity
                 )
             )
+        self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
 
+        self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "true"))
         self.DEBUG = asbool(self.get_raw_config("debug", "false"))
 
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
@@ -275,6 +288,23 @@ class CFG(object):
         frontend_dist_folder = os.path.join(tracim_v2_folder, "frontend", "dist")
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
+        )
+        self.PLUGIN__FOLDER_PATH = self.get_raw_config("plugin.folder_path", None)
+
+        self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
+            "frontend.custom_toolbox_folder_path", None
+        )
+
+    def _load_limitation_config(self) -> None:
+        self.LIMITATION__SHAREDSPACE_PER_USER = int(
+            self.get_raw_config("limitation.sharedspace_per_user", "0")
+        )
+        self.LIMITATION__CONTENT_LENGTH_FILE_SIZE = int(
+            self.get_raw_config("limitation.content_length_file_size", "0")
+        )
+        self.LIMITATION__WORKSPACE_SIZE = int(self.get_raw_config("limitation.workspace_size", "0"))
+        self.LIMITATION__USER_DEFAULT_ALLOWED_SPACE = int(
+            self.get_raw_config("limitation.user_default_allowed_space", "0")
         )
 
     def _load_email_config(self) -> None:
@@ -660,6 +690,15 @@ class CFG(object):
                 "FRONTEND__DIST_FOLDER_PATH", self.FRONTEND__DIST_FOLDER_PATH
             )
 
+        if self.USER__DEFAULT_PROFILE not in Profile.get_all_valid_slugs():
+            profile_str_list = ", ".join(
+                ['"{}"'.format(profile_name) for profile_name in Profile.get_all_valid_slugs()]
+            )
+            raise ConfigurationError(
+                'ERROR user.default_profile given "{}" is invalid,'
+                "valids values are {}.".format(self.USER__DEFAULT_PROFILE, profile_str_list)
+            )
+
     def _check_email_config_validity(self) -> None:
         """
         Check if config is correctly setted for email features
@@ -839,20 +878,24 @@ class CFG(object):
             app_config=self,
         )
 
-        office_document = Application(
-            label="Office Document",
-            slug="office_document",
+        gallery = Application(
+            label="Gallery",
+            slug="gallery",
+            fa_icon="picture-o",
+            is_active=True,
+            config={},
+            main_route="/ui/workspaces/{workspace_id}/gallery",
+            app_config=self,
+        )
+
+        collaborative_document_edition = Application(
+            label="Collaborative Document Edition",
+            slug="collaborative_document_edition",
             fa_icon="file-o",
             is_active=self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
             config={},
             main_route="",
             app_config=self,
-        )
-        office_document.add_content_type(
-            slug="office_document",
-            label="Office Document",
-            creation_label="Create an office document",
-            available_statuses=content_status_list.get_all(),
         )
         # INFO - G.M - 2019-08-08 - import app here instead of top of file,
         # to make thing easier later
@@ -860,6 +903,9 @@ class CFG(object):
         import tracim_backend.applications.share.application as share_app
 
         share_content = share_app.get_app(app_config=self)
+        import tracim_backend.applications.upload_permissions.application as upload_permissions_app
+
+        upload_permissions = upload_permissions_app.get_app(app_config=self)
         # process activated app list
         available_apps = OrderedDict(
             [
@@ -869,8 +915,10 @@ class CFG(object):
                 (folder.slug, folder),
                 (markdownpluspage.slug, markdownpluspage),
                 (agenda.slug, agenda),
-                (office_document.slug, office_document),
+                (gallery.slug, gallery),
+                (collaborative_document_edition.slug, collaborative_document_edition),
                 (share_content.slug, share_content),
+                (upload_permissions.slug, upload_permissions),
             ]
         )
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var

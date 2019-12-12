@@ -11,7 +11,8 @@ import {
   addAllResourceI18n,
   // SelectStatus,
   ArchiveDeleteContent,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -53,7 +54,10 @@ class FolderAdvanced extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) {
+          this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
+        }
         break
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
@@ -142,11 +146,25 @@ class FolderAdvanced extends React.Component {
   handleClickCheckbox = async appSlug => {
     const { props, state } = this
 
+    // FIXME - G.B. - 2019-08-14 - We need a sub-app system so you don't have to put the hardcoded strings
+    const APP_FILE_SLUG = 'file'
+    const APP_COLLABORATIVE_DOCUMENT_SLUG = 'collaborative_document_edition'
+
     const oldAvailableAppList = state.content.sub_content_types
 
-    const newAvailableAppList = state.content.sub_content_types.find(c => c === appSlug)
-      ? state.content.sub_content_types.filter(c => c !== appSlug)
-      : [...state.content.sub_content_types, appSlug]
+    let newAvailableAppList = []
+
+    if (state.content.sub_content_types.find(c => c === appSlug)) {
+      newAvailableAppList = state.content.sub_content_types.filter(c => c !== appSlug)
+      if (appSlug === APP_FILE_SLUG) {
+        newAvailableAppList = newAvailableAppList.filter(c => c !== APP_COLLABORATIVE_DOCUMENT_SLUG)
+      }
+    } else {
+      newAvailableAppList = [...state.content.sub_content_types, appSlug]
+      if (appSlug === APP_COLLABORATIVE_DOCUMENT_SLUG) {
+        newAvailableAppList = [...newAvailableAppList, APP_FILE_SLUG]
+      }
+    }
 
     this.setState(prev => ({ content: { ...prev.content, sub_content_types: newAvailableAppList } }))
 

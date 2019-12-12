@@ -95,8 +95,9 @@ class Account extends React.Component {
 
   getUserWorkspaceList = async () => {
     const { props, state } = this
+    const showOwnedWorkspace = false
 
-    const fetchGetUserWorkspaceList = await props.dispatch(getUserWorkspaceList(state.userToEditId))
+    const fetchGetUserWorkspaceList = await props.dispatch(getUserWorkspaceList(state.userToEditId, showOwnedWorkspace))
 
     switch (fetchGetUserWorkspaceList.status) {
       case 200: this.getUserWorkspaceListMemberList(fetchGetUserWorkspaceList.json); break

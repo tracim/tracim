@@ -25,10 +25,19 @@ Cypress.Commands.add('addUserToWorkspace', (userId, workspaceId, role = 'contrib
 
 Cypress.Commands.add('execAsAdmin', (user, callback) => {
   cy.logout()
-  cy.loginAs('administrators')
-  const result = callback().then(res => cy.log(res.email))
-  cy.logout()
-  cy.loginAs(user.profile)
+  cy.loginAs('administrators').then( () => {
+    return callback().then(res => cy.log(res.email))
+  }).then( (result) => {
+    cy.logout()
+    cy.login(user)
+  })
+})
+
+Cypress.Commands.add('enableAgenda', (workspace, enabled = true) => {
+  const data = {
+    agenda_enabled: enabled
+  }
+  cy.request('PUT', `/api/v2/workspaces/${workspace.workspace_id}`, data).then(response => response.body)
 })
 
 Cypress.Commands.add('createRandomUser', (profile = 'users') => {
@@ -45,7 +54,10 @@ Cypress.Commands.add('createRandomUser', (profile = 'users') => {
   }
   return cy
     .request('POST', '/api/v2/users', data)
-    .then(response => response.body)
+    .then(response => {
+      response.body.password = '8QLa$<w'
+      return response.body
+  })
 })
 
 Cypress.Commands.add('createUser', (fixturePath = 'baseUser') => {
@@ -257,3 +269,13 @@ Cypress.Commands.add('logInFile', (message, logPath = '/tmp/cypress.log') => {
   cy.exec(`echo ---------- >> ${logPath}`)
   cy.exec(`echo "\n" >> ${logPath}`)
 })
+
+Cypress.Commands.add('createGuestUploadLink', (workspaceId, emailList, password = '') => {
+  const url = `/api/v2/workspaces/${workspaceId}/upload_permissions`
+  const data = {
+    emails: emailList,
+    password
+  }
+  return cy.request('POST', url, data)
+})
+

@@ -4,9 +4,9 @@ import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
   addAllResourceI18n,
+  FileDropzone,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
-import FileDropzone from '../component/FileDropzone.jsx'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
 // https://github.com/tracim/tracim/issues/2066
@@ -55,6 +55,15 @@ class PopupCreateFile extends React.Component {
     // console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
+
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
 
   handleChangeFile = newFile => {
     if (!newFile || !newFile[0]) return
@@ -108,7 +117,7 @@ class PopupCreateFile extends React.Component {
   }
 
   handleValidate = async () => {
-    const { state } = this
+    const { props, state } = this
 
     const formData = new FormData()
     formData.append('files', state.uploadFile)
@@ -147,26 +156,13 @@ class PopupCreateFile extends React.Component {
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
-              case 3002:
-                GLOBAL_dispatchEvent({
-                  type: CUSTOM_EVENT.ADD_FLASH_MSG,
-                  data: {
-                    msg: this.props.t('A content with the same name already exists'),
-                    type: 'warning',
-                    delay: undefined
-                  }
-                })
-                break
+              case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
+              case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
+              case 6003: this.sendGlobalFlashMessage(props.t('Error, the shared space exceed its maximum size')); break
+              case 6004: this.sendGlobalFlashMessage(props.t('You have reach your storage limit, you cannot add new files')); break
             }
             break
-          default: GLOBAL_dispatchEvent({
-            type: CUSTOM_EVENT.ADD_FLASH_MSG,
-            data: {
-              msg: this.props.t('Error while creating file'),
-              type: 'warning',
-              delay: undefined
-            }
-          })
+          default: this.sendGlobalFlashMessage(props.t('Error while creating file')); break
         }
       }
     }

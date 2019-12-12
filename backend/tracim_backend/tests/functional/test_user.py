@@ -11,6 +11,7 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import create_1000px_png_test_image
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -2582,13 +2583,105 @@ class TestUserDisableWorkspaceNotification(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserWorkspaceEndpoint(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces
     """
 
+    def test_api__get_user_workspaces__ok_200__with_filter(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        admin_user,
+        application_api_factory,
+        web_testapp,
+        group_api_factory,
+        role_api_factory,
+    ):
+        """
+        Check obtain all workspaces reachables for user with different filter
+        """
+
+        workspace_api = workspace_api_factory.get()
+        owned_and_role_workspace = workspace_api.create_workspace(label="owned_and_role")
+        owned_only_workspace = workspace_api.create_workspace("owned_only")
+        user_api = user_api_factory.get()
+        user_api.create_user("toto@toto.toto", do_notify=False)
+        group_api = group_api_factory.get()
+        groups = [group_api.get_one_with_name("administrators")]
+        test_user = user_api.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api_test_user = workspace_api_factory.get(test_user)
+        role_only_workspace = workspace_api_test_user.create_workspace(label="role_only")
+        rapi = role_api_factory.get()
+        rapi.create_one(admin_user, role_only_workspace, UserRoleInWorkspace.READER, False)
+        rapi.create_one(
+            test_user, owned_only_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        )
+        transaction.commit()
+        rapi_test_user = role_api_factory.get(test_user)
+        rapi_test_user.delete_one(admin_user.user_id, owned_only_workspace.workspace_id)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {}
+        res = web_testapp.get(
+            "/api/v2/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "1"}
+        res = web_testapp.get(
+            "/api/v2/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "0"}
+        res = web_testapp.get(
+            "/api/v2/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "0", "show_owned_workspace": "1"}
+        res = web_testapp.get(
+            "/api/v2/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "0", "show_owned_workspace": "0"}
+        res = web_testapp.get(
+            "/api/v2/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == set()
+
+    @pytest.mark.usefixtures("default_content_fixture")
     def test_api__get_user_workspaces__ok_200__nominal_case(
         self, workspace_api_factory, application_api_factory, web_testapp
     ):
@@ -2620,6 +2713,7 @@ class TestUserWorkspaceEndpoint(object):
             workspace["sidebar_entries"][counter]["hexcolor"] = sidebar_entry.hexcolor
             workspace["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
 
+    @pytest.mark.usefixtures("default_content_fixture")
     def test_api__get_user_workspaces__err_403__unallowed_user(self, web_testapp):
         """
         Check obtain all workspaces reachables for one user
@@ -2633,6 +2727,7 @@ class TestUserWorkspaceEndpoint(object):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
+    @pytest.mark.usefixtures("default_content_fixture")
     def test_api__get_user_workspaces__err_401__unregistered_user(self, web_testapp):
         """
         Check obtain all workspaces reachables for one user
@@ -2646,6 +2741,7 @@ class TestUserWorkspaceEndpoint(object):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
+    @pytest.mark.usefixtures("default_content_fixture")
     def test_api__get_user_workspaces__err_400__user_does_not_exist(self, web_testapp):
         """
         Check obtain all workspaces reachables for one user who does
@@ -2659,6 +2755,163 @@ class TestUserWorkspaceEndpoint(object):
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_allowed_space_limitation"}], indirect=True
+)
+class TestUserEndpointWithAllowedSpaceLimitation(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/{user_id}
+    """
+
+    def test_api__get_user__ok_200__admin(self, user_api_factory, group_api_factory, web_testapp):
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["user_id"] == user_id
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "bob"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["is_deleted"] is False
+        assert res["lang"] == "fr"
+        assert res["allowed_space"] == 134217728
+
+    def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test user"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["lang"] == "fr"
+        assert res["allowed_space"] == 134217728
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section",
+    [{"name": "functional_test_with_trusted_user_as_default_profile"}],
+    indirect=True,
+)
+class TestUserEndpointTrustedUserDefaultProfile(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/{user_id}
+    """
+
+    def test_api__create_user__ok_200__full_admin_default_profile(
+        self, web_testapp, user_api_factory
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": None,
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        user_id = res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "trusted-users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test user"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["lang"] == "fr"
+
+        uapi = user_api_factory.get()
+        user = uapi.get_one(user_id)
+        assert user.email == "test@test.test"
+        assert user.validate_password("mysuperpassword")
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_allowed_space_limitation"}], indirect=True
+)
+class TestUserDiskSpace(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/{user_id}/allowed_space
+    """
+
+    def test_api__get_user_disk_space__ok_200__admin(
+        self, user_api_factory, group_api_factory, web_testapp, workspace_api_factory
+    ):
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="test@test.test",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        workspace_api = workspace_api_factory.get(current_user=test_user, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+        image = create_1000px_png_test_image()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=200,
+        )
+        res = web_testapp.get("/api/v2/users/{}/disk_space".format(user_id), status=200)
+        res = res.json_body
+        assert res["used_space"] == 6210
+        assert res["user"]["public_name"] == "bob"
+        assert res["user"]["avatar_url"] is None
+        assert res["allowed_space"] == 134217728
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -2700,6 +2953,7 @@ class TestUserEndpoint(object):
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
         assert res["lang"] == "fr"
+        assert res["allowed_space"] == 0
 
     def test_api__get_user__ok_200__user_itself(
         self, user_api_factory, group_api_factory, web_testapp
@@ -2733,6 +2987,7 @@ class TestUserEndpoint(object):
         assert res["public_name"] == "bob"
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
+        assert res["allowed_space"] == 0
 
     def test_api__get_user__err_403__other_normal_user(
         self, user_api_factory, group_api_factory, web_testapp
@@ -2777,6 +3032,64 @@ class TestUserEndpoint(object):
             "email": "test@test.test",
             "password": "mysuperpassword",
             "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test user"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["lang"] == "fr"
+        assert res["allowed_space"] == 0
+
+    def test_api__create_user__ok_200__full_admin_with_allowed_space(
+        self, web_testapp, user_api_factory
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "allowed_space": 134217728,
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        user_id = res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test user"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["lang"] == "fr"
+        assert res["allowed_space"] == 134217728
+
+        uapi = user_api_factory.get()
+        user = uapi.get_one(user_id)
+        assert user.email == "test@test.test"
+        assert user.validate_password("mysuperpassword")
+        assert user.allowed_space == 134217728
+
+    def test_api__create_user__ok_200__full_admin_default_profile(
+        self, web_testapp, user_api_factory
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": None,
             "timezone": "Europe/Paris",
             "lang": "fr",
             "public_name": "test user",
@@ -2991,7 +3304,7 @@ class TestUserWithNotificationEndpoint(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
+        assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "test user <test@test.test>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
@@ -3022,7 +3335,7 @@ class TestUserWithNotificationEndpoint(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
+        assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "test <test@test.test>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
@@ -3566,6 +3879,92 @@ class TestKnownMembersEndpoint(object):
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
         assert res[1]["avatar_url"] is None
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_known_member_filter_disabled"}], indirect=True
+)
+class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/{user_id}
+    """
+
+    def test_api__get_user__ok_200__show_all_members(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        web_testapp,
+    ):
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="bob2",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user3 = uapi.create_user(
+            email="test3@test3.test3",
+            password="password",
+            name="bob3",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        uapi.save(test_user3)
+
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        role_api = role_api_factory.get()
+        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        params = {"acp": "test"}
+        res = web_testapp.get(
+            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+
+        assert len(res) == 3
+        assert res[0]["user_id"] == test_user.user_id
+        assert res[0]["public_name"] == test_user.display_name
+        assert res[0]["avatar_url"] is None
+
+        assert res[1]["user_id"] == test_user2.user_id
+        assert res[1]["public_name"] == test_user2.display_name
+        assert res[1]["avatar_url"] is None
+
+        assert res[2]["user_id"] == test_user3.user_id
+        assert res[2]["public_name"] == test_user3.display_name
+        assert res[2]["avatar_url"] is None
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -4371,6 +4770,99 @@ class TestSetUserProfileEndpoint(object):
         params = {"profile": "administrators"}
         res = web_testapp.put_json(
             "/api/v2/users/{}/profile".format(user_id), params=params, status=403
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestSetUserAllowedSpaceEndpoint(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for PUT /api/v2/users/{user_id}/allowed_space
+    """
+
+    def test_api__set_user_allowed_space__ok_200__admin(
+        self, user_api_factory, group_api_factory, web_testapp
+    ):
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # check before
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["user_id"] == user_id
+        assert res["allowed_space"] == 0
+        # Set params
+        params = {"allowed_space": 134217728}
+        web_testapp.put_json(
+            "/api/v2/users/{}/allowed_space".format(user_id), params=params, status=204
+        )
+        # Check After
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["user_id"] == user_id
+        assert res["allowed_space"] == 134217728
+
+    def test_api__set_user_allowed_space__err_403__other_normal_user(
+        self, user_api_factory, group_api_factory, web_testapp
+    ):
+        """
+        Set user allowed_space of user normal user as normal user
+        Return 403 error because of no right to do this as simple user
+        """
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="test",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user2)
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
+        # Set params
+        params = {"allowed_space": 134217728}
+        res = web_testapp.put_json(
+            "/api/v2/users/{}/allowed_space".format(user_id), params=params, status=403
         )
         assert res.json_body
         assert "code" in res.json_body

@@ -25,10 +25,10 @@ from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import string_to_list
-from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
@@ -53,12 +53,18 @@ class ConfigModel(object):
         webdav_enabled: bool,
         webdav_url: str,
         collaborative_document_edition: CollaborativeDocumentEditionConfig,
+        content_length_file_size_limit: int,
+        workspace_size_limit: int,
+        workspaces_number_per_user_limit: int,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
         self.webdav_enabled = webdav_enabled
         self.webdav_url = webdav_url
         self.collaborative_document_edition = collaborative_document_edition
+        self.content_length_file_size_limit = content_length_file_size_limit
+        self.workspace_size_limit = workspace_size_limit
+        self.workspaces_number_per_user_limit = workspaces_number_per_user_limit
 
 
 class ErrorCodeModel(object):
@@ -137,7 +143,7 @@ class SetEmail(object):
 
 
 class SimpleFile(object):
-    def __init__(self, files: cgi.FieldStorage) -> None:
+    def __init__(self, files: cgi.FieldStorage = None) -> None:
         self.files = files
 
 
@@ -181,6 +187,15 @@ class UserProfile(object):
         self.profile = profile
 
 
+class UserAllowedSpace(object):
+    """
+    allowed space of user
+    """
+
+    def __init__(self, allowed_space: int) -> None:
+        self.allowed_space = allowed_space
+
+
 class UserCreation(object):
     """
     Just some user infos
@@ -195,6 +210,7 @@ class UserCreation(object):
         profile: str = None,
         lang: str = None,
         email_notification: bool = True,
+        allowed_space: typing.Optional[int] = None,
     ) -> None:
         self.email = email
         # INFO - G.M - 2018-08-16 - cleartext password, default value
@@ -203,8 +219,9 @@ class UserCreation(object):
         self.public_name = public_name or None
         self.timezone = timezone or ""
         self.lang = lang or None
-        self.profile = profile or Group.TIM_USER_GROUPNAME
+        self.profile = profile or None
         self.email_notification = email_notification
+        self.allowed_space = allowed_space
 
 
 class WorkspaceAndContentPath(object):
@@ -400,8 +417,10 @@ class ContentFilter(object):
         label: str = None,
         page_nb: int = None,
         limit: int = None,
+        namespaces_filter: str = None,
     ) -> None:
         self.parent_ids = string_to_list(parent_ids, ",", int)
+        self.namespaces_filter = string_to_list(namespaces_filter, ",", ContentNamespaces)
         self.complete_path_to_id = complete_path_to_id
         self.workspace_id = workspace_id
         self.show_archived = bool(show_archived)
@@ -461,10 +480,14 @@ class WorkspaceUpdate(object):
         label: typing.Optional[str] = None,
         description: typing.Optional[str] = None,
         agenda_enabled: typing.Optional[bool] = None,
+        public_upload_enabled: typing.Optional[bool] = None,
+        public_download_enabled: typing.Optional[bool] = None,
     ) -> None:
         self.label = label
         self.description = description
         self.agenda_enabled = agenda_enabled
+        self.public_upload_enabled = public_upload_enabled
+        self.public_download_enabled = public_download_enabled
 
 
 class WorkspaceCreate(object):
@@ -472,10 +495,19 @@ class WorkspaceCreate(object):
     Update workspace
     """
 
-    def __init__(self, label: str, description: str, agenda_enabled: bool = True) -> None:
+    def __init__(
+        self,
+        label: str,
+        description: str,
+        agenda_enabled: bool = True,
+        public_upload_enabled: bool = True,
+        public_download_enabled: bool = True,
+    ) -> None:
         self.label = label
         self.description = description
         self.agenda_enabled = agenda_enabled
+        self.public_upload_enabled = public_upload_enabled
+        self.public_download_enabled = public_download_enabled
 
 
 class ContentCreation(object):
@@ -566,6 +598,10 @@ class UserInContext(object):
     # Default
 
     @property
+    def user_in_context(self) -> "UserInContext":
+        return self
+
+    @property
     def email(self) -> str:
         return self.user.email
 
@@ -599,7 +635,7 @@ class UserInContext(object):
 
     @property
     def profile(self) -> Profile:
-        return self.user.profile.name
+        return self.user.profile.slug
 
     @property
     def is_deleted(self) -> bool:
@@ -616,6 +652,17 @@ class UserInContext(object):
     def auth_type(self) -> str:
         return self.user.auth_type.value
 
+    @property
+    def allowed_space(self) -> int:
+        return self.user.allowed_space
+
+    @property
+    def used_space(self) -> int:
+        from tracim_backend.lib.core.workspace import WorkspaceApi
+
+        wapi = WorkspaceApi(current_user=None, session=self.dbsession, config=self.config)
+        return wapi.get_user_used_space(self.user)
+
 
 class WorkspaceInContext(object):
     """
@@ -626,6 +673,10 @@ class WorkspaceInContext(object):
         self.workspace = workspace
         self.dbsession = dbsession
         self.config = config
+
+    @property
+    def workspace_in_context(self) -> "WorkspaceInContext":
+        return self
 
     @property
     def workspace_id(self) -> int:
@@ -677,6 +728,20 @@ class WorkspaceInContext(object):
         return self.workspace.agenda_enabled
 
     @property
+    def public_download_enabled(self) -> bool:
+        """
+        returns True if public download is enabled in this workspace
+        """
+        return self.workspace.public_download_enabled
+
+    @property
+    def public_upload_enabled(self) -> bool:
+        """
+        returns True if public upload is enabled in this workspace
+        """
+        return self.workspace.public_upload_enabled
+
+    @property
     def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:
         """
         get sidebar entries, those depends on activated apps.
@@ -695,6 +760,26 @@ class WorkspaceInContext(object):
             workspace_id=self.workspace_id
         )
         return root_frontend_url + workspace_frontend_url
+
+    @property
+    def owner(self) -> typing.Optional[UserInContext]:
+        if self.workspace.owner:
+            return UserInContext(
+                dbsession=self.dbsession, config=self.config, user=self.workspace.owner
+            )
+        return None
+
+    @property
+    def created(self) -> datetime:
+        return self.workspace.created
+
+    @property
+    def used_space(self) -> int:
+        return self.workspace.get_size()
+
+    @property
+    def allowed_space(self) -> int:
+        return self.config.LIMITATION__WORKSPACE_SIZE
 
 
 class UserRoleWorkspaceInContext(object):
@@ -816,6 +901,10 @@ class ContentInContext(object):
     @property
     def workspace(self) -> Workspace:
         return self.content.workspace
+
+    @property
+    def content_namespace(self) -> ContentNamespaces:
+        return self.content.content_namespace.value
 
     @property
     def parent(self) -> typing.Optional["ContentInContext"]:
@@ -1116,6 +1205,15 @@ class ContentInContext(object):
         if self.content.depot_file:
             return base64.b64encode(self.content.depot_file.file.read()).decode("ascii")
         return None
+
+    @property
+    def actives_shares(self) -> int:
+        # TODO - G.M - 2019-08-12 - handle case where share app is not enabled, by
+        # not starting it there. see #2189
+        from tracim_backend.applications.share.lib import ShareLib
+
+        api = ShareLib(config=self.config, session=self.dbsession, current_user=self._user)
+        return len(api.get_content_shares(self.content))
 
 
 class RevisionInContext(object):

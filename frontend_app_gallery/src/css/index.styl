@@ -1,0 +1,145 @@
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
+.carousel
+  &__thumbnail
+    & .slick-current
+      & .carousel__thumbnail__item__preview__content__image
+        background-color #7d4e24
+    &__item__preview__content
+      height 150px
+      margin 16px
+      display flex
+      align-items center
+      cursor pointer
+      &__image
+        margin 0 auto
+        box-shadow 0 0 8px 4px rgba(0,0,0,0.2)
+        border none
+        &:hover
+          box-shadow 0 0 16px 4px rgba(0,0,0,0.3)
+  &__item__preview
+    height 100%
+    &__content
+      height 100%
+      display: block
+      text-align: center
+      &__image
+        padding 8px
+        display flex
+        height 100%
+        & img
+          max-height 100%
+          margin auto
+          object-fit contain
+          cursor pointer
+          box-shadow 0 0 8px 2px rgba(0,0,0,0.2)
+  &__arrow
+    position absolute
+    height 100%
+    width 60px
+    cursor pointer
+    display block
+    top 0
+    z-index 1
+    & i
+      position absolute
+      top calc(50% - 20px)
+      left 50%
+      transform translateX(-50%)
+      font-size 40px
+    &:hover
+      background-color rgba(0, 0, 0, 0.1)
+      border-radius 10px
+    &.arrownext
+      right -20px
+    &.arrowprev
+      left -20px
+
+.gallery
+  height 100%
+  overflow auto
+  &__action__button
+    text-align center
+    & button
+      margin 5px
+    & i
+      margin-left 10px
+    &__lightbox
+      & > button
+        padding 5px 8.5px
+        cursor pointer
+      &__rotation
+        &__right > i
+          transform scaleX(-1)
+      &__openRawContent
+        // INFO - GM - 2019-11-29 - Copy the style of lightbox button because it is a <a> tag
+        margin 2px
+        padding 5px 8.5px
+        font-size 1.1rem
+        border-radius 0.25rem
+        color #929292
+        background-color rgba(0, 0, 0, 0.5)
+        &:hover
+          color #929292
+    &__rotation__right > i
+      transform scaleX(-1)
+  &__delete__file__popup
+    & .cardPopup__container
+      width 400px
+    &__body
+      width 100%
+      &__btn
+        display flex
+        justify-content flex-end
+        .btn:first-child
+          margin-right 15px
+  &__noContent
+    text-align center
+    font-size 20px
+  &__loader
+    width 100%
+    height 60vh
+    display flex
+    align-items center
+    justify-content center
+    &__icon
+      font-size 50px
+
+.rotate0
+  transform rotate(0deg)
+  transition none
+.rotate90
+  transform rotate(90deg)
+  transition none
+.rotate180
+  transform rotate(180deg)
+  transition none
+.rotate270
+  transform rotate(270deg)
+  transition none
+
+.ril__caption, .ril__toolbar
+  background none
+
+.ril__toolbarRightSide button
+  margin 2px
+  border-radius 0.25rem
+  background-color rgba(0, 0, 0, 0.5)
+  font-size 1.1rem
+  color #929292
+
+.slick-slide > div
+  height 100%
+
+.carousel__main .slick-track
+  height 60vh
+
+// MEDIAQUERIES
+
+@media (max-width: max-xs)
+  .gallery
+    &__action__button
+      & i
+        margin-left: 0
+      &__text
+        display none

@@ -31,13 +31,16 @@ from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
+from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
+from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
@@ -71,6 +74,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserWorkspaceFilterQuerySchema())
     @hapic.output_body(WorkspaceDigestSchema(many=True))
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -83,7 +87,11 @@ class UserController(Controller):
             config=app_config,
         )
 
-        workspaces = wapi.get_all_for_user(request.candidate_user)
+        workspaces = wapi.get_all_for_user(
+            request.candidate_user,
+            include_owned=hapic_data.query.show_owned_workspace,
+            include_with_role=hapic_data.query.show_workspace_with_role,
+        )
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -93,6 +101,20 @@ class UserController(Controller):
     def user(self, context, request: TracimRequest, hapic_data=None):
         """
         Get user infos.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return uapi.get_user_with_context(request.candidate_user)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(UserDiskSpaceSchema())
+    def user_disk_space(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get user space infos.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
@@ -135,6 +157,7 @@ class UserController(Controller):
             acp=hapic_data.query.acp,
             exclude_user_ids=hapic_data.query.exclude_user_ids,
             exclude_workspace_ids=hapic_data.query.exclude_workspace_ids,
+            filter_results=app_config.KNOWN_MEMBERS__FILTER,
         )
         context_users = [uapi.get_user_with_context(user) for user in users]
         return context_users
@@ -228,7 +251,10 @@ class UserController(Controller):
         gapi = GroupApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        groups = [gapi.get_one_with_name(hapic_data.body.profile)]
+        if hapic_data.body.profile:
+            groups = [gapi.get_one_with_name(hapic_data.body.profile)]
+        else:
+            groups = []
         password = hapic_data.body.password
         if not password and hapic_data.body.email_notification:
             password = password_generator()
@@ -241,6 +267,7 @@ class UserController(Controller):
             lang=hapic_data.body.lang,
             name=hapic_data.body.public_name,
             do_notify=hapic_data.body.email_notification,
+            allowed_space=hapic_data.body.allowed_space,
             groups=groups,
             do_save=True,
         )
@@ -334,6 +361,27 @@ class UserController(Controller):
             user=request.candidate_user,
             auth_type=request.candidate_user.auth_type,
             groups=groups,
+            do_save=True,
+        )
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(is_administrator)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(SetUserAllowedSpaceSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_allowed_space(self, context, request: TracimRequest, hapic_data=None):
+        """
+        set user allowed_space
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        uapi.update(
+            user=request.candidate_user,
+            auth_type=request.candidate_user.auth_type,
+            allowed_space=hapic_data.body.allowed_space,
             do_save=True,
         )
         return
@@ -516,6 +564,12 @@ class UserController(Controller):
         configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # noqa: W605
         configurator.add_view(self.user, route_name="user")
 
+        # user space info
+        configurator.add_route(
+            "user_disk_space", "/users/{user_id:\d+}/disk_space", request_method="GET"
+        )  # noqa: W605
+        configurator.add_view(self.user_disk_space, route_name="user_disk_space")
+
         # users lists
         configurator.add_route("users", "/users", request_method="GET")
         configurator.add_view(self.users, route_name="users")
@@ -581,6 +635,14 @@ class UserController(Controller):
             "set_user_profile", "/users/{user_id:\d+}/profile", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_profile, route_name="set_user_profile")
+
+        # set user allowed_space
+        configurator.add_route(
+            "set_user_allowed_space",
+            "/users/{user_id:\d+}/allowed_space",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.set_allowed_space, route_name="set_user_allowed_space")
 
         # user content
         configurator.add_route(

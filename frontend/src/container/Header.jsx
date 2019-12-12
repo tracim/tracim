@@ -31,12 +31,16 @@ import {
 } from '../helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
-import { IconWithWarning, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import {
+  ComposedIcon,
+  CUSTOM_EVENT
+} from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 
 class Header extends React.Component {
   componentDidMount () {
+    this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', {})
     i18n.changeLanguage(this.props.user.lang)
   }
 
@@ -74,6 +78,7 @@ class Header extends React.Component {
     const fetchPostUserLogout = await dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
       dispatch(setUserDisconnected())
+      this.props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
       history.push(PAGE.LOGIN)
     } else {
       dispatch(newFlashMessage(t('Disconnection error', 'danger')))
@@ -111,16 +116,23 @@ class Header extends React.Component {
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
             <ul className='header__menu__rightside'>
-              {!unLoggedAllowedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
+              {!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && !props.system.config.email_notification_activated && (
                 <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
-                    <IconWithWarning
-                      icon='envelope'
-                      customClass='slowblink'
+                    <ComposedIcon
+                      mainIcon='envelope'
+                      smallIcon='warning'
+                      mainIconCustomClass='slowblink'
+                      smallIconCustomClass='text-danger'
                     />
                   </div>
                 </li>
               )}
+
+              <li
+                id='customToolboxHeaderBtn'
+                className='header__menu__rightside__specificBtn'
+              />
 
               {props.user.logged &&
                 <li className='search__nav'>
@@ -137,7 +149,7 @@ class Header extends React.Component {
                 </li>
               )}
 
-              {!unLoggedAllowedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
+              {!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && props.appList.some(a => a.slug === 'agenda') && (
                 <li className='header__menu__rightside__agenda'>
                   <Link
                     className='btn outlineTextBtn primaryColorBorder nohover'

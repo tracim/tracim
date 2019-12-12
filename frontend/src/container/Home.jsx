@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../appFactory.js'
@@ -29,7 +28,8 @@ export class Home extends React.Component {
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview fullWidthFullHeight'>
           <section
-            className={classnames('homepage', props.workspaceList.length === 0 ? 'primaryColorBg' : '')}
+            className='homepage'
+            style={{ backgroundColor: props.workspaceList.length === 0 ? 'gray' : 'white' }}
           >
             <Card customClass='homepagecard'>
               <CardHeader displayHeader={false} />

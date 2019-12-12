@@ -332,7 +332,9 @@ class EmailManager(object):
 
             send_email_through(self.config, email_sender.send_mail, message)
 
-    def notify_created_account(self, user: User, password: str) -> None:
+    def notify_created_account(
+        self, user: User, password: str, origin_user: typing.Optional[User] = None
+    ) -> None:
         """
         Send created account email to given user.
 
@@ -351,12 +353,13 @@ class EmailManager(object):
         subject = translated_subject.replace(EST.WEBSITE_TITLE, str(self.config.WEBSITE__TITLE))
         message = MIMEMultipart("alternative")
         message["Subject"] = subject
-        message["From"] = self._get_sender()
+        message["From"] = self._get_sender(origin_user)
         message["To"] = formataddr((user.get_display_name(), user.email))
 
         html_template_file_path = self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML
 
         context = {
+            "origin_user": origin_user,
             "user": user,
             "password": password,
             "logo_url": get_email_logo_frontend_url(self.config),
@@ -443,6 +446,7 @@ class EmailManager(object):
                 imports=[
                     "from mako.filters import html_escape",
                     "from lxml.html.diff import htmldiff",
+                    "import humanize",
                 ],
             )
             return template.render(_=translator.get_translation, config=self.config, **context)

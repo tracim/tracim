@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
@@ -177,36 +176,29 @@ class TestThread(object):
         assert business_workspace.label != "business"
         assert business_workspace.label.startswith("business-deleted-")
 
-    def test_unit__create_workspace_same__error__same_workspace_name_unallowed(
+    def test_unit__create_workspace_same__ok__same_workspace_name_allowed(
         self, admin_user, session, app_config
     ):
 
         wapi = WorkspaceApi(session=session, current_user=admin_user, config=app_config)
         wapi.create_workspace(label="business", save_now=True)
-        with pytest.raises(WorkspaceLabelAlreadyUsed):
-            wapi.create_workspace(label="business", save_now=True)
+        wapi.create_workspace(label="business", save_now=True)
 
-    def test_unit__rename_workspace_same_wworkspace_same_name__ok__nominal_case(
+    def test_unit__rename_workspace_same_workspace_same_name__ok__nominal_case(
         self, admin_user, session, app_config
     ):
 
         wapi = WorkspaceApi(session=session, current_user=admin_user, config=app_config)
         workspace1 = wapi.create_workspace(label="business", save_now=True)
         modified_datetime = workspace1.updated
-        try:
-            wapi.update_workspace(workspace=workspace1, label="business", description="")
-        except WorkspaceLabelAlreadyUsed:
-            pytest.fail("Unexpected WorkspaceLabelAlreadyUsed..")
+        wapi.update_workspace(workspace=workspace1, label="business", description="")
         assert workspace1.updated != modified_datetime
 
-    def test_unit__rename_workspace_same_name_other_workspace__err__same_workspace_name_unallowed(
+    def test_unit__rename_workspace_same_name_other_workspace__ok__same_workspace_name_allowed(
         self, session, admin_user, app_config
     ):
 
         wapi = WorkspaceApi(session=session, current_user=admin_user, config=app_config)
         wapi.create_workspace(label="business", save_now=True)
         workspace2 = wapi.create_workspace(label="meeting", save_now=True)
-        with pytest.raises(WorkspaceLabelAlreadyUsed):
-            wapi.update_workspace(
-                workspace=workspace2, label="business", save_now=True, description=""
-            )
+        wapi.update_workspace(workspace=workspace2, label="business", save_now=True, description="")

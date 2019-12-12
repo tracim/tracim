@@ -1,4 +1,117 @@
 
+
+# 2.5.1 / 2019-12-06
+
+### New Features
+- Custom_toolbox feature is now available - beta
+
+### Fixed issues
+- Email: #2565
+- Frontend: #2345
+- Backend: #2558
+
+
+# 2.5.0 / 2019-11-29
+
+### New Features
+- Application gallery
+
+### Fixed issues
+- Preview-generator: #2532
+- Backend: #2518, #2526
+
+### Breaking change api
+- remove "size" parameter from create/update/get/get all workspaces endpoint
+
+
+# 2.4.5 / 2019-11-21
+
+### New Features
+- Creation of multiple shared spaces with same name
+- Configure default profile of new users 
+- Space Limitations (experimental) - allow some controls on users allowed space, etc
+
+### Fixed issues
+- General UX: #2494
+- Timeline: #2455
+- File App: #2501 
+- Backend & system: #2392, #2474, #2475, #2476, #2477, #2489, #2500, #2511
+
+
+# 2.4.4 / 2019-11-13
+
+### New Features
+
+- Preview of 3D files (*.stl), videos (10 image per each video) are now available
+
+### Fixed issues
+- Preview-generator: #2503, #2492
+
+### Known issues
+- Manual modification to install tracim on Ubuntu Trusty (14.04) is necessary (#2514)
+
+
+# 2.4.3 / 2019-09-26
+
+### Fixed issues
+- Docker: #2445
+- Content Listing: extended action button not working correctly
+
+
+# 2.4.2 / 2019-09-24
+
+### Fixed issues
+- Timeline: Missing css rule about word-break for comment
+
+
+# 2.4.1 / 2019-09-20
+
+### Fixed issues
+- Migration issue introduced with 2.4.0
+
+
+## 2.4.0 / 2019-09-19
+
+### New Features
+
+- Online document edition through CollaboraOnline/LibreofficeOnline integration
+- Public file share in download (allow remote users to access to a file stored in tracim, eventually through a password protected access)
+- Public file upload (allow remote users to upload to tracim their files, eventually through a password protected access)
+- Content meta-information panel (timeline, info) UI rework
+- Space Limitations (experimental) - allow some controls on file/workspace sizes, number of workspace per user, etc
+
+### Fixed issues
+
+- Content Listing: #1986, #2046, #2232, #2262, #2360
+- File App: #2062, #2174, #2203, #2265, #2273, #2294
+- Folder App: #1918, #2087, #2191, #2244
+- Timeline: #2275, #2276, #2282, #2300, #2316
+- Dashboard: #1774, #2038, #2242
+- Search: #1928, #1973
+- Backend & system: #619, #2105, #2132, #2154, #2177, #2224, #2314, #2354
+- Documentation: #2117, #2155
+- General: #1887, #1910, #1956, #1992, #2011, #2064, #2091, #2141, #2149
+- General UX: #573, #1198, #2076, #2092, #2096, #2121, #2159, #2237, #2299, #2395
+
+
+### Known issues
+
+- Debian 9 is released with Firefox ESR v60.8.0. In this version, long title are not limited in upload file popup (issue #2062)
+- Opening file with special characters in label on CollaboraOnline/LibreofficeOnline is not possible (issue #2219)
+- Tracim not support lock mecanism in collaborative edition (issue #2073)
+
+### Other changes
+
+Archive button not more used in Tracim. All archive buttons is hide (#2347)
+
+
+## 2.3.2 / 2019-08-01
+
+### Fixed issues
+
+- Email notifications: #2134
+
+
 ## 2.3.1 / 2019-07-05
 
 ### Fixed issues

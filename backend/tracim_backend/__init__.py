@@ -36,6 +36,7 @@ from tracim_backend.lib.agenda.authorization import add_www_authenticate_header_
 from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
     CollaborativeDocumentEditionFactory,
 )
+from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -83,6 +84,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_config = CFG(settings)
     app_config.configure_filedepot()
     settings["CFG"] = app_config
+    plugin_manager = init_plugin_manager(app_config)
+    settings["event_dispatcher"] = plugin_manager.event_dispatcher
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
     tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
@@ -213,6 +216,11 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     share_app_controller.import_controller(
         app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
     )
+    import tracim_backend.applications.upload_permissions.controller as upload_permission_controller
+
+    upload_permission_controller.import_controller(
+        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
+    )
 
     if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
         # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
@@ -265,8 +273,15 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(search_controller.bind, route_prefix=BASE_API_V2)
     if app_config.FRONTEND__SERVE:
         configurator.include("pyramid_mako")
-        frontend_controller = FrontendController(app_config.FRONTEND__DIST_FOLDER_PATH)
+        frontend_controller = FrontendController(
+            app_config.FRONTEND__DIST_FOLDER_PATH, app_config.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH
+        )
         configurator.include(frontend_controller.bind)
+
+    # INFO - G.M - 2019-11-27 - Include plugin custom web code
+    plugin_manager.event_dispatcher.hook.web_include(
+        configurator=configurator, app_config=app_config
+    )
 
     hapic.add_documentation_view("/api/v2/doc", "Tracim v2 API", "API of Tracim v2")
     return configurator.make_wsgi_app()

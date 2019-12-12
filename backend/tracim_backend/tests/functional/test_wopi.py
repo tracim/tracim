@@ -172,6 +172,7 @@ class TestWOPI(object):
             response["LastModifiedTime"]
             != updated_at.replace(tzinfo=datetime.timezone.utc).isoformat()
         )
+        assert content.file_mimetype == content.depot_file.content_type == "plain/text"
         assert file_.read() == new_content
 
     def test_api__put_content__ok_200__nominal_case_libreoffice_online(
@@ -235,6 +236,7 @@ class TestWOPI(object):
             response["LastModifiedTime"]
             != updated_at.replace(tzinfo=datetime.timezone.utc).isoformat()
         )
+        assert content.file_mimetype == content.depot_file.content_type == "plain/text"
         assert file_.read() == new_content
 
     def test_api__put_content__err_409__libreoffice_online_content_as_changed(

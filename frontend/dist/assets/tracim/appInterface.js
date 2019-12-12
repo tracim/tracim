@@ -27,8 +27,12 @@ var getSelectedApp = function (appName) {
         return (appWorkspaceAdvanced || {default: {}}).default
       case 'agenda':
         return (appAgenda || {default: {}}).default
-      case 'office_document':
-        return (appOfficeDocument || {default: {}}).default
+      case 'share_folder':
+        return (appShareFolderAdvanced || {default: {}}).default
+      case 'collaborative_document_edition':
+        return (appCollaborativeDocumentEdition || {default: {}}).default
+      case 'gallery':
+        return (appGallery || {default: {}}).default
       default:
         return APP_NOT_LOADED
     }

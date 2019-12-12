@@ -22,8 +22,12 @@ const wsEnTranslation = require('../dist/app/workspace_en_translation.json')
 const wsFrTranslation = require('../dist/app/workspace_fr_translation.json')
 const agendaEnTranslation = require('../dist/app/agenda_en_translation.json')
 const agendaFrTranslation = require('../dist/app/agenda_fr_translation.json')
-const officeDocumentEnTranslation = require('../dist/app/office_document_en_translation.json')
-const officeDocumentFrTranslation = require('../dist/app/office_document_fr_translation.json')
+const collaborativeDocumentEditionEnTranslation = require('../dist/app/collaborative_document_edition_en_translation.json')
+const collaborativeDocumentEditionFrTranslation = require('../dist/app/collaborative_document_edition_fr_translation.json')
+const shareFolderEnTranslation = require('../dist/app/share_folder_en_translation.json')
+const shareFolderFrTranslation = require('../dist/app/share_folder_fr_translation.json')
+const galleryEnTranslation = require('../dist/app/gallery_en_translation.json')
+const galleryFrTranslation = require('../dist/app/gallery_fr_translation.json')
 
 export const getBrowserLang = () => {
   const browserLang = navigator.language
@@ -57,7 +61,9 @@ i18n
           ...adminWsUserEnTranslation, // admin workspace user
           ...wsEnTranslation, // workspace
           ...agendaEnTranslation, // agenda
-          ...officeDocumentEnTranslation
+          ...collaborativeDocumentEditionEnTranslation,
+          ...shareFolderEnTranslation, // share folder,
+          ...galleryEnTranslation // gallery
         }
       },
       fr: {
@@ -72,7 +78,9 @@ i18n
           ...adminWsUserFrTranslation, // admin workspace user
           ...wsFrTranslation, // workspace
           ...agendaFrTranslation, // agenda
-          ...officeDocumentFrTranslation
+          ...collaborativeDocumentEditionFrTranslation,
+          ...shareFolderFrTranslation, // share folder
+          ...galleryFrTranslation // gallery
         }
       }
     }

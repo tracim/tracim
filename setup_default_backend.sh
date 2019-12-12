@@ -25,7 +25,7 @@ function logerror {
 function install_backend_system_dep {
     log "install base debian-packaged-dep for backend..."
     $SUDO apt update
-    PACKAGE_LIST='python3 python3-venv python3-dev python3-pip redis-server zlib1g-dev libjpeg-dev imagemagick libmagickwand-dev libpq-dev ghostscript libfile-mimeinfo-perl poppler-utils libimage-exiftool-perl qpdf libldap2-dev libsasl2-dev libreoffice inkscape'
+    PACKAGE_LIST='python3 python3-venv python3-dev python3-pip redis-server zlib1g-dev libjpeg-dev imagemagick libmagickwand-dev libpq-dev ghostscript libfile-mimeinfo-perl poppler-utils libimage-exiftool-perl qpdf libldap2-dev libsasl2-dev libreoffice inkscape ufraw-batch ffmpeg'
     for PACKAGE in $PACKAGE_LIST
     do
         $SUDO apt install -y $PACKAGE && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
@@ -40,7 +40,7 @@ function setup_pyenv {
 
 function install_backend_python_packages {
     log "install pip and setuptools"
-    pip install --upgrade pip setuptools && loggood "install pip and setuptools success" || logerror "failed to install pip and setuptools"
+    pip install --upgrade pip setuptools wheel && loggood "install pip and setuptools success" || logerror "failed to install pip and setuptools"
     log "install dependencies from requirements.txt"
     pip install -r "requirements.txt" && loggood "install requirements.txt success" || logerror "failed to install requirements.txt"
     log "install tracim-backend (sqlite_backend)..."
@@ -131,11 +131,11 @@ function install_npm_and_nodejs {
         logerror "npm not installed"
         log "install npm with nodejs"
         $SUDO apt install -y curl && loggood "install curl success" || logerror "failed to install curl"
-        curl -sL https://deb.nodesource.com/setup_8.x | $SUDOCURL bash -
+        curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
         $SUDO apt update
         $SUDO apt install -y nodejs && loggood "install nodejs success" || logerror "failed to install nodejs"
-        log "verify if nodejs 8.x is now installed"
-        dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s8.'
+        log "verify if nodejs 10.x is now installed"
+        dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s10.'
         if [ $? -eq 0 ]; then
             loggood "node \"$(node -v)\" is correctly installed"
             npm -v
@@ -146,7 +146,7 @@ function install_npm_and_nodejs {
             exit 1
             fi
         else
-            logerror "nodejs 8.x and npm are not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
+            logerror "nodejs 10.x and npm are not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
             exit 1
         fi
     fi
@@ -188,4 +188,3 @@ translate_email
 # Return to "$DEFAULTDIR/"
 log "cd $DEFAULTDIR"
 cd $DEFAULTDIR || exit 1
-

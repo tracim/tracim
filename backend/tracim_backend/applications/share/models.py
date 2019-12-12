@@ -4,6 +4,7 @@ from hashlib import sha256
 import os
 import typing
 
+import sqlalchemy
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -16,7 +17,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import synonym
 
 from tracim_backend.models.auth import User
-from tracim_backend.models.data import Content
 from tracim_backend.models.meta import DeclarativeBase
 
 
@@ -44,13 +44,18 @@ class ContentShare(DeclarativeBase):
     author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     email = Column(Unicode(MAX_EMAIL_LENGTH), nullable=False)
     share_token = Column(Unicode(MAX_SHARE_TOKEN_LENGTH), nullable=False)
-    share_group_id = Column(Unicode(MAX_GROUP_SHARE_ID_LENGTH), nullable=False)
+    share_group_uuid = Column(Unicode(MAX_GROUP_SHARE_ID_LENGTH), nullable=False)
     type = Column(Enum(ContentShareType), nullable=False)
     _password = Column("password", Unicode(MAX_HASHED_PASSWORD_LENGTH), nullable=True)
-    enabled = Column(Boolean, unique=False, nullable=False, default=True)
+    enabled = Column(
+        Boolean,
+        unique=False,
+        nullable=False,
+        default=True,
+        server_default=sqlalchemy.sql.expression.literal(True),
+    )
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     disabled = Column(DateTime, unique=False, nullable=True, default=None)
-    content = relationship("Content", remote_side=[Content.id], backref="shares")
     author = relationship("User", remote_side=[User.user_id])
 
     @classmethod

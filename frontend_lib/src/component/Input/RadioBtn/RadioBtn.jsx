@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 
 const POSITION_TOP = 'top'
 const POSITION_BOTTOM = 'bottom'
@@ -19,12 +20,28 @@ class RadioBtn extends React.Component{
       <div
         className={'radio_btn_group__btn ' + (isChecked ? 'radio_btn_group__btn__checked' : '')}
         onClick={this.handleClick.bind(this)}
+        onKeyDown={this.props.handleKeyDown ? this.props.handleKeyDown: () => {}}
         data-value={value}
+        tabIndex='0'
       >
         <label>{text}</label>
       </div>
     )
   }
+}
+
+RadioBtn.propTypes = {
+  onClick: PropTypes.func,
+  isChecked: PropTypes.bool,
+  value: PropTypes.string,
+  text: PropTypes.string
+}
+
+RadioBtn.defaultProps = {
+  onClick: () => {},
+  isChecked: false,
+  value: '',
+  text: ''
 }
 
 class RadioBtnWithImage extends React.Component{
@@ -50,18 +67,40 @@ class RadioBtnWithImage extends React.Component{
     return (
       <div
         className={className}
-        onClick={this.handleClick.bind(this)}
         data-value={value}
         style={{
           ...positionStyle,
           borderColor: customColor
         }}
+        onClick={this.handleClick.bind(this)}
+        onKeyDown={this.props.handleKeyDown ? this.props.handleKeyDown: () => {}}
+        tabIndex='0'
       >
         <img className={'radio_btn_group__btn__img__img'} src={img.src} alt={img.alt} height={img.height} width={img.width} />
         <div className={'radio_btn_group__btn__img__label'}>{text}</div>
       </div>
       )
   }
+}
+
+RadioBtnWithImage.propTypes = {
+  onClick: PropTypes.func,
+  index: PropTypes.number,
+  img: PropTypes.object,
+  isChecked: PropTypes.bool,
+  value: PropTypes.string,
+  text: PropTypes.string,
+  customColor: PropTypes.string
+}
+
+RadioBtnWithImage.defaultProps = {
+  onClick: () => {},
+  index: 0,
+  img: { position: '', src: '', alt: '', height: '', width: '' },
+  isChecked: false,
+  value: '',
+  text: '',
+  customColor: ''
 }
 
 export class RadioBtnGroup extends React.Component {
@@ -96,8 +135,10 @@ export class RadioBtnGroup extends React.Component {
             text={option.text}
             value={option.value}
             index={i}
-            onClick={this.toggleRadioBtn.bind(this)}
             customColor={customColor}
+            onClick={this.toggleRadioBtn.bind(this)}
+            handleKeyDown={this.props.handleKeyDown}
+
           />
         )
       }
@@ -109,6 +150,7 @@ export class RadioBtnGroup extends React.Component {
           value={option.value}
           index={i}
           onClick={this.toggleRadioBtn.bind(this)}
+          handleKeyDown={this.props.handleKeyDown}
         />
       )
     })
@@ -119,6 +161,20 @@ export class RadioBtnGroup extends React.Component {
       <div className="radio_btn_group">{this.buildButtons()}</div>
     )
   }
+}
+
+RadioBtnGroup.propTypes = {
+  selectedIndex: PropTypes.number,
+  options: PropTypes.arrayOf(PropTypes.object),
+  handleNewSelectedValue: PropTypes.func,
+  customColor: PropTypes.string
+}
+
+RadioBtnGroup.defaultProps = {
+  selectedIndex: 0,
+  options: [],
+  handleNewSelectedValue: () => {},
+  customColor: ''
 }
 
 export default RadioBtnGroup

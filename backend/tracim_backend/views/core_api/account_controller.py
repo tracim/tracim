@@ -27,7 +27,9 @@ from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
+from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
@@ -55,6 +57,19 @@ class AccountController(Controller):
     def account(self, context, request: TracimRequest, hapic_data=None):
         """
         Get user infos.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return uapi.get_user_with_context(request.current_user)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.output_body(UserDiskSpaceSchema())
+    def account_disk_space(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get user space infos.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
@@ -103,6 +118,7 @@ class AccountController(Controller):
             acp=hapic_data.query.acp,
             exclude_user_ids=hapic_data.query.exclude_user_ids,
             exclude_workspace_ids=hapic_data.query.exclude_workspace_ids,
+            filter_results=app_config.KNOWN_MEMBERS__FILTER,
         )
         context_users = [uapi.get_user_with_context(user) for user in users]
         return context_users
@@ -156,6 +172,7 @@ class AccountController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_CONTENT_ENDPOINTS])
     @check_right(is_user)
+    @hapic.input_query(UserWorkspaceFilterQuerySchema())
     @hapic.output_body(WorkspaceDigestSchema(many=True))
     def account_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -165,8 +182,11 @@ class AccountController(Controller):
         wapi = WorkspaceApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-
-        workspaces = wapi.get_all_for_user(request.current_user)
+        workspaces = wapi.get_all_for_user(
+            request.current_user,
+            include_owned=hapic_data.query.show_owned_workspace,
+            include_with_role=hapic_data.query.show_workspace_with_role,
+        )
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_CONTENT_ENDPOINTS])
@@ -340,8 +360,11 @@ class AccountController(Controller):
         # account info
         configurator.add_route("account", "/users/me", request_method="GET")
         configurator.add_view(self.account, route_name="account")
-        #
-        #
+
+        # account space info
+        configurator.add_route("account_disk_space", "/users/me/disk_space", request_method="GET")
+        configurator.add_view(self.account_disk_space, route_name="account_disk_space")
+
         # known members lists
         configurator.add_route(
             "account_known_members", "/users/me/known_members", request_method="GET"

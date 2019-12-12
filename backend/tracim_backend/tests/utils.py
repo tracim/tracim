@@ -19,6 +19,7 @@ from wsgidav.dav_provider import _DAVResource
 from tracim_backend import CFG
 from tracim_backend import CaldavAppFactory
 from tracim_backend.applications.share.lib import ShareLib
+from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
@@ -29,6 +30,7 @@ from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import 
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.setup_models import get_tm_session
 
@@ -45,6 +47,7 @@ class ContentApiFactory(object):
         show_active: bool = True,
         show_deleted: bool = False,
         show_archived: bool = False,
+        namespace_filter: typing.Optional[typing.List[ContentNamespaces]] = None,
     ) -> ContentApi:
         return ContentApi(
             session=self.session,
@@ -53,6 +56,7 @@ class ContentApiFactory(object):
             show_active=show_active,
             show_deleted=show_deleted,
             show_archived=show_archived,
+            namespaces_filter=namespace_filter,
         )
 
 
@@ -64,6 +68,20 @@ class ShareLibFactory(object):
 
     def get(self, current_user: typing.Optional[User] = None) -> ShareLib:
         return ShareLib(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.admin_user,
+        )
+
+
+class UploadPermissionLibFactory(object):
+    def __init__(self, session: Session, app_config: CFG, admin_user: User):
+        self.session = session
+        self.app_config = app_config
+        self.admin_user = admin_user
+
+    def get(self, current_user: typing.Optional[User] = None) -> UploadPermissionLib:
+        return UploadPermissionLib(
             session=self.session,
             config=self.app_config,
             current_user=current_user or self.admin_user,
@@ -164,6 +182,9 @@ def webdav_put_new_test_file_helper(
 ) -> _DAVResource:
     # This part id a reproduction of
     # wsgidav.request_server.RequestServer#doPUT
+
+    # INFO - G.M - 2019-07-11 - set content_length to correct value according to file_content
+    environ["CONTENT_LENGTH"] = len(file_content)
 
     # Grab parent folder where create file
     parentRes = provider.getResourceInst(wsgidav_util.getUriParent(file_path), environ)

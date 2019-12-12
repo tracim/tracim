@@ -48,6 +48,7 @@ from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.agenda.agenda import AgendaApi
 from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import AuthType
@@ -56,6 +57,8 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import TypeUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
+
+DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT = 5
 
 
 class UserApi(object):
@@ -155,12 +158,17 @@ class UserApi(object):
         acp: str,
         exclude_user_ids: typing.List[int] = None,
         exclude_workspace_ids: typing.List[int] = None,
+        nb_elem: typing.List[int] = DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT,
+        filter_results: bool = True,
     ) -> typing.Iterable[User]:
         """
         Return list of know user by current UserApi user.
         :param acp: autocomplete filter by name/email
         :param exclude_user_ids: user id to exclude from result
         :param exclude_workspace_ids: workspace user to exclude from result
+        :nb_elem: number of user to return, default value should be low for
+        security and privacy reasons
+        :filter_results: If true, do filter result according to user workspace if user is provided
         :return: List of found users
         """
         if len(acp) < 2:
@@ -186,7 +194,8 @@ class UserApi(object):
         )
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
         # should show only user in same workspace as user
-        if self._user and self._user.profile.id <= Group.TIM_USER:
+        assert not (filter_results and not self._user)
+        if filter_results and self._user and self._user.profile.id <= Group.TIM_USER:
             user_workspaces_id_query = (
                 self._session.query(UserRoleInWorkspace.workspace_id)
                 .distinct(UserRoleInWorkspace.workspace_id)
@@ -201,6 +210,7 @@ class UserApi(object):
             query = query.filter(User.user_id.in_(users_in_workspaces))
         if exclude_user_ids:
             query = query.filter(~User.user_id.in_(exclude_user_ids))
+        query = query.limit(nb_elem)
         return query.all()
 
     def find(
@@ -633,6 +643,7 @@ class UserApi(object):
         lang: str = None,
         auth_type: AuthType = None,
         groups: typing.Optional[typing.List[Group]] = None,
+        allowed_space: typing.Optional[int] = None,
         do_save=True,
     ) -> User:
         validator = TracimValidator()
@@ -689,6 +700,9 @@ class UserApi(object):
                 if group not in user.groups:
                     user.groups.append(group)
 
+        if allowed_space is not None:
+            user.allowed_space = allowed_space
+
         if do_save:
             self.save(user)
 
@@ -719,6 +733,7 @@ class UserApi(object):
         lang: str = None,
         auth_type: AuthType = AuthType.UNKNOWN,
         groups=[],
+        allowed_space: typing.Optional[int] = None,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> User:
@@ -727,6 +742,8 @@ class UserApi(object):
                 "Can't create user with invitation mail because " "notification are disabled."
             )
         new_user = self.create_minimal_user(email, groups, save_now=False)
+        if allowed_space is None:
+            allowed_space = self._config.LIMITATION__USER_DEFAULT_ALLOWED_SPACE
         self.update(
             user=new_user,
             name=name,
@@ -734,13 +751,16 @@ class UserApi(object):
             auth_type=auth_type,
             password=password,
             timezone=timezone,
+            allowed_space=allowed_space,
             lang=lang,
             do_save=False,
         )
         if do_notify:
             try:
                 email_manager = get_email_manager(self._config, self._session)
-                email_manager.notify_created_account(new_user, password=password)
+                email_manager.notify_created_account(
+                    new_user, password=password, origin_user=self._user
+                )
             # FIXME - G.M - 2018-11-02 - hack: accept bad recipient user creation
             # this should be fixed to find a solution to allow "fake" email but
             # also have clear error case for valid mail.
@@ -777,7 +797,7 @@ class UserApi(object):
             gapi = GroupApi(
                 current_user=self._user, session=self._session, config=self._config  # User
             )
-            groups = [gapi.get_one(Group.TIM_USER)]
+            groups = [gapi.get_one_with_name(self._config.USER__DEFAULT_PROFILE)]
         for group in groups:
             user.groups.append(group)
 
@@ -953,3 +973,16 @@ class UserApi(object):
             return False
 
         return True
+
+    def allowed_to_create_new_workspaces(self, user: User) -> bool:
+        # INFO - G.M - 2019-08-21 - 0 mean no limit here
+        if self._config.LIMITATION__SHAREDSPACE_PER_USER == 0:
+            return True
+
+        workspace_api = WorkspaceApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
+        owned_workspace = workspace_api.get_all_for_user(
+            user=user, include_owned=True, include_with_role=False
+        )
+        return not (len(owned_workspace) >= self._config.LIMITATION__SHAREDSPACE_PER_USER)

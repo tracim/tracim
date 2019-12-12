@@ -58,10 +58,33 @@ basic_setup.session_secret = change_this_value_please!
 ## example of app.enabled config explicit list config
 ; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder
 
+### Plugins ###
+# if provided, this allow tracim to load package from this dir and if package follow
+# the convention "tracim_backend_{plugin_name}", hooks provided inside the package will
+# be loaded, allowing to add new feature to an existing tracim.
+; plugin.folder_path = %(here)s/plugins
+
+
 ## CORS Special config
 # you can override access control allowed origin here with list of comma separated
 # base_url, by default only website.base_url and api.base_url are allowed
 ; cors.access-control-allowed-origin = http://localhost:6543,http://localhost:8090
+
+####
+# LIMITATION
+####
+
+# limit number of sharespaces any user can be owner, 0 mean not limit, default to 0
+; limitation.sharedspace_per_user = 0
+# max upload content length accepted by tracim for file in bytes
+# by default 0 meaning no limit. 104857600 (100MB) is a good value
+; limitation.content_length_file_size = 104857600
+# max size of all files of a workspace in bytes
+# by default 0 meaning no limit. 1073741824(1GB) is a good value
+; limitation.workspace_size = 1073741824
+## default allowed space for new user if not provided in bytes, 0 mean no space
+## limit. Limit is on the sum of sizes of owned by user workspace.
+; limitation.user_default_allowed_space = 0
 
 ####
 # STORAGE
@@ -180,7 +203,14 @@ auth_types = internal
 user.auth_token.validity = 604800
 ## user reset_password token lifetime (default to 900s -> 15 minutes)
 user.reset_password.token_lifetime = 900
+## Default profile of created user, valid values are users, trusted-users, administrators
+; user.default_profile = users
 
+## active or disable filter on known user, if activate user cannot see at all informations about
+## member with no common workspace. if false, it can access to these informations.
+## This is used by search mecanism for invitation of user in workspace.
+## default value to true.
+; known_members.filter = true
 ####
 # IHM
 ####
@@ -201,6 +231,11 @@ frontend.serve = True
 # will try to get it automatically according to tracim repository
 # organisation.
 ; frontend.dist_folder_path = /home/user/tracim/frontend/dist
+# if you need to add custom javascript code into Tracim, you can use custom toolbox
+# feature. you add your javascript in this folder, all content
+# of this folder will be serve in /custom_toolbox-assets
+# and all javascript ".js" file will be added to index.html file.
+; frontend.custom_toolbox_folder_path = /tmp/custom_toolbox
 
 ### Color ###
 # check for color.json file in tracim, check by default in tracim parent
@@ -286,8 +321,10 @@ email.notification.reply_to.email = reply+{content_id}@trac.im
 email.notification.references.email = thread+{content_id}@trac.im
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
 email.notification.created_account.subject = [{website_title}] Someone created an account for you
-email.notification.share_content_to_emitter.subject = [{website_title}] you shared {content_filename} to {nb_receivers} users
-email.notification.share_content_to_receiver.subject = [{website_title}] {emitter_name} shared content {content_filename} with you
+email.notification.share_content_to_emitter.subject = [{website_title}] You shared "{content_filename}" with {nb_receivers} people
+email.notification.share_content_to_receiver.subject = [{website_title}] {emitter_name} shared the file "{content_filename}" with you
+email.notification.upload_permission_to_emitter.subject = [{website_title}] You invited {nb_receivers} people to upload files on "{workspace_name}"
+email.notification.upload_permission_to_receiver.subject = {emitter_name} invited you to upload files on "{website_title}"
 
 ### Templates ###
 email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
@@ -295,6 +332,9 @@ email.notification.created_account.template.html = %(email.template_dir)s/create
 email.notification.reset_password_request.template.html = %(email.template_dir)s/reset_password_body_html.mak
 email.notification.share_content_to_emitter.template.html = %(email.template_dir)s/shared_content_to_emitter_body_html.mak
 email.notification.share_content_to_receiver.template.html = %(email.template_dir)s/shared_content_to_receiver_body_html.mak
+email.notification.upload_permission_to_emitter.template.html = %(email.template_dir)s/upload_permission_to_emitter_body_html.mak
+email.notification.upload_permission_to_receiver.template.html = %(email.template_dir)s/upload_permission_to_receiver_body_html.mak
+email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak
 
 ####
 # EMAIL-REPLY
@@ -439,6 +479,8 @@ search.engine = simple
 # Collaborative Document Edition (Collabora, etc)
 ####
 collaborative_document_edition.activated = False
+# software used for collaborative document_edition. "collabora" software value give support for
+# both CollaboraOnline and LibreofficeOnline.
 collaborative_document_edition.software = collabora
 # base url where collabora server exist
 collaborative_document_edition.collabora.base_url = http://localhost:9980
@@ -592,17 +634,28 @@ keys = generic
 ; keys = color
 
 [formatter_color]
-class=colorlog.ColoredFormatter
+## use utc based date format:
+class=tracim_backend.lib.utils.logger.ColoredUTCFormatter
+## alternative date: use normal current date (localized)
+; class=colorlog.ColoredFormatter
 format = %(asctime)s %(log_color)s%(levelname)-5.5s %(reset)s[%(name)s:%(lineno)s][%(threadName)s] %(log_color)s%(message)s
-datefmt = %H:%M:%S
+datefmt = %Y-%m-%d %H:%M:%S
 
 [formatter_generic]
+## use utc based date format:
+class=tracim_backend.lib.utils.logger.StandardUTCFormatter
+## alternative date: use normal current date (localized)
+; class=logging.Formatter
 format = %(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s
-datefmt = %H:%M:%S
+datefmt = %Y-%m-%d %H:%M:%S
 
 [formatter_tracim_email_notification]
+## use utc based date format:
+class=tracim_backend.lib.utils.logger.StandardUTCFormatter
+## alternative date: use normal current date (localized)
+; class=logging.Formatter
 format = %(asctime)s %(network)s %(action)s %(recipient)s %(subject)s %(message)s
-datefmt = %H:%M:%S
+datefmt = %Y-%m-%d %H:%M:%S
 
 ### HANDLERS ###
 [handlers]

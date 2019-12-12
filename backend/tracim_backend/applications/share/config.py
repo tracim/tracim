@@ -12,14 +12,14 @@ def load_config(app_config: CFG) -> CFG:
     )
     app_config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT = app_config.get_raw_config(
         "email.notification.share_content_to_receiver.subject",
-        _("[{website_title}] {emitter_name} shared content {content_filename} with you"),
+        _('[{website_title}] {emitter_name} shared the file "{content_filename}" with you'),
     )
     app_config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML = app_config.get_raw_config(
         "email.notification.share_content_to_emitter.template.html"
     )
     app_config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT = app_config.get_raw_config(
         "email.notification.share_content_to_emitter.subject",
-        _("[{website_title}] you shared {content_filename} to {nb_receivers} users"),
+        _('[{website_title}] You shared "{content_filename}" with {nb_receivers} people'),
     )
     return app_config
 

@@ -89,14 +89,25 @@ cd $DEFAULTDIR/frontend_app_folder_advanced || exit 1
 ./build_folder.sh $dev
 
 
+# app Share Folder Advanced
+log "cd $DEFAULTDIR/frontend_app_share_folder_advanced"
+cd $DEFAULTDIR/frontend_app_share_folder_advanced || exit 1
+./build_share_folder.sh $dev
+
+
 # app Calendar
 log "cd $DEFAULTDIR/frontend_app_agenda"
 cd $DEFAULTDIR/frontend_app_agenda || exit 1
 ./build_agenda.sh $dev
 
-# app Office Document
-log "cd $DEFAULTDIR/frontend_app_office_document"
-cd $DEFAULTDIR/frontend_app_office_document || exit 1
+# app Gallery
+log "cd $DEFAULTDIR/frontend_app_gallery"
+cd $DEFAULTDIR/frontend_app_gallery || exit 1
+./build_gallery.sh $dev
+
+# app Collaborative document edition
+log "cd $DEFAULTDIR/frontend_app_collaborative_document_edition"
+cd $DEFAULTDIR/frontend_app_collaborative_document_edition || exit 1
 ./build_app.sh $dev
 
 # build Tracimtracim

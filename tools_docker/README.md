@@ -43,6 +43,8 @@ If you don't want to use caldav (webdav is started by default):
 
 * START_CALDAV=0 (to deactivate agenda in tracim)
 
+If you want to use plugins and/or custom_toolbox you need to add files in `~/tracim/etc/plugins/` and `~/tracim/etc/custom_toolbox/` (default configuration). This two path are created when you start docker image for the first time.
+
 #### Updating index of ElasticSearch
 
 ⚠ Prerequiste: elasticsearch is running and you have starting tracim with parameter to communicate with elasticsearch

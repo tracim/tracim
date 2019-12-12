@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import { shallow } from 'enzyme'
 import Badge from '../../src/component/Badge/Badge.jsx'
 require('../../src/component/Badge/Badge.styl')
 

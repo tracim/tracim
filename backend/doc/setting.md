@@ -16,35 +16,44 @@ Priority order is (from less to most priority):
 
 |<env_var_name>|<config_file_name>|<config_name>|
 |--------------|------------------|-------------|
-|TRACIM_SQLALCHEMY__URL|sqlalchemy.url|SQLALCHEMY__URL|
-|TRACIM_DEFAULT_LANG|default_lang|DEFAULT_LANG|
-|TRACIM_COLOR__CONFIG_FILE_PATH|color.config_file_path|COLOR__CONFIG_FILE_PATH|
-|TRACIM_APP__ENABLED|app.enabled|APP__ENABLED|
-|TRACIM_DEPOT_STORAGE_DIR|depot_storage_dir|DEPOT_STORAGE_DIR|
-|TRACIM_DEPOT_STORAGE_NAME|depot_storage_name|DEPOT_STORAGE_NAME|
-|TRACIM_PREVIEW_CACHE_DIR|preview_cache_dir|PREVIEW_CACHE_DIR|
-|TRACIM_AUTH_TYPES|auth_types|AUTH_TYPES|
-|TRACIM_REMOTE_USER_HEADER|remote_user_header|REMOTE_USER_HEADER|
-|TRACIM_API__KEY|api.key|API__KEY|
-|TRACIM_SESSION__REISSUE_TIME|session.reissue_time|SESSION__REISSUE_TIME|
-|TRACIM_SESSION__DATA_DIR|session.data_dir|SESSION__DATA_DIR|
-|TRACIM_SESSION__LOCK_DIR|session.lock_dir|SESSION__LOCK_DIR|
-|TRACIM_WEBSITE__TITLE|website.title|WEBSITE__TITLE|
-|TRACIM_WEBSITE__BASE_URL|website.base_url|WEBSITE__BASE_URL|
-|TRACIM_API__BASE_URL|api.base_url|API__BASE_URL|
+|TRACIM_SQLALCHEMY__URL        |sqlalchemy.url                |SQLALCHEMY__URL               |
+|TRACIM_DEFAULT_LANG           |default_lang                  |DEFAULT_LANG                  |
+|TRACIM_COLOR__CONFIG_FILE_PATH|color.config_file_path        |COLOR__CONFIG_FILE_PATH       |
+|TRACIM_APP__ENABLED           |app.enabled                   |APP__ENABLED                  |
+|TRACIM_DEPOT_STORAGE_DIR      |depot_storage_dir             |DEPOT_STORAGE_DIR             |
+|TRACIM_DEPOT_STORAGE_NAME     |depot_storage_name            |DEPOT_STORAGE_NAME            |
+|TRACIM_PREVIEW_CACHE_DIR      |preview_cache_dir             |PREVIEW_CACHE_DIR             |
+|TRACIM_AUTH_TYPES             |auth_types                    |AUTH_TYPES                    |
+|TRACIM_REMOTE_USER_HEADER     |remote_user_header            |REMOTE_USER_HEADER            |
+|TRACIM_API__KEY               |api.key                       |API__KEY                      |
+|TRACIM_SESSION__REISSUE_TIME  |session.reissue_time          |SESSION__REISSUE_TIME         |
+|TRACIM_SESSION__DATA_DIR      |session.data_dir              |SESSION__DATA_DIR             |
+|TRACIM_SESSION__LOCK_DIR      |session.lock_dir              |SESSION__LOCK_DIR             |
+|TRACIM_WEBSITE__TITLE         |website.title                 |WEBSITE__TITLE                |
+|TRACIM_WEBSITE__BASE_URL      |website.base_url              |WEBSITE__BASE_URL             |
+|TRACIM_API__BASE_URL          |api.base_url                  |API__BASE_URL                 |
 |TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN|cors.access-control-allowed-origin|CORS__ACCESS_CONTROL_ALLOWED_ORIGIN|
-|TRACIM_USER__AUTH_TOKEN__VALIDITY|user.auth_token.validity|USER__AUTH_TOKEN__VALIDITY|
-|TRACIM_USER__RESET_PASSWORD__VALIDITY|user.reset_password.validity|USER__RESET_PASSWORD__VALIDITY|
+|TRACIM_USER__AUTH_TOKEN__VALIDITY|user.auth_token.validity      |USER__AUTH_TOKEN__VALIDITY    |
+|TRACIM_USER__RESET_PASSWORD__VALIDITY|user.reset_password.validity  |USER__RESET_PASSWORD__VALIDITY|
 |TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME|user.reset_password.token_lifetime|USER__RESET_PASSWORD__TOKEN_LIFETIME|
-|TRACIM_DEBUG|debug|DEBUG|
-|TRACIM_PREVIEW__JPG__RESTRICTED_DIMS|preview.jpg.restricted_dims|PREVIEW__JPG__RESTRICTED_DIMS|
-|TRACIM_PREVIEW__JPG__ALLOWED_DIMS|preview.jpg.allowed_dims|PREVIEW__JPG__ALLOWED_DIMS|
-|TRACIM_FRONTEND__SERVE|frontend.serve|FRONTEND__SERVE|
-|TRACIM_BACKEND__I18N_FOLDER_PATH|backend.i18n_folder_path|BACKEND__I18N_FOLDER_PATH|
-|TRACIM_FRONTEND__DIST_FOLDER_PATH|frontend.dist_folder_path|FRONTEND__DIST_FOLDER_PATH|
+|TRACIM_USER__DEFAULT_PROFILE  |user.default_profile          |USER__DEFAULT_PROFILE         |
+|TRACIM_KNOWN_MEMBERS__FILTER  |known_members.filter          |KNOWN_MEMBERS__FILTER         |
+|TRACIM_DEBUG                  |debug                         |DEBUG                         |
+|TRACIM_PREVIEW__JPG__RESTRICTED_DIMS|preview.jpg.restricted_dims   |PREVIEW__JPG__RESTRICTED_DIMS |
+|TRACIM_PREVIEW__JPG__ALLOWED_DIMS|preview.jpg.allowed_dims      |PREVIEW__JPG__ALLOWED_DIMS    |
+|TRACIM_FRONTEND__SERVE        |frontend.serve                |FRONTEND__SERVE               |
+|TRACIM_BACKEND__I18N_FOLDER_PATH|backend.i18n_folder_path      |BACKEND__I18N_FOLDER_PATH     |
+|TRACIM_FRONTEND__DIST_FOLDER_PATH|frontend.dist_folder_path     |FRONTEND__DIST_FOLDER_PATH    |
+|TRACIM_PLUGIN__FOLDER_PATH    |plugin.folder_path            |PLUGIN__FOLDER_PATH           |
+|TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH|frontend.custom_toolbox_folder_path|FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH|
+|TRACIM_LIMITATION__SHAREDSPACE_PER_USER|limitation.sharedspace_per_user|LIMITATION__SHAREDSPACE_PER_USER|
+|TRACIM_LIMITATION__CONTENT_LENGTH_FILE_SIZE|limitation.content_length_file_size|LIMITATION__CONTENT_LENGTH_FILE_SIZE|
+|TRACIM_LIMITATION__WORKSPACE_SIZE|limitation.workspace_size     |LIMITATION__WORKSPACE_SIZE    |
+|TRACIM_LIMITATION__USER_DEFAULT_ALLOWED_SPACE|limitation.user_default_allowed_space|LIMITATION__USER_DEFAULT_ALLOWED_SPACE|
 |TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION|email.notification.enabled_on_invitation|EMAIL__NOTIFICATION__ENABLED_ON_INVITATION|
 |TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL|email.notification.from.email |EMAIL__NOTIFICATION__FROM__EMAIL|
-|TRACIM_EMAIL__NOTIFICATION__FROM|email.notification.from|EMAIL__NOTIFICATION__FROM|
+|TRACIM_EMAIL__NOTIFICATION__FROM|email.notification.from       |EMAIL__NOTIFICATION__FROM     |
+|TRACIM_EMAIL__NOTIFICATION__FROM|email.notification.from       |EMAIL__NOTIFICATION__FROM     |
 |TRACIM_EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL|email.notification.from.default_label|EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL|
 |TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL|email.notification.reply_to.email|EMAIL__NOTIFICATION__REPLY_TO__EMAIL|
 |TRACIM_EMAIL__NOTIFICATION__REFERENCES__EMAIL|email.notification.references.email|EMAIL__NOTIFICATION__REFERENCES__EMAIL|
@@ -59,53 +68,67 @@ Priority order is (from less to most priority):
 |TRACIM_EMAIL__NOTIFICATION__SMTP__PORT|email.notification.smtp.port  |EMAIL__NOTIFICATION__SMTP__PORT|
 |TRACIM_EMAIL__NOTIFICATION__SMTP__USER|email.notification.smtp.user  |EMAIL__NOTIFICATION__SMTP__USER|
 |TRACIM_EMAIL__NOTIFICATION__SMTP__PASSWORD|email.notification.smtp.password|EMAIL__NOTIFICATION__SMTP__PASSWORD|
-|TRACIM_EMAIL__REPLY__ACTIVATED|email.reply.activated|EMAIL__REPLY__ACTIVATED|
-|TRACIM_EMAIL__REPLY__IMAP__SERVER|email.reply.imap.server|EMAIL__REPLY__IMAP__SERVER|
-|TRACIM_EMAIL__REPLY__IMAP__PORT|email.reply.imap.port|EMAIL__REPLY__IMAP__PORT|
-|TRACIM_EMAIL__REPLY__IMAP__USER|email.reply.imap.user|EMAIL__REPLY__IMAP__USER|
-|TRACIM_EMAIL__REPLY__IMAP__PASSWORD|email.reply.imap.password|EMAIL__REPLY__IMAP__PASSWORD|
-|TRACIM_EMAIL__REPLY__IMAP__FOLDER|email.reply.imap.folder|EMAIL__REPLY__IMAP__FOLDER|
-|TRACIM_EMAIL__REPLY__CHECK__HEARTBEAT|email.reply.check.heartbeat|EMAIL__REPLY__CHECK__HEARTBEAT|
-|TRACIM_EMAIL__REPLY__IMAP__USE_SSL|email.reply.imap.use_ssl|EMAIL__REPLY__IMAP__USE_SSL|
-|TRACIM_EMAIL__REPLY__IMAP__USE_IDLE|email.reply.imap.use_idle|EMAIL__REPLY__IMAP__USE_IDLE|
+|TRACIM_EMAIL__REPLY__ACTIVATED|email.reply.activated         |EMAIL__REPLY__ACTIVATED       |
+|TRACIM_EMAIL__REPLY__IMAP__SERVER|email.reply.imap.server       |EMAIL__REPLY__IMAP__SERVER    |
+|TRACIM_EMAIL__REPLY__IMAP__PORT|email.reply.imap.port         |EMAIL__REPLY__IMAP__PORT      |
+|TRACIM_EMAIL__REPLY__IMAP__USER|email.reply.imap.user         |EMAIL__REPLY__IMAP__USER      |
+|TRACIM_EMAIL__REPLY__IMAP__PASSWORD|email.reply.imap.password     |EMAIL__REPLY__IMAP__PASSWORD  |
+|TRACIM_EMAIL__REPLY__IMAP__FOLDER|email.reply.imap.folder       |EMAIL__REPLY__IMAP__FOLDER    |
+|TRACIM_EMAIL__REPLY__CHECK__HEARTBEAT|email.reply.check.heartbeat   |EMAIL__REPLY__CHECK__HEARTBEAT|
+|TRACIM_EMAIL__REPLY__IMAP__USE_SSL|email.reply.imap.use_ssl      |EMAIL__REPLY__IMAP__USE_SSL   |
+|TRACIM_EMAIL__REPLY__IMAP__USE_IDLE|email.reply.imap.use_idle     |EMAIL__REPLY__IMAP__USE_IDLE  |
 |TRACIM_EMAIL__REPLY__CONNECTION__MAX_LIFETIME|email.reply.connection.max_lifetime|EMAIL__REPLY__CONNECTION__MAX_LIFETIME|
-|TRACIM_EMAIL__REPLY__USE_HTML_PARSING|email.reply.use_html_parsing|EMAIL__REPLY__USE_HTML_PARSING|
-|TRACIM_EMAIL__REPLY__USE_TXT_PARSING|email.reply.use_txt_parsing|EMAIL__REPLY__USE_TXT_PARSING|
-|TRACIM_EMAIL__REPLY__LOCKFILE_PATH|email.reply.lockfile_path|EMAIL__REPLY__LOCKFILE_PATH|
-|TRACIM_EMAIL__PROCESSING_MODE |email.processing_mode|EMAIL__PROCESSING_MODE|
-|TRACIM_EMAIL__ASYNC__REDIS__HOST|email.async.redis.host|EMAIL__ASYNC__REDIS__HOST|
-|TRACIM_EMAIL__ASYNC__REDIS__PORT|email.async.redis.port|EMAIL__ASYNC__REDIS__PORT|
-|TRACIM_EMAIL__ASYNC__REDIS__DB|email.async.redis.db|EMAIL__ASYNC__REDIS__DB|
+|TRACIM_EMAIL__REPLY__USE_HTML_PARSING|email.reply.use_html_parsing  |EMAIL__REPLY__USE_HTML_PARSING|
+|TRACIM_EMAIL__REPLY__USE_TXT_PARSING|email.reply.use_txt_parsing   |EMAIL__REPLY__USE_TXT_PARSING |
+|TRACIM_EMAIL__REPLY__LOCKFILE_PATH|email.reply.lockfile_path     |EMAIL__REPLY__LOCKFILE_PATH   |
+|TRACIM_EMAIL__PROCESSING_MODE |email.processing_mode         |EMAIL__PROCESSING_MODE        |
+|TRACIM_EMAIL__ASYNC__REDIS__HOST|email.async.redis.host        |EMAIL__ASYNC__REDIS__HOST     |
+|TRACIM_EMAIL__ASYNC__REDIS__PORT|email.async.redis.port        |EMAIL__ASYNC__REDIS__PORT     |
+|TRACIM_EMAIL__ASYNC__REDIS__DB|email.async.redis.db          |EMAIL__ASYNC__REDIS__DB       |
 |TRACIM_NEW_USER__INVITATION__DO_NOTIFY|new_user.invitation.do_notify |NEW_USER__INVITATION__DO_NOTIFY|
 |TRACIM_NEW_USER__INVITATION__MINIMAL_PROFILE|new_user.invitation.minimal_profile|NEW_USER__INVITATION__MINIMAL_PROFILE|
-|TRACIM_LDAP_URL|ldap_url|LDAP_URL|
-|TRACIM_LDAP_BASE_URL|ldap_base_url|LDAP_BASE_URL|
-|TRACIM_LDAP_BIND_DN|ldap_bind_dn|LDAP_BIND_DN|
-|TRACIM_LDAP_BIND_PASS|ldap_bind_pass|LDAP_BIND_PASS|
-|TRACIM_LDAP_TLS|ldap_tls|LDAP_TLS|
-|TRACIM_LDAP_USER_BASE_DN|ldap_user_base_dn|LDAP_USER_BASE_DN|
-|TRACIM_LDAP_LOGIN_ATTRIBUTE|ldap_login_attribute|LDAP_LOGIN_ATTRIBUTE|
-|TRACIM_LDAP_NAME_ATTRIBUTE|ldap_name_attribute|LDAP_NAME_ATTRIBUTE|
-|TRACIM_WEBDAV__UI__ENABLED|webdav.ui.enabled|WEBDAV__UI__ENABLED|
-|TRACIM_WEBDAV__BASE_URL|webdav.base_url|WEBDAV__BASE_URL|
-|TRACIM_WEBDAV__VERBOSE__LEVEL|webdav.verbose.level|WEBDAV__VERBOSE__LEVEL|
-|TRACIM_WEBDAV__ROOT_PATH|webdav.root_path|WEBDAV__ROOT_PATH|
-|TRACIM_WEBDAV__BLOCK_SIZE|webdav.block_size|WEBDAV__BLOCK_SIZE|
-|TRACIM_WEBDAV__DIR_BROWSER__ENABLED|webdav.dir_browser.enabled|WEBDAV__DIR_BROWSER__ENABLED|
-|TRACIM_WEBDAV__DIR_BROWSER__FOOTER|webdav.dir_browser.footer|WEBDAV__DIR_BROWSER__FOOTER|
-|TRACIM_CALDAV__ENABLED|caldav.enabled|CALDAV__ENABLED|
+|TRACIM_LDAP_URL               |ldap_url                      |LDAP_URL                      |
+|TRACIM_LDAP_BASE_URL          |ldap_base_url                 |LDAP_BASE_URL                 |
+|TRACIM_LDAP_BIND_DN           |ldap_bind_dn                  |LDAP_BIND_DN                  |
+|TRACIM_LDAP_BIND_PASS         |ldap_bind_pass                |LDAP_BIND_PASS                |
+|TRACIM_LDAP_TLS               |ldap_tls                      |LDAP_TLS                      |
+|TRACIM_LDAP_USER_BASE_DN      |ldap_user_base_dn             |LDAP_USER_BASE_DN             |
+|TRACIM_LDAP_LOGIN_ATTRIBUTE   |ldap_login_attribute          |LDAP_LOGIN_ATTRIBUTE          |
+|TRACIM_LDAP_NAME_ATTRIBUTE    |ldap_name_attribute           |LDAP_NAME_ATTRIBUTE           |
+|TRACIM_WEBDAV__UI__ENABLED    |webdav.ui.enabled             |WEBDAV__UI__ENABLED           |
+|TRACIM_WEBDAV__BASE_URL       |webdav.base_url               |WEBDAV__BASE_URL              |
+|TRACIM_WEBDAV__VERBOSE__LEVEL |webdav.verbose.level          |WEBDAV__VERBOSE__LEVEL        |
+|TRACIM_WEBDAV__ROOT_PATH      |webdav.root_path              |WEBDAV__ROOT_PATH             |
+|TRACIM_WEBDAV__BLOCK_SIZE     |webdav.block_size             |WEBDAV__BLOCK_SIZE            |
+|TRACIM_WEBDAV__DIR_BROWSER__ENABLED|webdav.dir_browser.enabled    |WEBDAV__DIR_BROWSER__ENABLED  |
+|TRACIM_WEBDAV__DIR_BROWSER__FOOTER|webdav.dir_browser.footer     |WEBDAV__DIR_BROWSER__FOOTER   |
+|TRACIM_CALDAV__ENABLED        |caldav.enabled                |CALDAV__ENABLED               |
 |TRACIM_CALDAV__RADICALE_PROXY__BASE_URL|caldav.radicale_proxy.base_url|CALDAV__RADICALE_PROXY__BASE_URL|
 |TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|caldav.radicale.storage.filesystem_folder|CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|
-|TRACIM_SEARCH__ENGINE|search.engine|SEARCH__ENGINE|
+|TRACIM_SEARCH__ENGINE         |search.engine                 |SEARCH__ENGINE                |
+|TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS|search.elasticsearch.index_alias|SEARCH__ELASTICSEARCH__INDEX_ALIAS|
+|TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|search.elasticsearch.index_pattern_template|SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|
 |TRACIM_SEARCH__ELASTICSEARCH__USE_INGEST|search.elasticsearch.use_ingest|SEARCH__ELASTICSEARCH__USE_INGEST|
 |TRACIM_SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST|search.elasticsearch.ingest.mimetype_whitelist|SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST|
 |TRACIM_SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST|search.elasticsearch.ingest.mimetype_blacklist|SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST|
 |TRACIM_SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT|search.elasticsearch.ingest.size_limit|SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT|
-|TRACIM_SEARCH__ELASTICSEARCH__HOST|search.elasticsearch.host|SEARCH__ELASTICSEARCH__HOST|
-|TRACIM_SEARCH__ELASTICSEARCH__PORT|search.elasticsearch.port|SEARCH__ELASTICSEARCH__PORT|
-|TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS|search.elasticsearch.index_alias|SEARCH__ELASTICSEARCH__INDEX_ALIAS|
-|TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|search.elasticsearch.index_pattern_template|SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|
+|TRACIM_SEARCH__ELASTICSEARCH__HOST|search.elasticsearch.host     |SEARCH__ELASTICSEARCH__HOST   |
+|TRACIM_SEARCH__ELASTICSEARCH__PORT|search.elasticsearch.port     |SEARCH__ELASTICSEARCH__PORT   |
 |TRACIM_SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT|search.elasticsearch.request_timeout|SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT|
+|TRACIM_COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED|collaborative_document_edition.activated|COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED|
+|TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE|collaborative_document_edition.software|COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE|
+|TRACIM_COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL|collaborative_document_edition.collabora.base_url|COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL|
+|TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR|collaborative_document_edition.file_template_dir|COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR|
+|TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML|email.notification.share_content_to_receiver.template.html|EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML|
+|TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT|email.notification.share_content_to_receiver.subject|EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT|
+|TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML|email.notification.share_content_to_emitter.template.html|EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML|
+|TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT|email.notification.share_content_to_emitter.subject|EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT|
+|TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML|email.notification.upload_permission_to_receiver.template.html|EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML|
+|TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT|email.notification.upload_permission_to_receiver.subject|EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT|
+|TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML|email.notification.upload_permission_to_emitter.template.html|EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML|
+|TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT|email.notification.upload_permission_to_emitter.subject|EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT|
+|TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML|email.notification.new_upload_event.template.html|EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML|
+|TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT|email.notification.new_upload_event.subject|EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT|
 
 ### Currently config-file only params:
 
@@ -447,7 +470,7 @@ for default config file.
 
 First, you need an elastic_search server. An easy way to have one with docker can be (don't use for production):
 
-`docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0`
+`docker run -d -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch -v esconfig:/usr/share/elasticsearch/config -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0`
 
 You then need to setup config file:
 
@@ -474,18 +497,47 @@ If there is an update of tracim, use this one to migrate index (experimental, pr
 
 Your data are correctly indexed now, you can go to tracim ui and use search mecanism.
 
-# Collaborative Edition online #
+# Collaborative Edition online (tracim v2.4+) #
 
 ## Collaborative edition server ##
-At the moment tracim is only tested with [Collabora CODE](https://www.collaboraoffice.com/code/), but Tracim is theoretically ready for any software using the protocol `WOPI`.
 
-All the informations to set up a `Collabora CODE` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
+In tracim 2.4, Collaborative Edition online does support CollaboraOnline/libreofficeOnline.
 
-To set up a `Collabora CODE` server using docker for testing purpose:
+It is tested with CollaboraOnline (professional version of Collabora), with [Collabora CODE](https://hub.docker.com/r/collabora/code) and with [LibreofficeOnline](https://hub.docker.com/r/libreoffice/online). More information about CollaboraOnline [here](https://www.collaboraoffice.com/)
+We do not support yet other collaborative edition online service but we do support WOPI protocol making support for WOPI compatible software easy.
 
-`sudo docker run -d -t -p PORT:PORT -e "domain=IP_OF_TRACIM_API" -e "username=admin" -e "password=S3cRet" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.0.4-3`
+**To set up a `Collabora CODE` server using docker for testing purpose ([image](https://hub.docker.com/r/collabora/code)):**
 
-**Tracim is tested with the version 4.0.4-3, you can use the latest version at your own risk**
+note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like `domain=tracim\\.mysuperdomain\\.com`):
+
+
+`sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.0.5.2`
+
+:warning: Tracim is tested with the version 4.0.5.2, you can use the latest version at your own risk
+
+
+**To set up a `LibreofficeOnline` server(rolling release, unstable :warning:) using docker ([image](https://hub.docker.com/r/libreoffice/online)):**
+
+
+`sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always libreoffice/online:master`
+
+
+:information_source: All the information to set up a `Collabora CODE/ LibreofficelOnline` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
+
+:warning: Be really careful about configuring domain parameter, as [official documentation](https://www.collaboraoffice.com/code/docker/) said, value should be dot escaped, ex: `domain=.*\\.mysuperdomain\\.com`
+
+:information_source: you can add username/password parameter to set collabora admin console too :
+
+`-e "username=admin" -e "password=S3cRet"`
+
+admin interface is available at `https://<collabora_host>/loleaflet/dist/admin/admin.html`
+
+with collabora host can be value like `collaboradomain.ndd` or `localhost:9980`
+
+:information_source: to avoid using automatic ssl/tls encryption in collabora, you should disable it:
+
+`-e "extra_params=--o:ssl.enable=false"`
+
 
 
 ## Configuring tracim in development.ini ##
@@ -499,7 +551,9 @@ First you need to enable the edition on the API:
 
 Then you need to indicate the ip adress of the server for the protocol `WOPI`:
 
-`collaborative_document_edition.collabora.base_url = COLLABORA_IP_ADDRESS:PORT`
+`collaborative_document_edition.collabora.base_url = <collabora_base_url>`
+
+with collabora_base_url can be value like `http://localhost:9980` or `http://mycollaboraserver.ndd`
 
 
 Then you can set up default office document templates files, these templates will be the one used to create an empty document using Tracim online app.
@@ -514,3 +568,5 @@ But you can change the default directory to use your templates files:
 
 Filenames of the templates inside the directory are not relevant only their extensions matter and need correspond to the software's default extensions.
 For example `CODE` edit `Libre Office` files, so extensions will be `odt`, `odp`, `ods`.
+
+After all theses change in config, you should restart all tracim process (web, webdav, etc...)

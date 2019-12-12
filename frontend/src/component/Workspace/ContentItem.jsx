@@ -8,7 +8,8 @@ import BtnExtandedAction from './BtnExtandedAction.jsx'
 import DragHandle from '../DragHandle.jsx'
 import {
   Badge,
-  ListItemWrapper
+  ListItemWrapper,
+  ComposedIcon
 } from 'tracim_frontend_lib'
 
 class ContentItem extends React.Component {
@@ -53,9 +54,21 @@ class ContentItem extends React.Component {
           >
             <div className='content__type'
               title={props.t(props.contentType.label)}
-              style={{ color: props.contentType.hexcolor }}
+              style={{
+                color: props.contentType.hexcolor,
+                padding: props.isShared ? '0 15px' : '0 25px'
+              }}
             >
-              <i className={`fa fa-fw fa-${props.faIcon}`} />
+              {props.isShared
+                ? <ComposedIcon
+                  mainIcon={props.faIcon}
+                  smallIcon='share-alt'
+                  // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
+                  // https://github.com/tracim/tracim/issues/2098
+                  smallIconStyle={{ color: '#252525' }}
+                />
+                : <i className={`fa fa-fw fa-${props.faIcon}`} />
+              }
             </div>
 
             <div className='content__name' title={props.label}>
@@ -70,7 +83,24 @@ class ContentItem extends React.Component {
             <div className='d-none d-md-block' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
-                onClickExtendedAction={props.onClickExtendedAction}
+                onClickExtendedAction={{
+                  edit: {
+                    callback: e => props.onClickExtendedAction.edit.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.edit.label
+                  },
+                  download: {
+                    callback: e => props.onClickExtendedAction.download.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.download.label
+                  },
+                  archive: {
+                    callback: e => props.onClickExtendedAction.archive.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.archive.label
+                  },
+                  delete: {
+                    callback: e => props.onClickExtendedAction.delete.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.delete.label
+                  }
+                }}
               />
             </div>
           )}
@@ -129,7 +159,8 @@ ContentItem.propTypes = {
   faIcon: PropTypes.string,
   read: PropTypes.bool,
   urlContent: PropTypes.string,
-  userRoleIdInWorkspace: PropTypes.number
+  userRoleIdInWorkspace: PropTypes.number,
+  isShared: PropTypes.bool
 }
 
 ContentItem.defaultProps = {
@@ -138,5 +169,6 @@ ContentItem.defaultProps = {
   onClickItem: () => {},
   read: false,
   urlContent: '',
-  userRoleIdInWorkspace: 0
+  userRoleIdInWorkspace: 0,
+  isShared: false
 }

@@ -9,8 +9,10 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
+from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceNotFound
+from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
+from tracim_backend.exceptions import WorkspacePublicUploadDisabledException
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
@@ -29,7 +31,7 @@ class WorkspaceApi(object):
     def __init__(
         self,
         session: Session,
-        current_user: User,
+        current_user: typing.Optional[User],
         config: CFG,
         force_role: bool = False,
         show_deleted: bool = False,
@@ -81,21 +83,29 @@ class WorkspaceApi(object):
         label: str = "",
         description: str = "",
         agenda_enabled: bool = True,
+        public_download_enabled: bool = True,
+        public_upload_enabled: bool = True,
         save_now: bool = False,
     ) -> Workspace:
+        # TODO - G.M - 2019-04-11 - Fix Circular Import issue between userApi
+        # and workspaceApi
+        from tracim_backend.lib.core.user import UserApi
+
+        uapi = UserApi(session=self._session, current_user=self._user, config=self._config)
+        if not uapi.allowed_to_create_new_workspaces(self._user):
+            raise UserNotAllowedToCreateMoreWorkspace("User not allowed to create more workspace")
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
 
-        if self._session.query(Workspace).filter(Workspace.label == label).count() > 0:
-            raise WorkspaceLabelAlreadyUsed(
-                "A workspace with label {} already exist.".format(label)
-            )
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
         workspace.agenda_enabled = agenda_enabled
+        workspace.public_download_enabled = public_download_enabled
+        workspace.public_upload_enabled = public_upload_enabled
         workspace.created = datetime.utcnow()
         workspace.updated = datetime.utcnow()
+        workspace.owner = self._user
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
@@ -118,6 +128,8 @@ class WorkspaceApi(object):
         description: typing.Optional[str] = None,
         save_now: bool = False,
         agenda_enabled: typing.Optional[bool] = None,
+        public_upload_enabled: typing.Optional[bool] = None,
+        public_download_enabled: typing.Optional[bool] = None,
     ) -> Workspace:
         """
         Update workspace
@@ -130,21 +142,15 @@ class WorkspaceApi(object):
         if label is not None:
             if label == "":
                 raise EmptyLabelNotAllowed("Workspace label cannot be empty")
-            if (
-                self._session.query(Workspace)
-                .filter(Workspace.label == label)
-                .filter(Workspace.workspace_id != workspace.workspace_id)
-                .count()
-                > 0
-            ):
-                raise WorkspaceLabelAlreadyUsed(
-                    "A workspace with label {} already exist.".format(label)
-                )
             workspace.label = label
         if description is not None:
             workspace.description = description
         if agenda_enabled is not None:
             workspace.agenda_enabled = agenda_enabled
+        if public_upload_enabled is not None:
+            workspace.public_upload_enabled = public_upload_enabled
+        if public_download_enabled is not None:
+            workspace.public_download_enabled = public_download_enabled
         workspace.updated = datetime.utcnow()
         if save_now:
             self.save(workspace)
@@ -160,37 +166,84 @@ class WorkspaceApi(object):
             ) from exc
 
     def get_one_by_label(self, label: str) -> Workspace:
-        try:
-            return self._base_query().filter(Workspace.label == label).one()
-        except NoResultFound as exc:
+        """
+        Get one workspace by label, handle both direct
+        and "~~{workspace_id}" end form, to allow getting a specific workspace when
+        workspace_name is ambiguous (multiple workspace with same label)
+        :param label: label of workspace or "label~~{workspace_name} form.
+        :return: workspace found according to label given
+        """
+        splitted_label = label.split("~~", maxsplit=1)
+        # INFO - G.M - 2019-10-10 - unambiguous form with workspace id
+        if len(splitted_label) == 2 and splitted_label[1].isdecimal():
+            return self.get_one(splitted_label[1])
+        # INFO - G.M - 2019-10-10 - Ambiguous form with workspace label
+        else:
+            return self._get_one_by_label(label)
+
+    def _get_one_by_label(self, label: str) -> Workspace:
+        """
+        get workspace according to label given, if multiple workspace have
+        same label, return first one found.
+        """
+        # INFO - G.M - 2019-10-10 - result should be ordered same way as get_all() method,
+        # to unsure working
+        result = self.default_order_workspace(
+            self._base_query().filter(Workspace.label == label)
+        ).all()
+        if len(result) == 0:
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(id)
-            ) from exc
+            )
 
-    """
-    def get_one_for_current_user(self, id):
-        return self._base_query().filter(Workspace.workspace_id==id).\
-            session.query(ZKContact).filter(ZKContact.groups.any(ZKGroup.id.in_([1,2,3])))
-            filter(sqla.).one()
-    """
+        return result[0]
+
+    def default_order_workspace(self, query: Query) -> Query:
+        """
+        Order workspace in a standardized way to ensure order is same between get_one_by_label
+        and other methods like get_all, this is required for webdav support to work correctly
+        """
+        return query.order_by(Workspace.workspace_id)
 
     def get_all(self):
-        return self._base_query().all()
+        return self.default_order_workspace(self._base_query()).all()
 
-    def get_all_for_user(self, user: User, ignored_ids=None):
-        workspaces = []
+    def get_user_used_space(self, user: User) -> int:
+        workspaces = self.get_all_for_user(user, include_owned=True, include_with_role=False)
+        used_space = 0
+        for workspace in workspaces:
+            used_space += workspace.get_size()
+        return used_space
 
-        for role in user.roles:
-            if not role.workspace.is_deleted:
-                if not ignored_ids:
-                    workspaces.append(role.workspace)
-                elif role.workspace.workspace_id not in ignored_ids:
-                    workspaces.append(role.workspace)
-                else:
-                    pass  # do not return workspace
+    def _get_workspaces_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
+        return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
-        workspaces.sort(key=lambda workspace: workspace.label.lower())
-        return workspaces
+    def get_all_for_user(
+        self, user: User, include_owned: bool = True, include_with_role: bool = True
+    ) -> typing.List[Workspace]:
+        """
+        Get al workspace of user
+        :param user:  just an user
+        :param include_owned: include workspace where user is owner
+        :param include_with_role: include workspace where user has a role
+        :return: list of workspaces found
+        """
+        query = self._base_query()
+        workspace_ids = []
+        rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        if include_with_role:
+            workspace_ids.extend(
+                rapi.get_user_workspaces_ids(
+                    user_id=user.user_id, min_role=UserRoleInWorkspace.READER
+                )
+            )
+        if include_owned:
+            owned_workspaces = self._get_workspaces_owned_by_user(user.user_id)
+            workspace_ids.extend([workspace.workspace_id for workspace in owned_workspaces])
+
+        query = query.filter(Workspace.workspace_id.in_(workspace_ids))
+        query = query.order_by(Workspace.label)
+        return query.all()
 
     def get_all_manageable(self) -> typing.List[Workspace]:
         """Get all workspaces the current user has manager rights on."""
@@ -216,12 +269,14 @@ class WorkspaceApi(object):
             if role.workspace == workspace:
                 role.do_notify = True
 
-    def get_notifiable_roles(self, workspace: Workspace) -> [UserRoleInWorkspace]:
+    def get_notifiable_roles(
+        self, workspace: Workspace, force_notify: bool = False
+    ) -> [UserRoleInWorkspace]:
         roles = []
         for role in workspace.roles:
             if (
-                role.do_notify is True
-                and role.user != self._user
+                (force_notify or role.do_notify is True)
+                and (not self._user or role.user != self._user)
                 and role.user.is_active
                 and not role.user.is_deleted
                 and role.user.auth_type != AuthType.UNKNOWN
@@ -318,6 +373,20 @@ class WorkspaceApi(object):
                 except Exception as exc:
                     logger.error(self, "Something goes wrong during agenda create/update")
                     logger.exception(self, exc)
+
+    def check_public_upload_enabled(self, workspace: Workspace) -> None:
+        if not workspace.public_upload_enabled:
+            raise WorkspacePublicUploadDisabledException(
+                'Workspace "{}" has public '
+                "download feature disabled".format(workspace.workspace_id)
+            )
+
+    def check_public_download_enabled(self, workspace: Workspace) -> None:
+        if not workspace.public_download_enabled:
+            raise WorkspacePublicDownloadDisabledException(
+                'Workspace "{}" has public '
+                "download feature disabled".format(workspace.workspace_id)
+            )
 
     def get_base_query(self) -> Query:
         return self._base_query()

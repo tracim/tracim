@@ -29,6 +29,7 @@
     "radium": "^0.25.2",
     "react": "16.7.0",
     "react-animate-height": "^2.0.15",
+    "react-device-detect": "^1.7.5",
     "react-dnd": "7.4.5",
     "react-dnd-html5-backend": "7.4.4",
     "react-dom": "^16.7.0",
@@ -36,6 +37,7 @@
     "react-redux": "5.0.6",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
+    "reactstrap": "^8.0.0",
     "react-select": "^3.0.4",
     "redux": "3.7.2",
     "redux-logger": "^3.0.6",
@@ -88,7 +90,10 @@
       "GLOBAL_renderAppPopupCreation",
       "GLOBAL_dispatchEvent",
       "GLOBAL_hideApp",
-      "GLOBAL_primaryColor"
+      "GLOBAL_primaryColor",
+      "FormData",
+      "XMLHttpRequest",
+      "Image"
     ],
     "parser": "babel-eslint",
     "ignore": []

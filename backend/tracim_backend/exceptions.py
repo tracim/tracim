@@ -90,6 +90,14 @@ class WorkspaceAgendaDisabledException(TracimException):
     error_code = ErrorCode.WORKSPACE_AGENDA_DISABLED
 
 
+class WorkspacePublicUploadDisabledException(TracimException):
+    error_code = ErrorCode.WORKSPACE_PUBLIC_UPLOAD_DISABLED
+
+
+class WorkspacePublicDownloadDisabledException(TracimException):
+    error_code = ErrorCode.WORKSPACE_PUBLIC_DOWNLOAD_DISABLED
+
+
 class AgendaServerConnectionError(TracimException):
     pass
 
@@ -112,6 +120,10 @@ class UnknownAgendaType(AgendaException):
 
 class NotFound(TracimException):
     pass
+
+
+class NoFileValidationError(TracimException):
+    error_code = ErrorCode.NO_FILE_VALIDATION_ERROR
 
 
 class NoValidSearchEngine(TracimException):
@@ -140,6 +152,14 @@ class CaldavNotAuthorized(TracimException):
 
 class WorkspaceNotFound(NotFound):
     error_code = ErrorCode.WORKSPACE_NOT_FOUND
+
+
+class UploadPermissionNotFound(NotFound):
+    error_code = ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
+
+
+class ContentShareNotFound(NotFound):
+    error_code = ErrorCode.CONTENT_SHARE_NOT_FOUND
 
 
 class WorkspaceNotFoundInTracimRequest(NotFound):
@@ -255,6 +275,10 @@ class WorkspacesDoNotMatch(TracimException):
     error_code = ErrorCode.WORKSPACE_DO_NOT_MATCH
 
 
+class ContentNamespaceDoNotMatch(TracimException):
+    error_code = ErrorCode.CONTENT_NAMESPACE_DO_NOT_MATCH
+
+
 class PasswordDoNotMatch(TracimException):
     error_code = ErrorCode.PASSWORD_DO_NOT_MATCH
 
@@ -263,12 +287,28 @@ class EmptyValueNotAllowed(TracimException):
     pass
 
 
+class FileSizeOverMaxLimitation(TracimException):
+    error_code = ErrorCode.FILE_SIZE_OVER_MAX_LIMITATION
+
+
+class FileSizeOverWorkspaceEmptySpace(TracimException):
+    error_code = ErrorCode.FILE_SIZE_OVER_WORKSPACE_EMPTY_SPACE
+
+
+class FileSizeOverOwnerEmptySpace(TracimException):
+    error_code = ErrorCode.FILE_SIZE_OVER_OWNER_EMPTY_SPACE
+
+
 class TracimUnavailablePreviewType(TracimException):
     error_code = ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 
 
 class EmptyLabelNotAllowed(EmptyValueNotAllowed):
     pass
+
+
+class UserNotAllowedToCreateMoreWorkspace(TracimException):
+    error_code = ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
 
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
@@ -355,6 +395,10 @@ class RoleDoesNotExist(TracimException):
     pass
 
 
+class ProfileDoesNotExist(TracimException):
+    pass
+
+
 class UserRoleNotFound(TracimException):
     error_code = ErrorCode.USER_ROLE_NOT_FOUND
 
@@ -373,10 +417,6 @@ class InconsistentDatabase(TracimException):
 
 class ContentFilenameAlreadyUsedInFolder(TracimException):
     error_code = ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
-
-
-class WorkspaceLabelAlreadyUsed(TracimException):
-    error_code = ErrorCode.WORKSPACE_LABEL_ALREADY_USED
 
 
 class ParentNotFound(NotFound):

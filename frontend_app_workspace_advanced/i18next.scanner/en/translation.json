@@ -29,7 +29,12 @@
   "Error while loading app list": "warning",
   "Agenda activated": "Agenda activated",
   "Agenda deactivated": "Agenda deactivated",
+  "Download activated": "Download activated",
+  "Download deactivated": "Download deactivated",
+  "Upload activated": "Upload activated",
+  "Upload deactivated": "Upload deactivated",
   "Error while activating agenda": "Error while activating agenda",
   "Error while deactivating agenda": "Error while deactivating agenda",
-  "Agenda": "Agenda"
+  "Agenda": "Agenda",
+  "Optional functionalities": "Optional functionalities"
 }

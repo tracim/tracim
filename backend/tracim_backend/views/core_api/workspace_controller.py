@@ -19,8 +19,8 @@ from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
 from tracim_backend.exceptions import UserIsNotActive
+from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import UserRoleNotFound
-from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -45,6 +45,7 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.views import BASE_API_V2
@@ -59,6 +60,7 @@ from tracim_backend.views.core_api.schemas import RoleUpdateSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
+from tracim_backend.views.core_api.schemas import WorkspaceDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
@@ -110,6 +112,20 @@ class WorkspaceController(Controller):
         return wapi.get_workspace_with_context(request.current_workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
+    @check_right(can_see_workspace_information)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.output_body(WorkspaceDiskSpaceSchema())
+    def workspace_disk_space(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get workspace space info
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        wapi = WorkspaceApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return wapi.get_workspace_with_context(request.current_workspace)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @check_right(is_administrator)
     @hapic.output_body(WorkspaceSchema(many=True))
     def workspaces(self, context, request: TracimRequest, hapic_data=None):
@@ -127,7 +143,6 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(WorkspaceLabelAlreadyUsed, HTTPStatus.BAD_REQUEST)
     @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceModifySchema())
@@ -146,6 +161,8 @@ class WorkspaceController(Controller):
             label=hapic_data.body.label,
             description=hapic_data.body.description,
             agenda_enabled=hapic_data.body.agenda_enabled,
+            public_download_enabled=hapic_data.body.public_download_enabled,
+            public_upload_enabled=hapic_data.body.public_upload_enabled,
             save_now=True,
         )
         wapi.execute_update_workspace_actions(request.current_workspace)
@@ -153,7 +170,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(WorkspaceLabelAlreadyUsed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserNotAllowedToCreateMoreWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_trusted_user)
     @hapic.input_body(WorkspaceCreationSchema())
     @hapic.output_body(WorkspaceSchema())
@@ -170,6 +187,8 @@ class WorkspaceController(Controller):
             description=hapic_data.body.description,
             save_now=True,
             agenda_enabled=hapic_data.body.agenda_enabled,
+            public_download_enabled=hapic_data.body.public_download_enabled,
+            public_upload_enabled=hapic_data.body.public_upload_enabled,
         )
         wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)
@@ -393,6 +412,7 @@ class WorkspaceController(Controller):
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
+            namespaces_filter=content_filter.namespaces_filter or [ContentNamespaces.CONTENT],
             show_archived=content_filter.show_archived,
             show_deleted=content_filter.show_deleted,
             show_active=content_filter.show_active,
@@ -535,6 +555,7 @@ class WorkspaceController(Controller):
                 content,
                 new_parent=new_parent,
                 new_workspace=new_workspace,
+                new_content_namespace=ContentNamespaces.CONTENT,
                 must_stay_in_same_workspace=False,
             )
             api.execute_update_content_actions(content)
@@ -651,6 +672,11 @@ class WorkspaceController(Controller):
         # Workspace
         configurator.add_route("workspace", "/workspaces/{workspace_id}", request_method="GET")
         configurator.add_view(self.workspace, route_name="workspace")
+        # Workspace space
+        configurator.add_route(
+            "workspace_disk_space", "/workspaces/{workspace_id}/disk_space", request_method="GET"
+        )
+        configurator.add_view(self.workspace_disk_space, route_name="workspace_disk_space")
         # Create workspace
         configurator.add_route("create_workspace", "/workspaces", request_method="POST")
         configurator.add_view(self.create_workspace, route_name="create_workspace")

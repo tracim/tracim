@@ -1,3 +1,7 @@
+# Tracim
+
+![logo_tracim](logo_tracim.png)
+
 develop branch status:
 [![Build Status](https://travis-ci.org/tracim/tracim.svg?branch=develop)](https://travis-ci.org/tracim/tracim)
 [![Coverage Status](https://coveralls.io/repos/github/tracim/tracim/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim?branch=develop)
@@ -16,7 +20,7 @@ Test  tracim on your computer with docker:
 ```
 mkdir -p ~/tracim/etc
 mkdir -p ~/tracim/var
-docker run -e DATABASE_TYPE=sqlite -e START_CALDAV=1 -p 8080:80 -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
+docker run -e DATABASE_TYPE=sqlite -p 8080:80 -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 ```
 
 Then visit the url http://localhost:8080 and login in to tracim:
@@ -39,6 +43,17 @@ Tracim is distributed under the terms of 3 distinct licenses:
 In order to contribute to tracim source_code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
 
 ## Advanced - Install tracim from the sources
+
+OS compatibility (tested on with python >= 3.5):
+
+- Debian:
+  - Jessie (8)
+  - Stretch (9)
+  - Buster (10)
+- Ubuntu:
+  - Trusty (14.04) - need manual modification to install tracim, see https://github.com/tracim/tracim/issues/2514
+  - Xenia (16.04)
+  - Bionic (18.04)
 
 ### Get the source
 
