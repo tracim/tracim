@@ -1,9 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
-import { MoreInfo as MoreInfoWithoutHOC } from '../../../src/component/Dashboard/MoreInfo.jsx'
+import { shallow } from 'enzyme'
+import MoreInfo from '../../../src/component/Dashboard/MoreInfo.jsx'
 import sinon from 'sinon'
-import { translateMock } from '../../hocMock/translate.js'
 
 describe('<MoreInfo />', () => {
   const onClickToggleWebdavCallBack = sinon.stub()
@@ -16,9 +15,7 @@ describe('<MoreInfo />', () => {
     displayCalendarBtn: true
   }
 
-  const ComponentWithHoc = translateMock()(MoreInfoWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<MoreInfo { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`should display the calendar information when displayCalendarBtn is true`, () =>

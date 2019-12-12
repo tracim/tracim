@@ -109,11 +109,11 @@ describe('<Tracim />', () => {
     before(() => {
       nock(FETCH_CONFIG.apiUrl)
         .get('/system/config')
-        .reply(200, { })
+        .reply(200, {})
 
       nock(FETCH_CONFIG.apiUrl)
         .get('/system/applications')
-        .reply(200, { })
+        .reply(200, [])
 
       nock(FETCH_CONFIG.apiUrl)
         .get('/system/content_types')
@@ -121,6 +121,7 @@ describe('<Tracim />', () => {
 
       nock(FETCH_CONFIG.apiUrl)
         .get('/users/me/workspaces')
+        .query({ show_owned_workspace: 0 })
         .reply(200, [])
 
       nock(FETCH_CONFIG.apiUrl)

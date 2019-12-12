@@ -1,9 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { MenuProfil as MenuProfilWithoutHOC } from '../../../src/component/Header/MenuActionListItem/MenuProfil.jsx'
-import { translateMock } from '../../hocMock/translate.js'
-import { RouterMock } from '../../hocMock/withRouter.js'
 import sinon from 'sinon'
 
 describe('<MenuProfil />', () => {
@@ -17,13 +15,7 @@ describe('<MenuProfil />', () => {
     onClickLogout: onClickLogoutCallBack
   }
 
-  const ComponentWithHoc = translateMock()(MenuProfilWithoutHOC)
-
-  const wrapper = mount(
-    <RouterMock>
-      <ComponentWithHoc { ...props } />
-    </RouterMock>
-  )
+  const wrapper = shallow(<MenuProfilWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it('should display the public name in a div', () =>

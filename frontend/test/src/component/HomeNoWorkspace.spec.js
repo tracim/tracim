@@ -1,8 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { HomeNoWorkspace as HomeNoWorkspaceWithoutHOC } from '../../../src/component/Home/HomeNoWorkspace.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 import sinon from 'sinon'
 
 describe('<HomeNoWorkspace />', () => {
@@ -13,9 +12,7 @@ describe('<HomeNoWorkspace />', () => {
     onClickCreateWorkspace: onClickCreateWorkspaceCallBack
   }
 
-  const ComponentWithHoc = translateMock()(HomeNoWorkspaceWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<HomeNoWorkspaceWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`if canCreateWorkspace is true it should contains a div with a message to create a new Workspace`, () =>

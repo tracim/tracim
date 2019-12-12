@@ -1,11 +1,9 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { RecentActivity as RecentActivityWithoutHOC } from '../../../src/component/Dashboard/RecentActivity.jsx'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 import sinon from 'sinon'
-import { translateMock } from '../../hocMock/translate.js'
-import { RouterMock } from '../../hocMock/withRouter.js'
 
 describe('<RecentActivity />', () => {
   const onClickSeeMoreCallBack = sinon.stub()
@@ -33,12 +31,8 @@ describe('<RecentActivity />', () => {
     onClickEverythingAsRead: onClickEverythingAsReadCallBack
   }
 
-  const ComponentWithHoc = translateMock()(RecentActivityWithoutHOC)
-
-  const wrapper = mount(
-    <RouterMock>
-      <ComponentWithHoc { ...props } />
-    </RouterMock>
+  const wrapper = shallow(
+      <RecentActivityWithoutHOC { ...props } t={key=> key} />
   )
 
   describe('static design', () => {

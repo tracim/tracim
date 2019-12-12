@@ -1,8 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { MemberList as MemberListWithoutHOC } from '../../../src/component/Dashboard/MemberList.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 import sinon from 'sinon'
 
 describe('<MemberList />', () => {
@@ -35,9 +34,7 @@ describe('<MemberList />', () => {
     onClickRemoveMember: onClickRemoveMemberCallBack
   }
 
-  const ComponentWithHoc = translateMock()(MemberListWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<MemberListWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`should display ${props.memberList.length} members infos`, () =>

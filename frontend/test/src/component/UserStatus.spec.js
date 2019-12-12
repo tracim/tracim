@@ -1,8 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { UserStatus as UserStatusWithoutHOC } from '../../../src/component/Dashboard/UserStatus.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 import sinon from 'sinon'
 import { ROLE } from '../../../src/helper.js'
 
@@ -28,9 +27,7 @@ describe('<UserStatus />', () => {
     onClickRemoveNotify: onClickRemoveNotifyCallBack
   }
 
-  const ComponentWithHoc = translateMock()(UserStatusWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<UserStatusWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`should display the user public name: ${props.user.public_name}`, () =>

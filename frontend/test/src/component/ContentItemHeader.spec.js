@@ -1,17 +1,14 @@
 import React from 'react'
-import { expect, assert } from 'chai'
-import { mount } from 'enzyme'
+import { expect } from 'chai'
+import { shallow } from 'enzyme'
 import { FileItemHeader as FileItemHeaderWithoutHOC } from '../../../src/component/Workspace/ContentItemHeader.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 
 describe('<ContentItemHeader />', () => {
   const props = {
     showSearchDetails: true
   }
 
-  const ComponentWithHoc = translateMock()(FileItemHeaderWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<FileItemHeaderWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it('should display search details when showSearchDetails is true', () =>

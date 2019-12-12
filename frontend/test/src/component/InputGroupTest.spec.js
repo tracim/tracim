@@ -31,10 +31,6 @@ describe('<InputGroupText />', () => {
       expect(wrapper.find(`div.${props.parentClassName}`).length).to.equal(1)
     )
 
-    it(`should include a div with the class: ${props.parentClassName}__icon`, () =>
-      expect(wrapper.find(`div.${props.parentClassName}__icon`).length).to.equal(1)
-    )
-
     it(`should include a div with the class: ${props.parentClassName}__msgerror`, () =>
       expect(wrapper.find(`div.${props.parentClassName}__msgerror`).length).to.equal(1)
     )

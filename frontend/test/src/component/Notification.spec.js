@@ -1,9 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import sinon from 'sinon'
 import { Notification as NotificationWithoutHOC } from '../../../src/component/Account/Notification.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 
 describe('<Notification />', () => {
   const onChangeSubscriptionNotifCallBack = sinon.stub()
@@ -34,9 +33,7 @@ describe('<Notification />', () => {
     onChangeSubscriptionNotif: onChangeSubscriptionNotifCallBack
   }
 
-  const ComponentWithHoc = translateMock()(NotificationWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<NotificationWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`should display ${props.workspaceList.length} workspace`, () => {

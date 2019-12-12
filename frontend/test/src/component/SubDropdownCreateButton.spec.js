@@ -4,7 +4,6 @@ import { mount } from 'enzyme'
 import { SubDropdownCreateButton as SubDropdownCreateButtonWithoutHOC } from '../../../src/component/common/Input/SubDropdownCreateButton.jsx'
 import sinon from 'sinon'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
-import { translateMock } from '../../hocMock/translate'
 
 describe('<SubDropdownCreateButton />', () => {
   const onClickCreateContentCallBack = sinon.stub()
@@ -15,9 +14,7 @@ describe('<SubDropdownCreateButton />', () => {
     folderId: 1
   }
 
-  const ComponentWithHoc = translateMock()(SubDropdownCreateButtonWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = mount(<SubDropdownCreateButtonWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`should display ${contentType.length} available app`, () =>

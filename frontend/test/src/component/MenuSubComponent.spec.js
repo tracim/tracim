@@ -1,9 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import sinon from 'sinon'
 import { MenuSubComponent as MenuSubComponentWithoutHOC } from '../../../src/component/Account/MenuSubComponent.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 
 describe('<MenuSubComponent />', () => {
   const onClickMenuItemCallBack = sinon.stub()
@@ -21,9 +20,7 @@ describe('<MenuSubComponent />', () => {
     onClickMenuItem: onClickMenuItemCallBack,
   }
 
-  const ComponentWithHoc = translateMock()(MenuSubComponentWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<MenuSubComponentWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`should render ${props.menu.length} items`, () => {

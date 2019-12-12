@@ -1,8 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { HomeHasWorkspace as HomeHasWorkspaceWithoutHOC } from '../../../src/component/Home/HomeHasWorkspace.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 
 describe('<HomeHasWorkspace />', () => {
   const props = {
@@ -11,9 +10,7 @@ describe('<HomeHasWorkspace />', () => {
     }
   }
 
-  const ComponentWithHoc = translateMock()(HomeHasWorkspaceWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<HomeHasWorkspaceWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`should display in a div the publicName: ${props.user.public_name}`, () =>

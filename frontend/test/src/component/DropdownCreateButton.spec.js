@@ -1,10 +1,9 @@
 import React from 'react'
-import { expect, assert } from 'chai'
-import { mount } from 'enzyme'
+import { expect } from 'chai'
+import { shallow } from 'enzyme'
 import { DropdownCreateButton as DropdownCreateButtonWithoutHOC } from '../../../src/component/common/Input/DropdownCreateButton.jsx'
 import sinon from 'sinon'
 import { appList } from '../../hocMock/redux/appList/appList.js'
-import { translateMock } from '../../hocMock/translate.js'
 
 describe('<DropdownCreateButton />', () => {
   const onClickCreateContentCallBack = sinon.stub()
@@ -17,9 +16,7 @@ describe('<DropdownCreateButton />', () => {
     folderId: 1
   }
 
-  const ComponentWithHoc = translateMock()(DropdownCreateButtonWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<DropdownCreateButtonWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`the root div should have the parentClass: ${props.parentClass}`, () =>

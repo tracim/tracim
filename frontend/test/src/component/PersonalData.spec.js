@@ -1,10 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import sinon from 'sinon'
 import { PersonalData as PersonalDataWithoutHOC } from '../../../src/component/Account/PersonalData.jsx'
-import { translateMock } from '../../hocMock/translate.js'
-import { connectMock } from '../../hocMock/store.js'
 
 describe('<PersonnalData />', () => {
   const onClickSubmitCallBack = sinon.stub()
@@ -15,13 +13,7 @@ describe('<PersonnalData />', () => {
     userAuthType: 'randomUserAuthType'
   }
 
-  const mapStateToProps = {}
-
-  const ComponentWithHoc = connectMock(mapStateToProps)(translateMock()(PersonalDataWithoutHOC))
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
-
-  const wrapperInstance = wrapper.find('PersonalData')
+  const wrapper = shallow(<PersonalDataWithoutHOC { ...props } t={key => key} />)
 
   describe('handlers', () => {
     it('onClickSubmitCallBack should be called when the button is clicked and the new password is valid', () => {
@@ -36,18 +28,18 @@ describe('<PersonnalData />', () => {
   describe('intern functions', () => {
     const randomText = 'randomText'
     it('handleChangeOldPassword should change the state', () => {
-      wrapperInstance.instance().handleChangeName({ target: { value: randomText } })
-      expect(wrapperInstance.state('newName')).to.equal(randomText)
+      wrapper.instance().handleChangeName({ target: { value: randomText } })
+      expect(wrapper.state('newName')).to.equal(randomText)
     })
 
     it('handleChangeNewPassword should change the state', () => {
-      wrapperInstance.instance().handleChangeEmail({ target: { value: randomText } })
-      expect(wrapperInstance.state('newEmail')).to.equal(randomText)
+      wrapper.instance().handleChangeEmail({ target: { value: randomText } })
+      expect(wrapper.state('newEmail')).to.equal(randomText)
     })
 
     it('handleChangeNewPassword should change the state', () => {
-      wrapperInstance.instance().handleChangeCheckPassword({ target: { value: randomText } })
-      expect(wrapperInstance.state('checkPassword')).to.equal(randomText)
+      wrapper.instance().handleChangeCheckPassword({ target: { value: randomText } })
+      expect(wrapper.state('checkPassword')).to.equal(randomText)
     })
   })
 })

@@ -1,8 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { FlashMessage as FlashMessageWithoutHOC } from '../../../src/component/FlashMessage.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 import sinon from 'sinon'
 
 describe('<FlashMessage />', () => {
@@ -16,9 +15,7 @@ describe('<FlashMessage />', () => {
     removeFlashMessage: removeFlashMessageCallBack
   }
 
-  const ComponentWithHoc = translateMock()(FlashMessageWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<FlashMessageWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`should display the message: ${props.flashMessage[0].message} in a div`, () =>

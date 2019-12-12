@@ -1,9 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { Password as PasswordWithoutHOC } from '../../../src/component/Account/Password.jsx'
-import { connectMock } from '../../hocMock/store.js'
-import { translateMock } from '../../hocMock/translate.js'
 import sinon from 'sinon'
 
 describe('<Password />', () => {
@@ -17,11 +15,7 @@ describe('<Password />', () => {
     dispatch: dispatchMock
   }
 
-  const mapStateToProps = {}
-
-  const ComponentWithHoc = connectMock(mapStateToProps)(translateMock()(PasswordWithoutHOC))
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />).find('Password')
+  const wrapper = shallow(<PasswordWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it('should have one button', () => {

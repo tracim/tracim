@@ -1,8 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { UserInfo as UserInfoWithoutHOC } from '../../../src/component/Account/UserInfo.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 import { PROFILE } from '../../../src/helper.js'
 
 describe('<UserInfo />', () => {
@@ -14,9 +13,7 @@ describe('<UserInfo />', () => {
     }
   }
 
-  const ComponentWithHoc = translateMock()(UserInfoWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<UserInfoWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it('should display the publicName of the user in a div', () =>

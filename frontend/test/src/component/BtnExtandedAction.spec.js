@@ -1,9 +1,9 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { ExtandedAction as ExtandedActionWithoutHOC } from '../../../src/component/Workspace/BtnExtandedAction.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 import sinon from 'sinon'
+import { Link } from 'react-router-dom'
 
 describe('<ExtandedAction />', () => {
   const archiveCallBack = sinon.stub()
@@ -12,16 +12,24 @@ describe('<ExtandedAction />', () => {
 
   const props = {
     onClickExtendedAction: {
-      archive: archiveCallBack,
-      delete: deleteCallBack,
-      edit: editCallBack
+      archive: {
+        callback: archiveCallBack
+      },
+      delete: {
+        callback: deleteCallBack
+      },
+      edit: {
+        callback: editCallBack
+      }
     },
     userRoleIdInWorkspace: 8,
+    folderData: {
+      workspaceId: 0,
+      id: 0
+    }
   }
 
-  const ComponentWithHoc = translateMock()(ExtandedActionWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc {...props} />)
+  const wrapper = shallow(<ExtandedActionWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it('should hide all dropdown button when userRoleIdInWorkspace < 2', () => {
@@ -38,7 +46,8 @@ describe('<ExtandedAction />', () => {
 
     it('should show all dropdown button when userRoleIdInWorkspace > 4', () => {
       wrapper.setProps({ userRoleIdInWorkspace: 5 })
-      expect(wrapper.find('div.subdropdown__item').length).to.equal(3)
+      expect(wrapper.find('div.subdropdown__item').length).to.equal(2)
+      expect(wrapper.find(Link)).to.have.lengthOf(1)
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })
     })
   })
@@ -49,13 +58,8 @@ describe('<ExtandedAction />', () => {
       expect(editCallBack.called).to.equal(true)
     })
 
-    it('archiveCallBack should be called when the archive button is clicked', () => {
-      wrapper.find('div.subdropdown__item').at(1).simulate('click')
-      expect(archiveCallBack.called).to.equal(true)
-    })
-
     it('deleteCallBack should be called when the delete button is clicked', () => {
-      wrapper.find('div.subdropdown__item').at(2).simulate('click')
+      wrapper.find('div.subdropdown__item').at(1).simulate('click')
       expect(deleteCallBack.called).to.equal(true)
     })
   })

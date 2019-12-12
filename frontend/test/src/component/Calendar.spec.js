@@ -1,8 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { Calendar as CalendarWithoutHOC } from '../../../src/component/Account/Calendar.jsx'
-import { translateMock } from '../../hocMock/translate.js'
 
 describe('<Calendar />', () => {
   const props = {
@@ -11,9 +10,7 @@ describe('<Calendar />', () => {
     }
   }
 
-  const ComponentWithHoc = translateMock()(CalendarWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<CalendarWithoutHOC { ...props } t={key => key} />)
 
   describe('static intern', () => {
     it('should display the caldavUrl of the user in a div', () =>

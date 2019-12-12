@@ -1,13 +1,10 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
-import { Home as HomeWithoutHOC } from '../../../src/container/Home'
+import { shallow } from 'enzyme'
+import { Home as HomeWithoutHOC } from '../../../src/container/Home.jsx'
 import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
-import { withRouterMock } from '../../hocMock/withRouter'
-import { translateMock } from '../../hocMock/translate'
-import { shallowUntilTarget } from '../../hocMock/helper'
 
 describe('<Home />', () => {
   const renderAppPopupCreationCallBack = sinon.stub()
@@ -22,10 +19,8 @@ describe('<Home />', () => {
     renderAppPopupCreation: renderAppPopupCreationCallBack
   }
 
-  const ComponentWithHOC = withRouterMock(translateMock()(HomeWithoutHOC))
-
-  const wrapper = mount(
-    <ComponentWithHOC {...props} />
+  const wrapper = shallow(
+    <HomeWithoutHOC {...props} t={key => key} />
   )
 
   describe('static design', () => {
@@ -42,8 +37,7 @@ describe('<Home />', () => {
 
   describe('handler', () => {
     it('renderAppPopupCreationCallBack should be called when handleClickCreateWorkspace is called', () => {
-      wrapper.find('Home').instance()
-        .handleClickCreateWorkspace({ preventDefault: () => {} })
+      wrapper.instance().handleClickCreateWorkspace({ preventDefault: () => {} })
       expect(renderAppPopupCreationCallBack.called).to.equal(true)
     })
   })
