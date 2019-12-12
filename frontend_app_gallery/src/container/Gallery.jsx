@@ -172,7 +172,7 @@ class Gallery extends React.Component {
   loadFolderDetailAndParentsDetails = async (workspaceId, folderId) => {
     const { state, props } = this
 
-    const folderDetail = {}
+    let folderDetail
 
     let fetchContentDetail = await handleFetchResult(
       await getFolderDetail(state.config.apiUrl, workspaceId, folderId)
@@ -180,11 +180,13 @@ class Gallery extends React.Component {
 
     switch (fetchContentDetail.apiResponse.status) {
       case 200:
+        folderDetail = {}
+
         folderDetail.fileName = fetchContentDetail.body.filename
         folderDetail.folderParentsId = fetchContentDetail.body.parent_id ? [fetchContentDetail.body.parent_id] : []
 
-        let fetchLoopCondition = fetchContentDetail.body.parent_id !== null
-        while (fetchLoopCondition) {
+        let hasReachRootWorkspace = fetchContentDetail.body.parent_id !== null
+        while (hasReachRootWorkspace) {
           const prevParentId = fetchContentDetail.body.parent_id
 
           fetchContentDetail = await handleFetchResult(
@@ -192,19 +194,20 @@ class Gallery extends React.Component {
           )
           if (fetchContentDetail.apiResponse.status === 200) {
             if (fetchContentDetail.body.parent_id === null || prevParentId === fetchContentDetail.body.parent_id) {
-              fetchLoopCondition = false
+              hasReachRootWorkspace = false
             } else {
               folderDetail.folderParentsId.push(fetchContentDetail.body.parent_id)
             }
           } else {
             this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
-            break
+            hasReachRootWorkspace = false
           }
         }
-
-        return folderDetail
-      default: this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
+        break
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
     }
+    return folderDetail
   }
 
   loadGalleryList = async (workspaceId, folderId) => {
