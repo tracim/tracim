@@ -17,7 +17,7 @@ from tracim_backend.models.tracim_session import TracimSession
 def prevent_content_revision_delete(
     session: TracimSession, flush_context: UOWTransaction, instances: [DeclarativeBase]
 ) -> None:
-    if not session.allow_revision_deletion:
+    if not session.get_allowed_revision_deletion():
         for instance in session.deleted:
             if isinstance(instance, ContentRevisionRO) and instance.revision_id is not None:
                 raise ContentRevisionDeleteError(
