@@ -9,8 +9,8 @@ class TracimSession(Session):
     Subclass of Sqlalchemy session to add tracim specific stuff
     """
 
-    def __init__(self, *arg, **kwargs) -> None:
-        super().__init__(self, *arg, **kwargs)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self._allow_revision_deletion = False  # type: bool
 
     def set_allowed_revision_deletion(self, value: bool) -> None:
