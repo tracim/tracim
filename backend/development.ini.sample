@@ -70,6 +70,11 @@ basic_setup.session_secret = change_this_value_please!
 # base_url, by default only website.base_url and api.base_url are allowed
 ; cors.access-control-allowed-origin = http://localhost:6543,http://localhost:8090
 
+## Anonymous User
+# You can set default display name for anonymous user.
+default_anonymous_user_display_name = "Lost Meerkat"
+
+
 ####
 # LIMITATION
 ####

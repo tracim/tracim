@@ -17,6 +17,8 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.meta import DeclarativeBase
 
+ANONYMOUS_USER_EMAIL_PATTERN = "mail+anonymous_{hash}@anonymous"
+
 
 class CleanupLib(object):
     """
@@ -299,14 +301,16 @@ class CleanupLib(object):
         self.safe_delete(user)
         return user_id
 
-    def anonymise_user(self, user: User) -> User:
+    def anonymise_user(self, user: User, anonymised_user_display_name: str = None) -> User:
         """
         :param user: user to anonymise
         :return: user_id
         """
         hash = str(uuid.uuid4().hex)
-        user.display_name = "anonymous_{}".format(hash)
-        user.email = "mail+anonymous_{}@something".format(hash)
+        user.display_name = (
+            anonymised_user_display_name or self.app_config.DEFAULT_ANONYMOUS_USER_DISPLAY_NAME
+        )
+        user.email = ANONYMOUS_USER_EMAIL_PATTERN.format(hash=hash)
         user.is_active = False
         user.is_deleted = True
         self.safe_update(user)
