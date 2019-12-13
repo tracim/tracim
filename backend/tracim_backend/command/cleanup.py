@@ -83,7 +83,7 @@ class DeleteUserCommand(AppContextCommand):
                     user_list.append(user)
                 except UserDoesNotExist:
                     print("ERROR: user with email {} does not exist".format(login))
-                    exit(2)
+                    exit(1)
             print("~~~~~~~~~~")
             for user in user_list:
                 cleanup_lib = CleanupLib(session, self._app_config, test_mode=parsed_args.test_mode)
