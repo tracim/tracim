@@ -16,7 +16,7 @@ describe('<DropdownCreateButton />', () => {
     folderId: 1
   }
 
-  const wrapper = shallow(<DropdownCreateButtonWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<DropdownCreateButtonWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`the root div should have the parentClass: ${props.parentClass}`, () =>

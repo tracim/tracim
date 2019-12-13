@@ -19,7 +19,7 @@ export function withRouterMock (WrappedComponent) {
         <WrappedComponent
           {...this.props}
           history={{
-            action: "POP",
+            action: 'POP',
             block: () => {},
             createHref: () => {},
             go: () => {},
@@ -28,19 +28,19 @@ export function withRouterMock (WrappedComponent) {
             length: 7,
             listen: () => {},
             location: {
-              hash: "",
-              key: "3v4nbu",
-              pathname: "/ui/workspaces/1/contents",
-              search: "?folder_open="
+              hash: '',
+              key: '3v4nbu',
+              pathname: '/ui/workspaces/1/contents',
+              search: '?folder_open='
             },
             push: () => {},
-            replace: () => {},
+            replace: () => {}
           }}
           location={{
-            hash: "",
-            key: "3v4nbu",
-            pathname: "/ui/workspaces/1/contents",
-            search: "?folder_open="
+            hash: '',
+            key: '3v4nbu',
+            pathname: '/ui/workspaces/1/contents',
+            search: '?folder_open='
           }}
         />
       )

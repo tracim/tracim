@@ -1,5 +1,5 @@
 import React from 'react'
-import { expect, assert } from 'chai'
+import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import Logo from '../../../src/component/Header/Logo.jsx'
 

@@ -27,7 +27,7 @@ describe('<Search />', () => {
     })
   })
 
-  describe('handlers', () => {
+  describe('handler', () => {
     it('onClickSearchCallBack should be call when the button is clicked', () => {
       wrapper.find('button').simulate('click')
       expect(onClickSearchCallBack.called).to.equal(true)

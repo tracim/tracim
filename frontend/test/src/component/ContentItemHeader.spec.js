@@ -8,7 +8,7 @@ describe('<ContentItemHeader />', () => {
     showSearchDetails: true
   }
 
-  const wrapper = shallow(<FileItemHeaderWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<FileItemHeaderWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it('should display search details when showSearchDetails is true', () =>

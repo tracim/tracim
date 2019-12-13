@@ -15,14 +15,14 @@ describe('<Button />', () => {
     onClick: onClickCallBack
   }
 
-  const wrapper = shallow(<Button { ...props } />)
+  const wrapper = shallow(<Button {...props} />)
 
   describe('static design', () => {
     it('should display the button', () =>
       expect(wrapper.find('button').length).to.equal(1)
     )
 
-    it(`the button type should be ${ props.htmlType }`, () =>
+    it(`the button type should be ${props.htmlType}`, () =>
       expect(wrapper.find('button').prop('type')).to.equal(props.htmlType)
     )
 

@@ -8,19 +8,19 @@ describe('<MenuSubComponent />', () => {
   const onClickMenuItemCallBack = sinon.stub()
 
   const props = {
-    menu : [{
+    menu: [{
       name: 'randomItem1',
       label: 'randomLabel1',
       active: true
-    },{
+    }, {
       name: 'randomItem2',
       label: 'randomLabel2',
       active: false
     }],
-    onClickMenuItem: onClickMenuItemCallBack,
+    onClickMenuItem: onClickMenuItemCallBack
   }
 
-  const wrapper = shallow(<MenuSubComponentWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<MenuSubComponentWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`should render ${props.menu.length} items`, () => {
@@ -28,7 +28,7 @@ describe('<MenuSubComponent />', () => {
     })
 
     it(`should display the name each items (li)`, () => {
-      for(let i=0; i < props.menu.length; i++) {
+      for (let i = 0; i < props.menu.length; i++) {
         expect(wrapper.find('div.menusubcomponent__list__item__link').at(i)).to.have.text().equal(props.menu[i].label)
       }
     })

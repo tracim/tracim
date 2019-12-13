@@ -31,7 +31,7 @@ describe('<OpenCreateContentApp />', () => {
 
   const ComponentWithHoc = withRouterMock(connectMock(mapStateToProps)(OpenCreateContentAppWithoutHOC))
 
-  const wrapper = shallowUntilTarget(<ComponentWithHoc { ...props } />, OpenCreateContentAppWithoutHOC)
+  const wrapper = shallowUntilTarget(<ComponentWithHoc {...props} />, OpenCreateContentAppWithoutHOC)
 
   describe('intern function', () => {
     it('openCreateContentApp() should call renderAppPopupCreationCallBack to open the creation popup', () => {

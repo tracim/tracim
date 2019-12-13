@@ -27,7 +27,7 @@ describe('<UserStatus />', () => {
     onClickRemoveNotify: onClickRemoveNotifyCallBack
   }
 
-  const wrapper = shallow(<UserStatusWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<UserStatusWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`should display the user public name: ${props.user.public_name}`, () =>

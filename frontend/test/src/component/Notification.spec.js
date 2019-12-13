@@ -17,12 +17,12 @@ describe('<Notification />', () => {
       }],
       id: 1,
       label: 'randomLabel1'
-    },{
+    }, {
       memberList: [{
         id: 1,
         role: 'workspace-manager',
         doNotify: true
-      },{
+      }, {
         id: 0,
         role: 'content-manager',
         doNotify: true
@@ -33,7 +33,7 @@ describe('<Notification />', () => {
     onChangeSubscriptionNotif: onChangeSubscriptionNotifCallBack
   }
 
-  const wrapper = shallow(<NotificationWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<NotificationWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`should display ${props.workspaceList.length} workspace`, () => {
@@ -41,7 +41,7 @@ describe('<Notification />', () => {
     })
 
     it(`should display labels of workspaces`, () => {
-      for(let i = 0; i < props.workspaceList.length; i++) {
+      for (let i = 0; i < props.workspaceList.length; i++) {
         expect(wrapper.find('div.notification__table__wksname').at(i)).to.text().equal(props.workspaceList[i].label)
       }
     })

@@ -15,7 +15,7 @@ describe('<MoreInfo />', () => {
     displayCalendarBtn: true
   }
 
-  const wrapper = shallow(<MoreInfo { ...props } t={key => key} />)
+  const wrapper = shallow(<MoreInfo {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`should display the calendar information when displayCalendarBtn is true`, () =>

@@ -14,7 +14,7 @@ describe('<SubDropdownCreateButton />', () => {
     folderId: 1
   }
 
-  const wrapper = shallow(<SubDropdownCreateButtonWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<SubDropdownCreateButtonWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`should display ${contentType.length} available app`, () =>
@@ -22,7 +22,7 @@ describe('<SubDropdownCreateButton />', () => {
     )
 
     describe('each app should have his class in sub divs', () => {
-      for(let i = 0; i < contentType.length; i++) {
+      for (let i = 0; i < contentType.length; i++) {
         describe(contentType[i].slug, () => {
           it(`app: ${contentType[i].slug} should have a div with the class: subdropdown__link__${contentType[i].slug}`, () =>
             expect(wrapper.find('div.subdropdown__link__' + contentType[i].slug).length).to.equal(1)

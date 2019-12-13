@@ -37,7 +37,7 @@ describe('<Tracim />', () => {
     if (isFunction(param)) {
       return param(dispatchCallBack)
     }
-    switch(param.type) {
+    switch (param.type) {
       case `${SET}/${CONFIG}`:
         setConfigCallBack()
         break
@@ -74,7 +74,6 @@ describe('<Tracim />', () => {
         break
       default:
         return param
-        break
     }
   }
 
@@ -103,7 +102,7 @@ describe('<Tracim />', () => {
 
   const ComponentWithHOC2 = () => <Provider store={store}><ComponentWithHOC1 {...props} /></Provider>
 
-  const wrapper = shallowUntilTarget(<ComponentWithHOC2/>, TracimWithoutHOC)
+  const wrapper = shallowUntilTarget(<ComponentWithHOC2 />, TracimWithoutHOC)
 
   describe('intern function', () => {
     before(() => {

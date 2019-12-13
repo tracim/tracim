@@ -26,7 +26,7 @@ describe('<WebdavInfo />', () => {
       expect(wrapper.find(`a.webdavInfo__content__text__help`)).to.text().equal(props.webdavText)
     )
 
-    it(`should diplay the webdavUrl: ${props.webdavText}`, () =>
+    it(`should display the webdavUrl: ${props.webdavText}`, () =>
       expect(wrapper.find(`div.webdavInfo__content__link__url`)).to.text().equal(props.webdavUrl)
     )
   })

@@ -13,14 +13,14 @@ describe('<UserInfo />', () => {
     }
   }
 
-  const wrapper = shallow(<UserInfoWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<UserInfoWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it('should display the publicName of the user in a div', () =>
       expect(wrapper.find('div.userinfo__name')).to.text().contains(props.user.public_name)
     )
 
-    it('should display the email of the user in a <a/>', () =>
+    it('should display the email of the user in a <a/> tag', () =>
       expect(wrapper.find('a.userinfo__email')).to.text().contains(props.user.email)
     )
 

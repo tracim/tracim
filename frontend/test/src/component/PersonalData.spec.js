@@ -13,11 +13,11 @@ describe('<PersonnalData />', () => {
     userAuthType: 'randomUserAuthType'
   }
 
-  const wrapper = shallow(<PersonalDataWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<PersonalDataWithoutHOC {...props} t={key => key} />)
 
   describe('handlers', () => {
     it('onClickSubmitCallBack should be called when the button is clicked and the new password is valid', () => {
-      for(let i=0; i < wrapper.find('input.personaldata__form__txtinput').length; i++) {
+      for (let i = 0; i < wrapper.find('input.personaldata__form__txtinput').length; i++) {
         wrapper.find('input.personaldata__form__txtinput').at(i).simulate('change', { target: { value: 'newRandomPassWord' } })
       }
       wrapper.find('button').simulate('click')

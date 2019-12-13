@@ -14,7 +14,7 @@ describe('<MemberList />', () => {
       role: 'workspace-manager',
       doNotify: true,
       publicName: 'randomPublicName1'
-    },{
+    }, {
       id: 0,
       role: 'content-manager',
       doNotify: true,
@@ -34,7 +34,7 @@ describe('<MemberList />', () => {
     onClickRemoveMember: onClickRemoveMemberCallBack
   }
 
-  const wrapper = shallow(<MemberListWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<MemberListWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`should display ${props.memberList.length} members infos`, () =>
@@ -42,7 +42,7 @@ describe('<MemberList />', () => {
     )
 
     it(`should display the publicName of each member in memberList`, () => {
-      for(let i = 0; i < props.memberList.length; i++) {
+      for (let i = 0; i < props.memberList.length; i++) {
         expect(wrapper.find(`div.memberlist__list__item__info__name`).at(i)).to.text().equal(props.memberList[i].publicName)
       }
     })

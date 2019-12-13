@@ -10,7 +10,7 @@ describe('<Calendar />', () => {
     }
   }
 
-  const wrapper = shallow(<CalendarWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<CalendarWithoutHOC {...props} t={key => key} />)
 
   describe('static intern', () => {
     it('should display the caldavUrl of the user in a div', () =>

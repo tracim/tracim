@@ -11,7 +11,7 @@ describe('<AgendaInfo />', () => {
     customClass: 'randomCustomClass'
   }
 
-  const wrapper = shallow(<AgendaInfoWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<AgendaInfoWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`the root div should have the class: ${props.customClass}`, () =>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { expect, assert } from 'chai'
+import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import InputGroupText from '../../../src/component/common/Input/InputGroupText.jsx'
 import sinon from 'sinon'
@@ -23,7 +23,7 @@ describe('<InputGroupText />', () => {
   }
 
   const wrapper = shallow(
-    <InputGroupText { ...props } />
+    <InputGroupText {...props} />
   )
 
   describe('static design', () => {

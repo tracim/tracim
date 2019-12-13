@@ -15,7 +15,7 @@ describe('<MenuProfil />', () => {
     onClickLogout: onClickLogoutCallBack
   }
 
-  const wrapper = shallow(<MenuProfilWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<MenuProfilWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it('should display the public name in a div', () =>

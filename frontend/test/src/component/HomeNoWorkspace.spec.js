@@ -12,7 +12,7 @@ describe('<HomeNoWorkspace />', () => {
     onClickCreateWorkspace: onClickCreateWorkspaceCallBack
   }
 
-  const wrapper = shallow(<HomeNoWorkspaceWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<HomeNoWorkspaceWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`if canCreateWorkspace is true it should contains a div with a message to create a new Workspace`, () =>

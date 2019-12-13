@@ -10,7 +10,7 @@ describe('<HomeHasWorkspace />', () => {
     }
   }
 
-  const wrapper = shallow(<HomeHasWorkspaceWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<HomeHasWorkspaceWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`should display the publicName: ${props.user.public_name} in a div`, () =>

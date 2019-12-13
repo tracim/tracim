@@ -1,6 +1,5 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
 import sinon from 'sinon'
 import { OpenContentApp as OpenContentAppWithoutHOC } from '../../../src/component/Workspace/OpenContentApp.jsx'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
@@ -38,7 +37,7 @@ describe('<OpenContentApp />', () => {
 
   const ComponentWithHoc = withRouterMock(connectMock(mapStateToProps)(OpenContentAppWithoutHOC))
 
-  const wrapper = shallowUntilTarget(<ComponentWithHoc { ...props } />, OpenContentAppWithoutHOC)
+  const wrapper = shallowUntilTarget(<ComponentWithHoc {...props} />, OpenContentAppWithoutHOC)
 
   describe('intern function', () => {
     it('openContentApp() should call dispatchCustomEventCallBack to reload content when the app is already open', () => {

@@ -13,7 +13,7 @@
     "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "build-devwindoz": "set NODE_ENV=production&& webpack",
     "build-translation": "node i18next.scanner.js",
-    "test": "NODE_ENV=test mocha --config test/.mocharc.js"
+    "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
   "license": "ISC",
@@ -57,7 +57,7 @@
     "chai": "^4.2.0",
     "chai-enzyme": "^1.0.0-beta.1",
     "css-loader": "^3.0.0",
-    "enzyme": "3.9.0",
+    "enzyme": "3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "file-loader": "^4.0.0",
     "i18next-scanner": "^2.10.2",

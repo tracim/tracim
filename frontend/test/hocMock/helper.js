@@ -12,10 +12,10 @@ import { shallow } from 'enzyme'
  * The `TargetComponent` parameter is the React class (or function) that
  * you want to retrieve from the component tree.
  */
-export function shallowUntilTarget(componentInstance, TargetComponent, {
+export function shallowUntilTarget (componentInstance, TargetComponent, {
   maxTries = 10,
   shallowOptions,
-  _shallow = shallow,
+  _shallow = shallow
 } = {}) {
   if (!componentInstance) {
     throw new Error('componentInstance parameter is required')
@@ -44,7 +44,7 @@ export function shallowUntilTarget(componentInstance, TargetComponent, {
   throw new Error(`Could not find ${TargetComponent} in rendered instance: ${componentInstance}; gave up after ${maxTries} tries`)
 }
 
-export function restoreHistoryCallBack(callbacks) {
+export function restoreHistoryCallBack (callbacks) {
   callbacks.forEach(c => c.resetHistory())
 }
 

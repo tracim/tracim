@@ -44,7 +44,7 @@ describe('<Account />', () => {
     if (isFunction(param)) {
       return param(dispatchCallBack)
     }
-    switch(param.type) {
+    switch (param.type) {
       case `${UPDATE}/${USER_NAME}`:
         updateUserNameCallBack()
         break
@@ -74,7 +74,6 @@ describe('<Account />', () => {
         break
       default:
         return param
-        break
     }
   }
 
@@ -97,7 +96,7 @@ describe('<Account />', () => {
 
   const ComponentWithHOC1 = translateMock()(AccountWithoutHOC)
 
-  const ComponentWithHOC2 = () => <Provider store={store}><ComponentWithHOC1 { ...props } /></Provider>
+  const ComponentWithHOC2 = () => <Provider store={store}><ComponentWithHOC1 {...props} /></Provider>
 
   const wrapper = shallowUntilTarget(<ComponentWithHOC2 />, AccountWithoutHOC)
 
@@ -139,7 +138,7 @@ describe('<Account />', () => {
         updateUserWorkspaceSubscriptionNotifCallBack,
         updateUserAgendaUrlCallBack,
         setBreadcrumbsCallBack,
-        newFlashMessageInfoCallBack,
+        newFlashMessageInfoCallBack
       ])
     })
 

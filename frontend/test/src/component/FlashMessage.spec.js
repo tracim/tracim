@@ -15,7 +15,7 @@ describe('<FlashMessage />', () => {
     removeFlashMessage: removeFlashMessageCallBack
   }
 
-  const wrapper = shallow(<FlashMessageWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<FlashMessageWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`should display the message: ${props.flashMessage[0].message} in a div`, () =>

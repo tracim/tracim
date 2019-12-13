@@ -5,7 +5,6 @@ import { Password as PasswordWithoutHOC } from '../../../src/component/Account/P
 import sinon from 'sinon'
 
 describe('<Password />', () => {
-
   const onClickSubmitCallBack = sinon.stub()
   const dispatchMock = sinon.stub()
 
@@ -15,7 +14,7 @@ describe('<Password />', () => {
     dispatch: dispatchMock
   }
 
-  const wrapper = shallow(<PasswordWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<PasswordWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it('should have one button', () => {
@@ -36,7 +35,7 @@ describe('<Password />', () => {
     })
 
     it('onClickSubmitCallBack should be called when the button is clicked and the new password is valid', () => {
-      for(let i=0; i < wrapper.find('input.personaldata__form__txtinput').length; i++) {
+      for (let i = 0; i < wrapper.find('input.personaldata__form__txtinput').length; i++) {
         wrapper.find('input.personaldata__form__txtinput').at(i).simulate('change', { target: { value: 'newRandomPassWord' } })
       }
       wrapper.find('button').simulate('click')
@@ -61,5 +60,4 @@ describe('<Password />', () => {
       expect(wrapper.state('newPassword2')).to.equal(randomPassword)
     })
   })
-
 })

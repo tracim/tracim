@@ -9,7 +9,7 @@ describe('<LoginLogo />', () => {
     customClass: 'randomCustomClass'
   }
 
-  const wrapper = shallow(<LoginLogo { ...props } />)
+  const wrapper = shallow(<LoginLogo {...props} />)
 
   describe('static design', () => {
     it(`the div should have the class: ${props.customClass}`, () =>

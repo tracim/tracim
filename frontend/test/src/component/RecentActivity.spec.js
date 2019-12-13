@@ -32,7 +32,7 @@ describe('<RecentActivity />', () => {
   }
 
   const wrapper = shallow(
-      <RecentActivityWithoutHOC { ...props } t={key=> key} />
+    <RecentActivityWithoutHOC {...props} t={key => key} />
   )
 
   describe('static design', () => {
@@ -41,7 +41,7 @@ describe('<RecentActivity />', () => {
     )
 
     it(`should display the label of each recent activity`, () => {
-      for(let i = 0; i < props.recentActivityList.length; i++) {
+      for (let i = 0; i < props.recentActivityList.length; i++) {
         expect(wrapper.find('div.recentactivity__list__item__name').at(i)).to.text().contains(props.recentActivityList[i].label)
       }
     })
