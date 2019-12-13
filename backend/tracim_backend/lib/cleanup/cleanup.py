@@ -39,6 +39,7 @@ class CleanupLib(object):
             self.session.add(object_to_update)
         else:
             logger.debug(self, "fake update of {}".format(str(object_to_update)))
+            self.session.add(object_to_update)
             self.session.expunge(object_to_update)
 
     def safe_delete(self, object_to_delete: DeclarativeBase) -> None:
