@@ -60,7 +60,7 @@ describe('<InputGroupText />', () => {
     )
   })
 
-  describe('handler', () => {
+  describe('handlers', () => {
     it('onChangeCallBack should be call when input is onChange', () => {
       wrapper.find('input').simulate('change')
       expect(onChangeCallBack.called).to.equal(true)

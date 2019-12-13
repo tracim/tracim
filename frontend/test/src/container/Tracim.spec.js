@@ -8,14 +8,14 @@ import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
 import configureMockStore from 'redux-mock-store'
 import { translateMock } from '../../hocMock/translate'
 import { Provider } from 'react-redux'
-import {isFunction, shallowUntilTarget} from "../../hocMock/helper";
+import { isFunction, shallowUntilTarget } from '../../hocMock/helper'
 import {
   ADD, APP_LIST, APPEND,
   BREADCRUMBS, CONFIG, CONTENT_TYPE_LIST, FLASH_MESSAGE, REMOVE,
   SET,
   USER,
   WORKSPACE_LIST, WORKSPACE_LIST_MEMBER
-} from "../../../src/action-creator.sync";
+} from '../../../src/action-creator.sync'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { FETCH_CONFIG } from '../../../src/helper'
 const nock = require('nock')

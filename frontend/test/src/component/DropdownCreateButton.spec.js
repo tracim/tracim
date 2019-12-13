@@ -35,7 +35,7 @@ describe('<DropdownCreateButton />', () => {
       expect(wrapper.find(`button > div.${props.parentClass}__label__text`).length).to.equal(1)
     )
 
-    it(`a dive inside the the root div should have the class: ${props.parentClass}__setting`, () =>
+    it(`a div inside the the root div should have the class: ${props.parentClass}__setting`, () =>
       expect(wrapper.find(`div.${props.parentClass} > div.${props.parentClass}__setting`).length).to.equal(1)
     )
   })

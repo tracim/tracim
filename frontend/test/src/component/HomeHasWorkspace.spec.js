@@ -13,7 +13,7 @@ describe('<HomeHasWorkspace />', () => {
   const wrapper = shallow(<HomeHasWorkspaceWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
-    it(`should display in a div the publicName: ${props.user.public_name}`, () =>
+    it(`should display the publicName: ${props.user.public_name} in a div`, () =>
       expect(wrapper.find(`div.homepagecard__user__publicname`)).to.text().equal(props.user.public_name)
     )
   })

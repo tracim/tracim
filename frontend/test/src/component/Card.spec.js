@@ -14,7 +14,8 @@ describe('<Card />', () => {
     <Card {...props} >
       <CardHeader />
       <CardBody />
-    </Card>)
+    </Card>
+  )
 
   describe('static design', () => {
     it(`should have the customClass: ${props.customClass}`, () => {

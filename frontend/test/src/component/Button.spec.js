@@ -1,5 +1,5 @@
 import React from 'react'
-import { expect, assert } from 'chai'
+import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import Button from '../../../src/component/common/Input/Button.jsx'
 import sinon from 'sinon'
