@@ -1,10 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { ContentItemSearch as ContentItemSearchWithoutHOC } from '../../../src/component/ContentItemSearch.jsx'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
-import { translateMock } from '../../hocMock/translate.js'
-import { RouterMock } from '../../hocMock/withRouter.js'
 
 describe('<ContentItemSearch />', () => {
   const status = contentType[2].availableStatuses[0]
@@ -24,13 +22,7 @@ describe('<ContentItemSearch />', () => {
     lastModificationAuthor: 'randomAuthor'
   }
 
-  const ComponentWithHoc = translateMock()(ContentItemSearchWithoutHOC)
-
-  const wrapper = mount(
-    <RouterMock>
-      <ComponentWithHoc { ...props } />
-    </RouterMock>
-  )
+  const wrapper = shallow(<ContentItemSearchWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it('should display the path in a div', () =>
