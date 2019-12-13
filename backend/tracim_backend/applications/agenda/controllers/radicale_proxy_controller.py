@@ -6,13 +6,13 @@ from pyramid.config import Configurator
 from pyramid.response import Response
 from requests.auth import HTTPBasicAuth
 
+from tracim_backend.applications.agenda.authorization import can_access_to_agenda_list
+from tracim_backend.applications.agenda.authorization import can_access_user_agenda
+from tracim_backend.applications.agenda.authorization import can_access_workspace_event_agenda
+from tracim_backend.applications.agenda.authorization import can_access_workspace_root_agenda
+from tracim_backend.applications.agenda.utils.determiner import CaldavAuthorizationDeterminer
 from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.agenda.authorization import can_access_to_agenda_list
-from tracim_backend.lib.agenda.authorization import can_access_user_agenda
-from tracim_backend.lib.agenda.authorization import can_access_workspace_event_agenda
-from tracim_backend.lib.agenda.authorization import can_access_workspace_root_agenda
-from tracim_backend.lib.agenda.determiner import CaldavAuthorizationDeterminer
 from tracim_backend.lib.proxy.proxy import Proxy
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.request import TracimRequest

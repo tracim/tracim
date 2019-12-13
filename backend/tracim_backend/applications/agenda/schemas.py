@@ -6,9 +6,9 @@ from marshmallow import post_load
 from tracim_backend.app_models.validator import agenda_type_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
+from tracim_backend.applications.agenda.models import AgendaType
 from tracim_backend.models.context_models import Agenda
 from tracim_backend.models.context_models import AgendaFilterQuery
-from tracim_backend.views.agenda_api.models import AgendaType
 from tracim_backend.views.core_api.schemas import StrippedString
 
 

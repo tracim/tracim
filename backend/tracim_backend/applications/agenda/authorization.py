@@ -2,6 +2,8 @@
 
 from pyramid.events import NewResponse
 
+from tracim_backend.applications.agenda.utils.determiner import CaldavAuthorizationDeterminer
+from tracim_backend.applications.agenda.utils.utils import DavAuthorization
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import CaldavNotAuthenticated
 from tracim_backend.exceptions import CaldavNotAuthorized
@@ -10,8 +12,6 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.exceptions import WorkspaceNotFound
-from tracim_backend.lib.agenda.determiner import CaldavAuthorizationDeterminer
-from tracim_backend.lib.agenda.utils import DavAuthorization
 from tracim_backend.lib.utils.authorization import AuthorizationChecker
 from tracim_backend.lib.utils.authorization import SameUserChecker
 from tracim_backend.lib.utils.authorization import is_content_manager

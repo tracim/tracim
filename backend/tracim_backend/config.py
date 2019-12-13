@@ -149,7 +149,6 @@ class CFG(object):
         self._load_email_config()
         self._load_ldap_config()
         self._load_webdav_config()
-        self._load_caldav_config()
         self._load_search_config()
         self._load_collaborative_document_edition_config()
 
@@ -163,6 +162,9 @@ class CFG(object):
         import tracim_backend.applications.upload_permissions.config as upload_permissions_config
 
         upload_permissions_config.load_config(self)
+        import tracim_backend.applications.agenda.config as agenda_config
+
+        agenda_config.load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -487,28 +489,6 @@ class CFG(object):
         self.WEBDAV_SHOW_HISTORY = False
         self.WEBDAV_MANAGE_LOCK = True
 
-    def _load_caldav_config(self) -> None:
-        """
-        load config for caldav related stuff
-        """
-        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "false"))
-        self.CALDAV__RADICALE_PROXY__BASE_URL = self.get_raw_config(
-            "caldav.radicale_proxy.base_url", None
-        )
-        self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = self.get_raw_config(
-            "caldav.radicale.storage.filesystem_folder"
-        )
-        self.CALDAV__RADICALE__AGENDA_DIR = "agenda"
-        self.CALDAV__RADICALE__WORKSPACE_SUBDIR = "workspace"
-        self.CALDAV__RADICALE__USER_SUBDIR = "user"
-        self.CALDAV__RADICALE__BASE_PATH = "/{}/".format(self.CALDAV__RADICALE__AGENDA_DIR)
-        self.CALDAV__RADICALE__USER_PATH = "/{}/{}/".format(
-            self.CALDAV__RADICALE__AGENDA_DIR, self.CALDAV__RADICALE__USER_SUBDIR
-        )
-        self.CALDAV_RADICALE_WORKSPACE_PATH = "/{}/{}/".format(
-            self.CALDAV__RADICALE__AGENDA_DIR, self.CALDAV__RADICALE__WORKSPACE_SUBDIR
-        )
-
     def _load_ldap_config(self) -> None:
         """
         Load config for ldap related stuff
@@ -604,7 +584,6 @@ class CFG(object):
         """
         self._check_global_config_validity()
         self._check_email_config_validity()
-        self._check_caldav_config_validity()
         self._check_search_config_validity()
         self._check_collaborative_document_edition_config_validity()
 
@@ -614,6 +593,13 @@ class CFG(object):
         import tracim_backend.applications.share.config as share_app_config
 
         share_app_config.check_config(self)
+        import tracim_backend.applications.upload_permissions.config as upload_permission_config
+
+        upload_permission_config.check_config(self)
+
+        import tracim_backend.applications.agenda.config as agenda_config
+
+        agenda_config.check_config(self)
 
     def _check_collaborative_document_edition_config_validity(self) -> None:
         if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
@@ -743,38 +729,6 @@ class CFG(object):
                 )
             )
 
-    def _check_caldav_config_validity(self) -> None:
-        """
-        Check if config is correctly setted for caldav features
-        """
-        if self.CALDAV__ENABLED:
-            self.check_mandatory_param(
-                "CALDAV__RADICALE_PROXY__BASE_URL",
-                self.CALDAV__RADICALE_PROXY__BASE_URL,
-                when_str="when caldav feature is enabled",
-            )
-            # TODO - G.M - 2019-05-06 - convert "caldav.radicale.storage.filesystem_folder"
-            # as tracim global parameter
-            self.check_mandatory_param(
-                "CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER",
-                self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-                when_str="if caldav feature is enabled",
-            )
-            self.check_directory_path_param(
-                "CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER",
-                self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-                writable=True,
-            )
-            radicale_storage_type = self.settings.get("caldav.radicale.storage.type")
-            if radicale_storage_type != "multifilesystem":
-                raise ConfigurationError(
-                    '"{}" should be set to "{}"'
-                    " (currently only valid value)"
-                    ' when "{}" is true'.format(
-                        "caldav.radicale.storage.type", "multifilesystem", "caldav.enabled"
-                    )
-                )
-
     # INFO - G.M - 2019-04-05 - Post Actions Methods
     def do_post_check_action(self) -> None:
         self._set_default_app(self.APP__ENABLED)
@@ -868,16 +822,6 @@ class CFG(object):
             available_statuses=content_status_list.get_all(),
         )
 
-        agenda = Application(
-            label="Agenda",
-            slug="agenda",
-            fa_icon="calendar",
-            is_active=self.CALDAV__ENABLED,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/agenda",
-            app_config=self,
-        )
-
         gallery = Application(
             label="Gallery",
             slug="gallery",
@@ -906,6 +850,9 @@ class CFG(object):
         import tracim_backend.applications.upload_permissions.application as upload_permissions_app
 
         upload_permissions = upload_permissions_app.get_app(app_config=self)
+        import tracim_backend.applications.agenda.application as agenda_app
+
+        agenda = agenda_app.get_app(app_config=self)
         # process activated app list
         available_apps = OrderedDict(
             [

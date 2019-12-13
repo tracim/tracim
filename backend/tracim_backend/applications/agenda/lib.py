@@ -8,6 +8,7 @@ from colour import Color
 import requests
 from sqlalchemy.orm import Session
 
+from tracim_backend.applications.agenda.schemas import AgendaType
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaPropsUpdateFailed
 from tracim_backend.exceptions import AgendaServerConnectionError
@@ -18,7 +19,6 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import Agenda
 from tracim_backend.models.data import Workspace
-from tracim_backend.views.agenda_api.schemas import AgendaType
 
 CREATE_AGENDA_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
 <create xmlns="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav" xmlns:I="http://apple.com/ns/ical/">

@@ -18,6 +18,7 @@ from tracim_backend.app_models.validator import user_lang_validator
 from tracim_backend.app_models.validator import user_password_validator
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
+from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import AuthenticationFailed
@@ -46,7 +47,6 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
-from tracim_backend.lib.agenda.agenda import AgendaApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager

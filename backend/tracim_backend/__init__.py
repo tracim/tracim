@@ -9,10 +9,9 @@ import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
 
+from tracim_backend.applications.agenda.app_factory import CaldavAppFactory
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
-from tracim_backend.exceptions import CaldavNotAuthenticated
-from tracim_backend.exceptions import CaldavNotAuthorized
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentNotFoundInTracimRequest
@@ -31,8 +30,6 @@ from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.agenda import CaldavAppFactory
-from tracim_backend.lib.agenda.authorization import add_www_authenticate_header_for_caldav
 from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
     CollaborativeDocumentEditionFactory,
 )
@@ -54,7 +51,6 @@ from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API_V2
-from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.contents_api.file_controller import FileController
 from tracim_backend.views.contents_api.folder_controller import FolderController
@@ -221,7 +217,11 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     upload_permission_controller.import_controller(
         app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
     )
+    import tracim_backend.applications.agenda.controller as agenda_controller
 
+    agenda_controller.import_controller(
+        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2, context=context
+    )
     if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
         # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
         # import is here because import WOPI of Collabora controller without adding it to
@@ -240,27 +240,6 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
             collaborative_document_edition_controller.bind, route_prefix=BASE_API_V2
         )
     configurator.scan("tracim_backend.lib.utils.authentification")
-    if app_config.CALDAV__ENABLED:
-        # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,
-        # import is here because import AgendaController without adding it to
-        # pyramid make trouble in hapic which try to get view related
-        # to controller but failed.
-        from tracim_backend.views.agenda_api.agenda_controller import AgendaController
-
-        configurator.include(add_www_authenticate_header_for_caldav)
-        # caldav exception
-        context.handle_exception(CaldavNotAuthorized, HTTPStatus.FORBIDDEN)
-        context.handle_exception(CaldavNotAuthenticated, HTTPStatus.UNAUTHORIZED)
-        # controller
-        radicale_proxy_controller = RadicaleProxyController(
-            proxy_base_address=app_config.CALDAV__RADICALE_PROXY__BASE_URL,
-            radicale_base_path=app_config.CALDAV__RADICALE__BASE_PATH,
-            radicale_user_path=app_config.CALDAV__RADICALE__USER_PATH,
-            radicale_workspace_path=app_config.CALDAV_RADICALE_WORKSPACE_PATH,
-        )
-        agenda_controller = AgendaController()
-        configurator.include(agenda_controller.bind, route_prefix=BASE_API_V2)
-        configurator.include(radicale_proxy_controller.bind)
 
     # TODO - G.M - 2019-05-17 - check if possible to avoid this import here,
     # import is here because import SearchController without adding it to
