@@ -67,6 +67,7 @@ class DeleteUserCommand(AppContextCommand):
 
         deleted_user_ids = set()
         deleted_workspace_ids = set()
+
         with unprotected_content_revision(self._session) as session:
             uapi = UserApi(
                 config=self._app_config,
