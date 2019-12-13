@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import { SubDropdownCreateButton as SubDropdownCreateButtonWithoutHOC } from '../../../src/component/common/Input/SubDropdownCreateButton.jsx'
 import sinon from 'sinon'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
@@ -14,7 +14,7 @@ describe('<SubDropdownCreateButton />', () => {
     folderId: 1
   }
 
-  const wrapper = mount(<SubDropdownCreateButtonWithoutHOC { ...props } t={key => key} />)
+  const wrapper = shallow(<SubDropdownCreateButtonWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
     it(`should display ${contentType.length} available app`, () =>

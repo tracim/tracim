@@ -1,9 +1,8 @@
 import React from 'react'
-import { expect, assert } from 'chai'
-import { mount } from 'enzyme'
+import { expect } from 'chai'
+import { shallow } from 'enzyme'
 import { Timezone as TimezoneWithoutHOC } from '../../../src/component/Account/Timezone.jsx'
 import sinon from 'sinon'
-import { translateMock } from '../../hocMock/translate.js'
 
 describe('<Timezone />', () => {
   const onChangeTimezoneCallBack = sinon.stub()
@@ -20,9 +19,7 @@ describe('<Timezone />', () => {
     }
   }
 
-  const ComponentWithHoc = translateMock()(TimezoneWithoutHOC)
-
-  const wrapper = mount(<ComponentWithHoc { ...props } />)
+  const wrapper = shallow(<TimezoneWithoutHOC { ...props } t={key => key} />)
 
   describe('static design', () => {
 

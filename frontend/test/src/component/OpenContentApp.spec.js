@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import sinon from 'sinon'
 import { OpenContentApp as OpenContentAppWithoutHOC } from '../../../src/component/Workspace/OpenContentApp.jsx'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
@@ -10,6 +10,7 @@ import {
   withRouterMock
 } from '../../hocMock/withRouter'
 import { connectMock } from '../../hocMock/store'
+import { shallowUntilTarget } from '../../hocMock/helper'
 
 describe('<OpenContentApp />', () => {
   sinon.stub(console, 'log')
@@ -37,15 +38,11 @@ describe('<OpenContentApp />', () => {
 
   const ComponentWithHoc = withRouterMock(connectMock(mapStateToProps)(OpenContentAppWithoutHOC))
 
-  const wrapper = mount(
-    <ComponentWithHoc { ...props } />
-  )
-
-  const wrapperInstance = wrapper.find('OpenContentApp')
+  const wrapper = shallowUntilTarget(<ComponentWithHoc { ...props } />, OpenContentAppWithoutHOC)
 
   describe('intern function', () => {
     it('openContentApp() should call dispatchCustomEventCallBack to reload content when the app is already open', () => {
-      wrapperInstance.instance().openContentApp()
+      wrapper.instance().openContentApp()
       expect(dispatchCustomEventCallBack.called).to.equal(true)
       expect(renderAppFeatureCallBack.called).to.equal(false)
       expect(updateAppOpenedTypeCallBack.called).to.equal(false)
@@ -54,7 +51,7 @@ describe('<OpenContentApp />', () => {
 
     it('openContentApp() should call updateAppOpenedTypeCallBack and renderAppFeatureCallBack to open the new App and load his content', () => {
       wrapper.setProps({ appOpenedType: 'folder' })
-      wrapperInstance.instance().openContentApp()
+      wrapper.instance().openContentApp()
       expect(renderAppFeatureCallBack.called).to.equal(true)
       expect(updateAppOpenedTypeCallBack.called).to.equal(true)
       expect(dispatchCustomEventCallBack.called).to.equal(true)
@@ -66,7 +63,7 @@ describe('<OpenContentApp />', () => {
 
     it('openContentApp() should not call callback when the workspaceId is undefined', () => {
       wrapper.setProps({ workspaceId: undefined })
-      wrapperInstance.instance().openContentApp()
+      wrapper.instance().openContentApp()
       expect(renderAppFeatureCallBack.called).to.equal(false)
       expect(updateAppOpenedTypeCallBack.called).to.equal(false)
       expect(dispatchCustomEventCallBack.called).to.equal(false)
