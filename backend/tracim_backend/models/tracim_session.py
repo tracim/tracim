@@ -22,7 +22,7 @@ class TracimSession(Session):
 
 @contextmanager
 def unprotected_content_revision(
-    session: TracimSession
+    session: TracimSession,
 ) -> typing.Generator[TracimSession, None, None]:
     """
     allow to bypass protection on tracim revisions
