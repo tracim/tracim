@@ -57,7 +57,7 @@ class DeleteUserCommand(AppContextCommand):
         self._app_config = app_context["registry"].settings["CFG"]
 
         if parsed_args.test_mode:
-            print("(!) Running in Test mode, not change will be applied.")
+            print("(!) Running in Test mode, no changes will be applied.")
         if parsed_args.force:
             print("/!\\ Running in force mode, database created may be broken /!\\.")
         elif parsed_args.best_effort:
