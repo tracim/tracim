@@ -26,7 +26,7 @@ class DeleteUserCommand(AppContextCommand):
         parser.add_argument(
             "-best-effort",
             "--best-effort",
-            help="anonymise if needed user",
+            help="anonymizes the user where he cannot be deleted",
             dest="best_effort",
             default=False,
             action="store_true",
