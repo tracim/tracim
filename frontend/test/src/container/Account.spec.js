@@ -66,8 +66,7 @@ describe('<Account />', () => {
       case `${ADD}/${FLASH_MESSAGE}`:
         if (param.msg.type === 'warning') {
           newFlashMessageWarningCallBack()
-        }
-        if (param.msg.type === 'info') {
+        } else {
           newFlashMessageInfoCallBack()
         }
         break
@@ -148,7 +147,6 @@ describe('<Account />', () => {
       it('updateUserNameCallBack should be called when the function handleSubmitNameOrEmail() is called with a new Name', (done) => {
         wrapper.instance().handleSubmitNameOrEmail('randomNewName', '', '').then(() => {
           expect(updateUserNameCallBack.called).to.equal(true)
-          expect(newFlashMessageInfoCallBack.called).to.equal(true)
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
       })
@@ -156,14 +154,12 @@ describe('<Account />', () => {
       it('updateUserEmailCallBack should be called when the function handleSubmitNameOrEmail() is called with a new Email', (done) => {
         wrapper.instance().handleSubmitNameOrEmail('', 'randomNewEmail', 'randomPassword').then(() => {
           expect(updateUserEmailCallBack.called).to.equal(true)
-          expect(newFlashMessageInfoCallBack.called).to.equal(true)
         }).then(done, done)
       })
 
       it('newFlashMessageWarningCallBack should be called when the function handleSubmitNameOrEmail() is called with invalid new Name', (done) => {
         wrapper.instance().handleSubmitNameOrEmail('d', '', '').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
-          expect(newFlashMessageInfoCallBack.called).to.equal(false)
         }).then(done, done)
       })
     })
@@ -187,7 +183,6 @@ describe('<Account />', () => {
     describe('handleSubmitPassword', () => {
       it('newFlashMessageInfoCallBack should be called when handleSubmitPassword() is called with valid password', (done) => {
         wrapper.instance().handleSubmitPassword('randomOldPassword', 'randomPassWord', 'randomPassWord').then(() => {
-          expect(newFlashMessageInfoCallBack.called).to.equal(true)
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
       })
