@@ -32,10 +32,10 @@ describe('<Tracim />', () => {
   const appendBreadcrumbsCallBack = sinon.stub()
   const setWorkspaceListMemberListCallBack = sinon.stub()
 
-  const dispatchCallBack = async (param) => {
+  const dispatchCallBack = (param) => {
     console.log(param)
     if (isFunction(param)) {
-      return await param(dispatchCallBack)
+      return param(dispatchCallBack)
     }
     switch(param.type) {
       case `${SET}/${CONFIG}`:

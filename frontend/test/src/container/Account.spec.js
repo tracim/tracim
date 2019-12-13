@@ -39,10 +39,10 @@ describe('<Account />', () => {
   const setBreadcrumbsCallBack = sinon.stub()
   const newFlashMessageInfoCallBack = sinon.stub()
 
-  const dispatchCallBack = async (param) => {
+  const dispatchCallBack = (param) => {
     console.log(param)
     if (isFunction(param)) {
-      return await param(dispatchCallBack)
+      return param(dispatchCallBack)
     }
     switch(param.type) {
       case `${UPDATE}/${USER_NAME}`:
