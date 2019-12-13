@@ -50,6 +50,12 @@ class DeleteUserCommand(AppContextCommand):
         parser.add_argument(
             "-l", "--login", nargs="+", help="User logins (email)", dest="logins", required=True
         )
+        parser.add_argument(
+            "--anonymous-name",
+            help="Anonymous user display name to use",
+            dest="anonymous_name",
+            required=False,
+        )
         return parser
 
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
@@ -94,6 +100,7 @@ class DeleteUserCommand(AppContextCommand):
                     force=parsed_args.force,
                     best_effort=parsed_args.best_effort,
                     cleanup_lib=cleanup_lib,
+                    anonymised_user_display_name=parsed_args.anonymous_name,
                 )
                 deleted_user_ids.add(deleted_user_ids_result.user_id)
                 deleted_workspace_ids.update(deleted_workspace_ids)
@@ -129,7 +136,12 @@ class DeleteUserCommand(AppContextCommand):
                         )
 
     def _delete_user_database_info(
-        self, user: User, cleanup_lib: CleanupLib, force: bool = False, best_effort: bool = False
+        self,
+        user: User,
+        cleanup_lib: CleanupLib,
+        force: bool = False,
+        best_effort: bool = False,
+        anonymised_user_display_name: typing.Optional[str] = None,
     ):
         print('Trying to delete user {}: "{}"'.format(user.user_id, user.email))
         not_owned_workspace_revisions = cleanup_lib.get_user_revisions_on_other_user_workspace(user)
@@ -148,7 +160,9 @@ class DeleteUserCommand(AppContextCommand):
             )
             cleanup_lib.delete_user_associated_data(user)
             deleted_workspace_ids = cleanup_lib.delete_user_owned_workspace(user)
-            deleted_user_id = cleanup_lib.anonymise_user(user).user_id
+            deleted_user_id = cleanup_lib.anonymise_user(
+                user, anonymised_user_display_name=anonymised_user_display_name
+            ).user_id
             print(
                 'user {} anonymised to "{} <{}>".'.format(
                     user.user_id, user.display_name, user.email
@@ -181,6 +195,12 @@ class AnonymiseUserCommand(AppContextCommand):
             dest="dry_run_mode",
             default=False,
             action="store_true",
+        )
+        parser.add_argument(
+            "--anonymous-name",
+            help="Anonymous user display name to use",
+            dest="anonymous_name",
+            required=False,
         )
         parser.add_argument(
             "-l", "--login", nargs="+", help="User logins (email)", dest="logins", required=True
@@ -216,7 +236,9 @@ class AnonymiseUserCommand(AppContextCommand):
                     session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
                 )
                 print("anonymise user {}.".format(user.user_id))
-                cleanup_lib.anonymise_user(user)
+                cleanup_lib.anonymise_user(
+                    user, anonymised_user_display_name=parsed_args.anonymous_name
+                )
                 self._session.flush()
                 print(
                     'user {} anonymised to "{} <{}>".'.format(
