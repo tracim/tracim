@@ -28,13 +28,13 @@ class CleanupLib(object):
     using "unsafe_tracim_session" context_manager
     """
 
-    def __init__(self, session: Session, app_config: CFG, test_mode=False) -> None:
+    def __init__(self, session: Session, app_config: CFG, dry_run_mode=False) -> None:
         self.session = session
         self.app_config = app_config
-        self.test_mode = test_mode
+        self.dry_run_mode = dry_run_mode
 
     def safe_update(self, object_to_update: DeclarativeBase) -> None:
-        if not self.test_mode:
+        if not self.dry_run_mode:
             logger.debug(self, "update {}".format(str(object_to_update)))
             self.session.add(object_to_update)
         else:
@@ -43,9 +43,9 @@ class CleanupLib(object):
 
     def safe_delete(self, object_to_delete: DeclarativeBase) -> None:
         """
-        Delete object only if test mode is disabled
+        Delete object only if dry-run mode is disabled
         """
-        if not self.test_mode:
+        if not self.dry_run_mode:
             logger.debug(self, "delete {}".format(str(object_to_delete)))
             self.session.delete(object_to_delete)
         else:
@@ -53,9 +53,9 @@ class CleanupLib(object):
 
     def safe_delete_dir(self, dir_path: str) -> None:
         """
-        Delete dir only if test mode is disabled
+        Delete dir only if dry-run mode is disabled
         """
-        if not self.test_mode:
+        if not self.dry_run_mode:
             logger.debug(self, "delete {} dir".format(str(dir_path)))
             shutil.rmtree(dir_path)
         else:

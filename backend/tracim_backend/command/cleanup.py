@@ -32,17 +32,17 @@ class DeleteUserCommand(AppContextCommand):
             action="store_true",
         )
         parser.add_argument(
-            "-t",
-            "--test-mode",
-            help="test mode",
-            dest="test_mode",
+            "--dry-run",
+            help="dry-run mode",
+            dest="dry_run_mode",
             default=False,
             action="store_true",
         )
         parser.add_argument(
             "-f",
             "--force",
-            help="force user deletion",
+            help="force user deletion, this allow to delete user and his revision in case user has"
+            "created content in other user workspaces, this may create inconsistent database.",
             dest="force",
             default=False,
             action="store_true",
@@ -56,8 +56,8 @@ class DeleteUserCommand(AppContextCommand):
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
 
-        if parsed_args.test_mode:
-            print("(!) Running in Test mode, no changes will be applied.")
+        if parsed_args.dry_run_mode:
+            print("(!) Running in dry-run mode, no changes will be applied.")
         if parsed_args.force:
             print("/!\\ Running in force mode, database created may be broken /!\\.")
         elif parsed_args.best_effort:
@@ -86,7 +86,9 @@ class DeleteUserCommand(AppContextCommand):
                     exit(1)
             print("~~~~~~~~~~")
             for user in user_list:
-                cleanup_lib = CleanupLib(session, self._app_config, test_mode=parsed_args.test_mode)
+                cleanup_lib = CleanupLib(
+                    session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
+                )
                 deleted_user_ids_result = self._delete_user_database_info(
                     user,
                     force=parsed_args.force,
@@ -174,10 +176,9 @@ class AnonymiseUserCommand(AppContextCommand):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         parser.add_argument(
-            "-t",
-            "--test-mode",
-            help="test mode",
-            dest="test_mode",
+            "--dry-run",
+            help="dry-run mode",
+            dest="dry_run_mode",
             default=False,
             action="store_true",
         )
@@ -190,8 +191,8 @@ class AnonymiseUserCommand(AppContextCommand):
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
 
-        if parsed_args.test_mode:
-            print("(!) Running in Test mode, not change will be applied.")
+        if parsed_args.dry_run_mode:
+            print("(!) Running in dry-run mode, not change will be applied.")
 
         with unprotected_content_revision(self._session) as session:
             uapi = UserApi(
@@ -211,7 +212,9 @@ class AnonymiseUserCommand(AppContextCommand):
                     exit(2)
             for user in user_list:
                 print("~~~~~~~~~~")
-                cleanup_lib = CleanupLib(session, self._app_config, test_mode=parsed_args.test_mode)
+                cleanup_lib = CleanupLib(
+                    session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
+                )
                 print("anonymise user {}.".format(user.user_id))
                 cleanup_lib.anonymise_user(user)
                 self._session.flush()
