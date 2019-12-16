@@ -103,7 +103,7 @@ describe('<Account />', () => {
   describe('internal functions', () => {
     const invalidPassword = '0'
 
-    before(() => {
+    beforeEach(() => {
       nock(FETCH_CONFIG.apiUrl)
         .put('/users/me')
         .reply(200, { })
@@ -127,9 +127,6 @@ describe('<Account />', () => {
       nock(FETCH_CONFIG.apiUrl)
         .get('/users/me/agenda')
         .reply(200, [])
-    })
-
-    beforeEach(() => {
       restoreHistoryCallBack([
         setWorkspaceListMemberListCallBack,
         updateUserNameCallBack,
@@ -140,6 +137,10 @@ describe('<Account />', () => {
         setBreadcrumbsCallBack,
         newFlashMessageInfoCallBack
       ])
+    })
+
+    afterEach(() => {
+      nock.cleanAll()
     })
 
     describe('handleSubmitNameOrEmail', () => {

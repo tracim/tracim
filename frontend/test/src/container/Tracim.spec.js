@@ -105,7 +105,7 @@ describe('<Tracim />', () => {
   const wrapper = shallowUntilTarget(<ComponentWithHOC2 />, TracimWithoutHOC)
 
   describe('intern function', () => {
-    before(() => {
+    beforeEach(() => {
       nock(FETCH_CONFIG.apiUrl)
         .get('/system/config')
         .reply(200, {})
@@ -126,6 +126,10 @@ describe('<Tracim />', () => {
       nock(FETCH_CONFIG.apiUrl)
         .get(new RegExp('/workspaces/[0-9]/members'))
         .reply(200, { })
+    })
+
+    afterEach(() => {
+      nock.cleanAll()
     })
 
     describe('loadAppConfig', () => {

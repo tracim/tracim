@@ -16,6 +16,10 @@ describe('action-creator.async', () => {
         .reply(200, { json: () => {} })
     })
 
+    afterEach(() => {
+      nock.cleanAll()
+    })
+
     it('should call the right endpoint and return the right result', (done) => {
       const newName = 'randomNewName'
       putMyselfName(user, newName)(dispatch).then((result) => {
