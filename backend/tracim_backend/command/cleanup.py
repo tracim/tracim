@@ -91,6 +91,7 @@ class DeleteUserCommand(AppContextCommand):
                     print("ERROR: user with email {} does not exist".format(login))
                     exit(1)
             print("~~~~~~~~~~")
+
             for user in user_list:
                 cleanup_lib = CleanupLib(
                     session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
