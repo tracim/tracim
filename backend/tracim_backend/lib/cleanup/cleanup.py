@@ -197,7 +197,7 @@ class CleanupLib(object):
         return agenda_dir
 
     def delete_user_associated_data(self, user: User) -> None:
-        """deleted all stuff about user but user itself, his workspaces and content"""
+        """deleted all stuff about user except user itself, his workspaces and user content"""
 
         # INFO - G.M - 2019-12-11 - user permission
         upload_permissions = self.session.query(UploadPermission).filter(
