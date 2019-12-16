@@ -12,8 +12,6 @@ import { connectMock } from '../../hocMock/store'
 import { shallowUntilTarget } from '../../hocMock/helper'
 
 describe('<OpenContentApp />', () => {
-  sinon.stub(console, 'log')
-
   const dispatchCustomEventCallBack = sinon.stub()
   const updateAppOpenedTypeCallBack = sinon.stub()
   const renderAppFeatureCallBack = sinon.stub()

@@ -33,7 +33,6 @@ describe('<Tracim />', () => {
   const setWorkspaceListMemberListCallBack = sinon.stub()
 
   const dispatchCallBack = (param) => {
-    console.log(param)
     if (isFunction(param)) {
       return param(dispatchCallBack)
     }
@@ -105,7 +104,7 @@ describe('<Tracim />', () => {
   const wrapper = shallowUntilTarget(<ComponentWithHOC2 />, TracimWithoutHOC)
 
   describe('intern function', () => {
-    beforeEach(() => {
+    before(() => {
       nock(FETCH_CONFIG.apiUrl)
         .get('/system/config')
         .reply(200, {})
@@ -126,10 +125,6 @@ describe('<Tracim />', () => {
       nock(FETCH_CONFIG.apiUrl)
         .get(new RegExp('/workspaces/[0-9]/members'))
         .reply(200, { })
-    })
-
-    afterEach(() => {
-      nock.cleanAll()
     })
 
     describe('loadAppConfig', () => {

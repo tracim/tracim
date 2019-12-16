@@ -1,6 +1,6 @@
 import i18n, { getBrowserLang } from './i18n.js'
 
-const configEnv = require('../configEnv.json')
+const configEnv = process.env.NODE_ENV === 'test' ? require('../configEnv-test.json') : require('../configEnv.json')
 
 const versionFile = require('./version.json')
 export const TRACIM_APP_VERSION = versionFile.tracim_app_version

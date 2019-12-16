@@ -5,9 +5,6 @@ import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user.js'
 import { appList } from '../../hocMock/redux/appList/appList.js'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList.js'
-import configureMockStore from 'redux-mock-store'
-import { translateMock } from '../../hocMock/translate'
-import { Provider } from 'react-redux'
 import {
   BREADCRUMBS,
   SET,
@@ -23,10 +20,10 @@ import {
 } from '../../../src/action-creator.sync.js'
 import { FETCH_CONFIG } from '../../../src/helper'
 import {
-  shallowUntilTarget,
   restoreHistoryCallBack,
   isFunction
 } from '../../hocMock/helper'
+import { shallow } from 'enzyme'
 const nock = require('nock')
 
 describe('<Account />', () => {
@@ -40,7 +37,6 @@ describe('<Account />', () => {
   const newFlashMessageInfoCallBack = sinon.stub()
 
   const dispatchCallBack = (param) => {
-    console.log(param)
     if (isFunction(param)) {
       return param(dispatchCallBack)
     }
@@ -77,9 +73,6 @@ describe('<Account />', () => {
     }
   }
 
-  const mockStore = configureMockStore()
-  const store = mockStore({})
-
   const props = {
     breadcrumbs: [],
     user: user,
@@ -91,14 +84,11 @@ describe('<Account />', () => {
         email_notification_activated: true
       }
     },
+    t: key => key,
     dispatch: dispatchCallBack
   }
 
-  const ComponentWithHOC1 = translateMock()(AccountWithoutHOC)
-
-  const ComponentWithHOC2 = () => <Provider store={store}><ComponentWithHOC1 {...props} /></Provider>
-
-  const wrapper = shallowUntilTarget(<ComponentWithHOC2 />, AccountWithoutHOC)
+  const wrapper = shallow(<AccountWithoutHOC {...props} />)
 
   describe('internal functions', () => {
     const invalidPassword = '0'
@@ -137,10 +127,6 @@ describe('<Account />', () => {
         setBreadcrumbsCallBack,
         newFlashMessageInfoCallBack
       ])
-    })
-
-    afterEach(() => {
-      nock.cleanAll()
     })
 
     describe('handleSubmitNameOrEmail', () => {
