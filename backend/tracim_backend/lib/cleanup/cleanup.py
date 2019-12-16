@@ -17,7 +17,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.meta import DeclarativeBase
 
-ANONYMOUS_USER_EMAIL_PATTERN = "anonymous_{hash}@anonymous.anonymous"
+ANONYMOUS_USER_EMAIL_PATTERN = "anonymous_{hash}@anonymous.local"
 
 
 class CleanupLib(object):
