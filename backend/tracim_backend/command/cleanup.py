@@ -230,7 +230,7 @@ class AnonymiseUserCommand(AppContextCommand):
                     user_list.append(user)
                 except UserDoesNotExist:
                     print("ERROR: user with email {} does not exist".format(login))
-                    exit(2)
+                    exit(1)
             for user in user_list:
                 print("~~~~~~~~~~")
                 cleanup_lib = CleanupLib(

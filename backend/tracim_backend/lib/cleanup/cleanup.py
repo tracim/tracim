@@ -39,6 +39,10 @@ class CleanupLib(object):
             self.session.add(object_to_update)
         else:
             logger.debug(self, "fake update of {}".format(str(object_to_update)))
+            # INFO - G.M - 2019-12-16 - to cleanup current modified object from update
+            # we do need to expunge it, but expunging need to ensure first object is added
+            # in current session. If this is not the case expunge fail with InvalidRequestError
+            # exception and message "Instance <object> is not present in this Session"
             self.session.add(object_to_update)
             self.session.expunge(object_to_update)
 
