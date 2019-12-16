@@ -123,7 +123,7 @@ class CleanupLib(object):
                 self.delete_content(children)
 
         for revision in content.revisions:
-            deleted_contents.extend(self.delete_revision(revision))
+            deleted_contents.append(self.delete_revision(revision))
 
         logger.info(self, "delete content {}".format(content.content_id))
         deleted_contents.append(content.content_id)
