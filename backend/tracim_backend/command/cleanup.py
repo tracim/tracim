@@ -104,7 +104,7 @@ class DeleteUserCommand(AppContextCommand):
                     anonymised_user_display_name=parsed_args.anonymous_name,
                 )
                 deleted_user_ids.add(deleted_user_ids_result.user_id)
-                deleted_workspace_ids.update(deleted_workspace_ids)
+                deleted_workspace_ids.update(deleted_user_ids_result.workspace_ids)
                 print("~~~~~~~~~~")
 
             # INFO - G.M - 2019-12-13 - cleanup agenda at end of process
