@@ -28,7 +28,7 @@ class CleanupLib(object):
     using "unsafe_tracim_session" context_manager
     """
 
-    def __init__(self, session: Session, app_config: CFG, dry_run_mode=False) -> None:
+    def __init__(self, session: Session, app_config: CFG, dry_run_mode: bool = False) -> None:
         self.session = session
         self.app_config = app_config
         self.dry_run_mode = dry_run_mode
