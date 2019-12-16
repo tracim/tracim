@@ -174,7 +174,7 @@ class DeleteUserCommand(AppContextCommand):
                 "ERROR: User {} has revisions in other user workspace. Cannot delete it without"
                 " creating inconsistent database. Rollback changes.".format(user.user_id)
             )
-            exit(3)
+            exit(1)
         else:
             print('Delete all user "{}" data in database'.format(user.user_id))
             # INFO - G.M - 2019-12-13 - We can delete full user data
