@@ -12,7 +12,7 @@ from tracim_backend.models.tracim_session import unprotected_content_revision
 
 
 class DeleteResultIds(object):
-    def __init__(self, user_id: int, workspace_ids: typing.List[int] = None):
+    def __init__(self, user_id: int, workspace_ids: typing.Optional[typing.List[int]] = None) -> None:
         self.user_id = user_id
         self.workspace_ids = workspace_ids or []
 
