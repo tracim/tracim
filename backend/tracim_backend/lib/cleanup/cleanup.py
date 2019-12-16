@@ -302,7 +302,7 @@ class CleanupLib(object):
         self.safe_delete(user)
         return user_id
 
-    def anonymise_user(self, user: User, anonymised_user_display_name: str = None) -> User:
+    def anonymise_user(self, user: User, anonymised_user_display_name: typing.Optional[str] = None) -> User:
         """
         :param user: user to anonymise
         :return: user_id
