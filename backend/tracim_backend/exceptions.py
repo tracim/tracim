@@ -106,6 +106,10 @@ class CannotCreateAgenda(TracimException):
     pass
 
 
+class AgendaNotFoundError(TracimException):
+    pass
+
+
 class AgendaPropsUpdateFailed(TracimException):
     pass
 

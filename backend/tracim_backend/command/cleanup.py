@@ -1,10 +1,12 @@
 import argparse
+import traceback
 import typing
 
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend import UserDoesNotExist
 from tracim_backend.command import AppContextCommand
+from tracim_backend.exceptions import AgendaNotFoundError
 from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import User
@@ -12,7 +14,9 @@ from tracim_backend.models.tracim_session import unprotected_content_revision
 
 
 class DeleteResultIds(object):
-    def __init__(self, user_id: int, workspace_ids: typing.Optional[typing.List[int]] = None) -> None:
+    def __init__(
+        self, user_id: int, workspace_ids: typing.Optional[typing.List[int]] = None
+    ) -> None:
         self.user_id = user_id
         self.workspace_ids = workspace_ids or []
 
@@ -71,8 +75,8 @@ class DeleteUserCommand(AppContextCommand):
                 "(!) Running in best effort mode, will anonymise account instead of deleting them if needed."
             )
 
-        deleted_user_ids = set()
-        deleted_workspace_ids = set()
+        deleted_user_ids = set()  # typing.Set[int]
+        deleted_workspace_ids = set()  # typing.Set[int]
 
         with unprotected_content_revision(self._session) as session:
             uapi = UserApi(
@@ -116,12 +120,13 @@ class DeleteUserCommand(AppContextCommand):
                 for workspace_id in deleted_workspace_ids:
                     try:
                         cleanup_lib.delete_workspace_agenda(workspace_id)
-                    except FileNotFoundError:
+                    except AgendaNotFoundError:
                         print(
-                            "Warning: Cannot delete agenda for workspace {}, agenda not found".format(
+                            'Warning: Cannot delete agenda for workspace "{}", agenda not found. Agenda path may be incorrect or agenda not created'.format(
                                 workspace_id
                             )
                         )
+                        print(traceback.format_exc())
 
             if deleted_user_ids:
                 deleted_user_ids_str = ['"{}"'.format(user_id) for user_id in deleted_user_ids]
@@ -129,12 +134,13 @@ class DeleteUserCommand(AppContextCommand):
                 for user_id in deleted_user_ids:
                     try:
                         cleanup_lib.delete_user_agenda(user_id)
-                    except FileNotFoundError:
+                    except AgendaNotFoundError:
                         print(
-                            "Warning: Cannot delete agenda for user {}, agenda not found".format(
+                            'Warning: Cannot delete agenda for user "{}", agenda not found. Agenda path may be incorrect or agenda not created'.format(
                                 user_id
                             )
                         )
+                        print(traceback.format_exc())
 
     def _delete_user_database_info(
         self,

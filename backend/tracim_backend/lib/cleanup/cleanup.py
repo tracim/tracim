@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import AgendaNotFoundError
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
@@ -176,24 +177,23 @@ class CleanupLib(object):
         return workspace_id
 
     def delete_workspace_agenda(self, workspace_id: int) -> typing.Optional[str]:
-        # INFO - G.M - 2019-12-11 - delete workspace agenda
-        if not self.app_config.CALDAV__ENABLED:
-            logger.info(
-                self,
-                "will not delete workspace {} agenda, because caldav feature is disabled".format(
-                    workspace_id
-                ),
-            )
-            return
-
         agenda_dir = "{}{}{}{}".format(
             self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
             "/collection-root",
             self.app_config.CALDAV_RADICALE_WORKSPACE_PATH,
             workspace_id,
         )
-        logger.info(self, "delete workspace {} agenda dir : {}".format(workspace_id, agenda_dir))
-        self.safe_delete_dir(agenda_dir)
+        logger.info(
+            self, 'delete workspace "{}" agenda dir at "{}"'.format(workspace_id, agenda_dir)
+        )
+        try:
+            self.safe_delete_dir(agenda_dir)
+        except FileNotFoundError as e:
+            raise AgendaNotFoundError(
+                'Try to delete workspace "{}" agenda but no agenda found at {}'.format(
+                    workspace_id, agenda_dir
+                )
+            ) from e
         return agenda_dir
 
     def delete_user_associated_data(self, user: User) -> None:
@@ -239,15 +239,6 @@ class CleanupLib(object):
         :param user_id: user_id of user whe delete agenda
         :return: path of deleted agenda
         """
-
-        if not self.app_config.CALDAV__ENABLED:
-            logger.info(
-                self,
-                "will not delete user {} agenda, because caldav feature is disabled".format(
-                    user_id
-                ),
-            )
-            return
         agenda_dir = "{}{}{}{}".format(
             self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
             "/collection-root",
@@ -255,7 +246,12 @@ class CleanupLib(object):
             user_id,
         )
         logger.info(self, "delete user {} agenda dir : {}".format(user_id, agenda_dir))
-        self.safe_delete_dir(agenda_dir)
+        try:
+            self.safe_delete_dir(agenda_dir)
+        except FileNotFoundError as e:
+            raise AgendaNotFoundError(
+                "Try to delete user {} agenda but no agenda found at {}".format(user_id, agenda_dir)
+            ) from e
         return agenda_dir
 
     def delete_user_owned_workspace(self, user: User) -> typing.List[int]:
@@ -306,7 +302,9 @@ class CleanupLib(object):
         self.safe_delete(user)
         return user_id
 
-    def anonymise_user(self, user: User, anonymised_user_display_name: typing.Optional[str] = None) -> User:
+    def anonymise_user(
+        self, user: User, anonymised_user_display_name: typing.Optional[str] = None
+    ) -> User:
         """
         :param user: user to anonymise
         :return: user_id
