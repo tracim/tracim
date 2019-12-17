@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import Help from '../../../src/component/Header/MenuActionListItem/Help.jsx'
 import sinon from 'sinon'
 
@@ -11,7 +11,7 @@ describe('<Help />', () => {
     onClickHelp: onClickHelpCallBack
   }
 
-  const wrapper = shallow(<Help {...props} />)
+  const wrapper = mount(<Help {...props} />)
 
   describe('handler', () => {
     it('onClickHelpCallBack should be called when the button is clicked', () => {
