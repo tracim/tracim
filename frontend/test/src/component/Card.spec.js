@@ -10,10 +10,14 @@ describe('<Card />', () => {
     customClass: 'randomCustomClass'
   }
 
+  const CardBodyChildren = () => <div>Random Children</div>
+
   const wrapper = shallow(
     <Card {...props} >
       <CardHeader />
-      <CardBody />
+      <CardBody>
+        <CardBodyChildren />
+      </CardBody>
     </Card>
   )
 

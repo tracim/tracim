@@ -1,12 +1,12 @@
 import React from 'react'
 import { expect } from 'chai'
 import sinon from 'sinon'
+import { mount } from 'enzyme'
 import { OpenCreateContentApp as OpenCreateContentAppWithoutHOC } from '../../../src/component/Workspace/OpenCreateContentApp.jsx'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 import { user } from '../../hocMock/redux/user/user.js'
 import { connectMock } from '../../hocMock/store.js'
 import { withRouterMock } from '../../hocMock/withRouter.js'
-import { shallowUntilTarget } from '../../hocMock/helper'
 
 describe('<OpenCreateContentApp />', () => {
   const renderAppPopupCreationCallBack = sinon.stub()
@@ -31,18 +31,20 @@ describe('<OpenCreateContentApp />', () => {
 
   const ComponentWithHoc = withRouterMock(connectMock(mapStateToProps)(OpenCreateContentAppWithoutHOC))
 
-  const wrapper = shallowUntilTarget(<ComponentWithHoc {...props} />, OpenCreateContentAppWithoutHOC)
+  const wrapper = mount(<ComponentWithHoc {...props} />)
+
+  const wrapperInstance = wrapper.find(OpenCreateContentAppWithoutHOC)
 
   describe('intern function', () => {
     it('openCreateContentApp() should call renderAppPopupCreationCallBack to open the creation popup', () => {
-      wrapper.instance().openCreateContentApp()
+      wrapperInstance.instance().openCreateContentApp()
       expect(renderAppPopupCreationCallBack.called).to.equal(true)
       renderAppPopupCreationCallBack.resetHistory()
     })
 
     it('openCreateContentApp() should not call renderAppPopupCreationCallBack to open the creation popup when workspaceId is undefined', () => {
       wrapper.setProps({ workspaceId: undefined })
-      wrapper.instance().openCreateContentApp()
+      wrapperInstance.instance().openCreateContentApp()
       expect(renderAppPopupCreationCallBack.called).to.equal(false)
       renderAppPopupCreationCallBack.resetHistory()
       wrapper.setProps({ workspaceId: props.workspaceId })

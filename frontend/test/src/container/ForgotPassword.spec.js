@@ -2,11 +2,11 @@ import React from 'react'
 import { expect } from 'chai'
 import { ForgotPassword as ForgotPasswordWithoutHOC } from '../../../src/container/ForgotPassword'
 import sinon from 'sinon'
+import { mount } from 'enzyme'
 import { user } from '../../hocMock/redux/user/user'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { translateMock } from '../../hocMock/translate'
-import { shallowUntilTarget } from '../../hocMock/helper'
 
 describe('<ForgotPassword />', () => {
   const renderAppPopupCreationCallBack = sinon.stub()
@@ -26,23 +26,22 @@ describe('<ForgotPassword />', () => {
 
   const ComponentWithHOC = withRouterMock(translateMock()(ForgotPasswordWithoutHOC))
 
-  const wrapper = shallowUntilTarget(
-    <ComponentWithHOC {...props} />,
-    ForgotPasswordWithoutHOC
-  )
+  const wrapper = mount(<ComponentWithHOC {...props} />)
+
+  const wrapperInstance = wrapper.find(ForgotPasswordWithoutHOC)
 
   describe('intern function', () => {
     describe('handleInputKeyDown()', () => {
       it('should call the callBack when e.key === enter', () => {
-        wrapper.instance().handleInputKeyDown({ key: 'enter' })
+        wrapperInstance.instance().handleInputKeyDown({ key: 'enter' })
       })
     })
 
     describe('handleChangeBackupEmail()', () => {
       it('should set backupEmail in the state', () => {
-        wrapper.instance().handleChangeBackupEmail({ target: { value: 'testValue' } })
-        expect(wrapper.state().backupEmail.value).to.equal('testValue')
-        expect(wrapper.state().backupEmail.isInvalid).to.equal(false)
+        wrapperInstance.instance().handleChangeBackupEmail({ target: { value: 'testValue' } })
+        expect(wrapperInstance.state().backupEmail.value).to.equal('testValue')
+        expect(wrapperInstance.state().backupEmail.isInvalid).to.equal(false)
       })
     })
   })

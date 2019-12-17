@@ -10,14 +10,10 @@ const dispatch = () => {}
 
 describe('action-creator.async', () => {
   describe('putMyselfName', () => {
-    beforeEach(() => {
+    before(() => {
       nock(FETCH_CONFIG.apiUrl)
         .put('/users/me')
         .reply(200, { json: () => {} })
-    })
-
-    afterEach(() => {
-      nock.cleanAll()
     })
 
     it('should call the right endpoint and return the right result', (done) => {

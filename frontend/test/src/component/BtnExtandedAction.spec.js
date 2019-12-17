@@ -32,19 +32,19 @@ describe('<ExtandedAction />', () => {
   const wrapper = shallow(<ExtandedActionWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
-    it('should hide all dropdown button when userRoleIdInWorkspace < 2', () => {
+    it('should hide all dropdown buttons when userRoleIdInWorkspace < 2', () => {
       wrapper.setProps({ userRoleIdInWorkspace: 1 })
       expect(wrapper.find('div.subdropdown__item').length).to.equal(0)
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })
     })
 
-    it('should show only one dropdown button when userRoleIdInWorkspace = 2', () => {
+    it('should show only one dropdown buttons when userRoleIdInWorkspace = 2', () => {
       wrapper.setProps({ userRoleIdInWorkspace: 2 })
       expect(wrapper.find('div.subdropdown__item').length).to.equal(1)
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })
     })
 
-    it('should show all dropdown button when userRoleIdInWorkspace > 4', () => {
+    it('should show all dropdown buttons when userRoleIdInWorkspace > 4', () => {
       wrapper.setProps({ userRoleIdInWorkspace: 5 })
       expect(wrapper.find('div.subdropdown__item').length).to.equal(2)
       expect(wrapper.find(Link)).to.have.lengthOf(1)

@@ -7,7 +7,7 @@ import sinon from 'sinon'
 
 process.env.NODE_ENV = 'test'
 
-export const GLOBAL_primaryColor = {
+export const globalPrimaryColor = {
   hex: '#123456',
   rgb: 'rgb(18, 52, 86)'
 }
@@ -25,7 +25,7 @@ if (!global.window && !global.document) {
   global.window = window
   global.document = window.document
   global.navigator = window.navigator
-  global.GLOBAL_primaryColor = GLOBAL_primaryColor.hex
+  global.GLOBAL_primaryColor = globalPrimaryColor.hex
 }
 
 Enzyme.configure({ adapter: new Adapter() })

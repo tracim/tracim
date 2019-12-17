@@ -14,7 +14,8 @@ describe('<CardHeader />', () => {
   const wrapper = shallow(
     <CardHeader {...props}>
       <Children />
-    </CardHeader>)
+    </CardHeader>
+  )
 
   describe('static design', () => {
     it(`should have the formClass: ${props.customClass}`, () =>

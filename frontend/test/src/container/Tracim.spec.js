@@ -2,13 +2,14 @@ import React from 'react'
 import { expect } from 'chai'
 import { Tracim as TracimWithoutHOC } from '../../../src/container/Tracim'
 import sinon from 'sinon'
+import { mount } from 'enzyme'
 import { user } from '../../hocMock/redux/user/user'
 import { appList } from '../../hocMock/redux/appList/appList'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
 import configureMockStore from 'redux-mock-store'
 import { translateMock } from '../../hocMock/translate'
 import { Provider } from 'react-redux'
-import { isFunction, shallowUntilTarget } from '../../hocMock/helper'
+import { isFunction } from '../../hocMock/helper'
 import {
   ADD, APP_LIST, APPEND,
   BREADCRUMBS, CONFIG, CONTENT_TYPE_LIST, FLASH_MESSAGE, REMOVE,
@@ -101,7 +102,9 @@ describe('<Tracim />', () => {
 
   const ComponentWithHOC2 = () => <Provider store={store}><ComponentWithHOC1 {...props} /></Provider>
 
-  const wrapper = shallowUntilTarget(<ComponentWithHOC2 />, TracimWithoutHOC)
+  const wrapper = mount(<ComponentWithHOC2 {...props} />)
+
+  const wrapperInstance = wrapper.find(TracimWithoutHOC)
 
   describe('intern function', () => {
     before(() => {
@@ -129,19 +132,19 @@ describe('<Tracim />', () => {
 
     describe('loadAppConfig', () => {
       it('setConfigCallBack should be called when loadAppConfig() is called', (done) => {
-        wrapper.instance().loadAppConfig().then(() => {
+        wrapperInstance.instance().loadAppConfig().then(() => {
           expect(setConfigCallBack.called).to.equal(true)
         }).then(done, done)
       })
 
       it('setAppListCallBack should be called when loadAppConfig() is called', (done) => {
-        wrapper.instance().loadAppConfig().then(() => {
+        wrapperInstance.instance().loadAppConfig().then(() => {
           expect(setAppListCallBack.called).to.equal(true)
         }).then(done, done)
       })
 
       it('setContentTypeListCallBack should be called when loadAppConfig() is called', (done) => {
-        wrapper.instance().loadAppConfig().then(() => {
+        wrapperInstance.instance().loadAppConfig().then(() => {
           expect(setContentTypeListCallBack.called).to.equal(true)
         }).then(done, done)
       })
@@ -149,7 +152,7 @@ describe('<Tracim />', () => {
 
     describe('loadWorkspaceList', () => {
       it('setWorkspaceListCallBack should be called when loadWorkspaceList() is called', (done) => {
-        wrapper.instance().loadWorkspaceList().then(() => {
+        wrapperInstance.instance().loadWorkspaceList().then(() => {
           expect(setWorkspaceListCallBack.called).to.equal(true)
         }).then(done, done)
       })
@@ -157,7 +160,7 @@ describe('<Tracim />', () => {
 
     describe('loadWorkspaceListMemberList', () => {
       it('setWorkspaceListMemberListCallBack should be called when loadWorkspaceListMemberList() is called', (done) => {
-        wrapper.instance().loadWorkspaceListMemberList(workspaceList.workspaceList).then(() => {
+        wrapperInstance.instance().loadWorkspaceListMemberList(workspaceList.workspaceList).then(() => {
           expect(setWorkspaceListMemberListCallBack.called).to.equal(true)
         }).then(done, done)
       })
