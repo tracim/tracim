@@ -67,7 +67,7 @@ class File extends React.Component {
         props.t('Files'),
         props.t('file'),
         props.t('files'),
-        props.t('Upload a file')
+        props.t('Upload files')
       ],
       newComment: '',
       newFile: '',

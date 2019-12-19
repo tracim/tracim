@@ -48,7 +48,6 @@
   "Creation date:": "Date de création :",
   "Last modification:": "Dernière modification :",
   "Description:": "Description :",
-  "Upload a file": "Téléverser un fichier",
   "Error while loading share links list": "Erreur lors du chargement de la liste des liens de partage",
   "Error while deleting share link": "Erreur lors de la suppression d'un lien de partage",
   "Timeline": "Historique",
@@ -56,5 +55,8 @@
   "Number of shares:": "Nombre de partages :",
   "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximale autorisée",
   "Error, the shared space exceed its maximum size": "Erreur, l'espace partagé dépasse sa taille maximale",
-  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers"
+  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
+  "Some file(s) couldn't be uploaded": "Certains fichiers n'ont pas pu être téléversés",
+  "Files already uploaded:": "Fichiers déjà téléversés",
+  "Upload files": "Téléverser des fichiers"
 }

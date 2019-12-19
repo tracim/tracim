@@ -6,7 +6,7 @@ import {
   addAllResourceI18n,
   FileDropzone,
   CUSTOM_EVENT,
-  displayFileSize
+  FileUploadList
 } from 'tracim_frontend_lib'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -84,10 +84,16 @@ class PopupCreateFile extends React.Component {
         this.handleClose()
       } else {
         this.sendGlobalFlashMessage(props.t("Some file(s) couldn't be uploaded"))
-        this.setState({ uploadFiles: uploadedFiles, uploadedFiles: [], uploadStarted: false })
+        this.setState({
+          uploadFiles: uploadedFiles,
+          uploadedFiles: [],
+          uploadStarted: false,
+          progressUpload: {
+            display: false
+          }
+        })
       }
     }
-
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -99,41 +105,32 @@ class PopupCreateFile extends React.Component {
     }
   })
 
-  handleChangeFile = newFile => {
-    if (!newFile || !newFile[0]) return
+  handleChangeFile = newFileList => {
+    const { props, state } = this
 
-    const fileToSave = newFile
+    if (!newFileList || !newFileList[0]) return
 
-    // if (
-    //   !fileToSave.type.includes('image') ||
-    //   fileToSave.size > 2000000
-    // ) {
-    // this.setState({
-    //   uploadFile: fileToSave,
-    //   uploadFilePreview: false
-    // })
-    //   const uploadFiles = this.state.uploadFiles
-    //   uploadFiles.push(fileToSave)
-    //   this.setState({ uploadFiles, uploadFilePreview: false })
-    //   return
-    // }
-    fileToSave.forEach(f => f.percent = 0)
+    const alreadyUploadedList = newFileList.filter(newFile => state.uploadFiles.some(stateFile => stateFile.name === newFile.name))
+    if (alreadyUploadedList.length) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: <div>{props.t('Files already uploaded:')}<br /><ul>{alreadyUploadedList.map(file => <li>{file.name}</li>)}</ul></div>,
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
+    }
+
+    newFileList.forEach(f => { f.percent = 0 })
     const uploadFiles = this.state.uploadFiles
-    uploadFiles.push(...fileToSave)
+    uploadFiles.push(...newFileList)
     this.setState({ uploadFiles })
-
-    // var reader = new FileReader()
-    // reader.onload = e => {
-    //   this.setState({ uploadFilePreview: e.total > 0 ? e.target.result : false })
-    //   const img = new Image()
-    //   img.src = e.target.result
-    //   img.onerror = () => this.setState({ uploadFilePreview: false })
-    // }
-    // reader.readAsDataURL(fileToSave)
   }
 
   handleClose = () => {
-    const { state, props } = this
+    const { state } = this
 
     // if (state.progressUpload.display) {
     //   GLOBAL_dispatchEvent({
@@ -165,11 +162,11 @@ class PopupCreateFile extends React.Component {
 
     // fetch still doesn't handle event progress. So we need to use old school xhr object
     const xhr = new XMLHttpRequest()
-    // xhr.upload.addEventListener('loadstart', () => this.setState({ progressUpload: { display: false } }), false)
+
     const uploadInProgress = e => {
       if (e.lengthComputable) {
         const uploadFiles = state.uploadFiles
-        uploadFiles[uploadFiles.indexOf(file)].percent += (e.loaded / e.total * 100) / uploadFiles.length
+        uploadFiles[uploadFiles.indexOf(file)].percent = (e.loaded / e.total * 100) / uploadFiles.length
 
         this.setState({
           progressUpload: {
@@ -179,8 +176,8 @@ class PopupCreateFile extends React.Component {
         })
       }
     }
+
     xhr.upload.addEventListener('progress', uploadInProgress, false)
-    // xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: false } }), false)
 
     xhr.open('POST', `${state.config.apiUrl}/workspaces/${state.workspaceId}/files`, true)
 
@@ -194,33 +191,15 @@ class PopupCreateFile extends React.Component {
           case 200:
             const jsonResult200 = JSON.parse(xhr.responseText)
 
-            // file.jsonResult = jsonResult200
-            // this.handleClose()
-
-            // GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-
-            // if (state.uploadFiles.length === 1) {
-            //   GLOBAL_dispatchEvent({
-            //     type: CUSTOM_EVENT.OPEN_CONTENT_URL,
-            //     data: {
-            //       workspaceId: jsonResult200.workspace_id,
-            //       contentType: state.appName,
-            //       contentId: jsonResult200.content_id
-            //     }
-            //   })
-            // }
-            // uploadFile.splice(uploadFile.indexOf(file), 1)
-            // uploadFile[uploadFile.indexOf(file)].jsonResult = jsonResult200
             filePosted.jsonResult = { ...jsonResult200, code: 200 }
 
             uploadedFiles.push(filePosted)
-
             this.setState({ uploadedFiles })
             break
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
 
-            let hasError = ''
+            let hasError = props.t('Error while creating file')
             switch (jsonResult400.code) {
               case 3002: hasError = props.t('A content with the same name already exists'); break
               case 6002: hasError = props.t('The file is larger than the maximum file size allowed'); break
@@ -232,15 +211,18 @@ class PopupCreateFile extends React.Component {
             uploadedFiles.push(filePosted)
             this.setState({ uploadedFiles })
             break
-          default: this.sendGlobalFlashMessage(props.t('Error while creating file')); break
+          default:
+            filePosted.jsonResult = { code: 0 }
+            filePosted.hasError = props.t('Error while creating file')
+            uploadedFiles.push(filePosted)
+            this.setState({ uploadedFiles, progressUpload: { display: false } })
+            break
         }
       }
     }
 
     xhr.send(formData)
   }
-
-
 
   handleValidate = async () => {
     const { state } = this
@@ -255,7 +237,7 @@ class PopupCreateFile extends React.Component {
     state.uploadFiles.forEach((file, index) => this.postFile(file, index))
   }
 
-  onDeleteFile = (file) => {
+  handleDeleteFile = (file) => {
     const { state } = this
 
     const uploadFiles = state.uploadFiles
@@ -270,6 +252,15 @@ class PopupCreateFile extends React.Component {
     return Math.round(state.uploadFiles.reduce((accumulator, currentValue) => accumulator + currentValue.percent, 0))
   }
 
+  idValidateButtonDisabled () {
+    const { state } = this
+
+    let disabled = state.uploadFiles.length === 0 || state.uploadStarted
+    if (!disabled) state.uploadFiles.forEach(f => { if (f.hasError) disabled = true })
+
+    return disabled
+  }
+
   render () {
     const { props, state } = this
 
@@ -280,7 +271,7 @@ class PopupCreateFile extends React.Component {
         label={props.t(state.config.creationLabel)}
         customColor={state.config.hexcolor}
         faIcon={state.config.faIcon}
-        contentName={state.uploadFiles.length > 0 ? 'allowValidate' : ''} // hack to update the "disabled" state of the button
+        contentName={this.idValidateButtonDisabled() ? '' : 'allowValidate'} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
         btnValidateLabel={props.t('Validate and create')}
         customStyle={{ top: 'calc(50% - 177px)' }}
@@ -297,36 +288,14 @@ class PopupCreateFile extends React.Component {
             onClick={this.handleChangeFile}
             hexcolor={state.config.hexcolor}
             multipleFiles
-            preview={state.uploadFilePreview}
+            filesUploaded={state.uploadFiles}
           />
 
-          <div className='font-weight-bold'>
-            {state.uploadFiles.length > 0
-              ? props.t('Attached files')
-              : props.t('You have not yet chosen any files to upload.')
-            }
-          </div>
-
-          <div className='guestupload__card__form__right__files'>
-            {state.uploadFiles.map((file, index) =>
-              <div className='d-flex' key={file.name}>
-                <i className='fa fa-fw fa-file-o m-1' />
-
-                {file.name} ({displayFileSize(file.size)})
-
-                <button
-                  className='iconBtn ml-auto primaryColorFontHover'
-                  onClick={() => this.onDeleteFile(file)}
-                  title={props.t('Delete')}
-                >
-                  <i className='fa fa-fw fa-trash-o' />
-                </button>
-                {file.hasError && (
-                  <i title={file.hasError} className='fa fa-fw fa-exclamation-triangle create_file_error'/>
-                )}
-              </div>
-            )}
-          </div>
+          <FileUploadList
+            uploadFilesList={state.uploadFiles}
+            onDeleteFile={this.handleDeleteFile}
+            deleteFileDisabled={state.uploadStarted}
+          />
         </div>
       </CardPopupCreateContent>
     )

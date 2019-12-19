@@ -63,6 +63,7 @@ import GenericButton from './component/Button/GenericButton.jsx'
 import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
+import FileUploadList from './component/FileDropzone/FileUploadList.jsx'
 
 import ShareDownload from './component/ShareDownload/ShareDownload.jsx'
 import ShareLink from './component/ShareLink/ShareLink.jsx'
@@ -132,6 +133,7 @@ export {
   ComposedIcon,
   DisplayState,
   FileDropzone,
+  FileUploadList,
   ShareLink,
   ShareDownload,
   ProgressBar,

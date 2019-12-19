@@ -48,7 +48,6 @@
   "Creation date:": "Creation date:",
   "Last modification:": "Last modification:",
   "Description:": "Description:",
-  "Upload a file": "Upload a file",
   "Error while loading share links list": "Error while loading share links list",
   "Error while deleting share link": "Error while deleting share link",
   "Timeline": "Timeline",
@@ -56,5 +55,8 @@
   "Number of shares:": "Number of shares:",
   "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
   "Error, the shared space exceed its maximum size": "Error, the shared space exceed its maximum size",
-  "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files"
+  "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files",
+  "Some file(s) couldn't be uploaded": "Some file(s) couldn't be uploaded",
+  "Files already uploaded:": "Files already uploaded:",
+  "Upload files": "Upload files"
 }
