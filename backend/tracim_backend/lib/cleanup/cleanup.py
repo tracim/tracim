@@ -168,11 +168,11 @@ class CleanupLib(object):
             )
             self.safe_delete(upload_permission)
 
-            logger.info(self, "delete workspace {}".format(workspace.workspace_id))
-            self.safe_delete(workspace)
-            for content in workspace.contents:
-                self.delete_content(content)
+        for content in workspace.contents:
+            self.delete_content(content)
+
         workspace_id = workspace.workspace_id
+        logger.info(self, "delete workspace {}".format(workspace.workspace_id))
         self.safe_delete(workspace)
         return workspace_id
 
