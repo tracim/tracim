@@ -480,7 +480,97 @@ class TestCommands(object):
         result = app.run(["db", "delete", "-c", "donotexist.ini#command_test"])
         assert result == 1
 
+    def test_func__delete_user__err__workspace_left(
+        self,
+        session,
+        user_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Test User deletion : nominal case, user has change nothing in other user workspace
+        """
+        user_id = admin_user.user_id
+        workspace_api = workspace_api_factory.get()
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        session.flush()
+        workspace_id = test_workspace.workspace_id
+        transaction.commit()
+        assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        assert session.query(User).filter(User.user_id == user_id).one()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "admin@admin.admin",
+                "-d",
+            ]
+        )
+        assert result == 1
+
     def test_func__delete_user__ok__nominal_case(
+        self,
+        session,
+        user_api_factory,
+        group_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+    ) -> None:
+        """
+        Test User deletion : nominal case, user has change nothing in other user workspace
+        """
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        session.add(test_user)
+        session.flush()
+        transaction.commit()
+        user_id = test_user.user_id
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "test@test.test",
+                "-d",
+            ]
+        )
+        assert result == 0
+        with pytest.raises(NoResultFound):
+            session.query(User).filter(User.user_id == user_id).one()
+
+    def test_func__delete_user__ok__with_deleting_owned_workspaces(
         self,
         session,
         user_api_factory,
@@ -542,6 +632,7 @@ class TestCommands(object):
             [
                 "user",
                 "delete",
+                "-w",
                 "-c",
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-l",

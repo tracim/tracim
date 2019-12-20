@@ -21,6 +21,20 @@ from tracim_backend.models.meta import DeclarativeBase
 ANONYMOUS_USER_EMAIL_PATTERN = "anonymous_{hash}@anonymous.local"
 
 
+class UserNeedAnonymization(object):
+    def __init__(
+        self,
+        blocking_revisions: typing.List[ContentRevisionRO],
+        blocking_workspaces: typing.List[Workspace],
+    ) -> None:
+        self.blocking_revisions = blocking_revisions
+        self.blocking_workspaces = blocking_workspaces
+
+    @property
+    def need_anonymization(self):
+        return self.blocking_workspaces != [] or self.blocking_revisions != []
+
+
 class CleanupLib(object):
     """
     Cleanup content of tracim with theses methods.
@@ -306,7 +320,7 @@ class CleanupLib(object):
         self, user: User, anonymized_user_display_name: typing.Optional[str] = None
     ) -> User:
         """
-        :param user: user to anonymize
+        :param user: user to anonymize_if_needed
         :return: user_id
         """
         hash = str(uuid.uuid4().hex)
@@ -319,23 +333,29 @@ class CleanupLib(object):
         self.safe_update(user)
         return user
 
-    def get_user_revisions_on_other_user_workspace(
-        self, user: User
-    ) -> typing.List[ContentRevisionRO]:
+    def should_be_anonymized(
+        self, user: User, owned_workspace_will_be_deleted: bool = False
+    ) -> UserNeedAnonymization:
         wapi = WorkspaceApi(
             config=self.app_config, session=self.session, current_user=user, show_deleted=True
         )
-        user_owned_workspaces = wapi.get_all_for_user(
+        user_owned_workspaces_to_filter = wapi.get_all_for_user(
             user, include_owned=True, include_with_role=False
         )
 
-        return (
-            self.session.query(ContentRevisionRO)
-            .filter(
+        query = self.session.query(ContentRevisionRO)
+        if owned_workspace_will_be_deleted:
+            query = query.filter(
                 ~ContentRevisionRO.workspace_id.in_(
-                    [workspace.workspace_id for workspace in user_owned_workspaces]
+                    [workspace.workspace_id for workspace in user_owned_workspaces_to_filter]
                 )
             )
-            .filter(ContentRevisionRO.owner_id == user.user_id)
-            .all()
+            user_blocking_workspaces = []
+        else:
+            user_blocking_workspaces = user_owned_workspaces_to_filter
+
+        query = query.filter(ContentRevisionRO.owner_id == user.user_id)
+        user_blocking_revisions = query.all()
+        return UserNeedAnonymization(
+            blocking_workspaces=user_blocking_workspaces, blocking_revisions=user_blocking_revisions
         )
