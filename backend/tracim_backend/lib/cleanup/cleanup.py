@@ -302,16 +302,16 @@ class CleanupLib(object):
         self.safe_delete(user)
         return user_id
 
-    def anonymise_user(
-        self, user: User, anonymised_user_display_name: typing.Optional[str] = None
+    def anonymize_user(
+        self, user: User, anonymized_user_display_name: typing.Optional[str] = None
     ) -> User:
         """
-        :param user: user to anonymise
+        :param user: user to anonymize
         :return: user_id
         """
         hash = str(uuid.uuid4().hex)
         user.display_name = (
-            anonymised_user_display_name or self.app_config.DEFAULT_ANONYMOUS_USER_DISPLAY_NAME
+            anonymized_user_display_name or self.app_config.DEFAULT_ANONYMOUS_USER_DISPLAY_NAME
         )
         user.email = ANONYMOUS_USER_EMAIL_PATTERN.format(hash=hash)
         user.is_active = False

@@ -21,23 +21,23 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 @pytest.mark.usefixtures("base_fixture")
 class TestCleanupLib(object):
-    def test_unit__anonymise_user__ok__nominal_case(self, session, app_config) -> None:
+    def test_unit__anonymize_user__ok__nominal_case(self, session, app_config) -> None:
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         assert u.display_name == "bob"
         assert u.email == "bob@bob"
         cleanup_lib = CleanupLib(app_config=app_config, session=session)
-        cleanup_lib.anonymise_user(u)
+        cleanup_lib.anonymize_user(u)
         assert u.display_name == "Lost Meerkat"
         assert u.email.endswith("@anonymous.local")
 
-    def test_unit__anonymise_user__ok__explicit_name(self, session, app_config) -> None:
+    def test_unit__anonymize_user__ok__explicit_name(self, session, app_config) -> None:
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         assert u.display_name == "bob"
         assert u.email == "bob@bob"
         cleanup_lib = CleanupLib(app_config=app_config, session=session)
-        cleanup_lib.anonymise_user(u, anonymised_user_display_name="anonymous")
+        cleanup_lib.anonymize_user(u, anonymized_user_display_name="anonymous")
         assert u.display_name == "anonymous"
         assert u.email.endswith("@anonymous.local")
 
@@ -215,6 +215,7 @@ class TestCleanupLib(object):
         workspace_api = workspace_api_factory.get()
         test_workspace = workspace_api.create_workspace("test_workspace")
         session.add(test_workspace)
+        session.flush()
         workspace_id = test_workspace.workspace_id
         folder = content_api.create(
             label="test-folder",
@@ -264,14 +265,15 @@ class TestCleanupLib(object):
             .filter(UploadPermission.upload_permission_id == upload_permission_id)
             .one()
         )
+        session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
 
         with unprotected_content_revision(session) as unprotected_session:
             cleanup_lib = CleanupLib(app_config=app_config, session=unprotected_session)
             cleanup_lib.delete_user_associated_data(admin_user)
             session.flush()
         transaction.commit()
-        with pytest.raises(NoResultFound):
-            session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        # INFO - G.M - 2019-12-20 - workspace is not deleted by this method
+        session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
         with pytest.raises(NoResultFound):
             session.query(UserRoleInWorkspace).filter(
                 UserRoleInWorkspace.workspace_id == workspace_id

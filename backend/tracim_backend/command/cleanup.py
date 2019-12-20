@@ -72,7 +72,7 @@ class DeleteUserCommand(AppContextCommand):
             print("/!\\ Running in force mode, database created may be broken /!\\.")
         elif parsed_args.best_effort:
             print(
-                "(!) Running in best effort mode, will anonymise account instead of deleting them if needed."
+                "(!) Running in best effort mode, will anonymize account instead of deleting them if needed."
             )
 
         deleted_user_ids = set()  # typing.Set[int]
@@ -105,7 +105,7 @@ class DeleteUserCommand(AppContextCommand):
                     force=parsed_args.force,
                     best_effort=parsed_args.best_effort,
                     cleanup_lib=cleanup_lib,
-                    anonymised_user_display_name=parsed_args.anonymous_name,
+                    anonymized_user_display_name=parsed_args.anonymous_name,
                 )
                 deleted_user_ids.add(deleted_user_ids_result.user_id)
                 deleted_workspace_ids.update(deleted_user_ids_result.workspace_ids)
@@ -148,7 +148,7 @@ class DeleteUserCommand(AppContextCommand):
         cleanup_lib: CleanupLib,
         force: bool = False,
         best_effort: bool = False,
-        anonymised_user_display_name: typing.Optional[str] = None,
+        anonymized_user_display_name: typing.Optional[str] = None,
     ):
         print('Trying to delete user {}: "{}"'.format(user.user_id, user.email))
         not_owned_workspace_revisions = cleanup_lib.get_user_revisions_on_other_user_workspace(user)
@@ -159,19 +159,19 @@ class DeleteUserCommand(AppContextCommand):
                 " database.".format(len(not_owned_workspace_revisions), user.user_id)
             )
         if best_effort and not_owned_workspace_revisions:
-            # INFO - G.M - 2019-12-13 - We can anonymise user
+            # INFO - G.M - 2019-12-13 - We can anonymize user
             print(
-                'Delete most user "{}" data in database but revision outside his workspace and anonymise it.'.format(
+                'Delete most user "{}" data in database but revision outside his workspace and anonymize it.'.format(
                     user.user_id
                 )
             )
             cleanup_lib.delete_user_associated_data(user)
             deleted_workspace_ids = cleanup_lib.delete_user_owned_workspace(user)
-            deleted_user_id = cleanup_lib.anonymise_user(
-                user, anonymised_user_display_name=anonymised_user_display_name
+            deleted_user_id = cleanup_lib.anonymize_user(
+                user, anonymized_user_display_name=anonymized_user_display_name
             ).user_id
             print(
-                'user {} anonymised to "{} <{}>".'.format(
+                'user {} anonymized to "{} <{}>".'.format(
                     user.user_id, user.display_name, user.email
                 )
             )
@@ -190,9 +190,9 @@ class DeleteUserCommand(AppContextCommand):
         return DeleteResultIds(deleted_user_id, deleted_workspace_ids)
 
 
-class AnonymiseUserCommand(AppContextCommand):
+class AnonymizeUserCommand(AppContextCommand):
     def get_description(self) -> str:
-        return """anonymise user from database"""
+        return """anonymize user from database"""
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
@@ -242,13 +242,13 @@ class AnonymiseUserCommand(AppContextCommand):
                 cleanup_lib = CleanupLib(
                     session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
                 )
-                print("anonymise user {}.".format(user.user_id))
-                cleanup_lib.anonymise_user(
-                    user, anonymised_user_display_name=parsed_args.anonymous_name
+                print("anonymize user {}.".format(user.user_id))
+                cleanup_lib.anonymize_user(
+                    user, anonymized_user_display_name=parsed_args.anonymous_name
                 )
                 self._session.flush()
                 print(
-                    'user {} anonymised to "{} <{}>".'.format(
+                    'user {} anonymized to "{} <{}>".'.format(
                         user.user_id, user.display_name, user.email
                     )
                 )
