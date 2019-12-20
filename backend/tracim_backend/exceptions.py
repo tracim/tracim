@@ -110,6 +110,10 @@ class AgendaNotFoundError(TracimException):
     pass
 
 
+class UserCannotBeDeleted(TracimException):
+    pass
+
+
 class AgendaPropsUpdateFailed(TracimException):
     pass
 

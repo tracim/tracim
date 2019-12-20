@@ -4,6 +4,7 @@ import subprocess
 
 from depot.manager import DepotManager
 import pytest
+from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
 import tracim_backend
@@ -17,6 +18,11 @@ from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvi
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.data import User
+from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F401
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 
@@ -473,3 +479,629 @@ class TestCommands(object):
             app.run(["db", "delete", "-c", "donotexit.ini#command_test", "--debug"])
         result = app.run(["db", "delete", "-c", "donotexist.ini#command_test"])
         assert result == 1
+
+    def test_func__delete_user__ok__nominal_case(
+        self,
+        session,
+        user_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Test User deletion : nominal case, user has change nothing in other user workspace
+        """
+        user_id = admin_user.user_id
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True
+        )
+        workspace_api = workspace_api_factory.get()
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        session.flush()
+        workspace_id = test_workspace.workspace_id
+        folder = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        folder_id = folder.content_id
+        folder2 = content_api.create(
+            label="test-folder2",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        folder2_id = folder2.content_id
+        file_ = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            parent=folder,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        file_id = file_.content_id
+        transaction.commit()
+        assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        assert session.query(Content).filter(Content.id == file_id).one()
+        assert session.query(Content).filter(Content.id == folder_id).one()
+        assert session.query(Content).filter(Content.id == folder2_id).one()
+        assert session.query(User).filter(User.user_id == user_id).one()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "admin@admin.admin",
+            ]
+        )
+        assert result == 0
+        with pytest.raises(NoResultFound):
+            session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        with pytest.raises(NoResultFound):
+            session.query(Content).filter(Content.id == file_id).one()
+        with pytest.raises(NoResultFound):
+            session.query(Content).filter(Content.id == folder_id).one()
+        with pytest.raises(NoResultFound):
+            session.query(Content).filter(Content.id == folder2_id).one()
+        with pytest.raises(NoResultFound):
+            session.query(User).filter(User.user_id == user_id).one()
+
+    def test_func__delete_user__err__cannot_remove_user(
+        self,
+        session,
+        user_api_factory,
+        group_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Test User deletion cannot delete user because user has changed file in another user workspace
+        """
+        workspace_api = workspace_api_factory.get(current_user=admin_user)
+        test_workspace = workspace_api.create_workspace("test_workspace")
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        role_api = role_api_factory.get(current_user=test_user)
+        role_api.create_one(
+            test_user,
+            test_workspace,
+            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+        )
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+        )
+        session.add(test_workspace)
+        session.flush()
+        user_id = test_user.user_id
+        workspace_id = test_workspace.workspace_id
+        folder = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        folder_id = folder.content_id
+        folder2 = content_api.create(
+            label="test-folder2",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        folder2_id = folder2.content_id
+        file_ = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            parent=folder,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        file_id = file_.content_id
+        transaction.commit()
+        assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        assert session.query(Content).filter(Content.id == file_id).one()
+        assert session.query(Content).filter(Content.id == folder_id).one()
+        assert session.query(Content).filter(Content.id == folder2_id).one()
+        assert session.query(User).filter(User.user_id == user_id).one()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "test@test.test",
+            ]
+        )
+        assert result == 1
+        user_retrieved = session.query(User).filter(User.user_id == user_id).one()
+        assert user_retrieved
+        assert user_retrieved.email == "test@test.test"
+
+    def test_func__delete_user__ok__anonymize_with_best_effort(
+        self,
+        session,
+        user_api_factory,
+        group_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Test User deletion with best effort option
+        """
+        workspace_api = workspace_api_factory.get(current_user=admin_user)
+        admin_workspace = workspace_api.create_workspace("test_workspace")
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("trusted-users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api2 = workspace_api_factory.get(current_user=test_user)
+        user_workspace = workspace_api2.create_workspace("test_workspace2")
+
+        role_api = role_api_factory.get(current_user=test_user)
+        role_api.create_one(
+            test_user,
+            admin_workspace,
+            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+        )
+        session.add(admin_workspace)
+        session.add(user_workspace)
+        session.flush()
+        user_id = test_user.user_id
+        admin_workspace_id = admin_workspace.workspace_id
+        user_workspace_id = user_workspace.workspace_id
+        # INFO - G.M - 2019-12-20 - in user workspace
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+        )
+        folder2 = content_api.create(
+            label="test-folder2",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=user_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        folder2_id = folder2.content_id
+
+        # INFO - G.M - 2019-12-20 - in admin workspace
+        folder = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=admin_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        folder_id = folder.content_id
+        file_ = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=admin_workspace,
+            parent=folder,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        file_id = file_.content_id
+        transaction.commit()
+        assert session.query(Workspace).filter(Workspace.workspace_id == admin_workspace_id).one()
+        assert session.query(Workspace).filter(Workspace.workspace_id == user_workspace_id).one()
+        assert session.query(Content).filter(Content.id == file_id).one()
+        assert session.query(Content).filter(Content.id == folder_id).one()
+        assert session.query(Content).filter(Content.id == folder2_id).one()
+        assert session.query(User).filter(User.user_id == user_id).one()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "delete",
+                "-b",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "test@test.test",
+            ]
+        )
+        assert result == 0
+        with pytest.raises(NoResultFound):
+            assert (
+                session.query(Workspace).filter(Workspace.workspace_id == user_workspace_id).one()
+            )
+        assert session.query(Workspace).filter(Workspace.workspace_id == admin_workspace_id).one()
+        assert session.query(Content).filter(Content.id == file_id).one()
+        assert session.query(Content).filter(Content.id == folder_id).one()
+        with pytest.raises(NoResultFound):
+            session.query(Content).filter(Content.id == folder2_id).one()
+        test_user_retrieve = session.query(User).filter(User.user_id == user_id).one()
+        assert test_user_retrieve.display_name == "Lost Meerkat"
+        assert test_user_retrieve.email.endswith("@anonymous.local")
+
+    def test_func__delete_user__ok__anonymize_with_best_effort_specific_display_name(
+        self,
+        session,
+        user_api_factory,
+        group_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Test User deletion with best-effort option and custom display name for anonymous user
+        """
+        workspace_api = workspace_api_factory.get(current_user=admin_user)
+        admin_workspace = workspace_api.create_workspace("test_workspace")
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("trusted-users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api2 = workspace_api_factory.get(current_user=test_user)
+        user_workspace = workspace_api2.create_workspace("test_workspace2")
+
+        role_api = role_api_factory.get(current_user=test_user)
+        role_api.create_one(
+            test_user,
+            admin_workspace,
+            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+        )
+        session.add(admin_workspace)
+        session.add(user_workspace)
+        session.flush()
+        user_id = test_user.user_id
+        admin_workspace_id = admin_workspace.workspace_id
+        user_workspace_id = user_workspace.workspace_id
+        # INFO - G.M - 2019-12-20 - in user workspace
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+        )
+        folder2 = content_api.create(
+            label="test-folder2",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=user_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        folder2_id = folder2.content_id
+
+        # INFO - G.M - 2019-12-20 - in admin workspace
+        folder = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=admin_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        folder_id = folder.content_id
+        file_ = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=admin_workspace,
+            parent=folder,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        file_id = file_.content_id
+        transaction.commit()
+        assert session.query(Workspace).filter(Workspace.workspace_id == admin_workspace_id).one()
+        assert session.query(Workspace).filter(Workspace.workspace_id == user_workspace_id).one()
+        assert session.query(Content).filter(Content.id == file_id).one()
+        assert session.query(Content).filter(Content.id == folder_id).one()
+        assert session.query(Content).filter(Content.id == folder2_id).one()
+        assert session.query(User).filter(User.user_id == user_id).one()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "delete",
+                "-b",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "test@test.test",
+                "--anonymous-name",
+                "Custom Name",
+            ]
+        )
+        assert result == 0
+        with pytest.raises(NoResultFound):
+            assert (
+                session.query(Workspace).filter(Workspace.workspace_id == user_workspace_id).one()
+            )
+        assert session.query(Workspace).filter(Workspace.workspace_id == admin_workspace_id).one()
+        assert session.query(Content).filter(Content.id == file_id).one()
+        assert session.query(Content).filter(Content.id == folder_id).one()
+        with pytest.raises(NoResultFound):
+            session.query(Content).filter(Content.id == folder2_id).one()
+        test_user_retrieve = session.query(User).filter(User.user_id == user_id).one()
+        assert test_user_retrieve.display_name == "Custom Name"
+        assert test_user_retrieve.email.endswith("@anonymous.local")
+
+    def test_func__delete_user__ok__force_delete_all_user_content(
+        self,
+        session,
+        user_api_factory,
+        group_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Test User deletion with force option
+        """
+        workspace_api = workspace_api_factory.get(current_user=admin_user)
+        test_workspace = workspace_api.create_workspace("test_workspace")
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        role_api = role_api_factory.get(current_user=test_user)
+        role_api.create_one(
+            test_user,
+            test_workspace,
+            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+        )
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+        )
+        session.add(test_workspace)
+        session.flush()
+        user_id = test_user.user_id
+        workspace_id = test_workspace.workspace_id
+        folder = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        folder_id = folder.content_id
+        folder2 = content_api.create(
+            label="test-folder2",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        folder2_id = folder2.content_id
+        file_ = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            parent=folder,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        file_id = file_.content_id
+        transaction.commit()
+        assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        assert session.query(Content).filter(Content.id == file_id).one()
+        assert session.query(Content).filter(Content.id == folder_id).one()
+        assert session.query(Content).filter(Content.id == folder2_id).one()
+        assert session.query(User).filter(User.user_id == user_id).one()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "delete",
+                "--force",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "test@test.test",
+            ]
+        )
+        assert result == 0
+
+        assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        assert (
+            session.query(ContentRevisionRO).filter(ContentRevisionRO.content_id == file_id).all()
+            == []
+        )
+        assert (
+            session.query(ContentRevisionRO).filter(ContentRevisionRO.content_id == folder_id).all()
+            == []
+        )
+        assert (
+            session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.content_id == folder2_id)
+            .all()
+            == []
+        )
+        with pytest.raises(NoResultFound):
+            session.query(User).filter(User.user_id == user_id).one()
+
+    def test_func__anonymize_user__ok__nominal_case(
+        self,
+        session,
+        user_api_factory,
+        group_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Test User anonymization
+        """
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        user_id = test_user.user_id
+        transaction.commit()
+        assert session.query(User).filter(User.user_id == user_id).one()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "anonymize",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "test@test.test",
+            ]
+        )
+        assert result == 0
+
+        test_user_retrieve = session.query(User).filter(User.user_id == user_id).one()
+        assert test_user_retrieve.display_name == "Lost Meerkat"
+        assert test_user_retrieve.email.endswith("@anonymous.local")
+
+    def test_func__anonymize_user__ok__specific_display_name(
+        self,
+        session,
+        user_api_factory,
+        group_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Test User anonymization
+        """
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            groups=groups,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        user_id = test_user.user_id
+        transaction.commit()
+        assert session.query(User).filter(User.user_id == user_id).one()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "anonymize",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "test@test.test",
+                "--anonymous-name",
+                "Custom Name",
+            ]
+        )
+        assert result == 0
+
+        test_user_retrieve = session.query(User).filter(User.user_id == user_id).one()
+        assert test_user_retrieve.display_name == "Custom Name"
+        assert test_user_retrieve.email.endswith("@anonymous.local")

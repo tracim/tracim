@@ -262,7 +262,7 @@ class CleanupLib(object):
         """
         deleted_workspace_ids = []  # typing.List[int]
         wapi = WorkspaceApi(
-            config=self.app_config, session=self.session, current_user=user, show_deleted=True
+            config=self.app_config, session=self.session, current_user=None, show_deleted=True
         )
         user_owned_workspaces = wapi.get_all_for_user(
             user, include_owned=True, include_with_role=False

@@ -7,6 +7,7 @@ from pyramid.scripting import AppEnvironment
 from tracim_backend import UserDoesNotExist
 from tracim_backend.command import AppContextCommand
 from tracim_backend.exceptions import AgendaNotFoundError
+from tracim_backend.exceptions import UserCannotBeDeleted
 from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import User
@@ -91,9 +92,9 @@ class DeleteUserCommand(AppContextCommand):
                 try:
                     user = uapi.get_one_by_email(login)
                     user_list.append(user)
-                except UserDoesNotExist:
+                except UserDoesNotExist as exc:
                     print("ERROR: user with email {} does not exist".format(login))
-                    exit(1)
+                    raise exc
             print("~~~~~~~~~~")
 
             for user in user_list:
@@ -180,7 +181,9 @@ class DeleteUserCommand(AppContextCommand):
                 "ERROR: User {} has revisions in other user workspace. Cannot delete it without"
                 " creating inconsistent database. Rollback changes.".format(user.user_id)
             )
-            exit(1)
+            raise UserCannotBeDeleted(
+                "user {} has revision in other user workspace cannot delete it"
+            )
         else:
             print('Delete all user "{}" data in database'.format(user.user_id))
             # INFO - G.M - 2019-12-13 - We can delete full user data
@@ -234,9 +237,9 @@ class AnonymizeUserCommand(AppContextCommand):
                 try:
                     user = uapi.get_one_by_email(login)
                     user_list.append(user)
-                except UserDoesNotExist:
+                except UserDoesNotExist as exc:
                     print("ERROR: user with email {} does not exist".format(login))
-                    exit(1)
+                    raise exc
             for user in user_list:
                 print("~~~~~~~~~~")
                 cleanup_lib = CleanupLib(
