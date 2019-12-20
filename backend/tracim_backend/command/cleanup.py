@@ -93,7 +93,7 @@ class DeleteUserCommand(AppContextCommand):
                     user = uapi.get_one_by_email(login)
                     user_list.append(user)
                 except UserDoesNotExist as exc:
-                    print("ERROR: user with email {} does not exist".format(login))
+                    print('ERROR: user with email "{}" does not exist'.format(login))
                     raise exc
             print("~~~~~~~~~~")
 
@@ -238,7 +238,7 @@ class AnonymizeUserCommand(AppContextCommand):
                     user = uapi.get_one_by_email(login)
                     user_list.append(user)
                 except UserDoesNotExist as exc:
-                    print("ERROR: user with email {} does not exist".format(login))
+                    print('ERROR: user with email "{}" does not exist'.format(login))
                     raise exc
             for user in user_list:
                 print("~~~~~~~~~~")
