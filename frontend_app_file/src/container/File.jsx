@@ -27,7 +27,8 @@ import {
   checkEmailValidity,
   parserStringToList,
   removeExtensionOfFilename,
-  buildFilePreviewUrl
+  buildFilePreviewUrl,
+  ROLE_OBJECT
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -889,7 +890,7 @@ class File extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= 2 &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id &&
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
@@ -927,7 +928,7 @@ class File extends React.Component {
             </div>
 
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= 2 &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id &&
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
@@ -937,7 +938,7 @@ class File extends React.Component {
                 />
               }
 
-              {state.loggedUser.userRoleIdInWorkspace >= 4 &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id &&
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
