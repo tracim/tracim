@@ -15,11 +15,16 @@ const ContentItemSearch = props => {
       className='content__item'
       data-cy={'content__item'}
     >
-      <div className='content__type' title={props.t(props.contentType.label)} style={{ color: props.contentType.hexcolor }}>
+      <div
+        className='content__type'
+        title={props.t(props.contentType.label)}
+        style={{ color: props.contentType.hexcolor }}
+      >
         <i className={`fa fa-fw fa-${props.faIcon}`} />
       </div>
 
-      <div className='content__name'
+      <div
+        className='content__name searchResultPage'
         title={props.label}
         data-cy={'content__name'}
       >

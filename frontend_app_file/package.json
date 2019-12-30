@@ -78,7 +78,7 @@
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent",
       "CustomEvent",
-      "appOfficeDocument"
+      "appCollaborativeDocumentEdition"
     ],
     "parser": "babel-eslint",
     "ignore": []

@@ -1,6 +1,6 @@
 # ElasticSearch image with Ingest Plugin Enabled
 
-this is a ElasticSearch docker image build to run properly with _Tracim_.
+This is a ElasticSearch docker image build to run properly with _Tracim_.
 
 ## Build Image
 

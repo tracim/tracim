@@ -38,6 +38,7 @@ from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
+from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
 from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
@@ -50,6 +51,7 @@ from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
@@ -1911,6 +1913,7 @@ class ContentApi(object):
     def check_upload_size(self, content_length: int, workspace: Workspace) -> None:
         self._check_size_length_limitation(content_length)
         self.check_workspace_size_limitation(content_length, workspace)
+        self.check_owner_size_limitation(content_length, workspace)
 
     def _check_size_length_limitation(self, content_length: int) -> None:
         # INFO - G.M - 2019-08-23 - 0 mean no size limit
@@ -1932,6 +1935,20 @@ class ContentApi(object):
             raise FileSizeOverWorkspaceEmptySpace(
                 'File cannot be added (size "{}") because workspace is full: "{}/{}"'.format(
                     content_length, workspace_size, self._config.LIMITATION__WORKSPACE_SIZE
+                )
+            )
+
+    def check_owner_size_limitation(self, content_length: int, workspace: Workspace) -> None:
+        wapi = WorkspaceApi(current_user=None, session=self._session, config=self._config)
+        owner_allowed_space = workspace.owner.allowed_space
+        # INFO - G.M - 2019-10-08 - 0 mean no size limit
+        if owner_allowed_space == 0:
+            return
+        owner_used_space = wapi.get_user_used_space(workspace.owner)
+        if owner_used_space > workspace.owner.allowed_space:
+            raise FileSizeOverOwnerEmptySpace(
+                'File cannot be added (size "{}") because owner space is full: "{}/{}"'.format(
+                    content_length, owner_used_space, owner_allowed_space
                 )
             )
 

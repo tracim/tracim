@@ -1,4 +1,10 @@
-import { FETCH_CONFIG, ROLE_OBJECT, ROLE, PROFILE } from './helper.js'
+import i18n from './i18n.js'
+import {
+  FETCH_CONFIG,
+  ROLE_OBJECT,
+  ROLE,
+  PROFILE
+} from './helper.js'
 
 const STATUSES = [{
   label: 'Opened',

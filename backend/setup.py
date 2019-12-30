@@ -39,7 +39,7 @@ requires = [
     'filedepot',
     'babel',
     'python-slugify',
-    'preview-generator>=0.11',
+    'preview-generator>=0.13',
     'colour',
     'python-dateutil',
     # mail-notifier
@@ -72,7 +72,9 @@ requires = [
     # text-formatting
     'humanize',
     # logging
-    'colorlog'
+    'colorlog',
+    # plugin
+    'pluggy'
 ]
 
 tests_require = [

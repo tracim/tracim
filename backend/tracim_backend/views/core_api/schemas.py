@@ -4,10 +4,12 @@ import typing
 import marshmallow
 from marshmallow import post_load
 from marshmallow.fields import String
+from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
+from tracim_backend.app_models.rfc_email_validator import RFCEmailValidator
 from tracim_backend.app_models.validator import acp_validator
 from tracim_backend.app_models.validator import action_description_validator
 from tracim_backend.app_models.validator import all_content_types_validator
@@ -28,7 +30,6 @@ from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.auth import Group
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
@@ -57,6 +58,7 @@ from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SimpleFile
 from tracim_backend.models.context_models import TextBasedContentUpdate
+from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserInfos
 from tracim_backend.models.context_models import UserProfile
@@ -81,6 +83,29 @@ class StrippedString(String):
         if value:
             value = value.strip()
         return value.strip()
+
+
+class RFCEmail(ValidatedField, String):
+    """A validated email rfc style "john <john@john.ndd>" field.
+    Validation occurs during both serialization and
+    deserialization.
+
+    :param args: The same positional arguments that :class:`String` receives.
+    :param kwargs: The same keyword arguments that :class:`String` receives.
+    """
+
+    default_error_messages = {"invalid": "Not a valid rfc email address."}
+
+    def __init__(self, *args, **kwargs):
+        String.__init__(self, *args, **kwargs)
+        # Insert validation into self.validators so that multiple errors can be
+        # stored.
+        self.validators.insert(0, RFCEmailValidator(error=self.error_messages["invalid"]))
+
+    def _validated(self, value):
+        if value is None:
+            return None
+        return RFCEmailValidator(error=self.error_messages["invalid"])(value)
 
 
 class CollaborativeFileTypeSchema(marshmallow.Schema):
@@ -144,6 +169,19 @@ class UserDigestSchema(marshmallow.Schema):
     public_name = StrippedString(example="John Doe")
 
 
+class UserDiskSpaceSchema(UserDigestSchema):
+    user_id = marshmallow.fields.Int(dump_only=True, example=3)
+    allowed_space = marshmallow.fields.Integer(
+        description="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces. 0 mean no limit"
+    )
+    used_space = marshmallow.fields.Integer(
+        description="used space per user in bytes. this apply on sum of user owned workspace size."
+        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces."
+    )
+    user = marshmallow.fields.Nested(UserDigestSchema(), attribute="user_in_context")
+
+
 class UserSchema(UserDigestSchema):
     """
     Complete user schema
@@ -184,6 +222,13 @@ class UserSchema(UserDigestSchema):
         validate=OneOf([auth_type_en.value for auth_type_en in AuthType]),
         example=AuthType.INTERNAL.value,
         description="authentication system of the user",
+    )
+    allowed_space = marshmallow.fields.Integer(
+        validate=positive_int_validator,
+        allow_none=True,
+        required=False,
+        description="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     class Meta:
@@ -256,6 +301,24 @@ class SetUserProfileSchema(marshmallow.Schema):
         return UserProfile(**data)
 
 
+class SetUserAllowedSpaceSchema(marshmallow.Schema):
+    """
+    Schema used for setting user allowed space. This schema is for write access only
+    """
+
+    allowed_space = marshmallow.fields.Integer(
+        validate=positive_int_validator,
+        allow_none=True,
+        required=False,
+        description="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit.",
+    )
+
+    @post_load
+    def create_user_allowed_space(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UserAllowedSpace(**data)
+
+
 class UserCreationSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True, example="hello@tracim.fr", validate=user_email_validator
@@ -272,7 +335,7 @@ class UserCreationSchema(marshmallow.Schema):
         validate=user_profile_validator,
         example="trusted-users",
         required=False,
-        default=Group.TIM_USER_GROUPNAME,
+        allow_none=True,
         description=FIELD_PROFILE_DESC,
     )
     timezone = StrippedString(
@@ -297,6 +360,13 @@ class UserCreationSchema(marshmallow.Schema):
         default=None,
     )
     email_notification = marshmallow.fields.Bool(example=True, required=False, default=True)
+    allowed_space = marshmallow.fields.Integer(
+        validate=positive_int_validator,
+        allow_none=True,
+        required=False,
+        description="allowed space per user in bytes. this apply on sum of user owned workspace size."
+        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
+    )
 
     @post_load
     def create_user(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -807,10 +877,13 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
         description = "Entry element of a workspace menu"
 
 
-class WorkspaceDigestSchema(marshmallow.Schema):
+class WorkspaceMinimalSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
+
+
+class WorkspaceDigestSchema(WorkspaceMinimalSchema):
     sidebar_entries = marshmallow.fields.Nested(WorkspaceMenuEntrySchema, many=True)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
     agenda_enabled = marshmallow.fields.Bool(example=True, default=True)
@@ -835,10 +908,26 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         format=DATETIME_FORMAT, description="Workspace creation date"
     )
     owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
-    size = marshmallow.fields.Int()
 
     class Meta:
         description = "Full workspace informations"
+
+
+class WorkspaceDiskSpaceSchema(marshmallow.Schema):
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    used_space = marshmallow.fields.Int(
+        description="used space in the workspace in bytes."
+        "if owner allowed space limit or  workspace allowed_space limit is reach,"
+        "no file can be created/updated in this workspace."
+    )
+    allowed_space = marshmallow.fields.Int(
+        description="allowed space in workspace in bytes. "
+        "if limit is reach, no file can be created/updated "
+        "in any user owned workspaces. 0 mean no limit."
+    )
+    workspace = marshmallow.fields.Nested(
+        WorkspaceMinimalSchema(), attribute="workspace_in_context"
+    )
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):

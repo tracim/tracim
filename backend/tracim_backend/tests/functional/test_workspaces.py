@@ -10,6 +10,7 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import set_html_document_slug_to_legacy
 
 
@@ -49,6 +50,67 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
         web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
         params = {"label": "superworkspace3", "description": "mysuperdescription"}
         web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_workspace_size_limit"}], indirect=True
+)
+class TestWorkspaceDiskSpaceEndpoint(object):
+    """
+    Tests for /api/v2/workspaces/{workspace_id}/disk_space endpoint
+    """
+
+    def test_api__get_workspace_disk_space__ok_200__nominal_case(
+        self,
+        web_testapp,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        application_api_factory,
+        content_type_list,
+        content_api_factory,
+        session,
+    ) -> None:
+        """
+        Check obtain workspace reachable for user.
+        """
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.get_one(workspace.workspace_id)
+        transaction.commit()
+        image = create_1000px_png_test_image()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.post(
+            "/api/v2/workspaces/{}/files".format(workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=200,
+        )
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/disk_space".format(workspace.workspace_id), status=200
+        )
+        res = res.json_body
+        assert res["used_space"] == 6210
+        assert res["workspace_id"] == workspace.workspace_id
+        assert res["workspace"]["label"] == "test"
+        assert res["workspace"]["slug"] == "test"
+        assert res["allowed_space"] == 200
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -377,9 +439,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is True
 
-    def test_api__update_workspace__err_400__workspace_label_already_used(
-        self, web_testapp
-    ) -> None:
+    def test_api__update_workspace__ok_200__workspace_label_already_used(self, web_testapp) -> None:
         """
         Test update workspace with empty label
         """
@@ -409,11 +469,8 @@ class TestWorkspaceEndpoint(object):
         )
         # INFO - G.M - 2019-05-21 - updating one workspace to another workspace name is not allowed
         res = web_testapp.put_json(
-            "/api/v2/workspaces/{}".format(workspace2_id), status=400, params=params
+            "/api/v2/workspaces/{}".format(workspace2_id), status=200, params=params
         )
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.WORKSPACE_LABEL_ALREADY_USED
 
     def test_api__update_workspace__err_400__empty_label(self, web_testapp) -> None:
         """
@@ -450,23 +507,19 @@ class TestWorkspaceEndpoint(object):
         assert workspace["owner"]["avatar_url"] is None
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]
-        assert workspace["size"] == 0
         workspace_id = res.json_body["workspace_id"]
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
         assert workspace["workspace_id"] == workspace_2["workspace_id"]
 
-    def test_api__create_workspace_err_400__label_already_used(self, web_testapp) -> None:
+    def test_api__create_workspace__ok_200__label_already_used(self, web_testapp) -> None:
         """
         Test create workspace : label already used
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "superworkspace", "description": "mysuperdescription"}
         web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
-        res = web_testapp.post_json("/api/v2/workspaces", status=400, params=params)
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.WORKSPACE_LABEL_ALREADY_USED
+        web_testapp.post_json("/api/v2/workspaces", status=200, params=params)
 
     def test_api__create_workspace__err_400__empty_label(self, web_testapp) -> None:
         """
@@ -1979,6 +2032,79 @@ class TestWorkspaceMembersEndpoint(object):
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
+    "config_section",
+    [{"name": "functional_test_with_mail_test_sync_default_profile_trusted_users"}],
+    indirect=True,
+)
+class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
+    def test_api__create_workspace_member_role__ok_200__new_user(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        web_testapp,
+        mailhog,
+    ):
+        """
+        Create workspace member role
+        :return:
+        """
+
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("trusted-users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        # create workspace role
+        params = {
+            "user_id": None,
+            "user_public_name": None,
+            "user_email": "bob@bob.bob",
+            "role": "content-manager",
+        }
+        res = web_testapp.post_json(
+            "/api/v2/workspaces/{}/members".format(workspace.workspace_id),
+            status=200,
+            params=params,
+        )
+        user_role_found = res.json_body
+        assert user_role_found["role"] == "content-manager"
+        assert user_role_found["user_id"]
+        user_id = user_role_found["user_id"]
+        assert user_role_found["workspace_id"] == workspace.workspace_id
+        assert user_role_found["newly_created"] is True
+        assert user_role_found["email_sent"] is True
+        assert user_role_found["do_notify"] is False
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["profile"] == "trusted-users"
+
+        # check mail received
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 1
+        headers = response[0]["Content"]["Headers"]
+        assert headers["From"][0] == "test via Tracim <test_user_from+5@localhost>"
+        assert headers["To"][0] == "bob <bob@bob.bob>"
+        assert headers["Subject"][0] == "[TRACIM] Created account"
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize(
     "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
 )
 class TestUserInvitationWithMailActivatedSync(object):
@@ -2042,7 +2168,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
+        assert headers["From"][0] == "test via Tracim <test_user_from+5@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
@@ -2165,7 +2291,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
+        assert headers["From"][0] == "test via Tracim <test_user_from+5@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
         # check for notification to new user, user should not be notified

@@ -269,3 +269,13 @@ Cypress.Commands.add('logInFile', (message, logPath = '/tmp/cypress.log') => {
   cy.exec(`echo ---------- >> ${logPath}`)
   cy.exec(`echo "\n" >> ${logPath}`)
 })
+
+Cypress.Commands.add('createGuestUploadLink', (workspaceId, emailList, password = '') => {
+  const url = `/api/v2/workspaces/${workspaceId}/upload_permissions`
+  const data = {
+    emails: emailList,
+    password
+  }
+  return cy.request('POST', url, data)
+})
+

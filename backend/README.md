@@ -26,6 +26,8 @@ on Debian Stretch (9) with sudo:
     python3-pip \
     python3-venv \
     qpdf \
+    ufraw-batch \
+    ffmpeg \
     redis-server \
     zlib1g-dev
 
@@ -56,7 +58,7 @@ Activate it in your terminal session (**all tracim command execution must be exe
 
 Upgrade packaging tools:
 
-    pip install --upgrade pip setuptools
+    pip install --upgrade pip setuptools wheel
 
 (Optional) Install strict supported version of dependencies with requirement.txt :
 

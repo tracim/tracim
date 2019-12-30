@@ -25,7 +25,6 @@ from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import string_to_list
-from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
@@ -188,6 +187,15 @@ class UserProfile(object):
         self.profile = profile
 
 
+class UserAllowedSpace(object):
+    """
+    allowed space of user
+    """
+
+    def __init__(self, allowed_space: int) -> None:
+        self.allowed_space = allowed_space
+
+
 class UserCreation(object):
     """
     Just some user infos
@@ -202,6 +210,7 @@ class UserCreation(object):
         profile: str = None,
         lang: str = None,
         email_notification: bool = True,
+        allowed_space: typing.Optional[int] = None,
     ) -> None:
         self.email = email
         # INFO - G.M - 2018-08-16 - cleartext password, default value
@@ -210,8 +219,9 @@ class UserCreation(object):
         self.public_name = public_name or None
         self.timezone = timezone or ""
         self.lang = lang or None
-        self.profile = profile or Group.TIM_USER_GROUPNAME
+        self.profile = profile or None
         self.email_notification = email_notification
+        self.allowed_space = allowed_space
 
 
 class WorkspaceAndContentPath(object):
@@ -588,6 +598,10 @@ class UserInContext(object):
     # Default
 
     @property
+    def user_in_context(self) -> "UserInContext":
+        return self
+
+    @property
     def email(self) -> str:
         return self.user.email
 
@@ -621,7 +635,7 @@ class UserInContext(object):
 
     @property
     def profile(self) -> Profile:
-        return self.user.profile.name
+        return self.user.profile.slug
 
     @property
     def is_deleted(self) -> bool:
@@ -638,6 +652,17 @@ class UserInContext(object):
     def auth_type(self) -> str:
         return self.user.auth_type.value
 
+    @property
+    def allowed_space(self) -> int:
+        return self.user.allowed_space
+
+    @property
+    def used_space(self) -> int:
+        from tracim_backend.lib.core.workspace import WorkspaceApi
+
+        wapi = WorkspaceApi(current_user=None, session=self.dbsession, config=self.config)
+        return wapi.get_user_used_space(self.user)
+
 
 class WorkspaceInContext(object):
     """
@@ -648,6 +673,10 @@ class WorkspaceInContext(object):
         self.workspace = workspace
         self.dbsession = dbsession
         self.config = config
+
+    @property
+    def workspace_in_context(self) -> "WorkspaceInContext":
+        return self
 
     @property
     def workspace_id(self) -> int:
@@ -745,8 +774,12 @@ class WorkspaceInContext(object):
         return self.workspace.created
 
     @property
-    def size(self) -> int:
+    def used_space(self) -> int:
         return self.workspace.get_size()
+
+    @property
+    def allowed_space(self) -> int:
+        return self.config.LIMITATION__WORKSPACE_SIZE
 
 
 class UserRoleWorkspaceInContext(object):

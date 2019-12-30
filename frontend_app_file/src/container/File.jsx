@@ -21,16 +21,16 @@ import {
   Badge,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
-  ROLE_OBJECT,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
   checkEmailValidity,
-  parserStringToList
+  parserStringToList,
+  removeExtensionOfFilename,
+  buildFilePreviewUrl
 } from 'tracim_frontend_lib'
 import {
   MODE,
-  removeExtensionOfFilename,
   PAGE
 } from '../helper.js'
 import { debug } from '../debug.js'
@@ -51,8 +51,6 @@ import {
   putMyselfFileRead
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
-
-const CONTENT_TYPE_FILE = 'file'
 
 class File extends React.Component {
   constructor (props) {
@@ -85,6 +83,7 @@ class File extends React.Component {
       sharePassword: '',
       shareLinkList: []
     }
+    this.refContentLeftTop = React.createRef()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -170,10 +169,16 @@ class File extends React.Component {
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
-      await this.loadContent()
+      this.setState({
+        fileCurrentPage: 1
+      })
+      await this.loadContent(1)
       this.loadTimeline()
       this.buildBreadcrumbs()
-      if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
+      if (state.config.workspace.downloadEnabled) {
+        this.setState({})
+        this.loadShareLinkList()
+      }
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
@@ -284,12 +289,12 @@ class File extends React.Component {
     switch (fetchResultShareLinkList.apiResponse.status) {
       case 200:
         this.setState({
+          shareEmails: '',
+          sharePassword: '',
           shareLinkList: fetchResultShareLinkList.body
         })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
-      default:
-        this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
+      default: this.sendGlobalFlashMessage(this.props.t('Error while loading share links list')); break
     }
   }
 
@@ -347,13 +352,9 @@ class File extends React.Component {
     }
   }
 
-  handleClickNewVersion = () => this.setState({ mode: MODE.EDIT })
-
-  handleClickEdit = () => {
-    const { state } = this
-    state.config.history.push(
-      PAGE.WORKSPACE.CONTENT_EDITION(state.content.workspace_id, CONTENT_TYPE_FILE, state.content.content_id)
-    )
+  handleClickNewVersion = () => {
+    this.refContentLeftTop.current.scrollIntoView({ behavior: 'instant' })
+    this.setState({ mode: MODE.EDIT })
   }
 
   handleClickValidateNewDescription = async newDescription => {
@@ -522,10 +523,9 @@ class File extends React.Component {
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted,
         // use state.content.workspace_id instead of revision.workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
-        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1&revision_id=${revision.revision_id}`,
+        previewUrl: buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, revision.content_id, revision.revision_id, filenameNoExtension, 1, 500, 500),
         lightboxUrlList: (new Array(revision.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
-          // FIXME - b.l - refactor urls
-          `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${pageNb}`
+          buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, revision.content_id, revision.revision_id, filenameNoExtension, pageNb, 1920, 1080)
         )
       },
       fileCurrentPage: 1, // always set to first page on revision switch
@@ -602,7 +602,10 @@ class File extends React.Component {
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
               case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
-              default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
+              case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
+              case 6003: this.sendGlobalFlashMessage(props.t('Error, the shared space exceed its maximum size')); break
+              case 6004: this.sendGlobalFlashMessage(props.t('You have reach your storage limit, you cannot add new files')); break
+              default: this.sendGlobalFlashMessage(props.t('Error while uploading file')); break
             }
             break
           default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
@@ -620,15 +623,13 @@ class File extends React.Component {
     if (previousNext === 'previous' && state.fileCurrentPage === 0) return
     if (previousNext === 'next' && state.fileCurrentPage > state.content.page_nb) return
 
-    const revisionString = state.mode === MODE.REVISION ? `revisions/${state.content.current_revision_id}/` : ''
     const nextPageNumber = previousNext === 'previous' ? state.fileCurrentPage - 1 : state.fileCurrentPage + 1
 
     this.setState(prev => ({
       fileCurrentPage: nextPageNumber,
       content: {
         ...prev.content,
-        // FIXME - b.l - refactor urls
-        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}&revision_id=${state.content.current_revision_id}`
+        previewUrl: buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.current_revision_id, state.content.filenameNoExtension, nextPageNumber, 500, 500)
       }
     }))
   }
@@ -809,7 +810,7 @@ class File extends React.Component {
       children: (
         <FileProperties
           color={state.config.hexcolor}
-          fileType={state.content.file_extension}
+          fileType={state.content.mimetype}
           fileSize={displayFileSize(state.content.size)}
           filePageNb={state.content.page_nb}
           activesShares={state.content.actives_shares}
@@ -826,7 +827,7 @@ class File extends React.Component {
       )
     }
 
-    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace > ROLE_OBJECT.reader.id) {
+    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace > ROLE_OBJECT.contentManager.id) {
       return [
         timelineObject,
         {
@@ -888,7 +889,7 @@ class File extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= 2 &&
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
@@ -926,7 +927,7 @@ class File extends React.Component {
             </div>
 
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= 2 &&
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
@@ -936,7 +937,7 @@ class File extends React.Component {
                 />
               }
 
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= 4 &&
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
@@ -982,6 +983,7 @@ class File extends React.Component {
             newFile={state.newFile}
             newFilePreview={state.newFilePreview}
             progressUpload={state.progressUpload}
+            ref={this.refContentLeftTop}
           />
 
           <PopinFixedRightPart

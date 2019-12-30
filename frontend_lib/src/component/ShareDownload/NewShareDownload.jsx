@@ -56,7 +56,7 @@ export class NewShareDownload extends React.Component {
         <div className='shareDownload__email'>
           <textarea
             className='shareDownload__email__input form-control'
-            placeholder={props.t('Enter the email address of the recipient(s)')}
+            placeholder={props.t("Recipient's email addresses")}
             rows='1'
             value={props.shareEmails}
             onChange={props.onChangeEmails}
@@ -80,7 +80,7 @@ export class NewShareDownload extends React.Component {
             toggle={this.handleTogglePopoverMultipleEmails}
             trigger={isMobile ? 'focus' : 'hover'}
           >
-            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
+            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}</PopoverBody>
           </Popover>
         </div>
 
@@ -94,7 +94,7 @@ export class NewShareDownload extends React.Component {
                 <input
                   type={state.hidePassword ? 'password' : 'text'}
                   className='shareDownload__password__input form-control'
-                  placeholder={props.t('Password to share link')}
+                  placeholder={props.t('Password')}
                   value={props.sharePassword}
                   onChange={props.onChangePassword}
                   onFocus={props.onKeyDownEnter}
@@ -150,7 +150,6 @@ export class NewShareDownload extends React.Component {
             }}
           >
             {props.t('Cancel')}
-            <i className='fa fa-fw fa-times' />
           </button>
 
           <button
@@ -166,7 +165,6 @@ export class NewShareDownload extends React.Component {
             }}
           >
             {props.t('Validate')}
-            <i className='fa fa-fw fa-plus-circle' />
           </button>
         </div>
 

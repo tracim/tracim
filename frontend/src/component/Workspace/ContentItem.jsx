@@ -68,7 +68,7 @@ class ContentItem extends React.Component {
                   // https://github.com/tracim/tracim/issues/2098
                   smallIconStyle={{ color: '#252525' }}
                 />
-                : <i className={`fa fa-${props.faIcon}`} />
+                : <i className={`fa fa-fw fa-${props.faIcon}`} />
               }
             </div>
 
@@ -84,7 +84,24 @@ class ContentItem extends React.Component {
             <div className='d-none d-md-block' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
-                onClickExtendedAction={props.onClickExtendedAction}
+                onClickExtendedAction={{
+                  edit: {
+                    callback: e => props.onClickExtendedAction.edit.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.edit.label
+                  },
+                  download: {
+                    callback: e => props.onClickExtendedAction.download.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.download.label
+                  },
+                  archive: {
+                    callback: e => props.onClickExtendedAction.archive.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.archive.label
+                  },
+                  delete: {
+                    callback: e => props.onClickExtendedAction.delete.callback(e, props.folderData),
+                    label: props.onClickExtendedAction.delete.label
+                  }
+                }}
               />
             </div>
           )}

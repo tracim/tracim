@@ -275,7 +275,7 @@ export const displayFileSize = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
-export const parserStringToList = (string, separatorList = [',', ' ', ';', '\n']) => {
+export const parserStringToList = (string, separatorList = [',', ';', '\n']) => {
   let parsedString = string
   separatorList.forEach(separator => {
     parsedString = parsedString.split(separator).join(',')
@@ -291,3 +291,8 @@ export const checkEmailValidity = email => {
   const domainParts = parts[1].split('.')
   return domainParts.length === 2
 }
+
+export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) =>
+  `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview/jpg/${width}x${height}/${filenameNoExtension + '.jpg'}?page=${page}`
+
+export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')

@@ -65,8 +65,8 @@ export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
   label: 'Collaborative document',
   slug: 'collaborative_document_edition',
   faIcon: 'file-o',
-  hexcolor: '#ffc800',
-  creationLabel: i18n.t('Create a collaborative document'),
+  hexcolor: '#62676a',
+  creationLabel: i18n.t('Create an office document'),
   availableStatuses: contentType[0].availableStatuses
 })
 
@@ -151,7 +151,11 @@ class WorkspaceContent extends React.Component {
     const prevFilter = qs.parse(prevProps.location.search).type
     const currentFilter = qs.parse(props.location.search).type
 
-    if (prevState.workspaceIdInUrl !== workspaceId || prevFilter !== currentFilter) {
+    const hasWorkspaceIdChanged = prevState.workspaceIdInUrl !== workspaceId
+
+    if (hasWorkspaceIdChanged) this.loadWorkspaceDetail()
+
+    if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
       this.setState({ workspaceIdInUrl: workspaceId })
       this.loadAllWorkspaceContent(workspaceId, false)
     }
@@ -599,7 +603,7 @@ class WorkspaceContent extends React.Component {
 
   render () {
     const { breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t } = this.props
-    const { state } = this
+    const { state, props } = this
 
     const urlFilter = qs.parse(location.search).type
 
@@ -754,10 +758,22 @@ class WorkspaceContent extends React.Component {
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
                         read={currentWorkspace.contentReadStatusList.includes(content.id)}
                         onClickExtendedAction={{
-                          edit: e => this.handleClickEditContentItem(e, content),
-                          download: e => this.handleClickDownloadContentItem(e, content),
-                          archive: e => this.handleClickArchiveContentItem(e, content),
-                          delete: e => this.handleClickDeleteContentItem(e, content)
+                          edit: {
+                            callback: e => this.handleClickEditContentItem(e, content),
+                            label: props.t('Edit')
+                          },
+                          download: {
+                            callback: e => this.handleClickDownloadContentItem(e, content),
+                            label: props.t('Download')
+                          },
+                          archive: {
+                            callback: e => this.handleClickArchiveContentItem(e, content),
+                            label: props.t('Archive')
+                          },
+                          delete: {
+                            callback: e => this.handleClickDeleteContentItem(e, content),
+                            label: props.t('Delete')
+                          }
                         }}
                         onDropMoveContentItem={this.handleDropMoveContent}
                         key={content.id}

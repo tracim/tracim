@@ -5,7 +5,7 @@ import { FETCH_CONFIG, PAGE, findUserRoleIdInWorkspace } from './helper.js'
 import i18n from './i18n.js'
 import { ROLE, PROFILE } from 'tracim_frontend_lib'
 
-const mapStateToProps = ({ system, currentWorkspace }) => ({ system, currentWorkspace })
+const mapStateToProps = ({ system, currentWorkspace, workspaceList }) => ({ system, currentWorkspace, workspaceList })
 
 export function appFactory (WrappedComponent) {
   return withRouter(connect(mapStateToProps)(class AppFactory extends React.Component {

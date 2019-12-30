@@ -29,7 +29,10 @@ class GuestUpload extends React.Component {
 
     this.state = {
       hasPassword: false,
-      guestName: '',
+      guestFullname: {
+        value: '',
+        isInvalid: false
+      },
       guestComment: '',
       guestPassword: {
         value: '',
@@ -49,7 +52,6 @@ class GuestUpload extends React.Component {
     const { props } = this
 
     const response = await props.dispatch(getGuestUploadInfo(props.match.params.token))
-
     switch (response.status) {
       case 200:
         this.setState({ hasPassword: response.json.has_password })
@@ -62,7 +64,7 @@ class GuestUpload extends React.Component {
         props.history.push(PAGE.LOGIN)
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading upload informations'))
+        this.sendGlobalFlashMessage(props.t('Error while loading upload information'))
         props.history.push(PAGE.LOGIN)
     }
   }
@@ -76,17 +78,31 @@ class GuestUpload extends React.Component {
     }
   })
 
-  handleChangeFullName = e => this.setState({ guestName: e.target.value })
-  handleChangeComment = e => this.setState({ guestComment: e.target.value })
+  handleChangeFullName = e => this.setState({ guestFullname: { value: e.target.value, isInvalid: false } })
+  handleChangeComment = e => this.setState({ guestComment: e.target.value, isInvalid: false })
   handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })
 
-  handleAddFile = uploadFileList => {
-    if (!uploadFileList || !uploadFileList[0]) return
+  handleAddFile = newFileList => {
+    const { props, state } = this
+
+    if (!Array.isArray(newFileList) || (newFileList.length === 0)) return
+
+    const alreadyUploadedList = newFileList.filter(newFile => state.uploadFileList.some(stateFile => stateFile.name === newFile.name))
+    if (alreadyUploadedList.length) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: <div>{props.t('Files already uploaded:')}<br /><ul>{alreadyUploadedList.map(file => <li>{file.name}</li>)}</ul></div>,
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
 
     this.setState(previousState => ({
       uploadFileList: [
         ...previousState.uploadFileList,
-        ...uploadFileList
+        ...newFileList.filter(newFile => !state.uploadFileList.some(stateFile => stateFile.name === newFile.name))
       ]
     }))
   }
@@ -97,13 +113,41 @@ class GuestUpload extends React.Component {
     }))
   }
 
+  validateForm = () => {
+    const { props, state } = this
+    let errors = []
+    if (state.guestFullname.value.length < 1) errors.push({ field: 'guestFullname', msg: props.t('Full name must be at least 1 character') })
+    if (state.guestFullname.value.length > 255) errors.push({ field: 'guestFullname', msg: props.t('Full name must be less than 255 characters') })
+    if (state.hasPassword && (state.guestPassword.value.length < 6)) errors.push({ field: 'guestPassword', msg: props.t('Password must be at least 6 characters') })
+    if (state.hasPassword && (state.guestPassword.value.length > 255)) errors.push({ field: 'guestPassword', msg: props.t('Password must be less than 255 characters') })
+    if (state.uploadFileList.length === 0) errors.push({ field: 'uploadFileList', msg: props.t('You must select at least 1 file to upload') })
+    if (errors.length) {
+      // INFO - B.L - Not used now because form's css isn't ready for it use flash message instead
+      // this.setState({
+      //   guestPassword: { value: state.guestPassword.value, isInvalid: errors.some(error => error.key === 'guestPassword') },
+      //   guestFullname: { value: state.guestFullname.value, isInvalid: errors.some(error => error.key === 'guestFullname') }
+      // })
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: <div>{props.t('Errors in form:')}<br /><ul>{errors.map(error => <li key={error.field} >{error.msg}</li>)}</ul></div>,
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+    return (errors.length === 0)
+  }
+
   handleClickSend = async () => {
     const { props, state } = this
+    if (!this.validateForm()) return false
+
     const formData = new FormData()
 
     state.uploadFileList.forEach((uploadFile, index) => {
       formData.append(`file_${index}`, uploadFile)
-      formData.append('username', state.guestName)
+      formData.append('username', state.guestFullname.value)
       formData.append('message', state.guestComment)
       if (state.guestPassword.value !== '') formData.append('password', state.guestPassword.value)
     })
@@ -127,14 +171,13 @@ class GuestUpload extends React.Component {
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
-              case 3002:
-                this.sendGlobalFlashMessage(props.t('A content with the same name already exists'))
-                this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
-                break
-              default:
-                this.sendGlobalFlashMessage(props.t('Error while uploading file'))
-                this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
+              case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
+              case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
+              case 6003: this.sendGlobalFlashMessage(props.t('Error, the shared space exceed its maximum size')); break
+              case 6004: this.sendGlobalFlashMessage(props.t('Upload impossible, the destination storage capacity has been reached')); break
+              default: this.sendGlobalFlashMessage(props.t('Error while uploading file')); break
             }
+            this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
             break
           case 403:
             const jsonResult403 = JSON.parse(xhr.responseText)
@@ -173,8 +216,8 @@ class GuestUpload extends React.Component {
                 case this.UPLOAD_STATUS.BEFORE_LOAD:
                   return (
                     <UploadForm
-                      guestName={state.guestName}
                       hasPassword={state.hasPassword}
+                      guestFullname={state.guestFullname}
                       onChangeFullName={this.handleChangeFullName}
                       guestPassword={state.guestPassword}
                       onChangePassword={this.handleChangePassword}
@@ -196,7 +239,7 @@ class GuestUpload extends React.Component {
                   )
                 default:
                   return <ImportConfirmation
-                    title={props.t('Thank you, your import is finished!')}
+                    title={props.t('Thank you, your upload is finished !')}
                     text={props.t('Your interlocutor has been notified of your upload. You can close this window.')}
                   />
               }

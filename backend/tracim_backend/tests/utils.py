@@ -30,6 +30,7 @@ from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import 
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.setup_models import get_tm_session
 
@@ -46,6 +47,7 @@ class ContentApiFactory(object):
         show_active: bool = True,
         show_deleted: bool = False,
         show_archived: bool = False,
+        namespace_filter: typing.Optional[typing.List[ContentNamespaces]] = None,
     ) -> ContentApi:
         return ContentApi(
             session=self.session,
@@ -54,6 +56,7 @@ class ContentApiFactory(object):
             show_active=show_active,
             show_deleted=show_deleted,
             show_archived=show_archived,
+            namespaces_filter=namespace_filter,
         )
 
 

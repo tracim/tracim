@@ -30,12 +30,17 @@ import {
 } from '../helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
-import { ComposedIcon, CUSTOM_EVENT, PROFILE } from 'tracim_frontend_lib'
+import {
+  PROFILE,
+  ComposedIcon,
+  CUSTOM_EVENT
+} from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 
 class Header extends React.Component {
   componentDidMount () {
+    this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', {})
     i18n.changeLanguage(this.props.user.lang)
   }
 
@@ -73,6 +78,7 @@ class Header extends React.Component {
     const fetchPostUserLogout = await dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
       dispatch(setUserDisconnected())
+      this.props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
       history.push(PAGE.LOGIN)
     } else {
       dispatch(newFlashMessage(t('Disconnection error', 'danger')))
@@ -122,6 +128,11 @@ class Header extends React.Component {
                   </div>
                 </li>
               )}
+
+              <li
+                id='customToolboxHeaderBtn'
+                className='header__menu__rightside__specificBtn'
+              />
 
               {props.user.logged &&
                 <li className='search__nav'>

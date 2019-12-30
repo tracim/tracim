@@ -23,6 +23,8 @@ export function workspaceList (state = [], action) {
         })),
         isOpenInSidebar: ws.isOpenInSidebar,
         agendaEnabled: ws.agenda_enabled,
+        uploadEnabled: ws.public_upload_enabled,
+        downloadEnabled: ws.public_download_enabled,
         memberList: []
       }))
 
