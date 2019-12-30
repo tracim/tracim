@@ -148,7 +148,7 @@ export class Gallery extends React.Component {
       link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{workspaceLabel}</Link>,
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN
     }]
-    if (folderDetail.filename) {
+    if (folderDetail && folderDetail.folderParentsId) {
       breadcrumbsList.push({
         link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentsId.join(',')}`}>{folderDetail.fileName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
