@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import { NewMemberForm, Avatar } from 'tracim_frontend_lib'
+import { NewMemberForm, Avatar, ROLE_OBJECT } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
 
@@ -42,7 +42,7 @@ export class MemberList extends React.Component {
             )
             : (
               <div>
-                <ul className={classnames('memberlist__list', { 'withAddBtn': props.userRoleIdInWorkspace >= 8 })}>
+                <ul className={classnames('memberlist__list', { 'withAddBtn': props.userRoleIdInWorkspace >= ROLE_OBJECT.workspaceManager.id })}>
                   {props.memberList.map(m =>
                     <li className='memberlist__list__item  primaryColorBgLightenHover' key={m.id}>
                       <div className='memberlist__list__item__avatar'>
@@ -59,7 +59,7 @@ export class MemberList extends React.Component {
                         </div>
                       </div>
 
-                      {props.userRoleIdInWorkspace >= 8 && m.id !== props.loggedUser.user_id && (
+                      {props.userRoleIdInWorkspace >= ROLE_OBJECT.workspaceManager.id && m.id !== props.loggedUser.user_id && (
                         <div
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}
@@ -71,7 +71,7 @@ export class MemberList extends React.Component {
                   )}
                 </ul>
 
-                {props.userRoleIdInWorkspace >= 8 && (
+                {props.userRoleIdInWorkspace >= ROLE_OBJECT.workspaceManager.id && (
                   <div className='memberlist__btnadd' data-cy='memberlist__btnadd' onClick={props.onClickAddMemberBtn}>
                     <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
                       <div className='memberlist__btnadd__button__avatar'>

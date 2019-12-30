@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Avatar from '../Avatar/Avatar.jsx'
+import { ROLE_OBJECT } from '../../helper.js'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 import PropTypes from 'prop-types'
 
@@ -90,7 +91,7 @@ export const NewMemberForm = props => {
             </div>
           )}
 
-          {(props.canSendInviteNewUser && props.userRoleIdInWorkspace >= 8) && (
+          {(props.canSendInviteNewUser && props.userRoleIdInWorkspace >= ROLE_OBJECT.workspaceManager.id) && (
             props.emailNotifActivated
               ? (
                 <div className='name__adminmsg'>

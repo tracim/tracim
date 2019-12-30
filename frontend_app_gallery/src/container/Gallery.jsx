@@ -32,7 +32,7 @@ import classnames from 'classnames'
 
 const qs = require('query-string')
 
-class Gallery extends React.Component {
+export class Gallery extends React.Component {
   constructor (props) {
     super(props)
 
@@ -44,7 +44,7 @@ class Gallery extends React.Component {
       content: props.data ? props.data.content : debug.content,
       breadcrumbsList: [],
       appMounted: false,
-      folderId: qs.parse(props.data.config.history.location.search).folder_ids || 0,
+      folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || 0) : debug.config.folderId,
       folderDetail: {},
       imagesPreviews: [],
       fileCurrentPage: 1,
@@ -318,7 +318,7 @@ class Gallery extends React.Component {
   getPreviousImageUrl = () => {
     const { state } = this
 
-    if (state.imagesPreviews.length === 1) return
+    if (state.imagesPreviews.length <= 1) return
 
     if (state.fileSelected === 0) return state.imagesPreviews[state.imagesPreviews.length - 1].lightBoxUrlList[0]
     return state.imagesPreviews[state.fileSelected - 1].lightBoxUrlList[0]
@@ -327,7 +327,7 @@ class Gallery extends React.Component {
   getNextImageUrl = () => {
     const { state } = this
 
-    if (state.imagesPreviews.length === 1) return
+    if (state.imagesPreviews.length <= 1) return
 
     if (state.fileSelected === state.imagesPreviews.length - 1) return state.imagesPreviews[0].lightBoxUrlList[0]
     return state.imagesPreviews[state.fileSelected + 1].lightBoxUrlList[0]
@@ -388,8 +388,10 @@ class Gallery extends React.Component {
   rotateImg (fileSelected, direction) {
     const { state } = this
 
+    if (fileSelected < 0 || fileSelected >= state.imagesPreviews.length || !direction) return
+
     const imagesPreviews = state.imagesPreviews
-    let rotationAngle
+    let rotationAngle = 0
     switch (imagesPreviews[fileSelected].rotationAngle) {
       case (0):
         rotationAngle = direction === DIRECTION.RIGHT ? 90 : 270
@@ -417,6 +419,21 @@ class Gallery extends React.Component {
     return state.imagesPreviews[state.fileSelected].rawFileUrl
   }
 
+  handleMouseMove = () => {
+    clearInterval(this.mouseMoveTimeout)
+    if (this.state.displayLightbox) {
+      // INFO - GM - 2019-12-11 - It use dom manipulation instead of react state because ReactImageLightBox doesn't offer custom style props for the toolbar
+      document.getElementsByClassName('ril__toolbar')[0].style.transform = 'translateY(0px)'
+      document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
+    }
+    this.mouseMoveTimeout = setInterval(() => {
+      if (this.state.displayLightbox) {
+        document.getElementsByClassName('ril__toolbar')[0].style.transform = 'translateY(-50px)'
+        document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
+      }
+    }, 2000)
+  }
+
   render () {
     const { state, props } = this
 
@@ -433,7 +450,7 @@ class Gallery extends React.Component {
         <PageContent>
           <div className='gallery__action__button'>
             <button
-              className='btn outlineTextBtn nohover primaryColorBorder'
+              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__play'
               onClick={() => this.onClickSlickPlay(!state.autoPlay)}
             >
               <span className='gallery__action__button__text'>
@@ -462,7 +479,7 @@ class Gallery extends React.Component {
               INFO - CH - there is a bug with the property userRoleIdInWorkspace that comes from frontend, it might be it's default value which is 1
               So we won't use it for now and always display the delete button which will return 401 if user can't delete content
             */}
-            <button className='btn outlineTextBtn nohover primaryColorBorder' onClick={this.handleOpenDeleteFilePopup}>
+            <button className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__delete' onClick={this.handleOpenDeleteFilePopup}>
               <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className={'fa fa-fw fa-trash'} />
             </button>
           </div>
@@ -477,6 +494,7 @@ class Gallery extends React.Component {
                 loggedUser={state.loggedUser}
                 disableAnimation={state.displayLightbox}
                 isWorkspaceRoot={state.folderId === 0}
+                autoPlay={state.autoPlay}
               />
             ) : (
               <div className='gallery__loader'>
@@ -489,65 +507,67 @@ class Gallery extends React.Component {
             enabled={this.state.fullscreen}
             onChange={fullscreen => this.setState({ fullscreen })}
           >
-            <div ref={modalRoot => (this.modalRoot = modalRoot)} />
+            <div ref={modalRoot => (this.reactImageLightBoxModalRoot = modalRoot)} />
+
+            {state.displayLightbox && (
+              <div className='gallery__mouse__listener' onMouseMove={this.handleMouseMove}>
+                <ReactImageLightbox
+                  prevSrc={this.getPreviousImageUrl()}
+                  mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]}
+                  nextSrc={this.getNextImageUrl()}
+                  onCloseRequest={this.handleClickHideImageRaw}
+                  onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
+                  onMoveNextRequest={() => { this.handleClickPreviousNextPage(DIRECTION.RIGHT) }}
+                  imagePadding={0}
+                  reactModalProps={{ parentSelector: () => this.reactImageLightBoxModalRoot }}
+                  toolbarButtons={[
+                    <div className={'gallery__action__button__lightbox'}>
+                      <button
+                        className={'btn iconBtn'}
+                        onClick={() => this.onClickSlickPlay(!state.autoPlay)}
+                        title={state.autoPlay ? props.t('Pause') : props.t('Play')}
+                      >
+                        <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                      </button>
+
+                      <button
+                        className={'btn iconBtn'}
+                        onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))}
+                        title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}
+                      >
+                        <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
+                      </button>
+
+                      <button
+                        className='btn iconBtn gallery__action__button__lightbox__rotation__left'
+                        onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
+                        title={props.t('Rotate 90° left')}
+                      >
+                        <i className={'fa fa-fw fa-undo'} />
+                      </button>
+
+                      <button
+                        className='btn iconBtn gallery__action__button__lightbox__rotation__right'
+                        onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
+                        title={props.t('Rotate 90° right')}
+                      >
+                        <i className={'fa fa-fw fa-undo'} />
+                      </button>
+
+                      <a
+                        className='btn iconBtn gallery__action__button__lightbox__openRawContent'
+                        title={props.t('Open raw file')}
+                        href={this.getRawFileUrlSelectedFile()}
+                        target='_blank'
+                      >
+                        <i className={'fa fa-fw fa-download'} />
+                      </a>
+                    </div>
+                  ]}
+                />
+              </div>
+            )}
           </Fullscreen>
-
-          {state.displayLightbox && (
-            <ReactImageLightbox
-              prevSrc={this.getPreviousImageUrl()}
-              mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]}
-              nextSrc={this.getNextImageUrl()}
-              onCloseRequest={this.handleClickHideImageRaw}
-              onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
-              onMoveNextRequest={() => { this.handleClickPreviousNextPage(DIRECTION.RIGHT) }}
-              imagePadding={0}
-              reactModalProps={{ parentSelector: () => this.modalRoot }}
-              toolbarButtons={[
-                <div className={'gallery__action__button__lightbox'}>
-                  <button
-                    className={'btn iconBtn'}
-                    onClick={() => this.onClickSlickPlay(!state.autoPlay)}
-                    title={state.autoPlay ? props.t('Pause') : props.t('Play')}
-                  >
-                    <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
-                  </button>
-
-                  <button
-                    className={'btn iconBtn'}
-                    onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))}
-                    title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}
-                  >
-                    <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
-                  </button>
-
-                  <button
-                    className='btn iconBtn gallery__action__button__lightbox__rotation__left'
-                    onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
-                    title={props.t('Rotate 90° left')}
-                  >
-                    <i className={'fa fa-fw fa-undo'} />
-                  </button>
-
-                  <button
-                    className='btn iconBtn gallery__action__button__lightbox__rotation__right'
-                    onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
-                    title={props.t('Rotate 90° right')}
-                  >
-                    <i className={'fa fa-fw fa-undo'} />
-                  </button>
-
-                  <a
-                    className='btn iconBtn gallery__action__button__lightbox__openRawContent'
-                    title={props.t('Open raw file')}
-                    href={this.getRawFileUrlSelectedFile()}
-                    target='_blank'
-                  >
-                    <i className={'fa fa-fw fa-download'} />
-                  </a>
-                </div>
-              ]}
-            />
-          )}
 
           {state.displayPopupDelete && (
             <CardPopup

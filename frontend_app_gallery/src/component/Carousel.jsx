@@ -9,7 +9,7 @@ import ThumbnailPreview from './ThumbnailPreview.jsx'
 import CarouselArrow from './CarouselArrow'
 import { DIRECTION } from '../helper'
 
-class Carousel extends React.Component {
+export class Carousel extends React.Component {
   constructor (props) {
     super(props)
 
@@ -63,7 +63,7 @@ class Carousel extends React.Component {
       swipe: false,
       arrows: !props.disableAnimation,
       afterChange: this.onMainSliderPositionChange.bind(this),
-      lazyLoad: 'ondemand',
+      lazyLoad: props.autoPlay ? 'progressive' : 'ondemand',
       centerPadding: '0px',
       className: 'carousel__main',
       nextArrow: <CarouselArrow direction={DIRECTION.RIGHT} />,

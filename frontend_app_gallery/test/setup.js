@@ -23,3 +23,13 @@ if (!global.window && !global.document) {
 
 Enzyme.configure({adapter: new Adapter()})
 chai.use(chaiEnzyme())
+
+// INFO - GM - 2019- 12-09 - Fix for react-slick test from https://github.com/akiran/react-slick/issues/742#issuecomment-298992238
+window.matchMedia = window.matchMedia || function() {
+  return {
+    matches : false,
+    addListener : function() {},
+    removeListener: function() {}
+  }
+}
+console.log = () => {}
