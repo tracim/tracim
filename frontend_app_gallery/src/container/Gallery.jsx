@@ -357,6 +357,8 @@ class Gallery extends React.Component {
   rotateImg (fileSelected, direction) {
     const { state } = this
 
+    if (!state.imagesPreviews[fileSelected]) return
+
     const imagesPreviews = state.imagesPreviews
     let rotationAngle
     switch (imagesPreviews[fileSelected].rotationAngle) {

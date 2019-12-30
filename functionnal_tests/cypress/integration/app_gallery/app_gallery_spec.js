@@ -4,23 +4,28 @@ import { SELECTORS as s } from '../../support/generic_selector_commands.js'
 describe('App Gallery', function () {
   let workspaceId
   let folder1 = { label: 'first Folder' }
-  const files = [{
+  const createdFiles = {
+    file1: {
       title: 'fileTest1',
       fullFilename: 'Linux-Free-PNG.png',
       contentType: 'image/png'
-    }, {
+    },
+    file2: {
       title: 'fileTest2',
       fullFilename: 'Linux-Free-PNG.png',
       contentType: 'image/png'
-    }, {
+    },
+    file3: {
       title: 'fileTest3',
       fullFilename: 'artikodin.png',
       contentType: 'image/png'
-    }, {
+    },
+    file4: {
       title: 'fileTest4',
       fullFilename: 'artikodin.png',
       contentType: 'image/png'
-  }]
+    }
+  }
 
   before(function () {
     cy.resetDB()
@@ -29,20 +34,20 @@ describe('App Gallery', function () {
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
 
-      cy.createFile(files[0].fullFilename, files[0].contentType, files[0].title, workspace.workspace_id)
-        .then(newContent => files[0].id = newContent.content_id)
+      cy.createFile(createdFiles.file1.fullFilename, createdFiles.file1.contentType, createdFiles.file1.title, workspace.workspace_id)
+        .then(newContent => createdFiles.file1.id = newContent.content_id)
 
-      cy.createFile(files[1].fullFilename, files[1].contentType, files[1].title, workspace.workspace_id)
-        .then(newContent => files[1].id  = newContent.content_id)
+      cy.createFile(createdFiles.file2.fullFilename, createdFiles.file2.contentType, createdFiles.file2.title, workspace.workspace_id)
+        .then(newContent => createdFiles.file2.id  = newContent.content_id)
 
-      cy.createFile(files[2].fullFilename, files[2].contentType, files[2].title, workspace.workspace_id)
-        .then(newContent => files[2].id = newContent.content_id)
+      cy.createFile(createdFiles.file3.fullFilename, createdFiles.file3.contentType, createdFiles.file3.title, workspace.workspace_id)
+        .then(newContent => createdFiles.file3.id = newContent.content_id)
 
 
       cy.createFolder(folder1.label, workspaceId).then(f => {
         folder1 = f
-        cy.createFile(files[3].fullFilename, files[3].contentType, files[3].title, workspace.workspace_id, folder1.content_id)
-          .then(newContent => files[3].id = newContent.content_id)
+        cy.createFile(createdFiles.file4.fullFilename, createdFiles.file4.contentType, createdFiles.file4.title, workspace.workspace_id, folder1.content_id)
+          .then(newContent => createdFiles.file4.id = newContent.content_id)
       })
 
     })
@@ -50,6 +55,10 @@ describe('App Gallery', function () {
 
   beforeEach(() => {
     cy.loginAs('administrators')
+  })
+
+  afterEach(function () {
+    cy.cancelXHR()
   })
 
   describe('Open gallery App', () => {
@@ -88,99 +97,105 @@ describe('App Gallery', function () {
         .find('[data-cy=extended_action_gallery]')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[3].title}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file4.title}']`)
         .should('be.visible')
     })
   })
+
   describe('Carousel should be able to navigate through files', () => {
-    before(() => {
-      cy.loginAs('administrators')
+    it('Get previous image with the left arrow', () => {
       cy.visitPage({
         pageName: PAGES.GALLERY,
         params: { workspaceId }
       })
-    })
-
-    it('Get previous image with the left arrow', () => {
-      cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .should('be.visible')
-      cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
-        .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .find('.carousel__arrow.arrowprev')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[2].title}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file3.title}']`)
         .should('be.visible')
     })
     it('Get next image with the right arrow', () => {
+      cy.visitPage({
+        pageName: PAGES.GALLERY,
+        params: { workspaceId }
+      })
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .find('.carousel__arrow.arrownext')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file2.title}']`)
         .should('be.visible')
     })
     it('should start the autoPlay when the autoPlay is clicked', () => {
+      cy.visitPage({
+        pageName: PAGES.GALLERY,
+        params: { workspaceId }
+      })
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`[data-cy=gallery__action__button__auto__play]`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file2.title}']`)
         .should('be.visible')
     })
   })
 
   describe('Rotation test', () => {
-    before(() => {
-      cy.loginAs('administrators')
+    it('the image should be rotated to the left when the right rotate button is clicked', () => {
       cy.visitPage({
         pageName: PAGES.GALLERY,
         params: { workspaceId }
       })
-    })
-
-    it('the image should be rotated to the left when the right rotate button is clicked', () => {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']`)
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`button.gallery__action__button__rotation__left`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}'].rotate270`)
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}'].rotate270`)
         .should('be.visible')
     })
 
     it('the image should be rotated to the right when the left rotate button is clicked', () => {
+      cy.visitPage({
+        pageName: PAGES.GALLERY,
+        params: { workspaceId }
+      })
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']`)
+        .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`button.gallery__action__button__rotation__right`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}'].rotate0`)
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}'].rotate90`)
         .should('be.visible')
     })
   })
 
   describe('ImageLightBox', () => {
-    before(() => {
-      cy.loginAs('administrators')
+    it('should be able to open the lightbox', () => {
       cy.visitPage({
         pageName: PAGES.GALLERY,
         params: { workspaceId }
       })
-    })
-
-    it('should be able to open the lightbox', () => {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']:visible`)
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']:visible`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.gallery__action__button__lightbox`)
         .should('be.visible')
     })
     it('should enable fullscreen when the fullscreen button is clicked', () => {
+      cy.visitPage({
+        pageName: PAGES.GALLERY,
+        params: { workspaceId }
+      })
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']:visible`)
+        .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`[data-cy=gallery__action__button__lightbox__fullscreen]`)
         .click()
@@ -191,17 +206,13 @@ describe('App Gallery', function () {
   })
 
   describe('Delete file', () => {
-    before(() => {
-      cy.loginAs('administrators')
+    it('should be able to delete a file', () => {
       cy.visitPage({
         pageName: PAGES.GALLERY,
         params: { workspaceId }
       })
-    })
-
-    it('should be able to delete a file', () => {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']`)
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`[data-cy=gallery__action__button__delete]`)
@@ -213,7 +224,7 @@ describe('App Gallery', function () {
         .get(`[data-cy=gallery__delete__file__popup__body__btn__delete]`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img[alt='${files[0].title}']`)
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']`)
         .should('be.not.visible')
     })
   })
