@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
-import { ROLE, findUserRoleIdInWorkspace } from '../../helper.js'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { findUserRoleIdInWorkspace } from '../../helper.js'
+import { ROLE, CUSTOM_EVENT } from 'tracim_frontend_lib'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?

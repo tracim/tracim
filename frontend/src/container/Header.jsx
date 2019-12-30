@@ -25,13 +25,13 @@ import {
 import {
   COOKIE_FRONTEND,
   PAGE,
-  PROFILE,
   unLoggedAllowedPageList,
   ALL_CONTENT_TYPES
 } from '../helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
 import {
+  PROFILE,
   ComposedIcon,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'

@@ -27,7 +27,8 @@ import {
   checkEmailValidity,
   parserStringToList,
   removeExtensionOfFilename,
-  buildFilePreviewUrl
+  buildFilePreviewUrl,
+  ROLE_OBJECT
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -282,7 +283,7 @@ class File extends React.Component {
   loadShareLinkList = async () => {
     const { content, config } = this.state
 
-    if (this.state.loggedUser.userRoleIdInWorkspace < 2) return
+    if (this.state.loggedUser.userRoleIdInWorkspace < ROLE_OBJECT.contributor.id) return
 
     const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
 
@@ -819,7 +820,7 @@ class File extends React.Component {
           lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
           lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
           description={state.content.raw_content}
-          displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
+          displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id}
           disableChangeDescription={!state.content.is_editable}
           onClickValidateNewDescription={this.handleClickValidateNewDescription}
           key={'FileProperties'}
@@ -827,7 +828,7 @@ class File extends React.Component {
       )
     }
 
-    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= 4) {
+    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace > ROLE_OBJECT.contentManager.id) {
       return [
         timelineObject,
         {
@@ -889,7 +890,7 @@ class File extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= 2 &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id &&
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
@@ -927,7 +928,7 @@ class File extends React.Component {
             </div>
 
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= 2 &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id &&
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
@@ -937,7 +938,7 @@ class File extends React.Component {
                 />
               }
 
-              {state.loggedUser.userRoleIdInWorkspace >= 4 &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id &&
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}

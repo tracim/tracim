@@ -6,6 +6,7 @@ import classnames from 'classnames'
 import ContentItem from './ContentItem.jsx'
 import Folder from './Folder.jsx'
 import { PAGE, SHARE_FOLDER_ID } from '../../helper.js'
+import { ROLE_OBJECT } from 'tracim_frontend_lib'
 
 require('./Folder.styl')
 
@@ -69,7 +70,7 @@ class ShareFolder extends React.Component {
 
           <div className='folder__header__button'>
             <div className='d-none d-md-flex' title={props.t('Actions')}>
-              {props.userRoleIdInWorkspace >= 4 && (
+              {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
                 <div
                   className='extandedaction dropdown'
                   data-cy='extended_action'

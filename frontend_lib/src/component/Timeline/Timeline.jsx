@@ -7,6 +7,7 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import DisplayState from '../DisplayState/DisplayState.jsx'
+import { ROLE_OBJECT } from '../../helper.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -57,36 +58,36 @@ class Timeline extends React.Component {
             {props.t('Timeline')}
           </div>
         }
-          <div className='timeline__warning'>
-            {props.isDeprecated && !props.isArchived && !props.isDeleted && (
-              <DisplayState
-                msg={props.t('This content is deprecated')}
-                icon={props.deprecatedStatus.faIcon}
-              />
-            )}
+        <div className='timeline__warning'>
+          {props.isDeprecated && !props.isArchived && !props.isDeleted && (
+            <DisplayState
+              msg={props.t('This content is deprecated')}
+              icon={props.deprecatedStatus.faIcon}
+            />
+          )}
 
-            {props.isArchived && (
-              <DisplayState
-                msg={props.t('This content is archived')}
-                btnType='button'
-                icon='archive'
-                btnLabel={props.t('Restore')}
-                onClickBtn={props.onClickRestoreArchived}
-              />
-            )}
+          {props.isArchived && (
+            <DisplayState
+              msg={props.t('This content is archived')}
+              btnType='button'
+              icon='archive'
+              btnLabel={props.t('Restore')}
+              onClickBtn={props.onClickRestoreArchived}
+            />
+          )}
 
-            {props.isDeleted && (
-              <DisplayState
-                msg={props.t('This content is deleted')}
-                btnType='button'
-                icon='trash'
-                btnLabel={props.t('Restore')}
-                onClickBtn={props.onClickRestoreDeleted}
-              />
-            )}
-          </div>
+          {props.isDeleted && (
+            <DisplayState
+              msg={props.t('This content is deleted')}
+              btnType='button'
+              icon='trash'
+              btnLabel={props.t('Restore')}
+              onClickBtn={props.onClickRestoreDeleted}
+            />
+          )}
+        </div>
 
-          <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}>
+        <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}>
           {props.timelineData.map(content => {
             switch (content.timelineType) {
               case 'comment':
@@ -119,7 +120,7 @@ class Timeline extends React.Component {
           <li style={{visibility: 'hidden'}} ref={el => { this.timelineBottom = el }} />
         </ul>
 
-        {props.loggedUser.userRoleIdInWorkspace >= 2 &&
+        {props.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id &&
           <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
             <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__texteditor__textinput')}>
               <textarea
@@ -215,7 +216,7 @@ Timeline.defaultProps = {
   loggedUser: {
     id: '',
     name: '',
-    userRoleIdInWorkspace: 1
+    userRoleIdInWorkspace: ROLE_OBJECT.reader.id
   },
   timelineData: [],
   wysiwyg: false,

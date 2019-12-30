@@ -5,7 +5,8 @@ import { PAGE } from '../helper.js'
 import {
   handleFetchResult,
   CUSTOM_EVENT,
-  addAllResourceI18n
+  addAllResourceI18n,
+  ROLE_OBJECT
 } from 'tracim_frontend_lib'
 import {
   getWOPIToken,
@@ -87,7 +88,7 @@ class CollaborativeEditionFrame extends React.Component {
   buildCompleteIframeUrl = (urlSource, accessToken) => {
     const { state } = this
     const protocol = window.location.protocol
-    const readyonly = !state.content.is_editable || !state.loggedUser.userRoleIdInWorkspace >= 2
+    const readyonly = !state.content.is_editable || !state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id
     // INFO - B.L - 2019.08.01 - We assume frontend is on the same host than the API
     const host = window.location.host
     let url = `${urlSource}WOPISrc=${protocol}//${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1&lang=${state.loggedUser.lang}`

@@ -17,6 +17,10 @@ describe('Workspace upload property', () => {
     cy.visitPage({pageName: p.DASHBOARD, params: { workspaceId }})
   })
 
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   describe("Disable the workspace's upload feature", () => {
     it('Upload folder should not be visible', function () {
       cy.getTag({selectorName: s.WORKSPACE_DASHBOARD})

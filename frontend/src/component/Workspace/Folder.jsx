@@ -8,9 +8,9 @@ import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import DragHandle from '../DragHandle.jsx'
+import { ROLE_OBJECT } from 'tracim_frontend_lib'
 import {
   PAGE,
-  ROLE_OBJECT,
   DRAG_AND_DROP,
   sortWorkspaceContents,
   SHARE_FOLDER_ID
@@ -104,7 +104,7 @@ class Folder extends React.Component {
 
           <div className='folder__header__button'>
             <div className='folder__header__button__addbtn'>
-              {props.userRoleIdInWorkspace >= 2 && props.showCreateContentButton && folderAvailableApp.length > 0 && (
+              {props.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && props.showCreateContentButton && folderAvailableApp.length > 0 && (
                 <div title={props.t('Create in folder')}>
                   <button
                     className={classnames(
@@ -115,7 +115,7 @@ class Folder extends React.Component {
                       'primaryColorBgHover',
                       'primaryColorBorderDarkenHover',
                       'dropdown-toggle',
-                      props.userRoleIdInWorkspace === 2 ? 'no-margin-right' : ''
+                      props.userRoleIdInWorkspace === ROLE_OBJECT.contributor.id ? 'no-margin-right' : ''
                     )}
                     type='button'
                     id='dropdownMenuButton'
@@ -142,6 +142,7 @@ class Folder extends React.Component {
                   </div>
                 </div>
               )}
+
               <div className='d-none d-md-flex' title={props.t('Actions')}>
                 <BtnExtandedAction
                   userRoleIdInWorkspace={props.userRoleIdInWorkspace}

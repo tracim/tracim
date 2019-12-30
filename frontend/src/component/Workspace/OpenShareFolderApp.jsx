@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
-import { ROLE, findUserRoleIdInWorkspace } from '../../helper.js'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { findUserRoleIdInWorkspace } from '../../helper.js'
+import { ROLE, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 export class OpenShareFolderApp extends React.Component {
   openShareFolderAdvancedApp = () => {
