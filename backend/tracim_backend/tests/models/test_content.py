@@ -7,12 +7,14 @@ import pytest
 from sqlalchemy.sql.elements import and_
 import transaction
 
+from tracim_backend.exceptions import ContentRevisionDeleteError
 from tracim_backend.exceptions import ContentRevisionUpdateError
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.tracim_session import unprotected_content_revision
 from tracim_backend.tests.fixtures import *  # noqa:F401,F403
 
 
@@ -150,6 +152,51 @@ class TestContent(object):
         with pytest.raises(ContentRevisionUpdateError):
             content.description = "FOO"
         # Raise ContentRevisionUpdateError because revision can't be updated
+
+    def test_unit__delete_revision__err__nominal_case(self, admin_user, session, content_type_list):
+        # file creation
+        workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
+        session.add(workspace)
+        session.flush()
+        content = Content(
+            owner=admin_user,
+            workspace=workspace,
+            type=content_type_list.Page.slug,
+            label="TEST_CONTENT_1",
+            description="TEST_CONTENT_DESCRIPTION_1",
+            revision_type=ActionDescription.CREATION,
+            is_deleted=False,
+            is_archived=False,
+        )
+        session.add(content)
+        session.flush()
+        session.delete(content.revisions[0])
+        # Raise ContentRevisionDeleteError because revision can't be deleted
+        with pytest.raises(ContentRevisionDeleteError):
+            session.flush()
+
+    def test_unit__delete_revision__ok__with_unsafe_context(
+        self, admin_user, session, content_type_list
+    ):
+
+        with unprotected_content_revision(session) as unsafe_session:
+            workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
+            unsafe_session.add(workspace)
+            unsafe_session.flush()
+            content = Content(
+                owner=admin_user,
+                workspace=workspace,
+                type=content_type_list.Page.slug,
+                label="TEST_CONTENT_1",
+                description="TEST_CONTENT_DESCRIPTION_1",
+                revision_type=ActionDescription.CREATION,
+                is_deleted=False,
+                is_archived=False,
+            )
+            unsafe_session.add(content)
+            unsafe_session.flush()
+            unsafe_session.delete(content.revisions[0])
+            unsafe_session.flush()
 
     def test_unit__content_depot_file__ok__nominal_case(
         self, admin_user, session, content_type_list
