@@ -148,7 +148,7 @@ class Gallery extends React.Component {
       link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{workspaceLabel}</Link>,
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN
     }]
-    if (folderDetail) {
+    if (folderDetail.filename) {
       breadcrumbsList.push({
         link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentsId.join(',')}`}>{folderDetail.fileName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
@@ -172,7 +172,7 @@ class Gallery extends React.Component {
   loadFolderDetailAndParentsDetails = async (workspaceId, folderId) => {
     const { state, props } = this
 
-    let folderDetail
+    let folderDetail = {}
 
     let fetchContentDetail = await handleFetchResult(
       await getFolderDetail(state.config.apiUrl, workspaceId, folderId)
@@ -180,8 +180,6 @@ class Gallery extends React.Component {
 
     switch (fetchContentDetail.apiResponse.status) {
       case 200:
-        folderDetail = {}
-
         folderDetail.fileName = fetchContentDetail.body.filename
         folderDetail.folderParentsId = fetchContentDetail.body.parent_id ? [fetchContentDetail.body.parent_id] : []
 
