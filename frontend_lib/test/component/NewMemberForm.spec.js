@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { mount } from 'enzyme'
 import sinon from 'sinon'
 import NewMemberForm from '../../src/component/NewMemberForm/NewMemberForm.jsx'
-import { ROLE_OBJECT } from '../../src/helper.js'
+import { ROLE } from '../../src/helper.js'
 require('../../src/component/NewMemberForm/NewMemberForm.styl')
 
 describe('<NewMemberForm />', () => {
@@ -27,7 +27,7 @@ describe('<NewMemberForm />', () => {
     ],
     isEmail: false,
     onClickAutoComplete: onClickAutoCompleteCallBack,
-    userRoleIdInWorkspace: ROLE_OBJECT.workspaceManager.id,
+    userRoleIdInWorkspace: ROLE.workspaceManager.id,
     canSendInviteNewUser: true,
     emailNotifActivated: true,
     roleList: [{ slug: 'random' }, { slug: 'Role' }],

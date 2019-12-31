@@ -1,5 +1,5 @@
 import i18n, { getBrowserLang } from './i18n.js'
-import { PROFILE, ROLE_OBJECT } from 'tracim_frontend_lib'
+import { PROFILE, ROLE } from 'tracim_frontend_lib'
 
 const configEnv = require('../configEnv.json')
 
@@ -68,7 +68,7 @@ export const unLoggedAllowedPageList = [
 ]
 
 export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
-  const user = memberList.find(u => u.id === userId) || { role: ROLE_OBJECT.reader.slug }
+  const user = memberList.find(u => u.id === userId) || { role: ROLE.reader.slug }
   return (roleList.find(r => user.role === r.slug) || { id: 1 }).id
 }
 
