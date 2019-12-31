@@ -45,7 +45,10 @@ export class Gallery extends React.Component {
       breadcrumbsList: [],
       appMounted: false,
       folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || 0) : debug.config.folderId,
-      folderDetail: {},
+      folderDetail: {
+        fileName: '',
+        folderParentsId: []
+      },
       imagesPreviews: [],
       fileCurrentPage: 1,
       fileSelected: 0,
@@ -133,8 +136,9 @@ export class Gallery extends React.Component {
     contentDetail.workspaceLabel = await this.loadWorkspaceLabel()
     if (state.folderId) {
       contentDetail.folderDetail = await this.loadFolderDetailAndParentsDetails(state.config.appConfig.workspaceId, state.folderId)
+      this.setState({ folderDetail: contentDetail.folderDetail })
     }
-    this.setState({ folderDetail: contentDetail.folderDetail, workspaceLabel: contentDetail.workspaceLabel })
+    this.setState({ workspaceLabel: contentDetail.workspaceLabel })
     return contentDetail
   }
 
@@ -148,7 +152,7 @@ export class Gallery extends React.Component {
       link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{workspaceLabel}</Link>,
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN
     }]
-    if (folderDetail && folderDetail.folderParentsId) {
+    if (state.folderId) {
       breadcrumbsList.push({
         link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentsId.join(',')}`}>{folderDetail.fileName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
@@ -172,7 +176,10 @@ export class Gallery extends React.Component {
   loadFolderDetailAndParentsDetails = async (workspaceId, folderId) => {
     const { state, props } = this
 
-    let folderDetail = {}
+    let folderDetail = {
+      fileName: '',
+      folderParentsId: []
+    }
 
     let fetchContentDetail = await handleFetchResult(
       await getFolderDetail(state.config.apiUrl, workspaceId, folderId)
@@ -442,7 +449,7 @@ export class Gallery extends React.Component {
     return (
       <PageWrapper customClass='gallery'>
         <PageTitle
-          title={state.folderDetail ? state.folderDetail.fileName : state.workspaceLabel}
+          title={state.folderId ? state.folderDetail.fileName : state.workspaceLabel}
           icon={'picture-o'}
           breadcrumbsList={state.breadcrumbsList}
         />
