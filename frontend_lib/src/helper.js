@@ -221,6 +221,12 @@ export const PROFILE = {
 }
 export const PROFILE_LIST = [ADMINISTRATOR, MANAGER, USER]
 
+export const APP_FEATURE_MODE = {
+  VIEW: 'view',
+  EDIT: 'edit',
+  REVISION: 'revision'
+}
+
 // INFO - GB - 2019-07-05 - This password generetor function was based on
 // https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
 export const generateRandomPassword = () => {

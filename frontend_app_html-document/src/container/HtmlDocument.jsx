@@ -3,6 +3,7 @@ import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
+  appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
@@ -15,29 +16,20 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  convertBackslashNToBr,
   generateLocalStorageContentId,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
   ROLE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  APP_FEATURE_MODE
 } from 'tracim_frontend_lib'
-import {
-  MODE,
-  initWysiwyg
-} from '../helper.js'
+import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
   getHtmlDocComment,
   getHtmlDocRevision,
-  postHtmlDocNewComment,
   putHtmlDocContent,
-  putHtmlDocStatus,
-  putHtmlDocIsArchived,
-  putHtmlDocIsDeleted,
-  putHtmlDocRestoreArchived,
-  putHtmlDocRestoreDeleted,
   putHtmlDocRead
 } from '../action.async.js'
 import Radium from 'radium'
@@ -45,12 +37,17 @@ import Radium from 'radium'
 class HtmlDocument extends React.Component {
   constructor (props) {
     super(props)
+
+    const param = props.data || debug
+
+    props.setApiUrl(param.config.apiUrl)
+
     this.state = {
       appName: 'html-document',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
       externalTranslationList: [
         props.t('Text Document'),
         props.t('Text Documents'),
@@ -60,10 +57,10 @@ class HtmlDocument extends React.Component {
         props.t('Write a document')
       ],
       rawContentBeforeEdit: '',
-      timeline: props.data ? [] : [], // debug.timeline,
+      timeline: [],
       newComment: '',
       timelineWysiwyg: false,
-      mode: MODE.VIEW
+      mode: APP_FEATURE_MODE.VIEW
     }
 
     // i18n has been init, add resources from frontend
@@ -73,7 +70,7 @@ class HtmlDocument extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+  customEventReducer = async ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     const { state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
@@ -95,6 +92,7 @@ class HtmlDocument extends React.Component {
         })
         break
 
+      // CH - 2019-31-12 - This event is used to send a new content_id that will trigger data reload through componentDidUpdate
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -105,6 +103,12 @@ class HtmlDocument extends React.Component {
           isVisible: true,
           timelineWysiwyg: false
         }))
+        break
+
+      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
+        await this.loadContent()
+        this.loadTimeline()
+        this.buildBreadcrumbs()
         break
 
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -145,7 +149,7 @@ class HtmlDocument extends React.Component {
       wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
 
-    if (state.mode === MODE.EDIT && prevState.mode !== MODE.EDIT) {
+    if (state.mode === APP_FEATURE_MODE.EDIT && prevState.mode !== APP_FEATURE_MODE.EDIT) {
       tinymce.remove('#wysiwygNewVersion')
       wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
@@ -219,6 +223,7 @@ class HtmlDocument extends React.Component {
   }
 
   loadContent = async () => {
+    console.log('loadContent called')
     const { loggedUser, content, config, appName } = this.state
 
     const fetchResultHtmlDocument = getHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id)
@@ -271,8 +276,8 @@ class HtmlDocument extends React.Component {
       loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && // if user has EDIT authorization
       resRevision.body[0].raw_content === '' // has content been created with raw_content (means it's from webdav or import db)
     )
-      ? MODE.EDIT
-      : MODE.VIEW
+      ? APP_FEATURE_MODE.EDIT
+      : APP_FEATURE_MODE.VIEW
 
     // can't use this.getLocalStorageItem because it uses state that isn't yet initialized
     const localStorageRawContent = localStorage.getItem(
@@ -284,7 +289,7 @@ class HtmlDocument extends React.Component {
       mode: modeToRender,
       content: {
         ...resHtmlDocument.body,
-        raw_content: modeToRender === MODE.EDIT && hasLocalStorageRawContent
+        raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
           ? localStorageRawContent
           : resHtmlDocument.body.raw_content
       },
@@ -304,25 +309,7 @@ class HtmlDocument extends React.Component {
 
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
-
-    const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle, state.content.raw_content)
-    )
-
-    switch (fetchResultSaveHtmlDoc.apiResponse.status) {
-      case 200:
-        this.loadContent()
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-        break
-      case 400:
-        switch (fetchResultSaveHtmlDoc.body.code) {
-          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
-        }
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
-    }
+    props.appContentChangeTitle(state.content, newTitle, state.config.slug)
   }
 
   handleClickNewVersion = () => {
@@ -334,7 +321,7 @@ class HtmlDocument extends React.Component {
         raw_content: previouslyUnsavedRawContent || prev.content.raw_content
       },
       rawContentBeforeEdit: prev.content.raw_content, // for cancel btn
-      mode: MODE.EDIT
+      mode: APP_FEATURE_MODE.EDIT
     }))
   }
 
@@ -346,7 +333,7 @@ class HtmlDocument extends React.Component {
         ...prev.content,
         raw_content: prev.rawContentBeforeEdit
       },
-      mode: MODE.VIEW
+      mode: APP_FEATURE_MODE.VIEW
     }))
 
     const { appName, content } = this.state
@@ -387,140 +374,48 @@ class HtmlDocument extends React.Component {
   }
 
   handleChangeNewComment = e => {
-    const newComment = e.target.value
-    this.setState({ newComment })
-
-    this.setLocalStorageItem('comment', newComment)
+    const { props, state } = this
+    props.appContentChangeComment(e, state.content, this.setState.bind(this))
   }
 
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
+    const response = await props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
 
-    // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
-    // see https://github.com/tracim/tracim/issues/1101
-    const newCommentForApi = state.timelineWysiwyg
-      ? state.newComment
-      : `<p>${convertBackslashNToBr(state.newComment)}</p>`
-
-    const fetchResultSaveNewComment = await handleFetchResult(await postHtmlDocNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
-    switch (fetchResultSaveNewComment.apiResponse.status) {
-      case 200:
-        this.setState({ newComment: '' })
-        localStorage.removeItem(
-          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-        )
-        if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
-        this.loadContent()
-        break
-      case 400:
-        switch (fetchResultSaveNewComment.body.code) {
-          case 2003:
-            this.sendGlobalFlashMessage(props.t("You can't send an empty comment"))
-            break
-          default:
-            this.sendGlobalFlashMessage(props.t('Error while saving new comment'))
-            break
-        }
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
+    if (response.apiResponse.status === 200) {
+      if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
     }
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
+  loadTimeline = () => {
+    console.log('loadTimeline called')
+  }
+
   handleChangeStatus = async newStatus => {
-    const { state, props } = this
-
-    if (newStatus === state.content.status) return
-
-    const fetchResultSaveEditStatus = await handleFetchResult(
-      await putHtmlDocStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
-    )
-
-    switch (fetchResultSaveEditStatus.status) {
-      case 204: this.loadContent(); break
-      default: this.sendGlobalFlashMessage(props.t('Error while changing status'))
-    }
+    const { props, state } = this
+    props.appContentChangeStatus(state.content, newStatus, state.config.slug)
   }
 
   handleClickArchive = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: true }, mode: MODE.VIEW }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while archiving document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+    const { props, state } = this
+    props.appContentArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
   handleClickDelete = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putHtmlDocIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: MODE.VIEW }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while deleting document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+    const { props, state } = this
+    props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  handleClickRestoreArchived = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putHtmlDocRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while restoring document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+  handleClickRestoreArchive = async () => {
+    const { props, state } = this
+    props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  handleClickRestoreDeleted = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putHtmlDocRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while restoring document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+  handleClickRestoreDelete = async () => {
+    const { props, state } = this
+    props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
   handleClickShowRevision = revision => {
@@ -529,12 +424,12 @@ class HtmlDocument extends React.Component {
     const revisionArray = timeline.filter(t => t.timelineType === 'revision')
     const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
 
-    if (mode === MODE.REVISION && isLastRevision) {
+    if (mode === APP_FEATURE_MODE.REVISION && isLastRevision) {
       this.handleClickLastVersion()
       return
     }
 
-    if (mode === MODE.VIEW && isLastRevision) return
+    if (mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
 
     this.setState(prev => ({
       content: {
@@ -546,13 +441,13 @@ class HtmlDocument extends React.Component {
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted
       },
-      mode: MODE.REVISION
+      mode: APP_FEATURE_MODE.REVISION
     }))
   }
 
   handleClickLastVersion = () => {
     this.loadContent()
-    this.setState({ mode: MODE.VIEW })
+    this.setState({ mode: APP_FEATURE_MODE.VIEW })
   }
 
   render () {
@@ -589,12 +484,12 @@ class HtmlDocument extends React.Component {
                 <NewVersionBtn
                   customColor={config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={mode !== MODE.VIEW || !content.is_editable}
+                  disabled={mode !== APP_FEATURE_MODE.VIEW || !content.is_editable}
                   label={t('Edit')}
                 />
               }
 
-              {mode === MODE.REVISION &&
+              {mode === APP_FEATURE_MODE.REVISION &&
                 <button
                   className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn highlightBtn'
                   onClick={this.handleClickLastVersion}
@@ -612,7 +507,7 @@ class HtmlDocument extends React.Component {
                   selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                   availableStatus={config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
+                  disabled={mode === APP_FEATURE_MODE.REVISION || content.is_archived || content.is_deleted}
                 />
               }
 
@@ -621,7 +516,7 @@ class HtmlDocument extends React.Component {
                   customColor={config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
+                  disabled={mode === APP_FEATURE_MODE.REVISION || content.is_archived || content.is_deleted}
                 />
               }
             </div>
@@ -648,9 +543,9 @@ class HtmlDocument extends React.Component {
             isDeleted={content.is_deleted}
             isDeprecated={content.status === config.availableStatuses[3].slug}
             deprecatedStatus={config.availableStatuses[3]}
-            isDraftAvailable={mode === MODE.VIEW && loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
-            onClickRestoreArchived={this.handleClickRestoreArchived}
-            onClickRestoreDeleted={this.handleClickRestoreDeleted}
+            isDraftAvailable={mode === APP_FEATURE_MODE.VIEW && loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
+            onClickRestoreArchived={this.handleClickRestoreArchive}
+            onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key={'html-document'}
           />
@@ -669,14 +564,14 @@ class HtmlDocument extends React.Component {
                   loggedUser={loggedUser}
                   timelineData={timeline}
                   newComment={newComment}
-                  disableComment={mode === MODE.REVISION || mode === MODE.EDIT || !content.is_editable}
+                  disableComment={mode === APP_FEATURE_MODE.REVISION || mode === APP_FEATURE_MODE.EDIT || !content.is_editable}
                   availableStatusList={config.availableStatuses}
                   wysiwyg={timelineWysiwyg}
                   onChangeNewComment={this.handleChangeNewComment}
                   onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
-                  shouldScrollToBottom={mode !== MODE.REVISION}
+                  shouldScrollToBottom={mode !== APP_FEATURE_MODE.REVISION}
                 />
               }
             ]}
@@ -687,4 +582,10 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default translate()(Radium(HtmlDocument))
+export default translate()(
+  Radium(
+    appContentFactory(
+      HtmlDocument
+    )
+  )
+)
