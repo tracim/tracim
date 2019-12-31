@@ -86,12 +86,12 @@ export const defaultDebug = {
     email: 'osef@algoo.fr',
     lang: 'fr',
     avatar_url: null,
-    userRoleIdInWorkspace: ROLE_OBJECT.workspaceManager.id,
+    userRoleIdInWorkspace: ROLE.workspaceManager.id,
     created: '2019-06-03T14:28:14Z',
     is_active: true,
     is_deleted: false,
     logged: true,
-    profile: PROFILE.ADMINISTRATOR.slug,
+    profile: PROFILE.administrator.slug,
     timezone: ''
   }
 }

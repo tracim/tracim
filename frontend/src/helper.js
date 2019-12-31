@@ -1,5 +1,5 @@
 import i18n, { getBrowserLang } from './i18n.js'
-import { PROFILE, ROLE } from 'tracim_frontend_lib'
+import { PROFILE_LIST, ROLE } from 'tracim_frontend_lib'
 
 const configEnv = require('../configEnv.json')
 
@@ -87,7 +87,7 @@ export const COOKIE_FRONTEND = {
   DEFAULT_EXPIRE_TIME: 180
 }
 
-export const getUserProfile = slug => Object.keys(PROFILE).map(p => PROFILE[p]).find(p => slug === p.slug) || {}
+export const getUserProfile = slug => PROFILE_LIST.find(p => slug === p.slug) || {}
 
 const USER_AUTH_INTERNAL = 'internal'
 const USER_AUTH_UNKNOWN = 'unknown'

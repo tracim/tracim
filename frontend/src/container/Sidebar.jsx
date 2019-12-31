@@ -124,7 +124,7 @@ class Sidebar extends React.Component {
               </ul>
             </nav>
 
-            {getUserProfile(user.profile).id <= PROFILE.MANAGER.id &&
+            {getUserProfile(user.profile).id <= PROFILE.manager.id &&
               <div className='sidebar__content__btnnewworkspace'>
                 <button
                   className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'

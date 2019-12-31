@@ -583,7 +583,7 @@ class Dashboard extends React.Component {
                   onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
                   onClickRemoveMember={this.handleClickRemoveMember}
                   userRoleIdInWorkspace={userRoleIdInWorkspace}
-                  canSendInviteNewUser={[PROFILE.ADMINISTRATOR.slug, PROFILE.MANAGER.slug].includes(props.user.profile)}
+                  canSendInviteNewUser={[PROFILE.administrator.slug, PROFILE.manager.slug].includes(props.user.profile)}
                   emailNotifActivated={props.system.config.email_notification_activated}
                   autoCompleteClicked={state.autoCompleteClicked}
                   onClickAutoComplete={this.handleClickAutoComplete}

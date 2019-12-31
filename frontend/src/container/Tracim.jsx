@@ -233,7 +233,7 @@ class Tracim extends React.Component {
 
           <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
 
-          <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= PROFILE.MANAGER.id} />} />
+          <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= PROFILE.manager.id} />} />
 
           <Route path='/ui/workspaces/:idws?' render={() =>
             <>

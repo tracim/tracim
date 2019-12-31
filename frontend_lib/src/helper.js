@@ -178,52 +178,48 @@ export const ROLE = {
 }
 export const ROLE_LIST = [WORKSPACE_MANAGER, CONTENT_MANAGER, CONTRIBUTOR, READER]
 
-export const ROLE_old = []
-export const ROLE_OBJECT_old = {
-  reader: {},
-  contributor: {},
-  contentManager: {},
-  workspaceManager: {}
+const ADMINISTRATOR = {
+  id: 1,
+  slug: 'administrators',
+  faIcon: 'shield',
+  hexcolor: '#ed0007',
+  tradKey: [
+    i18n.t('Administrator'),
+    i18n.t('Trusted user + create users, administration of instance')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Administrator', // label must be used in components
+  description: 'Trusted user + create users, administration of instance'
 }
-
+const MANAGER = {
+  id: 2,
+  slug: 'trusted-users',
+  faIcon: 'graduation-cap',
+  hexcolor: '#f2af2d',
+  tradKey: [
+    i18n.t('Trusted user'),
+    i18n.t('User + create shared spaces, add members in shared spaces')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Trusted user', // label must be used in components
+  description: 'User + create shared spaces, add members in shared spaces'
+}
+const USER = {
+  id: 4,
+  slug: 'users',
+  faIcon: 'user',
+  hexcolor: '#3145f7',
+  tradKey: [
+    i18n.t('User'),
+  i18n.t('Access to shared spaces where user is member')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'User', // label must be used in components
+  description: 'Access to shared spaces where user is member'
+}
 export const PROFILE = {
-  ADMINISTRATOR: {
-    id: 1,
-    slug: 'administrators',
-    faIcon: 'shield',
-    hexcolor: '#ed0007',
-    tradKey: [
-      i18n.t('Administrator'),
-      i18n.t('Trusted user + create users, administration of instance')
-    ], // trad key allow the parser to generate an entry in the json file
-    label: 'Administrator', // label must be used in components
-    description: 'Trusted user + create users, administration of instance'
-  },
-  MANAGER: {
-    id: 2,
-    slug: 'trusted-users',
-    faIcon: 'graduation-cap',
-    hexcolor: '#f2af2d',
-    tradKey: [
-      i18n.t('Trusted user'),
-      i18n.t('User + create shared spaces, add members in shared spaces')
-    ], // trad key allow the parser to generate an entry in the json file
-    label: 'Trusted user', // label must be used in components
-    description: 'User + create shared spaces, add members in shared spaces'
-  },
-  USER: {
-    id: 4,
-    slug: 'users',
-    faIcon: 'user',
-    hexcolor: '#3145f7',
-    tradKey: [
-      i18n.t('User'),
-      i18n.t('Access to shared spaces where user is member')
-    ], // trad key allow the parser to generate an entry in the json file
-    label: 'User', // label must be used in components
-    description: 'Access to shared spaces where user is member'
-  }
+  administrator: ADMINISTRATOR,
+  manager: MANAGER,
+  user: USER
 }
+export const PROFILE_LIST = [ADMINISTRATOR, MANAGER, USER]
 
 // INFO - GB - 2019-07-05 - This password generetor function was based on
 // https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
