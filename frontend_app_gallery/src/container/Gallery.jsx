@@ -47,7 +47,7 @@ export class Gallery extends React.Component {
       folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || 0) : debug.config.folderId,
       folderDetail: {
         fileName: '',
-        folderParentsId: []
+        folderParentIdList: []
       },
       imagesPreviews: [],
       fileCurrentPage: 1,
@@ -154,7 +154,7 @@ export class Gallery extends React.Component {
     }]
     if (state.folderId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentsId.join(',')}`}>{folderDetail.fileName}</Link>,
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentIdList.join(',')}`}>{folderDetail.fileName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
@@ -178,7 +178,7 @@ export class Gallery extends React.Component {
 
     let folderDetail = {
       fileName: '',
-      folderParentsId: []
+      folderParentIdList: []
     }
 
     let fetchContentDetail = await handleFetchResult(
@@ -188,7 +188,7 @@ export class Gallery extends React.Component {
     switch (fetchContentDetail.apiResponse.status) {
       case 200:
         folderDetail.fileName = fetchContentDetail.body.filename
-        folderDetail.folderParentsId = fetchContentDetail.body.parent_id ? [fetchContentDetail.body.parent_id] : []
+        folderDetail.folderParentIdList = fetchContentDetail.body.parent_id ? [fetchContentDetail.body.parent_id] : []
 
         let hasReachRootWorkspace = fetchContentDetail.body.parent_id !== null
         while (hasReachRootWorkspace) {
@@ -201,7 +201,7 @@ export class Gallery extends React.Component {
             if (fetchContentDetail.body.parent_id === null || prevParentId === fetchContentDetail.body.parent_id) {
               hasReachRootWorkspace = false
             } else {
-              folderDetail.folderParentsId.push(fetchContentDetail.body.parent_id)
+              folderDetail.folderParentIdList.push(fetchContentDetail.body.parent_id)
             }
           } else {
             this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
@@ -280,16 +280,20 @@ export class Gallery extends React.Component {
   loadWorkspaceLabel = async () => {
     const { state, props } = this
 
+    let workspaceLabel = ''
+
     const fetchResultWorkspaceDetail = await handleFetchResult(
       await getWorkspaceDetail(state.config.apiUrl, state.config.appConfig.workspaceId)
     )
 
     switch (fetchResultWorkspaceDetail.apiResponse.status) {
       case 200:
-        return fetchResultWorkspaceDetail.body.label
+        workspaceLabel = fetchResultWorkspaceDetail.body.label
+        break
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
     }
+    return workspaceLabel
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
