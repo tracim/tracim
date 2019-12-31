@@ -16,7 +16,7 @@ const defaultUser = {
   logged: null, // null avoid to be redirected to /login while whoami ep has not responded yet
   auth_type: '',
   timezone: '',
-  profile: PROFILE.USER,
+  profile: PROFILE.user,
   email: '',
   is_active: true,
   avatar_url: null,

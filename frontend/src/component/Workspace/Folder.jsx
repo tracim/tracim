@@ -8,7 +8,7 @@ import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import DragHandle from '../DragHandle.jsx'
-import { ROLE_OBJECT } from 'tracim_frontend_lib'
+import { ROLE } from 'tracim_frontend_lib'
 import {
   PAGE,
   DRAG_AND_DROP,
@@ -78,7 +78,7 @@ class Folder extends React.Component {
             <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
           </div>
 
-          {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
+          {props.userRoleIdInWorkspace <= ROLE.contentManager.id && (
             <DragHandle
               connectDragSource={props.connectDragSource}
               title={props.t('Move this folder')}
@@ -104,7 +104,7 @@ class Folder extends React.Component {
 
           <div className='folder__header__button'>
             <div className='folder__header__button__addbtn'>
-              {props.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && props.showCreateContentButton && folderAvailableApp.length > 0 && (
+              {props.userRoleIdInWorkspace <= ROLE.contributor.id && props.showCreateContentButton && folderAvailableApp.length > 0 && (
                 <div title={props.t('Create in folder')}>
                   <button
                     className={classnames(
@@ -114,8 +114,7 @@ class Folder extends React.Component {
                       'primaryColorBorder',
                       'primaryColorBgHover',
                       'primaryColorBorderDarkenHover',
-                      'dropdown-toggle',
-                      props.userRoleIdInWorkspace === ROLE_OBJECT.contributor.id ? 'no-margin-right' : ''
+                      'dropdown-toggle'
                     )}
                     type='button'
                     id='dropdownMenuButton'

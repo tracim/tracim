@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
-import { ROLE_OBJECT } from '../../helper.js'
+import { ROLE } from '../../helper.js'
 
 // INFO - CH - 2019-09-16 - READ ME:
 // For this component to behave properly regarding responsive and text-overflow ellispsis, the parent of this component
@@ -62,7 +62,7 @@ class ShareLink extends React.Component {
           <i className='fa fa-fw fa-files-o'/>
         </button>
 
-        {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id &&
+        {props.userRoleIdInWorkspace <= ROLE.contentManager.id &&
           <button
             className='iconBtn'
             key='deleteShareLink'

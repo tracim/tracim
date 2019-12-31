@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
 import { findUserRoleIdInWorkspace } from '../../helper.js'
-import { ROLE, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { ROLE_LIST, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 export class OpenShareFolderApp extends React.Component {
   openShareFolderAdvancedApp = () => {
@@ -40,7 +40,7 @@ export class OpenShareFolderApp extends React.Component {
       renderAppFeature(
         shareConfig,
         user,
-        findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE),
+        findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE_LIST),
         contentToOpen
       )
       this.props.updateAppOpenedType(contentToOpen.type)

@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
-import { Badge, ROLE_OBJECT } from 'tracim_frontend_lib'
+import { Badge, ROLE } from 'tracim_frontend_lib'
 import { PAGE } from '../../helper.js'
 
 require('./RecentActivity.styl')
@@ -43,7 +43,7 @@ export const RecentActivity = props =>
             </div>
           )
 
-          if (content.type === 'folder' && props.roleIdForLoggedUser < ROLE_OBJECT.contentManager.id) {
+          if (content.type === 'folder' && props.roleIdForLoggedUser > ROLE.contentManager.id) {
             return (
               <div
                 className={classnames('recentactivity__list__item nolink primaryColorBgLightenHover')}

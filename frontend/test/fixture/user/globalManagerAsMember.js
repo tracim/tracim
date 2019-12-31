@@ -1,5 +1,5 @@
 import { globalManager } from './globalManager.js'
-import { ROLE_OBJECT } from 'tracim_frontend_lib'
+import { ROLE } from 'tracim_frontend_lib'
 
 const {id, publicName, isActive, doNotify} = globalManager
 
@@ -9,5 +9,5 @@ export const globalManagerAsMember = {
   publicName,
   isActive,
   doNotify,
-  role: ROLE_OBJECT.workspaceManager.id
+  role: ROLE.workspaceManager.id
 }

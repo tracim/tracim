@@ -1,11 +1,11 @@
 import React from 'react'
-import { ROLE } from 'tracim_frontend_lib'
+import { ROLE_LIST } from 'tracim_frontend_lib'
 
 require('./UserStatus.styl')
 
 export const UserStatus = props => {
   const mySelf = props.curWs.memberList.find(m => m.id === props.user.user_id) || { role: '' }
-  const myRole = ROLE.find(r => r.slug === mySelf.role) || { faIcon: '', hexcolor: '', label: '' }
+  const myRole = ROLE_LIST.find(r => r.slug === mySelf.role) || { faIcon: '', hexcolor: '', label: '' }
 
   return (
     <div className='userstatus notched primaryColorBorder'>

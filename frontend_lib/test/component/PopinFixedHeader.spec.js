@@ -2,7 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import PopinFixedHeader from '../../src/component/PopinFixed/PopinFixedHeader'
-import { ROLE_OBJECT } from '../../src/helper.js'
+import { ROLE } from '../../src/helper.js'
 import sinon from 'sinon'
 
 describe('<PopinFixedHeader />', () => {
@@ -16,7 +16,7 @@ describe('<PopinFixedHeader />', () => {
     customColor: 'randomCustomColor',
     rawTitle: 'randomRawTitle',
     componentTitle: <h1>Random Element</h1>,
-    userRoleIdInWorkspace: ROLE_OBJECT.contentManager.id,
+    userRoleIdInWorkspace: ROLE.contentManager.id,
     onValidateChangeTitle: onValidateChangeTitleCallBack,
     disableChangeTitle: false,
     showChangeTitleButton: true

@@ -12,7 +12,7 @@ import {
   // SelectStatus,
   ArchiveDeleteContent,
   CUSTOM_EVENT,
-  ROLE_OBJECT,
+  ROLE,
   appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
@@ -279,7 +279,7 @@ class FolderAdvanced extends React.Component {
                 />
               */}
 
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id &&
+              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}

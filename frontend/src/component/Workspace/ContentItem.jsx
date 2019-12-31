@@ -7,7 +7,7 @@ import { DRAG_AND_DROP } from '../../helper.js'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import DragHandle from '../DragHandle.jsx'
 import {
-  ROLE_OBJECT,
+  ROLE,
   Badge,
   ListItemWrapper,
   ComposedIcon
@@ -36,7 +36,7 @@ class ContentItem extends React.Component {
         key={props.id}
         id={props.contentId}
       >
-        {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
+        {props.userRoleIdInWorkspace <= ROLE.contentManager.id && (
           <DragHandle
             connectDragSource={props.connectDragSource}
             title={props.t('Move this content')}
@@ -80,7 +80,7 @@ class ContentItem extends React.Component {
             </div>
           </div>
 
-          {props.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && (
+          {props.userRoleIdInWorkspace <= ROLE.contributor.id && (
             <div className='d-none d-md-block' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
@@ -170,6 +170,6 @@ ContentItem.defaultProps = {
   onClickItem: () => {},
   read: false,
   urlContent: '',
-  userRoleIdInWorkspace: ROLE_OBJECT.reader.id,
+  userRoleIdInWorkspace: ROLE.reader.id,
   isShared: false
 }

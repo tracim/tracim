@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
 import { findUserRoleIdInWorkspace } from '../../helper.js'
-import { ROLE, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { ROLE_LIST, CUSTOM_EVENT } from 'tracim_frontend_lib'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
@@ -49,7 +49,7 @@ export class OpenContentApp extends React.Component {
         renderAppFeature(
           contentInfomations,
           user,
-          findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE),
+          findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE_LIST),
           contentToOpen
         )
         this.props.updateAppOpenedType(contentToOpen.type)

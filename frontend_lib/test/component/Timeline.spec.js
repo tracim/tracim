@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { mount } from 'enzyme'
 import Timeline from '../../src/component/Timeline/Timeline.jsx'
 import sinon from 'sinon'
-import { ROLE_OBJECT } from '../../src/helper.js'
+import { ROLE } from '../../src/helper.js'
 
 describe('<Timeline />', () => {
   const onClickWysiwygBtnCallBack = sinon.stub()
@@ -24,7 +24,7 @@ describe('<Timeline />', () => {
     loggedUser: {
       id: 'randomIdLogin',
       name: 'randomNameLogin',
-      userRoleIdInWorkspace: ROLE_OBJECT.contentManager.id
+      userRoleIdInWorkspace: ROLE.contentManager.id
     },
     wysiwyg: false,
     onClickWysiwygBtn: onClickWysiwygBtnCallBack,

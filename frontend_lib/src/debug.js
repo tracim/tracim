@@ -1,8 +1,8 @@
 import i18n from './i18n.js'
 import {
   FETCH_CONFIG,
-  ROLE_OBJECT,
   ROLE,
+  ROLE_LIST,
   PROFILE
 } from './helper.js'
 
@@ -54,7 +54,7 @@ export const defaultDebug = {
     apiUrl: '',
     availableStatuses: STATUSES,
     profileObject: PROFILE,
-    roleList: ROLE,
+    roleList: ROLE_LIST,
     system: SYSTEM_CONFIG,
     domContainer: DOM_CONTAINER,
     slug: '',
@@ -86,12 +86,12 @@ export const defaultDebug = {
     email: 'osef@algoo.fr',
     lang: 'fr',
     avatar_url: null,
-    userRoleIdInWorkspace: ROLE_OBJECT.workspaceManager.id,
+    userRoleIdInWorkspace: ROLE.workspaceManager.id,
     created: '2019-06-03T14:28:14Z',
     is_active: true,
     is_deleted: false,
     logged: true,
-    profile: PROFILE.ADMINISTRATOR.slug,
+    profile: PROFILE.administrator.slug,
     timezone: ''
   }
 }

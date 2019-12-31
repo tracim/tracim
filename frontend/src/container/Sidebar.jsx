@@ -18,7 +18,7 @@ import {
 } from '../helper.js'
 import {
   CUSTOM_EVENT,
-  ROLE,
+  ROLE_LIST,
   PROFILE
 } from 'tracim_frontend_lib'
 
@@ -111,7 +111,7 @@ class Sidebar extends React.Component {
                 { workspaceList.map(ws =>
                   <WorkspaceListItem
                     workspaceId={ws.id}
-                    userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.user_id, ws.memberList, ROLE)}
+                    userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.user_id, ws.memberList, ROLE_LIST)}
                     label={ws.label}
                     allowedAppList={ws.sidebarEntry}
                     activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
@@ -124,7 +124,7 @@ class Sidebar extends React.Component {
               </ul>
             </nav>
 
-            {getUserProfile(user.profile).id <= PROFILE.MANAGER.id &&
+            {getUserProfile(user.profile).id <= PROFILE.manager.id &&
               <div className='sidebar__content__btnnewworkspace'>
                 <button
                   className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'

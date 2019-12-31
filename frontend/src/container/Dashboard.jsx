@@ -10,7 +10,7 @@ import {
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   ROLE,
-  ROLE_OBJECT,
+  ROLE_LIST,
   PROFILE
 } from 'tracim_frontend_lib'
 import {
@@ -385,7 +385,7 @@ class Dashboard extends React.Component {
           creationLabel: ''
         },
         props.user,
-        findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
+        findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE_LIST),
         { ...props.curWs, workspace_id: props.curWs.id }
       )
     } else {
@@ -416,13 +416,13 @@ class Dashboard extends React.Component {
   render () {
     const { props, state } = this
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE_LIST)
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326
     const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
-        .filter(app => userRoleIdInWorkspace === ROLE_OBJECT.contributor.id ? app.slug !== 'contents/folder' : true)
+        .filter(app => userRoleIdInWorkspace === ROLE.contributor.id ? app.slug !== 'contents/folder' : true)
         .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
         .filter(app => app.slug !== 'contents/share_folder')
         .filter(app => app.slug !== 'share_content')
@@ -489,7 +489,7 @@ class Dashboard extends React.Component {
               breadcrumbsList={props.breadcrumbs}
             >
               <div className='dashboard__header__advancedmode'>
-                {userRoleIdInWorkspace >= ROLE_OBJECT.workspaceManager.id &&
+                {userRoleIdInWorkspace <= ROLE.workspaceManager.id &&
                   <button
                     type='button'
                     className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
@@ -519,7 +519,7 @@ class Dashboard extends React.Component {
 
                   <div className='dashboard__calltoaction'>
                     {contentTypeButtonList.map(app => {
-                      return (userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
+                      return (userRoleIdInWorkspace <= ROLE.contributor.id || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
                         <ContentTypeBtn
                           customClass='dashboard__calltoaction__button'
                           hexcolor={app.hexcolor}
@@ -566,7 +566,7 @@ class Dashboard extends React.Component {
                   customClass='dashboard__memberlist'
                   loggedUser={props.user}
                   memberList={props.curWs.memberList.filter(u => u.isActive)}
-                  roleList={ROLE}
+                  roleList={ROLE_LIST}
                   searchedKnownMemberList={state.searchedKnownMemberList}
                   autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
                   nameOrEmail={state.newMember.nameOrEmail}
@@ -583,7 +583,7 @@ class Dashboard extends React.Component {
                   onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
                   onClickRemoveMember={this.handleClickRemoveMember}
                   userRoleIdInWorkspace={userRoleIdInWorkspace}
-                  canSendInviteNewUser={[PROFILE.ADMINISTRATOR.slug, PROFILE.MANAGER.slug].includes(props.user.profile)}
+                  canSendInviteNewUser={[PROFILE.administrator.slug, PROFILE.manager.slug].includes(props.user.profile)}
                   emailNotifActivated={props.system.config.email_notification_activated}
                   autoCompleteClicked={state.autoCompleteClicked}
                   onClickAutoComplete={this.handleClickAutoComplete}

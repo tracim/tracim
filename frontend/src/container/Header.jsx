@@ -143,7 +143,7 @@ class Header extends React.Component {
                 </li>
               }
 
-              {props.user.profile === PROFILE.ADMINISTRATOR.slug && (
+              {props.user.profile === PROFILE.administrator.slug && (
                 <li className='header__menu__rightside__adminlink nav-item'>
                   <AdminLink />
                 </li>

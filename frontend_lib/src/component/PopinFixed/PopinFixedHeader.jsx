@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { ROLE_OBJECT } from '../../helper.js'
+import { ROLE } from '../../helper.js'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -75,7 +75,7 @@ class PopinFixedHeader extends React.Component {
           }
         </div>
 
-        {userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && state.editTitle &&
+        {userRoleIdInWorkspace <= ROLE.contributor.id && state.editTitle &&
           <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickUndoChangeTitleBtn}
@@ -85,7 +85,7 @@ class PopinFixedHeader extends React.Component {
           </button>
         }
 
-        {userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && showChangeTitleButton &&
+        {userRoleIdInWorkspace <= ROLE.contributor.id && showChangeTitleButton &&
           <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickChangeTitleBtn}
@@ -127,7 +127,7 @@ PopinFixedHeader.defaultProps = {
   customColor: '',
   rawTitle: '',
   componentTitle: <div />,
-  userRoleIdInWorkspace: ROLE_OBJECT.reader.id,
+  userRoleIdInWorkspace: ROLE.reader.id,
   onChangeTitle: () => {},
   disableChangeTitle: false,
   showChangeTitleButton: true
