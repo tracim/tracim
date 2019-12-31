@@ -20,7 +20,7 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, PROFILE } from 'tracim_frontend_lib'
 import {
   PAGE,
   COOKIE_FRONTEND,
@@ -233,7 +233,7 @@ class Tracim extends React.Component {
 
           <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
 
-          <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />} />
+          <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= PROFILE.manager.id} />} />
 
           <Route path='/ui/workspaces/:idws?' render={() =>
             <>

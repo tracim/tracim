@@ -32,7 +32,7 @@ import classnames from 'classnames'
 
 const qs = require('query-string')
 
-class Gallery extends React.Component {
+export class Gallery extends React.Component {
   constructor (props) {
     super(props)
 
@@ -44,7 +44,7 @@ class Gallery extends React.Component {
       content: props.data ? props.data.content : debug.content,
       breadcrumbsList: [],
       appMounted: false,
-      folderId: qs.parse(props.data.config.history.location.search).folder_ids || 0,
+      folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || 0) : debug.config.folderId,
       imagesPreviews: [],
       fileCurrentPage: 1,
       fileName: '',
@@ -287,7 +287,7 @@ class Gallery extends React.Component {
   getPreviousImageUrl = () => {
     const { state } = this
 
-    if (state.imagesPreviews.length === 1) return
+    if (state.imagesPreviews.length <= 1) return
 
     if (state.fileSelected === 0) return state.imagesPreviews[state.imagesPreviews.length - 1].lightBoxUrlList[0]
     return state.imagesPreviews[state.fileSelected - 1].lightBoxUrlList[0]
@@ -296,7 +296,7 @@ class Gallery extends React.Component {
   getNextImageUrl = () => {
     const { state } = this
 
-    if (state.imagesPreviews.length === 1) return
+    if (state.imagesPreviews.length <= 1) return
 
     if (state.fileSelected === state.imagesPreviews.length - 1) return state.imagesPreviews[0].lightBoxUrlList[0]
     return state.imagesPreviews[state.fileSelected + 1].lightBoxUrlList[0]
@@ -357,10 +357,12 @@ class Gallery extends React.Component {
   rotateImg (fileSelected, direction) {
     const { state } = this
 
+    if (fileSelected < 0 || fileSelected >= state.imagesPreviews.length || !direction) return
+
     if (!state.imagesPreviews[fileSelected]) return
 
     const imagesPreviews = state.imagesPreviews
-    let rotationAngle
+    let rotationAngle = 0
     switch (imagesPreviews[fileSelected].rotationAngle) {
       case (0):
         rotationAngle = direction === DIRECTION.RIGHT ? 90 : 270
@@ -419,7 +421,7 @@ class Gallery extends React.Component {
         <PageContent>
           <div className='gallery__action__button'>
             <button
-              className='btn outlineTextBtn nohover primaryColorBorder'
+              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__play'
               onClick={() => this.onClickSlickPlay(!state.autoPlay)}
               data-cy='gallery__action__button__auto__play'
             >
@@ -450,7 +452,7 @@ class Gallery extends React.Component {
               So we won't use it for now and always display the delete button which will return 401 if user can't delete content
             */}
             <button
-              className='btn outlineTextBtn nohover primaryColorBorder'
+              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__delete'
               onClick={this.handleOpenDeleteFilePopup}
               data-cy='gallery__action__button__delete'
             >

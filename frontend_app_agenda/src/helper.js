@@ -1,4 +1,4 @@
-import i18n from './i18n.js'
+import { PROFILE } from 'tracim_frontend_lib'
 
 export const getUserProfile = (profileObj, slug) => Object.keys(profileObj).map(p => profileObj[p]).find(p => slug === p.slug) || {}
 
@@ -20,29 +20,7 @@ export const debug = {
         email_notification_activated: true
       }
     },
-    profileObject: {
-      ADMINISTRATOR: {
-        id: 1,
-        slug: 'administrators',
-        faIcon: 'shield',
-        hexcolor: '#ed0007',
-        label: i18n.t('Administrator')
-      },
-      MANAGER: {
-        id: 2,
-        slug: 'trusted-users',
-        faIcon: 'graduation-cap',
-        hexcolor: '#f2af2d',
-        label: i18n.t('Trusted user')
-      },
-      USER: {
-        id: 4,
-        slug: 'users',
-        faIcon: 'user',
-        hexcolor: '#3145f7',
-        label: i18n.t('User')
-      }
-    }
+    profileObject: PROFILE
   },
   loggedUser: {
     user_id: 1,

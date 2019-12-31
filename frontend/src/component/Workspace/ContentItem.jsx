@@ -3,10 +3,11 @@ import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { DragSource } from 'react-dnd'
-import { ROLE_OBJECT, DRAG_AND_DROP } from '../../helper.js'
+import { DRAG_AND_DROP } from '../../helper.js'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import DragHandle from '../DragHandle.jsx'
 import {
+  ROLE,
   Badge,
   ListItemWrapper,
   ComposedIcon
@@ -35,7 +36,7 @@ class ContentItem extends React.Component {
         key={props.id}
         id={props.contentId}
       >
-        {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
+        {props.userRoleIdInWorkspace <= ROLE.contentManager.id && (
           <DragHandle
             connectDragSource={props.connectDragSource}
             title={props.t('Move this content')}
@@ -79,7 +80,7 @@ class ContentItem extends React.Component {
             </div>
           </div>
 
-          {props.userRoleIdInWorkspace >= 2 && (
+          {props.userRoleIdInWorkspace <= ROLE.contributor.id && (
             <div className='d-none d-md-block' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
@@ -169,6 +170,6 @@ ContentItem.defaultProps = {
   onClickItem: () => {},
   read: false,
   urlContent: '',
-  userRoleIdInWorkspace: 0,
+  userRoleIdInWorkspace: ROLE.reader.id,
   isShared: false
 }

@@ -1,6 +1,9 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import {
+  CUSTOM_EVENT,
+  PROFILE_LIST
+} from 'tracim_frontend_lib'
 
 export class AddUserForm extends React.Component {
   constructor (props) {
@@ -106,7 +109,7 @@ export class AddUserForm extends React.Component {
           </div>
 
           <div className='profile__list'>
-            {Object.keys(props.profile).map(p => props.profile[p]).map(p =>
+            {PROFILE_LIST.map(p =>
               <label
                 className='profile__list__item'
                 htmlFor={p.slug}
