@@ -8,7 +8,7 @@ import {
   CardPopup,
   handleFetchResult,
   BREADCRUMBS_TYPE,
-  ROLE_OBJECT,
+  ROLE,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
@@ -110,7 +110,7 @@ class AdminWorkspaceUser extends React.Component {
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: this.props.t(msg),
-      type: 'warning',
+      type: type || 'warning',
       delay: undefined
     }
   })
@@ -303,7 +303,7 @@ class AdminWorkspaceUser extends React.Component {
       GLOBAL_renderAppFeature({
         loggedUser: {
           ...state.loggedUser,
-          userRoleIdInWorkspace: ROLE_OBJECT.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
+          userRoleIdInWorkspace: ROLE.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
         },
         config: {
           label: 'Advanced dashboard',

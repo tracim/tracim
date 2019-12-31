@@ -1,8 +1,8 @@
 import i18n from './i18n.js'
 import {
   FETCH_CONFIG,
-  ROLE_OBJECT,
   ROLE,
+  ROLE_LIST,
   PROFILE
 } from './helper.js'
 
@@ -54,7 +54,7 @@ export const defaultDebug = {
     apiUrl: '',
     availableStatuses: STATUSES,
     profileObject: PROFILE,
-    roleList: ROLE,
+    roleList: ROLE_LIST,
     system: SYSTEM_CONFIG,
     domContainer: DOM_CONTAINER,
     slug: '',

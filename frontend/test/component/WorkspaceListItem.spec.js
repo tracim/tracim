@@ -9,12 +9,12 @@ import { RouterMock , withRouterMock } from '../hocMock/withRouter.js'
 import { translateMock } from '../hocMock/translate.js'
 import { firstWorkspace } from '../fixture/workspace/firstWorkspace.js'
 // import { GLOBAL_primaryColor } from '../setup.js'
-import { ROLE_OBJECT } from 'tracim_frontend_lib'
+import { ROLE } from 'tracim_frontend_lib'
 
 describe('<WorkspaceListItem />', () => {
   const props = {
     workspaceId: firstWorkspace.id,
-    userWorkspaceRoleId: ROLE_OBJECT.reader.id,
+    userWorkspaceRoleId: ROLE.reader.id,
     label: firstWorkspace.label,
     allowedAppList: firstWorkspace.sidebarEntry,
     onClickTitle: () => {},

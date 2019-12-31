@@ -114,8 +114,7 @@ class Folder extends React.Component {
                       'primaryColorBorder',
                       'primaryColorBgHover',
                       'primaryColorBorderDarkenHover',
-                      'dropdown-toggle',
-                      props.userRoleIdInWorkspace === ROLE.contributor.id ? 'no-margin-right' : ''
+                      'dropdown-toggle'
                     )}
                     type='button'
                     id='dropdownMenuButton'

@@ -19,7 +19,7 @@ import {
   generateLocalStorageContentId,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
-  ROLE_OBJECT,
+  ROLE,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
@@ -268,7 +268,7 @@ class HtmlDocument extends React.Component {
     // @fixme Côme - 2018/12/04 - this might not be a great idea
     const modeToRender = (
       resRevision.body.length === 1 && // if content has only one revision
-      loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && // if user has EDIT authorization
+      loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && // if user has EDIT authorization
       resRevision.body[0].raw_content === '' // has content been created with raw_content (means it's from webdav or import db)
     )
       ? MODE.EDIT
@@ -585,7 +585,7 @@ class HtmlDocument extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id &&
+              {loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
                 <NewVersionBtn
                   customColor={config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
@@ -607,7 +607,7 @@ class HtmlDocument extends React.Component {
             </div>
 
             <div className='d-flex'>
-              {loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id &&
+              {loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
                 <SelectStatus
                   selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                   availableStatus={config.availableStatuses}
@@ -616,7 +616,7 @@ class HtmlDocument extends React.Component {
                 />
               }
 
-              {loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id &&
+              {loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
                 <ArchiveDeleteContent
                   customColor={config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
@@ -648,7 +648,7 @@ class HtmlDocument extends React.Component {
             isDeleted={content.is_deleted}
             isDeprecated={content.status === config.availableStatuses[3].slug}
             deprecatedStatus={config.availableStatuses[3]}
-            isDraftAvailable={mode === MODE.VIEW && loggedUser.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id && this.getLocalStorageItem('rawContent')}
+            isDraftAvailable={mode === MODE.VIEW && loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             onClickShowDraft={this.handleClickNewVersion}
