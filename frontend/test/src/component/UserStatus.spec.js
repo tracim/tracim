@@ -3,12 +3,12 @@ import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { UserStatus as UserStatusWithoutHOC } from '../../../src/component/Dashboard/UserStatus.jsx'
 import sinon from 'sinon'
-import { ROLE } from '../../../src/helper.js'
+import { ROLE } from 'tracim_frontend_lib'
 
 describe('<UserStatus />', () => {
   const onClickAddNotifyCallBack = sinon.stub()
   const onClickRemoveNotifyCallBack = sinon.stub()
-  const testRole = ROLE.find(r => r.slug === 'workspace-manager')
+  const testRole = ROLE.workspaceManager
 
   const props = {
     user: {

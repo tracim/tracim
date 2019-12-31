@@ -2,6 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { MemberList as MemberListWithoutHOC } from '../../../src/component/Dashboard/MemberList.jsx'
+import { ROLE } from 'tracim_frontend_lib'
 import sinon from 'sinon'
 
 describe('<MemberList />', () => {
@@ -28,7 +29,7 @@ describe('<MemberList />', () => {
     loggedUser: {
       user_id: 1
     },
-    userRoleIdInWorkspace: 8,
+    userRoleIdInWorkspace: ROLE.workspaceManager.id,
     displayNewMemberForm: false,
     onClickAddMemberBtn: onClickAddMemberBtnCallBack,
     onClickRemoveMember: onClickRemoveMemberCallBack
@@ -47,14 +48,14 @@ describe('<MemberList />', () => {
       }
     })
 
-    it('should not display the adding button when userRoleIdInWorkspace < 8', () => {
-      wrapper.setProps({ userRoleIdInWorkspace: 1 })
+    it('should not display the adding button when userRoleIdInWorkspace > 1', () => {
+      wrapper.setProps({ userRoleIdInWorkspace: ROLE.reader.id })
       expect(wrapper.find('div.memberlist__btnadd').length).to.equal(0)
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })
     })
 
-    it('should not display the delete member button when userRoleIdInWorkspace < 8', () => {
-      wrapper.setProps({ userRoleIdInWorkspace: 1 })
+    it('should not display the delete member button when userRoleIdInWorkspace > 1', () => {
+      wrapper.setProps({ userRoleIdInWorkspace: ROLE.reader.id })
       expect(wrapper.find('div.memberlist__list__item__delete').length).to.equal(0)
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })
     })

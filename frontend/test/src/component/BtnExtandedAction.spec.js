@@ -2,6 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { ExtandedAction as ExtandedActionWithoutHOC } from '../../../src/component/Workspace/BtnExtandedAction.jsx'
+import { ROLE } from 'tracim_frontend_lib'
 import sinon from 'sinon'
 import { Link } from 'react-router-dom'
 
@@ -22,7 +23,7 @@ describe('<ExtandedAction />', () => {
         callback: editCallBack
       }
     },
-    userRoleIdInWorkspace: 8,
+    userRoleIdInWorkspace: 1,
     folderData: {
       workspaceId: 0,
       id: 0
@@ -32,20 +33,20 @@ describe('<ExtandedAction />', () => {
   const wrapper = shallow(<ExtandedActionWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
-    it('should hide all dropdown buttons when userRoleIdInWorkspace < 2', () => {
-      wrapper.setProps({ userRoleIdInWorkspace: 1 })
+    it('should hide all dropdown buttons when userRoleIdInWorkspace = 8', () => {
+      wrapper.setProps({ userRoleIdInWorkspace: ROLE.reader.id })
       expect(wrapper.find('div.subdropdown__item').length).to.equal(0)
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })
     })
 
-    it('should show only one dropdown buttons when userRoleIdInWorkspace = 2', () => {
-      wrapper.setProps({ userRoleIdInWorkspace: 2 })
+    it('should show only one dropdown buttons when userRoleIdInWorkspace = 4', () => {
+      wrapper.setProps({ userRoleIdInWorkspace: ROLE.contributor.id })
       expect(wrapper.find('div.subdropdown__item').length).to.equal(1)
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })
     })
 
-    it('should show all dropdown buttons when userRoleIdInWorkspace > 4', () => {
-      wrapper.setProps({ userRoleIdInWorkspace: 5 })
+    it('should show all dropdown buttons when userRoleIdInWorkspace = 1', () => {
+      wrapper.setProps({ userRoleIdInWorkspace: ROLE.workspaceManager.id })
       expect(wrapper.find('div.subdropdown__item').length).to.equal(2)
       expect(wrapper.find(Link)).to.have.lengthOf(1)
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })

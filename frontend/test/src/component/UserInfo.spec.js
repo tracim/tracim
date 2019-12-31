@@ -2,7 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { UserInfo as UserInfoWithoutHOC } from '../../../src/component/Account/UserInfo.jsx'
-import { PROFILE } from '../../../src/helper.js'
+import { PROFILE } from 'tracim_frontend_lib'
 
 describe('<UserInfo />', () => {
   const props = {
@@ -25,15 +25,15 @@ describe('<UserInfo />', () => {
     )
 
     it(`should display the profile label of the user in a div`, () =>
-      expect(wrapper.find('div.userinfo__profile')).to.text().contains(PROFILE.ADMINISTRATOR.label)
+      expect(wrapper.find('div.userinfo__profile')).to.text().contains(PROFILE.administrator.label)
     )
 
     it(`should display the administrator icon`, () =>
-      expect(wrapper.find(`div.userinfo__profile > i.fa.fa-${PROFILE.ADMINISTRATOR.faIcon}`).length).to.equal(1)
+      expect(wrapper.find(`div.userinfo__profile > i.fa.fa-${PROFILE.administrator.faIcon}`).length).to.equal(1)
     )
 
     it(`the icon should have the administrator hexcolor`, () => {
-      expect(wrapper.find(`i.fa.fa-${PROFILE.ADMINISTRATOR.faIcon}`).prop('style').color).to.equal(PROFILE.ADMINISTRATOR.hexcolor)
+      expect(wrapper.find(`i.fa.fa-${PROFILE.administrator.faIcon}`).prop('style').color).to.equal(PROFILE.administrator.hexcolor)
     })
   })
 })

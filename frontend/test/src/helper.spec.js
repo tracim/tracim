@@ -2,10 +2,9 @@ import { expect } from 'chai'
 import {
   sortWorkspaceContents,
   findUserRoleIdInWorkspace,
-  ROLE,
-  getUserProfile,
-  PROFILE
+  getUserProfile
 } from '../../src/helper.js'
+import { ROLE_LIST, PROFILE } from 'tracim_frontend_lib'
 
 describe('In file helper.js', () => {
   describe('the function sortWorkspaceContents()', () => {
@@ -124,42 +123,42 @@ describe('In file helper.js', () => {
     }]
 
     it('the function should return the correct reader id', () => {
-      const roleId = findUserRoleIdInWorkspace(0, memberList, ROLE)
-      expect(roleId).to.equal(1)
-    })
-
-    it('the function should return the correct contributor id', () => {
-      const roleId = findUserRoleIdInWorkspace(1, memberList, ROLE)
-      expect(roleId).to.equal(2)
-    })
-
-    it('the function should return the correct content-manager id', () => {
-      const roleId = findUserRoleIdInWorkspace(2, memberList, ROLE)
-      expect(roleId).to.equal(4)
-    })
-
-    it('the function should return the correct workspace-manager id', () => {
-      const roleId = findUserRoleIdInWorkspace(3, memberList, ROLE)
+      const roleId = findUserRoleIdInWorkspace(0, memberList, ROLE_LIST)
       expect(roleId).to.equal(8)
     })
 
-    it('the function should return the correct reader id when the user is not in memberList', () => {
-      const roleId = findUserRoleIdInWorkspace(4, memberList, ROLE)
+    it('the function should return the correct contributor id', () => {
+      const roleId = findUserRoleIdInWorkspace(1, memberList, ROLE_LIST)
+      expect(roleId).to.equal(4)
+    })
+
+    it('the function should return the correct content-manager id', () => {
+      const roleId = findUserRoleIdInWorkspace(2, memberList, ROLE_LIST)
+      expect(roleId).to.equal(2)
+    })
+
+    it('the function should return the correct workspace-manager id', () => {
+      const roleId = findUserRoleIdInWorkspace(3, memberList, ROLE_LIST)
       expect(roleId).to.equal(1)
+    })
+
+    it('the function should return the correct reader id when the user is not in memberList', () => {
+      const roleId = findUserRoleIdInWorkspace(4, memberList, ROLE_LIST)
+      expect(roleId).to.equal(8)
     })
   })
 
   describe('the getUserProfile() function', () => {
     it('should return the proper profile when the slug is "administrators"', () => {
-      expect(getUserProfile('administrators')).to.eql(PROFILE.ADMINISTRATOR)
+      expect(getUserProfile('administrators')).to.eql(PROFILE.administrator)
     })
 
     it('should return the proper profile when the slug is "trusted-users"', () => {
-      expect(getUserProfile('trusted-users')).to.eql(PROFILE.MANAGER)
+      expect(getUserProfile('trusted-users')).to.eql(PROFILE.manager)
     })
 
     it('should return the proper profile when the slug is "users"', () => {
-      expect(getUserProfile('users')).to.eql(PROFILE.USER)
+      expect(getUserProfile('users')).to.eql(PROFILE.user)
     })
 
     it('should return an empty object when the slug is empty', () => {

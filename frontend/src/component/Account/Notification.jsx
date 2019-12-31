@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { BtnSwitch, ROLE } from 'tracim_frontend_lib'
+import { BtnSwitch, ROLE_LIST } from 'tracim_frontend_lib'
 
 export const Notification = props =>
   <div className='account__userpreference__setting__notification'>
@@ -25,7 +25,7 @@ export const Notification = props =>
           {props.workspaceList.length > 0
             ? props.workspaceList.map(ws => {
               const mySelf = ws.memberList.find(u => u.id === props.userLoggedId)
-              const myRole = ROLE.find(r => r.slug === mySelf.role)
+              const myRole = ROLE_LIST.find(r => r.slug === mySelf.role)
               return (
                 <tr key={`ws_${ws.id}`}>
                   <td>
