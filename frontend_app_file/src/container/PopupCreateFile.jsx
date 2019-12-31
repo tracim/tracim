@@ -130,19 +130,19 @@ class PopupCreateFile extends React.Component {
   }
 
   handleClose = () => {
-    const { state } = this
+    const { state, props } = this
 
-    // if (state.progressUpload.display) {
-    //   GLOBAL_dispatchEvent({
-    //     type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    //     data: {
-    //       msg: props.t('Please wait until the upload ends'),
-    //       type: 'warning',
-    //       delay: undefined
-    //     }
-    //   })
-    //   return
-    // }
+    if (state.progressUpload.display) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: props.t('Please wait until the upload ends'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
+    }
 
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
