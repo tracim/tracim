@@ -25,10 +25,6 @@ class PopupCreateFile extends React.Component {
       uploadFiles: [],
       uploadedFiles: [],
       uploadFilePreview: null,
-      progressUpload: {
-        display: false,
-        percent: 0
-      },
       uploadStarted: false
     }
 
@@ -60,39 +56,10 @@ class PopupCreateFile extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    const { state, props } = this
+    const { state } = this
 
     if (state.uploadedFiles.length === state.uploadFiles.length && state.uploadStarted) {
-      let uploadedFiles = state.uploadedFiles
-      this.setState({ uploadStarted: false })
-
-      uploadedFiles = uploadedFiles.filter(f => f.jsonResult.code !== 200)
-
-      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-
-      if (uploadedFiles.length === 0) {
-        if (state.uploadFiles.length === 1) {
-          GLOBAL_dispatchEvent({
-            type: CUSTOM_EVENT.OPEN_CONTENT_URL,
-            data: {
-              workspaceId: state.uploadedFiles[0].jsonResult.workspace_id,
-              contentType: state.appName,
-              contentId: state.uploadedFiles[0].jsonResult.content_id
-            }
-          })
-        }
-        this.handleClose()
-      } else {
-        this.sendGlobalFlashMessage(props.t("Some file(s) couldn't be uploaded"))
-        this.setState({
-          uploadFiles: uploadedFiles,
-          uploadedFiles: [],
-          uploadStarted: false,
-          progressUpload: {
-            display: false
-          }
-        })
-      }
+      this.handleUploadedEnd()
     }
   }
 
@@ -105,10 +72,41 @@ class PopupCreateFile extends React.Component {
     }
   })
 
+  handleUploadedEnd = () => {
+    const { state, props } = this
+
+    let uploadedFileFailedList = state.uploadedFiles
+
+    uploadedFileFailedList = uploadedFileFailedList.filter(f => f.jsonResult.code !== 200)
+
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
+
+    if (uploadedFileFailedList.length === 0) {
+      if (state.uploadFiles.length === 1) {
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.OPEN_CONTENT_URL,
+          data: {
+            workspaceId: state.uploadedFiles[0].jsonResult.workspace_id,
+            contentType: state.appName,
+            contentId: state.uploadedFiles[0].jsonResult.content_id
+          }
+        })
+      }
+      this.handleClose()
+    } else {
+      this.sendGlobalFlashMessage(props.t("Some file(s) couldn't be uploaded"))
+      this.setState({
+        uploadFiles: uploadedFileFailedList,
+        uploadedFiles: [],
+        uploadStarted: false
+      })
+    }
+  }
+
   handleChangeFile = newFileList => {
     const { props, state } = this
 
-    if (!newFileList || !newFileList[0]) return
+    if (!newFileList || newFileList.length === 0) return
 
     const alreadyUploadedList = newFileList.filter(newFile => state.uploadFiles.some(stateFile => stateFile.name === newFile.name))
     if (alreadyUploadedList.length) {
@@ -122,17 +120,18 @@ class PopupCreateFile extends React.Component {
       })
       return
     }
-
-    newFileList.forEach(f => { f.percent = 0 })
-    const uploadFiles = this.state.uploadFiles
-    uploadFiles.push(...newFileList)
-    this.setState({ uploadFiles })
+    newFileList = newFileList.map(f => {
+      f.percent = 0
+      return f
+    })
+    newFileList.push(...state.uploadFiles)
+    this.setState({ uploadFiles: newFileList })
   }
 
-  handleClose = () => {
+  handleClose = (isFromUserAction) => {
     const { state, props } = this
 
-    if (state.progressUpload.display) {
+    if (isFromUserAction && state.uploadStarted) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
@@ -165,14 +164,11 @@ class PopupCreateFile extends React.Component {
 
     const uploadInProgress = e => {
       if (e.lengthComputable) {
-        const uploadFiles = state.uploadFiles
-        uploadFiles[uploadFiles.indexOf(file)].percent = (e.loaded / e.total * 100) / uploadFiles.length
+        const uploadFilesInProgress = state.uploadFiles
+        uploadFilesInProgress[uploadFilesInProgress.indexOf(file)].percent = (e.loaded / e.total * 99) / uploadFilesInProgress.length
 
         this.setState({
-          progressUpload: {
-            display: true
-          },
-          uploadFiles
+          uploadFiles: uploadFilesInProgress
         })
       }
     }
@@ -186,36 +182,36 @@ class PopupCreateFile extends React.Component {
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4) {
-        const uploadedFiles = state.uploadedFiles
+        const uploadedFilesUpdated = state.uploadedFiles
         switch (xhr.status) {
           case 200:
             const jsonResult200 = JSON.parse(xhr.responseText)
 
             filePosted.jsonResult = { ...jsonResult200, code: 200 }
 
-            uploadedFiles.push(filePosted)
-            this.setState({ uploadedFiles })
+            uploadedFilesUpdated.push(filePosted)
+            this.setState({ uploadedFiles: uploadedFilesUpdated })
             break
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
 
-            let hasError = props.t('Error while creating file')
+            let errorMessage = props.t('Error while creating file')
             switch (jsonResult400.code) {
-              case 3002: hasError = props.t('A content with the same name already exists'); break
-              case 6002: hasError = props.t('The file is larger than the maximum file size allowed'); break
-              case 6003: hasError = props.t('Error, the shared space exceed its maximum size'); break
-              case 6004: hasError = props.t('You have reach your storage limit, you cannot add new files'); break
+              case 3002: errorMessage = props.t('A content with the same name already exists'); break
+              case 6002: errorMessage = props.t('The file is larger than the maximum file size allowed'); break
+              case 6003: errorMessage = props.t('Error, the shared space exceed its maximum size'); break
+              case 6004: errorMessage = props.t('You have reach your storage limit, you cannot add new files'); break
             }
             filePosted.jsonResult = jsonResult400
-            filePosted.hasError = hasError
-            uploadedFiles.push(filePosted)
-            this.setState({ uploadedFiles })
+            filePosted.errorMessage = errorMessage
+            uploadedFilesUpdated.push(filePosted)
+            this.setState({ uploadedFiles: uploadedFilesUpdated })
             break
           default:
             filePosted.jsonResult = { code: 0 }
-            filePosted.hasError = props.t('Error while creating file')
-            uploadedFiles.push(filePosted)
-            this.setState({ uploadedFiles, progressUpload: { display: false } })
+            filePosted.errorMessage = props.t('Error while creating file')
+            uploadedFilesUpdated.push(filePosted)
+            this.setState({ uploadedFiles: uploadedFilesUpdated })
             break
         }
       }
@@ -227,12 +223,7 @@ class PopupCreateFile extends React.Component {
   handleValidate = async () => {
     const { state } = this
 
-    this.setState({
-      progressUpload: {
-        percent: 0
-      },
-      uploadStarted: true
-    })
+    this.setState({ uploadStarted: true })
 
     state.uploadFiles.forEach((file, index) => this.postFile(file, index))
   }
@@ -240,10 +231,8 @@ class PopupCreateFile extends React.Component {
   handleDeleteFile = (file) => {
     const { state } = this
 
-    const uploadFiles = state.uploadFiles
-    uploadFiles.splice(uploadFiles.indexOf(file), 1)
-
-    this.setState({ uploadFiles })
+    const uploadFilesWithoutDeletedFile = state.uploadFiles.filter(f => f !== file)
+    this.setState({ uploadFiles: uploadFilesWithoutDeletedFile })
   }
 
   getPercentUpload () {
@@ -255,10 +244,8 @@ class PopupCreateFile extends React.Component {
   idValidateButtonDisabled () {
     const { state } = this
 
-    let disabled = state.uploadFiles.length === 0 || state.uploadStarted
-    if (!disabled) state.uploadFiles.forEach(f => { if (f.hasError) disabled = true })
-
-    return disabled
+    if (state.uploadFiles.length === 0 || state.uploadStarted) return true
+    return state.uploadFiles.some(f => f.errorMessage)
   }
 
   render () {
@@ -266,7 +253,7 @@ class PopupCreateFile extends React.Component {
 
     return (
       <CardPopupCreateContent
-        onClose={this.handleClose}
+        onClose={() => this.handleClose(true)}
         onValidate={this.handleValidate}
         label={props.t(state.config.creationLabel)}
         customColor={state.config.hexcolor}
@@ -277,7 +264,7 @@ class PopupCreateFile extends React.Component {
         customStyle={{ top: 'calc(50% - 177px)' }}
       >
         <div>
-          {state.progressUpload.display &&
+          {state.uploadStarted &&
             <PopupProgressUpload
               color={state.config.hexcolor}
               percent={this.getPercentUpload()}
@@ -285,7 +272,6 @@ class PopupCreateFile extends React.Component {
           }
           <FileDropzone
             onDrop={this.handleChangeFile}
-            onClick={this.handleChangeFile}
             hexcolor={state.config.hexcolor}
             multipleFiles
             filesUploaded={state.uploadFiles}

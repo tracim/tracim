@@ -31,8 +31,8 @@ export const FileUploadList = (props) => {
           >
             <i className='fa fa-fw fa-trash-o' />
           </button>
-          {file.hasError && (
-            <i title={file.hasError} className='file__upload__list__item__error fa fa-fw fa-exclamation-triangle'/>
+          {file.errorMessage && (
+            <i title={file.errorMessage} className='file__upload__list__item__error fa fa-fw fa-exclamation-triangle'/>
           )}
         </div>
         )}
@@ -52,5 +52,6 @@ FileUploadList.propTypes = {
 
 FileUploadList.defaultState = {
   uploadFilesList: [],
-  deleteFileDisabled: false
+  deleteFileDisabled: false,
+  customTitle: ''
 }
