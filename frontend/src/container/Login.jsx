@@ -138,7 +138,10 @@ class Login extends React.Component {
     const { props } = this
 
     const fetchGetConfig = await props.dispatch(getConfig())
-    if (fetchGetConfig.status === 200) props.dispatch(setConfig(fetchGetConfig.json))
+    if (fetchGetConfig.status === 200) {
+      props.dispatch(setConfig(fetchGetConfig.json))
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: fetchGetConfig.json.instance_name } })
+    }
   }
 
   loadAppList = async () => {

@@ -130,6 +130,7 @@ class Dashboard extends React.Component {
         if (props.appList.some(a => a.slug === 'agenda') && fetchWorkspaceDetail.json.agenda_enabled) {
           this.loadCalendarDetail()
         }
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: fetchWorkspaceDetail.json.label } })
         break
       case 400:
         props.history.push(PAGE.HOME)

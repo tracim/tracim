@@ -82,21 +82,33 @@ class AdminWorkspaceUser extends React.Component {
   }
 
   async componentDidMount () {
+    const { props } = this
+
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
 
-    if (this.state.config.type === 'workspace') await this.loadWorkspaceContent()
-    else if (this.state.config.type === 'user') await this.loadUserContent()
+    if (this.state.config.type === 'workspace') {
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('Shared space management') } })
+      await this.loadWorkspaceContent()
+    } else if (this.state.config.type === 'user') {
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('User account management') } })
+      await this.loadUserContent()
+    }
 
     this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { state } = this
+    const { state, props } = this
 
     console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`, prevState, state)
     if (prevState.config.type !== state.config.type) {
-      if (state.config.type === 'workspace') this.loadWorkspaceContent()
-      else if (state.config.type === 'user') this.loadUserContent()
+      if (this.state.config.type === 'workspace') {
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('Shared space management') } })
+        this.loadWorkspaceContent()
+      } else if (this.state.config.type === 'user') {
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('User account management') } })
+        this.loadUserContent()
+      }
       this.buildBreadcrumbs()
     }
   }

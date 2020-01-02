@@ -113,6 +113,7 @@ class WorkspaceContent extends React.Component {
         props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, { encode: false }))
         this.setState({ appOpenedType: false })
 
+        this.setPageTitle(props.currentWorkspace.label)
         this.props.dispatch(resetBreadcrumbsAppFeature())
         break
 
@@ -189,6 +190,10 @@ class WorkspaceContent extends React.Component {
     }
   })
 
+  setPageTitle = (title) => {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: title } })
+  }
+
   loadWorkspaceDetail = async () => {
     const { props } = this
 
@@ -196,6 +201,7 @@ class WorkspaceContent extends React.Component {
     switch (fetchWorkspaceDetail.status) {
       case 200:
         props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
+        this.setPageTitle(fetchWorkspaceDetail.json.label)
         break
       case 400:
         props.history.push(PAGE.HOME)
@@ -799,7 +805,7 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType }) => ({
-  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType
+const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, system }) => ({
+  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, system
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))

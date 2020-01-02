@@ -102,6 +102,7 @@ class File extends React.Component {
         if (isSameContentId) {
           this.setState({ isVisible: true })
           this.buildBreadcrumbs()
+          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: state.content.label } })
         }
         break
 
@@ -223,6 +224,7 @@ class File extends React.Component {
           },
           mode: MODE.VIEW
         })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: fetchResultFile.body.label } })
         break
       default:
         this.sendGlobalFlashMessage(this.props.t('Error while loading file'))

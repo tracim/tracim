@@ -6,6 +6,7 @@ import appFactory from '../appFactory.js'
 import {
   workspaceConfig
 } from '../helper.js'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -17,6 +18,10 @@ class Home extends React.Component {
     e.preventDefault()
     const { props } = this
     props.renderAppPopupCreation(workspaceConfig, props.user, null, null)
+  }
+
+  componentDidMount () {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: this.props.system.config.instance_name } })
   }
 
   render () {

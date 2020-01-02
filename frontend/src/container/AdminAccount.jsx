@@ -66,7 +66,10 @@ class Account extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.buildBreadcrumbs()
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: this.props.t('Account edition') } })
+        break
     }
   }
 
@@ -88,6 +91,7 @@ class Account extends React.Component {
           subComponentMenu: prev.subComponentMenu
             .filter(menu => editableUserAuthTypeList.includes(fetchGetUser.json.auth_type) ? true : menu.name !== 'password')
         }))
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('Account edition') } })
         break
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
     }

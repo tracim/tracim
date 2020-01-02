@@ -1287,3 +1287,4 @@ class ConfigSchema(marshmallow.Schema):
     content_length_file_size_limit = marshmallow.fields.Integer()
     workspace_size_limit = marshmallow.fields.Integer()
     workspaces_number_per_user_limit = marshmallow.fields.Integer()
+    instance_name = marshmallow.fields.String()

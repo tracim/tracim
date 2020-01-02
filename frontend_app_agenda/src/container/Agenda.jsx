@@ -73,6 +73,7 @@ class Agenda extends React.Component {
 
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
 
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: this.props.t('Agenda') } })
     this.loadAgendaList(state.config.appConfig.workspaceId)
     if (state.config.appConfig.workspaceId !== null) await this.loadWorkspaceData()
     this.buildBreadcrumbs()

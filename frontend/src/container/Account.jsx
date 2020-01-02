@@ -77,7 +77,10 @@ class Account extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.buildBreadcrumbs()
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: this.props.t('My Account') } })
+        break
     }
   }
 
@@ -86,6 +89,7 @@ class Account extends React.Component {
     if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
     if (props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
     this.buildBreadcrumbs()
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('My Account') } })
   }
 
   loadAgendaUrl = async () => {
