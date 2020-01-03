@@ -102,7 +102,7 @@ class File extends React.Component {
         if (isSameContentId) {
           this.setState({ isVisible: true })
           this.buildBreadcrumbs()
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: state.content.label } })
+          this.setHeadTitle(state.content.label)
         }
         break
 
@@ -202,6 +202,10 @@ class File extends React.Component {
     }
   })
 
+  setHeadTitle = (title) => {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+  }
+
   loadContent = async (pageToLoad = null) => {
     const { content, config, fileCurrentPage } = this.state
 
@@ -224,7 +228,7 @@ class File extends React.Component {
           },
           mode: MODE.VIEW
         })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: fetchResultFile.body.label } })
+        this.setHeadTitle(fetchResultFile.body.label)
         break
       default:
         this.sendGlobalFlashMessage(this.props.t('Error while loading file'))

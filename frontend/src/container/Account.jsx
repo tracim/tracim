@@ -79,7 +79,7 @@ class Account extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         this.buildBreadcrumbs()
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: this.props.t('My Account') } })
+        this.setHeadTitle(this.props.t('My Account'))
         break
     }
   }
@@ -89,7 +89,7 @@ class Account extends React.Component {
     if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
     if (props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
     this.buildBreadcrumbs()
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('My Account') } })
+    this.setHeadTitle(this.props.t('My Account'))
   }
 
   loadAgendaUrl = async () => {
@@ -206,6 +206,10 @@ class Account extends React.Component {
   }
 
   handleChangeTimezone = newTimezone => console.log('(NYI) new timezone : ', newTimezone)
+
+  setHeadTitle = (title) => {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+  }
 
   render () {
     const { props, state } = this

@@ -89,7 +89,7 @@ class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(appendBreadcrumbs(data.breadcrumbs))
         break
-      case CUSTOM_EVENT.SET_TITLE:
+      case CUSTOM_EVENT.SET_HEAD_TITLE:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         document.title = data.title
         break
@@ -133,7 +133,7 @@ class Tracim extends React.Component {
     const fetchGetConfig = await props.dispatch(getConfig())
     if (fetchGetConfig.status === 200) {
       props.dispatch(setConfig(fetchGetConfig.json))
-      document.title = fetchGetConfig.json.instance_name
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: fetchGetConfig.json.instance_name } })
     }
 
     const fetchGetAppList = await props.dispatch(getAppList())

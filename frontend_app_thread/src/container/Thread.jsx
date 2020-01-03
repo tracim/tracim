@@ -71,7 +71,7 @@ class Thread extends React.Component {
         if (isSameContentId) {
           this.setState({ isVisible: true })
           this.buildBreadcrumbs()
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: state.content.label } })
+          this.setHeadTitle(state.content.label)
         }
         break
 
@@ -164,6 +164,10 @@ class Thread extends React.Component {
     }
   })
 
+  setHeadTitle = (title) => {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+  }
+
   loadContent = async () => {
     const { loggedUser, content, config } = this.state
 
@@ -213,7 +217,7 @@ class Thread extends React.Component {
       listMessage: revisionWithComment
     })
 
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: resThread.body.label } })
+    this.setHeadTitle(resThread.body.label)
     await putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }

@@ -82,7 +82,7 @@ class HtmlDocument extends React.Component {
         if (isSameContentId) {
           this.setState({ isVisible: true })
           this.buildBreadcrumbs()
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: state.content.label } })
+          this.setHeadTitle(state.content.label)
         }
         break
 
@@ -175,6 +175,10 @@ class HtmlDocument extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = (title) => {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+  }
 
   isValidLocalStorageType = type => ['rawContent', 'comment'].includes(type)
 
@@ -294,7 +298,7 @@ class HtmlDocument extends React.Component {
       timeline: revisionWithComment
     })
 
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: resHtmlDocument.body.label } })
+    this.setHeadTitle(resHtmlDocument.body.label)
     await putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }

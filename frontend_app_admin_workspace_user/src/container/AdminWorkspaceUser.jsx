@@ -87,10 +87,10 @@ class AdminWorkspaceUser extends React.Component {
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
 
     if (this.state.config.type === 'workspace') {
-      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('Shared space management') } })
+      this.setHeadTitle(props.t('Shared space management'))
       await this.loadWorkspaceContent()
     } else if (this.state.config.type === 'user') {
-      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('User account management') } })
+      this.setHeadTitle(props.t('User account management'))
       await this.loadUserContent()
     }
 
@@ -103,10 +103,10 @@ class AdminWorkspaceUser extends React.Component {
     console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`, prevState, state)
     if (prevState.config.type !== state.config.type) {
       if (this.state.config.type === 'workspace') {
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('Shared space management') } })
+        this.setHeadTitle(props.t('Shared space management'))
         this.loadWorkspaceContent()
       } else if (this.state.config.type === 'user') {
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: props.t('User account management') } })
+        this.setHeadTitle(props.t('User account management'))
         this.loadUserContent()
       }
       this.buildBreadcrumbs()
@@ -126,6 +126,10 @@ class AdminWorkspaceUser extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = (title) => {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+  }
 
   loadWorkspaceContent = async () => {
     const { props, state } = this

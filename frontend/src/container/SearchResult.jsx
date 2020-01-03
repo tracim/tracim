@@ -66,7 +66,7 @@ class SearchResult extends React.Component {
   }
 
   componentDidMount () {
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: this.props.t('Search results') } })
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: this.props.t('Search results') } })
     this.buildBreadcrumbs()
     this.loadSearchUrl()
   }

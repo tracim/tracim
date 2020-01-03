@@ -140,7 +140,7 @@ class Login extends React.Component {
     const fetchGetConfig = await props.dispatch(getConfig())
     if (fetchGetConfig.status === 200) {
       props.dispatch(setConfig(fetchGetConfig.json))
-      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_TITLE, data: { title: fetchGetConfig.json.instance_name } })
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: fetchGetConfig.json.instance_name } })
     }
   }
 

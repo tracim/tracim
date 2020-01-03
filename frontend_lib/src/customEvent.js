@@ -17,7 +17,7 @@ export const CUSTOM_EVENT = {
   REFRESH_WORKSPACE_LIST_THEN_REDIRECT: 'refreshWorkspaceList_then_redirect',
   RELOAD_CONTENT: type => `${type}_reloadContent`,
   SET_BREADCRUMBS: 'setBreadcrumbs',
-  SET_TITLE: 'setTitle',
+  SET_HEAD_TITLE: 'setTitle',
   SHOW_APP: type => `${type}_showApp`,
   SHOW_CREATE_WORKSPACE_POPUP: 'showCreateWorkspacePopup',
   UNMOUNT_APP: 'unmount_app',
