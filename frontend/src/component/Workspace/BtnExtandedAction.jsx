@@ -5,7 +5,7 @@ import { ROLE } from 'tracim_frontend_lib'
 import { PAGE } from '../../helper'
 import { Link } from 'react-router-dom'
 
-const ExtandedAction = props => {
+export const ExtandedAction = props => {
   return (
     <div
       className='extandedaction dropdown'

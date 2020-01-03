@@ -3,7 +3,7 @@ import { translate } from 'react-i18next'
 
 require('./Search.styl')
 
-class Search extends React.Component {
+export class Search extends React.Component {
   constructor (props) {
     super(props)
 

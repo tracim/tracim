@@ -22,7 +22,7 @@ import {
   PROFILE
 } from 'tracim_frontend_lib'
 
-class Sidebar extends React.Component {
+export class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {

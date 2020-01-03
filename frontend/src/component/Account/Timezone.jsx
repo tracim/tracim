@@ -1,6 +1,7 @@
 import React from 'react'
 import Select from 'react-select'
-import 'react-select/dist/react-select.css'
+// INFO - GM - 2019-08-20 - this css file doesn't exist
+// import 'react-select/dist/react-select.css'
 import { translate } from 'react-i18next'
 
 export const Timezone = props => {
