@@ -275,6 +275,14 @@ class HtmlDocument extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
+  loadTimeline = () => {
+    // INFO - CH - 2019-01-03 - this function must exists to match app content interface. Although it isn't used here because
+    // we need some timeline data to initialize the app in loadContent(). So the timeline generation is handled by loadContent()
+    // The data required to initialize is the number of revisions and whether the first revision has raw_content === '' or not
+    // this is used to know whether we should open the app in EDIT or VIEW mode. See modeToRender in function loadContent()
+    return true
+  }
+
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
@@ -304,9 +312,9 @@ class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.VIEW
     }))
 
-    const { appName, content } = this.state
+    const { state } = this
     localStorage.removeItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent')
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
     )
   }
 
@@ -357,10 +365,6 @@ class HtmlDocument extends React.Component {
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
-  loadTimeline = () => {
-    console.log('loadTimeline called')
-  }
-
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
     props.appContentChangeTitle(state.content, newTitle, state.config.slug)
@@ -392,17 +396,17 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickShowRevision = revision => {
-    const { mode, timeline } = this.state
+    const { state } = this
 
-    const revisionArray = timeline.filter(t => t.timelineType === 'revision')
+    const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
     const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
 
-    if (mode === APP_FEATURE_MODE.REVISION && isLastRevision) {
+    if (state.mode === APP_FEATURE_MODE.REVISION && isLastRevision) {
       this.handleClickLastVersion()
       return
     }
 
-    if (mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
+    if (state.mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
 
     this.setState(prev => ({
       content: {
@@ -424,72 +428,71 @@ class HtmlDocument extends React.Component {
   }
 
   render () {
-    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode, rawContentBeforeEdit } = this.state
-    const { t } = this.props
+    const { props, state } = this
 
-    if (!isVisible) return null
+    if (!state.isVisible) return null
 
     return (
       <PopinFixed
-        customClass={`${config.slug}`}
-        customColor={config.hexcolor}
+        customClass={`${state.config.slug}`}
+        customColor={state.config.hexcolor}
       >
         <PopinFixedHeader
-          customClass={`${config.slug}`}
-          customColor={config.hexcolor}
-          faIcon={config.faIcon}
-          rawTitle={content.label}
-          componentTitle={<div>{content.label}</div>}
-          userRoleIdInWorkspace={loggedUser.userRoleIdInWorkspace}
+          customClass={`${state.config.slug}`}
+          customColor={state.config.hexcolor}
+          faIcon={state.config.faIcon}
+          rawTitle={state.content.label}
+          componentTitle={<div>{state.content.label}</div>}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={!content.is_editable}
+          disableChangeTitle={!state.content.is_editable}
         />
 
         <PopinFixedOption
-          customColor={config.hexcolor}
-          customClass={`${config.slug}`}
+          customColor={state.config.hexcolor}
+          customClass={`${state.config.slug}`}
           i18n={i18n}
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
                 <NewVersionBtn
-                  customColor={config.hexcolor}
+                  customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={mode !== APP_FEATURE_MODE.VIEW || !content.is_editable}
-                  label={t('Edit')}
+                  disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
+                  label={props.t('Edit')}
                 />
               }
 
-              {mode === APP_FEATURE_MODE.REVISION &&
+              {state.mode === APP_FEATURE_MODE.REVISION &&
                 <button
                   className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn highlightBtn'
                   onClick={this.handleClickLastVersion}
-                  style={{ backgroundColor: config.hexcolor, color: '#fdfdfd' }}
+                  style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                 >
                   <i className='fa fa-history' />
-                  {t('Last version')}
+                  {props.t('Last version')}
                 </button>
               }
             </div>
 
             <div className='d-flex'>
-              {loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
                 <SelectStatus
-                  selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
-                  availableStatus={config.availableStatuses}
+                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                  availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={mode === APP_FEATURE_MODE.REVISION || content.is_archived || content.is_deleted}
+                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
               }
 
-              {loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
+              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
                 <ArchiveDeleteContent
-                  customColor={config.hexcolor}
+                  customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={mode === APP_FEATURE_MODE.REVISION || content.is_archived || content.is_deleted}
+                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
               }
             </div>
@@ -497,26 +500,26 @@ class HtmlDocument extends React.Component {
         </PopinFixedOption>
 
         <PopinFixedContent
-          customClass={`${config.slug}__contentpage`}
+          customClass={`${state.config.slug}__contentpage`}
         >
-          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using config.availableStatuses[3].slug
+          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
           <HtmlDocumentComponent
-            mode={mode}
-            customColor={config.hexcolor}
+            mode={state.mode}
+            customColor={state.config.hexcolor}
             wysiwygNewVersion={'wysiwygNewVersion'}
             onClickCloseEditMode={this.handleCloseNewVersion}
-            disableValidateBtn={rawContentBeforeEdit === content.raw_content}
+            disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
             onClickValidateBtn={this.handleSaveHtmlDocument}
-            version={content.number}
-            lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
-            text={content.raw_content}
+            version={state.content.number}
+            lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+            text={state.content.raw_content}
             onChangeText={this.handleChangeText}
-            isArchived={content.is_archived}
-            isDeleted={content.is_deleted}
-            isDeprecated={content.status === config.availableStatuses[3].slug}
-            deprecatedStatus={config.availableStatuses[3]}
-            isDraftAvailable={mode === APP_FEATURE_MODE.VIEW && loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
+            isArchived={state.content.is_archived}
+            isDeleted={state.content.is_deleted}
+            isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+            deprecatedStatus={state.config.availableStatuses[3]}
+            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
             onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
@@ -524,28 +527,30 @@ class HtmlDocument extends React.Component {
           />
 
           <PopinFixedRightPart
-            customClass={`${config.slug}__contentpage`}
-            customColor={config.hexcolor}
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
             menuItemList={[
               {
                 id: 'timeline',
-                label: t('Timeline'),
+                label: props.t('Timeline'),
                 icon: 'fa-history',
-                children: <Timeline
-                  customClass={`${config.slug}__contentpage`}
-                  customColor={config.hexcolor}
-                  loggedUser={loggedUser}
-                  timelineData={timeline}
-                  newComment={newComment}
-                  disableComment={mode === APP_FEATURE_MODE.REVISION || mode === APP_FEATURE_MODE.EDIT || !content.is_editable}
-                  availableStatusList={config.availableStatuses}
-                  wysiwyg={timelineWysiwyg}
-                  onChangeNewComment={this.handleChangeNewComment}
-                  onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-                  onClickWysiwygBtn={this.handleToggleWysiwyg}
-                  onClickRevisionBtn={this.handleClickShowRevision}
-                  shouldScrollToBottom={mode !== APP_FEATURE_MODE.REVISION}
-                />
+                children: (
+                  <Timeline
+                    customClass={`${state.config.slug}__contentpage`}
+                    customColor={state.config.hexcolor}
+                    loggedUser={state.loggedUser}
+                    timelineData={state.timeline}
+                    newComment={state.newComment}
+                    disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+                    availableStatusList={state.config.availableStatuses}
+                    wysiwyg={state.timelineWysiwyg}
+                    onChangeNewComment={this.handleChangeNewComment}
+                    onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+                    onClickWysiwygBtn={this.handleToggleWysiwyg}
+                    onClickRevisionBtn={this.handleClickShowRevision}
+                    shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+                  />
+                )
               }
             ]}
           />
