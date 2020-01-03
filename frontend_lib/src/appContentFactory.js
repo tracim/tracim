@@ -79,7 +79,7 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewComment = async (content, isContentWysiwyg, newComment, setState, appSlug) => {
+    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug) => {
       this.checkApiUrl()
 
       const response = await handleFetchResult(
@@ -90,7 +90,7 @@ export function appContentFactory (WrappedComponent) {
           body: JSON.stringify({
             // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
             // see https://github.com/tracim/tracim/issues/1101
-            raw_content: isContentWysiwyg
+            raw_content: isCommentWysiwyg
               ? newComment
               : `<p>${convertBackslashNToBr(newComment)}</p>`
           })
@@ -100,9 +100,12 @@ export function appContentFactory (WrappedComponent) {
       switch (response.apiResponse.status) {
         case 200:
           setState({ newComment: '' })
+          if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+
           localStorage.removeItem(
             generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment')
           )
+
           GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
           break
         case 400:

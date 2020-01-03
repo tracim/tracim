@@ -356,11 +356,7 @@ class HtmlDocument extends React.Component {
 
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
-    const response = await props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
-
-    if (response.apiResponse.status === 200) {
-      if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
-    }
+    props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
