@@ -31,6 +31,7 @@ from tracim_backend.applications.collaborative_document_edition.schema import (
     FileCreateFromTemplateSchema,
 )
 from tracim_backend.applications.collaborative_document_edition.schema import FileTemplateInfoSchema
+from tracim_backend.applications.file.file_controller import can_create_file
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -43,7 +44,6 @@ from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.views.contents_api.file_controller import can_create_file
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema

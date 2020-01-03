@@ -10,6 +10,12 @@ from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
 
 from tracim_backend.applications.agenda.app_factory import CaldavAppFactory
+from tracim_backend.applications.file.file_controller import FileController
+from tracim_backend.applications.folder.folder_controller import FolderController
+from tracim_backend.applications.html_document.html_document_controller import (
+    HTMLDocumentController,
+)
+from tracim_backend.applications.thread.threads_controller import ThreadController
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import ContentInNotEditableState
@@ -49,10 +55,6 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.contents_api.comment_controller import CommentController
-from tracim_backend.views.contents_api.file_controller import FileController
-from tracim_backend.views.contents_api.folder_controller import FolderController
-from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController
-from tracim_backend.views.contents_api.threads_controller import ThreadController
 from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
