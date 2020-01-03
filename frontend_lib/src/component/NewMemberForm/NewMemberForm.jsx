@@ -206,5 +206,5 @@ NewMemberForm.defaultProps = {
   onClickKnownMember: () => {},
   onChangeNameOrEmail: () => {},
   onClickAutoComplete: () => {},
-  onClickCloseAddMemberBtn: () => {},
+  onClickCloseAddMemberBtn: () => {}
 }

@@ -91,7 +91,10 @@ class PopinFixedHeader extends React.Component {
             onClick={this.handleClickChangeTitleBtn}
             disabled={disableChangeTitle}
           >
-            {state.editTitle ? <i className='fa fa-check' title={ t('Validate the title') } /> : <i className='fa fa-pencil' title={t('Edit title')} />}
+            {state.editTitle
+              ? <i className='fa fa-check' title={t('Validate the title')} />
+              : <i className='fa fa-pencil' title={t('Edit title')} />
+            }
           </button>
         }
 

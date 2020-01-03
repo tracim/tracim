@@ -33,7 +33,7 @@ export const handleFetchResult = async fetchResult => {
   if (status >= 200 && status <= 299) return generateFetchResponse(fetchResult)
   if (status >= 300 && status <= 399) return generateFetchResponse(fetchResult)
   if (status === 401) { // unauthorized
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.DISCONNECTED_FROM_API, date: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.DISCONNECTED_FROM_API, date: {} })
     return generateFetchResponse(fetchResult)
   }
   if (status >= 400 && status <= 499) return generateFetchResponse(fetchResult) // let specific handler handle it with fetchResult.body.code
@@ -55,7 +55,7 @@ export const addAllResourceI18n = (i18nFromApp, translation, activeLang) => {
   i18n.changeLanguage(activeLang) // set frontend_lib's i18n on app mount
 }
 
-export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
+export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, { locale: dateFnsLocale[lang], addSuffix: true })
 
 export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
@@ -92,7 +92,7 @@ export const revisionTypeList = [{
 }, {
   id: 'status-update',
   faIcon: 'random',
-  label: statusLabel => i18n.t('Status changed to {{status}}', {status: statusLabel})
+  label: statusLabel => i18n.t('Status changed to {{status}}', { status: statusLabel })
 }, {
   id: 'unarchiving',
   faIcon: 'file-archive-o',
@@ -115,7 +115,7 @@ export const generateLocalStorageContentId = (workspaceId, contentId, contentTyp
 
 export const appFeatureCustomEventHandlerShowApp = (newContent, currentContentId, appName) => {
   if (newContent.content_id !== currentContentId) {
-    const event = new CustomEvent(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, {detail: {type: CUSTOM_EVENT.RELOAD_CONTENT(appName), data: newContent}})
+    const event = new CustomEvent(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, { detail: { type: CUSTOM_EVENT.RELOAD_CONTENT(appName), data: newContent } })
     document.dispatchEvent(event)
     return false
   }
@@ -209,7 +209,7 @@ const USER = {
   hexcolor: '#3145f7',
   tradKey: [
     i18n.t('User'),
-  i18n.t('Access to shared spaces where user is member')
+    i18n.t('Access to shared spaces where user is member')
   ], // trad key allow the parser to generate an entry in the json file
   label: 'User', // label must be used in components
   description: 'Access to shared spaces where user is member'

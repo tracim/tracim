@@ -269,7 +269,7 @@ export function appContentFactory (WrappedComponent) {
         .map((revision, i) => ({
           ...revision,
           created_raw: revision.created,
-          created: displayDistanceDate(revision.created, state.loggedUser.lang),
+          created: displayDistanceDate(revision.created, userLang),
           timelineType: 'revision',
           commentList: revision.comment_ids.map(ci => ({
             timelineType: 'comment',
@@ -278,9 +278,9 @@ export function appContentFactory (WrappedComponent) {
           number: i + 1
         }))
         .flatMap(revision => [revision, ...revision.commentList])
-  }
+    }
 
-    render() {
+    render () {
       return (
         <WrappedComponent
           {...this.props}
