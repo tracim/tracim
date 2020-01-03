@@ -502,8 +502,10 @@ class HtmlDocument extends React.Component {
         <PopinFixedContent
           customClass={`${state.config.slug}__contentpage`}
         >
-          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
-            https://github.com/tracim/tracim/issues/1840 */}
+          {/*
+            FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
+            https://github.com/tracim/tracim/issues/1840
+          */}
           <HtmlDocumentComponent
             mode={state.mode}
             customColor={state.config.hexcolor}
@@ -529,30 +531,28 @@ class HtmlDocument extends React.Component {
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
-            menuItemList={[
-              {
-                id: 'timeline',
-                label: props.t('Timeline'),
-                icon: 'fa-history',
-                children: (
-                  <Timeline
-                    customClass={`${state.config.slug}__contentpage`}
-                    customColor={state.config.hexcolor}
-                    loggedUser={state.loggedUser}
-                    timelineData={state.timeline}
-                    newComment={state.newComment}
-                    disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
-                    availableStatusList={state.config.availableStatuses}
-                    wysiwyg={state.timelineWysiwyg}
-                    onChangeNewComment={this.handleChangeNewComment}
-                    onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-                    onClickWysiwygBtn={this.handleToggleWysiwyg}
-                    onClickRevisionBtn={this.handleClickShowRevision}
-                    shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
-                  />
-                )
-              }
-            ]}
+            menuItemList={[{
+              id: 'timeline',
+              label: props.t('Timeline'),
+              icon: 'fa-history',
+              children: (
+                <Timeline
+                  customClass={`${state.config.slug}__contentpage`}
+                  customColor={state.config.hexcolor}
+                  loggedUser={state.loggedUser}
+                  timelineData={state.timeline}
+                  newComment={state.newComment}
+                  disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+                  availableStatusList={state.config.availableStatuses}
+                  wysiwyg={state.timelineWysiwyg}
+                  onChangeNewComment={this.handleChangeNewComment}
+                  onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+                  onClickWysiwygBtn={this.handleToggleWysiwyg}
+                  onClickRevisionBtn={this.handleClickShowRevision}
+                  shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+                />
+              )
+            }]}
           />
         </PopinFixedContent>
       </PopinFixed>
@@ -560,10 +560,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default translate()(
-  Radium(
-    appContentFactory(
-      HtmlDocument
-    )
-  )
-)
+export default translate()(Radium(appContentFactory(HtmlDocument)))
