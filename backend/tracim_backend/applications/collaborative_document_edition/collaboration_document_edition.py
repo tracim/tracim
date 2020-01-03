@@ -8,19 +8,19 @@ import typing
 from sqlalchemy.orm import Session
 
 from tracim_backend import CFG
+from tracim_backend.applications.collaborative_document_edition.models import (
+    CollaborativeDocumentEditionConfig,
+)
+from tracim_backend.applications.collaborative_document_edition.models import (
+    CollaborativeDocumentEditionFileType,
+)
+from tracim_backend.applications.collaborative_document_edition.models import (
+    CollaborativeDocumentEditionToken,
+)
+from tracim_backend.applications.collaborative_document_edition.models import FileTemplateList
 from tracim_backend.exceptions import FileTemplateNotAvailable
 from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableFile
-from tracim_backend.lib.collaborative_document_edition.models import (
-    CollaborativeDocumentEditionConfig,
-)
-from tracim_backend.lib.collaborative_document_edition.models import (
-    CollaborativeDocumentEditionFileType,
-)
-from tracim_backend.lib.collaborative_document_edition.models import (
-    CollaborativeDocumentEditionToken,
-)
-from tracim_backend.lib.collaborative_document_edition.models import FileTemplateList
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.utils import is_dir_exist
 from tracim_backend.lib.utils.utils import is_dir_readable

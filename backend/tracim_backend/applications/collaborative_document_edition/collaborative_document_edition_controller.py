@@ -6,44 +6,47 @@ from pyramid.config import Configurator
 from pyramid.traversal import DefaultRootFactory
 import transaction
 
+from tracim_backend import ContentNotFound
+from tracim_backend import TracimRequest
+from tracim_backend import hapic
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
+    CollaborativeDocumentEditionFactory,
+)
+from tracim_backend.applications.collaborative_document_edition.controller import (
+    COLLABORATIVE_DOCUMENT_EDITION_BASE,
+)
+from tracim_backend.applications.collaborative_document_edition.controller import (
+    SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
+)
+from tracim_backend.applications.collaborative_document_edition.models import (
+    CollaborativeDocumentEditionToken,
+)
+from tracim_backend.applications.collaborative_document_edition.models import FileTemplateList
+from tracim_backend.applications.collaborative_document_edition.schema import (
+    CollaborativeDocumentEditionTokenSchema,
+)
+from tracim_backend.applications.collaborative_document_edition.schema import (
+    FileCreateFromTemplateSchema,
+)
+from tracim_backend.applications.collaborative_document_edition.schema import FileTemplateInfoSchema
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
-from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileTemplateNotAvailable
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import UnallowedSubContent
-from tracim_backend.extensions import hapic
-from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
-    CollaborativeDocumentEditionFactory,
-)
-from tracim_backend.lib.collaborative_document_edition.models import (
-    CollaborativeDocumentEditionToken,
-)
-from tracim_backend.lib.collaborative_document_edition.models import FileTemplateList
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
-from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.views.collaborative_document_edition_api.schema import (
-    CollaborativeDocumentEditionTokenSchema,
-)
-from tracim_backend.views.collaborative_document_edition_api.schema import (
-    FileCreateFromTemplateSchema,
-)
-from tracim_backend.views.collaborative_document_edition_api.schema import FileTemplateInfoSchema
 from tracim_backend.views.contents_api.file_controller import can_create_file
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
-
-SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS = "Collaborative Document Edition"
-COLLABORATIVE_DOCUMENT_EDITION_BASE = "collaborative-document-edition"
 
 
 class CollaborativeDocumentEditionController(Controller):

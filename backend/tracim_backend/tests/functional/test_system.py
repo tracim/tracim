@@ -243,7 +243,10 @@ class TestConfigEndpoint(object):
 @pytest.mark.usefixtures("base_fixture")
 class TestErrorCodeEndpoint(object):
     def test_api__get_error_code_endpoint__ok__200__nominal_case(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admCollaborativeDocumentEditionFactoryin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/v2/system/error_codes", status=200)
         # check if all error_codes are available by checking number of item
         # received

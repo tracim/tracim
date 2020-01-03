@@ -14,6 +14,24 @@ import transaction
 from tracim_backend import CFG
 from tracim_backend import TracimRequest
 from tracim_backend import hapic
+from tracim_backend.applications.collaborative_document_edition.controller import (
+    COLLABORATIVE_DOCUMENT_EDITION_BASE,
+)
+from tracim_backend.applications.collaborative_document_edition.controller import (
+    SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
+)
+from tracim_backend.applications.collaborative_document_edition.wopi_api.wopi_schema import (
+    WOPICheckFileInfoSchema,
+)
+from tracim_backend.applications.collaborative_document_edition.wopi_api.wopi_schema import (
+    WopiPutHeadersSchema,
+)
+from tracim_backend.applications.collaborative_document_edition.wopi_api.wopi_schema import (
+    WopiPutResponseSchema,
+)
+from tracim_backend.applications.collaborative_document_edition.wopi_api.wopi_schema import (
+    WOPITokenQuerySchema,
+)
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
@@ -24,24 +42,6 @@ from tracim_backend.lib.wopi.models import WopiCheckFileInfo
 from tracim_backend.lib.wopi.models import WopiLastModifiedTime
 from tracim_backend.lib.wopi.wopi import WopiLib
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.views.collaborative_document_edition_api.controller import (
-    COLLABORATIVE_DOCUMENT_EDITION_BASE,
-)
-from tracim_backend.views.collaborative_document_edition_api.controller import (
-    SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
-)
-from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_schema import (
-    WOPICheckFileInfoSchema,
-)
-from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_schema import (
-    WopiPutHeadersSchema,
-)
-from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_schema import (
-    WopiPutResponseSchema,
-)
-from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_schema import (
-    WOPITokenQuerySchema,
-)
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentIdPathSchema
 

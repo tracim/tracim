@@ -30,9 +30,6 @@ from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
-    CollaborativeDocumentEditionFactory,
-)
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
@@ -222,23 +219,11 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     agenda_controller.import_controller(
         app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2, context=context
     )
-    if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
-        # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
-        # import is here because import WOPI of Collabora controller without adding it to
-        # pyramid make trouble in hapic which try to get view related
-        # to controller but failed.
-        from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_controller import (
-            WOPIController,
-        )
+    import tracim_backend.applications.collaborative_document_edition.controller as collaborative_document_edition_controller
 
-        wopi_controller = WOPIController()
-        configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
-        collaborative_document_edition_controller = CollaborativeDocumentEditionFactory().get_controller(
-            app_config
-        )
-        configurator.include(
-            collaborative_document_edition_controller.bind, route_prefix=BASE_API_V2
-        )
+    collaborative_document_edition_controller.import_controller(
+        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
+    )
     configurator.scan("tracim_backend.lib.utils.authentification")
 
     # TODO - G.M - 2019-05-17 - check if possible to avoid this import here,

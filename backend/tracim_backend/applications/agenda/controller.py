@@ -3,10 +3,10 @@ from http import HTTPStatus
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend import CaldavNotAuthenticated
-from tracim_backend import CaldavNotAuthorized
 from tracim_backend.applications.agenda.authorization import add_www_authenticate_header_for_caldav
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import CaldavNotAuthenticated
+from tracim_backend.exceptions import CaldavNotAuthorized
 from tracim_backend.views import BASE_API_V2
 
 

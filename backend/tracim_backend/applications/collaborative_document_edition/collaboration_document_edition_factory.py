@@ -2,12 +2,14 @@ import typing
 
 from sqlalchemy.orm import Session
 
-from tracim_backend.config import CFG
-from tracim_backend.exceptions import NoValidCollaborativeDocumentEditionSoftware
-from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition import (
+from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition import (
     CollaborativeDocumentEditionLib,
 )
-from tracim_backend.lib.collaborative_document_edition.data import COLLABORA_DOCUMENT_EDITION_SLUG
+from tracim_backend.applications.collaborative_document_edition.data import (
+    COLLABORA_DOCUMENT_EDITION_SLUG,
+)
+from tracim_backend.config import CFG
+from tracim_backend.exceptions import NoValidCollaborativeDocumentEditionSoftware
 from tracim_backend.models.auth import User
 from tracim_backend.views.controllers import Controller
 
@@ -20,7 +22,7 @@ class CollaborativeDocumentEditionFactory(object):
     @classmethod
     def get_controller(cls, config: "CFG") -> Controller:
         assert config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
-        from tracim_backend.views.collaborative_document_edition_api.collabora_controller import (
+        from tracim_backend.applications.collaborative_document_edition.collabora.collabora_controller import (
             CollaboraController,
         )
 
@@ -41,7 +43,7 @@ class CollaborativeDocumentEditionFactory(object):
 
         if config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import
-            from tracim_backend.lib.collaborative_document_edition.collabora import (
+            from tracim_backend.applications.collaborative_document_edition.collabora.collabora import (
                 CollaboraCollaborativeDocumentEditionLib,
             )
 

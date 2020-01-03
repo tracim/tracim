@@ -15,7 +15,6 @@ from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
-from tracim_backend.lib.collaborative_document_edition.data import COLLABORA_DOCUMENT_EDITION_SLUG
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
@@ -150,7 +149,6 @@ class CFG(object):
         self._load_ldap_config()
         self._load_webdav_config()
         self._load_search_config()
-        self._load_collaborative_document_edition_config()
 
         # INFO - G.M - 2019-08-08 - import app here instead of top of file,
         # to make thing easier later
@@ -165,6 +163,9 @@ class CFG(object):
         import tracim_backend.applications.agenda.config as agenda_config
 
         agenda_config.load_config(self)
+        import tracim_backend.applications.collaborative_document_edition.config as collaborative_document_edition_config
+
+        collaborative_document_edition_config.load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -562,20 +563,6 @@ class CFG(object):
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
         )
 
-    def _load_collaborative_document_edition_config(self):
-        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
-            self.get_raw_config("collaborative_document_edition.activated", "false")
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE = self.get_raw_config(
-            "collaborative_document_edition.software"
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = self.get_raw_config(
-            "collaborative_document_edition.collabora.base_url"
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = self.get_raw_config(
-            "collaborative_document_edition.file_template_dir"
-        )
-
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -585,7 +572,6 @@ class CFG(object):
         self._check_global_config_validity()
         self._check_email_config_validity()
         self._check_search_config_validity()
-        self._check_collaborative_document_edition_config_validity()
 
         # INFO - G.M - 2019-08-08 - import app here instead of top of file,
         # to make thing easier later
@@ -600,15 +586,9 @@ class CFG(object):
         import tracim_backend.applications.agenda.config as agenda_config
 
         agenda_config.check_config(self)
+        import tracim_backend.applications.collaborative_document_edition.config as collaborative_document_edition_config
 
-    def _check_collaborative_document_edition_config_validity(self) -> None:
-        if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
-            if self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
-                self.check_mandatory_param(
-                    "COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL",
-                    self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL,
-                    when_str="if collabora feature is activated",
-                )
+        collaborative_document_edition_config.check_config(self)
 
     def _check_global_config_validity(self) -> None:
         """
@@ -832,15 +812,6 @@ class CFG(object):
             app_config=self,
         )
 
-        collaborative_document_edition = Application(
-            label="Collaborative Document Edition",
-            slug="collaborative_document_edition",
-            fa_icon="file-o",
-            is_active=self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
-            config={},
-            main_route="",
-            app_config=self,
-        )
         # INFO - G.M - 2019-08-08 - import app here instead of top of file,
         # to make thing easier later
         # when app will be load dynamycally.
@@ -853,6 +824,9 @@ class CFG(object):
         import tracim_backend.applications.agenda.application as agenda_app
 
         agenda = agenda_app.get_app(app_config=self)
+        import tracim_backend.applications.collaborative_document_edition.application as collaborative_document_edition_app
+
+        collaborative_document_edition = collaborative_document_edition_app.get_app(app_config=self)
         # process activated app list
         available_apps = OrderedDict(
             [

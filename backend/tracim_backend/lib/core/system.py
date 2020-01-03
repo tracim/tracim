@@ -2,7 +2,6 @@ import datetime
 import typing
 from urllib.parse import urljoin
 
-from tracim_backend import CollaborativeDocumentEditionFactory
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.context_models import AboutModel
@@ -26,6 +25,10 @@ class SystemApi(object):
     def get_config(self) -> ConfigModel:
         collaborative_document_edition_config = None
         if self._config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
+            from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
+                CollaborativeDocumentEditionFactory,
+            )
+
             collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
                 session=None, current_user=None, config=self._config
             )
