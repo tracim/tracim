@@ -38,8 +38,9 @@ export function appContentFactory (WrappedComponent) {
 
       if (content.label === newTitle) return
 
+      // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
       const response = await handleFetchResult(
-        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/${appSlug}/${content.content_id}`, {
+        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/${appSlug}s/${content.content_id}`, {
           credentials: 'include',
           headers: { ...FETCH_CONFIG.headers },
           method: 'PUT',
@@ -126,7 +127,8 @@ export function appContentFactory (WrappedComponent) {
       if (newStatus === content.status) return
 
       const response = await handleFetchResult(
-        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/${appSlug}/${content.content_id}/status`, {
+        // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
+        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/${appSlug}s/${content.content_id}/status`, {
           credentials: 'include',
           headers: { ...FETCH_CONFIG.headers },
           method: 'PUT',
