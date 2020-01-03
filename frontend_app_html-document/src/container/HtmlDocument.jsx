@@ -15,7 +15,6 @@ import {
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus,
-  displayDistanceDate,
   generateLocalStorageContentId,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
@@ -224,11 +223,11 @@ class HtmlDocument extends React.Component {
 
   loadContent = async () => {
     console.log('loadContent called')
-    const { loggedUser, content, config, appName } = this.state
+    const { props, state } = this
 
-    const fetchResultHtmlDocument = getHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultComment = getHtmlDocComment(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultRevision = getHtmlDocRevision(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultComment = getHtmlDocComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
     const [resHtmlDocument, resComment, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultHtmlDocument),
@@ -236,36 +235,10 @@ class HtmlDocument extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const resCommentWithProperDate = resComment.body.map(c => ({
-      ...c,
-      created_raw: c.created,
-      created: displayDistanceDate(c.created, loggedUser.lang)
-    }))
-
-    const revisionWithComment = resRevision.body
-      .map((r, i) => ({
-        ...r,
-        created_raw: r.created,
-        created: displayDistanceDate(r.created, loggedUser.lang),
-        timelineType: 'revision',
-        commentList: r.comment_ids.map(ci => ({
-          timelineType: 'comment',
-          ...resCommentWithProperDate.find(c => c.content_id === ci)
-        })),
-        number: i + 1
-      }))
-      .reduce((acc, rev) => [
-        ...acc,
-        rev,
-        ...rev.commentList.map(comment => ({
-          ...comment,
-          customClass: '',
-          loggedUser: this.state.config.loggedUser
-        }))
-      ], [])
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
 
     const localStorageComment = localStorage.getItem(
-      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, appName, 'comment')
+      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, state.appName, 'comment')
     )
 
     // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
@@ -273,7 +246,7 @@ class HtmlDocument extends React.Component {
     // @fixme Côme - 2018/12/04 - this might not be a great idea
     const modeToRender = (
       resRevision.body.length === 1 && // if content has only one revision
-      loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && // if user has EDIT authorization
+      state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && // if user has EDIT authorization
       resRevision.body[0].raw_content === '' // has content been created with raw_content (means it's from webdav or import db)
     )
       ? APP_FEATURE_MODE.EDIT
@@ -281,7 +254,7 @@ class HtmlDocument extends React.Component {
 
     // can't use this.getLocalStorageItem because it uses state that isn't yet initialized
     const localStorageRawContent = localStorage.getItem(
-      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, appName, 'rawContent')
+      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, state.appName, 'rawContent')
     )
     const hasLocalStorageRawContent = !!localStorageRawContent
 
@@ -298,18 +271,13 @@ class HtmlDocument extends React.Component {
       timeline: revisionWithComment
     })
 
-    await putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
+    await putHtmlDocRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
-  }
-
-  handleSaveEditTitle = async newTitle => {
-    const { props, state } = this
-    props.appContentChangeTitle(state.content, newTitle, state.config.slug)
   }
 
   handleClickNewVersion = () => {
@@ -391,6 +359,11 @@ class HtmlDocument extends React.Component {
 
   loadTimeline = () => {
     console.log('loadTimeline called')
+  }
+
+  handleSaveEditTitle = async newTitle => {
+    const { props, state } = this
+    props.appContentChangeTitle(state.content, newTitle, state.config.slug)
   }
 
   handleChangeStatus = async newStatus => {

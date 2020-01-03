@@ -5,11 +5,13 @@ import {
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   generateLocalStorageContentId,
-  convertBackslashNToBr
+  convertBackslashNToBr,
+  displayDistanceDate
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
+// For now, I don't have found a good way of checking whether it has been done or not.
 export function appContentFactory (WrappedComponent) {
   return class AppContentFactory extends React.Component {
     apiUrl = null
@@ -20,6 +22,8 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
+    setApiUrl = url => this.apiUrl = url
+
     sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.ADD_FLASH_MSG,
       data: {
@@ -28,8 +32,6 @@ export function appContentFactory (WrappedComponent) {
         delay: delay || undefined
       }
     })
-
-    setApiUrl = url => this.apiUrl = url
 
     appContentChangeTitle = async (content, newTitle, appSlug) => {
       this.checkApiUrl()
@@ -256,6 +258,28 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
+    buildTimelineFromCommentAndRevision = (commentList, revisionList, userLang) => {
+      const resCommentWithProperDate = commentList.map(c => ({
+        ...c,
+        created_raw: c.created,
+        created: displayDistanceDate(c.created, userLang)
+      }))
+
+      return revisionList
+        .map((revision, i) => ({
+          ...revision,
+          created_raw: revision.created,
+          created: displayDistanceDate(revision.created, state.loggedUser.lang),
+          timelineType: 'revision',
+          commentList: revision.comment_ids.map(ci => ({
+            timelineType: 'comment',
+            ...resCommentWithProperDate.find(c => c.content_id === ci)
+          })),
+          number: i + 1
+        }))
+        .flatMap(revision => [revision, ...revision.commentList])
+  }
+
     render() {
       return (
         <WrappedComponent
@@ -269,6 +293,7 @@ export function appContentFactory (WrappedComponent) {
           appContentDelete={this.appContentDelete}
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
+          buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
         />
       )
     }
