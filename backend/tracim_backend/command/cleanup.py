@@ -32,7 +32,7 @@ class DeleteUserCommand(AppContextCommand):
         parser.add_argument(
             "-w",
             "--delete-owned-sharespaces",
-            help="Delete also owned sharespaces of user",
+            help="delete also owned sharespaces of user",
             dest="delete_sharespaces",
             default=False,
             action="store_true",
@@ -89,7 +89,7 @@ class DeleteUserCommand(AppContextCommand):
         )
         parser.add_argument(
             "--anonymous-name",
-            help="Anonymous user display name to use if anonymize option is activated",
+            help="anonymous user display name to use if anonymize option is activated",
             dest="anonymous_name",
             required=False,
         )
@@ -290,7 +290,7 @@ class AnonymizeUserCommand(AppContextCommand):
         )
         parser.add_argument(
             "--anonymous-name",
-            help="Anonymous user display name to use",
+            help="anonymous user display name to use",
             dest="anonymous_name",
             required=False,
         )
