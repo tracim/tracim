@@ -67,7 +67,7 @@ optional arguments:
                         development.ini)
   -d, --debug_mode      enable tracim log for debug
   -w, --delete-owned-sharespaces
-                        Delete also owned sharespaces of user
+                        delete also owned sharespaces of user
   -a, --anonymize-if-needed
                         anonymizes the user where he cannot be deleted
   -r, --delete-all-user-revisions
@@ -82,7 +82,7 @@ optional arguments:
   -l LOGINS [LOGINS ...], --login LOGINS [LOGINS ...]
                         user logins (email) to delete one or more user
   --anonymous-name ANONYMOUS_NAME
-                        Anonymous user display name to use if anonymize option
+                        anonymous user display name to use if anonymize option
                         is activated
 ```
 
@@ -107,7 +107,7 @@ optional arguments:
   -d, --debug_mode      enable tracim log for debug
   --dry-run             dry-run mode
   --anonymous-name ANONYMOUS_NAME
-                        Anonymous user display name to use
+                        anonymous user display name to use
   -l LOGINS [LOGINS ...], --login LOGINS [LOGINS ...]
                         user logins (email)
 ```
