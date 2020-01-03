@@ -252,6 +252,7 @@ class DeleteUserCommand(AppContextCommand):
             print('All user "{}" revisions deleted'.format(user.user_id))
 
         if should_be_anonymized.need_anonymization and not force_delete_all_associated_data:
+            cleanup_lib.delete_user_associated_data(user)
             cleanup_lib.anonymize_user(
                 user, anonymized_user_display_name=anonymized_user_display_name
             )
