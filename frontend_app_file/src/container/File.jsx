@@ -28,7 +28,7 @@ import {
   parserStringToList,
   removeExtensionOfFilename,
   buildFilePreviewUrl,
-  computeProgressionPercentage
+  computeProgressionPercentage,
   ROLE
 } from 'tracim_frontend_lib'
 import {
