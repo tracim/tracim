@@ -65,20 +65,22 @@ optional arguments:
   -c CONFIG_FILE, --config CONFIG_FILE
                         application config file to read (default:
                         development.ini)
-  -d, --debug_mode      enable_tracim log for debug
+  -d, --debug_mode      enable tracim log for debug
   -w, --delete-owned-sharespaces
                         Delete also owned sharespaces of user
   -a, --anonymize-if-needed
                         anonymizes the user where he cannot be deleted
   -r, --delete-all-user-revisions
-                        this allow to delete all user revisions. This may
-                        create inconsistent database
-  -b, --best-effort     trying doing the best deletion possible, same as -w -a
-  -f, --force           force user deletion, same as -r -w. May create
-                        inconsistent database
-  --dry-run             dry-run mode
+                        this allow to delete all user revisions. Warning !
+                        This may create inconsistent database
+  -b, --best-effort     trying doing the best deletion possible, same as '-w
+                        -a'
+  -f, --force           force user deletion, same as '-r -w'. Warning ! This
+                        may create inconsistent database
+  --dry-run             dry-run mode, simulate action to be done but do not
+                        modify anything
   -l LOGINS [LOGINS ...], --login LOGINS [LOGINS ...]
-                        User logins (email)
+                        user logins (email) to delete one or more user
   --anonymous-name ANONYMOUS_NAME
                         Anonymous user display name to use if anonymize option
                         is activated
@@ -102,12 +104,12 @@ optional arguments:
   -c CONFIG_FILE, --config CONFIG_FILE
                         application config file to read (default:
                         development.ini)
-  -d, --debug_mode      enable_tracim log for debug
+  -d, --debug_mode      enable tracim log for debug
   --dry-run             dry-run mode
   --anonymous-name ANONYMOUS_NAME
                         Anonymous user display name to use
   -l LOGINS [LOGINS ...], --login LOGINS [LOGINS ...]
-                        User logins (email)
+                        user logins (email)
 ```
 
 ## Caldav ##

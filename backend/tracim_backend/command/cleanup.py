@@ -48,7 +48,7 @@ class DeleteUserCommand(AppContextCommand):
         parser.add_argument(
             "-r",
             "--delete-all-user-revisions",
-            help="this allow to delete all user revisions. This may create inconsistent database",
+            help="this allow to delete all user revisions. Warning ! This may create inconsistent database",
             dest="delete_revisions",
             default=False,
             action="store_true",
@@ -57,7 +57,7 @@ class DeleteUserCommand(AppContextCommand):
         parser.add_argument(
             "-b",
             "--best-effort",
-            help="trying doing the best deletion possible, same as -w -a",
+            help="trying doing the best deletion possible, same as '-w -a'",
             dest="best_effort",
             default=False,
             action="store_true",
@@ -65,7 +65,7 @@ class DeleteUserCommand(AppContextCommand):
         parser.add_argument(
             "-f",
             "--force",
-            help="force user deletion, same as -r -w. May create inconsistent database",
+            help="force user deletion, same as '-r -w'. Warning ! This may create inconsistent database",
             dest="force",
             default=False,
             action="store_true",
@@ -73,14 +73,19 @@ class DeleteUserCommand(AppContextCommand):
 
         parser.add_argument(
             "--dry-run",
-            help="dry-run mode",
+            help="dry-run mode, simulate action to be done but do not modify anything",
             dest="dry_run_mode",
             default=False,
             action="store_true",
         )
 
         parser.add_argument(
-            "-l", "--login", nargs="+", help="User logins (email)", dest="logins", required=True
+            "-l",
+            "--login",
+            nargs="+",
+            help="user logins (email) to delete one or more user",
+            dest="logins",
+            required=True,
         )
         parser.add_argument(
             "--anonymous-name",
@@ -290,7 +295,7 @@ class AnonymizeUserCommand(AppContextCommand):
             required=False,
         )
         parser.add_argument(
-            "-l", "--login", nargs="+", help="User logins (email)", dest="logins", required=True
+            "-l", "--login", nargs="+", help="user logins (email)", dest="logins", required=True
         )
         return parser
 
