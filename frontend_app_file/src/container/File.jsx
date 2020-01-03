@@ -31,9 +31,7 @@ import {
   ROLE,
   APP_FEATURE_MODE
 } from 'tracim_frontend_lib'
-import {
-  PAGE
-} from '../helper.js'
+import { PAGE } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
@@ -155,17 +153,17 @@ class File extends React.Component {
 
   async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
+    const { state } = this
 
-    const { appName, content, config } = this.state
     const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
     )
     if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
 
     await this.loadContent()
     this.loadTimeline()
     this.buildBreadcrumbs()
-    if (config.workspace.downloadEnabled) this.loadShareLinkList()
+    if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -207,34 +205,34 @@ class File extends React.Component {
   })
 
   loadContent = async (pageToLoad = null) => {
-    const { content, config, fileCurrentPage } = this.state
+    const { state, props } = this
 
-    const fetchResultFile = await handleFetchResult(await getFileContent(config.apiUrl, content.workspace_id, content.content_id))
+    const response = await handleFetchResult(await getFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
-    switch (fetchResultFile.apiResponse.status) {
+    switch (response.apiResponse.status) {
       case 200:
-        const filenameNoExtension = removeExtensionOfFilename(fetchResultFile.body.filename)
-        const pageForPreview = pageToLoad || fileCurrentPage
+        const filenameNoExtension = removeExtensionOfFilename(response.body.filename)
+        const pageForPreview = pageToLoad || state.fileCurrentPage
         this.setState({
           content: {
-            ...fetchResultFile.body,
+            ...response.body,
             filenameNoExtension: filenameNoExtension,
             // FIXME - b.l - refactor urls
-            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}&revision_id=${fetchResultFile.body.current_revision_id}`,
-            lightboxUrlList: (new Array(fetchResultFile.body.page_nb)).fill('').map((n, i) =>
+            previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/revisions/${response.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}&revision_id=${response.body.current_revision_id}`,
+            lightboxUrlList: (new Array(response.body.page_nb)).fill('').map((n, i) =>
               // FIXME - b.l - refactor urls
-              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
+              `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/revisions/${response.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
           },
           mode: APP_FEATURE_MODE.VIEW
         })
         break
       default:
-        this.sendGlobalFlashMessage(this.props.t('Error while loading file'))
+        this.sendGlobalFlashMessage(props.t('Error while loading file'))
         return
     }
 
-    await putMyselfFileRead(config.apiUrl, content.workspace_id, content.content_id)
+    await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
@@ -260,21 +258,21 @@ class File extends React.Component {
   }
 
   loadShareLinkList = async () => {
-    const { content, config } = this.state
+    const { props, state } = this
 
-    if (this.state.loggedUser.userRoleIdInWorkspace > ROLE.contributor.id) return
+    if (state.loggedUser.userRoleIdInWorkspace > ROLE.contributor.id) return
 
-    const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
+    const response = await handleFetchResult(await getShareLinksList(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
-    switch (fetchResultShareLinkList.apiResponse.status) {
+    switch (response.apiResponse.status) {
       case 200:
         this.setState({
           shareEmails: '',
           sharePassword: '',
-          shareLinkList: fetchResultShareLinkList.body
+          shareLinkList: response.body
         })
         break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while loading share links list')); break
+      default: this.sendGlobalFlashMessage(props.t('Error while loading share links list')); break
     }
   }
 
@@ -547,7 +545,7 @@ class File extends React.Component {
       return false
     }
 
-    const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
+    const response = await handleFetchResult(await postShareLinksList(
       state.config.apiUrl,
       state.content.workspace_id,
       state.content.content_id,
@@ -555,16 +553,16 @@ class File extends React.Component {
       isPasswordActive ? state.sharePassword : null
     ))
 
-    switch (fetchResultPostShareLinks.apiResponse.status) {
+    switch (response.apiResponse.status) {
       case 200:
         this.setState(prev => ({
-          shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
+          shareLinkList: [...prev.shareLinkList, ...response.body],
           shareEmails: '',
           sharePassword: ''
         }))
         return true
       case 400:
-        switch (fetchResultPostShareLinks.body.code) {
+        switch (response.body.code) {
           case 2001:
             this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
             break
@@ -596,14 +594,13 @@ class File extends React.Component {
   }
 
   handleClickDeleteShareLink = async shareLinkId => {
-    const { config, content } = this.state
-    const { props } = this
+    const { props, state } = this
 
-    const fetchResultDeleteShareLink = await handleFetchResult(
-      await deleteShareLink(config.apiUrl, content.workspace_id, content.content_id, shareLinkId)
+    const response = await handleFetchResult(
+      await deleteShareLink(state.config.apiUrl, state.content.workspace_id, state.content.content_id, shareLinkId)
     )
 
-    switch (fetchResultDeleteShareLink.status) {
+    switch (response.status) {
       case 204:
         this.loadShareLinkList()
         break
