@@ -50,7 +50,6 @@ class File extends React.Component {
     super(props)
 
     const param = props.data || debug
-
     props.setApiUrl(param.config.apiUrl)
 
     this.state = {
@@ -111,6 +110,7 @@ class File extends React.Component {
         })
         break
 
+      // CH - 2019-31-12 - This event is used to send a new content_id that will trigger data reload through componentDidUpdate
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')

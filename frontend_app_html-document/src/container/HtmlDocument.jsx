@@ -38,7 +38,6 @@ class HtmlDocument extends React.Component {
     super(props)
 
     const param = props.data || debug
-
     props.setApiUrl(param.config.apiUrl)
 
     this.state = {
