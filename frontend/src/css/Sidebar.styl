@@ -15,6 +15,11 @@ sidebarColorDarken = darken(sidebarColor, 15%)
   justify-content space-between
   height 100%
 
+// INFO - GM - 2019-12-31 - Workaround in order to fix the sidebar arrow which become hidden only on IOS,
+// workaround found here https://stackoverflow.com/questions/29482203/iphone-fixed-position-div-invisible
+.sidebarpagecontainer
+  -webkit-transform translateZ(0)
+
 .sidebar
   position relative
   transition all sidebar-animate-speed

@@ -1,5 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
 require('./MenuSubComponent.styl')
@@ -31,3 +32,13 @@ export const MenuSubComponent = props => {
 }
 
 export default translate()(MenuSubComponent)
+
+MenuSubComponent.propTypes = {
+  menu: PropTypes.arrayOf(PropTypes.object),
+  onClickMenuItem: PropTypes.func
+}
+
+MenuSubComponent.defaultProps = {
+  menu: [],
+  onClickMenuItem: () => {}
+}

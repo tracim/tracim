@@ -86,6 +86,9 @@ RUN \
     && rm -rf /tracim/frontend*/node_modules \
 # Remove default conf about apache2
     && rm /etc/apache2/sites-enabled/000-default.conf \
+# Do not show apache version
+    && sed -i "s|ServerTokens OS|ServerTokens Prod|g" /etc/apache2/conf-enabled/security.conf \
+    && sed -i "s|ServerSignature On|ServerSignature Off|g" /etc/apache2/conf-enabled/security.conf \
 # Purges useless packages
     && apt purge -yq \
     build-essential \

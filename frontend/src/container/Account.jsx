@@ -38,7 +38,7 @@ import {
 } from '../helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
-class Account extends React.Component {
+export class Account extends React.Component {
   constructor (props) {
     super(props)
 

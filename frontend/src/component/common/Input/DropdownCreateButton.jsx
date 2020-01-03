@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import SubDropdownCreateButton from './SubDropdownCreateButton.jsx'
 import { translate } from 'react-i18next'
 
-const DropdownCreateButton = props => {
+export const DropdownCreateButton = props => {
   return (
     <div className={classnames(props.parentClass, props.customClass, 'dropdownCreateBtn')}>
       <button
