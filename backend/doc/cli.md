@@ -45,7 +45,7 @@ This will drop all your database, be carefull !
 
 ### Delete user(s)
 
-Theses commands allow to delete user from database. Unlike deletion from tracimcli
+Theses commands allow to delete user from database. Unlike deletion from tracim
 ui which only make data not visible anymore, this command does delete content in
 database, so you need to be careful using this.
 
