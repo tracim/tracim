@@ -125,10 +125,10 @@ class Thread extends React.Component {
 
   async componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
+    const { state } = this
 
-    const { appName, content } = this.state
     const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
     )
     if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
 
@@ -139,7 +139,6 @@ class Thread extends React.Component {
 
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
-
     console.log('%c<Thread> did Update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
@@ -175,10 +174,7 @@ class Thread extends React.Component {
     const response = await handleFetchResult(
       await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     )
-
-    this.setState({
-      content: response.body
-    })
+    this.setState({ content: response.body })
 
     await putThreadRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
@@ -197,9 +193,7 @@ class Thread extends React.Component {
 
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
 
-    this.setState({
-      listMessage: revisionWithComment
-    })
+    this.setState({ listMessage: revisionWithComment })
   }
 
   buildBreadcrumbs = () => {
@@ -266,74 +260,74 @@ class Thread extends React.Component {
   }
 
   render () {
-    const { config, isVisible, loggedUser, content, listMessage, newComment, timelineWysiwyg } = this.state
+    const { state } = this
 
-    if (!isVisible) return null
+    if (!state.isVisible) return null
 
     return (
-      <PopinFixed customClass={config.slug} customColor={config.hexcolor}>
+      <PopinFixed customClass={state.config.slug} customColor={state.config.hexcolor}>
         <PopinFixedHeader
-          customClass={`${config.slug}__contentpage`}
-          customColor={config.hexcolor}
-          faIcon={config.faIcon}
-          rawTitle={content.label}
-          componentTitle={<div>{content.label}</div>}
-          userRoleIdInWorkspace={loggedUser.userRoleIdInWorkspace}
+          customClass={`${state.config.slug}__contentpage`}
+          customColor={state.config.hexcolor}
+          faIcon={state.config.faIcon}
+          rawTitle={state.content.label}
+          componentTitle={<div>{state.content.label}</div>}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={!content.is_editable}
+          disableChangeTitle={!state.content.is_editable}
         />
 
         <PopinFixedOption
-          customClass={`${config.slug}__contentpage`}
-          customColor={config.hexcolor}
+          customClass={`${state.config.slug}__contentpage`}
+          customColor={state.config.hexcolor}
           i18n={i18n}
         >
           <div className='justify-content-end'>
-            {loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+            {state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
               <SelectStatus
-                selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
-                availableStatus={config.availableStatuses}
+                selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                availableStatus={state.config.availableStatuses}
                 onChangeStatus={this.handleChangeStatus}
-                disabled={content.is_archived || content.is_deleted}
+                disabled={state.content.is_archived || state.content.is_deleted}
               />
             }
 
-            {loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
+            {state.loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
               <ArchiveDeleteContent
-                customColor={config.hexcolor}
+                customColor={state.config.hexcolor}
                 onClickArchiveBtn={this.handleClickArchive}
                 onClickDeleteBtn={this.handleClickDelete}
-                disabled={content.is_archived || content.is_deleted}
+                disabled={state.content.is_archived || state.content.is_deleted}
               />
             }
           </div>
         </PopinFixedOption>
 
-        <PopinFixedContent customClass={`${config.slug}__contentpage`}>
-          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using config.availableStatuses[3].slug
+        <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
+          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
           <Timeline
-            customClass={`${config.slug}__contentpage`}
-            customColor={config.hexcolor}
-            loggedUser={loggedUser}
-            timelineData={listMessage}
-            newComment={newComment}
-            disableComment={!content.is_editable}
-            availableStatusList={config.availableStatuses}
-            wysiwyg={timelineWysiwyg}
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            loggedUser={state.loggedUser}
+            timelineData={state.listMessage}
+            newComment={state.newComment}
+            disableComment={!state.content.is_editable}
+            availableStatusList={state.config.availableStatuses}
+            wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             allowClickOnRevision={false}
             onClickRevisionBtn={() => {}}
             shouldScrollToBottom
-            isArchived={content.is_archived}
+            isArchived={state.content.is_archived}
             onClickRestoreArchived={this.handleClickRestoreArchive}
-            isDeleted={content.is_deleted}
+            isDeleted={state.content.is_deleted}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
-            isDeprecated={content.status === config.availableStatuses[3].slug}
-            deprecatedStatus={config.availableStatuses[3]}
+            isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+            deprecatedStatus={state.config.availableStatuses[3]}
             showTitle={false}
           />
         </PopinFixedContent>

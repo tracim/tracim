@@ -173,9 +173,7 @@ class File extends React.Component {
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
-      this.setState({
-        fileCurrentPage: 1
-      })
+      this.setState({ fileCurrentPage: 1 })
       await this.loadContent(1)
       this.loadTimeline()
       this.buildBreadcrumbs()
@@ -252,9 +250,7 @@ class File extends React.Component {
 
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
 
-    this.setState({
-      timeline: revisionWithComment
-    })
+    this.setState({ timeline: revisionWithComment })
   }
 
   loadShareLinkList = async () => {
