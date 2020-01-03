@@ -7,7 +7,8 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
-  ProgressBar
+  ProgressBar,
+  computeProgressionPercentage
 } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
@@ -154,7 +155,7 @@ class GuestUpload extends React.Component {
     // INFO - GB - 2019-07-09 - Fetch still doesn't handle event progress, so we need to use old school xhr object.
     const xhr = new XMLHttpRequest()
     xhr.upload.addEventListener('loadstart', () => this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } }), false)
-    const uploadInProgress = e => e.lengthComputable && this.setState({ progressUpload: { display: this.UPLOAD_STATUS.LOADING, percent: Math.round(e.loaded / e.total * 100) } })
+    const uploadInProgress = e => e.lengthComputable && this.setState({ progressUpload: { display: this.UPLOAD_STATUS.LOADING, percent: Math.round(computeProgressionPercentage(e.loaded, e.total)) } })
     xhr.upload.addEventListener('progress', uploadInProgress, false)
     xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: this.UPLOAD_STATUS.AFTER_LOAD, percent: 0 } }), false)
 

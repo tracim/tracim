@@ -4,6 +4,7 @@ import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
   addAllResourceI18n,
+  computeProgressionPercentage,
   FileDropzone,
   CUSTOM_EVENT,
   FileUploadList
@@ -22,8 +23,8 @@ class PopupCreateFile extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       workspaceId: props.data ? props.data.workspaceId : debug.workspaceId,
       folderId: props.data ? props.data.folderId : debug.folderId,
-      uploadFiles: [],
-      uploadedFiles: [],
+      uploadFileList: [],
+      uploadedFileList: [],
       uploadFilePreview: null,
       uploadStarted: false
     }
@@ -58,8 +59,8 @@ class PopupCreateFile extends React.Component {
   componentDidUpdate (prevProps, prevState, snapshot) {
     const { state } = this
 
-    if (state.uploadedFiles.length === state.uploadFiles.length && state.uploadStarted) {
-      this.handleUploadedEnd()
+    if (state.uploadedFileList.length === state.uploadFileList.length && state.uploadStarted) {
+      this.handleUploadEnd()
     }
   }
 
@@ -72,23 +73,21 @@ class PopupCreateFile extends React.Component {
     }
   })
 
-  handleUploadedEnd = () => {
+  handleUploadEnd = () => {
     const { state, props } = this
 
-    let uploadedFileFailedList = state.uploadedFiles
-
-    uploadedFileFailedList = uploadedFileFailedList.filter(f => f.jsonResult.code !== 200)
+    const uploadedFileFailedList = state.uploadedFileList.filter(f => f.jsonResult.code !== 200)
 
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
 
     if (uploadedFileFailedList.length === 0) {
-      if (state.uploadFiles.length === 1) {
+      if (state.uploadFileList.length === 1) {
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.OPEN_CONTENT_URL,
           data: {
-            workspaceId: state.uploadedFiles[0].jsonResult.workspace_id,
+            workspaceId: state.uploadedFileList[0].jsonResult.workspace_id,
             contentType: state.appName,
-            contentId: state.uploadedFiles[0].jsonResult.content_id
+            contentId: state.uploadedFileList[0].jsonResult.content_id
           }
         })
       }
@@ -96,8 +95,8 @@ class PopupCreateFile extends React.Component {
     } else {
       this.sendGlobalFlashMessage(props.t("Some file(s) couldn't be uploaded"))
       this.setState({
-        uploadFiles: uploadedFileFailedList,
-        uploadedFiles: [],
+        uploadFileList: uploadedFileFailedList,
+        uploadedFileList: [],
         uploadStarted: false
       })
     }
@@ -108,7 +107,7 @@ class PopupCreateFile extends React.Component {
 
     if (!newFileList || newFileList.length === 0) return
 
-    const alreadyUploadedList = newFileList.filter(newFile => state.uploadFiles.some(stateFile => stateFile.name === newFile.name))
+    const alreadyUploadedList = newFileList.filter(newFile => state.uploadFileList.some(stateFile => stateFile.name === newFile.name))
     if (alreadyUploadedList.length) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
@@ -120,12 +119,8 @@ class PopupCreateFile extends React.Component {
       })
       return
     }
-    newFileList = newFileList.map(f => {
-      f.percent = 0
-      return f
-    })
-    newFileList.push(...state.uploadFiles)
-    this.setState({ uploadFiles: newFileList })
+    newFileList = newFileList.map(f => { f.percent = 0; return f }).concat(state.uploadFileList)
+    this.setState({ uploadFileList: newFileList })
   }
 
   handleClose = (isFromUserAction) => {
@@ -164,11 +159,11 @@ class PopupCreateFile extends React.Component {
 
     const uploadInProgress = e => {
       if (e.lengthComputable) {
-        const uploadFilesInProgress = state.uploadFiles
-        uploadFilesInProgress[uploadFilesInProgress.indexOf(file)].percent = (e.loaded / e.total * 99) / uploadFilesInProgress.length
+        const uploadFileInProgressList = state.uploadFileList
+        uploadFileInProgressList[uploadFileInProgressList.indexOf(file)].percent = computeProgressionPercentage(e.loaded, e.total, uploadFileInProgressList.length)
 
         this.setState({
-          uploadFiles: uploadFilesInProgress
+          uploadFileList: uploadFileInProgressList
         })
       }
     }
@@ -182,15 +177,15 @@ class PopupCreateFile extends React.Component {
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4) {
-        const uploadedFilesUpdated = state.uploadedFiles
+        const uploadedFileUpdatedList = state.uploadedFileList
         switch (xhr.status) {
           case 200:
             const jsonResult200 = JSON.parse(xhr.responseText)
 
             filePosted.jsonResult = { ...jsonResult200, code: 200 }
 
-            uploadedFilesUpdated.push(filePosted)
-            this.setState({ uploadedFiles: uploadedFilesUpdated })
+            uploadedFileUpdatedList.push(filePosted)
+            this.setState({ uploadedFileList: uploadedFileUpdatedList })
             break
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
@@ -204,14 +199,14 @@ class PopupCreateFile extends React.Component {
             }
             filePosted.jsonResult = jsonResult400
             filePosted.errorMessage = errorMessage
-            uploadedFilesUpdated.push(filePosted)
-            this.setState({ uploadedFiles: uploadedFilesUpdated })
+            uploadedFileUpdatedList.push(filePosted)
+            this.setState({ uploadedFileList: uploadedFileUpdatedList })
             break
           default:
             filePosted.jsonResult = { code: 0 }
             filePosted.errorMessage = props.t('Error while creating file')
-            uploadedFilesUpdated.push(filePosted)
-            this.setState({ uploadedFiles: uploadedFilesUpdated })
+            uploadedFileUpdatedList.push(filePosted)
+            this.setState({ uploadedFileList: uploadedFileUpdatedList })
             break
         }
       }
@@ -225,27 +220,27 @@ class PopupCreateFile extends React.Component {
 
     this.setState({ uploadStarted: true })
 
-    state.uploadFiles.forEach((file, index) => this.postFile(file, index))
+    state.uploadFileList.forEach((file, index) => this.postFile(file, index))
   }
 
   handleDeleteFile = (file) => {
     const { state } = this
 
-    const uploadFilesWithoutDeletedFile = state.uploadFiles.filter(f => f !== file)
-    this.setState({ uploadFiles: uploadFilesWithoutDeletedFile })
+    const uploadFileWithoutDeletedFileList = state.uploadFileList.filter(f => f !== file)
+    this.setState({ uploadFileList: uploadFileWithoutDeletedFileList })
   }
 
   getPercentUpload () {
     const { state } = this
 
-    return Math.round(state.uploadFiles.reduce((accumulator, currentValue) => accumulator + currentValue.percent, 0))
+    return Math.round(state.uploadFileList.reduce((accumulator, currentValue) => accumulator + currentValue.percent, 0))
   }
 
-  idValidateButtonDisabled () {
+  isValidateButtonDisabled () {
     const { state } = this
 
-    if (state.uploadFiles.length === 0 || state.uploadStarted) return true
-    return state.uploadFiles.some(f => f.errorMessage)
+    if (state.uploadFileList.length === 0 || state.uploadStarted) return true
+    return state.uploadFileList.some(f => f.errorMessage)
   }
 
   render () {
@@ -258,7 +253,7 @@ class PopupCreateFile extends React.Component {
         label={props.t(state.config.creationLabel)}
         customColor={state.config.hexcolor}
         faIcon={state.config.faIcon}
-        contentName={this.idValidateButtonDisabled() ? '' : 'allowValidate'} // hack to update the "disabled" state of the button
+        contentName={this.isValidateButtonDisabled() ? '' : 'allowValidate'} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
         btnValidateLabel={props.t('Validate and create')}
         customStyle={{ top: 'calc(50% - 177px)' }}
@@ -274,11 +269,10 @@ class PopupCreateFile extends React.Component {
             onDrop={this.handleChangeFile}
             hexcolor={state.config.hexcolor}
             multipleFiles
-            filesUploaded={state.uploadFiles}
           />
 
           <FileUploadList
-            uploadFilesList={state.uploadFiles}
+            uploadFilesList={state.uploadFileList}
             onDeleteFile={this.handleDeleteFile}
             deleteFileDisabled={state.uploadStarted}
           />

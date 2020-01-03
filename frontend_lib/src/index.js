@@ -14,7 +14,8 @@ import {
   parserStringToList,
   checkEmailValidity,
   buildFilePreviewUrl,
-  removeExtensionOfFilename
+  removeExtensionOfFilename,
+  computeProgressionPercentage
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -96,6 +97,7 @@ export {
   generateRandomPassword,
   buildFilePreviewUrl,
   removeExtensionOfFilename,
+  computeProgressionPercentage,
   Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,

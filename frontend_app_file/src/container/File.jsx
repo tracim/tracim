@@ -27,7 +27,8 @@ import {
   checkEmailValidity,
   parserStringToList,
   removeExtensionOfFilename,
-  buildFilePreviewUrl
+  buildFilePreviewUrl,
+  computeProgressionPercentage
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -576,7 +577,7 @@ class File extends React.Component {
     // fetch still doesn't handle event progress. So we need to use old school xhr object :scream:
     const xhr = new XMLHttpRequest()
     xhr.upload.addEventListener('loadstart', () => this.setState({ progressUpload: { display: false, percent: 0 } }), false)
-    const uploadInProgress = e => e.lengthComputable && this.setState({ progressUpload: { display: true, percent: Math.round(e.loaded / e.total * 100) } })
+    const uploadInProgress = e => e.lengthComputable && this.setState({ progressUpload: { display: true, percent: Math.round(computeProgressionPercentage(e.loaded, e.total)) } })
     xhr.upload.addEventListener('progress', uploadInProgress, false)
     xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: false, percent: 0 } }), false)
 
