@@ -119,6 +119,8 @@ class PopupCreateFile extends React.Component {
       })
       return
     }
+    // INFO - GM - 2020-01-03 - newFileList is an array of File and we can't use spread operator on it in order to add a new attribute
+    // See https://developer.mozilla.org/fr/docs/Web/API/File
     newFileList = newFileList.map(f => { f.percent = 0; return f }).concat(state.uploadFileList)
     this.setState({ uploadFileList: newFileList })
   }
