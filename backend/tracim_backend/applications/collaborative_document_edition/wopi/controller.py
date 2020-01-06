@@ -20,16 +20,21 @@ from tracim_backend.applications.collaborative_document_edition.controller impor
 from tracim_backend.applications.collaborative_document_edition.controller import (
     SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
 )
-from tracim_backend.applications.collaborative_document_edition.wopi_api.wopi_schema import (
+from tracim_backend.applications.collaborative_document_edition.wopi.lib import WopiLib
+from tracim_backend.applications.collaborative_document_edition.wopi.models import WopiCheckFileInfo
+from tracim_backend.applications.collaborative_document_edition.wopi.models import (
+    WopiLastModifiedTime,
+)
+from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WOPICheckFileInfoSchema,
 )
-from tracim_backend.applications.collaborative_document_edition.wopi_api.wopi_schema import (
+from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WopiPutHeadersSchema,
 )
-from tracim_backend.applications.collaborative_document_edition.wopi_api.wopi_schema import (
+from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WopiPutResponseSchema,
 )
-from tracim_backend.applications.collaborative_document_edition.wopi_api.wopi_schema import (
+from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WOPITokenQuerySchema,
 )
 from tracim_backend.exceptions import TracimFileNotFound
@@ -38,9 +43,6 @@ from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_current_content_contributor
 from tracim_backend.lib.utils.authorization import is_current_content_reader
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
-from tracim_backend.lib.wopi.models import WopiCheckFileInfo
-from tracim_backend.lib.wopi.models import WopiLastModifiedTime
-from tracim_backend.lib.wopi.wopi import WopiLib
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentIdPathSchema

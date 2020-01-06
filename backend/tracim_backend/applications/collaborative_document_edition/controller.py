@@ -18,7 +18,7 @@ def import_controller(
         # import is here because import WOPI of Collabora controller without adding it to
         # pyramid make trouble in hapic which try to get view related
         # to controller but failed.
-        from tracim_backend.applications.collaborative_document_edition.wopi_api.wopi_controller import (
+        from tracim_backend.applications.collaborative_document_edition.wopi.controller import (
             WOPIController,
         )
 
