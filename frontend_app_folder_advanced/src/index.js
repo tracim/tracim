@@ -4,6 +4,7 @@ import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import FolderAdvanced from './container/FolderAdvanced.jsx'
 import PopupCreateFolder from './container/PopupCreateFolder.jsx'
+import { ROLE } from 'tracim_frontend_lib'
 
 require('./css/index.styl')
 
@@ -12,8 +13,7 @@ const appInterface = {
   isRendered: false,
   renderAppFeature: data => {
     // if loggedUser isn't at least content manager, do not open the advanced folder app
-    console.log(data)
-    if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace < 4) return
+    if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id) return
 
     return ReactDOM.render(
       <FolderAdvanced data={data} />

@@ -528,7 +528,7 @@ class WorkspaceAdvanced extends React.Component {
                   autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
                   emailNotifActivated={state.config.system.config.email_notification_activated}
                   canSendInviteNewUser={
-                    [state.config.profileObject.ADMINISTRATOR.slug, state.config.profileObject.MANAGER.slug].includes(state.loggedUser.profile)
+                    [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
                   }
                   userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
                   autoCompleteClicked={state.autoCompleteClicked}

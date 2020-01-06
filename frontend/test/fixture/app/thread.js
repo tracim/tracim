@@ -4,5 +4,6 @@ export const thread = {
   isActive: true,
   faIcon: 'comments-o',
   hexcolor: '#428BCA',
-  config: {}
+  config: {},
+  creationLabel: 'Create a tread'
 }

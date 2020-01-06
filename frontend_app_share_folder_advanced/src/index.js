@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import ShareFolderAdvanced from './container/ShareFolderAdvanced.jsx'
+import { ROLE } from 'tracim_frontend_lib'
 
 require('./css/index.styl')
 
@@ -10,7 +11,7 @@ const appInterface = {
   name: 'share_folder',
   isRendered: false,
   renderAppFeature: data => {
-    if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace < 4) return
+    if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id) return
 
     return ReactDOM.render(
       <ShareFolderAdvanced data={data} />

@@ -25,13 +25,13 @@ import {
 import {
   COOKIE_FRONTEND,
   PAGE,
-  PROFILE,
   unLoggedAllowedPageList,
   ALL_CONTENT_TYPES
 } from '../helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
 import {
+  PROFILE,
   ComposedIcon,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
@@ -143,7 +143,7 @@ class Header extends React.Component {
                 </li>
               }
 
-              {props.user.profile === PROFILE.ADMINISTRATOR.slug && (
+              {props.user.profile === PROFILE.administrator.slug && (
                 <li className='header__menu__rightside__adminlink nav-item'>
                   <AdminLink />
                 </li>

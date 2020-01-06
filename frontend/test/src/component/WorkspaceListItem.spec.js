@@ -1,19 +1,19 @@
 import React from 'react'
-import { expect, assert } from 'chai'
-import { mount, configure } from 'enzyme'
+import { assert } from 'chai'
+import { mount } from 'enzyme'
 // FIXME - CH - React DnD seems to have an issue preventing it from being used in unit test environment
 // Thread to follow: https://github.com/react-dnd/react-dnd/issues/1485
-// import { WorkspaceListItem  as WorkspaceListItemWithoutHOC } from '../../src/component/Sidebar/WorkspaceListItem.jsx'
-import { dropTargetMock } from '../hocMock/dragAndDrop.js'
-import { RouterMock , withRouterMock } from '../hocMock/withRouter.js'
-import { translateMock } from '../hocMock/translate.js'
-import { firstWorkspace } from '../fixture/workspace/firstWorkspace.js'
-// import { GLOBAL_primaryColor } from '../setup.js'
+// import { WorkspaceListItem as WorkspaceListItemWithoutHOC } from '../../../src/component/Sidebar/WorkspaceListItem.jsx'
+import { dropTargetMock } from '../../hocMock/dragAndDrop.js'
+import { RouterMock, withRouterMock } from '../../hocMock/withRouter.js'
+import { translateMock } from '../../hocMock/translate.js'
+import { firstWorkspace } from '../../fixture/workspace/firstWorkspace.js'
+import { ROLE } from 'tracim_frontend_lib'
 
 describe('<WorkspaceListItem />', () => {
   const props = {
     workspaceId: firstWorkspace.id,
-    userWorkspaceRoleId: 1,
+    userWorkspaceRoleId: ROLE.reader.id,
     label: firstWorkspace.label,
     allowedAppList: firstWorkspace.sidebarEntry,
     onClickTitle: () => {},
@@ -42,10 +42,10 @@ describe('<WorkspaceListItem />', () => {
     )
   )
 
-  // const wrapper = mount(
-  //   <ComponentWithMockHOC {...props} />,
-  //   { wrappingComponent: RouterMock }
-  // )
+  mount(
+    <ComponentWithMockHOC {...props} />,
+    { wrappingComponent: RouterMock }
+  )
 
   it('force success', () => assert(true, true))
 

@@ -2,11 +2,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { Route, Redirect } from 'react-router-dom'
-import { PAGE, PROFILE } from '../helper.js'
+import { PAGE } from '../helper.js'
 import appFactory from '../appFactory.js'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, PROFILE } from 'tracim_frontend_lib'
 
-class AppFullscreenRouter extends React.Component {
+export class AppFullscreenRouter extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -29,7 +29,7 @@ class AppFullscreenRouter extends React.Component {
         {this.state.isMounted && (// we must wait for the component to be fully mounted to be sure the div#appFullscreenContainer exists in DOM
           <div className='emptyDivForRoute'>
             <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => {
-              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{ pathname: '/ui' }} />
+              if (props.user.profile !== PROFILE.administrator.slug) return <Redirect to={{ pathname: '/ui' }} />
 
               const content = {
                 workspaceList: [],
@@ -41,7 +41,7 @@ class AppFullscreenRouter extends React.Component {
             }} />
 
             <Route exact path={PAGE.ADMIN.USER} render={() => {
-              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{ pathname: '/ui' }} />
+              if (props.user.profile !== PROFILE.administrator.slug) return <Redirect to={{ pathname: '/ui' }} />
 
               const content = {
                 workspaceList: [],

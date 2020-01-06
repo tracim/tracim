@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 require('./FlashMessage.styl')
 
-const FlashMessage = props => {
+export const FlashMessage = props => {
   if (!props.flashMessage.length || props.flashMessage.length === 0) return null
 
   const dataTypeArray = [{
