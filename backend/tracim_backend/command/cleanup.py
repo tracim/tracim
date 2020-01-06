@@ -39,9 +39,9 @@ class DeleteUserCommand(AppContextCommand):
         )
         parser.add_argument(
             "-a",
-            "--anonymize-if-needed",
+            "--anonymize-if-required",
             help="anonymizes the user where he cannot be deleted",
-            dest="anonymize_if_needed",
+            dest="anonymize_if_required",
             default=False,
             action="store_true",
         )
@@ -88,9 +88,9 @@ class DeleteUserCommand(AppContextCommand):
             required=True,
         )
         parser.add_argument(
-            "--anonymous-name",
-            help="anonymous user display name to use if anonymize option is activated",
-            dest="anonymous_name",
+            "--anonymize-name",
+            help="anonymized user display name to use if anonymize option is activated",
+            dest="anonymize_name",
             required=False,
         )
         return parser
@@ -103,7 +103,7 @@ class DeleteUserCommand(AppContextCommand):
         delete_owned_sharespaces = (
             parsed_args.force or parsed_args.best_effort or parsed_args.delete_sharespaces
         )
-        anonymize_user_if_needed = parsed_args.best_effort or parsed_args.anonymize_if_needed
+        anonymize_if_required = parsed_args.best_effort or parsed_args.anonymize_if_required
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, no changes will be applied.")
@@ -116,11 +116,11 @@ class DeleteUserCommand(AppContextCommand):
             print("/!\\ Delete all user revisions, database created may be broken /!\\.")
         if delete_owned_sharespaces:
             print("(!) User owned sharespaces will be deleted too.")
-        if anonymize_user_if_needed:
+        if anonymize_if_required:
             print("(!) Will Anonymize user if not possible to delete it")
-            if parsed_args.anonymous_name:
+            if parsed_args.anonymize_name:
                 print(
-                    '(!) Custom anonymous name choosen is : "{}"'.format(parsed_args.anonymous_name)
+                    '(!) Custom anonymize name choosen is : "{}"'.format(parsed_args.anonymize_name)
                 )
 
         deleted_user_ids = set()  # typing.Set[int]
@@ -151,9 +151,9 @@ class DeleteUserCommand(AppContextCommand):
                 deleted_user_ids_result = self._delete_user_database_info(
                     user,
                     force_delete_all_user_revisions=delete_user_revision,
-                    anonymize_if_needed=anonymize_user_if_needed,
+                    anonymize_if_required=anonymize_if_required,
                     delete_owned_workspaces=delete_owned_sharespaces,
-                    anonymized_user_display_name=parsed_args.anonymous_name,
+                    anonymized_user_display_name=parsed_args.anonymize_name,
                     cleanup_lib=cleanup_lib,
                 )
                 deleted_user_ids.add(deleted_user_ids_result.user_id)
@@ -191,28 +191,28 @@ class DeleteUserCommand(AppContextCommand):
                         )
                         print(traceback.format_exc())
 
-    def should_be_anonymized(
+    def should_anonymize(
         self, user: User, owned_workspaces_will_be_deleted: bool, cleanup_lib: CleanupLib
     ) -> UserNeedAnonymization:
         # INFO - G.M - 2019-12-20 - check user revisions that need to be deleted for consistent database
         # if we do not want to anonymize user but delete him
-        should_be_anonymized = cleanup_lib.should_be_anonymized(
+        should_anonymize = cleanup_lib.should_anonymize(
             user, owned_workspace_will_be_deleted=owned_workspaces_will_be_deleted
         )
 
-        if should_be_anonymized.blocking_revisions:
+        if should_anonymize.blocking_revisions:
             print(
                 '{} revision of user "{}" in sharespaces found, deleting them, can cause inconsistent'
-                " database.".format(len(should_be_anonymized.blocking_revisions), user.user_id)
+                " database.".format(len(should_anonymize.blocking_revisions), user.user_id)
             )
 
-        if should_be_anonymized.blocking_workspaces:
+        if should_anonymize.blocking_workspaces:
             print(
                 '{} workspace(s) of user "{}" found, cannot delete user without deleting/changing ownership'.format(
-                    len(should_be_anonymized.blocking_workspaces), user.user_id
+                    len(should_anonymize.blocking_workspaces), user.user_id
                 )
             )
-        return should_be_anonymized
+        return should_anonymize
 
     def _delete_user_database_info(
         self,
@@ -220,7 +220,7 @@ class DeleteUserCommand(AppContextCommand):
         cleanup_lib: CleanupLib,
         delete_owned_workspaces: bool = False,
         force_delete_all_user_revisions: bool = False,
-        anonymize_if_needed: bool = False,
+        anonymize_if_required: bool = False,
         anonymized_user_display_name: typing.Optional[str] = None,
     ):
         print('Trying to delete user {}: "{}"'.format(user.user_id, user.email))
@@ -228,7 +228,7 @@ class DeleteUserCommand(AppContextCommand):
         deleted_workspace_ids = []
         deleted_user_id = user.user_id
         print("---------")
-        should_be_anonymized = self.should_be_anonymized(
+        should_anonymize = self.should_anonymize(
             user, owned_workspaces_will_be_deleted=delete_owned_workspaces, cleanup_lib=cleanup_lib
         )
         force_delete_all_associated_data = (
@@ -236,14 +236,14 @@ class DeleteUserCommand(AppContextCommand):
         )
 
         revision_conflict_for_deleting_user = (
-            should_be_anonymized.blocking_revisions and not force_delete_all_associated_data
+            should_anonymize.blocking_revisions and not force_delete_all_associated_data
         )
         workspace_conflict_for_deleting_user = (
-            should_be_anonymized.blocking_workspaces and not delete_owned_workspaces
+            should_anonymize.blocking_workspaces and not delete_owned_workspaces
         )
         if (
             revision_conflict_for_deleting_user or workspace_conflict_for_deleting_user
-        ) and not anonymize_if_needed:
+        ) and not anonymize_if_required:
             raise UserCannotBeDeleted(
                 'user "{}" has revisions or workspaces left, cannot delete it'.format(user.user_id)
             )
@@ -256,7 +256,7 @@ class DeleteUserCommand(AppContextCommand):
             cleanup_lib.delete_user_revisions(user)
             print('All user "{}" revisions deleted'.format(user.user_id))
 
-        if should_be_anonymized.need_anonymization and not force_delete_all_associated_data:
+        if should_anonymize.need_anonymization and not force_delete_all_associated_data:
             cleanup_lib.delete_user_associated_data(user)
             cleanup_lib.anonymize_user(
                 user, anonymized_user_display_name=anonymized_user_display_name
@@ -289,9 +289,9 @@ class AnonymizeUserCommand(AppContextCommand):
             action="store_true",
         )
         parser.add_argument(
-            "--anonymous-name",
-            help="anonymous user display name to use",
-            dest="anonymous_name",
+            "--anonymize-name",
+            help="anonymized user display name to use if anonymize option is activated",
+            dest="anonymize_name",
             required=False,
         )
         parser.add_argument(
@@ -329,7 +329,7 @@ class AnonymizeUserCommand(AppContextCommand):
                 )
                 print("anonymize user {}.".format(user.user_id))
                 cleanup_lib.anonymize_user(
-                    user, anonymized_user_display_name=parsed_args.anonymous_name
+                    user, anonymized_user_display_name=parsed_args.anonymize_name
                 )
                 self._session.flush()
                 print(

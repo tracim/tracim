@@ -18,7 +18,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.meta import DeclarativeBase
 
-ANONYMOUS_USER_EMAIL_PATTERN = "anonymous_{hash}@anonymous.local"
+ANONYMIZED_USER_EMAIL_PATTERN = "anonymous_{hash}@anonymous.local"
 
 
 class UserNeedAnonymization(object):
@@ -320,20 +320,20 @@ class CleanupLib(object):
         self, user: User, anonymized_user_display_name: typing.Optional[str] = None
     ) -> User:
         """
-        :param user: user to anonymize_if_needed
+        :param user: user to anonymize_if_required
         :return: user_id
         """
         hash = str(uuid.uuid4().hex)
         user.display_name = (
-            anonymized_user_display_name or self.app_config.DEFAULT_ANONYMOUS_USER_DISPLAY_NAME
+            anonymized_user_display_name or self.app_config.DEFAULT_ANONYMIZED_USER_DISPLAY_NAME
         )
-        user.email = ANONYMOUS_USER_EMAIL_PATTERN.format(hash=hash)
+        user.email = ANONYMIZED_USER_EMAIL_PATTERN.format(hash=hash)
         user.is_active = False
         user.is_deleted = True
         self.safe_update(user)
         return user
 
-    def should_be_anonymized(
+    def should_anonymize(
         self, user: User, owned_workspace_will_be_deleted: bool = False
     ) -> UserNeedAnonymization:
         wapi = WorkspaceApi(

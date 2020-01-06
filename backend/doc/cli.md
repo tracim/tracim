@@ -56,7 +56,7 @@ we suggest to anonymize them (see `-a` or `-b` ) if deleting them could create t
 $ tracimcli user delete -h
 usage: tracimcli user delete [-h] [-c CONFIG_FILE] [-d] [-w] [-a] [-r] [-b]
                              [-f] [--dry-run] -l LOGINS [LOGINS ...]
-                             [--anonymous-name ANONYMOUS_NAME]
+                             [--anonymize-name ANONYMIZE_NAME]
 
 Remove user and associated information from database
 
@@ -68,7 +68,7 @@ optional arguments:
   -d, --debug_mode      enable tracim log for debug
   -w, --delete-owned-sharespaces
                         delete also owned sharespaces of user
-  -a, --anonymize-if-needed
+  -a, --anonymize-if-required
                         anonymizes the user where he cannot be deleted
   -r, --delete-all-user-revisions
                         this allow to delete all user revisions. Warning !
@@ -81,9 +81,9 @@ optional arguments:
                         modify anything
   -l LOGINS [LOGINS ...], --login LOGINS [LOGINS ...]
                         user logins (email) to delete one or more user
-  --anonymous-name ANONYMOUS_NAME
-                        anonymous user display name to use if anonymize option
-                        is activated
+  --anonymize-name ANONYMIZE_NAME
+                        anonymized user display name to use if anonymize
+                        option is activated
 ```
 
 ### Anonymize user(s)
@@ -94,7 +94,7 @@ You can also anonymize user without deleting any user data user using
 ```
 $ tracimcli user anonymize -h
 usage: tracimcli user anonymize [-h] [-c CONFIG_FILE] [-d] [--dry-run]
-                                [--anonymous-name ANONYMOUS_NAME] -l LOGINS
+                                [--anonymize-name ANONYMIZE_NAME] -l LOGINS
                                 [LOGINS ...]
 
 anonymize user from database
@@ -106,8 +106,9 @@ optional arguments:
                         development.ini)
   -d, --debug_mode      enable tracim log for debug
   --dry-run             dry-run mode
-  --anonymous-name ANONYMOUS_NAME
-                        anonymous user display name to use
+  --anonymize-name ANONYMIZE_NAME
+                        anonymized user display name to use if anonymize
+                        option is activated
   -l LOGINS [LOGINS ...], --login LOGINS [LOGINS ...]
                         user logins (email)
 ```

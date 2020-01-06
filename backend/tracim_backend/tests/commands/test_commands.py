@@ -961,7 +961,7 @@ class TestCommands(object):
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-l",
                 "test@test.test",
-                "--anonymous-name",
+                "--anonymize-name",
                 "Custom Name",
             ]
         )
@@ -1187,7 +1187,7 @@ class TestCommands(object):
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-l",
                 "test@test.test",
-                "--anonymous-name",
+                "--anonymize-name",
                 "Custom Name",
             ]
         )
