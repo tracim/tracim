@@ -1,4 +1,4 @@
-describe('delete a html-document', function () {
+describe('delete a html-document content', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -12,7 +12,7 @@ describe('delete a html-document', function () {
     cy.cancelXHR()
   })
 
-  it('should show the content as deleted and remove it from content list', function () {
+  it('should show the content as deleted and remove it from the content list', function () {
     cy.visit('/ui/workspaces/1/dashboard')
     cy.get('.dashboard__workspace__detail').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-file-text-o').should('be.visible')
