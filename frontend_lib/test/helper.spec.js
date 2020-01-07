@@ -69,7 +69,7 @@ describe('helper.js', () => {
       })
     })
 
-    it('should return the proper Response when status: 300\'', (done) => {
+    it('should return the proper Response when status: 300', (done) => {
       const cloneFetchResult = {
         json: () => 'jsonTest'
       }
@@ -110,7 +110,7 @@ describe('helper.js', () => {
       const separatorList = [',', ';']
 
       const substringList = ['randomEmail@randomEmail.randomEmail', 'randomEmail@randomEmail.randomEmail', 'randomEmail@randomEmail.randomEmail']
-      
+
       expect(substringList).to.deep.equal(parserStringToList(string, separatorList))
     })
   })

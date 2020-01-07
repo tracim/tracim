@@ -11,7 +11,7 @@ import {
 import { CUSTOM_EVENT } from './customEvent.js'
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
-// For now, I don't have found a good way of checking whether it has been done or not.
+// For now, I don't have found a good way of checking if it has been done or not.
 export function appContentFactory (WrappedComponent) {
   return class AppContentFactory extends React.Component {
     apiUrl = null
@@ -156,11 +156,13 @@ export function appContentFactory (WrappedComponent) {
     appContentArchive = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/archived`, {
-        credentials: 'include',
-        headers: { ...FETCH_CONFIG.headers },
-        method: 'PUT'
-      })
+      const response = await await handleFetchResult(
+        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/archived`, {
+          credentials: 'include',
+          headers: { ...FETCH_CONFIG.headers },
+          method: 'PUT'
+        })
+      )
 
       switch (response.status) {
         case 204:
@@ -185,11 +187,13 @@ export function appContentFactory (WrappedComponent) {
     appContentDelete = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/trashed`, {
-        credentials: 'include',
-        headers: { ...FETCH_CONFIG.headers },
-        method: 'PUT'
-      })
+      const response = await await handleFetchResult(
+        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/trashed`, {
+          credentials: 'include',
+          headers: { ...FETCH_CONFIG.headers },
+          method: 'PUT'
+        })
+      )
 
       switch (response.status) {
         case 204:
@@ -212,11 +216,13 @@ export function appContentFactory (WrappedComponent) {
     appContentRestoreArchive = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/archived/restore`, {
-        credentials: 'include',
-        headers: { ...FETCH_CONFIG.headers },
-        method: 'PUT'
-      })
+      const response = await await handleFetchResult(
+        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/archived/restore`, {
+          credentials: 'include',
+          headers: { ...FETCH_CONFIG.headers },
+          method: 'PUT'
+        })
+      )
 
       switch (response.status) {
         case 204:
@@ -239,11 +245,13 @@ export function appContentFactory (WrappedComponent) {
     appContentRestoreDelete = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/trashed/restore`, {
-        credentials: 'include',
-        headers: { ...FETCH_CONFIG.headers },
-        method: 'PUT'
-      })
+      const response = await await handleFetchResult(
+        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/trashed/restore`, {
+          credentials: 'include',
+          headers: { ...FETCH_CONFIG.headers },
+          method: 'PUT'
+        })
+      )
 
       switch (response.status) {
         case 204:
