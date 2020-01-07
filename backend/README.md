@@ -29,7 +29,8 @@ on Debian Stretch (9) with sudo:
     ufraw-batch \
     ffmpeg \
     redis-server \
-    zlib1g-dev
+    zlib1g-dev \
+    exiftool
 
 for better preview support:
 
