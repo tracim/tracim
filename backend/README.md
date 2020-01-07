@@ -19,7 +19,7 @@ on Debian Stretch (9) with sudo:
     libldap2-dev \
     libmagickwand-dev \
     libpq-dev \
-    libsasl2-dev
+    libsasl2-dev \
     poppler-utils \
     python3 \
     python3-dev \
