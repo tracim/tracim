@@ -121,13 +121,13 @@ You can run Tracim WSGI apps with many WSGI servers. We provide examples to run 
 
 #### Install uWSGI
 
-You can install uWSGI either with pip or with the package manager of your distribution.
+On Debian:
 
-    # install uWSGI with pip (unneeded if you already have uWSGI with python3 plugin enabled)
-    sudo pip3 install uwsgi
-
-    # install uWSGI on Debian
     sudo apt install uwsgi uwsgi-plugin-python3
+
+Or with PIP:
+
+    sudo pip3 install uwsgi
 
 #### All in terminal way ####
 
