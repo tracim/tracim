@@ -10,7 +10,7 @@ Installation
 
 on Debian Stretch (9) with sudo:
 
-    sudo apt update && apt install \
+    sudo apt update && sudo apt install \
     ghostscript \
     git \
     imagemagick \
