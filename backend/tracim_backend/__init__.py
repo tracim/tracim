@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from copy import deepcopy
-import importlib
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
@@ -38,6 +37,7 @@ from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.plugins import init_plugin_manager
+from tracim_backend.lib.utils.app import TracimControllerImporter
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -50,7 +50,7 @@ from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
 from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.lib.utils.utils import find_direct_submodule_path
+from tracim_backend.lib.utils.utils import load_apps
 from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
@@ -205,11 +205,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
 
-    import tracim_backend.applications as apps_modules
-
-    for app_config_path in find_direct_submodule_path(apps_modules):
-        module = importlib.import_module("{}.controller".format(app_config_path))
-        module.import_controller(
+    load_apps()
+    for controller_import in TracimControllerImporter.__subclasses__():
+        controller_import().import_controller(
             app_config=app_config,
             configurator=configurator,
             route_prefix=BASE_API_V2,

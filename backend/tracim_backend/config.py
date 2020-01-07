@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
-import importlib
 import json
 import os
 import typing
@@ -17,10 +16,12 @@ from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
-from tracim_backend.lib.utils.utils import find_direct_submodule_path
+from tracim_backend.lib.utils.utils import get_app_configs
+from tracim_backend.lib.utils.utils import get_app_factories
 from tracim_backend.lib.utils.utils import is_dir_exist
 from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
+from tracim_backend.lib.utils.utils import load_apps
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
@@ -69,6 +70,7 @@ class CFG(object):
         self.settings = settings.copy()
         self.config_naming = []  # type: typing.List[ConfigParam]
         logger.debug(self, "CONFIG_PROCESS:1: load config from settings")
+        load_apps()
         self.load_config()
         logger.debug(self, "CONFIG_PROCESS:2: check validity of config given")
         self._check_consistency()
@@ -149,15 +151,8 @@ class CFG(object):
         self._load_webdav_config()
         self._load_search_config()
 
-        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
-        # to make thing easier later
-        # when app will be load dynamycally.
-
-        import tracim_backend.applications as apps_modules
-
-        for app_config_path in find_direct_submodule_path(apps_modules):
-            module = importlib.import_module("{}.config".format(app_config_path))
-            module.load_config(self)
+        for app_config in get_app_configs():
+            app_config().load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -565,11 +560,8 @@ class CFG(object):
         self._check_email_config_validity()
         self._check_search_config_validity()
 
-        import tracim_backend.applications as apps_modules
-
-        for app_config_path in find_direct_submodule_path(apps_modules):
-            module = importlib.import_module("{}.config".format(app_config_path))
-            module.check_config(self)
+        for app_config in get_app_configs():
+            app_config().check_config(self)
 
     def _check_global_config_validity(self) -> None:
         """
@@ -695,13 +687,9 @@ class CFG(object):
         self._set_default_app(self.APP__ENABLED)
 
     def _set_default_app(self, enabled_app_list: typing.List[str]) -> None:
-        import tracim_backend.applications as apps_modules
-
         available_apps = OrderedDict()
-
-        for app_path in find_direct_submodule_path(apps_modules):
-            module = importlib.import_module("{}.application".format(app_path))
-            new_app = module.get_app(app_config=self)
+        for app_factory in get_app_factories():
+            new_app = app_factory().create_app(self)
             available_apps.update({new_app.slug: new_app})
 
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var

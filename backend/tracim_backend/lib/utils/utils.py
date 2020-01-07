@@ -22,6 +22,9 @@ from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
+from tracim_backend.lib.utils.app import TracimAppConfig
+from tracim_backend.lib.utils.app import TracimAppFactory
+from tracim_backend.lib.utils.app import TracimControllerImporter
 
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
@@ -390,6 +393,27 @@ class EmailUser(object):
     @property
     def email_link(self) -> str:
         return "mailto:{email_address}".format(email_address=self.email_address)
+
+
+def load_apps():
+    import tracim_backend.applications as apps_modules
+
+    for app_config_path in find_direct_submodule_path(apps_modules):
+        importlib.import_module("{}.application".format(app_config_path))
+        importlib.import_module("{}.config".format(app_config_path))
+        importlib.import_module("{}.controller".format(app_config_path))
+
+
+def get_controllers_importers():
+    return TracimControllerImporter.__subclasses__()
+
+
+def get_app_configs():
+    return TracimAppConfig.__subclasses__()
+
+
+def get_app_factories():
+    return TracimAppFactory.__subclasses__()
 
 
 def find_direct_submodule_path(module: types.ModuleType) -> typing.List[str]:

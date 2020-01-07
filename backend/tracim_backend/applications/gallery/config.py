@@ -1,15 +1,10 @@
 from tracim_backend import CFG
+from tracim_backend.lib.utils.app import TracimAppConfig
 
 
-def load_config(app_config: CFG) -> CFG:
-    """
-    load config
-    """
-    return app_config
+class GalleryAppConfig(TracimAppConfig):
+    def load_config(self, app_config: CFG) -> CFG:
+        return app_config
 
-
-def check_config(app_config: CFG) -> CFG:
-    """
-    Check if config is correctly setted
-    """
-    return app_config
+    def check_config(self, app_config: CFG) -> CFG:
+        return app_config

@@ -1,14 +1,16 @@
 from tracim_backend.app_models.applications import Application
 from tracim_backend.config import CFG
+from tracim_backend.lib.utils.app import TracimAppFactory
 
 
-def get_app(app_config: CFG) -> Application:
-    return Application(
-        label="Upload permission",
-        slug="upload_permission",
-        fa_icon="cloud-upload",
-        is_active=True,
-        config={},
-        main_route="",
-        app_config=app_config,
-    )
+class UploadPermissionAppFactory(TracimAppFactory):
+    def create_app(self, app_config: CFG) -> Application:
+        return Application(
+            label="Upload permission",
+            slug="upload_permission",
+            fa_icon="cloud-upload",
+            is_active=True,
+            config={},
+            main_route="",
+            app_config=app_config,
+        )
