@@ -30,30 +30,12 @@ class DeleteUserCommand(AppContextCommand):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         parser.add_argument(
-            "-w",
-            "--delete-owned-sharespaces",
-            help="delete also owned sharespaces of user",
-            dest="delete_sharespaces",
+            "--dry-run",
+            help="dry-run mode, simulate action to be done but do not modify anything",
+            dest="dry_run_mode",
             default=False,
             action="store_true",
         )
-        parser.add_argument(
-            "-a",
-            "--anonymize-if-required",
-            help="anonymizes the user where he cannot be deleted",
-            dest="anonymize_if_required",
-            default=False,
-            action="store_true",
-        )
-        parser.add_argument(
-            "-r",
-            "--delete-all-user-revisions",
-            help="this allow to delete all user revisions. Warning ! This may create inconsistent database",
-            dest="delete_revisions",
-            default=False,
-            action="store_true",
-        )
-
         parser.add_argument(
             "-b",
             "--best-effort",
@@ -70,15 +52,38 @@ class DeleteUserCommand(AppContextCommand):
             default=False,
             action="store_true",
         )
-
         parser.add_argument(
-            "--dry-run",
-            help="dry-run mode, simulate action to be done but do not modify anything",
-            dest="dry_run_mode",
+            "-a",
+            "--anonymize-if-required",
+            help="anonymizes the user where he cannot be deleted",
+            dest="anonymize_if_required",
             default=False,
             action="store_true",
         )
 
+        parser.add_argument(
+            "--anonymize-name",
+            help="anonymized user display name to use if anonymize option is activated",
+            dest="anonymize_name",
+            required=False,
+        )
+        parser.add_argument(
+            "-r",
+            "--delete-all-user-revisions",
+            help="this allow to delete all user revisions. Warning ! This may create inconsistent database",
+            dest="delete_revisions",
+            default=False,
+            action="store_true",
+        )
+
+        parser.add_argument(
+            "-w",
+            "--delete-owned-sharespaces",
+            help="delete also owned sharespaces of user",
+            dest="delete_sharespaces",
+            default=False,
+            action="store_true",
+        )
         parser.add_argument(
             "-l",
             "--login",
@@ -86,12 +91,6 @@ class DeleteUserCommand(AppContextCommand):
             help="user logins (email) to delete one or more user",
             dest="logins",
             required=True,
-        )
-        parser.add_argument(
-            "--anonymize-name",
-            help="anonymized user display name to use if anonymize option is activated",
-            dest="anonymize_name",
-            required=False,
         )
         return parser
 
