@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
+import importlib
 import json
 import os
 import typing
@@ -16,6 +17,7 @@ from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
+from tracim_backend.lib.utils.utils import find_direct_submodule_path
 from tracim_backend.lib.utils.utils import is_dir_exist
 from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
@@ -150,36 +152,12 @@ class CFG(object):
         # INFO - G.M - 2019-08-08 - import app here instead of top of file,
         # to make thing easier later
         # when app will be load dynamycally.
-        import tracim_backend.applications.share.config as share_config
 
-        share_config.load_config(self)
-        import tracim_backend.applications.upload_permissions.config as upload_permissions_config
+        import tracim_backend.applications as apps_modules
 
-        upload_permissions_config.load_config(self)
-        import tracim_backend.applications.agenda.config as agenda_config
-
-        agenda_config.load_config(self)
-        import tracim_backend.applications.collaborative_document_edition.config as collaborative_document_edition_config
-
-        collaborative_document_edition_config.load_config(self)
-        import tracim_backend.applications.html_document.config as html_document_config
-
-        html_document_config.load_config(self)
-        import tracim_backend.applications.thread.config as thread_config
-
-        thread_config.load_config(self)
-        import tracim_backend.applications.file.config as file_config
-
-        file_config.load_config(self)
-        import tracim_backend.applications.folder.config as folder_config
-
-        folder_config.load_config(self)
-        import tracim_backend.applications.markdownpluspage.config as markdownpluspage_config
-
-        markdownpluspage_config.load_config(self)
-        import tracim_backend.applications.gallery.config as gallery_config
-
-        gallery_config.load_config(self)
+        for app_config_path in find_direct_submodule_path(apps_modules):
+            module = importlib.import_module("{}.config".format(app_config_path))
+            module.load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -587,39 +565,11 @@ class CFG(object):
         self._check_email_config_validity()
         self._check_search_config_validity()
 
-        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
-        # to make thing easier later
-        # when app will be load dynamycally.
-        import tracim_backend.applications.agenda.config as agenda_config
+        import tracim_backend.applications as apps_modules
 
-        agenda_config.check_config(self)
-        import tracim_backend.applications.share.config as share_config
-
-        share_config.check_config(self)
-        import tracim_backend.applications.upload_permissions.config as upload_permissions_config
-
-        upload_permissions_config.check_config(self)
-        import tracim_backend.applications.collaborative_document_edition.config as collaborative_document_edition_config
-
-        collaborative_document_edition_config.check_config(self)
-        import tracim_backend.applications.html_document.config as html_document_config
-
-        html_document_config.check_config(self)
-        import tracim_backend.applications.thread.config as thread_config
-
-        thread_config.check_config(self)
-        import tracim_backend.applications.file.config as file_config
-
-        file_config.check_config(self)
-        import tracim_backend.applications.folder.config as folder_config
-
-        folder_config.check_config(self)
-        import tracim_backend.applications.markdownpluspage.config as markdownpluspage_config
-
-        markdownpluspage_config.check_config(self)
-        import tracim_backend.applications.gallery.config as gallery_config
-
-        gallery_config.check_config(self)
+        for app_config_path in find_direct_submodule_path(apps_modules):
+            module = importlib.import_module("{}.config".format(app_config_path))
+            module.check_config(self)
 
     def _check_global_config_validity(self) -> None:
         """
@@ -745,54 +695,15 @@ class CFG(object):
         self._set_default_app(self.APP__ENABLED)
 
     def _set_default_app(self, enabled_app_list: typing.List[str]) -> None:
-        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
-        # to make thing easier later
-        # when app will be load dynamycally.
-        import tracim_backend.applications.share.application as share_app
+        import tracim_backend.applications as apps_modules
 
-        share_content = share_app.get_app(app_config=self)
-        import tracim_backend.applications.upload_permissions.application as upload_permissions_app
+        available_apps = OrderedDict()
 
-        upload_permissions = upload_permissions_app.get_app(app_config=self)
-        import tracim_backend.applications.agenda.application as agenda_app
+        for app_path in find_direct_submodule_path(apps_modules):
+            module = importlib.import_module("{}.application".format(app_path))
+            new_app = module.get_app(app_config=self)
+            available_apps.update({new_app.slug: new_app})
 
-        agenda = agenda_app.get_app(app_config=self)
-        import tracim_backend.applications.collaborative_document_edition.application as collaborative_document_edition_app
-
-        collaborative_document_edition = collaborative_document_edition_app.get_app(app_config=self)
-        import tracim_backend.applications.html_document.application as html_document_app
-
-        html_documents = html_document_app.get_app(app_config=self)
-        import tracim_backend.applications.thread.application as thread_app
-
-        thread = thread_app.get_app(app_config=self)
-        import tracim_backend.applications.file.application as file_app
-
-        _file = file_app.get_app(app_config=self)
-        import tracim_backend.applications.folder.application as folder_app
-
-        folder = folder_app.get_app(app_config=self)
-        import tracim_backend.applications.markdownpluspage.application as markdownpluspage_app
-
-        markdownpluspage = markdownpluspage_app.get_app(app_config=self)
-        import tracim_backend.applications.gallery.application as gallery_app
-
-        gallery = gallery_app.get_app(app_config=self)
-        # process activated app list
-        available_apps = OrderedDict(
-            [
-                (html_documents.slug, html_documents),
-                (_file.slug, _file),
-                (thread.slug, thread),
-                (folder.slug, folder),
-                (markdownpluspage.slug, markdownpluspage),
-                (agenda.slug, agenda),
-                (gallery.slug, gallery),
-                (collaborative_document_edition.slug, collaborative_document_edition),
-                (share_content.slug, share_content),
-                (upload_permissions.slug, upload_permissions),
-            ]
-        )
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var
         app_list.clear()

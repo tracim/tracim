@@ -3,6 +3,7 @@ import typing
 
 from depot.manager import DepotManager
 from hapic.data import HapicFile
+from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import FILE_TYPE
@@ -49,7 +50,7 @@ is_shareable_content_type = ContentTypeChecker(shareables_content_type)
 
 
 def import_controller(
-    configurator: Configurator, app_config: CFG, route_prefix: str
+    configurator: Configurator, app_config: CFG, route_prefix: str, context: PyramidContext
 ) -> Configurator:
     share_controller = ShareController()
     configurator.include(share_controller.bind, route_prefix=route_prefix)

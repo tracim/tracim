@@ -392,6 +392,21 @@ class EmailUser(object):
         return "mailto:{email_address}".format(email_address=self.email_address)
 
 
+def find_direct_submodule_path(module: types.ModuleType) -> typing.List[str]:
+    """
+    Get path of submodules of given module
+    :param module: module to check
+    :return: list of path of direct submodule
+    """
+    module_path_list = []
+    for importer, submodule_relative_path, is_package in pkgutil.iter_modules(module.__path__):
+        submodule_path = "{module_name}.{submodule_relative_path}".format(
+            module_name=module.__name__, submodule_relative_path=submodule_relative_path
+        )
+        module_path_list.append(submodule_path)
+    return sorted(module_path_list)
+
+
 def find_all_submodule_path(module: types.ModuleType) -> typing.List[str]:
     """
     get all submodules path of a module

@@ -1,3 +1,4 @@
+from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
 from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
@@ -11,7 +12,7 @@ COLLABORATIVE_DOCUMENT_EDITION_BASE = "collaborative-document-edition"
 
 
 def import_controller(
-    configurator: Configurator, app_config: CFG, route_prefix: str
+    configurator: Configurator, app_config: CFG, route_prefix: str, context: PyramidContext
 ) -> Configurator:
     if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
         # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,

@@ -31,7 +31,7 @@ from tracim_backend.applications.collaborative_document_edition.schema import (
     FileCreateFromTemplateSchema,
 )
 from tracim_backend.applications.collaborative_document_edition.schema import FileTemplateInfoSchema
-from tracim_backend.applications.file.file_controller import can_create_file
+from tracim_backend.applications.content_file.file_controller import can_create_file
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed

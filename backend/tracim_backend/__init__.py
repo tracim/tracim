@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from copy import deepcopy
+import importlib
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
@@ -10,12 +11,12 @@ from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
 
 from tracim_backend.applications.agenda.app_factory import CaldavAppFactory
-from tracim_backend.applications.file.file_controller import FileController
-from tracim_backend.applications.folder.folder_controller import FolderController
-from tracim_backend.applications.html_document.html_document_controller import (
+from tracim_backend.applications.content_file.file_controller import FileController
+from tracim_backend.applications.content_folder.folder_controller import FolderController
+from tracim_backend.applications.content_html_document.html_document_controller import (
     HTMLDocumentController,
 )
-from tracim_backend.applications.thread.threads_controller import ThreadController
+from tracim_backend.applications.content_thread.threads_controller import ThreadController
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import ContentInNotEditableState
@@ -49,6 +50,7 @@ from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
 from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.utils.utils import find_direct_submodule_path
 from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
@@ -203,29 +205,17 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
 
-    # INFO - G.M - 2019-08-08 - import app here instead of top of file,
-    # to make thing easier later
-    # when app will be load dynamycally.
-    import tracim_backend.applications.share.controller as share_app_controller
+    import tracim_backend.applications as apps_modules
 
-    share_app_controller.import_controller(
-        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
-    )
-    import tracim_backend.applications.upload_permissions.controller as upload_permission_controller
+    for app_config_path in find_direct_submodule_path(apps_modules):
+        module = importlib.import_module("{}.controller".format(app_config_path))
+        module.import_controller(
+            app_config=app_config,
+            configurator=configurator,
+            route_prefix=BASE_API_V2,
+            context=context,
+        )
 
-    upload_permission_controller.import_controller(
-        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
-    )
-    import tracim_backend.applications.agenda.controller as agenda_controller
-
-    agenda_controller.import_controller(
-        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2, context=context
-    )
-    import tracim_backend.applications.collaborative_document_edition.controller as collaborative_document_edition_controller
-
-    collaborative_document_edition_controller.import_controller(
-        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
-    )
     configurator.scan("tracim_backend.lib.utils.authentification")
 
     # TODO - G.M - 2019-05-17 - check if possible to avoid this import here,
