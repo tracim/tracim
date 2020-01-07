@@ -141,8 +141,10 @@ class DeleteUserCommand(AppContextCommand):
                 except UserDoesNotExist as exc:
                     print('ERROR: user with email "{}" does not exist'.format(login))
                     raise exc
-            print("~~~~~~~~~~")
-
+            print("\n~~~~")
+            print("Deletion of user from Database")
+            print("~~~~\n")
+            print("~~~~")
             for user in user_list:
                 cleanup_lib = CleanupLib(
                     session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
@@ -157,14 +159,19 @@ class DeleteUserCommand(AppContextCommand):
                 )
                 deleted_user_ids.add(deleted_user_ids_result.user_id)
                 deleted_workspace_ids.update(deleted_user_ids_result.workspace_ids)
-                print("~~~~~~~~~~")
-
+                print("~~~~")
+            print(
+                "deletion of user(s) from database process almost finished, change will be applied at end "
+                "of this script.\n"
+            )
+            print("~~~~")
+            print("Deletion of Caldav Agenda\n")
             # INFO - G.M - 2019-12-13 - cleanup agenda at end of process
             if deleted_workspace_ids:
                 deleted_workspace_ids_str = [
                     '"{}"'.format(workspace_id) for workspace_id in deleted_workspace_ids
                 ]
-                print("Delete agenda of workspaces {}".format(", ".join(deleted_workspace_ids_str)))
+                print("delete agenda of workspaces {}".format(", ".join(deleted_workspace_ids_str)))
                 for workspace_id in deleted_workspace_ids:
                     try:
                         cleanup_lib.delete_workspace_agenda(workspace_id)
@@ -178,7 +185,7 @@ class DeleteUserCommand(AppContextCommand):
 
             if deleted_user_ids:
                 deleted_user_ids_str = ['"{}"'.format(user_id) for user_id in deleted_user_ids]
-                print("Delete agenda of users {}".format(", ".join(deleted_user_ids_str)))
+                print("delete agenda of users {}".format(", ".join(deleted_user_ids_str)))
                 for user_id in deleted_user_ids:
                     try:
                         cleanup_lib.delete_user_agenda(user_id)
@@ -189,6 +196,10 @@ class DeleteUserCommand(AppContextCommand):
                             )
                         )
                         print(traceback.format_exc())
+            print("~~~~")
+            print("deletion of Agenda process finished")
+            print("~~~~")
+            print("Finished")
 
     def should_anonymize(
         self, user: User, owned_workspaces_will_be_deleted: bool, cleanup_lib: CleanupLib
@@ -222,11 +233,10 @@ class DeleteUserCommand(AppContextCommand):
         anonymize_if_required: bool = False,
         anonymized_user_display_name: typing.Optional[str] = None,
     ):
-        print('Trying to delete user {}: "{}"'.format(user.user_id, user.email))
+        print('trying to delete user {}: "{}"\n'.format(user.user_id, user.email))
 
         deleted_workspace_ids = []
         deleted_user_id = user.user_id
-        print("---------")
         should_anonymize = self.should_anonymize(
             user, owned_workspaces_will_be_deleted=delete_owned_workspaces, cleanup_lib=cleanup_lib
         )
@@ -249,11 +259,11 @@ class DeleteUserCommand(AppContextCommand):
 
         if delete_owned_workspaces:
             deleted_workspace_ids = cleanup_lib.delete_user_owned_workspace(user)
-            print('Owned workspace for user "{}" deleted'.format(user.user_id))
+            print('owned workspace for user "{}" deleted'.format(user.user_id))
 
         if force_delete_all_user_revisions:
             cleanup_lib.delete_user_revisions(user)
-            print('All user "{}" revisions deleted'.format(user.user_id))
+            print('all user "{}" revisions deleted'.format(user.user_id))
 
         if should_anonymize.need_anonymization and not force_delete_all_associated_data:
             cleanup_lib.delete_user_associated_data(user)
@@ -269,6 +279,7 @@ class DeleteUserCommand(AppContextCommand):
             print('delete user "{}"'.format(user.user_id))
             cleanup_lib.delete_user_associated_data(user)
             cleanup_lib.safe_delete(user)
+            print('user "{}" deleted'.format(user.user_id))
 
         self._session.flush()
         return DeleteResultIds(deleted_user_id, deleted_workspace_ids)
