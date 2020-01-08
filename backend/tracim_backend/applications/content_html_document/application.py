@@ -1,10 +1,13 @@
+from hapic.ext.pyramid import PyramidContext
+from pyramid.config import Configurator
+from tracim_backend.applications.content_html_document.html_document_controller import HTMLDocumentController
 from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.config import CFG
-from tracim_backend.lib.utils.app import TracimAppFactory
+from tracim_backend.lib.utils.app import TracimApp
 
 
-class ContentHTMLDocumentAppFactory(TracimAppFactory):
+class ContentHTMLDocumentApp(TracimApp):
     def create_app(self, app_config: CFG) -> Application:
         html_documents = Application(
             label="Text Documents",  # TODO - G.M - 24-05-2018 - Check label
@@ -24,3 +27,22 @@ class ContentHTMLDocumentAppFactory(TracimAppFactory):
             file_extension=".document.html",
         )
         return html_documents
+
+    def load_config(self, app_config: CFG) -> CFG:
+        return app_config
+
+    def check_config(self, app_config: CFG) -> CFG:
+        return app_config
+
+    def import_controllers(
+        self,
+        configurator: Configurator,
+        app_config: CFG,
+        route_prefix: str,
+        context: PyramidContext,
+    ) -> Configurator:
+        html_document_controller = HTMLDocumentController()
+        configurator.include(html_document_controller.bind, route_prefix=route_prefix)
+        return configurator
+
+application = ContentHTMLDocumentApp()

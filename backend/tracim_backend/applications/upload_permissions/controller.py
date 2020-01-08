@@ -1,10 +1,7 @@
 from http import HTTPStatus
 import typing
 
-from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
-
-from tracim_backend import TracimControllerImporter
 from tracim_backend import TracimRequest
 from tracim_backend.applications.upload_permissions.authorization import has_public_upload_enabled
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
@@ -44,20 +41,6 @@ SWAGGER_TAG__UPLOAD_PERMISSION_SECTION = "Upload Permission"
 SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__WORKSPACE_ENDPOINTS, SWAGGER_TAG__UPLOAD_PERMISSION_SECTION
 )
-
-
-class UploadPermissionsControllerImporter(TracimControllerImporter):
-    def import_controller(
-        self,
-        configurator: Configurator,
-        app_config: CFG,
-        route_prefix: str,
-        context: PyramidContext,
-    ) -> Configurator:
-        upload_permission_controller = UploadPermissionController()
-        configurator.include(upload_permission_controller.bind, route_prefix=route_prefix)
-        return configurator
-
 
 class UploadPermissionController(Controller):
     """

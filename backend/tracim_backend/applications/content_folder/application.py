@@ -1,11 +1,13 @@
+from hapic.ext.pyramid import PyramidContext
+from pyramid.config import Configurator
+from tracim_backend.applications.content_folder.folder_controller import FolderController
 from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.config import CFG
-from tracim_backend.lib.utils.app import TracimAppFactory
+from tracim_backend.lib.utils.app import TracimApp
 from tracim_backend.models.roles import WorkspaceRoles
 
-
-class ContentFolderAppFactory(TracimAppFactory):
+class ContentFolderApp(TracimApp):
     def create_app(self, app_config: CFG) -> Application:
         folder = Application(
             label="Folder",
@@ -25,3 +27,22 @@ class ContentFolderAppFactory(TracimAppFactory):
             minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
         )
         return folder
+
+    def load_config(self, app_config: CFG) -> CFG:
+        return app_config
+
+    def check_config(self, app_config: CFG) -> CFG:
+        return app_config
+
+    def import_controllers(
+        self,
+        configurator: Configurator,
+        app_config: CFG,
+        route_prefix: str,
+        context: PyramidContext,
+    ) -> Configurator:
+        folder_controller = FolderController()
+        configurator.include(folder_controller.bind, route_prefix=route_prefix)
+        return configurator
+
+application = ContentFolderApp()

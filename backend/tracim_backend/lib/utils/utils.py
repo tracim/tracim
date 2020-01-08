@@ -23,7 +23,7 @@ from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.lib.utils.app import TracimAppConfig
-from tracim_backend.lib.utils.app import TracimAppFactory
+from tracim_backend.lib.utils.app import TracimApp
 from tracim_backend.lib.utils.app import TracimControllerImporter
 
 if typing.TYPE_CHECKING:
@@ -413,7 +413,7 @@ def get_app_configs():
 
 
 def get_app_factories():
-    return TracimAppFactory.__subclasses__()
+    return TracimApp.__subclasses__()
 
 
 def find_direct_submodule_path(module: types.ModuleType) -> typing.List[str]:

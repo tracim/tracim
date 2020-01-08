@@ -10,13 +10,11 @@ if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
 
 
-class TracimAppFactory(ABC):
+class TracimApp(ABC):
     def create_app(self, app_config: "CFG") -> Application:
         """ Create Tracim application"""
         raise NotImplementedError()
 
-
-class TracimAppConfig(ABC):
     def load_config(self, app_config: "CFG") -> "CFG":
         """
         Allow to load specific config parameter, example:
@@ -31,9 +29,7 @@ class TracimAppConfig(ABC):
         """
         raise NotImplementedError()
 
-
-class TracimControllerImporter(ABC):
-    def import_controller(
+    def import_controllers(
         self,
         configurator: Configurator,
         app_config: "CFG",

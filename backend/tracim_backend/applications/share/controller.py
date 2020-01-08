@@ -3,10 +3,8 @@ import typing
 
 from depot.manager import DepotManager
 from hapic.data import HapicFile
-from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend import TracimControllerImporter
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.share.authorization import has_public_download_enabled
@@ -49,18 +47,6 @@ SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(
 shareables_content_type = [FILE_TYPE]
 is_shareable_content_type = ContentTypeChecker(shareables_content_type)
 
-
-class ShareControllerImporter(TracimControllerImporter):
-    def import_controller(
-        self,
-        configurator: Configurator,
-        app_config: CFG,
-        route_prefix: str,
-        context: PyramidContext,
-    ) -> Configurator:
-        share_controller = ShareController()
-        configurator.include(share_controller.bind, route_prefix=route_prefix)
-        return configurator
 
 
 class ShareController(Controller):
