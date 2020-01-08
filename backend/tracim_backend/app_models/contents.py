@@ -13,7 +13,7 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.app_models.applications import Application  # noqa: F401
+    from tracim_backend.app_models.applications import TracimApplicationInContext  # noqa: F401
 
 
 class GlobalStatus(Enum):
@@ -187,7 +187,7 @@ class ContentTypeList(object):
     def Thread(self) -> ContentType:
         return self.get_one_by_slug(THREAD_TYPE)
 
-    def __init__(self, app_list: typing.List["Application"]):
+    def __init__(self, app_list: typing.List["TracimApplicationInContext"]):
         self.app_list = app_list
         self._special_contents_types = [self.Comment]
         self._extra_slugs = [self.Any_SLUG]

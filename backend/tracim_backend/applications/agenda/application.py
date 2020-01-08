@@ -3,17 +3,20 @@ from http import HTTPStatus
 from hapic.ext.pyramid import PyramidContext
 from paste.deploy.converters import asbool
 from pyramid.config import Configurator
-from tracim_backend.views import BASE_API_V2
-from tracim_backend.app_models.applications import Application
+
+from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.applications.agenda.authorization import add_www_authenticate_header_for_caldav
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import ConfigurationError, CaldavNotAuthorized, \
-    CaldavNotAuthenticated
-from tracim_backend.lib.utils.app import TracimApp
+from tracim_backend.exceptions import CaldavNotAuthenticated
+from tracim_backend.exceptions import CaldavNotAuthorized
+from tracim_backend.exceptions import ConfigurationError
+from tracim_backend.lib.utils.app import TracimApplication
+from tracim_backend.views import BASE_API_V2
 
-class AgendaApp(TracimApp):
-    def create_app(self, app_config: CFG) -> Application:
-        return Application(
+
+class AgendaApp(TracimApplication):
+    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
+        return TracimApplicationInContext(
             label="Agenda",
             slug="agenda",
             fa_icon="calendar",
@@ -115,5 +118,6 @@ class AgendaApp(TracimApp):
             configurator.include(agenda_controller.bind, route_prefix=BASE_API_V2)
             configurator.include(radicale_proxy_controller.bind)
         return configurator
+
 
 application = AgendaApp()

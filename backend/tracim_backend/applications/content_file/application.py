@@ -1,15 +1,16 @@
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
-from tracim_backend import FileController
-from tracim_backend.app_models.applications import Application
+
+from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.applications.content_file.file_controller import FileController
 from tracim_backend.config import CFG
-from tracim_backend.lib.utils.app import TracimApp
+from tracim_backend.lib.utils.app import TracimApplication
 
 
-class ContentFileApp(TracimApp):
-    def create_app(self, app_config: CFG) -> Application:
-        _file = Application(
+class ContentFileApp(TracimApplication):
+    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
+        _file = TracimApplicationInContext(
             label="Files",
             slug="contents/file",
             fa_icon="paperclip",
@@ -42,5 +43,6 @@ class ContentFileApp(TracimApp):
         file_controller = FileController()
         configurator.include(file_controller.bind, route_prefix=route_prefix)
         return configurator
+
 
 application = ContentFileApp()

@@ -9,12 +9,14 @@ from tracim_backend.exceptions import AppDoesNotExist
 
 if typing.TYPE_CHECKING:
     from tracim_backend.models.data import Workspace
-    from tracim_backend.app_models.applications import Application  # noqa:F401
+    from tracim_backend.app_models.applications import TracimApplicationInContext  # noqa:F401
     from tracim_backend.app_models.contents import ContentType  # noqa: F401
 
 
 class ApplicationApi(object):
-    def __init__(self, app_list: List["Application"], show_all: bool = False) -> None:
+    def __init__(
+        self, app_list: List["TracimApplicationInContext"], show_all: bool = False
+    ) -> None:
         self.apps = app_list
         self.show_all = show_all
 
@@ -24,7 +26,7 @@ class ApplicationApi(object):
                 return app
         raise AppDoesNotExist("Application {app} does not exist".format(app=slug))
 
-    def get_all(self) -> List["Application"]:
+    def get_all(self) -> List["TracimApplicationInContext"]:
         active_apps = []
         for app in self.apps:
             if self.show_all or app.is_active:

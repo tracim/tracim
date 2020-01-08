@@ -1,6 +1,6 @@
 from mock import Mock
 
-from tracim_backend.app_models.applications import Application
+from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.workspace_menu_entries import all_content_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
@@ -16,7 +16,7 @@ class TestApplicationApi(object):
         app_config = Mock()
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS["primary"] = "#fff"
-        thread = Application(
+        thread = TracimApplicationInContext(
             label="Threads",
             slug="contents/thread",
             fa_icon="comments-o",
@@ -33,7 +33,7 @@ class TestApplicationApi(object):
             file_extension=".thread.html",
         )
 
-        markdownpluspage = Application(
+        markdownpluspage = TracimApplicationInContext(
             label="Markdown Plus Documents",
             # TODO - G.M - 24-05-2018 - Check label
             slug="contents/markdownpluspage",
@@ -69,7 +69,7 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS["primary"] = "#fff"
 
-        folder = Application(
+        folder = TracimApplicationInContext(
             label="Folder",
             slug="contents/folder",
             fa_icon="folder-o",
@@ -100,7 +100,7 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS["primary"] = "#fff"
 
-        agenda = Application(
+        agenda = TracimApplicationInContext(
             label="Agenda",
             slug="agenda",
             fa_icon="calendar",
@@ -124,7 +124,7 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS["primary"] = "#fff"
 
-        agenda = Application(
+        agenda = TracimApplicationInContext(
             label="Agenda",
             slug="agenda",
             fa_icon="calendar",

@@ -9,7 +9,7 @@ if typing.TYPE_CHECKING:
     from tracim_backend.app_models.contents import ContentStatus  # noqa: F401
 
 
-class Application(object):
+class TracimApplicationInContext(object):
     """
     Application class with data needed for frontend
     """

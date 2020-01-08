@@ -2,7 +2,7 @@ from hapic.ext.pyramid import PyramidContext
 from paste.deploy.converters import asbool
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.applications import Application
+from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
     CollaborativeDocumentEditionFactory,
 )
@@ -10,13 +10,13 @@ from tracim_backend.applications.collaborative_document_edition.data import (
     COLLABORA_DOCUMENT_EDITION_SLUG,
 )
 from tracim_backend.config import CFG
-from tracim_backend.lib.utils.app import TracimApp
+from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.views import BASE_API_V2
 
 
-class CollaborativeDocumentEditionApp(TracimApp):
-    def create_app(self, app_config: CFG) -> Application:
-        return Application(
+class CollaborativeDocumentEditionApp(TracimApplication):
+    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
+        return TracimApplicationInContext(
             label="Collaborative Document Edition",
             slug="collaborative_document_edition",
             fa_icon="file-o",

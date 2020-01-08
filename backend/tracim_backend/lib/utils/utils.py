@@ -22,7 +22,7 @@ from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
-from tracim_backend.lib.utils.app import TracimApp
+from tracim_backend.lib.utils.app import TracimApplication
 
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
@@ -393,7 +393,7 @@ class EmailUser(object):
         return "mailto:{email_address}".format(email_address=self.email_address)
 
 
-def load_apps() -> typing.List[TracimApp]:
+def load_apps() -> typing.List[TracimApplication]:
     import tracim_backend.applications as apps_modules
 
     tracim_apps = []

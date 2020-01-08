@@ -4,14 +4,17 @@ import typing
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.applications import Application
+from tracim_backend.app_models.applications import TracimApplicationInContext
 
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
 
 
-class TracimApp(ABC):
-    def create_app(self, app_config: "CFG") -> Application:
+class TracimApplication(ABC):
+    def __init__(self):
+        self.is_active = False
+
+    def create_app(self, app_config: "CFG") -> TracimApplicationInContext:
         """ Create Tracim application"""
         raise NotImplementedError()
 

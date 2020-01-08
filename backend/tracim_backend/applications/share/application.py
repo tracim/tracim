@@ -2,16 +2,18 @@ import os
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
-from tracim_backend.app_models.applications import Application
+
+from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.applications.share.controller import ShareController
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ConfigurationError
-from tracim_backend.lib.utils.app import TracimApp
+from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.translation import translator_marker as _
 
-class ShareApp(TracimApp):
-    def create_app(self, app_config: CFG) -> Application:
-        return Application(
+
+class ShareApp(TracimApplication):
+    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
+        return TracimApplicationInContext(
             label="Share Content",
             slug="share_content",
             fa_icon="share",
@@ -59,14 +61,15 @@ class ShareApp(TracimApp):
         return app_config
 
     def import_controllers(
-            self,
-            configurator: Configurator,
-            app_config: CFG,
-            route_prefix: str,
-            context: PyramidContext,
+        self,
+        configurator: Configurator,
+        app_config: CFG,
+        route_prefix: str,
+        context: PyramidContext,
     ) -> Configurator:
         share_controller = ShareController()
         configurator.include(share_controller.bind, route_prefix=route_prefix)
         return configurator
+
 
 application = ShareApp()

@@ -1,13 +1,14 @@
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
-from tracim_backend.app_models.applications import Application
+
+from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.config import CFG
-from tracim_backend.lib.utils.app import TracimApp
+from tracim_backend.lib.utils.app import TracimApplication
 
 
-class GalleryApp(TracimApp):
-    def create_app(self, app_config: CFG) -> Application:
-        return Application(
+class GalleryApp(TracimApplication):
+    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
+        return TracimApplicationInContext(
             label="Gallery",
             slug="gallery",
             fa_icon="picture-o",
@@ -32,5 +33,6 @@ class GalleryApp(TracimApp):
     ) -> Configurator:
         # INFO - G.M - 2020-01-03 - Dummy backend app
         return configurator
+
 
 application = GalleryApp()
