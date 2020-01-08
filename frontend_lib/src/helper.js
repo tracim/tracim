@@ -113,15 +113,6 @@ export const revisionTypeList = [{
 
 export const generateLocalStorageContentId = (workspaceId, contentId, contentType, dataType) => `${workspaceId}/${contentId}/${contentType}_${dataType}`
 
-export const appFeatureCustomEventHandlerShowApp = (newContent, currentContentId, appName) => {
-  if (newContent.content_id !== currentContentId) {
-    const event = new CustomEvent(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, { detail: { type: CUSTOM_EVENT.RELOAD_CONTENT(appName), data: newContent } })
-    document.dispatchEvent(event)
-    return false
-  }
-  return true
-}
-
 const WORKSPACE_MANAGER = {
   id: 1,
   slug: 'workspace-manager',

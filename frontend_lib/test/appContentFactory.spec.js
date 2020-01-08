@@ -6,6 +6,7 @@ import { appContentFactory } from '../src/appContentFactory.js'
 import { status } from './fixture/status.js'
 import { commentList as fixtureCommentList } from './fixture/contentCommentList.js'
 import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
+import { content } from './fixture/content.js'
 import {
   mockPutContent200,
   mockPostContentComment200,
@@ -24,16 +25,21 @@ describe('appContentFactory.js', () => {
   const fakeCheckApiUrl = sinon.stub() // TODO: Do I need a stub here ?
   global.GLOBAL_dispatchEvent = sinon.spy()
   global.localStorage = {
+    getItem: sinon.spy(),
     setItem: sinon.spy(),
     removeItem: sinon.spy()
   }
   const fakeSetState = sinon.spy()
+  const fakeBuildBreadcrumbs = sinon.spy()
+  const fakeLoadContent = sinon.spy()
+  const fakeLoadTimeline = sinon.spy()
 
   const DummyComponent = () => <div>I'm empty</div>
   const WrappedDummyComponent = appContentFactory(DummyComponent)
   const wrapper = shallow(<WrappedDummyComponent />)
 
   const fakeContent = {
+    ...content,
     workspace_id: 12,
     content_id: 42,
     label: 'unedited label',
@@ -48,6 +54,11 @@ describe('appContentFactory.js', () => {
     it('should have all the new props', () => {
       expect(wrapper.props()).to.have.all.keys(
         'setApiUrl',
+        'appContentCustomEventHandlerShowApp',
+        'appContentCustomEventHandlerHideApp',
+        'appContentCustomEventHandlerReloadContent',
+        'appContentCustomEventHandlerReloadAppFeatureData',
+        'appContentCustomEventHandlerAllAppChangeLanguage',
         'appContentChangeTitle',
         'appContentChangeComment',
         'appContentSaveNewComment',
@@ -69,6 +80,198 @@ describe('appContentFactory.js', () => {
     })
   })
 
+  describe('function appContentCustomEventHandlerShowApp', () => {
+    describe('with the same content id', () => {
+      const newContent = { ...fakeContent }
+
+      before(() => {
+        wrapper.instance().appContentCustomEventHandlerShowApp(newContent, fakeContent, fakeSetState, fakeBuildBreadcrumbs)
+      })
+
+      after(() => {
+        fakeSetState.resetHistory()
+        fakeBuildBreadcrumbs.resetHistory()
+      })
+
+      it('should call setState to show the app', () => {
+        sinon.assert.calledWith(fakeSetState, { isVisible: true })
+      })
+
+      it('should call buildBreadcrumbs function', () => {
+        expect(fakeBuildBreadcrumbs.called).to.equal(true)
+      })
+    })
+
+    describe('with a different content id', () => {
+      const newContent = {
+        ...fakeContent,
+        content_id: fakeContent.content_id + 1
+      }
+
+      before(() => {
+        wrapper.instance().appContentCustomEventHandlerShowApp(newContent, fakeContent, fakeSetState, fakeBuildBreadcrumbs)
+      })
+
+      after(() => {
+        global.GLOBAL_dispatchEvent.resetHistory()
+        fakeSetState.resetHistory()
+        fakeBuildBreadcrumbs.resetHistory()
+      })
+
+      it('should call the custom event RELOAD_CONTENT', () => {
+        sinon.assert.calledWith(
+          global.GLOBAL_dispatchEvent,
+          { type: CUSTOM_EVENT.RELOAD_CONTENT(newContent.content_type), data: newContent }
+        )
+      })
+
+      it('should have called neither setState nor buildBreadcrumbs', () => {
+        expect(fakeSetState.called).to.equal(false)
+        expect(fakeBuildBreadcrumbs.called).to.equal(false)
+      })
+    })
+  })
+
+  describe('function appContentCustomEventHandlerHideApp', () => {
+    const fakeTinymceRemove = sinon.spy()
+
+    before(() => {
+      global.tinymce.remove = fakeTinymceRemove
+      wrapper.instance().appContentCustomEventHandlerHideApp(fakeSetState)
+    })
+
+    after(() => {
+      fakeTinymceRemove.resetHistory()
+      fakeSetState.resetHistory()
+    })
+
+    it('should reset the tinymce comment field', () => {
+      sinon.assert.calledWith(fakeTinymceRemove, '#wysiwygTimelineComment')
+    })
+
+    it('should call setState to hide the app and set back the comment textarea to normal', () => {
+      sinon.assert.calledWith(fakeSetState, {
+        isVisible: false,
+        timelineWysiwyg: false
+      })
+    })
+  })
+
+  describe('function appContentCustomEventHandlerReloadContent', () => {
+    const newContent = { ...fakeContent }
+    const fakeTinymceRemove = sinon.spy()
+
+    before(() => {
+      global.tinymce.remove = fakeTinymceRemove
+      wrapper.instance().appContentCustomEventHandlerReloadContent(newContent, fakeSetState, appContentSlug)
+    })
+
+    after(() => {
+      fakeTinymceRemove.resetHistory()
+      global.localStorage.getItem.resetHistory()
+      fakeSetState.resetHistory()
+    })
+
+    it('should remove the tinymce comment field', () => {
+      sinon.assert.calledWith(fakeTinymceRemove, '#wysiwygTimelineComment')
+    })
+
+    it('should get the localStorage value', () => {
+      sinon.assert.calledWith(
+        global.localStorage.getItem,
+        generateLocalStorageContentId(fakeContent.workspace_id, fakeContent.content_id, appContentSlug, 'comment')
+      )
+    })
+
+    it('should call setState to update with the new comment', () => {
+      // INFO - CH - 2019-01-07 - I don't know how to do a callWith when setState is called with a function in parameter
+      sinon.assert.called(fakeSetState)
+    })
+  })
+
+  describe('function appContentCustomEventHandlerReloadAppFeatureData', () => {
+    before(() => {
+      wrapper.instance().appContentCustomEventHandlerReloadAppFeatureData(fakeLoadContent, fakeLoadTimeline, fakeBuildBreadcrumbs)
+    })
+
+    after(() => {
+      fakeLoadContent.resetHistory()
+      fakeLoadTimeline.resetHistory()
+      fakeBuildBreadcrumbs.resetHistory()
+    })
+
+    it('should call the 3 functions given in parameter', () => {
+      expect(fakeLoadContent.called).to.equal(true)
+      expect(fakeLoadTimeline.called).to.equal(true)
+      expect(fakeBuildBreadcrumbs.called).to.equal(true)
+    })
+  })
+
+  describe('function appContentCustomEventHandlerAllAppChangeLanguage', () => {
+    const fakeTinymceRemove = sinon.spy()
+    const fakeI18nChangeLanguage = sinon.spy()
+    const fakeI18n = {
+      changeLanguage: fakeI18nChangeLanguage
+    }
+    const newLang = 'en'
+    const dummyChangeNewCommentHandler = () => {}
+    const fakeWysiwygConstructor = sinon.spy()
+
+    before(() => {
+      global.tinymce.remove = fakeTinymceRemove
+      global.wysiwyg = fakeWysiwygConstructor
+      wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(
+        false, newLang, dummyChangeNewCommentHandler, fakeSetState, fakeI18n, fakeLoadTimeline
+      )
+    })
+
+    after(() => {
+      fakeSetState.resetHistory()
+      fakeI18nChangeLanguage.resetHistory()
+      fakeLoadTimeline.resetHistory()
+    })
+
+    it('should call setState to change the user lang', () => {
+      // INFO - CH - 2019-01-07 - I don't know how to do a callWith when setState is called with a function in parameter
+      sinon.assert.called(fakeSetState)
+    })
+
+    it('should call the function changeLanguage of i18n object', () => {
+      sinon.assert.calledWith(fakeI18nChangeLanguage, newLang)
+    })
+
+    it('should call the function loadTimeline', () => {
+      expect(fakeLoadTimeline.called).to.equal(true)
+    })
+
+    describe('with isTimelineWysiwyg to true', () => {
+      const fakeWysiwygConstructor = sinon.spy()
+      before(() => {
+        global.tinymce.remove = fakeTinymceRemove
+        global.wysiwyg = fakeWysiwygConstructor
+        wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(
+          true, newLang, dummyChangeNewCommentHandler, fakeSetState, fakeI18n, fakeLoadTimeline
+        )
+      })
+
+      after(() => {
+        fakeTinymceRemove.resetHistory()
+        fakeWysiwygConstructor.resetHistory()
+        fakeSetState.resetHistory()
+        fakeI18nChangeLanguage.resetHistory()
+        fakeLoadTimeline.resetHistory()
+      })
+
+      it('should remove the tinymce comment field', () => {
+        sinon.assert.calledWith(fakeTinymceRemove, '#wysiwygTimelineComment')
+      })
+
+      it('should call the tinymce constructor', () => {
+        sinon.assert.calledWith(fakeWysiwygConstructor, '#wysiwygTimelineComment', newLang, dummyChangeNewCommentHandler)
+      })
+    })
+  })
+
   describe('function appContentChangeTitle', () => {
     describe('on title change success', async () => {
       let response = {}
@@ -79,6 +282,11 @@ describe('appContentFactory.js', () => {
         const newLabel = 'Edited label'
         mockPutContent200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, appContentSlug, newLabel, fakeContent.raw_content)
         response = await wrapper.instance().appContentChangeTitle(fakeContent, newLabel, appContentSlug)
+      })
+
+      after(() => {
+        fakeCheckApiUrl.resetHistory()
+        global.GLOBAL_dispatchEvent.resetHistory()
       })
 
       it('should call the function checkApiUrl', () => {
@@ -117,6 +325,7 @@ describe('appContentFactory.js', () => {
 
     after(() => {
       fakeSetState.resetHistory()
+      global.localStorage.setItem.resetHistory()
     })
 
     it('should call setState with the new comment value', () => {
@@ -136,6 +345,7 @@ describe('appContentFactory.js', () => {
       let response = {}
       const fakeTinymceSetContent = sinon.spy()
       global.tinymce = {
+        ...global.tinymce,
         get: () => ({
           setContent: fakeTinymceSetContent
         })
@@ -151,7 +361,10 @@ describe('appContentFactory.js', () => {
       })
 
       after(() => {
-        fakeSetState.resetHistory()
+        fakeCheckApiUrl.resetHistory()
+        fakeTinymceSetContent.resetHistory()
+        global.localStorage.removeItem.resetHistory()
+        global.GLOBAL_dispatchEvent.resetHistory()
       })
 
       it('should call the function checkApiUrl', () => {
@@ -196,6 +409,11 @@ describe('appContentFactory.js', () => {
         response = await wrapper.instance().appContentChangeStatus(fakeContent, newStatusSlug, appContentSlug)
       })
 
+      after(() => {
+        fakeCheckApiUrl.resetHistory()
+        global.GLOBAL_dispatchEvent.resetHistory()
+      })
+
       it('should call the function checkApiUrl', () => {
         expect(fakeCheckApiUrl.called).to.equal(true)
       })
@@ -221,7 +439,9 @@ describe('appContentFactory.js', () => {
       })
 
       after(() => {
+        fakeCheckApiUrl.resetHistory()
         fakeSetState.resetHistory()
+        global.GLOBAL_dispatchEvent.resetHistory()
       })
 
       it('should call the function checkApiUrl', () => {
@@ -254,7 +474,9 @@ describe('appContentFactory.js', () => {
       })
 
       after(() => {
+        fakeCheckApiUrl.resetHistory()
         fakeSetState.resetHistory()
+        global.GLOBAL_dispatchEvent.resetHistory()
       })
 
       it('should call the function checkApiUrl', () => {
@@ -287,7 +509,9 @@ describe('appContentFactory.js', () => {
       })
 
       after(() => {
+        fakeCheckApiUrl.resetHistory()
         fakeSetState.resetHistory()
+        global.GLOBAL_dispatchEvent.resetHistory()
       })
 
       it('should call the function checkApiUrl', () => {
@@ -320,7 +544,9 @@ describe('appContentFactory.js', () => {
       })
 
       after(() => {
+        fakeCheckApiUrl.resetHistory()
         fakeSetState.resetHistory()
+        global.GLOBAL_dispatchEvent.resetHistory()
       })
 
       it('should call the function checkApiUrl', () => {

@@ -69,44 +69,27 @@ class HtmlDocument extends React.Component {
   }
 
   customEventReducer = async ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-    const { state } = this
+    const { props, state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) {
-          this.setState({ isVisible: true })
-          this.buildBreadcrumbs()
-        }
+        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
         break
 
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
+        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
         tinymce.remove('#wysiwygNewVersion')
-        this.setState({
-          isVisible: false,
-          timelineWysiwyg: false
-        })
         break
 
-      // CH - 2019-31-12 - This event is used to send a new content_id that will trigger data reload through componentDidUpdate
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
+        props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
         tinymce.remove('#wysiwygNewVersion')
-
-        this.setState(prev => ({
-          content: { ...prev.content, ...data },
-          isVisible: true,
-          timelineWysiwyg: false
-        }))
         break
 
       case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
-        await this.loadContent()
-        this.loadTimeline()
-        this.buildBreadcrumbs()
+        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
         break
 
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -350,7 +333,7 @@ class HtmlDocument extends React.Component {
 
   handleChangeNewComment = e => {
     const { props, state } = this
-    props.appContentChangeComment(e, state.content, this.setState.bind(this))
+    props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
   handleClickValidateNewCommentBtn = async () => {

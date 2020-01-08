@@ -33,6 +33,66 @@ export function appContentFactory (WrappedComponent) {
       }
     })
 
+    // INFO - CH - 2019-01-08 - event called by OpenContentApp to open the show the app if it is already rendered
+    appContentCustomEventHandlerShowApp = (newContent, content, setState, buildBreadcrumbs) => {
+      if (newContent.content_id !== content.content_id) {
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT(content.content_type), data: newContent })
+        return
+      }
+      setState({ isVisible: true })
+      buildBreadcrumbs()
+    }
+
+    // INFO - CH - 2019-01-08 - event called by OpenContentApp in case of opening another app feature
+    appContentCustomEventHandlerHideApp = setState => {
+      tinymce.remove('#wysiwygTimelineComment')
+      setState({
+        isVisible: false,
+        timelineWysiwyg: false
+      })
+    }
+
+    // CH - 2019-31-12 - This event is used to send a new content_id that will trigger data reload through componentDidUpdate
+    appContentCustomEventHandlerReloadContent = (newContent, setState, appSlug) => {
+      tinymce.remove('#wysiwygTimelineComment')
+
+      const previouslyUnsavedComment = localStorage.getItem(
+        generateLocalStorageContentId(newContent.workspace_id, newContent.content_id, appSlug, 'comment')
+      )
+
+      setState(prev => ({
+        content: { ...prev.content, ...newContent },
+        isVisible: true,
+        timelineWysiwyg: false,
+        newComment: prev.content.content_id === newContent.content_id
+          ? prev.newComment
+          : (previouslyUnsavedComment || '')
+      }))
+    }
+
+    // CH - 2019-31-12 - This event is used to reload all app data. It's not supposed to handle content id change
+    appContentCustomEventHandlerReloadAppFeatureData = async (loadContent, loadTimeline, buildBreadcrumbs) => {
+      await loadContent()
+      loadTimeline()
+      buildBreadcrumbs()
+    }
+
+    appContentCustomEventHandlerAllAppChangeLanguage = (isTimelineWysiwyg, newLang, changeNewCommentHandler, setState, i18n, loadTimeline) => {
+      if (isTimelineWysiwyg) {
+        tinymce.remove('#wysiwygTimelineComment')
+        wysiwyg('#wysiwygTimelineComment', newLang, changeNewCommentHandler)
+      }
+
+      setState(prev => ({
+        loggedUser: {
+          ...prev.loggedUser,
+          lang: newLang
+        }
+      }))
+      i18n.changeLanguage(newLang)
+      loadTimeline()
+    }
+
     appContentChangeTitle = async (content, newTitle, appSlug) => {
       this.checkApiUrl()
 
@@ -298,6 +358,11 @@ export function appContentFactory (WrappedComponent) {
         <WrappedComponent
           {...this.props}
           setApiUrl={this.setApiUrl}
+          appContentCustomEventHandlerShowApp={this.appContentCustomEventHandlerShowApp}
+          appContentCustomEventHandlerHideApp={this.appContentCustomEventHandlerHideApp}
+          appContentCustomEventHandlerReloadAppFeatureData={this.appContentCustomEventHandlerReloadAppFeatureData}
+          appContentCustomEventHandlerReloadContent={this.appContentCustomEventHandlerReloadContent}
+          appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
           appContentSaveNewComment={this.appContentSaveNewComment}

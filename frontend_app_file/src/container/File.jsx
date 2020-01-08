@@ -90,63 +90,33 @@ class File extends React.Component {
   }
 
   customEventReducer = async ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-    const { state } = this
+    const { props, state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) {
-          this.setState({ isVisible: true })
-          this.buildBreadcrumbs()
-        }
+        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
         break
 
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
-        this.setState({
-          isVisible: false,
-          timelineWysiwyg: false
-        })
+        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
         break
 
-      // CH - 2019-31-12 - This event is used to send a new content_id that will trigger data reload through componentDidUpdate
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
-        const previouslyUnsavedComment = localStorage.getItem(
-          generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
-        )
-        this.setState(prev => ({
-          content: { ...prev.content, ...data },
-          isVisible: true,
-          timelineWysiwyg: false,
-          newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
-        }))
+        props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
         break
 
       case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
-        await this.loadContent()
-        this.loadTimeline()
-        this.buildBreadcrumbs()
+        console.log('%c<File> Custom event', 'color: #28a745', type, data)
+        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
         break
 
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-
-        if (state.timelineWysiwyg) {
-          tinymce.remove('#wysiwygTimelineComment')
-          wysiwyg('#wysiwygTimelineComment', data, this.handleChangeNewComment)
-        }
-
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        this.loadTimeline()
+        props.appContentCustomEventHandlerAllAppChangeLanguage(
+          state.timelineWysiwyg, data, this.handleChangeNewComment, this.setState.bind(this), i18n, this.loadTimeline
+        )
         break
     }
   }
@@ -326,7 +296,7 @@ class File extends React.Component {
 
   handleChangeNewComment = e => {
     const { props, state } = this
-    props.appContentChangeComment(e, state.content, this.setState.bind(this))
+    props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
   handleSaveEditTitle = async newTitle => {
