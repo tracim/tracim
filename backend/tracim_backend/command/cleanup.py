@@ -109,17 +109,17 @@ class DeleteUserCommand(AppContextCommand):
         if parsed_args.force:
             print("(!) Running in force mode")
         if parsed_args.best_effort:
-            print("(!) Running in best_effort mode")
+            print("(!) Running in best-effort mode")
 
         if delete_user_revision:
             print("/!\\ Delete all user revisions, database created may be broken /!\\.")
         if delete_owned_sharespaces:
             print("(!) User owned sharespaces will be deleted too.")
         if anonymize_if_required:
-            print("(!) Will Anonymize user if not possible to delete it")
+            print("(!) Will anonymize user if not possible to delete it")
             if parsed_args.anonymize_name:
                 print(
-                    '(!) Custom anonymize name choosen is : "{}"'.format(parsed_args.anonymize_name)
+                    '(!) Custom anonymize name choosen is: "{}"'.format(parsed_args.anonymize_name)
                 )
 
         deleted_user_ids = set()  # typing.Set[int]
