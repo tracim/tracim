@@ -199,7 +199,10 @@ class DeleteUserCommand(AppContextCommand):
             print("~~~~")
             print("deletion of Agenda process finished")
             print("~~~~")
-            print("Finished")
+            if parsed_args.dry_run_mode:
+                print("Finished (dry-run mode, no change applied)")
+            else:
+                print("Finished")
 
     def should_anonymize(
         self, user: User, owned_workspaces_will_be_deleted: bool, cleanup_lib: CleanupLib
