@@ -4,6 +4,8 @@ import sinon from 'sinon'
 import { shallow } from 'enzyme'
 import { appContentFactory } from '../src/appContentFactory.js'
 import { status } from './fixture/status.js'
+import { commentList as fixtureCommentList } from './fixture/contentCommentList.js'
+import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
 import {
   mockPutContent200,
   mockPostContentComment200,
@@ -14,10 +16,8 @@ import {
   mockPutContentDeleteRestore204
 } from './apiMock.js'
 import { CUSTOM_EVENT } from '../src/customEvent.js'
-import {
-  APP_FEATURE_MODE,
-  generateLocalStorageContentId
-} from '../src/helper.js'
+import { generateLocalStorageContentId } from '../src/helper.js'
+
 
 
 describe('appContentFactory.js', () => {
@@ -342,6 +342,20 @@ describe('appContentFactory.js', () => {
   })
 
   describe('function buildTimelineFromCommentAndRevision', () => {
-    // TODO
+    const commentList = fixtureCommentList
+    const revisionList = fixtureRevisionList.map((revision, i) => ({
+      ...revision,
+      // ensure that the first revision after creation has all the comments from commentList
+      comment_ids: i === 1 ? commentList.map(comment => comment.content_id) : []
+    }))
+    let commentAndRevisionMergedList = []
+
+    before(() => {
+      commentAndRevisionMergedList = wrapper.instance().buildTimelineFromCommentAndRevision(commentList, revisionList, 'en')
+    })
+
+    it('should have merged all the comments and revision at depth 0', () => {
+      expect(commentAndRevisionMergedList.length).to.equal(commentList.length + revisionList.length)
+    })
   })
 })
