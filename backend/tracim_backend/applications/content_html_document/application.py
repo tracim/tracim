@@ -11,16 +11,8 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class ContentHTMLDocumentApp(TracimApplication):
-    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
-        html_documents = TracimApplicationInContext(
-            label="Text Documents",  # TODO - G.M - 24-05-2018 - Check label
-            slug="contents/html-document",
-            fa_icon="file-text-o",
-            is_active=True,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=html-document",
-            app_config=app_config,
-        )
+    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
+        html_documents = TracimApplicationInContext(app_config=app_config, app=self)
         html_documents.add_content_type(
             slug="html-document",
             label="Text Document",
@@ -49,4 +41,11 @@ class ContentHTMLDocumentApp(TracimApplication):
         return configurator
 
 
-application = ContentHTMLDocumentApp()
+application = ContentHTMLDocumentApp(
+    label="Text Documents",  # TODO - G.M - 24-05-2018 - Check label
+    slug="contents/html-document",
+    fa_icon="file-text-o",
+    is_active=True,
+    config={},
+    main_route="/ui/workspaces/{workspace_id}/contents?type=html-document",
+)

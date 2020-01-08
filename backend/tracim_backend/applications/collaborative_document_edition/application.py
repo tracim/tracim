@@ -15,16 +15,8 @@ from tracim_backend.views import BASE_API_V2
 
 
 class CollaborativeDocumentEditionApp(TracimApplication):
-    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
-        return TracimApplicationInContext(
-            label="Collaborative Document Edition",
-            slug="collaborative_document_edition",
-            fa_icon="file-o",
-            is_active=app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
-            config={},
-            main_route="",
-            app_config=app_config,
-        )
+    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
+        return TracimApplicationInContext(app_config=app_config, app=self)
 
     def load_config(self, app_config: CFG) -> CFG:
         app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
@@ -81,4 +73,11 @@ class CollaborativeDocumentEditionApp(TracimApplication):
         return configurator
 
 
-application = CollaborativeDocumentEditionApp()
+application = CollaborativeDocumentEditionApp(
+    label="Collaborative Document Edition",
+    slug="collaborative_document_edition",
+    fa_icon="file-o",
+    is_active=True,
+    config={},
+    main_route="",
+)

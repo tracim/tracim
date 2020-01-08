@@ -9,16 +9,8 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class ContentThreadApp(TracimApplication):
-    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
-        thread = TracimApplicationInContext(
-            label="Threads",
-            slug="contents/thread",
-            fa_icon="comments-o",
-            is_active=True,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
-            app_config=app_config,
-        )
+    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
+        thread = TracimApplicationInContext(app_config=app_config, app=self)
         thread.add_content_type(
             slug="thread",
             label="Thread",
@@ -46,4 +38,11 @@ class ContentThreadApp(TracimApplication):
         return configurator
 
 
-application = ContentThreadApp()
+application = ContentThreadApp(
+    label="Threads",
+    slug="contents/thread",
+    fa_icon="comments-o",
+    is_active=True,
+    config={},
+    main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
+)

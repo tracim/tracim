@@ -15,16 +15,8 @@ from tracim_backend.views import BASE_API_V2
 
 
 class AgendaApp(TracimApplication):
-    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
-        return TracimApplicationInContext(
-            label="Agenda",
-            slug="agenda",
-            fa_icon="calendar",
-            is_active=app_config.CALDAV__ENABLED,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/agenda",
-            app_config=app_config,
-        )
+    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
+        return TracimApplicationInContext(app_config=app_config, app=self)
 
     def load_config(self, app_config: CFG) -> CFG:
         """
@@ -120,4 +112,11 @@ class AgendaApp(TracimApplication):
         return configurator
 
 
-application = AgendaApp()
+application = AgendaApp(
+    label="Agenda",
+    slug="agenda",
+    fa_icon="calendar",
+    config={},
+    is_active=True,
+    main_route="/ui/workspaces/{workspace_id}/agenda",
+)

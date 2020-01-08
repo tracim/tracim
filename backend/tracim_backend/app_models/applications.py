@@ -7,6 +7,7 @@ from tracim_backend.models.roles import WorkspaceRoles
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG  # noqa: F401
     from tracim_backend.app_models.contents import ContentStatus  # noqa: F401
+    from tracim_backend.lib.utils.app import TracimApplication
 
 
 class TracimApplicationInContext(object):
@@ -14,35 +15,41 @@ class TracimApplicationInContext(object):
     Application class with data needed for frontend
     """
 
-    def __init__(
-        self,
-        label: str,
-        slug: str,
-        fa_icon: str,
-        is_active: bool,
-        config: typing.Dict[str, str],
-        main_route: str,
-        app_config: "CFG",
-    ) -> None:
-        """
-        @param label: public label of application
-        @param slug: identifier of application
-        @param fa_icon: font awesome icon class
-        @param is_active: True if application enable, False if inactive
-        @param config: a dict with eventual application config
-        @param main_route: the route of the frontend "home" screen of
-        the application. For exemple, if you have an application
-        called "agenda", the main route will be something
-        like /workspace/{wid}/agenda.
-        """
-        self.label = label
-        self.slug = slug
-        self.fa_icon = fa_icon
-        self.hexcolor = self._get_hexcolor_or_default(slug, app_config)
-        self.is_active = is_active
-        self.config = config
-        self.main_route = main_route
-        self.content_types = []
+    def __init__(self, app_config: "CFG", app: "TracimApplication") -> None:
+        self.app = app
+        self.app_config = app_config
+
+    @property
+    def label(self) -> str:
+        return self.app.label
+
+    @property
+    def slug(self) -> str:
+        return self.app.slug
+
+    @property
+    def fa_icon(self) -> str:
+        return self.app.fa_icon
+
+    @property
+    def hexcolor(self) -> str:
+        return self._get_hexcolor_or_default(self.app.slug, self.app_config)
+
+    @property
+    def is_active(self) -> int:
+        return self.app.is_active
+
+    @property
+    def config(self) -> typing.Dict:
+        return self.app.config
+
+    @property
+    def main_route(self) -> str:
+        return self.app.main_route
+
+    @property
+    def content_types(self) -> typing.List[ContentType]:
+        return self.app.content_types
 
     # TODO - G.M - 2018-08-07 - Refactor slug coherence issue like this one.
     # we probably should not have 2 kind of slug

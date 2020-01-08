@@ -12,16 +12,8 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 
 
 class ShareApp(TracimApplication):
-    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
-        return TracimApplicationInContext(
-            label="Share Content",
-            slug="share_content",
-            fa_icon="share",
-            is_active=True,
-            config={},
-            main_route="",
-            app_config=app_config,
-        )
+    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
+        return TracimApplicationInContext(app_config=app_config, app=self)
 
     def load_config(self, app_config: CFG) -> CFG:
         # share content email
@@ -72,4 +64,11 @@ class ShareApp(TracimApplication):
         return configurator
 
 
-application = ShareApp()
+application = ShareApp(
+    label="Share Content",
+    slug="share_content",
+    fa_icon="share",
+    is_active=True,
+    config={},
+    main_route="",
+)

@@ -9,16 +9,8 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class ContentFileApp(TracimApplication):
-    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
-        _file = TracimApplicationInContext(
-            label="Files",
-            slug="contents/file",
-            fa_icon="paperclip",
-            is_active=True,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=file",
-            app_config=app_config,
-        )
+    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
+        _file = TracimApplicationInContext(app=self, app_config=app_config)
         _file.add_content_type(
             slug="file",
             label="File",
@@ -45,4 +37,11 @@ class ContentFileApp(TracimApplication):
         return configurator
 
 
-application = ContentFileApp()
+application = ContentFileApp(
+    label="Files",
+    slug="contents/file",
+    fa_icon="paperclip",
+    is_active=True,
+    config={},
+    main_route="/ui/workspaces/{workspace_id}/contents?type=file",
+)

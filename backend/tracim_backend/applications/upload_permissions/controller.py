@@ -2,6 +2,7 @@ from http import HTTPStatus
 import typing
 
 from pyramid.config import Configurator
+
 from tracim_backend import TracimRequest
 from tracim_backend.applications.upload_permissions.authorization import has_public_upload_enabled
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
@@ -41,6 +42,7 @@ SWAGGER_TAG__UPLOAD_PERMISSION_SECTION = "Upload Permission"
 SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__WORKSPACE_ENDPOINTS, SWAGGER_TAG__UPLOAD_PERMISSION_SECTION
 )
+
 
 class UploadPermissionController(Controller):
     """

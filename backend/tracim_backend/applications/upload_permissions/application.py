@@ -12,16 +12,8 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 
 
 class UploadPermissionApp(TracimApplication):
-    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
-        return TracimApplicationInContext(
-            label="Upload permission",
-            slug="upload_permission",
-            fa_icon="cloud-upload",
-            is_active=True,
-            config={},
-            main_route="",
-            app_config=app_config,
-        )
+    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
+        return TracimApplicationInContext(app=self, app_config=app_config)
 
     def load_config(self, app_config: CFG) -> CFG:
         app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML = app_config.get_raw_config(
@@ -83,4 +75,11 @@ class UploadPermissionApp(TracimApplication):
         return configurator
 
 
-application = UploadPermissionApp()
+application = UploadPermissionApp(
+    label="Upload permission",
+    slug="upload_permission",
+    fa_icon="cloud-upload",
+    is_active=True,
+    config={},
+    main_route="",
+)

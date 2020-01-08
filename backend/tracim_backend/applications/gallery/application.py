@@ -7,16 +7,8 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class GalleryApp(TracimApplication):
-    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
-        return TracimApplicationInContext(
-            label="Gallery",
-            slug="gallery",
-            fa_icon="picture-o",
-            is_active=True,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/gallery",
-            app_config=app_config,
-        )
+    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
+        return TracimApplicationInContext(app_config=app_config, app=self)
 
     def load_config(self, app_config: CFG) -> CFG:
         return app_config
@@ -35,4 +27,11 @@ class GalleryApp(TracimApplication):
         return configurator
 
 
-application = GalleryApp()
+application = GalleryApp(
+    label="Gallery",
+    slug="gallery",
+    fa_icon="picture-o",
+    is_active=True,
+    config={},
+    main_route="/ui/workspaces/{workspace_id}/gallery",
+)

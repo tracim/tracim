@@ -11,10 +11,24 @@ if typing.TYPE_CHECKING:
 
 
 class TracimApplication(ABC):
-    def __init__(self):
-        self.is_active = False
+    def __init__(
+        self,
+        label: str,
+        slug: str,
+        fa_icon: str,
+        is_active: bool,
+        config: typing.Dict[str, str],
+        main_route: str,
+    ) -> None:
+        self.label = label
+        self.slug = slug
+        self.fa_icon = fa_icon
+        self.is_active = is_active
+        self.config = config
+        self.main_route = main_route
+        self.content_types = []
 
-    def create_app(self, app_config: "CFG") -> TracimApplicationInContext:
+    def get_application_in_context(self, app_config: "CFG") -> TracimApplicationInContext:
         """ Create Tracim application"""
         raise NotImplementedError()
 

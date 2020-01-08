@@ -48,7 +48,6 @@ shareables_content_type = [FILE_TYPE]
 is_shareable_content_type = ContentTypeChecker(shareables_content_type)
 
 
-
 class ShareController(Controller):
     """
     Endpoints for Share Content

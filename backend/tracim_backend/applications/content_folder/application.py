@@ -10,16 +10,8 @@ from tracim_backend.models.roles import WorkspaceRoles
 
 
 class ContentFolderApp(TracimApplication):
-    def create_app(self, app_config: CFG) -> TracimApplicationInContext:
-        folder = TracimApplicationInContext(
-            label="Folder",
-            slug="contents/folder",
-            fa_icon="folder-o",
-            is_active=True,
-            config={},
-            main_route="",
-            app_config=app_config,
-        )
+    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
+        folder = TracimApplicationInContext(app=self, app_config=app_config)
         folder.add_content_type(
             slug="folder",
             label="Folder",
@@ -48,4 +40,11 @@ class ContentFolderApp(TracimApplication):
         return configurator
 
 
-application = ContentFolderApp()
+application = ContentFolderApp(
+    label="Folder",
+    slug="contents/folder",
+    fa_icon="folder-o",
+    is_active=True,
+    config={},
+    main_route="",
+)
