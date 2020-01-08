@@ -202,7 +202,10 @@ You can then run the process this way :
 ### With Pserve : legacy way, usefull for debug and dev ###
 
 This method rely on development.ini configuration. default web server used is _Waitress_
-in` development.ini.sample`
+in `development.ini.sample`
+
+:warning: By default, python warning are disabled. To enable warning please set
+`PYTHONWARNINGS` env var, for example `PYTHONWARNINGS=default` .
 
 run tracim_backend web api:
 
