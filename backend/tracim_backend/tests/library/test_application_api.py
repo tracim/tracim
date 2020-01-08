@@ -1,11 +1,31 @@
+from hapic.ext.pyramid import PyramidContext
 from mock import Mock
+from pyramid.config import Configurator
 
-from tracim_backend.app_models.applications import TracimApplicationInContext
+from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.workspace_menu_entries import all_content_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.models.roles import WorkspaceRoles
+
+
+class DummyApp(TracimApplication):
+    def load_config(self, app_config: CFG) -> CFG:
+        return app_config
+
+    def check_config(self, app_config: CFG) -> CFG:
+        return app_config
+
+    def import_controllers(
+        self,
+        configurator: Configurator,
+        app_config: CFG,
+        route_prefix: str,
+        context: PyramidContext,
+    ) -> Configurator:
+        return configurator
 
 
 class TestApplicationApi(object):
@@ -16,14 +36,14 @@ class TestApplicationApi(object):
         app_config = Mock()
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS["primary"] = "#fff"
-        thread = TracimApplicationInContext(
+
+        thread = DummyApp(
             label="Threads",
             slug="contents/thread",
             fa_icon="comments-o",
             is_active=True,
             config={},
             main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
-            app_config=app_config,
         )
         thread.add_content_type(
             slug="thread",
@@ -33,7 +53,7 @@ class TestApplicationApi(object):
             file_extension=".thread.html",
         )
 
-        markdownpluspage = TracimApplicationInContext(
+        markdownpluspage = DummyApp(
             label="Markdown Plus Documents",
             # TODO - G.M - 24-05-2018 - Check label
             slug="contents/markdownpluspage",
@@ -41,7 +61,6 @@ class TestApplicationApi(object):
             is_active=False,
             config={},
             main_route="/ui/workspaces/{workspace_id}/contents?type=markdownpluspage",
-            app_config=app_config,
         )
         markdownpluspage.add_content_type(
             slug="markdownpage",
@@ -53,7 +72,9 @@ class TestApplicationApi(object):
         workspace = Mock()
         workspace.workspace_id = 12
         workspace.agenda_enabled = True
-        default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)
+        default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(
+            workspace=workspace, app_config=app_config
+        )
         assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
         assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
@@ -69,14 +90,13 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS["primary"] = "#fff"
 
-        folder = TracimApplicationInContext(
+        folder = DummyApp(
             label="Folder",
             slug="contents/folder",
             fa_icon="folder-o",
             is_active=True,
             config={},
             main_route="",
-            app_config=app_config,
         )
         folder.add_content_type(
             slug="folder",
@@ -90,7 +110,9 @@ class TestApplicationApi(object):
         workspace = Mock()
         workspace.workspace_id = 12
         workspace.agenda_enabled = True
-        default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)
+        default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(
+            workspace=workspace, app_config=app_config
+        )
         assert len(default_workspace_menu_entry) == 2
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
         assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
@@ -100,20 +122,21 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS["primary"] = "#fff"
 
-        agenda = TracimApplicationInContext(
+        agenda = DummyApp(
             label="Agenda",
             slug="agenda",
             fa_icon="calendar",
             is_active=True,
             config={},
             main_route="/ui/workspaces/{workspace_id}/agenda",
-            app_config=app_config,
         )
         app_api = ApplicationApi(app_list=[agenda], show_all=False)
         workspace = Mock()
         workspace.workspace_id = 12
         workspace.agenda_enabled = True
-        default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)
+        default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(
+            workspace=workspace, app_config=app_config
+        )
         assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
         assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
@@ -124,20 +147,21 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS["primary"] = "#fff"
 
-        agenda = TracimApplicationInContext(
+        agenda = DummyApp(
             label="Agenda",
             slug="agenda",
             fa_icon="calendar",
             is_active=True,
             config={},
             main_route="/ui/workspaces/{workspace_id}/agenda",
-            app_config=app_config,
         )
         app_api = ApplicationApi(app_list=[agenda], show_all=False)
         workspace = Mock()
         workspace.workspace_id = 12
         workspace.agenda_enabled = False
-        default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)
+        default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(
+            workspace=workspace, app_config=app_config
+        )
         assert len(default_workspace_menu_entry) == 2
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
         assert default_workspace_menu_entry[1].label == all_content_menu_entry.label

@@ -1,7 +1,6 @@
 import pytest
 import transaction
 
-from tracim_backend.app_models.contents import ContentTypeInContext
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import InsufficientUserProfile
@@ -9,6 +8,7 @@ from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
+from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.authorization import AndAuthorizationChecker
 from tracim_backend.lib.utils.authorization import AuthorizationChecker
 from tracim_backend.lib.utils.authorization import CandidateUserProfileChecker
@@ -481,10 +481,9 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
         current_workspace = Workspace(workspace_id=3, owner=current_user)
-        candidate_content_type = ContentTypeInContext(
+        candidate_content_type = TracimContentType(
             slug="test",
             fa_icon="",
-            hexcolor="",
             label="Test",
             creation_label="Test",
             available_statuses=[],
@@ -500,7 +499,7 @@ class TestAuthorizationChecker(object):
         transaction.commit()
 
         class FakeContentTypeList(object):
-            def get_one_by_slug(self, slug=str) -> ContentTypeInContext:
+            def get_one_by_slug(self, slug=str) -> TracimContentType:
                 return candidate_content_type
 
         class FakeTracimContext(TracimContext):
@@ -523,10 +522,9 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
         current_workspace = Workspace(workspace_id=3, owner=current_user)
-        candidate_content_type = ContentTypeInContext(
+        candidate_content_type = TracimContentType(
             slug="test",
             fa_icon="",
-            hexcolor="",
             label="Test",
             creation_label="Test",
             available_statuses=[],
@@ -542,7 +540,7 @@ class TestAuthorizationChecker(object):
         transaction.commit()
 
         class FakeContentTypeList(object):
-            def get_one_by_slug(self, slug=str) -> ContentTypeInContext:
+            def get_one_by_slug(self, slug=str) -> TracimContentType:
                 return candidate_content_type
 
         class FakeTracimContext(TracimContext):
@@ -565,10 +563,9 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
         current_workspace = Workspace(workspace_id=3, owner=current_user)
-        candidate_content_type = ContentTypeInContext(
+        candidate_content_type = TracimContentType(
             slug="test",
             fa_icon="",
-            hexcolor="",
             label="Test",
             creation_label="Test",
             available_statuses=[],
@@ -582,7 +579,7 @@ class TestAuthorizationChecker(object):
         transaction.commit()
 
         class FakeContentTypeList(object):
-            def get_one_by_slug(self, slug=str) -> ContentTypeInContext:
+            def get_one_by_slug(self, slug=str) -> TracimContentType:
                 return candidate_content_type
 
         class FakeTracimContext(TracimContext):
@@ -609,10 +606,9 @@ class TestAuthorizationChecker(object):
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
         current_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level)
-        candidate_content_type = ContentTypeInContext(
+        candidate_content_type = TracimContentType(
             slug="test",
             fa_icon="",
-            hexcolor="",
             label="Test",
             creation_label="Test",
             available_statuses=[],
@@ -625,7 +621,7 @@ class TestAuthorizationChecker(object):
         transaction.commit()
 
         class FakeContentTypeList(object):
-            def get_one_by_slug(self, slug=str) -> ContentTypeInContext:
+            def get_one_by_slug(self, slug=str) -> TracimContentType:
                 return candidate_content_type
 
         class FakeTracimContext(TracimContext):
