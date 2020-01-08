@@ -3,7 +3,6 @@ import os
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.applications.share.controller import ShareController
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ConfigurationError
@@ -12,9 +11,6 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 
 
 class ShareApp(TracimApplication):
-    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
-        return TracimApplicationInContext(app_config=app_config, app=self)
-
     def load_config(self, app_config: CFG) -> CFG:
         # share content email
         app_config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML = app_config.get_raw_config(

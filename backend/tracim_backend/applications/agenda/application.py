@@ -4,7 +4,6 @@ from hapic.ext.pyramid import PyramidContext
 from paste.deploy.converters import asbool
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.applications.agenda.authorization import add_www_authenticate_header_for_caldav
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import CaldavNotAuthenticated
@@ -15,9 +14,6 @@ from tracim_backend.views import BASE_API_V2
 
 
 class AgendaApp(TracimApplication):
-    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
-        return TracimApplicationInContext(app_config=app_config, app=self)
-
     def load_config(self, app_config: CFG) -> CFG:
         """
         load config for caldav related stuff

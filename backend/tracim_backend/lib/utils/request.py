@@ -6,7 +6,6 @@ import pluggy
 from pyramid.request import Request
 from sqlalchemy.orm import Session
 
-from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFoundInTracimRequest
@@ -21,6 +20,7 @@ from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
@@ -111,7 +111,7 @@ class TracimContext(object):
         )
 
     @property
-    def candidate_content_type(self) -> ContentType:
+    def candidate_content_type(self) -> TracimContentType:
         """
         content_type given in entry
         """
@@ -186,7 +186,9 @@ class TracimContext(object):
             content_type=content_type_list.Any_SLUG,
         )
 
-    def _get_content_type(self, content_type_slug_fetcher: typing.Callable[[], str]) -> ContentType:
+    def _get_content_type(
+        self, content_type_slug_fetcher: typing.Callable[[], str]
+    ) -> TracimContentType:
         content_type_slug = content_type_slug_fetcher()
         return content_type_list.get_one_by_slug(content_type_slug)
 

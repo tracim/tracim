@@ -9,11 +9,13 @@ from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.utils.app import TracimApplication  # noqa:F401
+from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.app_models.applications import TracimApplicationInContext  # noqa: F401
+    from tracim_backend.config import CFG
 
 
 class GlobalStatus(Enum):
@@ -105,34 +107,59 @@ content_status_list = ContentStatusList(
 # ContentType
 
 
-class ContentType(object):
+class ContentTypeInContext(object):
     """
     Future ContentType object class
     """
 
-    def __init__(
-        self,
-        slug: str,
-        fa_icon: str,
-        hexcolor: str,
-        label: str,
-        creation_label: str,
-        available_statuses: typing.List[ContentStatus],
-        slug_alias: typing.List[str] = None,
-        allow_sub_content: bool = False,
-        file_extension: typing.Optional[str] = None,
-        minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
-    ) -> None:
-        self.slug = slug
-        self.fa_icon = fa_icon
-        self.hexcolor = hexcolor
-        self.label = label
-        self.creation_label = creation_label
-        self.available_statuses = available_statuses
-        self.slug_alias = slug_alias
-        self.allow_sub_content = allow_sub_content
-        self.file_extension = file_extension
-        self.minimal_role_content_creation = minimal_role_content_creation
+    def __init__(self, app_config: "CFG", content_type: "TracimContentType") -> None:
+        self.content_type = content_type
+        self.app_config = app_config
+
+    @property
+    def label(self) -> str:
+        return self.content_type.label
+
+    @property
+    def slug(self) -> str:
+        return self.content_type.slug
+
+    @property
+    def fa_icon(self) -> str:
+        return self.content_type.fa_icon
+
+    @property
+    def hexcolor(self) -> str:
+        if self.content_type.app:
+            app_api = ApplicationApi(app_list)
+            return app_api.get_application_in_context(
+                self.content_type.app, self.app_config
+            ).hexcolor
+        return ""
+
+    @property
+    def creation_label(self) -> str:
+        return self.content_type.creation_label
+
+    @property
+    def available_statuses(self) -> typing.List[ContentStatus]:
+        return self.content_type.available_statuses
+
+    @property
+    def slug_alias(self) -> typing.List[str]:
+        return self.content_type.slug_alias
+
+    @property
+    def allow_sub_content(self) -> bool:
+        return self.content_type.allow_sub_content
+
+    @property
+    def minimal_role_content_creation(self) -> WorkspaceRoles:
+        return self.content_type.minimal_role_content_creation
+
+    @property
+    def file_extension(self) -> str:
+        return self.content_type.file_extension
 
 
 THREAD_TYPE = "thread"
@@ -142,20 +169,19 @@ HTML_DOCUMENTS_TYPE = "html-document"
 FOLDER_TYPE = "folder"
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
-event_type = ContentType(
+event_type = TracimContentType(
     slug="event",
     fa_icon="",
-    hexcolor="",
     label="Event",
     creation_label="Event",
     available_statuses=content_status_list.get_all(),
+    app=None,
 )
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
-comment_type = ContentType(
+comment_type = TracimContentType(
     slug="comment",
     fa_icon="",
-    hexcolor="",
     label="Comment",
     creation_label="Comment",
     available_statuses=content_status_list.get_all(),
@@ -172,33 +198,33 @@ class ContentTypeList(object):
     Event = event_type
 
     @property
-    def Folder(self) -> ContentType:
+    def Folder(self) -> TracimContentType:
         return self.get_one_by_slug(FOLDER_TYPE)
 
     @property
-    def File(self) -> ContentType:
+    def File(self) -> TracimContentType:
         return self.get_one_by_slug(FILE_TYPE)
 
     @property
-    def Page(self) -> ContentType:
+    def Page(self) -> TracimContentType:
         return self.get_one_by_slug(HTML_DOCUMENTS_TYPE)
 
     @property
-    def Thread(self) -> ContentType:
+    def Thread(self) -> TracimContentType:
         return self.get_one_by_slug(THREAD_TYPE)
 
-    def __init__(self, app_list: typing.List["TracimApplicationInContext"]):
+    def __init__(self, app_list: typing.List["TracimApplication"]):
         self.app_list = app_list
         self._special_contents_types = [self.Comment]
         self._extra_slugs = [self.Any_SLUG]
 
     @property
-    def _content_types(self) -> List[ContentType]:
+    def _content_types(self) -> List[TracimContentType]:
         app_api = ApplicationApi(self.app_list)
         content_types = app_api.get_content_types()
         return content_types
 
-    def get_one_by_slug(self, slug: str) -> ContentType:
+    def get_one_by_slug(self, slug: str) -> TracimContentType:
         """
         Get ContentType object according to slug
         match for both slug and slug_alias
@@ -220,7 +246,7 @@ class ContentTypeList(object):
         allowed_type_slug = [contents_type.slug for contents_type in self._content_types]
         return allowed_type_slug
 
-    def endpoint_allowed_types(self) -> typing.List[ContentType]:
+    def endpoint_allowed_types(self) -> typing.List[TracimContentType]:
         """
         Same as restricted_allowed_types_slug but return
         ContentType instead of str slug
@@ -266,6 +292,11 @@ class ContentTypeList(object):
         for elem in sub_content_allowed:
             properties_dict[elem] = True
         return properties_dict
+
+    def get_content_type_in_context(
+        self, content_type: TracimContentType, app_config: "CFG"
+    ) -> ContentTypeInContext:
+        return ContentTypeInContext(content_type=content_type, app_config=app_config)
 
 
 content_type_list = ContentTypeList(app_list)

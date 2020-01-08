@@ -6,17 +6,18 @@ from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.app_models.workspace_menu_entries import all_content_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
 from tracim_backend.exceptions import AppDoesNotExist
+from tracim_backend.lib.utils.app import TracimApplication
+from tracim_backend.lib.utils.app import TracimContentType
 
 if typing.TYPE_CHECKING:
     from tracim_backend.models.data import Workspace
+    from tracim_backend.config import CFG
     from tracim_backend.app_models.applications import TracimApplicationInContext  # noqa:F401
-    from tracim_backend.app_models.contents import ContentType  # noqa: F401
+    from tracim_backend.app_models.contents import ContentTypeInContext  # noqa: F401
 
 
 class ApplicationApi(object):
-    def __init__(
-        self, app_list: List["TracimApplicationInContext"], show_all: bool = False
-    ) -> None:
+    def __init__(self, app_list: List["TracimApplication"], show_all: bool = False) -> None:
         self.apps = app_list
         self.show_all = show_all
 
@@ -26,7 +27,14 @@ class ApplicationApi(object):
                 return app
         raise AppDoesNotExist("Application {app} does not exist".format(app=slug))
 
-    def get_all(self) -> List["TracimApplicationInContext"]:
+    def get_application_in_context(
+        self, app: TracimApplication, app_config: "CFG"
+    ) -> "TracimApplicationInContext":
+        from tracim_backend.app_models.applications import TracimApplicationInContext
+
+        return TracimApplicationInContext(app=app, app_config=app_config)
+
+    def get_all(self) -> List["TracimApplication"]:
         active_apps = []
         for app in self.apps:
             if self.show_all or app.is_active:
@@ -34,7 +42,7 @@ class ApplicationApi(object):
 
         return active_apps
 
-    def get_content_types(self) -> List["ContentType"]:
+    def get_content_types(self) -> List[TracimContentType]:
         active_content_types = []
         for app in self.get_all():
             if app.content_types:
@@ -43,13 +51,16 @@ class ApplicationApi(object):
         return active_content_types
 
     def get_default_workspace_menu_entry(
-        self, workspace: "Workspace"
+        self, workspace: "Workspace", app_config: "CFG"
     ) -> typing.List[WorkspaceMenuEntry]:
         """
         Get default menu entry for a workspace
         """
         menu_entries = [copy(dashboard_menu_entry), copy(all_content_menu_entry)]
-        for app in self.get_all():
+        applications_in_context = [
+            self.get_application_in_context(app, app_config) for app in self.get_all()
+        ]
+        for app in applications_in_context:
             # FIXME - G.M - 2019-04-01 - temporary fix to avoid giving agenda
             # menu entry, menu entry should be added through hook in app itself
             # see issue #706, https://github.com/tracim/tracim/issues/706

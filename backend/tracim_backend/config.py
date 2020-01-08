@@ -687,8 +687,7 @@ class CFG(object):
     def _set_default_app(self, enabled_app_list: typing.List[str]) -> None:
         available_apps = OrderedDict()
         for app in self.apps:
-            new_app = app.get_application_in_context(self)
-            available_apps.update({new_app.slug: new_app})
+            available_apps.update({app.slug: app})
 
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var

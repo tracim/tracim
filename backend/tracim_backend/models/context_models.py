@@ -751,7 +751,7 @@ class WorkspaceInContext(object):
         # list should be able to change (depending on activated/disabled
         # apps)
         app_api = ApplicationApi(app_list)
-        return app_api.get_default_workspace_menu_entry(self.workspace)
+        return app_api.get_default_workspace_menu_entry(self.workspace, self.config)
 
     @property
     def frontend_url(self):

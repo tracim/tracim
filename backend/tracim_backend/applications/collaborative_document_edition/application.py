@@ -2,7 +2,6 @@ from hapic.ext.pyramid import PyramidContext
 from paste.deploy.converters import asbool
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
     CollaborativeDocumentEditionFactory,
 )
@@ -15,9 +14,6 @@ from tracim_backend.views import BASE_API_V2
 
 
 class CollaborativeDocumentEditionApp(TracimApplication):
-    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
-        return TracimApplicationInContext(app_config=app_config, app=self)
-
     def load_config(self, app_config: CFG) -> CFG:
         app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
             app_config.get_raw_config("collaborative_document_edition.activated", "false")

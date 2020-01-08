@@ -1,7 +1,6 @@
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.applications.content_file.file_controller import FileController
 from tracim_backend.config import CFG
@@ -9,16 +8,6 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class ContentFileApp(TracimApplication):
-    def get_application_in_context(self, app_config: CFG) -> TracimApplicationInContext:
-        _file = TracimApplicationInContext(app=self, app_config=app_config)
-        _file.add_content_type(
-            slug="file",
-            label="File",
-            creation_label="Upload a file",
-            available_statuses=content_status_list.get_all(),
-        )
-        return _file
-
     def load_config(self, app_config: CFG) -> CFG:
         return app_config
 
@@ -44,4 +33,10 @@ application = ContentFileApp(
     is_active=True,
     config={},
     main_route="/ui/workspaces/{workspace_id}/contents?type=file",
+)
+application.add_content_type(
+    slug="file",
+    label="File",
+    creation_label="Upload a file",
+    available_statuses=content_status_list.get_all(),
 )

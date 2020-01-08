@@ -5,9 +5,37 @@ from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.applications import TracimApplicationInContext
+from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.config import CFG
+    from tracim_backend.config import CFG  # noqa:F401
+    from tracim_backend.app_models.contents import ContentStatus  # noqa:F401
+
+
+class TracimContentType(ABC):
+    def __init__(
+        self,
+        slug: str,
+        fa_icon: str,
+        label: str,
+        creation_label: str,
+        available_statuses: typing.List["ContentStatus"],
+        app: "TracimApplication" = None,
+        slug_alias: typing.List[str] = None,
+        allow_sub_content: bool = False,
+        file_extension: typing.Optional[str] = None,
+        minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
+    ) -> None:
+        self.slug = slug
+        self.fa_icon = fa_icon
+        self.label = label
+        self.creation_label = creation_label
+        self.available_statuses = available_statuses
+        self.slug_alias = slug_alias
+        self.allow_sub_content = allow_sub_content
+        self.file_extension = file_extension
+        self.minimal_role_content_creation = minimal_role_content_creation
+        self.app = app
 
 
 class TracimApplication(ABC):
@@ -26,7 +54,32 @@ class TracimApplication(ABC):
         self.is_active = is_active
         self.config = config
         self.main_route = main_route
-        self.content_types = []
+        self.content_types = []  # typing.List[ContentType]
+
+    def add_content_type(
+        self,
+        label: str,
+        slug: str,
+        creation_label: str,
+        available_statuses: typing.List["ContentStatus"],
+        slug_alias: typing.List[str] = None,
+        allow_sub_content: bool = False,
+        file_extension: typing.Optional[str] = None,
+        minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
+    ) -> None:
+        content_type = TracimContentType(
+            slug=slug,
+            fa_icon=self.fa_icon,
+            label=label,
+            creation_label=creation_label,
+            available_statuses=available_statuses,
+            slug_alias=slug_alias,
+            allow_sub_content=allow_sub_content,
+            file_extension=file_extension,
+            minimal_role_content_creation=minimal_role_content_creation,
+            app=self,
+        )
+        self.content_types.append(content_type)
 
     def get_application_in_context(self, app_config: "CFG") -> TracimApplicationInContext:
         """ Create Tracim application"""
