@@ -19,8 +19,6 @@ import {
 import { CUSTOM_EVENT } from '../src/customEvent.js'
 import { generateLocalStorageContentId } from '../src/helper.js'
 
-
-
 describe('appContentFactory.js', () => {
   const fakeCheckApiUrl = sinon.stub() // TODO: Do I need a stub here ?
   global.GLOBAL_dispatchEvent = sinon.spy()
@@ -399,14 +397,12 @@ describe('appContentFactory.js', () => {
 
   describe('function appContentChangeStatus', () => {
     describe('on status change success', async () => {
-      let response = {}
-
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
 
         const newStatusSlug = status.VALIDATED.slug
         mockPutContentStatus204(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, appContentSlug, newStatusSlug)
-        response = await wrapper.instance().appContentChangeStatus(fakeContent, newStatusSlug, appContentSlug)
+        await wrapper.instance().appContentChangeStatus(fakeContent, newStatusSlug, appContentSlug)
       })
 
       after(() => {
@@ -429,13 +425,11 @@ describe('appContentFactory.js', () => {
 
   describe('function appContentArchive', () => {
     describe('on archive success', async () => {
-      let response = {}
-
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
 
         mockPutContentArchive204(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id)
-        response = await wrapper.instance().appContentArchive(fakeContent, fakeSetState, appContentSlug)
+        await wrapper.instance().appContentArchive(fakeContent, fakeSetState, appContentSlug)
       })
 
       after(() => {
@@ -464,13 +458,11 @@ describe('appContentFactory.js', () => {
 
   describe('function appContentDelete', () => {
     describe('on delete success', async () => {
-      let response = {}
-
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
 
         mockPutContentDelete204(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id)
-        response = await wrapper.instance().appContentDelete(fakeContent, fakeSetState, appContentSlug)
+        await wrapper.instance().appContentDelete(fakeContent, fakeSetState, appContentSlug)
       })
 
       after(() => {
@@ -499,13 +491,11 @@ describe('appContentFactory.js', () => {
 
   describe('function appContentRestoreArchive', () => {
     describe('on archive restore success', async () => {
-      let response = {}
-
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
 
         mockPutContentArchiveRestore204(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id)
-        response = await wrapper.instance().appContentRestoreArchive(fakeContent, fakeSetState, appContentSlug)
+        await wrapper.instance().appContentRestoreArchive(fakeContent, fakeSetState, appContentSlug)
       })
 
       after(() => {
@@ -534,13 +524,11 @@ describe('appContentFactory.js', () => {
 
   describe('function appContentRestoreDelete', () => {
     describe('on archive restore success', async () => {
-      let response = {}
-
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
 
         mockPutContentDeleteRestore204(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id)
-        response = await wrapper.instance().appContentRestoreDelete(fakeContent, fakeSetState, appContentSlug)
+        await wrapper.instance().appContentRestoreDelete(fakeContent, fakeSetState, appContentSlug)
       })
 
       after(() => {
