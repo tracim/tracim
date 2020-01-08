@@ -4,5 +4,6 @@ export const htmlDocument = {
   isActive: true,
   faIcon: 'file-text-o',
   hexcolor: '#00CC00',
-  config: {}
+  config: {},
+  creationLabel: 'Create a htmlDocument'
 }

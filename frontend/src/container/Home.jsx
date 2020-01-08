@@ -12,7 +12,7 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import HomeNoWorkspace from '../component/Home/HomeNoWorkspace.jsx'
 import HomeHasWorkspace from '../component/Home/HomeHasWorkspace.jsx'
 
-class Home extends React.Component {
+export class Home extends React.Component {
   handleClickCreateWorkspace = e => {
     e.preventDefault()
     const { props } = this

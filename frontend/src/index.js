@@ -10,8 +10,9 @@ import { I18nextProvider } from 'react-i18next'
 import i18n from './i18n.js'
 import { DragDropContextProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
+import { history } from './helper'
 
-export const history = require('history').createBrowserHistory()
+// export const history = require('history').createBrowserHistory()
 
 require('./css/index.styl')
 

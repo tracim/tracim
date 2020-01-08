@@ -52,7 +52,7 @@ import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
 
-class Tracim extends React.Component {
+export class Tracim extends React.Component {
   constructor (props) {
     super(props)
 

@@ -4,5 +4,6 @@ export const agenda = {
   isActive: true,
   faIcon: 'calendar',
   hexcolor: '#ff4b3a',
-  config: {}
+  config: {},
+  creationLabel: 'Create a agenda'
 }
