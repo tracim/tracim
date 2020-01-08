@@ -14,10 +14,10 @@ import transaction
 from tracim_backend import CFG
 from tracim_backend import TracimRequest
 from tracim_backend import hapic
-from tracim_backend.applications.collaborative_document_edition.controller import (
+from tracim_backend.applications.collaborative_document_edition.data import (
     COLLABORATIVE_DOCUMENT_EDITION_BASE,
 )
-from tracim_backend.applications.collaborative_document_edition.controller import (
+from tracim_backend.applications.collaborative_document_edition.data import (
     SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
 )
 from tracim_backend.applications.collaborative_document_edition.wopi.lib import WopiLib

@@ -1,17 +1,18 @@
 from hapic.ext.pyramid import PyramidContext
 from paste.deploy.converters import asbool
 from pyramid.config import Configurator
-from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import \
-    CollaborativeDocumentEditionFactory
-from tracim_backend.views import BASE_API_V2
+
 from tracim_backend.app_models.applications import Application
-from tracim_backend.applications.collaborative_document_edition.data import \
-    COLLABORA_DOCUMENT_EDITION_SLUG
+from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
+    CollaborativeDocumentEditionFactory,
+)
+from tracim_backend.applications.collaborative_document_edition.data import (
+    COLLABORA_DOCUMENT_EDITION_SLUG,
+)
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.app import TracimApp
+from tracim_backend.views import BASE_API_V2
 
-SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS = "Collaborative Document Edition"
-COLLABORATIVE_DOCUMENT_EDITION_BASE = "collaborative-document-edition"
 
 class CollaborativeDocumentEditionApp(TracimApp):
     def create_app(self, app_config: CFG) -> Application:

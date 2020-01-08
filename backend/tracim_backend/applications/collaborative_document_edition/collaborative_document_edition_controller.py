@@ -14,10 +14,10 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
     CollaborativeDocumentEditionFactory,
 )
-from tracim_backend.applications.collaborative_document_edition.controller import (
+from tracim_backend.applications.collaborative_document_edition.data import (
     COLLABORATIVE_DOCUMENT_EDITION_BASE,
 )
-from tracim_backend.applications.collaborative_document_edition.controller import (
+from tracim_backend.applications.collaborative_document_edition.data import (
     SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
 )
 from tracim_backend.applications.collaborative_document_edition.models import (

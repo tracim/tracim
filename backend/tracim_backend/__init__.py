@@ -10,12 +10,6 @@ from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
 
 from tracim_backend.applications.agenda.app_factory import CaldavAppFactory
-from tracim_backend.applications.content_file.file_controller import FileController
-from tracim_backend.applications.content_folder.folder_controller import FolderController
-from tracim_backend.applications.content_html_document.html_document_controller import (
-    HTMLDocumentController,
-)
-from tracim_backend.applications.content_thread.threads_controller import ThreadController
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import ContentInNotEditableState
@@ -37,7 +31,6 @@ from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.plugins import init_plugin_manager
-from tracim_backend.lib.utils.app import TracimControllerImporter
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -50,7 +43,6 @@ from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
 from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.lib.utils.utils import load_apps
 from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
@@ -189,10 +181,6 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     reset_password_controller = ResetPasswordController()
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
-    html_document_controller = HTMLDocumentController()
-    thread_controller = ThreadController()
-    file_controller = FileController()
-    folder_controller = FolderController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -200,14 +188,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(reset_password_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(workspace_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(html_document_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
 
-    load_apps()
-    for controller_import in TracimControllerImporter.__subclasses__():
-        controller_import().import_controller(
+    for app in app_config.apps:
+        app.import_controllers(
             app_config=app_config,
             configurator=configurator,
             route_prefix=BASE_API_V2,
