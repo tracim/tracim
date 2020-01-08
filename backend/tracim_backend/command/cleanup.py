@@ -121,7 +121,7 @@ class DeleteUserCommand(AppContextCommand):
                 print(
                     '(!) Custom anonymize name choosen is: "{}"'.format(parsed_args.anonymize_name)
                 )
-
+        print("")
         deleted_user_ids = set()  # typing.Set[int]
         deleted_workspace_ids = set()  # typing.Set[int]
 
@@ -141,7 +141,7 @@ class DeleteUserCommand(AppContextCommand):
                 except UserDoesNotExist as exc:
                     print('ERROR: user with email "{}" does not exist'.format(login))
                     raise exc
-            print("\n~~~~")
+            print("~~~~")
             print("Deletion of user from Database")
             print("~~~~\n")
             print("~~~~")
