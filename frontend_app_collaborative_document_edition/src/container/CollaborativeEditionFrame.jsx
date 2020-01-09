@@ -16,10 +16,13 @@ import {
 const FORM_ID = 'loleafletform'
 const IFRAME_ID = 'loleafletframe'
 
-class CollaborativeEditionFrame extends React.Component {
+export class CollaborativeEditionFrame extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      config: props.data ? props.data.config : {},
+      loggedUser: props.data ? props.data.loggedUser : {},
+      content: props.data ? props.data.content : {},
       iframeUrl: '',
       formId: props.formId ? props.formId : FORM_ID,
       iframeId: props.frameId ? props.frameId : IFRAME_ID,
@@ -35,8 +38,7 @@ class CollaborativeEditionFrame extends React.Component {
       },
       accessToken: '',
       onlineEditorUrl: '',
-      ready: false,
-      loggedUser: props.data.loggedUser
+      ready: false
     }
     // INFO - B.L - 2019/09/03 handleIframeIsClosing is called by an event from window so we have to bind this
     this.handleIframeIsClosing = this.handleIframeIsClosing.bind(this)
