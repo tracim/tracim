@@ -200,7 +200,7 @@ This method relies on development.ini configuration. default web server used is 
 in` development.ini.sample`
 
 :warning: By default, python warning are disabled. To enable warning please set
-`PYTHONWARNINGS` env var, for example `PYTHONWARNINGS=default` .
+`PYTHONWARNINGS` env var, for example `export PYTHONWARNINGS=default` .
 
 Run the tracim_backend web api:
 
