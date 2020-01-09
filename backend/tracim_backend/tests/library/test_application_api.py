@@ -57,7 +57,6 @@ class TestApplicationApi(object):
             # TODO - G.M - 24-05-2018 - Check label
             slug="contents/markdownpluspage",
             fa_icon="file-code-o",
-            is_active=False,
             config={},
             main_route="/ui/workspaces/{workspace_id}/contents?type=markdownpluspage",
         )
@@ -67,6 +66,8 @@ class TestApplicationApi(object):
             creation_label="Create a Markdown document",
             available_statuses=content_status_list.get_all(),
         )
+        thread.is_active = True
+        markdownpluspage.is_active = False
         app_api = ApplicationApi(app_list=[thread, markdownpluspage], show_all=False)
         workspace = Mock()
         workspace.workspace_id = 12
@@ -100,6 +101,7 @@ class TestApplicationApi(object):
             allow_sub_content=True,
             minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
         )
+        folder.is_active = True
         app_api = ApplicationApi(app_list=[folder], show_all=False)
         workspace = Mock()
         workspace.workspace_id = 12
@@ -123,6 +125,7 @@ class TestApplicationApi(object):
             config={},
             main_route="/ui/workspaces/{workspace_id}/agenda",
         )
+        agenda.is_active = True
         app_api = ApplicationApi(app_list=[agenda], show_all=False)
         workspace = Mock()
         workspace.workspace_id = 12
@@ -147,6 +150,7 @@ class TestApplicationApi(object):
             config={},
             main_route="/ui/workspaces/{workspace_id}/agenda",
         )
+        agenda.is_active = True
         app_api = ApplicationApi(app_list=[agenda], show_all=False)
         workspace = Mock()
         workspace.workspace_id = 12
