@@ -36,12 +36,14 @@ export class Gallery extends React.Component {
   constructor (props) {
     super(props)
 
+    const param = props.data || debug
+
     this.state = {
       appName: 'gallery',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
       breadcrumbsList: [],
       appMounted: false,
       folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || 0) : debug.config.folderId,
@@ -74,11 +76,11 @@ export class Gallery extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Gallery> Custom event', 'color: #28a745', type, data)
-        const currentFolderId = qs.parse(data.config.history.location.search).folder_ids
-        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || currentFolderId !== state.folderId) {
+        const newFolderId = qs.parse(data.config.history.location.search).folder_ids
+        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || newFolderId !== state.folderId) {
           this.setState({
             config: data.config,
-            folderId: currentFolderId
+            folderId: newFolderId
           })
         }
         break

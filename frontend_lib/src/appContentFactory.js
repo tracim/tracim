@@ -77,7 +77,8 @@ export function appContentFactory (WrappedComponent) {
       buildBreadcrumbs()
     }
 
-    appContentCustomEventHandlerAllAppChangeLanguage = (isTimelineWysiwyg, newLang, changeNewCommentHandler, setState, i18n, loadTimeline) => {
+    // INFO - 2019-01-09 - if param isTimelineWysiwyg is false, param changeNewCommentHandler isn't required
+    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n, isTimelineWysiwyg, changeNewCommentHandler = null) => {
       if (isTimelineWysiwyg) {
         tinymce.remove('#wysiwygTimelineComment')
         wysiwyg('#wysiwygTimelineComment', newLang, changeNewCommentHandler)
@@ -90,10 +91,9 @@ export function appContentFactory (WrappedComponent) {
         }
       }))
       i18n.changeLanguage(newLang)
-      loadTimeline()
     }
 
-    appContentChangeTitle = async (content, newTitle, appSlug) => {
+    appContentChangeTitle = async (content, newTitle, appSlug, propertiesToAddToBody = {}) => {
       this.checkApiUrl()
 
       if (content.label === newTitle) return
@@ -106,7 +106,8 @@ export function appContentFactory (WrappedComponent) {
           method: 'PUT',
           body: JSON.stringify({
             label: newTitle,
-            raw_content: content.raw_content
+            raw_content: content.raw_content,
+            ...propertiesToAddToBody
           })
         })
       )

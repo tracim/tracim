@@ -218,15 +218,12 @@ describe('appContentFactory.js', () => {
     before(() => {
       global.tinymce.remove = fakeTinymceRemove
       global.wysiwyg = fakeWysiwygConstructor
-      wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(
-        false, newLang, dummyChangeNewCommentHandler, fakeSetState, fakeI18n, fakeLoadTimeline
-      )
+      wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n, false)
     })
 
     after(() => {
       fakeSetState.resetHistory()
       fakeI18nChangeLanguage.resetHistory()
-      fakeLoadTimeline.resetHistory()
     })
 
     it('should call setState to change the user lang', () => {
@@ -238,18 +235,12 @@ describe('appContentFactory.js', () => {
       sinon.assert.calledWith(fakeI18nChangeLanguage, newLang)
     })
 
-    it('should call the function loadTimeline', () => {
-      expect(fakeLoadTimeline.called).to.equal(true)
-    })
-
     describe('with isTimelineWysiwyg to true', () => {
       const fakeWysiwygConstructor = sinon.spy()
       before(() => {
         global.tinymce.remove = fakeTinymceRemove
         global.wysiwyg = fakeWysiwygConstructor
-        wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(
-          true, newLang, dummyChangeNewCommentHandler, fakeSetState, fakeI18n, fakeLoadTimeline
-        )
+        wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n, true, dummyChangeNewCommentHandler)
       })
 
       after(() => {
@@ -257,7 +248,6 @@ describe('appContentFactory.js', () => {
         fakeWysiwygConstructor.resetHistory()
         fakeSetState.resetHistory()
         fakeI18nChangeLanguage.resetHistory()
-        fakeLoadTimeline.resetHistory()
       })
 
       it('should remove the tinymce comment field', () => {
