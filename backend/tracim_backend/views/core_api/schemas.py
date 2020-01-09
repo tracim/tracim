@@ -25,6 +25,7 @@ from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
 from tracim_backend.app_models.validator import user_password_validator
 from tracim_backend.app_models.validator import user_profile_validator
+from tracim_backend.app_models.validator import user_profile_validator_with_nobody
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
@@ -206,7 +207,7 @@ class UserSchema(UserDigestSchema):
     )
     profile = StrippedString(
         attribute="profile",
-        validate=user_profile_validator,
+        validate=user_profile_validator_with_nobody,
         example="trusted-users",
         description=FIELD_PROFILE_DESC,
     )
@@ -294,6 +295,7 @@ class SetUserProfileSchema(marshmallow.Schema):
         validate=user_profile_validator,
         example="trusted-users",
         description=FIELD_PROFILE_DESC,
+        required=True,
     )
 
     @post_load
