@@ -3,7 +3,6 @@ import os
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend.applications.upload_permissions.controller import UploadPermissionController
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.lib.utils.app import TracimApplication
@@ -67,6 +66,10 @@ class UploadPermissionApp(TracimApplication):
         route_prefix: str,
         context: PyramidContext,
     ) -> None:
+        from tracim_backend.applications.upload_permissions.controller import (
+            UploadPermissionController,
+        )
+
         upload_permission_controller = UploadPermissionController()
         configurator.include(upload_permission_controller.bind, route_prefix=route_prefix)
 
@@ -75,7 +78,6 @@ application = UploadPermissionApp(
     label="Upload permission",
     slug="upload_permission",
     fa_icon="cloud-upload",
-    is_active=True,
     config={},
     main_route="",
 )

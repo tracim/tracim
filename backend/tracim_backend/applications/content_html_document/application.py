@@ -2,9 +2,6 @@ from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import content_status_list
-from tracim_backend.applications.content_html_document.html_document_controller import (
-    HTMLDocumentController,
-)
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.app import TracimApplication
 
@@ -33,6 +30,10 @@ class ContentHTMLDocumentApp(TracimApplication):
         route_prefix: str,
         context: PyramidContext,
     ) -> None:
+        from tracim_backend.applications.content_html_document.html_document_controller import (
+            HTMLDocumentController,
+        )
+
         html_document_controller = HTMLDocumentController()
         configurator.include(html_document_controller.bind, route_prefix=route_prefix)
 
@@ -41,7 +42,6 @@ application = ContentHTMLDocumentApp(
     label="Text Documents",  # TODO - G.M - 24-05-2018 - Check label
     slug="contents/html-document",
     fa_icon="file-text-o",
-    is_active=True,
     config={},
     main_route="/ui/workspaces/{workspace_id}/contents?type=html-document",
 )

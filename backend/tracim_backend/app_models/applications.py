@@ -33,7 +33,7 @@ class TracimApplicationInContext(object):
         return self._get_hexcolor_or_default(self.app.slug, self.app_config)
 
     @property
-    def is_active(self) -> int:
+    def is_active(self) -> bool:
         return self.app.is_active
 
     @property

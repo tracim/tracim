@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
+from tracim_backend import app_list
 from tracim_backend.app_models.validator import TracimValidator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -21,6 +22,7 @@ from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
+from tracim_backend.exceptions import AppDoesNotExist
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailTemplateError
@@ -47,6 +49,7 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
@@ -887,7 +890,9 @@ class UserApi(object):
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_updated_user should start hook use by agenda  app code.
 
-        if self._config.CALDAV__ENABLED:
+        app_lib = ApplicationApi(app_list=app_list)
+        try:
+            app_lib.get_one("agenda")
             agenda_api = AgendaApi(
                 current_user=self._user, session=self._session, config=self._config
             )
@@ -899,6 +904,8 @@ class UserApi(object):
             except Exception as exc:
                 logger.error(self, "Something goes wrong during agenda create/update")
                 logger.exception(self, exc)
+        except AppDoesNotExist:
+            pass
 
     def execute_created_user_actions(self, user: User) -> None:
         """
@@ -918,7 +925,9 @@ class UserApi(object):
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_created_user should start hook use by agenda  app code.
 
-        if self._config.CALDAV__ENABLED:
+        app_lib = ApplicationApi(app_list=app_list)
+        try:
+            app_lib.get_one("agenda")
             agenda_api = AgendaApi(
                 current_user=self._user, session=self._session, config=self._config
             )
@@ -937,6 +946,8 @@ class UserApi(object):
             except Exception as exc:
                 logger.error(self, "Something goes wrong during agenda create/update")
                 logger.exception(self, exc)
+        except AppDoesNotExist:
+            pass
 
     def _check_user_auth_validity(self, user: User) -> None:
         if not self._user_can_authenticate(user):

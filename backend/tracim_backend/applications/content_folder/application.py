@@ -2,7 +2,6 @@ from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import content_status_list
-from tracim_backend.applications.content_folder.folder_controller import FolderController
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.models.roles import WorkspaceRoles
@@ -32,15 +31,12 @@ class ContentFolderApp(TracimApplication):
         route_prefix: str,
         context: PyramidContext,
     ) -> None:
+        from tracim_backend.applications.content_folder.folder_controller import FolderController
+
         folder_controller = FolderController()
         configurator.include(folder_controller.bind, route_prefix=route_prefix)
 
 
 application = ContentFolderApp(
-    label="Folder",
-    slug="contents/folder",
-    fa_icon="folder-o",
-    is_active=True,
-    config={},
-    main_route="",
+    label="Folder", slug="contents/folder", fa_icon="folder-o", config={}, main_route=""
 )

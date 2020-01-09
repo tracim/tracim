@@ -31,7 +31,9 @@ from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
+from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
@@ -196,7 +198,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(workspace_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)
 
-    for app in app_config.apps:
+    app_lib = ApplicationApi(app_list=app_list)
+    for app in app_lib.get_all():
         app.import_controllers(
             app_config=app_config,
             configurator=configurator,

@@ -3,7 +3,6 @@ import os
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend.applications.share.controller import ShareController
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.lib.utils.app import TracimApplication
@@ -56,15 +55,12 @@ class ShareApp(TracimApplication):
         route_prefix: str,
         context: PyramidContext,
     ) -> None:
+        from tracim_backend.applications.share.controller import ShareController
+
         share_controller = ShareController()
         configurator.include(share_controller.bind, route_prefix=route_prefix)
 
 
 application = ShareApp(
-    label="Share Content",
-    slug="share_content",
-    fa_icon="share",
-    is_active=True,
-    config={},
-    main_route="",
+    label="Share Content", slug="share_content", fa_icon="share", config={}, main_route=""
 )

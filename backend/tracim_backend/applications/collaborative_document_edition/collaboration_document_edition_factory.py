@@ -21,7 +21,6 @@ class CollaborativeDocumentEditionFactory(object):
 
     @classmethod
     def get_controller(cls, config: "CFG") -> Controller:
-        assert config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
         from tracim_backend.applications.collaborative_document_edition.collabora.collabora_controller import (
             CollaboraController,
         )

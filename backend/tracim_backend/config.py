@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from collections import OrderedDict
 import json
 import os
 import typing
@@ -13,6 +12,8 @@ from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
+from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
@@ -67,14 +68,23 @@ class CFG(object):
         # with object in some context
         self.settings = settings.copy()
         self.config_naming = []  # type: typing.List[ConfigParam]
-        logger.debug(self, "CONFIG_PROCESS:1: load config from settings")
-        self.apps = load_apps()
+        logger.debug(self, "CONFIG_PROCESS:1: load enabled apps")
+        self.load_enabled_apps()
+        logger.debug(self, "CONFIG_PROCESS:3: load config from settings")
         self.load_config()
-        logger.debug(self, "CONFIG_PROCESS:2: check validity of config given")
+        logger.debug(self, "CONFIG_PROCESS:4: check validity of config given")
         self._check_consistency()
         self.check_config_validity()
-        logger.debug(self, "CONFIG_PROCESS:3: do post actions")
-        self.do_post_check_action()
+        logger.debug(self, "CONFIG_PROCESS:5: End of config process")
+
+        app_lib = ApplicationApi(app_list=app_list, show_all=True)
+        for app in app_lib.get_all():
+            logger.info(
+                self,
+                "LOADED_APP:{state}:{slug}:{label}".format(
+                    state="ENABLED" if app.is_active else "DISABLED", slug=app.slug, label=app.label
+                ),
+            )
 
     # INFO - G.M - 2019-04-05 - Utils Methods
 
@@ -129,10 +139,79 @@ class CFG(object):
         )
         return config_value
 
-    # INFO - G.M - 2019-04-05 - Config loading methods
+    # INFO - G.M - 2019-04-05 - load of enabled app
+    def load_enabled_apps(self) -> None:
+        self._load_enabled_apps_config()
+        loaded_apps = load_apps()
+        self._load_enabled_app(self.APP__ENABLED, loaded_apps)
 
-    def load_config(self) -> None:
-        """Parse configuration file and env variables"""
+    def _load_enabled_apps_config(self) -> None:
+        self.log_config_header("App Enabled config parameters:")
+        default_enabled_app = (
+            "contents/thread,"
+            "contents/file,"
+            "contents/html-document,"
+            "contents/folder,"
+            "{extend_apps}"
+            "share_content,"
+            "upload_permission,"
+            "gallery"
+        )
+        extend_apps = ""
+        # TODO - G.M - 2020-01-09 - remove this retrocompat code, as
+        #  CALDAV__ENABLED and COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
+        # should be deprecated.
+        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "false"))
+        if self.CALDAV__ENABLED:
+            extend_apps += ",agenda"
+        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
+            self.get_raw_config("collaborative_document_edition.activated", "false")
+        )
+        if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
+            extend_apps += ",collaborative_document_edition"
+        default_enabled_app = default_enabled_app.format(extend_apps=extend_apps)
+        self.APP__ENABLED = string_to_list(
+            self.get_raw_config("app.enabled", default_enabled_app),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
+
+    def _load_enabled_app(
+        self, enabled_app_slug_list: typing.List[str], loaded_apps: typing.List[TracimApplication]
+    ) -> None:
+
+        # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
+        # of tracim_backend, Be careful app_list is a global_var
+        app_list.clear()
+        # INFO - G.M - 2020-01-09 - order of app in app_list should be:
+        # - all enabled app according to enabled_app_slug_list order
+        # - all disabled app
+        enabled_app_list = []
+        disabled_app_list = []
+        for app_slug in enabled_app_slug_list:
+            for app in loaded_apps:
+                if app.slug == app_slug:
+                    app.load_content_types()
+                    app.is_active = True
+                    enabled_app_list.append(app)
+
+        for app in loaded_apps:
+            if app not in enabled_app_list:
+                disabled_app_list.append(app)
+
+        for app in enabled_app_list:
+            app_list.append(app)
+
+        for app in disabled_app_list:
+            app_list.append(app)
+
+        # TODO - G.M - 2018-08-08 - We need to update validators each time
+        # app_list is updated.
+        update_validators()
+
+    def log_config_header(self, title: str) -> None:
+        logger.info(self, title)
         logger.info(
             self,
             CONFIG_LOG_TEMPLATE.format(
@@ -142,14 +221,26 @@ class CFG(object):
                 config_name_source="<config_name_source>",
             ),
         )
+
+    # INFO - G.M - 2019-04-05 - Config loading methods
+    def load_config(self) -> None:
+        """Parse configuration file and env variables"""
+        self.log_config_header("Global config parameters:")
         self._load_global_config()
+        self.log_config_header("Limitation config parameters:")
         self._load_limitation_config()
+        self.log_config_header("Email config parameters:")
         self._load_email_config()
+        self.log_config_header("LDAP config parameters:")
         self._load_ldap_config()
+        self.log_config_header("Webdav config parameters:")
         self._load_webdav_config()
+        self.log_config_header("Search config parameters:")
         self._load_search_config()
 
-        for app in self.apps:
+        app_lib = ApplicationApi(app_list=app_list)
+        for app in app_lib.get_all():
+            self.log_config_header('"{label}" app config parameters:'.format(label=app.label))
             app.load_config(self)
 
     def _load_global_config(self) -> None:
@@ -167,26 +258,6 @@ class CFG(object):
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
         )
-
-        default_enabled_app = (
-            "contents/thread,"
-            "contents/file,"
-            "contents/html-document,"
-            "contents/folder,"
-            "agenda,"
-            "collaborative_document_edition,"
-            "share_content,"
-            "upload_permission,"
-            "gallery"
-        )
-
-        self.APP__ENABLED = string_to_list(
-            self.get_raw_config("app.enabled", default_enabled_app),
-            separator=",",
-            cast_func=str,
-            do_strip=True,
-        )
-
         self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir")
         self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name")
         self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir")
@@ -561,7 +632,8 @@ class CFG(object):
         self._check_email_config_validity()
         self._check_search_config_validity()
 
-        for app in self.apps:
+        app_lib = ApplicationApi(app_list=app_list)
+        for app in app_lib.get_all():
             app.check_config(self)
 
     def _check_global_config_validity(self) -> None:
@@ -682,27 +754,6 @@ class CFG(object):
                     self.CST.ASYNC, self.CST.SYNC, self.EMAIL__PROCESSING_MODE
                 )
             )
-
-    # INFO - G.M - 2019-04-05 - Post Actions Methods
-    def do_post_check_action(self) -> None:
-        self._set_default_app(self.APP__ENABLED)
-
-    def _set_default_app(self, enabled_app_list: typing.List[str]) -> None:
-        available_apps = OrderedDict()
-        for app in self.apps:
-            available_apps.update({app.slug: app})
-
-        # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
-        # of tracim_backend, Be careful app_list is a global_var
-        app_list.clear()
-        for app_slug in enabled_app_list:
-            if app_slug in available_apps.keys():
-                app = available_apps[app_slug]
-                app.load_content_types()
-                app_list.append(available_apps[app_slug])
-        # TODO - G.M - 2018-08-08 - We need to update validators each time
-        # app_list is updated.
-        update_validators()
 
     def _check_search_config_validity(self):
         search_engine_valid = ["elasticsearch", "simple"]

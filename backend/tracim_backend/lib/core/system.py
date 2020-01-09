@@ -4,6 +4,9 @@ from urllib.parse import urljoin
 
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
+from tracim_backend.exceptions import AppDoesNotExist
+from tracim_backend.extensions import app_list
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.models.context_models import ErrorCodeModel
@@ -24,7 +27,9 @@ class SystemApi(object):
 
     def get_config(self) -> ConfigModel:
         collaborative_document_edition_config = None
-        if self._config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
+        app_lib = ApplicationApi(app_list=app_list)
+        try:
+            app_lib.get_one("collaborative_document_edition")
             from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
                 CollaborativeDocumentEditionFactory,
             )
@@ -33,6 +38,8 @@ class SystemApi(object):
                 session=None, current_user=None, config=self._config
             )
             collaborative_document_edition_config = collaborative_document_edition_api.get_config()
+        except AppDoesNotExist:
+            pass
         return ConfigModel(
             email_notification_activated=self._config.EMAIL__NOTIFICATION__ACTIVATED,
             new_user_invitation_do_notify=self._config.NEW_USER__INVITATION__DO_NOTIFY,

@@ -41,7 +41,6 @@ class TestApplicationApi(object):
             label="Threads",
             slug="contents/thread",
             fa_icon="comments-o",
-            is_active=True,
             config={},
             main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
         )
@@ -91,12 +90,7 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS["primary"] = "#fff"
 
         folder = DummyApp(
-            label="Folder",
-            slug="contents/folder",
-            fa_icon="folder-o",
-            is_active=True,
-            config={},
-            main_route="",
+            label="Folder", slug="contents/folder", fa_icon="folder-o", config={}, main_route=""
         )
         folder.add_content_type(
             slug="folder",
@@ -126,7 +120,6 @@ class TestApplicationApi(object):
             label="Agenda",
             slug="agenda",
             fa_icon="calendar",
-            is_active=True,
             config={},
             main_route="/ui/workspaces/{workspace_id}/agenda",
         )
@@ -151,7 +144,6 @@ class TestApplicationApi(object):
             label="Agenda",
             slug="agenda",
             fa_icon="calendar",
-            is_active=True,
             config={},
             main_route="/ui/workspaces/{workspace_id}/agenda",
         )

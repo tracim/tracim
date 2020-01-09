@@ -24,7 +24,8 @@ class ApplicationApi(object):
     def get_one(self, slug):
         for app in self.apps:
             if app.slug == slug:
-                return app
+                if self.show_all or app.is_active:
+                    return app
         raise AppDoesNotExist("Application {app} does not exist".format(app=slug))
 
     def get_application_in_context(
