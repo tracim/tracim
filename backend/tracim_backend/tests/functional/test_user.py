@@ -2683,7 +2683,7 @@ class TestUserWorkspaceEndpoint(object):
 
     @pytest.mark.usefixtures("default_content_fixture")
     def test_api__get_user_workspaces__ok_200__nominal_case(
-        self, workspace_api_factory, application_api_factory, web_testapp
+        self, workspace_api_factory, application_api_factory, web_testapp, app_config
     ):
         """
         Check obtain all workspaces reachables for user with user auth.
@@ -2694,7 +2694,7 @@ class TestUserWorkspaceEndpoint(object):
         app_api = application_api_factory.get()
 
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
-            workspace=workspace
+            workspace=workspace, app_config=app_config
         )  # nope8
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/v2/users/1/workspaces", status=200)
