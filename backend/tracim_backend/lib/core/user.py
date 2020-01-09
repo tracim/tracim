@@ -148,7 +148,7 @@ class UserApi(object):
         return self._user
 
     def _get_all_query(self) -> Query:
-        return self._session.query(User).order_by(func.lower(User.display_name))
+        return self._base_query().order_by(func.lower(User.display_name))
 
     def get_all(self) -> typing.Iterable[User]:
         return self._get_all_query().all()

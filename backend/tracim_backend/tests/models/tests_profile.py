@@ -26,6 +26,10 @@ class TestProfile(object):
         profile_slugs = Profile.get_all_valid_slugs()
         assert set(profile_slugs) == {"administrators", "users", "trusted-users"}
 
+    def test_profile__ok__get_profile_slugs__ok__include_nobody(self):
+        profile_slugs = Profile.get_all_valid_slugs(include_nobody=True)
+        assert set(profile_slugs) == {"nobody", "administrators", "users", "trusted-users"}
+
     def test_profile__ok__get_profile__from_slug__ok__nominal_case(self):
         profile = Profile.get_profile_from_slug("administrators")
 
