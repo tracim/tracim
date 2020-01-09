@@ -1,7 +1,7 @@
 tracim_backend
 ==============
 
-Backend source code of tracim v2, using Pyramid Framework.
+Backend source code of Tracim v2, using Pyramid Framework.
 
 Installation
 ---------------
@@ -10,7 +10,7 @@ Installation
 
 on Debian Stretch (9) with sudo:
 
-    sudo apt update && apt install \
+    sudo apt update && sudo apt install \
     ghostscript \
     git \
     imagemagick \
@@ -19,7 +19,7 @@ on Debian Stretch (9) with sudo:
     libldap2-dev \
     libmagickwand-dev \
     libpq-dev \
-    libsasl2-dev
+    libsasl2-dev \
     poppler-utils \
     python3 \
     python3-dev \
@@ -29,7 +29,8 @@ on Debian Stretch (9) with sudo:
     ufraw-batch \
     ffmpeg \
     redis-server \
-    zlib1g-dev
+    zlib1g-dev \
+    exiftool
 
 for better preview support:
 
@@ -52,7 +53,7 @@ Create a Python virtual environment:
 
     python3 -m venv env
 
-Activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**):
+Activate it in your terminal session (**all Tracim command execution must be executed under this virtual environment**):
 
     source env/bin/activate
 
@@ -60,19 +61,19 @@ Upgrade packaging tools:
 
     pip install --upgrade pip setuptools wheel
 
-(Optional) Install strict supported version of dependencies with requirement.txt :
+(Optional) Install strict supported version of dependencies with requirement.txt:
 
     pip install -r requirements.txt
 
-Install the project in editable mode with its develop requirements :
+Install the project in editable mode with its develop requirements:
 
     pip install -e ".[dev]"
 
-If you want to use postgresql, mysql or other databases
-than the default one: sqlite, you need to install python driver for those databases
-that are supported by sqlalchemy.
+If you want to use PostgreSQL, MySQL or other database engines
+than the default one (SQLite), you need to install python driver for those databases
+that are supported by SQLAlchemy.
 
-For postgreSQL and mySQL, those are shortcuts to install Tracim with test and
+For PostgreSQL and MySQL, those are shortcuts to install Tracim with test and
 specific driver.
 
 For PostgreSQL:
@@ -90,20 +91,16 @@ Create [configuration file](doc/setting.md) for a development environment:
 
     cp development.ini.sample development.ini
 
-default configuration given is correct for local-test, if you need to run tracim
-over network, check [configuration file documentation](doc/setting.md)
+The provided default configuration is suitable for local-test. If you need to run Tracim
+over network, see [configuration file documentation](doc/setting.md).
 
-you need to create a color.json file at root of tracim :
+You need to create a color.json file at root of Tracim:
 
     cp ../color.json.sample ../color.json
 
 You should also create requested folder for running tracim:
 
-    mkdir sessions_data
-    mkdir sessions_lock
-    mkdir depot
-    mkdir previews
-    mkdir radicale_storage
+    mkdir sessions_data sessions_lock depot previews radicale_storage
 
 Initialize the database using [tracimcli](doc/cli.md) tool
 
@@ -116,28 +113,26 @@ Stamp current version of database to last (useful for migration):
 Running Tracim Backend WSGI APP
 ---------------
 
-You can run Tracim wsgi apps with many wsgi server. We provided here example to run them:
-- with UWSGI using wsgi/* script.
-- with pserve command of pyramid which rely only on development.ini pastedeploy config.
+You can run Tracim WSGI apps with many WSGI servers. We provide examples to run them with:
+- uWSGI using wsgi/* script.
+- The pserve command of pyramid which only rely on development.ini pastedeploy config.
 
-### With Uwsgi : great for production ###
+### With uWSGI: great for production ###
 
-#### Install Uwsgi
+#### Install uWSGI
 
-You can either install uwsgi with pip or with you distrib package manager:
+On Debian:
 
-    # install uwsgi with pip ( unneeded if you already have uwsgi with python3 plugin enabled)
-    sudo pip3 install uwsgi
-
-or on debian 9 :
-
-    # install uwsgi on debian 9
     sudo apt install uwsgi uwsgi-plugin-python3
+
+Or with PIP:
+
+    sudo pip3 install uwsgi
 
 #### All in terminal way ####
 
 
-Run all web services with uwsgi
+Run all web services with UWSGI:
 
     ## UWSGI SERVICES
     # set tracim_conf_file path
@@ -149,7 +144,7 @@ Run all web services with uwsgi
     # caldav radicale server (used behind pyramid webserver for auth)
     uwsgi -d /tmp/tracim_caldav.log --http-socket localhost:5232 --plugin python3 --wsgi-file wsgi/caldav.py -H env --pidfile /tmp/tracim_caldav.pid
 
-to stop them:
+To stop them:
 
     # pyramid webserver
     uwsgi --stop /tmp/tracim_web.pid
@@ -158,9 +153,9 @@ to stop them:
     # caldav radicale server
     uwsgi --stop /tmp/tracim_caldav.pid
 
-#### With Uwsgi ini script file ####
+#### With uWSGI ini script file ####
 
-You can also preset uwsgi config for tracim, this way, creating this kind of .ini file:
+You can also preset uWSGI config for Tracim by creating this kind of .ini file:
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
@@ -170,7 +165,7 @@ You can also preset uwsgi config for tracim, this way, creating this kind of .in
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-and for webdav :
+And for WebDAV:
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
@@ -180,7 +175,7 @@ and for webdav :
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-and for caldav :
+And for CalDAV:
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
@@ -190,7 +185,7 @@ and for caldav :
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-You can then run the process this way :
+You can then run the process this way:
 
     # You need to replace <WSGI_CONF_WEB> with correct path
     uwsgi --ini <WSGI_CONF_WEB>.ini --http-socket :6543
@@ -199,23 +194,23 @@ You can then run the process this way :
     # You need to replace <WSGI_CONF_CALDAV> with correct path
     uwsgi --ini <WSGI_CONF_CALDAV>.ini --http-socket localhost:5232
 
-### With Pserve : legacy way, usefull for debug and dev ###
+### With Pserve: legacy way, useful for debug and dev ###
 
-This method rely on development.ini configuration. default web server used is _Waitress_
-in `development.ini.sample`
+This method relies on development.ini configuration. default web server used is _Waitress_
+in` development.ini.sample`
 
 :warning: By default, python warning are disabled. To enable warning please set
 `PYTHONWARNINGS` env var, for example `PYTHONWARNINGS=default` .
 
-run tracim_backend web api:
+Run the tracim_backend web api:
 
     pserve development.ini
 
-run wsgidav server:
+Run the WsgiDAV server:
 
     tracimcli webdav start
 
-run caldav server
+Run the CalDAV server:
 
     tracimcli caldav start
 
@@ -225,7 +220,7 @@ Running Tracim Backend Daemon
 Feature such as async email notification and email reply system need additional
 daemons to work correctly.
 
-### python way
+### The Python way
 
 #### Run daemons
 
@@ -244,7 +239,7 @@ daemons to work correctly.
     # email fetcher
     killall python3 daemons/mail_fetcher.py
 
-### Using Supervisor
+### Using supervisor
 
 #### Install supervisor
 
@@ -252,7 +247,7 @@ daemons to work correctly.
 
 #### Configure supervisord.conf file
 
-example of supervisord.conf file
+Example of supervisord.conf file:
 
     [supervisord]
     ; You need to replace <PATH> with correct absolute path
@@ -277,13 +272,13 @@ example of supervisord.conf file
     autorestart=true
     environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-run with (supervisord.conf should be provided, see [supervisord.conf default_paths](http://supervisord.org/configuration.html):
+Run with (supervisord.conf should be provided, see [supervisord.conf default_paths](http://supervisord.org/configuration.html):
 
     supervisord
 
-## Run Tests and others checks ##
+## Run tests and others checks ##
 
-### Run Tests ###
+### Run tests ###
 
 Some directory are required to make tests functional, you can create them and do some other check
 with this script:
@@ -292,23 +287,23 @@ with this script:
     python3 ./setup_dev_env.py
 
 Before running some functional test related to email, you need a local working *MailHog*
-see here : https://github.com/mailhog/MailHog
+see here: https://github.com/mailhog/MailHog
 
-You can run it this way with docker :
+You can run it this way with Docker:
 
     docker pull mailhog/mailhog
     docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 
 You need also a test ldap server on port 3890 for ldap related test.
-see here : https://github.com/rroemhild/docker-test-openldap
+See here: https://github.com/rroemhild/docker-test-openldap
 
-You can run it this way with docker :
+You can run it this way with Docker:
 
     docker pull rroemhild/test-openldap
     docker run -d -p 3890:389 rroemhild/test-openldap
 
 You need also a elasticsearch server on port 9200 for elasticsearch related test
-You can run it this way with docker :
+You can run it this way with Docker:
 
     docker pull elasticsearch:7.0.0
     docker run -d -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch -v esconfig:/usr/share/elasticsearch/config -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
@@ -337,7 +332,7 @@ Flake8 check(unused import, variable and many other checks):
 
 ### About Pytest tests config ###
 
-For running tests, tracim tests need config setted:
+For running tests, Tracim tests need config to be set:
 - specific config for specific tests is
 available in TEST_CONFIG_FILE_PATH (by default: "./tests_configs.ini" in backend folder).
 - For more general config, pytest rely on dotenv .env file (by default ".test.env" in backend folder)
@@ -350,10 +345,10 @@ for example, if you want to use another database, you can do this:
     python3 ./setup_dev_env.py
     pytest
 
-Order of usage is (from less to more important, last is used if setted):
+Order of usage is (from less to more important, last is used if set):
 - specific TEST_CONFIG_FILE_PATH config (different for each test)
 - default env var setting in .test.env
-- env var setted by user
+- env var set by user
 
 Tracim API
 ----------
@@ -364,7 +359,7 @@ The specification is accessible when you run Tracim, go to */api/v2/doc* .
 
 For example, with default config:
 
-    # run tracim
+    # run Tracim
     pserve development.ini
     # launch your favorite web-browser
     firefox http://localhost:6543/api/v2/doc/
