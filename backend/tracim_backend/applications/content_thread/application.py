@@ -8,11 +8,11 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class ContentThreadApp(TracimApplication):
-    def load_config(self, app_config: CFG) -> CFG:
-        return app_config
+    def load_config(self, app_config: CFG) -> None:
+        pass
 
-    def check_config(self, app_config: CFG) -> CFG:
-        return app_config
+    def check_config(self, app_config: CFG) -> None:
+        pass
 
     def import_controllers(
         self,
@@ -20,10 +20,9 @@ class ContentThreadApp(TracimApplication):
         app_config: CFG,
         route_prefix: str,
         context: PyramidContext,
-    ) -> Configurator:
+    ) -> None:
         thread_controller = ThreadController()
         configurator.include(thread_controller.bind, route_prefix=route_prefix)
-        return configurator
 
 
 application = ContentThreadApp(

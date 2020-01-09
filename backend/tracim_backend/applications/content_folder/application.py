@@ -9,11 +9,11 @@ from tracim_backend.models.roles import WorkspaceRoles
 
 
 class ContentFolderApp(TracimApplication):
-    def load_config(self, app_config: CFG) -> CFG:
-        return app_config
+    def load_config(self, app_config: CFG) -> None:
+        pass
 
-    def check_config(self, app_config: CFG) -> CFG:
-        return app_config
+    def check_config(self, app_config: CFG) -> None:
+        pass
 
     def import_controllers(
         self,
@@ -21,10 +21,9 @@ class ContentFolderApp(TracimApplication):
         app_config: CFG,
         route_prefix: str,
         context: PyramidContext,
-    ) -> Configurator:
+    ) -> None:
         folder_controller = FolderController()
         configurator.include(folder_controller.bind, route_prefix=route_prefix)
-        return configurator
 
 
 application = ContentFolderApp(

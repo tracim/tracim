@@ -14,7 +14,7 @@ from tracim_backend.views import BASE_API_V2
 
 
 class AgendaApp(TracimApplication):
-    def load_config(self, app_config: CFG) -> CFG:
+    def load_config(self, app_config: CFG) -> None:
         """
         load config for caldav related stuff
         """
@@ -37,9 +37,8 @@ class AgendaApp(TracimApplication):
         app_config.CALDAV_RADICALE_WORKSPACE_PATH = "/{}/{}/".format(
             app_config.CALDAV__RADICALE__AGENDA_DIR, app_config.CALDAV__RADICALE__WORKSPACE_SUBDIR
         )
-        return app_config
 
-    def check_config(self, app_config: CFG) -> CFG:
+    def check_config(self, app_config: CFG) -> None:
         """
         Check if config is correctly setted for caldav features
         """
@@ -70,7 +69,6 @@ class AgendaApp(TracimApplication):
                         "caldav.radicale.storage.type", "multifilesystem", "caldav.enabled"
                     )
                 )
-        return app_config
 
     def import_controllers(
         self,
@@ -78,7 +76,7 @@ class AgendaApp(TracimApplication):
         app_config: CFG,
         route_prefix: str,
         context: PyramidContext,
-    ) -> Configurator:
+    ) -> None:
         if app_config.CALDAV__ENABLED:
             # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,
             # import is here because import AgendaController without adding it to
@@ -105,7 +103,6 @@ class AgendaApp(TracimApplication):
             agenda_controller = AgendaController()
             configurator.include(agenda_controller.bind, route_prefix=BASE_API_V2)
             configurator.include(radicale_proxy_controller.bind)
-        return configurator
 
 
 application = AgendaApp(

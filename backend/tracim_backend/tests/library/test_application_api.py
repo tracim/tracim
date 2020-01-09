@@ -12,11 +12,11 @@ from tracim_backend.models.roles import WorkspaceRoles
 
 
 class DummyApp(TracimApplication):
-    def load_config(self, app_config: CFG) -> CFG:
-        return app_config
+    def load_config(self, app_config: CFG) -> None:
+        pass
 
-    def check_config(self, app_config: CFG) -> CFG:
-        return app_config
+    def check_config(self, app_config: CFG) -> None:
+        pass
 
     def import_controllers(
         self,
@@ -24,8 +24,8 @@ class DummyApp(TracimApplication):
         app_config: CFG,
         route_prefix: str,
         context: PyramidContext,
-    ) -> Configurator:
-        return configurator
+    ) -> None:
+        pass
 
 
 class TestApplicationApi(object):

@@ -14,7 +14,7 @@ from tracim_backend.views import BASE_API_V2
 
 
 class CollaborativeDocumentEditionApp(TracimApplication):
-    def load_config(self, app_config: CFG) -> CFG:
+    def load_config(self, app_config: CFG) -> None:
         app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
             app_config.get_raw_config("collaborative_document_edition.activated", "false")
         )
@@ -27,9 +27,8 @@ class CollaborativeDocumentEditionApp(TracimApplication):
         app_config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = app_config.get_raw_config(
             "collaborative_document_edition.file_template_dir"
         )
-        return app_config
 
-    def check_config(self, app_config: CFG) -> CFG:
+    def check_config(self, app_config: CFG) -> None:
         if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
             if (
                 app_config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE
@@ -40,7 +39,6 @@ class CollaborativeDocumentEditionApp(TracimApplication):
                     app_config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL,
                     when_str="if collabora feature is activated",
                 )
-        return app_config
 
     def import_controllers(
         self,
@@ -48,7 +46,7 @@ class CollaborativeDocumentEditionApp(TracimApplication):
         app_config: CFG,
         route_prefix: str,
         context: PyramidContext,
-    ) -> Configurator:
+    ) -> None:
         if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
             # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
             # import is here because import WOPI of Collabora controller without adding it to
@@ -66,7 +64,6 @@ class CollaborativeDocumentEditionApp(TracimApplication):
             configurator.include(
                 collaborative_document_edition_controller.bind, route_prefix=BASE_API_V2
             )
-        return configurator
 
 
 application = CollaborativeDocumentEditionApp(

@@ -10,11 +10,11 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class ContentHTMLDocumentApp(TracimApplication):
-    def load_config(self, app_config: CFG) -> CFG:
-        return app_config
+    def load_config(self, app_config: CFG) -> None:
+        pass
 
-    def check_config(self, app_config: CFG) -> CFG:
-        return app_config
+    def check_config(self, app_config: CFG) -> None:
+        pass
 
     def import_controllers(
         self,
@@ -22,10 +22,9 @@ class ContentHTMLDocumentApp(TracimApplication):
         app_config: CFG,
         route_prefix: str,
         context: PyramidContext,
-    ) -> Configurator:
+    ) -> None:
         html_document_controller = HTMLDocumentController()
         configurator.include(html_document_controller.bind, route_prefix=route_prefix)
-        return configurator
 
 
 application = ContentHTMLDocumentApp(

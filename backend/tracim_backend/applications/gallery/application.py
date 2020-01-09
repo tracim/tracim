@@ -6,11 +6,11 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class GalleryApp(TracimApplication):
-    def load_config(self, app_config: CFG) -> CFG:
-        return app_config
+    def load_config(self, app_config: CFG) -> None:
+        pass
 
-    def check_config(self, app_config: CFG) -> CFG:
-        return app_config
+    def check_config(self, app_config: CFG) -> None:
+        pass
 
     def import_controllers(
         self,
@@ -18,9 +18,9 @@ class GalleryApp(TracimApplication):
         app_config: CFG,
         route_prefix: str,
         context: PyramidContext,
-    ) -> Configurator:
+    ) -> None:
         # INFO - G.M - 2020-01-03 - Dummy backend app
-        return configurator
+        pass
 
 
 application = GalleryApp(

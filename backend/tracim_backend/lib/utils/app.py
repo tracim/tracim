@@ -85,14 +85,14 @@ class TracimApplication(ABC):
         """ Create Tracim application"""
         raise NotImplementedError()
 
-    def load_config(self, app_config: "CFG") -> "CFG":
+    def load_config(self, app_config: "CFG") -> None:
         """
         Allow to load specific config parameter, example:
         >>> app_config.TEST__EXAMPLE_CONFIG_PARAMETER = app_config.get_raw_config("test.example_config_parameter")
         """
         raise NotImplementedError()
 
-    def check_config(self, app_config: "CFG") -> "CFG":
+    def check_config(self, app_config: "CFG") -> None:
         """
         Check app specific config consistency, example:
         >>> app_config.check_mandatory_param("TEST__EXAMPLE_CONFIG_PARAMETER", app_config.TEST__EXAMPLE_CONFIG_PARAMETER)
@@ -105,7 +105,7 @@ class TracimApplication(ABC):
         app_config: "CFG",
         route_prefix: str,
         context: PyramidContext,
-    ) -> Configurator:
+    ) -> None:
         """
         Allow to import Controller and other stuff in Tracim web context
         """

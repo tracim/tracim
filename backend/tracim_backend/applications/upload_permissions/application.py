@@ -11,7 +11,7 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 
 
 class UploadPermissionApp(TracimApplication):
-    def load_config(self, app_config: CFG) -> CFG:
+    def load_config(self, app_config: CFG) -> None:
         app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML = app_config.get_raw_config(
             "email.notification.upload_permission_to_receiver.template.html"
         )
@@ -37,9 +37,8 @@ class UploadPermissionApp(TracimApplication):
                 '[{website_title}] {uploader_username} shared {nb_uploaded_contents} files in "{workspace_name}"'
             ),
         )
-        return app_config
 
-    def check_config(self, app_config: CFG) -> CFG:
+    def check_config(self, app_config: CFG) -> None:
         # INFO - G.M - 2019-02-01 - check if template are available,
         # do not allow running with email_notification_activated
         # if templates needed are not available
@@ -57,7 +56,6 @@ class UploadPermissionApp(TracimApplication):
                             template_description=template_description, template_path=template_path
                         )
                     )
-        return app_config
 
     def import_controllers(
         self,
@@ -65,10 +63,9 @@ class UploadPermissionApp(TracimApplication):
         app_config: CFG,
         route_prefix: str,
         context: PyramidContext,
-    ) -> Configurator:
+    ) -> None:
         upload_permission_controller = UploadPermissionController()
         configurator.include(upload_permission_controller.bind, route_prefix=route_prefix)
-        return configurator
 
 
 application = UploadPermissionApp(
