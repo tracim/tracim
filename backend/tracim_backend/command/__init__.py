@@ -89,7 +89,7 @@ class AppContextCommand(Command):
         parser.add_argument(
             "-d",
             "--debug_mode",
-            help="enable_tracim log for debug",
+            help="enable tracim log for debug",
             dest="debug",
             required=False,
             action="store_true",

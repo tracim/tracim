@@ -97,6 +97,7 @@ class UserCommand(AppContextCommand):
     def _create_user(self, login: str, password: str, do_notify: bool, **kwargs) -> User:
         if not password:
             if self._password_required():
+                print("You must provide -p/--password parameter")
                 raise BadCommandError("You must provide -p/--password parameter")
             password = ""
         if self._user_api.check_email_already_in_db(login):
@@ -153,17 +154,16 @@ class UserCommand(AppContextCommand):
                     do_notify=parsed_args.send_email,
                 )
             except UserAlreadyExistError as exc:
-                raise UserAlreadyExistError(
-                    "Error: User already exist (use `user update` command instead)"
-                ) from exc
+                print("Error: User already exist (use `user update` command instead)")
+                raise UserAlreadyExistError() from exc
             except NotificationSendingFailed as exc:
-                raise NotificationSendingFailed(
-                    "Error: Cannot send email notification due to error, user not created."
-                ) from exc
+                print("Error: Cannot send email notification due to error, user not created.")
+                raise NotificationSendingFailed() from exc
             except NotificationDisabledCantCreateUserWithInvitation as exc:
-                raise NotificationDisabledCantCreateUserWithInvitation(
+                print(
                     "Error: Email notification disabled but notification required, user not created."
-                ) from exc
+                )
+                raise NotificationDisabledCantCreateUserWithInvitation() from exc
         else:
             if parsed_args.password:
                 self._update_password_for_login(
