@@ -6,6 +6,9 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class GalleryApp(TracimApplication):
+    def load_content_types(self) -> None:
+        pass
+
     def load_config(self, app_config: CFG) -> None:
         pass
 

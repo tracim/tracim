@@ -8,6 +8,15 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class ContentThreadApp(TracimApplication):
+    def load_content_types(self) -> None:
+        self.add_content_type(
+            slug="thread",
+            label="Thread",
+            creation_label="Start a topic",
+            available_statuses=content_status_list.get_all(),
+            file_extension=".thread.html",
+        )
+
     def load_config(self, app_config: CFG) -> None:
         pass
 
@@ -32,11 +41,4 @@ application = ContentThreadApp(
     is_active=True,
     config={},
     main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
-)
-application.add_content_type(
-    slug="thread",
-    label="Thread",
-    creation_label="Start a topic",
-    available_statuses=content_status_list.get_all(),
-    file_extension=".thread.html",
 )

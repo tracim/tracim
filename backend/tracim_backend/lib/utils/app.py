@@ -81,8 +81,12 @@ class TracimApplication(ABC):
         )
         self.content_types.append(content_type)
 
+    def load_content_types(self):
+        """load app content type"""
+        raise NotImplementedError()
+
     def get_application_in_context(self, app_config: "CFG") -> TracimApplicationInContext:
-        """ Create Tracim application"""
+        """ Create Tracim application in context for frontend"""
         raise NotImplementedError()
 
     def load_config(self, app_config: "CFG") -> None:

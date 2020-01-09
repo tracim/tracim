@@ -14,6 +14,9 @@ from tracim_backend.views import BASE_API_V2
 
 
 class AgendaApp(TracimApplication):
+    def load_content_types(self) -> None:
+        pass
+
     def load_config(self, app_config: CFG) -> None:
         """
         load config for caldav related stuff

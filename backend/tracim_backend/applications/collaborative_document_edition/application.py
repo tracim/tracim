@@ -14,6 +14,9 @@ from tracim_backend.views import BASE_API_V2
 
 
 class CollaborativeDocumentEditionApp(TracimApplication):
+    def load_content_types(self) -> None:
+        pass
+
     def load_config(self, app_config: CFG) -> None:
         app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
             app_config.get_raw_config("collaborative_document_edition.activated", "false")

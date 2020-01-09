@@ -8,6 +8,14 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class ContentFileApp(TracimApplication):
+    def load_content_types(self) -> None:
+        self.add_content_type(
+            slug="file",
+            label="File",
+            creation_label="Upload a file",
+            available_statuses=content_status_list.get_all(),
+        )
+
     def load_config(self, app_config: CFG) -> None:
         pass
 
@@ -32,10 +40,4 @@ application = ContentFileApp(
     is_active=True,
     config={},
     main_route="/ui/workspaces/{workspace_id}/contents?type=file",
-)
-application.add_content_type(
-    slug="file",
-    label="File",
-    creation_label="Upload a file",
-    available_statuses=content_status_list.get_all(),
 )

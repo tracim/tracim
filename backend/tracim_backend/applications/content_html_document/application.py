@@ -10,6 +10,16 @@ from tracim_backend.lib.utils.app import TracimApplication
 
 
 class ContentHTMLDocumentApp(TracimApplication):
+    def load_content_types(self) -> None:
+        self.add_content_type(
+            slug="html-document",
+            label="Text Document",
+            creation_label="Write a document",
+            available_statuses=content_status_list.get_all(),
+            slug_alias=["page"],
+            file_extension=".document.html",
+        )
+
     def load_config(self, app_config: CFG) -> None:
         pass
 
@@ -34,12 +44,4 @@ application = ContentHTMLDocumentApp(
     is_active=True,
     config={},
     main_route="/ui/workspaces/{workspace_id}/contents?type=html-document",
-)
-application.add_content_type(
-    slug="html-document",
-    label="Text Document",
-    creation_label="Write a document",
-    available_statuses=content_status_list.get_all(),
-    slug_alias=["page"],
-    file_extension=".document.html",
 )

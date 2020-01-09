@@ -11,6 +11,9 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 
 
 class UploadPermissionApp(TracimApplication):
+    def load_content_types(self) -> None:
+        pass
+
     def load_config(self, app_config: CFG) -> None:
         app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML = app_config.get_raw_config(
             "email.notification.upload_permission_to_receiver.template.html"

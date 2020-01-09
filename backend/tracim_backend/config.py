@@ -697,6 +697,8 @@ class CFG(object):
         app_list.clear()
         for app_slug in enabled_app_list:
             if app_slug in available_apps.keys():
+                app = available_apps[app_slug]
+                app.load_content_types()
                 app_list.append(available_apps[app_slug])
         # TODO - G.M - 2018-08-08 - We need to update validators each time
         # app_list is updated.

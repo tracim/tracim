@@ -9,6 +9,16 @@ from tracim_backend.models.roles import WorkspaceRoles
 
 
 class ContentFolderApp(TracimApplication):
+    def load_content_types(self) -> None:
+        self.add_content_type(
+            slug="folder",
+            label="Folder",
+            creation_label="Create a folder",
+            available_statuses=content_status_list.get_all(),
+            allow_sub_content=True,
+            minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
+        )
+
     def load_config(self, app_config: CFG) -> None:
         pass
 
@@ -33,12 +43,4 @@ application = ContentFolderApp(
     is_active=True,
     config={},
     main_route="",
-)
-application.add_content_type(
-    slug="folder",
-    label="Folder",
-    creation_label="Create a folder",
-    available_statuses=content_status_list.get_all(),
-    allow_sub_content=True,
-    minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
 )
