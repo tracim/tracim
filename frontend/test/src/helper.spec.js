@@ -4,7 +4,11 @@ import {
   findUserRoleIdInWorkspace,
   getUserProfile
 } from '../../src/helper.js'
-import { ROLE_LIST, PROFILE } from 'tracim_frontend_lib'
+import {
+  ROLE,
+  ROLE_LIST,
+  PROFILE
+} from 'tracim_frontend_lib'
 
 describe('In file helper.js', () => {
   describe('the function sortWorkspaceContents()', () => {
@@ -124,27 +128,27 @@ describe('In file helper.js', () => {
 
     it('the function should return the correct reader id', () => {
       const roleId = findUserRoleIdInWorkspace(0, memberList, ROLE_LIST)
-      expect(roleId).to.equal(8)
+      expect(roleId).to.equal(ROLE.reader.id)
     })
 
     it('the function should return the correct contributor id', () => {
       const roleId = findUserRoleIdInWorkspace(1, memberList, ROLE_LIST)
-      expect(roleId).to.equal(4)
+      expect(roleId).to.equal(ROLE.contributor.id)
     })
 
     it('the function should return the correct content-manager id', () => {
       const roleId = findUserRoleIdInWorkspace(2, memberList, ROLE_LIST)
-      expect(roleId).to.equal(2)
+      expect(roleId).to.equal(ROLE.contentManager.id)
     })
 
     it('the function should return the correct workspace-manager id', () => {
       const roleId = findUserRoleIdInWorkspace(3, memberList, ROLE_LIST)
-      expect(roleId).to.equal(1)
+      expect(roleId).to.equal(ROLE.workspaceManager.id)
     })
 
     it('the function should return the correct reader id when the user is not in memberList', () => {
       const roleId = findUserRoleIdInWorkspace(4, memberList, ROLE_LIST)
-      expect(roleId).to.equal(8)
+      expect(roleId).to.equal(ROLE.reader.id)
     })
   })
 
