@@ -27,9 +27,9 @@ export function appFactory (WrappedComponent) {
       content
     })
 
-    renderAppFullscreen = (appConfig, user, content) => GLOBAL_renderAppFullscreen({
+    renderAppFullscreen = (appConfig, user, userRoleIdInWorkspace, content) => GLOBAL_renderAppFullscreen({
       loggedUser: user.logged
-        ? { ...user, userRoleIdInWorkspace: findUserRoleIdInWorkspace(user.user_id, this.props.currentWorkspace.memberList, ROLE_LIST) }
+        ? { ...user, userRoleIdInWorkspace }
         : {},
       config: {
         ...appConfig,
