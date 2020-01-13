@@ -31,7 +31,7 @@ class ContentFolderApp(TracimApplication):
         route_prefix: str,
         context: PyramidContext,
     ) -> None:
-        from tracim_backend.applications.content_folder.folder_controller import FolderController
+        from tracim_backend.applications.content_folder.controller import FolderController
 
         folder_controller = FolderController()
         configurator.include(folder_controller.bind, route_prefix=route_prefix)

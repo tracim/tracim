@@ -3,7 +3,7 @@ import typing
 from defusedxml import ElementTree
 import requests
 
-from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition import (
+from tracim_backend.applications.collaborative_document_edition.lib import (
     CollaborativeDocumentEditionLib,
 )
 from tracim_backend.applications.collaborative_document_edition.models import (

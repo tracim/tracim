@@ -1,11 +1,11 @@
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
-    CollaborativeDocumentEditionFactory,
-)
 from tracim_backend.applications.collaborative_document_edition.data import (
     COLLABORA_DOCUMENT_EDITION_SLUG,
+)
+from tracim_backend.applications.collaborative_document_edition.factory import (
+    CollaborativeDocumentEditionFactory,
 )
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.app import TracimApplication

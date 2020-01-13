@@ -30,7 +30,7 @@ class ContentHTMLDocumentApp(TracimApplication):
         route_prefix: str,
         context: PyramidContext,
     ) -> None:
-        from tracim_backend.applications.content_html_document.html_document_controller import (
+        from tracim_backend.applications.content_html_document.controller import (
             HTMLDocumentController,
         )
 

@@ -28,7 +28,7 @@ class ContentFileApp(TracimApplication):
         route_prefix: str,
         context: PyramidContext,
     ) -> None:
-        from tracim_backend.applications.content_file.file_controller import FileController
+        from tracim_backend.applications.content_file.controller import FileController
 
         file_controller = FileController()
         configurator.include(file_controller.bind, route_prefix=route_prefix)

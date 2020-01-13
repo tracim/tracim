@@ -11,14 +11,14 @@ from tracim_backend import TracimRequest
 from tracim_backend import hapic
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
-    CollaborativeDocumentEditionFactory,
-)
 from tracim_backend.applications.collaborative_document_edition.data import (
     COLLABORATIVE_DOCUMENT_EDITION_BASE,
 )
 from tracim_backend.applications.collaborative_document_edition.data import (
     SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
+)
+from tracim_backend.applications.collaborative_document_edition.factory import (
+    CollaborativeDocumentEditionFactory,
 )
 from tracim_backend.applications.collaborative_document_edition.models import (
     CollaborativeDocumentEditionToken,
@@ -31,7 +31,7 @@ from tracim_backend.applications.collaborative_document_edition.schema import (
     FileCreateFromTemplateSchema,
 )
 from tracim_backend.applications.collaborative_document_edition.schema import FileTemplateInfoSchema
-from tracim_backend.applications.content_file.file_controller import can_create_file
+from tracim_backend.applications.content_file.controller import can_create_file
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed

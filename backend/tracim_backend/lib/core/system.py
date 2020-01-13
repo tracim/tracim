@@ -30,7 +30,7 @@ class SystemApi(object):
         app_lib = ApplicationApi(app_list=app_list)
         try:
             app_lib.get_one("collaborative_document_edition")
-            from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition_factory import (
+            from tracim_backend.applications.collaborative_document_edition.factory import (
                 CollaborativeDocumentEditionFactory,
             )
 

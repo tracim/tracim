@@ -2,11 +2,11 @@ import typing
 
 from sqlalchemy.orm import Session
 
-from tracim_backend.applications.collaborative_document_edition.collaboration_document_edition import (
-    CollaborativeDocumentEditionLib,
-)
 from tracim_backend.applications.collaborative_document_edition.data import (
     COLLABORA_DOCUMENT_EDITION_SLUG,
+)
+from tracim_backend.applications.collaborative_document_edition.lib import (
+    CollaborativeDocumentEditionLib,
 )
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import NoValidCollaborativeDocumentEditionSoftware
@@ -21,7 +21,7 @@ class CollaborativeDocumentEditionFactory(object):
 
     @classmethod
     def get_controller(cls, config: "CFG") -> Controller:
-        from tracim_backend.applications.collaborative_document_edition.collabora.collabora_controller import (
+        from tracim_backend.applications.collaborative_document_edition.collabora.controller import (
             CollaboraController,
         )
 

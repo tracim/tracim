@@ -29,7 +29,7 @@ class ContentThreadApp(TracimApplication):
         route_prefix: str,
         context: PyramidContext,
     ) -> None:
-        from tracim_backend.applications.content_thread.threads_controller import ThreadController
+        from tracim_backend.applications.content_thread.controller import ThreadController
 
         thread_controller = ThreadController()
         configurator.include(thread_controller.bind, route_prefix=route_prefix)
