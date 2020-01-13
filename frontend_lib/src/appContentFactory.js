@@ -13,7 +13,7 @@ import { CUSTOM_EVENT } from './customEvent.js'
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
 export function appContentFactory (WrappedComponent) {
-  return class AppContentFactory extends React.Component {
+  return class extends React.Component {
     apiUrl = null
 
     checkApiUrl = () => {
