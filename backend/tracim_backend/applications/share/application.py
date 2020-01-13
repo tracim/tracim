@@ -61,6 +61,7 @@ class ShareApp(TracimApplication):
         configurator.include(share_controller.bind, route_prefix=route_prefix)
 
 
-application = ShareApp(
-    label="Share Content", slug="share_content", fa_icon="share", config={}, main_route=""
-)
+def create_app() -> TracimApplication:
+    return ShareApp(
+        label="Share Content", slug="share_content", fa_icon="share", config={}, main_route=""
+    )

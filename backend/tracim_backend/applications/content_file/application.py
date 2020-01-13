@@ -34,10 +34,11 @@ class ContentFileApp(TracimApplication):
         configurator.include(file_controller.bind, route_prefix=route_prefix)
 
 
-application = ContentFileApp(
-    label="Files",
-    slug="contents/file",
-    fa_icon="paperclip",
-    config={},
-    main_route="/ui/workspaces/{workspace_id}/contents?type=file",
-)
+def create_app() -> TracimApplication:
+    return ContentFileApp(
+        label="Files",
+        slug="contents/file",
+        fa_icon="paperclip",
+        config={},
+        main_route="/ui/workspaces/{workspace_id}/contents?type=file",
+    )

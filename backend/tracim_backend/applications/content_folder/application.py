@@ -37,6 +37,7 @@ class ContentFolderApp(TracimApplication):
         configurator.include(folder_controller.bind, route_prefix=route_prefix)
 
 
-application = ContentFolderApp(
-    label="Folder", slug="contents/folder", fa_icon="folder-o", config={}, main_route=""
-)
+def create_app() -> TracimApplication:
+    return ContentFolderApp(
+        label="Folder", slug="contents/folder", fa_icon="folder-o", config={}, main_route=""
+    )

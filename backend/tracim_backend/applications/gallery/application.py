@@ -26,10 +26,11 @@ class GalleryApp(TracimApplication):
         pass
 
 
-application = GalleryApp(
-    label="Gallery",
-    slug="gallery",
-    fa_icon="picture-o",
-    config={},
-    main_route="/ui/workspaces/{workspace_id}/gallery",
-)
+def create_app() -> TracimApplication:
+    return GalleryApp(
+        label="Gallery",
+        slug="gallery",
+        fa_icon="picture-o",
+        config={},
+        main_route="/ui/workspaces/{workspace_id}/gallery",
+    )

@@ -35,10 +35,11 @@ class ContentThreadApp(TracimApplication):
         configurator.include(thread_controller.bind, route_prefix=route_prefix)
 
 
-application = ContentThreadApp(
-    label="Threads",
-    slug="contents/thread",
-    fa_icon="comments-o",
-    config={},
-    main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
-)
+def create_app() -> TracimApplication:
+    return ContentThreadApp(
+        label="Threads",
+        slug="contents/thread",
+        fa_icon="comments-o",
+        config={},
+        main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
+    )

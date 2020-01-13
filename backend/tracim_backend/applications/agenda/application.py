@@ -104,10 +104,11 @@ class AgendaApp(TracimApplication):
         configurator.include(radicale_proxy_controller.bind)
 
 
-application = AgendaApp(
-    label="Agenda",
-    slug="agenda",
-    fa_icon="calendar",
-    config={},
-    main_route="/ui/workspaces/{workspace_id}/agenda",
-)
+def create_app() -> TracimApplication:
+    return AgendaApp(
+        label="Agenda",
+        slug="agenda",
+        fa_icon="calendar",
+        config={},
+        main_route="/ui/workspaces/{workspace_id}/agenda",
+    )

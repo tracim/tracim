@@ -38,10 +38,11 @@ class ContentHTMLDocumentApp(TracimApplication):
         configurator.include(html_document_controller.bind, route_prefix=route_prefix)
 
 
-application = ContentHTMLDocumentApp(
-    label="Text Documents",  # TODO - G.M - 24-05-2018 - Check label
-    slug="contents/html-document",
-    fa_icon="file-text-o",
-    config={},
-    main_route="/ui/workspaces/{workspace_id}/contents?type=html-document",
-)
+def create_app() -> TracimApplication:
+    return ContentHTMLDocumentApp(
+        label="Text Documents",  # TODO - G.M - 24-05-2018 - Check label
+        slug="contents/html-document",
+        fa_icon="file-text-o",
+        config={},
+        main_route="/ui/workspaces/{workspace_id}/contents?type=html-document",
+    )

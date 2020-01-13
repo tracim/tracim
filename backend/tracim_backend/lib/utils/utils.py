@@ -399,7 +399,7 @@ def load_apps() -> typing.List[TracimApplication]:
     tracim_apps = []
     for app_config_path in find_direct_submodule_path(apps_modules):
         module = importlib.import_module("{}.application".format(app_config_path))
-        tracim_apps.append(module.application)
+        tracim_apps.append(module.create_app())
     return tracim_apps
 
 

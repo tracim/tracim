@@ -74,10 +74,11 @@ class UploadPermissionApp(TracimApplication):
         configurator.include(upload_permission_controller.bind, route_prefix=route_prefix)
 
 
-application = UploadPermissionApp(
-    label="Upload permission",
-    slug="upload_permission",
-    fa_icon="cloud-upload",
-    config={},
-    main_route="",
-)
+def create_app() -> TracimApplication:
+    return UploadPermissionApp(
+        label="Upload permission",
+        slug="upload_permission",
+        fa_icon="cloud-upload",
+        config={},
+        main_route="",
+    )
