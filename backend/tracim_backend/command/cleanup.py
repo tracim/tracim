@@ -7,9 +7,12 @@ from pyramid.scripting import AppEnvironment
 from tracim_backend import UserDoesNotExist
 from tracim_backend.command import AppContextCommand
 from tracim_backend.exceptions import AgendaNotFoundError
+from tracim_backend.exceptions import AppDoesNotExist
 from tracim_backend.exceptions import UserCannotBeDeleted
+from tracim_backend.extensions import app_list
 from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.lib.cleanup.cleanup import UserNeedAnonymization
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import User
 from tracim_backend.models.tracim_session import unprotected_content_revision
@@ -166,36 +169,50 @@ class DeleteUserCommand(AppContextCommand):
             )
             print("~~~~")
             print("Deletion of Caldav Agenda\n")
-            # INFO - G.M - 2019-12-13 - cleanup agenda at end of process
-            if deleted_workspace_ids:
-                deleted_workspace_ids_str = [
-                    '"{}"'.format(workspace_id) for workspace_id in deleted_workspace_ids
-                ]
-                print("delete agenda of workspaces {}".format(", ".join(deleted_workspace_ids_str)))
-                for workspace_id in deleted_workspace_ids:
-                    try:
-                        cleanup_lib.delete_workspace_agenda(workspace_id)
-                    except AgendaNotFoundError:
-                        print(
-                            'Warning: Cannot delete agenda for workspace "{}", agenda not found. Agenda path may be incorrect or agenda not created'.format(
-                                workspace_id
-                            )
-                        )
-                        print(traceback.format_exc())
+            app_lib = ApplicationApi(app_list=app_list)
+            try:
+                app_lib.get_one("agenda")
+                agenda_enabled = True
+            except AppDoesNotExist:
+                agenda_enabled = False
 
-            if deleted_user_ids:
-                deleted_user_ids_str = ['"{}"'.format(user_id) for user_id in deleted_user_ids]
-                print("delete agenda of users {}".format(", ".join(deleted_user_ids_str)))
-                for user_id in deleted_user_ids:
-                    try:
-                        cleanup_lib.delete_user_agenda(user_id)
-                    except AgendaNotFoundError:
-                        print(
-                            'Warning: Cannot delete agenda for user "{}", agenda not found. Agenda path may be incorrect or agenda not created'.format(
-                                user_id
-                            )
+            if agenda_enabled:
+                # INFO - G.M - 2019-12-13 - cleanup agenda at end of process
+                if deleted_workspace_ids:
+                    deleted_workspace_ids_str = [
+                        '"{}"'.format(workspace_id) for workspace_id in deleted_workspace_ids
+                    ]
+                    print(
+                        "delete agenda of workspaces {}".format(
+                            ", ".join(deleted_workspace_ids_str)
                         )
-                        print(traceback.format_exc())
+                    )
+                    for workspace_id in deleted_workspace_ids:
+                        try:
+                            cleanup_lib.delete_workspace_agenda(workspace_id)
+                        except AgendaNotFoundError:
+                            print(
+                                'Warning: Cannot delete agenda for workspace "{}", agenda not found. Agenda path may be incorrect or agenda not created'.format(
+                                    workspace_id
+                                )
+                            )
+                            print(traceback.format_exc())
+
+                if deleted_user_ids:
+                    deleted_user_ids_str = ['"{}"'.format(user_id) for user_id in deleted_user_ids]
+                    print("delete agenda of users {}".format(", ".join(deleted_user_ids_str)))
+                    for user_id in deleted_user_ids:
+                        try:
+                            cleanup_lib.delete_user_agenda(user_id)
+                        except AgendaNotFoundError:
+                            print(
+                                'Warning: Cannot delete agenda for user "{}", agenda not found. Agenda path may be incorrect or agenda not created'.format(
+                                    user_id
+                                )
+                            )
+                            print(traceback.format_exc())
+            else:
+                print("Warning ! Agenda app not enabled, agenda will not be deleted.")
             print("~~~~")
             print("deletion of Agenda process finished")
             print("~~~~")
