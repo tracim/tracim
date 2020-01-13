@@ -100,7 +100,7 @@ export class AppFullscreenRouter extends React.Component {
             <Route path={PAGE.WORKSPACE.CONTENT_EDITION(':idws', ':idcts')} render={({ match }) => {
               const workspaceId = parseInt(props.match.params.idws)
               const content = {
-                workspace_id: match.params.idws,
+                workspace_id: workspaceId,
                 content_id: match.params.idcts
               }
               const workspaceMemberList = (props.workspaceList.find(ws => ws.id === workspaceId) || { memberList: [] }).memberList
