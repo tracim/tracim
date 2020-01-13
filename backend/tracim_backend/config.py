@@ -163,12 +163,12 @@ class CFG(object):
         # should be deprecated.
         self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "false"))
         if self.CALDAV__ENABLED:
-            extend_apps += ",agenda"
+            extend_apps += "agenda,"
         self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
             self.get_raw_config("collaborative_document_edition.activated", "false")
         )
         if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
-            extend_apps += ",collaborative_document_edition"
+            extend_apps += "collaborative_document_edition,"
         default_enabled_app = default_enabled_app.format(extend_apps=extend_apps)
         self.APP__ENABLED = string_to_list(
             self.get_raw_config("app.enabled", default_enabled_app),
