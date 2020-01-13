@@ -3,20 +3,35 @@ import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { Gallery as GalleryWithoutHOC } from '../../src/container/Gallery.jsx'
 import { DIRECTION } from '../../src/helper'
+import { defaultDebug } from 'tracim_frontend_lib'
 
 describe('<Gallery />', () => {
-  const stateMock = {
-    config: {
-      apiUrl: '',
-      slug: 'gallery',
-      faIcon: 'paperclip',
-      hexcolor: '#ffa500',
-      label: 'Gallery',
-      appConfig: {
-        forceShowSidebar: false,
-        workspaceId: '1'
+  const props = {
+    data: {
+      config: {
+        apiUrl: 'http://localhost:1337/api/v2',
+        slug: 'gallery',
+        faIcon: 'paperclip',
+        hexcolor: '#ffa500',
+        label: 'Gallery',
+        appConfig: {
+          forceShowSidebar: false,
+          workspaceId: '1'
+        },
+        history: {
+          location: {
+            search: '?folder_ids=1'
+          }
+        },
+        translation :''
+      },
+      loggedUser: {
+        ...defaultDebug.loggedUser
       }
-    },
+    }
+  }
+
+  const stateMock = {
     content: {
       content_type: 'file',
       workspace_id: 0,
@@ -69,7 +84,7 @@ describe('<Gallery />', () => {
     ]
   }
 
-  const wrapper = shallow(<GalleryWithoutHOC t={tradKey => tradKey}/>)
+  const wrapper = shallow(<GalleryWithoutHOC {...props} t={tradKey => tradKey}/>)
   wrapper.setState(stateMock)
 
   describe('static design', () => {
