@@ -13,7 +13,10 @@ const appInterface = {
   isRendered: false,
   renderAppFeature: data => {
     // if loggedUser isn't at least content manager, do not open the advanced folder app
-    if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id) return
+    if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id)  {
+      console.log('%c<FolderAdvanced>', 'color: #28a745', 'Error: insufficient rights to open app')
+      return
+    }
 
     return ReactDOM.render(
       <FolderAdvanced data={data} />
