@@ -1,10 +1,11 @@
 @import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
 .carousel
+  &__main
+    margin 0 30px
   &__thumbnail
-    margin-top 5px
-    border-radius 10px
-    background-color #E8E8E7
+    background-color #f0f0f0
+    margin-top 10px
     & .slick-current
       & .carousel__thumbnail__item__preview__content__image
         background-color #7d4e24
@@ -61,6 +62,10 @@
 .gallery
   height 100%
   overflow auto
+  .pageContentGeneric
+    margin 0
+    height auto
+    padding 0
   &__action__button
     text-align center
     & button
