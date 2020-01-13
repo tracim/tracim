@@ -385,10 +385,12 @@ export class Gallery extends React.Component {
 
   onClickSlickPlay (play) {
     if (play) {
+      document.getElementsByClassName('ril__navButtons').forEach(arrow => { if (arrow.style) arrow.style.visibility = 'hidden' })
       this.setState({
         autoPlay: setInterval(() => this.handleClickPreviousNextPage(DIRECTION.RIGHT), 3000)
       })
     } else {
+      document.getElementsByClassName('ril__navButtons').forEach(arrow => { if (arrow.style) arrow.style.visibility = 'visible' })
       clearInterval(this.state.autoPlay)
       this.setState({
         autoPlay: null
