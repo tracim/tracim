@@ -9,7 +9,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend import app_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
-from tracim_backend.exceptions import AppDoesNotExist
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceNotFound
@@ -326,8 +325,7 @@ class WorkspaceApi(object):
         from tracim_backend.applications.agenda.lib import AgendaApi
 
         app_lib = ApplicationApi(app_list=app_list)
-        try:
-            app_lib.get_one("agenda")
+        if app_lib.exist("agenda"):
             if workspace.agenda_enabled:
                 agenda_api = AgendaApi(
                     current_user=self._user, session=self._session, config=self._config
@@ -347,8 +345,6 @@ class WorkspaceApi(object):
                 except Exception as exc:
                     logger.error(self, "Something goes wrong during agenda create/update")
                     logger.exception(self, exc)
-        except AppDoesNotExist:
-            pass
 
     def execute_update_workspace_actions(self, workspace: Workspace) -> None:
         """
@@ -364,8 +360,7 @@ class WorkspaceApi(object):
         # event on_updated_workspace should start hook use by agenda app code.
 
         app_lib = ApplicationApi(app_list=app_list)
-        try:
-            app_lib.get_one("agenda")
+        if app_lib.exist("agenda"):
             # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
             # with event refactor, see https://github.com/tracim/tracim/issues/1487
             from tracim_backend.applications.agenda.lib import AgendaApi
@@ -382,8 +377,6 @@ class WorkspaceApi(object):
                 except Exception as exc:
                     logger.error(self, "Something goes wrong during agenda create/update")
                     logger.exception(self, exc)
-        except AppDoesNotExist:
-            pass
 
     def check_public_upload_enabled(self, workspace: Workspace) -> None:
         if not workspace.public_upload_enabled:

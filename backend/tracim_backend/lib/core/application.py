@@ -21,7 +21,16 @@ class ApplicationApi(object):
         self.apps = app_list
         self.show_all = show_all
 
-    def get_one(self, slug):
+    def exist(self, slug: str) -> bool:
+        """ Check if app with this slug does exist according to applicationApi configuration"""
+        try:
+            self.get_one(slug)
+            return True
+        except AppDoesNotExist:
+            return False
+
+    def get_one(self, slug: str) -> TracimApplication:
+        """ Get app with given slug if exist"""
         for app in self.apps:
             if app.slug == slug:
                 if self.show_all or app.is_active:

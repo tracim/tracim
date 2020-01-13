@@ -22,7 +22,6 @@ from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
-from tracim_backend.exceptions import AppDoesNotExist
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailTemplateError
@@ -891,8 +890,7 @@ class UserApi(object):
         # event on_updated_user should start hook use by agenda  app code.
 
         app_lib = ApplicationApi(app_list=app_list)
-        try:
-            app_lib.get_one("agenda")
+        if app_lib.exist("agenda"):
             agenda_api = AgendaApi(
                 current_user=self._user, session=self._session, config=self._config
             )
@@ -904,8 +902,6 @@ class UserApi(object):
             except Exception as exc:
                 logger.error(self, "Something goes wrong during agenda create/update")
                 logger.exception(self, exc)
-        except AppDoesNotExist:
-            pass
 
     def execute_created_user_actions(self, user: User) -> None:
         """
@@ -926,8 +922,7 @@ class UserApi(object):
         # event on_created_user should start hook use by agenda  app code.
 
         app_lib = ApplicationApi(app_list=app_list)
-        try:
-            app_lib.get_one("agenda")
+        if app_lib.exist("agenda"):
             agenda_api = AgendaApi(
                 current_user=self._user, session=self._session, config=self._config
             )
@@ -946,8 +941,6 @@ class UserApi(object):
             except Exception as exc:
                 logger.error(self, "Something goes wrong during agenda create/update")
                 logger.exception(self, exc)
-        except AppDoesNotExist:
-            pass
 
     def _check_user_auth_validity(self, user: User) -> None:
         if not self._user_can_authenticate(user):
