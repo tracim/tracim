@@ -2,12 +2,20 @@ import React from 'react'
 import i18n from './i18n.js'
 import {
   handleFetchResult,
-  FETCH_CONFIG,
   APP_FEATURE_MODE,
   generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate
 } from './helper.js'
+import {
+  putEditContent,
+  postNewComment,
+  putEditStatus,
+  putContentArchived,
+  putContentDeleted,
+  putContentRestoreArchive,
+  putContentRestoreDelete
+} from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
@@ -100,16 +108,7 @@ export function appContentFactory (WrappedComponent) {
 
       // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
       const response = await handleFetchResult(
-        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/${appSlug}s/${content.content_id}`, {
-          credentials: 'include',
-          headers: { ...FETCH_CONFIG.headers },
-          method: 'PUT',
-          body: JSON.stringify({
-            label: newTitle,
-            raw_content: content.raw_content,
-            ...propertiesToAddToBody
-          })
-        })
+        await putEditContent(this.apiUrl, content.workspace_id, content.content_id, appSlug, newTitle, content.raw_content, propertiesToAddToBody)
       )
 
       switch (response.apiResponse.status) {
@@ -143,19 +142,12 @@ export function appContentFactory (WrappedComponent) {
     appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug) => {
       this.checkApiUrl()
 
+      // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
+      // see https://github.com/tracim/tracim/issues/1101
+      const newCommentForApi = isCommentWysiwyg ? newComment : `<p>${convertBackslashNToBr(newComment)}</p>`
+
       const response = await handleFetchResult(
-        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/comments`, {
-          credentials: 'include',
-          headers: { ...FETCH_CONFIG.headers },
-          method: 'POST',
-          body: JSON.stringify({
-            // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
-            // see https://github.com/tracim/tracim/issues/1101
-            raw_content: isCommentWysiwyg
-              ? newComment
-              : `<p>${convertBackslashNToBr(newComment)}</p>`
-          })
-        })
+        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApi)
       )
 
       switch (response.apiResponse.status) {
@@ -191,15 +183,7 @@ export function appContentFactory (WrappedComponent) {
       if (newStatus === content.status) return
 
       const response = await handleFetchResult(
-        // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
-        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/${appSlug}s/${content.content_id}/status`, {
-          credentials: 'include',
-          headers: { ...FETCH_CONFIG.headers },
-          method: 'PUT',
-          body: JSON.stringify({
-            status: newStatus
-          })
-        })
+        await putEditStatus(this.apiUrl, content.workspace_id, content.content_id, appSlug, newStatus)
       )
 
       switch (response.status) {
@@ -218,11 +202,7 @@ export function appContentFactory (WrappedComponent) {
       this.checkApiUrl()
 
       const response = await await handleFetchResult(
-        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/archived`, {
-          credentials: 'include',
-          headers: { ...FETCH_CONFIG.headers },
-          method: 'PUT'
-        })
+        await putContentArchived(this.apiUrl, content.workspace_id, content.content_id)
       )
 
       switch (response.status) {
@@ -249,11 +229,7 @@ export function appContentFactory (WrappedComponent) {
       this.checkApiUrl()
 
       const response = await await handleFetchResult(
-        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/trashed`, {
-          credentials: 'include',
-          headers: { ...FETCH_CONFIG.headers },
-          method: 'PUT'
-        })
+        await putContentDeleted(this.apiUrl, content.workspace_id, content.content_id)
       )
 
       switch (response.status) {
@@ -278,11 +254,7 @@ export function appContentFactory (WrappedComponent) {
       this.checkApiUrl()
 
       const response = await await handleFetchResult(
-        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/archived/restore`, {
-          credentials: 'include',
-          headers: { ...FETCH_CONFIG.headers },
-          method: 'PUT'
-        })
+        await putContentRestoreArchive(this.apiUrl, content.workspace_id, content.content_id)
       )
 
       switch (response.status) {
@@ -307,11 +279,7 @@ export function appContentFactory (WrappedComponent) {
       this.checkApiUrl()
 
       const response = await await handleFetchResult(
-        await fetch(`${this.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/trashed/restore`, {
-          credentials: 'include',
-          headers: { ...FETCH_CONFIG.headers },
-          method: 'PUT'
-        })
+        await putContentRestoreDelete(this.apiUrl, content.workspace_id, content.content_id)
       )
 
       switch (response.status) {
