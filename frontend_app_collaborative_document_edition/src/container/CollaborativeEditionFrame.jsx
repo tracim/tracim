@@ -16,10 +16,13 @@ import {
 const FORM_ID = 'loleafletform'
 const IFRAME_ID = 'loleafletframe'
 
-class CollaborativeEditionFrame extends React.Component {
+export class CollaborativeEditionFrame extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      config: props.data ? props.data.config : {},
+      loggedUser: props.data ? props.data.loggedUser : {},
+      content: props.data ? props.data.content : {},
       iframeUrl: '',
       formId: props.formId ? props.formId : FORM_ID,
       iframeId: props.frameId ? props.frameId : IFRAME_ID,
@@ -35,8 +38,7 @@ class CollaborativeEditionFrame extends React.Component {
       },
       accessToken: '',
       onlineEditorUrl: '',
-      ready: false,
-      loggedUser: props.data.loggedUser
+      ready: false
     }
     // INFO - B.L - 2019/09/03 handleIframeIsClosing is called by an event from window so we have to bind this
     this.handleIframeIsClosing = this.handleIframeIsClosing.bind(this)
@@ -88,7 +90,7 @@ class CollaborativeEditionFrame extends React.Component {
   buildCompleteIframeUrl = (urlSource, accessToken) => {
     const { state } = this
     const protocol = window.location.protocol
-    const readyonly = !state.content.is_editable || !state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id
+    const readyonly = !state.content.is_editable || !(state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id)
     // INFO - B.L - 2019.08.01 - We assume frontend is on the same host than the API
     const host = window.location.host
     let url = `${urlSource}WOPISrc=${protocol}//${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1&lang=${state.loggedUser.lang}`
