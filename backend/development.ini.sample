@@ -49,14 +49,19 @@ basic_setup.session_secret = change_this_value_please!
 # already added to default list.
 # This parameter is a list of app slug separated by ',' char.
 ## Not exhaustive list of available apps:
-# - content/thread -> thread/topic/discussion : allow to discuss about one
+# - "content/thread" -> thread/topic/discussion : allow to discuss about one
 #   subject.
-# - content/file -> allow to upload all type of file like .pdf, .odt, .jpg, etc
-# - content/html-document -> allow to work on a standard html-based document
+# - "content/file" -> allow to upload all type of file like .pdf, .odt, .jpg, etc
+# - "content/html-document" -> allow to work on a standard html-based document
 #   which is editable through tracim.
-# - content/folder -> allow to put content into folder.
+# - "content/folder" -> allow to put content into folder.
+# - "agenda" -> add caldav agenda feature (specific process need to be runned)
+# - "collaborative_document_edition" -> add support for collaborative document edition,
+#   add support for collaborative edition server like collabora/libreofficeOnline.
+# - "share_content" -> allow user to share tracim content with external user
+# - "upload_permission" -> allow external with permission to upload some file in a workspace.
 ## example of app.enabled config explicit list config
-; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder
+; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission
 
 ### Plugins ###
 # if provided, this allow tracim to load package from this dir and if package follow
