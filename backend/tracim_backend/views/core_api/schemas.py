@@ -966,7 +966,10 @@ class TimezoneSchema(marshmallow.Schema):
 
 class AboutSchema(marshmallow.Schema):
     name = StrippedString(example="Tracim", description="Software name")
-    version = StrippedString(example="2.0", allow_none=True, description="Version of Tracim")
+    version = StrippedString(example="2.6", allow_none=True, description="Version of Tracim")
+    build_version = StrippedString(
+        example="release_02.06.00", allow_none=True, description="Build Version of Tracim"
+    )
     datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
     website = marshmallow.fields.URL(allow_none=True)
 

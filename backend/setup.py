@@ -34,6 +34,7 @@ requires = [
     'preview-generator>=0.13',
     'colour',
     'python-dateutil',
+    'gitpython',
     # mail-notifier
     'mako',
     'lxml',

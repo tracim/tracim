@@ -14,6 +14,7 @@ from urllib.parse import urlencode
 from urllib.parse import urljoin
 
 from colour import Color
+from git import InvalidGitRepositoryError
 import pytz
 from redis import Redis
 from rq import Queue
@@ -416,3 +417,25 @@ def find_all_submodule_path(module: types.ModuleType) -> typing.List[str]:
         # INFO - G.M - 2019-11-29 - remove submodule from loaded modules
         del sys.modules[spec.name]
     return module_path_list
+
+
+def get_build_version(path: str) -> str:
+    """
+    Get either tag or commit hash linked to current commit
+    :param path: path of git repository
+    :return: tag or commit hash
+    """
+    try:
+        import git
+
+        repo = git.Repo(path, search_parent_directories=True)
+    except (ImportError, InvalidGitRepositoryError):
+        return "unknown"
+
+    tags = [tag for tag in repo.tags if tag.commit == repo.head.commit]
+    if tags:
+        # INFO - G.M - 2020-01-13 - return first associated tag to head commit
+        return tags[0]
+    else:
+        # INFO - G.M - 2020-01-13 - return the 10 first letter of current commit hash
+        return repo.head.object.hexsha[:10]
