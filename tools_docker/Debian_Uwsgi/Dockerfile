@@ -58,6 +58,7 @@ RUN \
     uwsgi \
     uwsgi-plugin-python3 \
     vim \
+    xvfb \
     zlib1g-dev \
 # Install nodejs
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
