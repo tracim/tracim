@@ -70,7 +70,7 @@ export class Gallery extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+  customEventReducer = ({ detail: { type, data } }) => {
     const { state } = this
 
     switch (type) {

@@ -549,7 +549,7 @@ describe('appContentFactory.js', () => {
     const commentList = fixtureCommentList
     const revisionList = fixtureRevisionList.map((revision, i) => ({
       ...revision,
-      // ensure that the first revision after creation has all the comments from commentList
+      // INFO - CH - 2019-01-14 - ensure that the first revision after creation has all the comments from commentList
       comment_ids: i === 1 ? commentList.map(comment => comment.content_id) : []
     }))
     let commentAndRevisionMergedList = []
