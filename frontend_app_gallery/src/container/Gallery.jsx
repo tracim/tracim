@@ -255,7 +255,7 @@ export class Gallery extends React.Component {
 
           const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
           const previewUrl = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 1400, 1400)
-          const previewUrlForThumbnail = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 150, 150)
+          const previewUrlForThumbnail = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 125, 125)
           const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, j) =>
             buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, j + 1, 1920, 1920)
           )
@@ -458,6 +458,7 @@ export class Gallery extends React.Component {
           title={state.folderId ? state.folderDetail.fileName : state.workspaceLabel}
           icon={'picture-o'}
           breadcrumbsList={state.breadcrumbsList}
+          parentClass='gallery'
         />
 
         <PageContent>
