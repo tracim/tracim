@@ -137,6 +137,7 @@ setup(
             'search index-upgrade-experimental = tracim_backend.command.search:SearchIndexUpgradeCommand',
             'search index-drop = tracim_backend.command.search:SearchIndexDeleteCommand',
             'dev parameters list = tracim_backend.command.devtools:ParametersListCommand',
+            'dev parameters value = tracim_backend.command.devtools:ParametersValueCommand',
             'user delete = tracim_backend.command.cleanup:DeleteUserCommand',
             'user anonymize = tracim_backend.command.cleanup:AnonymizeUserCommand',
         ]
