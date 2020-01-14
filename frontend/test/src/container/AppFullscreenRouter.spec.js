@@ -46,7 +46,12 @@ describe('<AppFullscreenRouter />', () => {
       expect(renderAppFullscreenCallBack.called).to.equal(true)
 
       let args = renderAppFullscreenCallBack.getCalls()[0].args
-      expect(args).to.deep.equal([{ slug: 'collaborative_document_edition', hexcolor: '#7d4e24' }, props.user, ROLE.reader.id, { workspace_id: '1', content_id: '1' }])
+      expect(args).to.deep.equal([
+        { slug: 'collaborative_document_edition', hexcolor: '#7d4e24' },
+        props.user,
+        ROLE.reader.id,
+        { workspace_id: 1, content_id: '1' }
+      ])
     })
 
     it(`renderAppFullscreenCallBack should be called when the route is ${PAGE.WORKSPACE.AGENDA(1)}`, () => {
