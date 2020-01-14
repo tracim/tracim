@@ -18,7 +18,7 @@ class PopupCreateFile extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'file', // must remain 'file' because it is the name of the react built app (which contains File and PopupCreateFile)
+      appName: 'file', // INFO - CH - 2018-08-28 - must remain 'file' because it is the name of the react built app (which contains File and PopupCreateFile)
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       workspaceId: props.data ? props.data.workspaceId : debug.workspaceId,
@@ -29,14 +29,14 @@ class PopupCreateFile extends React.Component {
       uploadStarted: false
     }
 
-    // i18n has been init, add resources from frontend
+    // INFO - CH - 2018-08-28 - i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+  customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<PopupCreateFile> Custom event', 'color: #28a745', type, data)
@@ -52,7 +52,6 @@ class PopupCreateFile extends React.Component {
   }
 
   componentWillUnmount () {
-    // console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
@@ -156,7 +155,7 @@ class PopupCreateFile extends React.Component {
     formData.append('parent_id', state.folderId || 0)
     let filePosted = file
 
-    // fetch still doesn't handle event progress. So we need to use old school xhr object
+    // INFO - CH - 2018-08-28 - fetch still doesn't handle event progress. So we need to use old school xhr object
     const xhr = new XMLHttpRequest()
 
     const uploadInProgress = e => {
@@ -258,7 +257,7 @@ class PopupCreateFile extends React.Component {
         contentName={this.isValidateButtonDisabled() ? '' : 'allowValidate'} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
         btnValidateLabel={props.t('Validate and create')}
-        customStyle={{ top: 'calc(50% - 177px)' }}
+        customStyle={{ top: '50%', transform: 'translateY(-50%)' }}
       >
         <div>
           {state.uploadStarted &&
