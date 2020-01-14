@@ -457,7 +457,7 @@ export class Gallery extends React.Component {
     }, 2000)
   }
 
-  handleAfterOpenReactImageLightBox () {
+  handleAfterOpenReactImageLightBox = () => {
     const { state } = this
 
     if (state.autoPlay) this.displayReactImageLightBoxArrows(false)
@@ -553,7 +553,7 @@ export class Gallery extends React.Component {
                   onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
                   onMoveNextRequest={() => { this.handleClickPreviousNextPage(DIRECTION.RIGHT) }}
                   imagePadding={0}
-                  onAfterOpen={this.handleAfterOpenReactImageLightBox.bind(this)}
+                  onAfterOpen={this.handleAfterOpenReactImageLightBox}
                   reactModalProps={{ parentSelector: () => this.reactImageLightBoxModalRoot }}
                   toolbarButtons={[
                     <div className={'gallery__action__button__lightbox'}>
