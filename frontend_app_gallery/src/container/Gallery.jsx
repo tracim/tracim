@@ -384,18 +384,26 @@ export class Gallery extends React.Component {
   }
 
   onClickSlickPlay (play) {
+    const { state } = this
+
+    if (state.displayLightbox) this.displayReactImageLightBoxArrows(!play)
+
     if (play) {
-      document.getElementsByClassName('ril__navButtons').forEach(arrow => { if (arrow.style) arrow.style.visibility = 'hidden' })
       this.setState({
         autoPlay: setInterval(() => this.handleClickPreviousNextPage(DIRECTION.RIGHT), 3000)
       })
     } else {
-      document.getElementsByClassName('ril__navButtons').forEach(arrow => { if (arrow.style) arrow.style.visibility = 'visible' })
       clearInterval(this.state.autoPlay)
       this.setState({
         autoPlay: null
       })
     }
+  }
+
+  displayReactImageLightBoxArrows (display) {
+    document.getElementsByClassName('ril__navButtons').forEach(arrow => {
+      if (arrow.style) arrow.style.visibility = display ? 'visible' : 'hidden'
+    })
   }
 
   rotateImg (fileSelected, direction) {
@@ -447,6 +455,12 @@ export class Gallery extends React.Component {
         document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
       }
     }, 2000)
+  }
+
+  handleAfterOpenReactImageLightBox () {
+    const { state } = this
+
+    if (state.autoPlay) this.displayReactImageLightBoxArrows(false)
   }
 
   render () {
@@ -539,6 +553,7 @@ export class Gallery extends React.Component {
                   onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
                   onMoveNextRequest={() => { this.handleClickPreviousNextPage(DIRECTION.RIGHT) }}
                   imagePadding={0}
+                  onAfterOpen={this.handleAfterOpenReactImageLightBox.bind(this)}
                   reactModalProps={{ parentSelector: () => this.reactImageLightBoxModalRoot }}
                   toolbarButtons={[
                     <div className={'gallery__action__button__lightbox'}>
