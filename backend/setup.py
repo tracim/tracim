@@ -84,7 +84,9 @@ tests_require = [
     'responses',
     'mock',
     'Pillow',
-    'freezegun',
+    # INFO - G.M - 2020-01-14 - static version of freezeguh due to regression
+    # with webtest, see https://github.com/spulec/freezegun/issues/326
+    'freezegun==0.3.12',
 ]
 
 devtools_require=[
