@@ -458,7 +458,7 @@ export class Gallery extends React.Component {
           title={state.folderId ? state.folderDetail.fileName : state.workspaceLabel}
           icon={'picture-o'}
           breadcrumbsList={state.breadcrumbsList}
-          parentClass='gallery'
+          parentClass='gallery__header'
         />
 
         <PageContent>
