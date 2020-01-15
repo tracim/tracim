@@ -40,7 +40,7 @@ function create_require_dirs {
     create_dir "sessions_lock" "$DEFAULTDIR/sessions/sessions_lock"
     create_dir "depot" "$DEFAULTDIR/depot"
     create_dir "preview" "$DEFAULTDIR/previews"
-    create_dir "radicale_storage" $DEFAULTDIR/radicale_storage
+    create_dir "radicale_storage" "$DEFAULTDIR/radicale_storage"
 }
 
 create_require_dirs
