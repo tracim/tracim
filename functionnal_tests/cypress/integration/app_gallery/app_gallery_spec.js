@@ -127,7 +127,7 @@ describe('App Gallery', function () {
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file2.title}']`)
         .should('be.visible')
     })
-    it('should start the autoPlay when the autoPlay is clicked', () => {
+    it('should start the autoPlay and hide arrows when the autoPlay is clicked', () => {
       cy.visitPage({
         pageName: PAGES.GALLERY,
         params: { workspaceId }
@@ -138,6 +138,12 @@ describe('App Gallery', function () {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file2.title}']`)
         .should('be.visible')
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get('.carousel__arrow.arrownext')
+        .should('be.not.visible')
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get('.carousel__arrow.arrowprev')
+        .should('be.not.visible')
     })
   })
 
@@ -202,6 +208,25 @@ describe('App Gallery', function () {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.fullscreen.fullscreen-enabled`)
         .should('be.visible')
+    })
+    it('should hide arrows when the autoPlay is enabled', () => {
+      cy.visitPage({
+        pageName: PAGES.GALLERY,
+        params: { workspaceId }
+      })
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']:visible`)
+        .click()
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`[data-cy=gallery__action__button__lightbox__auto__play]`)
+        .click()
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`.ril-next-button.ril__navButtons`)
+        .should('be.not.visible')
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`.ril-prev-button.ril__navButtons`)
+        .should('be.not.visible')
+
     })
   })
 

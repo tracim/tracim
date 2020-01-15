@@ -561,6 +561,7 @@ export class Gallery extends React.Component {
                         className='btn iconBtn'
                         onClick={() => this.onClickSlickPlay(!state.autoPlay)}
                         title={state.autoPlay ? props.t('Pause') : props.t('Play')}
+                        data-cy='gallery__action__button__lightbox__auto__play'
                       >
                         <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
                       </button>
