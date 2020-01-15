@@ -21,7 +21,7 @@ class Home extends React.Component {
   }
 
   componentDidMount () {
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: this.props.system.config.instance_name } })
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: this.props.t('Home') } })
   }
 
   render () {
