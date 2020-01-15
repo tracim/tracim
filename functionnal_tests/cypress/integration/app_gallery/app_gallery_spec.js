@@ -226,7 +226,6 @@ describe('App Gallery', function () {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.ril-prev-button.ril__navButtons`)
         .should('be.not.visible')
-
     })
   })
 
