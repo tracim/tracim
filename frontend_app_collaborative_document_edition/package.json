@@ -11,7 +11,7 @@
     "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "build-devwindoz": "set NODE_ENV=production&& webpack",
     "build-translation": "node i18next.scanner.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
   "license": "ISC",
@@ -44,11 +44,14 @@
     "css-loader": "^3.0.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
+    "es6-promise": "^4.2.8",
     "file-loader": "^4.0.0",
     "i18next-scanner": "^2.10.2",
     "ignore-styles": "^5.0.1",
+    "isomorphic-fetch": "^2.2.1",
     "jsdom": "^15.1.1",
     "mocha": "^6.1.4",
+    "nock": "^11.7.2",
     "standard": "^12.0.1",
     "standard-loader": "^6.0.1",
     "style-loader": "^0.23.1",
@@ -70,5 +73,20 @@
     ],
     "parser": "babel-eslint",
     "ignore": []
+  },
+  "babel": {
+    "env": {
+      "test": {
+        "presets": [
+          "@babel/preset-env",
+          "@babel/preset-react"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties",
+          "@babel/plugin-proposal-object-rest-spread",
+          "@babel/plugin-transform-object-assign"
+        ]
+      }
+    }
   }
 }
