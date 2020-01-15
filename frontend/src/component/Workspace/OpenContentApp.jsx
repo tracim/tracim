@@ -39,7 +39,7 @@ export class OpenContentApp extends React.Component {
         // if another app is already visible, hide it
         if (appOpenedType !== false) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
 
-        const contentInfomations = {
+        const contentInformation = {
           ...contentType.find(ct => ct.slug === contentToOpen.type),
           workspace: {
             downloadEnabled: currentWorkspace.downloadEnabled
@@ -47,7 +47,7 @@ export class OpenContentApp extends React.Component {
         }
         // open app
         renderAppFeature(
-          contentInfomations,
+          contentInformation,
           user,
           findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE_LIST),
           contentToOpen
