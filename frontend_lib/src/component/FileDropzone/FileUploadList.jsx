@@ -28,6 +28,7 @@ export const FileUploadList = (props) => {
             onClick={() => props.onDeleteFile(file)}
             title={props.t('Delete')}
             disabled={props.deleteFileDisabled}
+            data-cy='file__upload__list__item__delete'
           >
             <i className='fa fa-fw fa-trash-o' />
           </button>
