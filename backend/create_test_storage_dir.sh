@@ -21,36 +21,26 @@ function logerror {
     echo -e "\n${RED}[$(date +'%H:%M:%S')]${RED} $ $1${NC}"
 }
 
+function create_dir(){
+    DIR_NAME=$1
+    DIR_PATH=$2
+    if [ ! -d "$DIR_PATH" ]; then
+        log "create $DIR_NAME dir ..."
+        mkdir $DIR_PATH && loggood "creation $DIR_NAME dir success" || logerror "failed to create $DIR_NAME dir ($DIR_PATH)"
+    else
+        loggood "$DIR_NAME dir ($DIR_PATH) already exist"
+    fi
+}
+
 function create_require_dirs {
-      log "create requires directories"
-   if [ ! -d "$DEFAULTDIR/" ]; then
-     log "create test_storage_dir data dir ..."
-     mkdir "$DEFAULTDIR" && loggood "creation test_storage_dir dir success" || logerror "failed to create session data dir"
-   fi
-    if [ ! -d "$DEFAULTDIR/sessions/" ]; then
-     log "create session dir ..."
-     mkdir "$DEFAULTDIR/sessions/" && loggood "creation session dir success" || logerror "failed to create session data dir"
-   fi
-   if [ ! -d "$DEFAULTDIR/sessions/sessions_data/" ]; then
-     log "create session data dir ..."
-     mkdir "$DEFAULTDIR/sessions/sessions_data/" && loggood "creation session data dir success" || logerror "failed to create session data dir"
-   fi
-   if [ ! -d "$DEFAULTDIR/sessions/sessions_lock/" ]; then
-     log "create session lock dir ..."
-     mkdir "$DEFAULTDIR/sessions/sessions_lock/" && loggood "creation session lock dir success" || logerror "failed to create session lock dir"
-   fi
-   if [ ! -d "$DEFAULTDIR/depot/" ]; then
-     log "create depot dir ..."
-     mkdir "$DEFAULTDIR/depot/" && loggood "creation depot dir success" || logerror "failed to create depot dir"
-   fi
-   if [ ! -d "$DEFAULTDIR/previews/" ]; then
-     log "create preview dir ..."
-     mkdir "$DEFAULTDIR/previews/" && loggood "creation preview dir success" || logerror "failed to create preview dir"
-   fi
-   if [ ! -d $DEFAULTDIR/radicale_storage ]; then
-     log "create radicale storage dir ..."
-     mkdir $DEFAULTDIR/radicale_storage && loggood "creation radicale storage dir success" || logerror "failed to create radicale storage dir"
-   fi
+    log "create requires directories"
+    create_dir "test_storage" $DEFAULTDIR
+    create_dir "session" "$DEFAULTDIR/sessions"
+    create_dir "sessions_data" "$DEFAULTDIR/sessions/sessions_data"
+    create_dir "sessions_lock" "$DEFAULTDIR/sessions/sessions_lock"
+    create_dir "depot" "$DEFAULTDIR/depot"
+    create_dir "preview" "$DEFAULTDIR/previews"
+    create_dir "radicale_storage" $DEFAULTDIR/radicale_storage
 }
 
 create_require_dirs
