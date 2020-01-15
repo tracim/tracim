@@ -24,7 +24,7 @@ context('Add file(s) with PopupCreateFile', function () {
   })
 
   describe('Adds a file to a workspace', () => {
-    it('should open the app file with the new file added', () => {
+    it('should open the app file with the newly added file', () => {
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .get('[data-cy="contentTypeBtn_contents/file"]')
         .click()
@@ -41,8 +41,8 @@ context('Add file(s) with PopupCreateFile', function () {
   })
 
   describe('Adds multiples files to a workspace', () => {
-    describe('add 2 file not added yet', () => {
-      it('should update the workspace content list with the new files added', () => {
+    describe('add 2 files not added yet', () => {
+      it('should update the workspace content list with the newly added files', () => {
         const fileName1 = 'png_exemple2'
         const fileName2 = 'pdf_exemple2'
 
@@ -63,7 +63,7 @@ context('Add file(s) with PopupCreateFile', function () {
     })
 
     describe('add 2 files with one already added', () => {
-      it('should update the workspace content list with the new file added and not close the popup in order to display the upload fail', () => {
+      it('should update the workspace content list with the newly added file without closing the popup in order to display the failed upload', () => {
         const fileName1 = 'png_exemple3'
         const fileName2 = 'pdf_exemple3'
 
@@ -86,8 +86,8 @@ context('Add file(s) with PopupCreateFile', function () {
       })
     })
 
-    describe('add 2 files with a third file deleted before validate the form', () => {
-      it('should be able to delete a file before validate the form', () => {
+    describe('add 2 files and a third one deleted right before validating the form', () => {
+      it('should be able to delete a file before validating the form', () => {
         const fileName1 = 'png_exemple4'
         const fileName2 = 'pdf_exemple4'
         const fileName3 = 'png_exemple4_1'
