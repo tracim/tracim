@@ -9,3 +9,5 @@ If one or more of these checkpoints are out of scope, please write below why the
 - [ ] If there are FIXME in the code, then there are associated issues and issue is referenced in the FIXME
 - [ ] If there are TODO, NOTE or HACK in code, date and developer initials are present
 - [ ] Automated tests have been written (covering feature or non regression), or *at least* an issue has been created for test implementation
+
+- [ ] Tested by quality team

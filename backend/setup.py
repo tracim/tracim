@@ -84,7 +84,9 @@ tests_require = [
     'responses',
     'mock',
     'Pillow',
-    'freezegun',
+    # INFO - G.M - 2020-01-14 - static version of freezeguh due to regression
+    # with webtest, see https://github.com/spulec/freezegun/issues/326
+    'freezegun==0.3.12',
 ]
 
 devtools_require=[
@@ -164,7 +166,9 @@ setup(
             'search index-populate = tracim_backend.command.search:SearchIndexIndexCommand',
             'search index-upgrade-experimental = tracim_backend.command.search:SearchIndexUpgradeCommand',
             'search index-drop = tracim_backend.command.search:SearchIndexDeleteCommand',
-            'dev parameters list = tracim_backend.command.devtools:ParametersListCommand'
+            'dev parameters list = tracim_backend.command.devtools:ParametersListCommand',
+            'user delete = tracim_backend.command.cleanup:DeleteUserCommand',
+            'user anonymize = tracim_backend.command.cleanup:AnonymizeUserCommand',
         ]
     },
     message_extractors={'tracim_backend': [
