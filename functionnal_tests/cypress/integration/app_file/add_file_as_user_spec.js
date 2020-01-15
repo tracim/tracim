@@ -19,6 +19,10 @@ context('Add file(s) with PopupCreateFile', function () {
     cy.visit(`/ui/workspaces/${workspaceId}/dashboard`)
   })
 
+  afterEach(function () {
+    cy.cancelXHR()
+  })
+
   describe('Adds a file to a workspace', () => {
     it('should open the app file with the new file added', () => {
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
