@@ -34,6 +34,7 @@ WORKSPACE_FRONTEND_URL_SCHEMA = "workspaces/{workspace_id}"
 FRONTEND_UI_SUBPATH = "ui"
 LOGIN_SUBPATH = "login"
 RESET_PASSWORD_SUBPATH = "reset-password"
+UNKNOWN_BUILD_VERSION = "unknown"
 
 
 def generate_documentation_swagger_tag(*sections: str) -> str:
@@ -430,12 +431,11 @@ def get_build_version(path: str) -> str:
 
         repo = git.Repo(path, search_parent_directories=True)
     except (ImportError, InvalidGitRepositoryError):
-        return "unknown"
+        return UNKNOWN_BUILD_VERSION
 
-    tags = [tag for tag in repo.tags if tag.commit == repo.head.commit]
-    if tags:
+    try:
         # INFO - G.M - 2020-01-13 - return first associated tag to head commit
-        return tags[0]
-    else:
+        return next((tag for tag in repo.tags if tag.commit == repo.head.commit))
+    except StopIteration:
         # INFO - G.M - 2020-01-13 - return the 10 first letter of current commit hash
         return repo.head.object.hexsha[:10]
