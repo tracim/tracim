@@ -517,7 +517,6 @@ class CFG(object):
         Load config for ldap related stuff
         """
         self.LDAP_URL = self.get_raw_config("ldap_url", "dc=directory,dc=fsf,dc=org")
-        self.LDAP_BASE_URL = self.get_raw_config("ldap_base_url", "dc=directory,dc=fsf,dc=org")
         self.LDAP_BIND_DN = self.get_raw_config(
             "ldap_bind_dn", "cn=admin, dc=directory,dc=fsf,dc=org"
         )
