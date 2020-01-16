@@ -4,17 +4,25 @@ from pyramid.config import Configurator
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.app import TracimApplication
+from tracim_backend.lib.utils.app import TracimContentType
+from tracim_backend.models.roles import WorkspaceRoles
 
 
 class ContentThreadApp(TracimApplication):
     def load_content_types(self) -> None:
-        self.add_content_type(
+        content_type = TracimContentType(
             slug="thread",
+            fa_icon=self.fa_icon,
             label="Thread",
             creation_label="Start a topic",
             available_statuses=content_status_list.get_all(),
+            slug_aliases=["page"],
+            allow_sub_content=False,
             file_extension=".thread.html",
+            minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
+            app=self,
         )
+        self.content_types.append(content_type)
 
     def load_config(self, app_config: CFG) -> None:
         pass
@@ -22,7 +30,7 @@ class ContentThreadApp(TracimApplication):
     def check_config(self, app_config: CFG) -> None:
         pass
 
-    def import_controllers(
+    def load_controllers(
         self,
         configurator: Configurator,
         app_config: CFG,

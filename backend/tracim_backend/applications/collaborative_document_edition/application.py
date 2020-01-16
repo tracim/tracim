@@ -35,7 +35,7 @@ class CollaborativeDocumentEditionApp(TracimApplication):
                 when_str="if collabora feature is activated",
             )
 
-    def import_controllers(
+    def load_controllers(
         self,
         configurator: Configurator,
         app_config: CFG,

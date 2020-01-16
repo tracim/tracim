@@ -18,7 +18,7 @@ class DummyApp(TracimApplication):
     def check_config(self, app_config: CFG) -> None:
         pass
 
-    def import_controllers(
+    def load_controllers(
         self,
         configurator: Configurator,
         app_config: CFG,

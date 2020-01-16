@@ -227,7 +227,7 @@ class ContentTypeList(object):
     def get_one_by_slug(self, slug: str) -> TracimContentType:
         """
         Get ContentType object according to slug
-        match for both slug and slug_alias
+        match for both slug and slug_aliases
         """
         content_types = self._content_types.copy()
         content_types.extend(self._special_contents_types)

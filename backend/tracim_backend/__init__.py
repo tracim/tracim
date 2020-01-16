@@ -200,7 +200,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
 
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
-        app.import_controllers(
+        app.load_controllers(
             app_config=app_config,
             configurator=configurator,
             route_prefix=BASE_API_V2,

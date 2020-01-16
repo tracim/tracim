@@ -4,16 +4,23 @@ from pyramid.config import Configurator
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.app import TracimApplication
+from tracim_backend.lib.utils.app import TracimContentType
+from tracim_backend.models.roles import WorkspaceRoles
 
 
 class ContentFileApp(TracimApplication):
     def load_content_types(self) -> None:
-        self.add_content_type(
+        content_type = TracimContentType(
             slug="file",
+            fa_icon=self.fa_icon,
             label="File",
             creation_label="Upload a file",
             available_statuses=content_status_list.get_all(),
+            allow_sub_content=False,
+            minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
+            app=self,
         )
+        self.content_types.append(content_type)
 
     def load_config(self, app_config: CFG) -> None:
         pass
@@ -21,7 +28,7 @@ class ContentFileApp(TracimApplication):
     def check_config(self, app_config: CFG) -> None:
         pass
 
-    def import_controllers(
+    def load_controllers(
         self,
         configurator: Configurator,
         app_config: CFG,

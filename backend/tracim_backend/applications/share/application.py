@@ -48,7 +48,7 @@ class ShareApp(TracimApplication):
                         )
                     )
 
-    def import_controllers(
+    def load_controllers(
         self,
         configurator: Configurator,
         app_config: CFG,
