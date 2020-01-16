@@ -44,7 +44,7 @@ class TracimContentType(object):
         self.label = label
         self.creation_label = creation_label
         self.available_statuses = available_statuses
-        self.slug_alias = slug_aliases
+        self.slug_aliases = slug_aliases
         self.allow_sub_content = allow_sub_content
         self.file_extension = file_extension
         self.minimal_role_content_creation = minimal_role_content_creation

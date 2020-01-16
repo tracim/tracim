@@ -1137,10 +1137,10 @@ class ContentApi(object):
             # INFO - G.M - 2018-07-05 - convert with
             #  content type object to support legacy slug
             content_type_object = content_type_list.get_one_by_slug(content_type_slug)
-            all_slug_alias = [content_type_object.slug]
-            if content_type_object.slug_alias:
-                all_slug_alias.extend(content_type_object.slug_alias)
-            resultset = resultset.filter(Content.type.in_(all_slug_alias))
+            all_slug_aliases = [content_type_object.slug]
+            if content_type_object.slug_aliases:
+                all_slug_aliases.extend(content_type_object.slug_aliases)
+            resultset = resultset.filter(Content.type.in_(all_slug_aliases))
 
         if parent_ids is False:
             resultset = resultset.filter(Content.parent_id == None)  # noqa: E711

@@ -8,6 +8,7 @@ from tracim_backend.app_models.workspace_menu_entries import all_content_menu_en
 from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.app import TracimApplication
+from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.models.roles import WorkspaceRoles
 
 
@@ -44,13 +45,19 @@ class TestApplicationApi(object):
             config={},
             main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
         )
-        thread.add_content_type(
+        content_type = TracimContentType(
             slug="thread",
+            fa_icon=thread.fa_icon,
             label="Thread",
             creation_label="Start a topic",
             available_statuses=content_status_list.get_all(),
+            slug_aliases=["page"],
+            allow_sub_content=False,
             file_extension=".thread.html",
+            minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
+            app=thread,
         )
+        thread.content_types.append(content_type)
 
         markdownpluspage = DummyApp(
             label="Markdown Plus Documents",
@@ -60,12 +67,18 @@ class TestApplicationApi(object):
             config={},
             main_route="/ui/workspaces/{workspace_id}/contents?type=markdownpluspage",
         )
-        markdownpluspage.add_content_type(
+        content_type = TracimContentType(
             slug="markdownpage",
+            fa_icon=thread.fa_icon,
             label="Rich Markdown File",
             creation_label="Create a Markdown document",
             available_statuses=content_status_list.get_all(),
+            allow_sub_content=False,
+            file_extension=".md",
+            minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
+            app=thread,
         )
+        markdownpluspage.content_types.append(content_type)
         thread.is_active = True
         markdownpluspage.is_active = False
         app_api = ApplicationApi(app_list=[thread, markdownpluspage], show_all=False)
@@ -93,14 +106,17 @@ class TestApplicationApi(object):
         folder = DummyApp(
             label="Folder", slug="contents/folder", fa_icon="folder-o", config={}, main_route=""
         )
-        folder.add_content_type(
+        content_type = TracimContentType(
             slug="folder",
+            fa_icon=folder.fa_icon,
             label="Folder",
             creation_label="Create a folder",
             available_statuses=content_status_list.get_all(),
             allow_sub_content=True,
             minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
+            app=folder,
         )
+        folder.content_types.append(content_type)
         folder.is_active = True
         app_api = ApplicationApi(app_list=[folder], show_all=False)
         workspace = Mock()

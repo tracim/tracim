@@ -146,8 +146,8 @@ class ContentTypeInContext(object):
         return self.content_type.available_statuses
 
     @property
-    def slug_alias(self) -> typing.List[str]:
-        return self.content_type.slug_alias
+    def slug_aliases(self) -> typing.List[str]:
+        return self.content_type.slug_aliases
 
     @property
     def allow_sub_content(self) -> bool:
@@ -233,7 +233,7 @@ class ContentTypeList(object):
         content_types.extend(self._special_contents_types)
         content_types.append(self.Event)
         for item in content_types:
-            if item.slug == slug or (item.slug_alias and slug in item.slug_alias):
+            if item.slug == slug or (item.slug_aliases and slug in item.slug_aliases):
                 return item
         raise ContentTypeNotExist()
 
@@ -276,8 +276,8 @@ class ContentTypeList(object):
         content_types.extend(self._special_contents_types)
         for content_type in content_types:
             allowed_types_slug.append(content_type.slug)
-            if content_type.slug_alias:
-                allowed_types_slug.extend(content_type.slug_alias)
+            if content_type.slug_aliases:
+                allowed_types_slug.extend(content_type.slug_aliases)
         allowed_types_slug.extend(self._extra_slugs)
         return allowed_types_slug
 
