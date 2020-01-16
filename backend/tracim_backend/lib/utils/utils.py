@@ -396,6 +396,15 @@ class EmailUser(object):
 
 
 def load_apps() -> typing.List[TracimApplication]:
+    """
+    Load all availables applications of Tracim.
+
+    this will find all direct submodules of tracim_backend.applications to
+    run all "tracim_backend.applications.<application_name>.application.create_app" functions
+    to obtain a list of all TracimApplication available
+    :warning: this obtain all available applications and do not filter between enabled/disabled applications
+    :return: list of loaded app
+    """
     import tracim_backend.applications as apps_modules
 
     tracim_apps = []
