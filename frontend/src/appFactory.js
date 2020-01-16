@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { FETCH_CONFIG, PAGE, findUserRoleIdInWorkspace } from './helper.js'
+import { FETCH_CONFIG, PAGE } from './helper.js'
 import i18n from './i18n.js'
 import { ROLE_LIST, PROFILE } from 'tracim_frontend_lib'
 
@@ -27,9 +27,9 @@ export function appFactory (WrappedComponent) {
       content
     })
 
-    renderAppFullscreen = (appConfig, user, content) => GLOBAL_renderAppFullscreen({
+    renderAppFullscreen = (appConfig, user, userRoleIdInWorkspace, content) => GLOBAL_renderAppFullscreen({
       loggedUser: user.logged
-        ? { ...user, userRoleIdInWorkspace: findUserRoleIdInWorkspace(user.user_id, this.props.currentWorkspace.memberList, ROLE_LIST) }
+        ? { ...user, userRoleIdInWorkspace }
         : {},
       config: {
         ...appConfig,
