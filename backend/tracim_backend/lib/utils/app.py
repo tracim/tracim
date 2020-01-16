@@ -61,9 +61,11 @@ class TracimApplication(ABC):
     you need to implements all the methods of TracimApplication, to make application work correctly.
 
     Use "pass" if you don't want to put anything in one of the required method. example:
+
     >>> def load_config(self, app_config: "CFG") -> None:
     ...    pass
-    # doctest: +SKIP
+    ... # doctest: +SKIP
+
     If you want more examples, check "tracim_backend.applications.<application_name>.application" files.
     """
 
@@ -94,6 +96,7 @@ class TracimApplication(ABC):
         load app content type, by adding TracimContentType object
         into app.content_types list
         example:
+
         >>> def load_content_types(self) -> None:
         ...     content_type = TracimContentType(
         ...         slug='html-document',
@@ -116,6 +119,7 @@ class TracimApplication(ABC):
         """
         Allow to load specific config parameter,
         example:
+
         >>> app_config.TEST__EXAMPLE_CONFIG_PARAMETER = app_config.get_raw_config("test.example_config_parameter")
         ... # doctest: +SKIP
         """
@@ -131,6 +135,7 @@ class TracimApplication(ABC):
         allowed). Be careful, if you set a default value, it will be used by default, default value need
          also to be Falsy (False, "", None or []) to raise Exception about parameter required.
         example:
+
         >>> def check_config(self, app_config: "CFG") -> None:
         ...     if app_config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
         ...          app_config.check_mandatory_param(
@@ -139,10 +144,12 @@ class TracimApplication(ABC):
         ...             when_str="if collabora feature is activated",
         ...         )
         ... # doctest: +SKIP
+
         - you can use also app_config.check_directory_path_param to check
         if directory provided is correct, writable or/and readable. This
          will raise ConfigurationError.
         example:
+
         >>> def check_config(self, app_config: "CFG") -> None:
         ...     app_config.check_directory_path_param(
         ...         "CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER",
@@ -151,7 +158,9 @@ class TracimApplication(ABC):
         ...         readable = True,
         ...     )
         ... # doctest: +SKIP
+
         - you can add other check like this :
+
         >>> def check_config(self, app_config: "CFG") -> None:
         ...     if not os.path.exists(app_config.COLOR__CONFIG_FILE_PATH):
         ...        raise ConfigurationError(
@@ -183,6 +192,7 @@ class TracimApplication(ABC):
         route_prefix should be by default BASE_API_V2 ("/api/v2/")
         It's also the best place to add new globally web handled exception (handled by hapic).
         example:
+
         >>> def load_controllers(
         ...         self,
         ...         configurator: Configurator,
@@ -197,6 +207,7 @@ class TracimApplication(ABC):
         ...     context.handle_exception(CaldavNotAuthorized, HTTPStatus.FORBIDDEN)
         ...     context.handle_exception(CaldavNotAuthenticated, HTTPStatus.UNAUTHORIZED)
         ... # doctest: +SKIP
+
         # you can also check Controller object documentation or pyramid configurator doc:
         # https://docs.pylonsproject.org/projects/pyramid/en/latest/api/config.html
         # whenever you raise CaldavNotAuthenticated exception in a view, it will raise

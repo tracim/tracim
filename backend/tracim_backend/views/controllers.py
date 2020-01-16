@@ -19,6 +19,7 @@ class Controller(ABC):
      For example, "is_user" will raise "InsufficientUserProfile"
 
     Example of simple controller:
+
     >>> class MyController(Controller):
     ...    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     ...    @check_right(is_user)

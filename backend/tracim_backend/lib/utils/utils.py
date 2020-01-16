@@ -226,8 +226,10 @@ def string_to_list(
     """
     Convert a string to a list of separated item of one type according
     to a string separator and to a cast_func
+
     >>> string_to_list('1,2,3', ',', int)
     [1, 2, 3]
+
     :param base_string: entry string which should be converted.
     :param separator: string separator,
     :param cast_func: all item should be casted to this function, this help
