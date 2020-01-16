@@ -113,11 +113,14 @@ class WorkspaceContent extends React.Component {
         props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, { encode: false }))
         this.setState({ appOpenedType: false })
 
-        this.setHeadTitle(props.currentWorkspace.label)
+        this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
         this.props.dispatch(resetBreadcrumbsAppFeature())
         break
 
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.buildBreadcrumbs()
+        this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
+        break
     }
   }
 
@@ -159,6 +162,7 @@ class WorkspaceContent extends React.Component {
     if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
       this.setState({ workspaceIdInUrl: workspaceId })
       this.loadAllWorkspaceContent(workspaceId, false)
+      if (!hasWorkspaceIdChanged && prevFilter !== currentFilter) this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
     }
   }
 
@@ -201,7 +205,7 @@ class WorkspaceContent extends React.Component {
     switch (fetchWorkspaceDetail.status) {
       case 200:
         props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        this.setHeadTitle(fetchWorkspaceDetail.json.label)
+        this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
         break
       case 400:
         props.history.push(PAGE.HOME)
@@ -529,6 +533,16 @@ class WorkspaceContent extends React.Component {
     return contentType
       ? `${props.t('List of')} ${props.t(contentType.label.toLowerCase() + 's')}`
       : props.t('List of contents')
+  }
+
+  getFilterName = urlFilter => {
+    const { props } = this
+    const contentType = props.contentType.find(ct => ct.slug === urlFilter)
+    console.log('CONTENT_TYPE', contentType)
+    const filterName = contentType
+      ? props.t(contentType.label.toLowerCase() + 's')
+      : props.t('Contents')
+    return filterName[0].toUpperCase() + filterName.toLowerCase().substr(1)
   }
 
   getIcon = urlFilter => {

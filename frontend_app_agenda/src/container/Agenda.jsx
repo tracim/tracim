@@ -42,7 +42,7 @@ class Agenda extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-    const { state } = this
+    const { state, props } = this
 
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
@@ -61,6 +61,10 @@ class Agenda extends React.Component {
         }))
         i18n.changeLanguage(data)
         this.buildBreadcrumbs()
+        this.setHeadTitle(state.config.appConfig.workspaceId !== null
+          ? `${props.t('Agenda')} · ${state.content.workspaceLabel}`
+          : props.t('My agendas')
+        )
         this.agendaIframe.contentWindow.location.reload()
         break
       default:
@@ -69,13 +73,16 @@ class Agenda extends React.Component {
   }
 
   async componentDidMount () {
-    const { state } = this
+    const { state, props } = this
 
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
 
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: this.props.t('Agenda') } })
     this.loadAgendaList(state.config.appConfig.workspaceId)
-    if (state.config.appConfig.workspaceId !== null) await this.loadWorkspaceData()
+    if (state.config.appConfig.workspaceId !== null) {
+      await this.loadWorkspaceData()
+    } else {
+      this.setHeadTitle(props.t('My agendas'))
+    }
     this.buildBreadcrumbs()
   }
 
@@ -95,6 +102,10 @@ class Agenda extends React.Component {
   componentWillUnmount () {
     console.log('%c<Agenda> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  }
+
+  setHeadTitle = (title) => {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
   }
 
   loadAgendaList = async workspaceId => {
@@ -121,7 +132,7 @@ class Agenda extends React.Component {
   // on a workspace is to extract it from the members list that workspace
   // see https://github.com/tracim/tracim/issues/1581
   loadUserRoleInWorkspace = async agendaList => {
-    const { state } = this
+    const { state, props } = this
     const fetchResultList = await Promise.all(
       agendaList
         .filter(a => a.agenda_type === 'workspace')
@@ -192,7 +203,7 @@ class Agenda extends React.Component {
   }
 
   loadWorkspaceData = async () => {
-    const { state } = this
+    const { state, props } = this
 
     const fetchResultWorkspaceDetail = await handleFetchResult(
       await getWorkspaceDetail(state.config.apiUrl, state.config.appConfig.workspaceId)
@@ -205,6 +216,7 @@ class Agenda extends React.Component {
             workspaceLabel: fetchResultWorkspaceDetail.body.label
           }
         })
+        this.setHeadTitle(`${props.t('Agenda')} · ${fetchResultWorkspaceDetail.body.label}`)
     }
   }
 

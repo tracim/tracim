@@ -65,7 +65,7 @@ export class Gallery extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-    const { state } = this
+    const { state, props } = this
 
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
@@ -88,6 +88,7 @@ export class Gallery extends React.Component {
         }))
         i18n.changeLanguage(data)
         this.buildBreadcrumbs()
+        this.setHeadTitle(`${props.t('Gallery')} · ${state.content.workspaceLabel}`)
         break
       default:
         break
@@ -248,6 +249,7 @@ export class Gallery extends React.Component {
             workspaceLabel: fetchResultWorkspaceDetail.body.label
           }
         })
+        this.setHeadTitle(`${props.t('Gallery')} · ${fetchResultWorkspaceDetail.body.label}`)
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
@@ -262,6 +264,10 @@ export class Gallery extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = (title) => {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+  }
 
   handleClickHideImageRaw = () => {
     this.setState({ displayLightbox: false, fullscreen: false })

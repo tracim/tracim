@@ -91,7 +91,7 @@ class Tracim extends React.Component {
         break
       case CUSTOM_EVENT.SET_HEAD_TITLE:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        document.title = `${data.title} · ${this.props.system.config.instance_name}`
+        document.title = `${data.title} · ${this.props.system.config.instance_name} · Tracim`
         break
     }
   }

@@ -80,7 +80,10 @@ class Dashboard extends React.Component {
         await this.loadWorkspaceDetail()
         this.buildBreadcrumbs()
         break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.buildBreadcrumbs()
+        this.setHeadTitle()
+        break
     }
   }
 
@@ -130,7 +133,7 @@ class Dashboard extends React.Component {
         if (props.appList.some(a => a.slug === 'agenda') && fetchWorkspaceDetail.json.agenda_enabled) {
           this.loadCalendarDetail()
         }
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: fetchWorkspaceDetail.json.label } })
+        this.setHeadTitle()
         break
       case 400:
         props.history.push(PAGE.HOME)
@@ -182,6 +185,10 @@ class Dashboard extends React.Component {
       case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
     }
+  }
+
+  setHeadTitle = () => {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: this.props.t('Dashboard') } })
   }
 
   buildBreadcrumbs = () => {
