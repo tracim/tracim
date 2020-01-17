@@ -20,6 +20,16 @@ function logerror {
     echo -e "\n${RED}[$(date +'%H:%M:%S')]${RED} $ $1${NC}"
 }
 
+function create_dir(){
+    DIR_NAME=$1
+    DIR_PATH=$2
+    if [ ! -d "$DIR_PATH" ]; then
+        log "create $DIR_NAME dir ..."
+        mkdir $DIR_PATH && loggood "creation $DIR_NAME dir success" || logerror "failed to create $DIR_NAME dir ($DIR_PATH)"
+    else
+        loggood "$DIR_NAME dir ($DIR_PATH) already exist"
+    fi
+}
 # Function for backend
 
 function install_backend_system_dep {
@@ -76,38 +86,18 @@ function setup_config_file {
     else
         loggood "sessions_lock folder not exist"
     fi
-
-    if [ ! -d "$DEFAULTDIR/backend/radicale_storage" ]; then
-       log "create radicale storage dir"
-       mkdir "$DEFAULTDIR/backend/radicale_storage" && loggood "create radicale storage folder success" || logerror "failed to create radicale_storage folder"
-    else
-        loggood "radicale storage dir already exist"
-    fi
 }
+
 
 function create_require_dirs {
-   log "create requires directories"
-   if [ ! -d "$DEFAULTDIR/backend/sessions_data/" ]; then
-     log "create session data dir ..."
-     mkdir "$DEFAULTDIR/backend/sessions_data/" && loggood "creation session data dir success" || logerror "failed to create session data dir"
-   fi
-   if [ ! -d "$DEFAULTDIR/backend/sessions_lock/" ]; then
-     log "create session lock dir ..."
-     mkdir "$DEFAULTDIR/backend/sessions_lock/" && loggood "creation session lock dir success" || logerror "failed to create session lock dir"
-   fi
-   if [ ! -d "$DEFAULTDIR/backend/depot/" ]; then
-     log "create depot dir ..."
-     mkdir "$DEFAULTDIR/backend/depot/" && loggood "creation depot dir success" || logerror "failed to create depot dir"
-   fi
-   if [ ! -d "$DEFAULTDIR/backend/previews/" ]; then
-     log "create preview dir ..."
-     mkdir "$DEFAULTDIR/backend/previews/" && loggood "creation preview dir success" || logerror "failed to create preview dir"
-   fi
-   if [ ! -d $DEFAULTDIR/backend/radicale_storage ]; then
-     log "create radicale storage dir ..."
-     mkdir $DEFAULTDIR/backend/radicale_storage && loggood "creation radicale storage dir success" || logerror "failed to create radicale storage dir"
-   fi
+    log "create requires directories"
+    create_dir "sessions_data" "$DEFAULTDIR/backend/sessions_data"
+    create_dir "sessions_lock" "$DEFAULTDIR/backend/sessions_lock"
+    create_dir "depot" "$DEFAULTDIR/backend/depot"
+    create_dir "preview" "$DEFAULTDIR/backend/previews"
+    create_dir "radicale_storage" "$DEFAULTDIR/backend/radicale_storage"
 }
+
 function setup_db {
     log "check if database exist"
     result=$(alembic -c development.ini current)
