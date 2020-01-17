@@ -7,6 +7,7 @@ from depot.manager import DepotManager
 from paste.deploy.converters import asbool
 
 from tracim_backend.app_models.validator import update_validators
+from tracim_backend.apps import load_apps
 from tracim_backend.exceptions import ConfigCodeError
 from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.exceptions import NotReadableDirectory
@@ -20,7 +21,6 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.lib.utils.utils import is_dir_exist
 from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
-from tracim_backend.lib.utils.utils import load_apps
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group

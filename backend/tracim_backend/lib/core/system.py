@@ -2,6 +2,7 @@ import datetime
 import typing
 from urllib.parse import urljoin
 
+from tracim_backend.apps import COLLABORATIVE_DOCUMENT_EDITION__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
 from tracim_backend.extensions import app_list
@@ -27,7 +28,7 @@ class SystemApi(object):
     def get_config(self) -> ConfigModel:
         collaborative_document_edition_config = None
         app_lib = ApplicationApi(app_list=app_list)
-        if app_lib.exist("collaborative_document_edition"):
+        if app_lib.exist(COLLABORATIVE_DOCUMENT_EDITION__APP_SLUG):
             from tracim_backend.applications.collaborative_document_edition.factory import (
                 CollaborativeDocumentEditionFactory,
             )

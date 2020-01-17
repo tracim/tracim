@@ -20,6 +20,7 @@ from tracim_backend.app_models.validator import user_password_validator
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.applications.agenda.lib import AgendaApi
+from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import AuthenticationFailed
@@ -890,7 +891,7 @@ class UserApi(object):
         # event on_updated_user should start hook use by agenda  app code.
 
         app_lib = ApplicationApi(app_list=app_list)
-        if app_lib.exist("agenda"):
+        if app_lib.exist(AGENDA__APP_SLUG):
             agenda_api = AgendaApi(
                 current_user=self._user, session=self._session, config=self._config
             )
@@ -922,7 +923,7 @@ class UserApi(object):
         # event on_created_user should start hook use by agenda  app code.
 
         app_lib = ApplicationApi(app_list=app_list)
-        if app_lib.exist("agenda"):
+        if app_lib.exist(AGENDA__APP_SLUG):
             agenda_api = AgendaApi(
                 current_user=self._user, session=self._session, config=self._config
             )

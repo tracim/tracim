@@ -5,6 +5,7 @@ import typing
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend import UserDoesNotExist
+from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.command import AppContextCommand
 from tracim_backend.exceptions import AgendaNotFoundError
 from tracim_backend.exceptions import UserCannotBeDeleted
@@ -169,7 +170,7 @@ class DeleteUserCommand(AppContextCommand):
             print("~~~~")
             print("Deletion of Caldav Agenda\n")
             app_lib = ApplicationApi(app_list=app_list)
-            if app_lib.exist("agenda"):
+            if app_lib.exist(AGENDA__APP_SLUG):
                 # INFO - G.M - 2019-12-13 - cleanup agenda at end of process
                 if deleted_workspace_ids:
                     deleted_workspace_ids_str = [
