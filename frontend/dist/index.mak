@@ -10,8 +10,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/tracim_16x16.png?v=${build_version}">
     <link rel='manifest' href='/assets/manifest.json?v=${build_version}'>
 
-    <link rel='stylesheet' type='text/css' href='/assets/font/font-awesome-4.7.0/css/font-awesome.css?v=${build_version}'>
-    <link rel='stylesheet' type='text/css' href='/assets/bootstrap/bootstrap-4.0.0-beta.css?v=${build_version}'>
+    <link rel='stylesheet' type='text/css' href='/assets/font/font-awesome-4.7.0/css/font-awesome.css'>
+    <link rel='stylesheet' type='text/css' href='/assets/bootstrap/bootstrap-4.0.0-beta.css'>
 
     <style>
       <%
@@ -99,11 +99,11 @@
     <script type='text/javascript' src='/app/workspace_advanced.app.js?v=${build_version}'></script>
     <script type='text/javascript' src='/app/gallery.app.js?v=${build_version}'></script>
 
-    <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js?v=${build_version}'></script>
-    <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js?v=${build_version}'></script>
-    <script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js?v=${build_version}'></script>
+    <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
+    <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>
+    <script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js'></script>
 
-    <script type='text/javascript' src='/assets/tinymce/js/tinymce/jquery.tinymce.min.js?v=${build_version}'></script>
-    <script type='text/javascript' src='/assets/tinymce/js/tinymce/tinymce.min.js?v=${build_version}'></script>
+    <script type='text/javascript' src='/assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js'></script>
+    <script type='text/javascript' src='/assets/tinymce-4.7.13/js/tinymce/tinymce.min.js'></script>
   </body>
 </html>
