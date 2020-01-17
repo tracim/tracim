@@ -1,4 +1,5 @@
 from abc import ABC
+from abc import abstractmethod
 import mimetypes
 import os
 from os.path import isfile
@@ -48,11 +49,12 @@ class CollaborativeDocumentEditionLib(ABC):
         self._user = current_user
         self._config = config
 
+    @abstractmethod
     def get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
         """
         Get list of supported file type for collaborative editions
         """
-        raise NotImplementedError()
+        pass
 
     def get_config(self) -> CollaborativeDocumentEditionConfig:
         return CollaborativeDocumentEditionConfig(

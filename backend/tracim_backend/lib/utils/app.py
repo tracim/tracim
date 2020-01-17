@@ -1,4 +1,5 @@
 from abc import ABC
+from abc import abstractmethod
 import typing
 
 from hapic.ext.pyramid import PyramidContext
@@ -91,6 +92,7 @@ class TracimApplication(ABC):
         # if app slug in is APP_ENABLED.
         self.is_active = False
 
+    @abstractmethod
     def load_content_types(self) -> None:
         """
         load app content type, by adding TracimContentType object
@@ -113,8 +115,9 @@ class TracimApplication(ABC):
         ...     self.content_types.append(content_type)
         ... # doctest: +SKIP
         """
-        raise NotImplementedError()
+        pass
 
+    @abstractmethod
     def load_config(self, app_config: "CFG") -> None:
         """
         Allow to load specific config parameter,
@@ -123,8 +126,9 @@ class TracimApplication(ABC):
         >>> app_config.TEST__EXAMPLE_CONFIG_PARAMETER = app_config.get_raw_config("test.example_config_parameter")
         ... # doctest: +SKIP
         """
-        raise NotImplementedError()
+        pass
 
+    @abstractmethod
     def check_config(self, app_config: "CFG") -> None:
         """
         Check app specific config consistency.
@@ -175,8 +179,9 @@ class TracimApplication(ABC):
 
         :raise: ConfigurationError if configuration given is invalid.
         """
-        raise NotImplementedError()
+        pass
 
+    @abstractmethod
     def load_controllers(
         self,
         configurator: Configurator,
@@ -213,4 +218,4 @@ class TracimApplication(ABC):
         # whenever you raise CaldavNotAuthenticated exception in a view, it will raise
         # HTTPStatus.UNAUTHORIZED -> HTTP code 401.
         """
-        raise NotImplementedError()
+        pass

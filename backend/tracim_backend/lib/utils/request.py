@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from abc import ABC
+from abc import abstractmethod
 from json import JSONDecodeError
 import typing
 
@@ -26,7 +28,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
 
 
-class TracimContext(object):
+class TracimContext(ABC):
     """
     Abstract class, Context of Tracim, neede for tracim authorization mecanism.
     """
@@ -199,18 +201,20 @@ class TracimContext(object):
     # General context parameters
 
     @property
+    @abstractmethod
     def dbsession(self) -> Session:
         """
         Current session available
         """
-        raise NotImplementedError()
+        pass
 
     @property
+    @abstractmethod
     def app_config(self) -> CFG:
         """
         Current config available
         """
-        raise NotImplementedError()
+        pass
 
     # IDs fetchers
 

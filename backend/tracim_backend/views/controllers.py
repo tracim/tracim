@@ -1,4 +1,5 @@
 from abc import ABC
+from abc import abstractmethod
 
 from pyramid.config import Configurator
 
@@ -35,6 +36,7 @@ class Controller(ABC):
     ... # doctest: +SKIP
     """
 
+    @abstractmethod
     def bind(self, configurator: Configurator) -> None:
         """
         Method to add endpoints to configurator.
@@ -42,4 +44,4 @@ class Controller(ABC):
         :param configurator: pyramid Configurator
         :return: Nothing
         """
-        raise NotImplementedError()
+        pass
