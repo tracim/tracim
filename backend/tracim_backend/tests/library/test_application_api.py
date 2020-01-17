@@ -81,7 +81,7 @@ class TestApplicationApi(object):
         markdownpluspage.content_types.append(content_type)
         thread.is_active = True
         markdownpluspage.is_active = False
-        app_api = ApplicationApi(app_list=[thread, markdownpluspage], show_all=False)
+        app_api = ApplicationApi(app_list=[thread, markdownpluspage], show_inactive=False)
         workspace = Mock()
         workspace.workspace_id = 12
         workspace.agenda_enabled = True
@@ -118,7 +118,7 @@ class TestApplicationApi(object):
         )
         folder.content_types.append(content_type)
         folder.is_active = True
-        app_api = ApplicationApi(app_list=[folder], show_all=False)
+        app_api = ApplicationApi(app_list=[folder], show_inactive=False)
         workspace = Mock()
         workspace.workspace_id = 12
         workspace.agenda_enabled = True
@@ -142,7 +142,7 @@ class TestApplicationApi(object):
             main_route="/ui/workspaces/{workspace_id}/agenda",
         )
         agenda.is_active = True
-        app_api = ApplicationApi(app_list=[agenda], show_all=False)
+        app_api = ApplicationApi(app_list=[agenda], show_inactive=False)
         workspace = Mock()
         workspace.workspace_id = 12
         workspace.agenda_enabled = True
@@ -167,7 +167,7 @@ class TestApplicationApi(object):
             main_route="/ui/workspaces/{workspace_id}/agenda",
         )
         agenda.is_active = True
-        app_api = ApplicationApi(app_list=[agenda], show_all=False)
+        app_api = ApplicationApi(app_list=[agenda], show_inactive=False)
         workspace = Mock()
         workspace.workspace_id = 12
         workspace.agenda_enabled = False

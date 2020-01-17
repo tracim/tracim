@@ -77,7 +77,7 @@ class CFG(object):
         self.check_config_validity()
         logger.debug(self, "CONFIG_PROCESS:5: End of config process")
 
-        app_lib = ApplicationApi(app_list=app_list, show_all=True)
+        app_lib = ApplicationApi(app_list=app_list, show_inactive=True)
         for app in app_lib.get_all():
             logger.info(
                 self,

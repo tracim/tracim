@@ -17,9 +17,15 @@ if typing.TYPE_CHECKING:
 
 
 class ApplicationApi(object):
-    def __init__(self, app_list: List["TracimApplication"], show_all: bool = False) -> None:
+    def __init__(self, app_list: List["TracimApplication"], show_inactive: bool = False) -> None:
+        """
+        Lib to get information about applications in tracim.
+
+        :param app_list: list of current applications.
+        :param show_inactive: search or not in inactive app too.
+        """
         self.apps = app_list
-        self.show_all = show_all
+        self.show_inactive = show_inactive
 
     def exist(self, slug: str) -> bool:
         """ Check if app with this slug does exist according to applicationApi configuration"""
@@ -33,13 +39,14 @@ class ApplicationApi(object):
         """ Get app with given slug if exist"""
         for app in self.apps:
             if app.slug == slug:
-                if self.show_all or app.is_active:
+                if self.show_inactive or app.is_active:
                     return app
         raise AppDoesNotExist("Application {app} does not exist".format(app=slug))
 
     def get_application_in_context(
         self, app: TracimApplication, app_config: "CFG"
     ) -> "TracimApplicationInContext":
+        # INFO - G.M - 2020-01-17 - import here to avoid circular import.
         from tracim_backend.app_models.applications import TracimApplicationInContext
 
         return TracimApplicationInContext(app=app, app_config=app_config)
@@ -47,7 +54,7 @@ class ApplicationApi(object):
     def get_all(self) -> List["TracimApplication"]:
         active_apps = []
         for app in self.apps:
-            if self.show_all or app.is_active:
+            if self.show_inactive or app.is_active:
                 active_apps.append(app)
 
         return active_apps
