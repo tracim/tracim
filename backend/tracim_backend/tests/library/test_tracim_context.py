@@ -5,9 +5,14 @@ import pytest
 from tracim_backend.lib.utils.request import TracimContext
 
 
-class TestTracimContext(object):
+class BaseFakeTracimContext(TracimContext):
+    app_config = None
+    dbsession = None
+
+
+class TestBaseFakeTracimContext(object):
     def test_unit_test_generate_if_none__ok__nominal_case(self) -> None:
-        tracim_context = TracimContext()
+        tracim_context = BaseFakeTracimContext()
 
         a = None
 
@@ -33,7 +38,7 @@ class TestTracimContext(object):
         assert a == 12
 
     def test_unit_test_generate_if_none__ok__already_exist(self) -> None:
-        tracim_context = TracimContext()
+        tracim_context = BaseFakeTracimContext()
 
         a = 12
 
@@ -42,7 +47,7 @@ class TestTracimContext(object):
         assert a == 12
 
     def test_unit_test_generate_if_none__err__exception(self) -> None:
-        tracim_context = TracimContext()
+        tracim_context = BaseFakeTracimContext()
 
         a = None
 

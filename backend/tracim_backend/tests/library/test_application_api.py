@@ -28,6 +28,9 @@ class DummyApp(TracimApplication):
     ) -> None:
         pass
 
+    def load_content_types(self) -> None:
+        pass
+
 
 class TestApplicationApi(object):
     def test_get_default_workspace_menu_entry__ok__nominal_case(self):
