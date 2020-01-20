@@ -7,7 +7,7 @@ import classnames from 'classnames'
 const Badge = props =>
   <span
     className={classnames('badge', props.customClass)}
-    style={{...props.style}}
+    style={{ ...props.style }}
   >
     { props.text }
   </span>

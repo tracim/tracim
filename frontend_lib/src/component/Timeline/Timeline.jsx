@@ -41,7 +41,7 @@ class Timeline extends React.Component {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  scrollToBottom = () => this.timelineBottom.scrollIntoView({behavior: 'instant'})
+  scrollToBottom = () => this.timelineBottom.scrollIntoView({ behavior: 'instant' })
 
   render () {
     const { props } = this
@@ -91,33 +91,37 @@ class Timeline extends React.Component {
           {props.timelineData.map(content => {
             switch (content.timelineType) {
               case 'comment':
-                return <Comment
-                  customClass={props.customClass}
-                  customColor={props.customColor}
-                  author={content.author.public_name}
-                  createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
-                  createdDistance={content.created}
-                  text={content.raw_content}
-                  fromMe={props.loggedUser.user_id === content.author.user_id}
-                  key={`comment_${content.content_id}`}
-              />
+                return (
+                  <Comment
+                    customClass={props.customClass}
+                    customColor={props.customColor}
+                    author={content.author.public_name}
+                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdDistance={content.created}
+                    text={content.raw_content}
+                    fromMe={props.loggedUser.user_id === content.author.user_id}
+                    key={`comment_${content.content_id}`}
+                  />
+                )
               case 'revision':
-                return <Revision
-                  customClass={props.customClass}
-                  customColor={props.customColor}
-                  revisionType={content.revision_type}
-                  createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
-                  createdDistance={content.created}
-                  number={content.number}
-                  status={props.availableStatusList.find(status => status.slug === content.status)}
-                  authorPublicName={content.author.public_name}
-                  allowClickOnRevision={props.allowClickOnRevision}
-                  onClickRevision={() => props.onClickRevisionBtn(content)}
-                  key={`revision_${content.revision_id}`}
-                />
+                return (
+                  <Revision
+                    customClass={props.customClass}
+                    customColor={props.customColor}
+                    revisionType={content.revision_type}
+                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdDistance={content.created}
+                    number={content.number}
+                    status={props.availableStatusList.find(status => status.slug === content.status)}
+                    authorPublicName={content.author.public_name}
+                    allowClickOnRevision={props.allowClickOnRevision}
+                    onClickRevision={() => props.onClickRevisionBtn(content)}
+                    key={`revision_${content.revision_id}`}
+                  />
+                )
             }
           })}
-          <li style={{visibility: 'hidden'}} ref={el => { this.timelineBottom = el }} />
+          <li style={{ visibility: 'hidden' }} ref={el => { this.timelineBottom = el }} />
         </ul>
 
         {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&

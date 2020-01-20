@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
+  appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
@@ -16,11 +17,9 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  convertBackslashNToBr,
   generateLocalStorageContentId,
   Badge,
   BREADCRUMBS_TYPE,
-  appFeatureCustomEventHandlerShowApp,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -28,12 +27,10 @@ import {
   parserStringToList,
   removeExtensionOfFilename,
   buildFilePreviewUrl,
-  ROLE
+  ROLE,
+  APP_FEATURE_MODE
 } from 'tracim_frontend_lib'
-import {
-  MODE,
-  PAGE
-} from '../helper.js'
+import { PAGE } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
@@ -42,13 +39,7 @@ import {
   getFileRevision,
   getShareLinksList,
   postShareLinksList,
-  postFileNewComment,
   putFileContent,
-  putFileStatus,
-  putFileIsArchived,
-  putFileIsDeleted,
-  putFileRestoreArchived,
-  putFileRestoreDeleted,
   putMyselfFileRead
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
@@ -56,13 +47,17 @@ import FileProperties from '../component/FileProperties.jsx'
 class File extends React.Component {
   constructor (props) {
     super(props)
+
+    const param = props.data || debug
+    props.setApiUrl(param.config.apiUrl)
+
     this.state = {
       appName: 'file',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
-      timeline: props.data ? [] : [], // debug.timeline,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
+      timeline: [],
       externalTranslationList: [
         props.t('File'),
         props.t('Files'),
@@ -75,7 +70,7 @@ class File extends React.Component {
       newFilePreview: null,
       fileCurrentPage: 1,
       timelineWysiwyg: false,
-      mode: MODE.VIEW,
+      mode: APP_FEATURE_MODE.VIEW,
       progressUpload: {
         display: false,
         percent: 0
@@ -93,56 +88,34 @@ class File extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-    const { state } = this
+  customEventReducer = async ({ detail: { type, data } }) => {
+    const { props, state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) {
-          this.setState({ isVisible: true })
-          this.buildBreadcrumbs()
-        }
+        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
         break
 
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
-        this.setState({
-          isVisible: false,
-          timelineWysiwyg: false
-        })
+        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
         break
 
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
-        const previouslyUnsavedComment = localStorage.getItem(
-          generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
-        )
-        this.setState(prev => ({
-          content: { ...prev.content, ...data },
-          isVisible: true,
-          timelineWysiwyg: false,
-          newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
-        }))
+        props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+        break
+
+      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
+        console.log('%c<File> Custom event', 'color: #28a745', type, data)
+        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
         break
 
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-
-        if (state.timelineWysiwyg) {
-          tinymce.remove('#wysiwygTimelineComment')
-          wysiwyg('#wysiwygTimelineComment', data, this.handleChangeNewComment)
-        }
-
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
+        props.appContentCustomEventHandlerAllAppChangeLanguage(
+          data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
+        )
         this.loadTimeline()
         break
     }
@@ -150,17 +123,17 @@ class File extends React.Component {
 
   async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
+    const { state } = this
 
-    const { appName, content, config } = this.state
     const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
     )
     if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
 
     await this.loadContent()
     this.loadTimeline()
     this.buildBreadcrumbs()
-    if (config.workspace.downloadEnabled) this.loadShareLinkList()
+    if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -170,9 +143,7 @@ class File extends React.Component {
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
-      this.setState({
-        fileCurrentPage: 1
-      })
+      this.setState({ fileCurrentPage: 1 })
       await this.loadContent(1)
       this.loadTimeline()
       this.buildBreadcrumbs()
@@ -202,100 +173,72 @@ class File extends React.Component {
   })
 
   loadContent = async (pageToLoad = null) => {
-    const { content, config, fileCurrentPage } = this.state
+    const { state, props } = this
 
-    const fetchResultFile = await handleFetchResult(await getFileContent(config.apiUrl, content.workspace_id, content.content_id))
+    const response = await handleFetchResult(await getFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
-    switch (fetchResultFile.apiResponse.status) {
+    switch (response.apiResponse.status) {
       case 200:
-        const filenameNoExtension = removeExtensionOfFilename(fetchResultFile.body.filename)
-        const pageForPreview = pageToLoad || fileCurrentPage
+        const filenameNoExtension = removeExtensionOfFilename(response.body.filename)
+        const pageForPreview = pageToLoad || state.fileCurrentPage
         this.setState({
           content: {
-            ...fetchResultFile.body,
+            ...response.body,
             filenameNoExtension: filenameNoExtension,
             // FIXME - b.l - refactor urls
-            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}&revision_id=${fetchResultFile.body.current_revision_id}`,
-            lightboxUrlList: (new Array(fetchResultFile.body.page_nb)).fill('').map((n, i) =>
+            previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/revisions/${response.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}&revision_id=${response.body.current_revision_id}`,
+            lightboxUrlList: (new Array(response.body.page_nb)).fill('').map((n, i) =>
               // FIXME - b.l - refactor urls
-              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
+              `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/revisions/${response.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
           },
-          mode: MODE.VIEW
+          mode: APP_FEATURE_MODE.VIEW
         })
         break
       default:
-        this.sendGlobalFlashMessage(this.props.t('Error while loading file'))
+        this.sendGlobalFlashMessage(props.t('Error while loading file'))
         return
     }
 
-    await putMyselfFileRead(config.apiUrl, content.workspace_id, content.content_id)
+    await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
   loadTimeline = async () => {
-    const { loggedUser, content, config, t } = this.state
+    const { props, state } = this
 
     const [resComment, resRevision] = await Promise.all([
-      handleFetchResult(await getFileComment(config.apiUrl, content.workspace_id, content.content_id)),
-      handleFetchResult(await getFileRevision(config.apiUrl, content.workspace_id, content.content_id))
+      handleFetchResult(await getFileComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
+      handleFetchResult(await getFileRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
     ])
 
     if (resComment.apiResponse.status !== 200 && resRevision.apiResponse.status !== 200) {
-      this.sendGlobalFlashMessage(t('Error while loading timeline'))
+      this.sendGlobalFlashMessage(props.t('Error while loading timeline'))
       console.log('Error loading timeline', 'comments', resComment, 'revisions', resRevision)
       return
     }
 
-    const resCommentWithProperDate = resComment.body.map(c => ({
-      ...c,
-      created_raw: c.created,
-      created: displayDistanceDate(c.created, loggedUser.lang)
-    }))
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
 
-    const revisionWithComment = resRevision.body
-      .map((r, i) => ({
-        ...r,
-        created_raw: r.created,
-        created: displayDistanceDate(r.created, loggedUser.lang),
-        timelineType: 'revision',
-        commentList: r.comment_ids.map(ci => ({
-          timelineType: 'comment',
-          ...resCommentWithProperDate.find(c => c.content_id === ci)
-        })),
-        number: i + 1
-      }))
-      .reduce((acc, rev) => [
-        ...acc,
-        rev,
-        ...rev.commentList.map(comment => ({
-          ...comment,
-          customClass: '',
-          loggedUser: config.loggedUser
-        }))
-      ], [])
-
-    this.setState({
-      timeline: revisionWithComment
-    })
+    this.setState({ timeline: revisionWithComment })
   }
 
   loadShareLinkList = async () => {
-    const { content, config } = this.state
+    const { props, state } = this
 
-    if (this.state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id) return
+    if (state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id) return
 
-    const fetchResultShareLinkList = await handleFetchResult(await getShareLinksList(config.apiUrl, content.workspace_id, content.content_id))
+    const response = await handleFetchResult(await getShareLinksList(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
-    switch (fetchResultShareLinkList.apiResponse.status) {
+    switch (response.apiResponse.status) {
       case 200:
         this.setState({
           shareEmails: '',
           sharePassword: '',
-          shareLinkList: fetchResultShareLinkList.body
+          shareLinkList: response.body
         })
         break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while loading share links list')); break
+      default: this.sendGlobalFlashMessage(props.t('Error while loading share links list')); break
     }
   }
 
@@ -328,34 +271,9 @@ class File extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
-  handleSaveEditTitle = async newTitle => {
-    const { props, state } = this
-
-    const fetchResultSaveFile = await handleFetchResult(
-      await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle, state.content.raw_content)
-    )
-
-    switch (fetchResultSaveFile.apiResponse.status) {
-      case 200:
-        this.loadContent()
-        this.loadTimeline()
-        if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-        break
-      case 400:
-        switch (fetchResultSaveFile.body.code) {
-          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-          case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
-        }
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
-    }
-  }
-
   handleClickNewVersion = () => {
     this.refContentLeftTop.current.scrollIntoView({ behavior: 'instant' })
-    this.setState({ mode: MODE.EDIT })
+    this.setState({ mode: APP_FEATURE_MODE.EDIT })
   }
 
   handleClickValidateNewDescription = async newDescription => {
@@ -377,125 +295,49 @@ class File extends React.Component {
   }
 
   handleChangeNewComment = e => {
-    const newComment = e.target.value
-    this.setState({ newComment })
-
-    const { appName, content } = this.state
-    localStorage.setItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment'),
-      newComment
-    )
+    const { props, state } = this
+    props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleSaveEditTitle = async newTitle => {
     const { props, state } = this
+    const response = await props.appContentChangeTitle(state.content, newTitle, state.config.slug)
 
-    // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
-    // see https://github.com/tracim/tracim/issues/1101
-    const newCommentForApi = state.timelineWysiwyg
-      ? state.newComment
-      : `<p>${convertBackslashNToBr(state.newComment)}</p>`
-
-    const fetchResultSaveNewComment = await handleFetchResult(await postFileNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
-
-    switch (fetchResultSaveNewComment.apiResponse.status) {
-      case 200:
-        this.setState({ newComment: '' })
-        localStorage.removeItem(
-          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-        )
-        if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
-        this.loadContent()
-        this.loadTimeline()
-        break
-      case 400:
-        switch (fetchResultSaveNewComment.body.code) {
-          case 2003:
-            this.sendGlobalFlashMessage(props.t("You can't send an empty comment"))
-            break
-          default:
-            this.sendGlobalFlashMessage(props.t('Error while saving new comment'))
-            break
-        }
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
+    if (response.apiResponse.status === 200) {
+      if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
     }
+  }
+
+  handleClickValidateNewCommentBtn = () => {
+    const { props, state } = this
+    props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleChangeStatus = async newStatus => {
-    const { state, props } = this
-
-    if (newStatus === state.content.status) return
-
-    const fetchResultSaveEditStatus = await handleFetchResult(
-      await putFileStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
-    )
-
-    switch (fetchResultSaveEditStatus.status) {
-      case 204:
-        this.loadContent()
-        this.loadTimeline()
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while changing status'))
-    }
+    const { props, state } = this
+    props.appContentChangeStatus(state.content, newStatus, state.config.slug)
   }
 
   handleClickArchive = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putFileIsArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: true } }))
-        this.loadContent()
-        this.loadTimeline()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while archiving document'))
-    }
+    const { props, state } = this
+    props.appContentArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
   handleClickDelete = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-        this.loadContent()
-        this.loadTimeline()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
-    }
+    const { props, state } = this
+    props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  handleClickRestoreArchived = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putFileRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
-        this.loadContent()
-        this.loadTimeline()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
-    }
+  handleClickRestoreArchive = async () => {
+    const { props, state } = this
+    props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  handleClickRestoreDeleted = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putFileRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
-        this.loadContent()
-        this.loadTimeline()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
-    }
+  handleClickRestoreDelete = async () => {
+    const { props, state } = this
+    props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
   handleClickShowRevision = async revision => {
@@ -504,12 +346,12 @@ class File extends React.Component {
     const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
     const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
 
-    if (state.mode === MODE.REVISION && isLastRevision) {
+    if (state.mode === APP_FEATURE_MODE.REVISION && isLastRevision) {
       this.handleClickLastVersion()
       return
     }
 
-    if (state.mode === MODE.VIEW && isLastRevision) return
+    if (state.mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
 
     const filenameNoExtension = removeExtensionOfFilename(revision.filename)
 
@@ -530,14 +372,14 @@ class File extends React.Component {
         )
       },
       fileCurrentPage: 1, // always set to first page on revision switch
-      mode: MODE.REVISION
+      mode: APP_FEATURE_MODE.REVISION
     }))
   }
 
   handleClickLastVersion = () => {
     this.setState({
       fileCurrentPage: 1,
-      mode: MODE.VIEW
+      mode: APP_FEATURE_MODE.VIEW
     })
     this.loadContent(1)
   }
@@ -566,7 +408,7 @@ class File extends React.Component {
     }
   }
 
-  handleClickDropzoneCancel = () => this.setState({ mode: MODE.VIEW, newFile: '', newFilePreview: null })
+  handleClickDropzoneCancel = () => this.setState({ mode: APP_FEATURE_MODE.VIEW, newFile: '', newFilePreview: null })
 
   handleClickDropzoneValidate = async () => {
     const { props, state } = this
@@ -594,7 +436,7 @@ class File extends React.Component {
               newFile: '',
               newFilePreview: null,
               fileCurrentPage: 1,
-              mode: MODE.VIEW
+              mode: APP_FEATURE_MODE.VIEW
             })
             this.loadContent(1)
             this.loadTimeline()
@@ -669,7 +511,7 @@ class File extends React.Component {
       return false
     }
 
-    const fetchResultPostShareLinks = await handleFetchResult(await postShareLinksList(
+    const response = await handleFetchResult(await postShareLinksList(
       state.config.apiUrl,
       state.content.workspace_id,
       state.content.content_id,
@@ -677,16 +519,16 @@ class File extends React.Component {
       isPasswordActive ? state.sharePassword : null
     ))
 
-    switch (fetchResultPostShareLinks.apiResponse.status) {
+    switch (response.apiResponse.status) {
       case 200:
         this.setState(prev => ({
-          shareLinkList: [...prev.shareLinkList, ...fetchResultPostShareLinks.body],
+          shareLinkList: [...prev.shareLinkList, ...response.body],
           shareEmails: '',
           sharePassword: ''
         }))
         return true
       case 400:
-        switch (fetchResultPostShareLinks.body.code) {
+        switch (response.body.code) {
           case 2001:
             this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
             break
@@ -718,14 +560,13 @@ class File extends React.Component {
   }
 
   handleClickDeleteShareLink = async shareLinkId => {
-    const { config, content } = this.state
-    const { props } = this
+    const { props, state } = this
 
-    const fetchResultDeleteShareLink = await handleFetchResult(
-      await deleteShareLink(config.apiUrl, content.workspace_id, content.content_id, shareLinkId)
+    const response = await handleFetchResult(
+      await deleteShareLink(state.config.apiUrl, state.content.workspace_id, state.content.content_id, shareLinkId)
     )
 
-    switch (fetchResultDeleteShareLink.status) {
+    switch (response.status) {
       case 204:
         this.loadShareLinkList()
         break
@@ -738,7 +579,7 @@ class File extends React.Component {
   }
 
   getDownloadBaseUrl = (apiUrl, content, mode) => {
-    const urlRevisionPart = mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
+    const urlRevisionPart = mode === APP_FEATURE_MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
     // FIXME - b.l - refactor urls
     return `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${urlRevisionPart}`
   }
@@ -792,14 +633,14 @@ class File extends React.Component {
           loggedUser={state.loggedUser}
           timelineData={state.timeline}
           newComment={state.newComment}
-          disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
+          disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
           availableStatusList={state.config.availableStatuses}
           wysiwyg={state.timelineWysiwyg}
           onChangeNewComment={this.handleChangeNewComment}
           onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
           onClickWysiwygBtn={this.handleToggleWysiwyg}
           onClickRevisionBtn={this.handleClickShowRevision}
-          shouldScrollToBottom={state.mode !== MODE.REVISION}
+          shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           key={'Timeline'}
         />
       )
@@ -890,31 +731,31 @@ class File extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
+                  disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Update')}
                 />
-              }
+              )}
 
-              {onlineEditionAction &&
+              {onlineEditionAction && (
                 <GenericButton
                   customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
                   dataCy='wsContentGeneric__option__menu__addversion'
                   customColor={state.config.hexcolor}
                   onClick={onlineEditionAction.callback}
-                  disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
+                  disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t(onlineEditionAction.label)}
                   style={{
                     marginLeft: '5px'
                   }}
                   faIcon={'edit'}
                 />
-              }
+              )}
 
-              {state.mode === MODE.REVISION &&
+              {state.mode === APP_FEATURE_MODE.REVISION && (
                 <button
                   className='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
@@ -924,28 +765,28 @@ class File extends React.Component {
                   <i className='fa fa-history' />
                   {props.t('Last version')}
                 </button>
-              }
+              )}
             </div>
 
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
+                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                   mobileVersion={onlineEditionAction}
                 />
-              }
+              )}
 
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
+                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
-              }
+              )}
             </div>
           </div>
         </PopinFixedOption>
@@ -969,8 +810,8 @@ class File extends React.Component {
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            onClickRestoreArchived={this.handleClickRestoreArchived}
-            onClickRestoreDeleted={this.handleClickRestoreDeleted}
+            onClickRestoreArchived={this.handleClickRestoreArchive}
+            onClickRestoreDeleted={this.handleClickRestoreDelete}
             downloadRawUrl={this.getDownloadRawUrl(state)}
             isPdfAvailable={state.content.has_pdf_preview}
             downloadPdfPageUrl={this.getDownloadPdfPageUrl(state)}
@@ -998,4 +839,4 @@ class File extends React.Component {
   }
 }
 
-export default translate()(File)
+export default translate()(appContentFactory(File))

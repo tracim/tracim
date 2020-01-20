@@ -32,7 +32,7 @@ export class NewShareDownload extends React.Component {
   }
 
   handleRandomPassword = () => {
-    this.props.onChangePassword({target: {value: generateRandomPassword()}})
+    this.props.onChangePassword({ target: { value: generateRandomPassword() } })
     if (this.state.hidePassword) {
       this.handleTogglePasswordVisibility()
     }
@@ -85,57 +85,58 @@ export class NewShareDownload extends React.Component {
         </div>
 
         {state.isPasswordActive
-        ? (
-          <div className='shareDownload__password'>
-            <div className='shareDownload__password__active'>
-              <div className='shareDownload__password__wrapper'>
-                <i className='fa fa-fw fa-lock' />
+          ? (
+            <div className='shareDownload__password'>
+              <div className='shareDownload__password__active'>
+                <div className='shareDownload__password__wrapper'>
+                  <i className='fa fa-fw fa-lock' />
 
-                <input
-                  type={state.hidePassword ? 'password' : 'text'}
-                  className='shareDownload__password__input form-control'
-                  placeholder={props.t('Password')}
-                  value={props.sharePassword}
-                  onChange={props.onChangePassword}
-                  onFocus={props.onKeyDownEnter}
-                />
+                  <input
+                    type={state.hidePassword ? 'password' : 'text'}
+                    className='shareDownload__password__input form-control'
+                    placeholder={props.t('Password')}
+                    value={props.sharePassword}
+                    onChange={props.onChangePassword}
+                    onFocus={props.onKeyDownEnter}
+                  />
+
+                  <button
+                    type='button'
+                    className='shareDownload__password__icon'
+                    key='seeSharePassword'
+                    title={props.t('Show password')}
+                    style={{ ':hover': { color: props.hexcolor } }}
+                    data-cy='seePassword'
+                    onClick={this.handleTogglePasswordVisibility}
+                  >
+                    <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+                  </button>
+                </div>
 
                 <button
                   type='button'
                   className='shareDownload__password__icon'
-                  key='seeSharePassword'
-                  title={props.t('Show password')}
+                  key='randomSharePassword'
+                  title={props.t('Generate random password')}
                   style={{ ':hover': { color: props.hexcolor } }}
-                  data-cy='seePassword'
-                  onClick={this.handleTogglePasswordVisibility}
+                  onClick={this.handleRandomPassword}
                 >
-                  <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+                  <i className='fa fa-fw fa-repeat' />
                 </button>
               </div>
-
-              <button
-                type='button'
-                className='shareDownload__password__icon'
-                key='randomSharePassword'
-                title={props.t('Generate random password')}
-                style={{ ':hover': { color: props.hexcolor } }}
-                onClick={this.handleRandomPassword}
-              >
-                <i className='fa fa-fw fa-repeat' />
-              </button>
+              <span className='shareDownload__password__link' onClick={this.handleTogglePasswordActive}>
+                {props.t('Cancel protection by password')}
+              </span>
             </div>
-            <span className='shareDownload__password__link' onClick={this.handleTogglePasswordActive}>
-              {props.t('Cancel protection by password')}
-            </span>
-          </div>
-        )
-        : (
-          <div className='shareDownload__password'>
-            <span className='shareDownload__password__link' onClick={this.handleTogglePasswordActive}>
-              {props.t('Protect by password')}
-            </span>
-          </div>
-        )}
+          )
+          : (
+            <div className='shareDownload__password'>
+              <span className='shareDownload__password__link' onClick={this.handleTogglePasswordActive}>
+                {props.t('Protect by password')}
+              </span>
+            </div>
+          )
+        }
 
         <div className='d-flex mt-3'>
           <button

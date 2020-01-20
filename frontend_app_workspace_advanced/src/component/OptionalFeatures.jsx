@@ -2,7 +2,7 @@ import React from 'react'
 import { BtnSwitch } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
-const OptionalFunctionalities = props => {
+const OptionalFeatures = props => {
   return (
     <div className='formBlock workspace_advanced__optionalfunctionalities'>
       <div className='formBlock__title workspace_advanced__optionalfunctionalities__title'>
@@ -39,4 +39,4 @@ const OptionalFunctionalities = props => {
   )
 }
 
-export default translate()(OptionalFunctionalities)
+export default translate()(OptionalFeatures)

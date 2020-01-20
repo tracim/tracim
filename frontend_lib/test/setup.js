@@ -4,6 +4,9 @@ import Enzyme from 'enzyme'
 import chaiEnzyme from 'chai-enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 
+require('es6-promise').polyfill()
+require('isomorphic-fetch')
+
 process.env.NODE_ENV = 'test'
 
 // INFO - CH - 2019-06-24 - Example from https://medium.com/riipen-engineering/testing-react-with-enzyme-part-1-setup-ff49e51f8ff0

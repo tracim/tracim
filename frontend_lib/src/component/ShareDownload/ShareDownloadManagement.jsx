@@ -36,7 +36,7 @@ class ShareDownloadManagement extends React.Component {
       <>
         <div className='shareDownload__management__header'>
           <div className='shareDownload__title'>
-            {props.t('{{label}} share', {label: props.label, interpolation: {escapeValue: false}})}
+            {props.t('{{label}} share', { label: props.label, interpolation: { escapeValue: false } })}
           </div>
           {props.userRoleIdInWorkspace >= ROLE.contentManager.id &&
             <button

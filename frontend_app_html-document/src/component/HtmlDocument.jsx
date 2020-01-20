@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   TextAreaApp,
-  DisplayState
+  DisplayState,
+  APP_FEATURE_MODE
 } from 'tracim_frontend_lib'
-import { MODE } from '../helper.js'
 import { translate } from 'react-i18next'
 
 export const HtmlDocument = props => {
@@ -38,7 +38,7 @@ export const HtmlDocument = props => {
       )}
 
       <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
-        {props.mode === MODE.VIEW && props.isDraftAvailable && (
+        {props.mode === APP_FEATURE_MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
             msg={props.t('You have a pending draft')}
             btnType='link'
@@ -48,12 +48,12 @@ export const HtmlDocument = props => {
           />
         )}
 
-        {(props.mode === MODE.VIEW || props.mode === MODE.REVISION) && (
+        {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
             <div className='html-document__contentpage__textnote__version'>
               version n°
-              <div dangerouslySetInnerHTML={{ __html: props.mode === MODE.VIEW ? props.lastVersion : props.version }} />
-              {props.mode === MODE.REVISION &&
+              <div dangerouslySetInnerHTML={{ __html: props.mode === APP_FEATURE_MODE.VIEW ? props.lastVersion : props.version }} />
+              {props.mode === APP_FEATURE_MODE.REVISION &&
                 <div className='html-document__contentpage__textnote__lastversion outlineTextBtn'>
                   ({props.t('latest version :')} {props.lastVersion})
                 </div>
@@ -64,7 +64,7 @@ export const HtmlDocument = props => {
           </div>
         )}
 
-        {props.mode === MODE.EDIT &&
+        {props.mode === APP_FEATURE_MODE.EDIT &&
           <TextAreaApp
             id={props.wysiwygNewVersion}
             customClass={'html-document__editionmode'}
