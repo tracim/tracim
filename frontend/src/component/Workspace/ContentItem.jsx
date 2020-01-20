@@ -36,7 +36,7 @@ class ContentItem extends React.Component {
         key={props.id}
         id={props.contentId}
       >
-        {props.userRoleIdInWorkspace <= ROLE.contentManager.id && (
+        {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
           <DragHandle
             connectDragSource={props.connectDragSource}
             title={props.t('Move this content')}
@@ -80,7 +80,7 @@ class ContentItem extends React.Component {
             </div>
           </div>
 
-          {props.userRoleIdInWorkspace <= ROLE.contributor.id && (
+          {props.userRoleIdInWorkspace >= ROLE.contributor.id && (
             <div className='d-none d-md-block' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}

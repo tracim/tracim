@@ -36,6 +36,7 @@ export const FileDropzone = props => {
                 </div>
               </div>
             )
+            // TODO - CH - refactor this. See https://github.com/tracim/tracim/issues/2603
             case false:
               if (!props.multipleFiles) {
                 return (

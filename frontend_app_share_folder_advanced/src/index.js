@@ -11,7 +11,10 @@ const appInterface = {
   name: 'share_folder',
   isRendered: false,
   renderAppFeature: data => {
-    if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id) return
+    if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id) {
+      console.log('%c<ShareFolderAdvanced>', 'color: #28a745', 'Error: insufficient rights to open app')
+      return
+    }
 
     return ReactDOM.render(
       <ShareFolderAdvanced data={data} />

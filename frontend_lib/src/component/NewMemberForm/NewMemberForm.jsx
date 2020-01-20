@@ -91,7 +91,7 @@ export const NewMemberForm = props => {
             </div>
           )}
 
-          {(props.canSendInviteNewUser && props.userRoleIdInWorkspace <= ROLE.workspaceManager.id) && (
+          {(props.canSendInviteNewUser && props.userRoleIdInWorkspace >= ROLE.workspaceManager.id) && (
             props.emailNotifActivated
               ? (
                 <div className='name__adminmsg'>
@@ -206,5 +206,5 @@ NewMemberForm.defaultProps = {
   onClickKnownMember: () => {},
   onChangeNameOrEmail: () => {},
   onClickAutoComplete: () => {},
-  onClickCloseAddMemberBtn: () => {},
+  onClickCloseAddMemberBtn: () => {}
 }
