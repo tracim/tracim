@@ -14,7 +14,6 @@ import {
   SelectStatus,
   ArchiveDeleteContent,
   generateLocalStorageContentId,
-  appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE,
   ROLE,
   CUSTOM_EVENT

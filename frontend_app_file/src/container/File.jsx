@@ -20,7 +20,6 @@ import {
   generateLocalStorageContentId,
   Badge,
   BREADCRUMBS_TYPE,
-  appFeatureCustomEventHandlerShowApp,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,

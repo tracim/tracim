@@ -17,7 +17,6 @@ import {
   SelectStatus,
   generateLocalStorageContentId,
   BREADCRUMBS_TYPE,
-  appFeatureCustomEventHandlerShowApp,
   ROLE,
   CUSTOM_EVENT,
   APP_FEATURE_MODE
