@@ -4,8 +4,11 @@
   &__main
     margin 0 30px
   &__thumbnail
+    height 157px
     margin-top 10px
     background-color #f0f0f0
+    & > .slick-list
+      height 100%
     & .slick-current
       & .carousel__thumbnail__item__preview__content__image
         background-color #7d4e24
@@ -146,7 +149,7 @@
   height 100%
 
 .carousel__main .slick-track
-  height 55vh
+  height calc(100vh - 375px)
 
 // MEDIAQUERIES
 
