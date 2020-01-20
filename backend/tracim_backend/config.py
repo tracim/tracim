@@ -21,7 +21,7 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.lib.utils.utils import is_dir_exist
 from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
-from tracim_backend.lib.utils.utils import string_to_list
+from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
@@ -170,7 +170,7 @@ class CFG(object):
         if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
             extend_apps += "collaborative_document_edition,"
         default_enabled_app = default_enabled_app.format(extend_apps=extend_apps)
-        self.APP__ENABLED = string_to_list(
+        self.APP__ENABLED = string_to_unique_item_list(
             self.get_raw_config("app.enabled", default_enabled_app),
             separator=",",
             cast_func=str,
@@ -261,7 +261,7 @@ class CFG(object):
         self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir")
         self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name")
         self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir")
-        self.AUTH_TYPES = string_to_list(
+        self.AUTH_TYPES = string_to_unique_item_list(
             self.get_raw_config("auth_types", "internal"),
             separator=",",
             cast_func=AuthType,
@@ -290,7 +290,7 @@ class CFG(object):
         else:
             default_cors_allowed_origin = self.WEBSITE__BASE_URL
 
-        self.CORS__ACCESS_CONTROL_ALLOWED_ORIGIN = string_to_list(
+        self.CORS__ACCESS_CONTROL_ALLOWED_ORIGIN = string_to_unique_item_list(
             self.get_raw_config("cors.access-control-allowed-origin", default_cors_allowed_origin),
             separator=",",
             cast_func=str,
@@ -329,7 +329,7 @@ class CFG(object):
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
             self.get_raw_config("preview.jpg.restricted_dims", "false")
         )
-        self.PREVIEW__JPG__ALLOWED_DIMS = string_to_list(
+        self.PREVIEW__JPG__ALLOWED_DIMS = string_to_unique_item_list(
             self.get_raw_config("preview.jpg.allowed_dims", "256x256"),
             cast_func=PreviewDim.from_string,
             separator=",",
@@ -595,7 +595,7 @@ class CFG(object):
         )
         # FIXME - G.M - 2019-05-31 - limit default allowed mimetype to useful list instead of
         ALLOWED_INGEST_DEFAULT_MIMETYPE = ""
-        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_list(
+        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_unique_item_list(
             self.get_raw_config(
                 "search.elasticsearch.ingest.mimetype_whitelist", ALLOWED_INGEST_DEFAULT_MIMETYPE
             ),
@@ -603,7 +603,7 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
-        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST = string_to_list(
+        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST = string_to_unique_item_list(
             self.get_raw_config("search.elasticsearch.ingest.mimetype_blacklist", ""),
             separator=",",
             cast_func=str,

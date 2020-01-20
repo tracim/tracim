@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
 import datetime
 import email
 import importlib
@@ -228,6 +229,8 @@ def string_to_list(
 
     >>> string_to_list('1,2,3', ',', int)
     [1, 2, 3]
+    >>> string_to_list('1,2,3,2', ',', int)
+    [1, 2, 3, 2]
 
     :param base_string: entry string which should be converted.
     :param separator: string separator,
@@ -244,6 +247,34 @@ def string_to_list(
     if do_strip:
         string_list = [item.strip() for item in string_list]
     return [cast_func(item) for item in string_list]
+
+
+def string_to_unique_item_list(
+    base_string: str,
+    separator: str,
+    cast_func: typing.Callable[[str], typing.Any],
+    do_strip: bool = False,
+) -> typing.List[typing.Any]:
+    """
+    Convert a string to a list of separated item of one type according
+    to a string separator and to a cast_func, but with storing only unique value.
+
+    >>> string_to_unique_item_list('1,2,3', ',', int)
+    [1, 2, 3]
+    >>> string_to_unique_item_list('1,2,3,2', ',', int)
+    [1, 2, 3]
+
+    :param base_string: entry string which should be converted.
+    :param separator: string separator,
+    :param cast_func: all item should be casted to this function, this help
+    :param do_strip: if true strip string (remove beginning and ending whitespace)
+    of separated element before casting.
+    if false, do not strip string before casting
+    to convert to type like int, str ...
+    :return: list of unique content of type returned by the cast_func.
+    """
+    item_list = string_to_list(base_string, separator, cast_func, do_strip)
+    return list(OrderedDict.fromkeys(item_list))
 
 
 def deprecated(func: typing.Callable):
