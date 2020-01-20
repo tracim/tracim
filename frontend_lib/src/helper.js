@@ -114,7 +114,7 @@ export const revisionTypeList = [{
 export const generateLocalStorageContentId = (workspaceId, contentId, contentType, dataType) => `${workspaceId}/${contentId}/${contentType}_${dataType}`
 
 const WORKSPACE_MANAGER = {
-  id: 1,
+  id: 8,
   slug: 'workspace-manager',
   faIcon: 'gavel',
   hexcolor: '#ed0007',
@@ -126,7 +126,7 @@ const WORKSPACE_MANAGER = {
   description: 'Content manager + add members and edit shared spaces'
 }
 const CONTENT_MANAGER = {
-  id: 2,
+  id: 4,
   slug: 'content-manager',
   faIcon: 'graduation-cap',
   hexcolor: '#f2af2d',
@@ -138,7 +138,7 @@ const CONTENT_MANAGER = {
   description: 'Contributor + create folders and manage contents'
 }
 const CONTRIBUTOR = {
-  id: 4,
+  id: 2,
   slug: 'contributor',
   faIcon: 'pencil',
   hexcolor: '#3145f7',
@@ -150,7 +150,7 @@ const CONTRIBUTOR = {
   description: 'Reader + create/modify content'
 }
 const READER = {
-  id: 8,
+  id: 1,
   slug: 'reader',
   faIcon: 'eye',
   hexcolor: '#15d948',
@@ -170,7 +170,7 @@ export const ROLE = {
 export const ROLE_LIST = [WORKSPACE_MANAGER, CONTENT_MANAGER, CONTRIBUTOR, READER]
 
 const ADMINISTRATOR = {
-  id: 1,
+  id: 3,
   slug: 'administrators',
   faIcon: 'shield',
   hexcolor: '#ed0007',
@@ -194,7 +194,7 @@ const MANAGER = {
   description: 'User + create shared spaces, add members in shared spaces'
 }
 const USER = {
-  id: 4,
+  id: 1,
   slug: 'users',
   faIcon: 'user',
   hexcolor: '#3145f7',

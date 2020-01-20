@@ -124,7 +124,7 @@ class Timeline extends React.Component {
           <li style={{ visibility: 'hidden' }} ref={el => { this.timelineBottom = el }} />
         </ul>
 
-        {props.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
           <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
             <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__texteditor__textinput')}>
               <textarea

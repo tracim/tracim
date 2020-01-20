@@ -203,7 +203,6 @@ class HtmlDocument extends React.Component {
   }
 
   loadContent = async () => {
-    console.log('loadContent called')
     const { props, state } = this
 
     const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
@@ -227,7 +226,7 @@ class HtmlDocument extends React.Component {
     // @fixme Côme - 2018/12/04 - this might not be a great idea
     const modeToRender = (
       resRevision.body.length === 1 && // if content has only one revision
-      state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && // if user has EDIT authorization
+      state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && // if user has EDIT authorization
       resRevision.body[0].raw_content === '' // has content been created with raw_content (means it's from webdav or import db)
     )
       ? APP_FEATURE_MODE.EDIT
@@ -433,16 +432,16 @@ class HtmlDocument extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Edit')}
                 />
-              }
+              )}
 
-              {state.mode === APP_FEATURE_MODE.REVISION &&
+              {state.mode === APP_FEATURE_MODE.REVISION && (
                 <button
                   className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn highlightBtn'
                   onClick={this.handleClickLastVersion}
@@ -451,27 +450,27 @@ class HtmlDocument extends React.Component {
                   <i className='fa fa-history' />
                   {props.t('Last version')}
                 </button>
-              }
+              )}
             </div>
 
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
                   disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
-              }
+              )}
 
-              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
                   disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
-              }
+              )}
             </div>
           </div>
         </PopinFixedOption>
@@ -498,7 +497,7 @@ class HtmlDocument extends React.Component {
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
+            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
             onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}

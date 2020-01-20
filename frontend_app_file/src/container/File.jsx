@@ -226,7 +226,7 @@ class File extends React.Component {
   loadShareLinkList = async () => {
     const { props, state } = this
 
-    if (state.loggedUser.userRoleIdInWorkspace > ROLE.contributor.id) return
+    if (this.state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id) return
 
     const response = await handleFetchResult(await getShareLinksList(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
@@ -661,7 +661,7 @@ class File extends React.Component {
           lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
           lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
           description={state.content.raw_content}
-          displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id}
+          displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
           disableChangeDescription={!state.content.is_editable}
           onClickValidateNewDescription={this.handleClickValidateNewDescription}
           key={'FileProperties'}
@@ -669,7 +669,7 @@ class File extends React.Component {
       )
     }
 
-    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id) {
+    if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id) {
       return [
         timelineObject,
         {
@@ -731,16 +731,16 @@ class File extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Update')}
                 />
-              }
+              )}
 
-              {onlineEditionAction &&
+              {onlineEditionAction && (
                 <GenericButton
                   customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
                   dataCy='wsContentGeneric__option__menu__addversion'
@@ -753,9 +753,9 @@ class File extends React.Component {
                   }}
                   faIcon={'edit'}
                 />
-              }
+              )}
 
-              {state.mode === APP_FEATURE_MODE.REVISION &&
+              {state.mode === APP_FEATURE_MODE.REVISION && (
                 <button
                   className='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
@@ -765,11 +765,11 @@ class File extends React.Component {
                   <i className='fa fa-history' />
                   {props.t('Last version')}
                 </button>
-              }
+              )}
             </div>
 
             <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
@@ -777,16 +777,16 @@ class File extends React.Component {
                   disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                   mobileVersion={onlineEditionAction}
                 />
-              }
+              )}
 
-              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
                   disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
-              }
+              )}
             </div>
           </div>
         </PopinFixedOption>

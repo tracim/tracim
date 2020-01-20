@@ -250,23 +250,23 @@ class Thread extends React.Component {
           i18n={i18n}
         >
           <div className='justify-content-end'>
-            {state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+            {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
               <SelectStatus
                 selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                 availableStatus={state.config.availableStatuses}
                 onChangeStatus={this.handleChangeStatus}
                 disabled={state.content.is_archived || state.content.is_deleted}
               />
-            }
+            )}
 
-            {state.loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
+            {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
               <ArchiveDeleteContent
                 customColor={state.config.hexcolor}
                 onClickArchiveBtn={this.handleClickArchive}
                 onClickDeleteBtn={this.handleClickDelete}
                 disabled={state.content.is_archived || state.content.is_deleted}
               />
-            }
+            )}
           </div>
         </PopinFixedOption>
 

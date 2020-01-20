@@ -38,7 +38,7 @@ class ShareDownloadManagement extends React.Component {
           <div className='shareDownload__title'>
             {props.t('{{label}} share', { label: props.label, interpolation: { escapeValue: false } })}
           </div>
-          {props.userRoleIdInWorkspace <= ROLE.contentManager.id &&
+          {props.userRoleIdInWorkspace >= ROLE.contentManager.id &&
             <button
               className='shareDownload__btn btn highlightBtn'
               key='newShareDownload'
@@ -56,7 +56,7 @@ class ShareDownloadManagement extends React.Component {
           }
         </div>
 
-        {shareLinkList.length > 0 && props.userRoleIdInWorkspace <= ROLE.contributor.id &&
+        {shareLinkList.length > 0 && props.userRoleIdInWorkspace >= ROLE.contributor.id &&
           shareLinkList.map(shareLink =>
             <ShareLink
               email={shareLink.email}

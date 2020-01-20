@@ -465,7 +465,7 @@ class WorkspaceContent extends React.Component {
       const destinationMemberList = props.workspaceList.find(ws => ws.id === destination.workspaceId).memberList
       const userRoleIdInDestination = findUserRoleIdInWorkspace(props.user.user_id, destinationMemberList, ROLE_LIST)
 
-      if (userRoleIdInDestination <= ROLE.contributor.id) {
+      if (userRoleIdInDestination >= ROLE.contributor.id) {
         props.dispatch(newFlashMessage(props.t('Insufficient rights'), 'danger'))
         return
       }
@@ -586,7 +586,7 @@ class WorkspaceContent extends React.Component {
 
     return (
       <div className='workspace__content__fileandfolder__empty'>
-        {userRoleIdInWorkspace < ROLE.reader.id ? creationAllowedMessage : creationNotAllowedMessage}
+        {userRoleIdInWorkspace > ROLE.reader.id ? creationAllowedMessage : creationNotAllowedMessage}
       </div>
     )
   }
@@ -673,7 +673,7 @@ class WorkspaceContent extends React.Component {
               icon={this.getIcon(urlFilter)}
               breadcrumbsList={breadcrumbs}
             >
-              {userRoleIdInWorkspace <= ROLE.contributor.id && (
+              {userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <DropdownCreateButton
                   parentClass='workspace__header__btnaddcontent'
                   folderId={null} // null because it is workspace root content
@@ -782,7 +782,7 @@ class WorkspaceContent extends React.Component {
                   )
                 }
 
-                {userRoleIdInWorkspace <= ROLE.contributor.id && workspaceContentList.length >= 10 && (
+                {userRoleIdInWorkspace >= ROLE.contributor.id && workspaceContentList.length >= 10 && (
                   <DropdownCreateButton
                     customClass='workspace__content__button'
                     folderId={null}

@@ -70,7 +70,7 @@ class ShareFolder extends React.Component {
 
           <div className='folder__header__button'>
             <div className='d-none d-md-flex' title={props.t('Actions')}>
-              {props.userRoleIdInWorkspace <= ROLE.contentManager.id && (
+              {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <div
                   className='extandedaction dropdown'
                   data-cy='extended_action'
