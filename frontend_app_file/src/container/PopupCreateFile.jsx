@@ -106,6 +106,10 @@ class PopupCreateFile extends React.Component {
 
     if (!newFileList || newFileList.length === 0) return
 
+    if (newFileList.length === 1 && state.uploadFileList.length === 0) {
+      this.loadUploadFilePreview(newFileList[0])
+    } else if (state.uploadFilePreview) this.setState({ uploadFilePreview: false })
+
     const alreadyUploadedList = newFileList.filter(newFile => state.uploadFileList.some(stateFile => stateFile.name === newFile.name))
     if (alreadyUploadedList.length) {
       GLOBAL_dispatchEvent({
@@ -228,6 +232,13 @@ class PopupCreateFile extends React.Component {
     const { state } = this
 
     const uploadFileWithoutDeletedFileList = state.uploadFileList.filter(f => f !== file)
+    switch (uploadFileWithoutDeletedFileList.length) {
+      case 0:
+        this.setState({ uploadFilePreview: false }); break
+      case 1:
+        this.loadUploadFilePreview(uploadFileWithoutDeletedFileList[0]); break
+    }
+
     this.setState({ uploadFileList: uploadFileWithoutDeletedFileList })
   }
 
@@ -242,6 +253,19 @@ class PopupCreateFile extends React.Component {
 
     if (state.uploadFileList.length === 0 || state.uploadStarted) return true
     return state.uploadFileList.some(f => f.errorMessage)
+  }
+
+  loadUploadFilePreview = (file) => {
+    if (file.type.includes('image') && file.size <= 2000000) {
+      let reader = new FileReader()
+      reader.onload = e => {
+        this.setState({ uploadFilePreview: e.total > 0 ? e.target.result : false })
+        const img = new Image()
+        img.src = e.target.result
+        img.onerror = () => this.setState({ uploadFilePreview: false })
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   render () {
@@ -269,7 +293,8 @@ class PopupCreateFile extends React.Component {
           <FileDropzone
             onDrop={this.handleChangeFile}
             hexcolor={state.config.hexcolor}
-            multipleFiles
+            preview={state.uploadFilePreview}
+            multipleFiles={!state.uploadFilePreview}
           />
 
           <FileUploadList
