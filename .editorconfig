@@ -7,14 +7,24 @@ root = true
 [*]
 end_of_line = lf
 insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
 
 [*.py]
-charset = utf-8
 indent_style = space
 indent_size = 4
+tab_width = 4
 max_line_length = 100
 
-# Matches the exact files either package.json or .travis.yml
-[.travis.yml]
+[*.sh]
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{js,json,json.sample,yml,yaml,jsx,styl,css}]
 indent_style = space
 indent_size = 2
+tab_width = 2
