@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 // require('./BtnSwitch.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export const BtnSwitch = props =>
-  <div className={classnames('btnswitch', {'disabled': props.disabled})}>
+  <div className={classnames('btnswitch', { 'disabled': props.disabled })}>
     <label className='switch nomarginlabel' onClick={e => {
       e.preventDefault()
       e.stopPropagation()
@@ -23,7 +23,7 @@ export const BtnSwitch = props =>
         }}
         disabled={props.disabled}
       />
-      <span className={classnames('slider round', {'primaryColorBg': props.checked && !props.disabled, 'defaultBg': !props.checked || props.disabled})} />
+      <span className={classnames('slider round', { 'primaryColorBg': props.checked && !props.disabled, 'defaultBg': !props.checked || props.disabled })} />
     </label>
     <div className='btnswitch__text'>
       { props.checked ? props.activeLabel : props.inactiveLabel }

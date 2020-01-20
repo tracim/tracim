@@ -4,11 +4,8 @@ import {
   convertBackslashNToBr,
   handleFetchResult,
   generateFetchResponse,
-  appFeatureCustomEventHandlerShowApp,
   parserStringToList
 } from '../src/helper.js'
-import sinon from 'sinon'
-import { CUSTOM_EVENT } from '../src/customEvent.js'
 
 describe('helper.js', () => {
   describe('generateLocalStorageContentId()', () => {
@@ -26,20 +23,6 @@ describe('helper.js', () => {
         fixture.dataType
       )
       expect(localStorageContentId).to.eql(`${fixture.workspaceId}/${fixture.contentId}/${fixture.contentType}_${fixture.dataType}`)
-    })
-  })
-
-  describe('appFeatureCustomEventHandlerShowApp()', () => {
-    it(`should dispatch the proper custom event: ${CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER}`, () => {
-      const fixture = {
-        newContent: { id: 52 },
-        currentContentId: 53,
-        appName: 'randomAppName'
-      }
-      const customEvent = sinon.stub()
-      global.document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, customEvent)
-      appFeatureCustomEventHandlerShowApp(fixture.newContent, fixture.currentContentId, fixture.appName)
-      expect(customEvent.called).to.equal(true)
     })
   })
 
@@ -69,7 +52,7 @@ describe('helper.js', () => {
       })
     })
 
-    it('should return the proper Response when status: 300\'', (done) => {
+    it('should return the proper Response when status: 300', (done) => {
       const cloneFetchResult = {
         json: () => 'jsonTest'
       }
@@ -110,7 +93,7 @@ describe('helper.js', () => {
       const separatorList = [',', ';']
 
       const substringList = ['randomEmail@randomEmail.randomEmail', 'randomEmail@randomEmail.randomEmail', 'randomEmail@randomEmail.randomEmail']
-      
+
       expect(substringList).to.deep.equal(parserStringToList(string, separatorList))
     })
   })

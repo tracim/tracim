@@ -1,4 +1,3 @@
-import i18n from './i18n.js'
 import {
   FETCH_CONFIG,
   ROLE,

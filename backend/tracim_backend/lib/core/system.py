@@ -2,6 +2,8 @@ import datetime
 import typing
 from urllib.parse import urljoin
 
+from importlib_metadata import metadata
+
 from tracim_backend.apps import COLLABORATIVE_DOCUMENT_EDITION__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
@@ -20,9 +22,9 @@ class SystemApi(object):
         # TODO - G.M - 2018-09-26 - Set version correctly
         return AboutModel(
             name="Tracim",
-            version="2.5.1",
+            version=metadata("tracim_backend")["Version"],
             datetime=datetime.datetime.now(),
-            website="https://www.tracim.fr",
+            website=metadata("tracim_backend")["Home-page"],
         )
 
     def get_config(self) -> ConfigModel:

@@ -4,11 +4,11 @@ import PropTypes from 'prop-types'
 const ComposedIcon = props =>
   <i
     className={`composedIcon ${props.mainIconCustomClass} fa fa-fw fa-${props.mainIcon}`}
-    style={{...props.mainIconStyle}}
+    style={{ ...props.mainIconStyle }}
   >
     <i
       className={`composedIcon__subIcon ${props.smallIconCustomClass} fa fa-${props.smallIcon}`}
-      style={{...props.smallIconStyle}}
+      style={{ ...props.smallIconStyle }}
     />
   </i>
 
