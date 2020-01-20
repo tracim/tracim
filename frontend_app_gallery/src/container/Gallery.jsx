@@ -448,11 +448,20 @@ export class Gallery extends React.Component {
       // INFO - GM - 2019-12-11 - It use dom manipulation instead of react state because ReactImageLightBox doesn't offer custom style props for the toolbar
       document.getElementsByClassName('ril__toolbar')[0].style.transform = 'translateY(0px)'
       document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
+      document.getElementsByClassName('ril__navButtons').forEach(e => {
+        e.style['transition-duration'] = '0.5s'
+        e.style.transform = 'translateX(0px)'
+      })
     }
     this.mouseMoveTimeout = setInterval(() => {
       if (this.state.displayLightbox) {
         document.getElementsByClassName('ril__toolbar')[0].style.transform = 'translateY(-50px)'
         document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
+        document.getElementsByClassName('ril__navButtonNext')[0].style.transform = 'translateX(100%)'
+        document.getElementsByClassName('ril__navButtonPrev')[0].style.transform = 'translateX(-100%)'
+        document.getElementsByClassName('ril__navButtons').forEach(e => {
+          e.style['transition-duration'] = '0.5s'
+        })
       }
     }, 2000)
   }
