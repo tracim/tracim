@@ -226,7 +226,7 @@ class File extends React.Component {
   loadShareLinkList = async () => {
     const { props, state } = this
 
-    if (this.state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id) return
+    if (state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id) return
 
     const response = await handleFetchResult(await getShareLinksList(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
