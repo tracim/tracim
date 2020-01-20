@@ -23,7 +23,7 @@ describe('<ExtandedAction />', () => {
         callback: editCallBack
       }
     },
-    userRoleIdInWorkspace: 1,
+    userRoleIdInWorkspace: ROLE.workspaceManager.id,
     folderData: {
       workspaceId: 0,
       id: 0

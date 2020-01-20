@@ -24,7 +24,7 @@ export const ExtandedAction = props => {
       </button>
 
       <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-        {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace <= ROLE.contributor.id && (
+        {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace >= ROLE.contributor.id && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.edit.callback}
@@ -68,7 +68,7 @@ export const ExtandedAction = props => {
           </div>
         )} */}
 
-        {props.userRoleIdInWorkspace <= ROLE.contentManager.id && (
+        {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.delete.callback}

@@ -427,7 +427,7 @@ class Thread extends React.Component {
           i18n={i18n}
         >
           <div className='justify-content-end'>
-            {loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+            {loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
               <SelectStatus
                 selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                 availableStatus={config.availableStatuses}
@@ -436,7 +436,7 @@ class Thread extends React.Component {
               />
             }
 
-            {loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
+            {loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id &&
               <ArchiveDeleteContent
                 customColor={config.hexcolor}
                 onClickArchiveBtn={this.handleClickArchive}
