@@ -1,13 +1,5 @@
-import os
-
 import sys
 from setuptools import setup, find_packages
-
-here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'README.md')) as f:
-    README = f.read()
-with open(os.path.join(here, 'CHANGES.txt')) as f:
-    CHANGES = f.read()
 
 requires = [
     # pyramid
@@ -114,27 +106,6 @@ if sys.version_info < (3, 5):
 
 
 setup(
-    name='tracim_backend',
-    version='1.9.1',
-    description='Rest API (Back-end) of Tracim v2',
-    long_description=README + '\n\n' + CHANGES,
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Programming Language :: Python',
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        'Framework :: Pyramid',
-        'Topic :: Internet :: WWW/HTTP',
-        'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
-        'Topic :: Communications :: File Sharing',
-        'Topic :: Communications',
-        'License :: OSI Approved :: MIT License',
-    ],
-    author='',
-    author_email='',
-    url='https://github.com/tracim/tracim_backend',
-    keywords='web pyramid tracim ',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
