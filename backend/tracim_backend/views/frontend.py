@@ -21,13 +21,13 @@ class FrontendController(Controller):
     def __init__(
         self,
         dist_folder_path: str,
-        build_version: str,
+        cache_token: str,
         custom_toolbox_folder_path: typing.Optional[str],
     ) -> None:
         self.dist_folder_path = dist_folder_path
         self.custom_toolbox_folder_path = custom_toolbox_folder_path
         self.custom_toolbox_files = []  # type: typing.List["os.DirEntry"]
-        self.build_version = build_version
+        self.cache_token = cache_token
         if custom_toolbox_folder_path:
             self.custom_toolbox_files = self._get_custom_toolboxes_files(
                 self.custom_toolbox_folder_path
@@ -72,7 +72,7 @@ class FrontendController(Controller):
                 "applications": frontend_apps,
                 "website_title": app_config.WEBSITE__TITLE,
                 "custom_toolbox_files": self.custom_toolbox_files,
-                "build_version": self.build_version,
+                "cache_token": self.cache_token,
             },
         )
 

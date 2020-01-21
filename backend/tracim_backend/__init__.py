@@ -283,7 +283,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         frontend_controller = FrontendController(
             dist_folder_path=app_config.FRONTEND__DIST_FOLDER_PATH,
             custom_toolbox_folder_path=app_config.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH,
-            build_version=app_config.BUILD_VERSION,
+            cache_token=app_config.FRONTEND__CACHE_TOKEN,
         )
         configurator.include(frontend_controller.bind)
 

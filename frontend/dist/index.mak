@@ -5,13 +5,13 @@
     <meta name='viewport' content='width=device-width, user-scalable=no'>
 
     <title>${website_title}</title>
-    <link rel="icon" type="image/png" sizes="64x64" href="/assets/images/favicon/tracim_64x64.png?v=${build_version}">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/tracim_32x32.png?v=${build_version}">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/tracim_16x16.png?v=${build_version}">
-    <link rel='manifest' href='/assets/manifest.json?v=${build_version}'>
+    <link rel="icon" type="image/png" sizes="64x64" href="/assets/images/favicon/tracim_64x64.png?token=${cache_token}">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/tracim_32x32.png?token=${cache_token}">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/tracim_16x16.png?token=${cache_token}">
+    <link rel='manifest' href='/assets/manifest.json?token=${cache_token}'>
 
-    <link rel='stylesheet' type='text/css' href='/assets/font/font-awesome-4.7.0/css/font-awesome.css'>
-    <link rel='stylesheet' type='text/css' href='/assets/bootstrap/bootstrap-4.0.0-beta.css'>
+    <link rel='stylesheet' type='text/css' href='/assets/font/font-awesome-4.7.0/css/font-awesome.css?token=${cache_token}'>
+    <link rel='stylesheet' type='text/css' href='/assets/bootstrap/bootstrap-4.0.0-beta.css?token=${cache_token}'>
 
     <style>
       <%
@@ -77,33 +77,33 @@
   <body>
     <div id='content'></div>
 
-    <script type='text/javascript' src='/app/tracim_frontend_lib.style.js?v=${build_version}'></script>
+    <script type='text/javascript' src='/app/tracim_frontend_lib.style.js?token=${cache_token}'></script>
 
-    <script type='text/javascript' src='/assets/tracim/appInterface.js?v=${build_version}'></script>
-    <script type='text/javascript' src='/assets/tracim/tinymceInit.js?v=${build_version}'></script>
+    <script type='text/javascript' src='/assets/tracim/appInterface.js?token=${cache_token}'></script>
+    <script type='text/javascript' src='/assets/tracim/tinymceInit.js?token=${cache_token}'></script>
 
     % for custom_toolbox_file in custom_toolbox_files:
-    <script type='text/javascript' src='/custom_toolbox-assets/${custom_toolbox_file.name}?v=${build_version}'></script>
+    <script type='text/javascript' src='/custom_toolbox-assets/${custom_toolbox_file.name}?token=${cache_token}'></script>
     % endfor
 
-    <script type='text/javascript' src='/assets/tracim.vendors~app.js?v=${build_version}'></script>
-    <script type='text/javascript' src='/assets/tracim.app.js?v=${build_version}'></script>
+    <script type='text/javascript' src='/assets/tracim.vendors~app.js?token=${cache_token}'></script>
+    <script type='text/javascript' src='/assets/tracim.app.js?token=${cache_token}'></script>
 
-    <script type='text/javascript' src='/app/workspace.app.js?v=${build_version}'></script>
+    <script type='text/javascript' src='/app/workspace.app.js?token=${cache_token}'></script>
 
     % for app in applications:
-    <script type='text/javascript' src='/app/${app.minislug}.app.js?v=${build_version}'></script>
+    <script type='text/javascript' src='/app/${app.minislug}.app.js?token=${cache_token}'></script>
     %endfor
-    <script type='text/javascript' src='/app/share_folder.app.js?v=${build_version}'></script>
-    <script type='text/javascript' src='/app/admin_workspace_user.app.js?v=${build_version}'></script>
-    <script type='text/javascript' src='/app/workspace_advanced.app.js?v=${build_version}'></script>
-    <script type='text/javascript' src='/app/gallery.app.js?v=${build_version}'></script>
+    <script type='text/javascript' src='/app/share_folder.app.js?token=${cache_token}'></script>
+    <script type='text/javascript' src='/app/admin_workspace_user.app.js?token=${cache_token}'></script>
+    <script type='text/javascript' src='/app/workspace_advanced.app.js?token=${cache_token}'></script>
+    <script type='text/javascript' src='/app/gallery.app.js?token=${cache_token}'></script>
 
-    <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
-    <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>
-    <script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js'></script>
+    <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js?token=${cache_token}'></script>
+    <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js?token=${cache_token}'></script>
+    <script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js?token=${cache_token}'></script>
 
-    <script type='text/javascript' src='/assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js'></script>
-    <script type='text/javascript' src='/assets/tinymce-4.7.13/js/tinymce/tinymce.min.js'></script>
+    <script type='text/javascript' src='/assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js?token=${cache_token}'></script>
+    <script type='text/javascript' src='/assets/tinymce-4.7.13/js/tinymce/tinymce.min.js?token=${cache_token}'></script>
   </body>
 </html>
