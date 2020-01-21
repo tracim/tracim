@@ -106,10 +106,10 @@ class PopupCreateFile extends React.Component {
       this.loadUploadFilePreview(newFileList[0])
     } else if (state.uploadFilePreview) this.setState({ uploadFilePreview: FILE_PREVIEW_STATE.NO_FILE })
 
-    const alreadyUploadedList = newFileList.filter((newFile) => this.hasFilesAlreadyInList(newFile, state.fileToUploadList))
+    const alreadyUploadedList = newFileList.filter((newFile) => this.isFileAlreadyInList(newFile, state.fileToUploadList))
     if (alreadyUploadedList.length > 0) {
       this.sendGlobalFlashMessage(<div>{props.t('Files already uploaded:')}<br /><ul>{alreadyUploadedList.map(file => <li>{file.name}</li>)}</ul></div>)
-      newFileListResult = newFileList.filter((newFile) => !this.hasFilesAlreadyInList(newFile, state.fileToUploadList))
+      newFileListResult = newFileList.filter((newFile) => !this.isFileAlreadyInList(newFile, state.fileToUploadList))
     }
     newFileListResult = newFileListResult.concat(state.fileToUploadList)
     this.setState({ fileToUploadList: newFileListResult })
@@ -131,7 +131,7 @@ class PopupCreateFile extends React.Component {
     })
   }
 
-  hasFilesAlreadyInList = (newFile, listToFilter) => listToFilter.some(stateFile => stateFile.name === newFile.name)
+  isFileAlreadyInList = (fileToFind, list) => list.some(file => file.name === fileToFind.name)
 
   uploadInProgress = (e, file) => {
     if (e.lengthComputable) {
@@ -175,14 +175,15 @@ class PopupCreateFile extends React.Component {
 
     this.setState({ uploadStarted: true })
 
-    Promise.all(state.fileToUploadList.map((file) => this.postFile(file)))
-      .then(xhrList => {
-        this.handleAllFileUploadEnd(xhrList.map((xhr, index) => this.handleFileUploadEnd(xhr, state.fileToUploadList[index])))
-      })
-      .catch(() => {
-        this.sendGlobalFlashMessage(props.t('Error while creating file'))
-        this.handleClose(false)
-      })
+    Promise.all(state.fileToUploadList.map(async (file) => ({
+      xhr: await this.postFile(file),
+      file: file
+    }))).then(uploadedFileResponseList => {
+      this.handleAllFileUploadEnd(uploadedFileResponseList.map((uploadedFileResponse) => this.handleFileUploadEnd(uploadedFileResponse.xhr, uploadedFileResponse.file)))
+    }).catch(() => {
+      this.sendGlobalFlashMessage(props.t('Error while creating file'))
+      this.handleClose(false)
+    })
   }
 
   handleFileUploadEnd = (xhr, file) => {
