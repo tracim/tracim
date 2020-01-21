@@ -24,7 +24,7 @@ class UploadForm extends React.Component {
     const { props } = this
     const guestFullnameIsValid = props.guestFullname.value.length && !props.guestFullname.isInvalid
     const guestPasswordIsValid = !props.hasPassword || (props.guestPassword.value.length && !props.guestPassword.isInvalid)
-    const uploadListIsValid = props.uploadFileList.length > 0
+    const uploadListIsValid = props.fileToUploadList.length > 0
     return !(guestPasswordIsValid && guestFullnameIsValid && uploadListIsValid)
   }
 
@@ -83,7 +83,7 @@ class UploadForm extends React.Component {
 
           <InputTextArea
             placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
-            numberRows={props.uploadFileList.length > 4 ? '20' : '15'}
+            numberRows={props.fileToUploadList.length > 4 ? '20' : '15'}
             value={props.guestComment}
             onChange={props.onChangeComment}
           />
@@ -98,7 +98,7 @@ class UploadForm extends React.Component {
           />
 
           <FileUploadList
-            uploadFilesList={props.uploadFileList}
+            fileToUploadList={props.fileToUploadList}
             onDeleteFile={props.onDeleteFile}
             customTitle={props.t('Attached files')}
           />

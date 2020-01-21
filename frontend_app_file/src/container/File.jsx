@@ -30,7 +30,7 @@ import {
   ROLE,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
-  PREVIEW_POSSIBLE_CASE
+  FILE_PREVIEW_STATE
 } from 'tracim_frontend_lib'
 import { PAGE } from '../helper.js'
 import { debug } from '../debug.js'
@@ -69,7 +69,7 @@ class File extends React.Component {
       ],
       newComment: '',
       newFile: '',
-      newFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW,
+      newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
@@ -396,21 +396,21 @@ class File extends React.Component {
 
       var reader = new FileReader()
       reader.onload = e => {
-        this.setState({ newFilePreview: e.total > 0 ? e.target.result : PREVIEW_POSSIBLE_CASE.NO_PREVIEW_AVAILABLE })
+        this.setState({ newFilePreview: e.total > 0 ? e.target.result : FILE_PREVIEW_STATE.NO_FILE })
         const img = new Image()
         img.src = e.target.result
-        img.onerror = () => this.setState({ newFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW_AVAILABLE })
+        img.onerror = () => this.setState({ newFilePreview: FILE_PREVIEW_STATE.NO_FILE })
       }
       reader.readAsDataURL(fileToSave)
     } else {
       this.setState({
         newFile: fileToSave,
-        newFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW_AVAILABLE
+        newFilePreview: FILE_PREVIEW_STATE.NO_FILE
       })
     }
   }
 
-  handleClickDropzoneCancel = () => this.setState({ mode: APP_FEATURE_MODE.VIEW, newFile: '', newFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW })
+  handleClickDropzoneCancel = () => this.setState({ mode: APP_FEATURE_MODE.VIEW, newFile: '', newFilePreview: FILE_PREVIEW_STATE.NO_FILE })
 
   handleClickDropzoneValidate = async () => {
     const { props, state } = this
@@ -436,7 +436,7 @@ class File extends React.Component {
           case 204:
             this.setState({
               newFile: '',
-              newFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW,
+              newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
               fileCurrentPage: 1,
               mode: APP_FEATURE_MODE.VIEW
             })

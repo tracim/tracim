@@ -9,7 +9,7 @@ import {
   CUSTOM_EVENT,
   ProgressBar,
   computeProgressionPercentage,
-  PREVIEW_POSSIBLE_CASE
+  FILE_PREVIEW_STATE
 } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
@@ -41,8 +41,8 @@ class GuestUpload extends React.Component {
         isInvalid: false
       },
       appName: 'file',
-      uploadFileList: [],
-      uploadFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW,
+      fileToUploadList: [],
+      uploadFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       progressUpload: {
         display: this.UPLOAD_STATUS.BEFORE_LOAD,
         percent: 0
@@ -89,7 +89,7 @@ class GuestUpload extends React.Component {
 
     if (!Array.isArray(newFileList) || (newFileList.length === 0)) return
 
-    const alreadyUploadedList = newFileList.filter(newFile => state.uploadFileList.some(stateFile => stateFile.name === newFile.name))
+    const alreadyUploadedList = newFileList.filter(newFile => state.fileToUploadList.some(stateFile => stateFile.name === newFile.name))
     if (alreadyUploadedList.length) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
@@ -102,16 +102,16 @@ class GuestUpload extends React.Component {
     }
 
     this.setState(previousState => ({
-      uploadFileList: [
-        ...previousState.uploadFileList,
-        ...newFileList.filter(newFile => !state.uploadFileList.some(stateFile => stateFile.name === newFile.name))
+      fileToUploadList: [
+        ...previousState.fileToUploadList,
+        ...newFileList.filter(newFile => !state.fileToUploadList.some(stateFile => stateFile.name === newFile.name))
       ]
     }))
   }
 
   handleDeleteFile = deletedFile => {
     this.setState(previousState => ({
-      uploadFileList: previousState.uploadFileList.filter(file => file.name !== deletedFile.name)
+      fileToUploadList: previousState.fileToUploadList.filter(file => file.name !== deletedFile.name)
     }))
   }
 
@@ -122,7 +122,7 @@ class GuestUpload extends React.Component {
     if (state.guestFullname.value.length > 255) errors.push({ field: 'guestFullname', msg: props.t('Full name must be less than 255 characters') })
     if (state.hasPassword && (state.guestPassword.value.length < 6)) errors.push({ field: 'guestPassword', msg: props.t('Password must be at least 6 characters') })
     if (state.hasPassword && (state.guestPassword.value.length > 255)) errors.push({ field: 'guestPassword', msg: props.t('Password must be less than 255 characters') })
-    if (state.uploadFileList.length === 0) errors.push({ field: 'uploadFileList', msg: props.t('You must select at least 1 file to upload') })
+    if (state.fileToUploadList.length === 0) errors.push({ field: 'fileToUploadList', msg: props.t('You must select at least 1 file to upload') })
     if (errors.length) {
       // INFO - B.L - Not used now because form's css isn't ready for it use flash message instead
       // this.setState({
@@ -147,7 +147,7 @@ class GuestUpload extends React.Component {
 
     const formData = new FormData()
 
-    state.uploadFileList.forEach((uploadFile, index) => {
+    state.fileToUploadList.forEach((uploadFile, index) => {
       formData.append(`file_${index}`, uploadFile)
       formData.append('username', state.guestFullname.value)
       formData.append('message', state.guestComment)
@@ -168,7 +168,7 @@ class GuestUpload extends React.Component {
       if (xhr.readyState === 4) {
         switch (xhr.status) {
           case 204:
-            this.setState({ uploadFileList: [] })
+            this.setState({ fileToUploadList: [] })
             break
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
@@ -228,7 +228,7 @@ class GuestUpload extends React.Component {
                       onAddFile={this.handleAddFile}
                       onDeleteFile={this.handleDeleteFile}
                       onClickSend={this.handleClickSend}
-                      uploadFileList={state.uploadFileList}
+                      fileToUploadList={state.fileToUploadList}
                       uploadFilePreview={state.uploadFilePreview}
                     />
                   )

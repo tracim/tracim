@@ -8,7 +8,7 @@ import {
   FileDropzone,
   CUSTOM_EVENT,
   FileUploadList,
-  PREVIEW_POSSIBLE_CASE
+  FILE_PREVIEW_STATE
 } from 'tracim_frontend_lib'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -25,7 +25,7 @@ class PopupCreateFile extends React.Component {
       workspaceId: props.data ? props.data.workspaceId : debug.workspaceId,
       folderId: props.data ? props.data.folderId : debug.folderId,
       fileToUploadList: [],
-      uploadFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW,
+      uploadFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       uploadStarted: false
     }
 
@@ -98,19 +98,21 @@ class PopupCreateFile extends React.Component {
 
     if (!newFileList || newFileList.length === 0) return
 
-    if (newFileList.length === 1 && state.fileToUploadList.length === 0) {
-      this.loadUploadFilePreview(newFileList[0])
-    } else if (state.uploadFilePreview) this.setState({ uploadFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW })
-
-    const alreadyUploadedList = newFileList.filter((newFile) => this.filesAlreadyInListFilter(newFile, state.fileToUploadList))
-    if (alreadyUploadedList.length > 0) {
-      this.sendGlobalFlashMessage(<div>{props.t('Files already uploaded:')}<br /><ul>{alreadyUploadedList.map(file => <li>{file.name}</li>)}</ul></div>)
-      newFileList = newFileList.filter((newFile) => !this.filesAlreadyInListFilter(newFile, state.fileToUploadList))
-    }
     // INFO - GM - 2020-01-03 - newFileList is an array of File and we can't use spread operator on it in order to add a new attribute
     // See https://developer.mozilla.org/fr/docs/Web/API/File
-    newFileList = newFileList.map(f => { f.percent = 0; return f }).concat(state.fileToUploadList)
-    this.setState({ fileToUploadList: newFileList })
+    let newFileListResult = newFileList.map(f => { f.percent = 0; return f })
+
+    if (newFileList.length === 1 && state.fileToUploadList.length === 0) {
+      this.loadUploadFilePreview(newFileList[0])
+    } else if (state.uploadFilePreview) this.setState({ uploadFilePreview: FILE_PREVIEW_STATE.NO_FILE })
+
+    const alreadyUploadedList = newFileList.filter((newFile) => this.hasFilesAlreadyInList(newFile, state.fileToUploadList))
+    if (alreadyUploadedList.length > 0) {
+      this.sendGlobalFlashMessage(<div>{props.t('Files already uploaded:')}<br /><ul>{alreadyUploadedList.map(file => <li>{file.name}</li>)}</ul></div>)
+      newFileListResult = newFileList.filter((newFile) => !this.hasFilesAlreadyInList(newFile, state.fileToUploadList))
+    }
+    newFileListResult = newFileListResult.concat(state.fileToUploadList)
+    this.setState({ fileToUploadList: newFileListResult })
   }
 
   handleClose = (isFromUserAction) => {
@@ -129,9 +131,9 @@ class PopupCreateFile extends React.Component {
     })
   }
 
-  filesAlreadyInListFilter = (newFile, listToFilter) => listToFilter.some(stateFile => stateFile.name === newFile.name)
+  hasFilesAlreadyInList = (newFile, listToFilter) => listToFilter.some(stateFile => stateFile.name === newFile.name)
 
-  uploadInProgress = file => e => {
+  uploadInProgress = (e, file) => {
     if (e.lengthComputable) {
       const uploadFileInProgressList = this.state.fileToUploadList
       uploadFileInProgressList[uploadFileInProgressList.indexOf(file)].percent = computeProgressionPercentage(e.loaded, e.total, uploadFileInProgressList.length)
@@ -153,18 +155,16 @@ class PopupCreateFile extends React.Component {
       // INFO - CH - 2018-08-28 - fetch still doesn't handle event progress. So we need to use old school xhr object
       const xhr = new XMLHttpRequest()
 
-      xhr.upload.addEventListener('progress', this.uploadInProgress(file), false)
+      xhr.upload.addEventListener('progress', e => this.uploadInProgress(e, file), false)
 
       xhr.open('POST', `${state.config.apiUrl}/workspaces/${state.workspaceId}/files`, true)
 
       xhr.setRequestHeader('Accept', 'application/json')
       xhr.withCredentials = true
 
-      xhr.onerror = () => reject(xhr)
+      xhr.onerror = () => reject(new Error())
 
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4) resolve(xhr)
-      }
+      xhr.onload = () => resolve(xhr)
 
       xhr.send(formData)
     })
@@ -175,20 +175,20 @@ class PopupCreateFile extends React.Component {
 
     this.setState({ uploadStarted: true })
 
-    Promise.all(state.fileToUploadList.map(async (file) => {
-      const xhr = await this.postFile(file)
-      return this.handleFileUploadEnd(xhr, file)
-    })).catch(() => {
-      this.sendGlobalFlashMessage(props.t('Error while creating file'))
-    }).then(uploadedFiles => {
-      this.handleAllFileUploadEnd(uploadedFiles)
-    })
+    Promise.all(state.fileToUploadList.map((file) => this.postFile(file)))
+      .then(xhrList => {
+        this.handleAllFileUploadEnd(xhrList.map((xhr, index) => this.handleFileUploadEnd(xhr, state.fileToUploadList[index])))
+      })
+      .catch(() => {
+        this.sendGlobalFlashMessage(props.t('Error while creating file'))
+        this.handleClose(false)
+      })
   }
 
   handleFileUploadEnd = (xhr, file) => {
     const { props } = this
 
-    const filePosted = file
+    const filePosted = new File([file], file.name)
     switch (xhr.status) {
       case 200:
         const jsonResult200 = JSON.parse(xhr.responseText)
@@ -230,7 +230,7 @@ class PopupCreateFile extends React.Component {
     const uploadFileWithoutDeletedFileList = state.fileToUploadList.filter(f => f.name !== file.name)
     switch (uploadFileWithoutDeletedFileList.length) {
       case 0:
-        this.setState({ uploadFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW, fileToUploadList: uploadFileWithoutDeletedFileList })
+        this.setState({ uploadFilePreview: FILE_PREVIEW_STATE.NO_FILE, fileToUploadList: uploadFileWithoutDeletedFileList })
         return
       case 1:
         this.loadUploadFilePreview(uploadFileWithoutDeletedFileList[0])
@@ -256,10 +256,10 @@ class PopupCreateFile extends React.Component {
     if (file.type.includes('image') && file.size <= 2000000) {
       let reader = new FileReader()
       reader.onload = e => {
-        this.setState({ uploadFilePreview: e.total > 0 ? e.target.result : PREVIEW_POSSIBLE_CASE.NO_PREVIEW })
+        this.setState({ uploadFilePreview: e.total > 0 ? e.target.result : FILE_PREVIEW_STATE.NO_FILE })
         const img = new Image()
         img.src = e.target.result
-        img.onerror = () => this.setState({ uploadFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW })
+        img.onerror = () => this.setState({ uploadFilePreview: FILE_PREVIEW_STATE.NO_FILE })
       }
       reader.readAsDataURL(file)
     }
@@ -295,7 +295,7 @@ class PopupCreateFile extends React.Component {
           />
 
           <FileUploadList
-            uploadFilesList={state.fileToUploadList}
+            fileToUploadList={state.fileToUploadList}
             onDeleteFile={this.handleDeleteFile}
             deleteFileDisabled={state.uploadStarted}
           />

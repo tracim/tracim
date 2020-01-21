@@ -275,7 +275,7 @@ export const removeExtensionOfFilename = filename => filename.split('.').splice(
 
 export const computeProgressionPercentage = (progressionLoaded, progressionTotal, elementListLength = 1) => (progressionLoaded / progressionTotal * 99) / elementListLength
 
-export const PREVIEW_POSSIBLE_CASE = {
-  NO_PREVIEW_AVAILABLE: 'noPreviewAvailable',
-  NO_PREVIEW: 'noPreview'
+export const FILE_PREVIEW_STATE = {
+  NO_PREVIEW: 'noPreview',
+  NO_FILE: 'noFile'
 }

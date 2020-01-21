@@ -9,14 +9,14 @@ export const FileUploadList = (props) => {
   return (
     <div className='file__upload'>
       <div className='file__upload__title font-weight-bold'>
-        {props.uploadFilesList.length > 0
+        {props.fileToUploadList.length > 0
           ? title
           : props.t('You have not yet chosen any files to upload.')
         }
       </div>
 
       <div className='file__upload__list'>
-      {props.uploadFilesList.map((file) =>
+      {props.fileToUploadList.map((file) =>
         <div className='file__upload__list__item' key={file.name}>
           <i className='fa fa-fw fa-file-o m-1' />
           <div className='file__upload__list__item__label'>
@@ -46,13 +46,13 @@ export default translate()(FileUploadList)
 
 FileUploadList.propTypes = {
   onDeleteFile: PropTypes.func.isRequired,
-  uploadFilesList: PropTypes.array,
+  fileToUploadList: PropTypes.array,
   customTitle: PropTypes.string,
   deleteFileDisabled: PropTypes.bool
 }
 
 FileUploadList.defaultState = {
-  uploadFilesList: [],
+  fileToUploadList: [],
   deleteFileDisabled: false,
   customTitle: ''
 }

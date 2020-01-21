@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Dropzone from 'react-dropzone' // INFO - GB- 2019-07-31 - react-dropzone is in an older version because of a persistent problem with Hooks
 import { translate } from 'react-i18next'
-import { PREVIEW_POSSIBLE_CASE } from '../../helper.js'
+import { FILE_PREVIEW_STATE } from '../../helper.js'
 
 export const FileDropzone = props => {
   return (
@@ -16,7 +16,7 @@ export const FileDropzone = props => {
       <div className='filecontent__form mb-4' drop='true'>
         {(() => {
           switch (props.preview) {
-            case PREVIEW_POSSIBLE_CASE.NO_PREVIEW:
+            case FILE_PREVIEW_STATE.NO_FILE:
               return (
                 <div>
                   <div
@@ -38,7 +38,7 @@ export const FileDropzone = props => {
                   </div>
                 </div>
               )
-            case PREVIEW_POSSIBLE_CASE.NO_PREVIEW_AVAILABLE:
+            case FILE_PREVIEW_STATE.NO_FILE:
               return (
                 <div className='filecontent__preview' drop='true'>
                   <i className='filecontent__preview__nopreview-icon fa fa-paperclip' style={{ color: props.hexcolor }} />
@@ -73,7 +73,7 @@ FileDropzone.propTypes = {
 
 FileDropzone.defaultState = {
   multipleFiles: false,
-  preview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW,
+  preview: FILE_PREVIEW_STATE.NO_FILE,
   hexcolor: '',
-  filename: '',
+  filename: ''
 }
