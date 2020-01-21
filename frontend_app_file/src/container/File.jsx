@@ -30,6 +30,7 @@ import {
   ROLE,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
+  PREVIEW_POSSIBLE_CASE
 } from 'tracim_frontend_lib'
 import { PAGE } from '../helper.js'
 import { debug } from '../debug.js'
@@ -68,7 +69,7 @@ class File extends React.Component {
       ],
       newComment: '',
       newFile: '',
-      newFilePreview: null,
+      newFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW,
       fileCurrentPage: 1,
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
@@ -390,26 +391,26 @@ class File extends React.Component {
 
     const fileToSave = newFile[0]
 
-    if (fileToSave.type.includes('image') && fileToSave.size > 2000000) { // allow preview
+    if (fileToSave.type.includes('image') && fileToSave.size <= 2000000) {
       this.setState({ newFile: fileToSave })
 
       var reader = new FileReader()
       reader.onload = e => {
-        this.setState({ newFilePreview: e.total > 0 ? e.target.result : false })
+        this.setState({ newFilePreview: e.total > 0 ? e.target.result : PREVIEW_POSSIBLE_CASE.NO_PREVIEW_AVAILABLE })
         const img = new Image()
         img.src = e.target.result
-        img.onerror = () => this.setState({ newFilePreview: false })
+        img.onerror = () => this.setState({ newFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW_AVAILABLE })
       }
       reader.readAsDataURL(fileToSave)
-    } else { // no preview
+    } else {
       this.setState({
         newFile: fileToSave,
-        newFilePreview: false
+        newFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW_AVAILABLE
       })
     }
   }
 
-  handleClickDropzoneCancel = () => this.setState({ mode: APP_FEATURE_MODE.VIEW, newFile: '', newFilePreview: null })
+  handleClickDropzoneCancel = () => this.setState({ mode: APP_FEATURE_MODE.VIEW, newFile: '', newFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW })
 
   handleClickDropzoneValidate = async () => {
     const { props, state } = this
@@ -435,7 +436,7 @@ class File extends React.Component {
           case 204:
             this.setState({
               newFile: '',
-              newFilePreview: null,
+              newFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW,
               fileCurrentPage: 1,
               mode: APP_FEATURE_MODE.VIEW
             })

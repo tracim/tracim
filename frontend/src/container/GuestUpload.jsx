@@ -8,7 +8,8 @@ import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
   ProgressBar,
-  computeProgressionPercentage
+  computeProgressionPercentage,
+  PREVIEW_POSSIBLE_CASE
 } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
@@ -41,7 +42,7 @@ class GuestUpload extends React.Component {
       },
       appName: 'file',
       uploadFileList: [],
-      uploadFilePreview: null,
+      uploadFilePreview: PREVIEW_POSSIBLE_CASE.NO_PREVIEW,
       progressUpload: {
         display: this.UPLOAD_STATUS.BEFORE_LOAD,
         percent: 0
