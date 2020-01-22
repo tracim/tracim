@@ -23,6 +23,7 @@ class SystemApi(object):
         return AboutModel(
             name="Tracim",
             version=metadata("tracim_backend")["Version"],
+            build_version=self._config.BUILD_VERSION,
             datetime=datetime.datetime.now(),
             website=metadata("tracim_backend")["Home-page"],
         )

@@ -52,16 +52,16 @@ basic_setup.session_secret = change_this_value_please!
 # Not exhaustive list of available apps:
 # - "content/thread" -> thread/topic/discussion : allow to discuss about one
 #   subject.
-# - "content/file" -> allow to upload all type of file like .pdf, .odt, .jpg, etc
-# - "content/html-document" -> allow to work on a standard html-based document
-#   which is editable through tracim.
-# - "content/folder" -> allow to put content into folder.
-# - "agenda" -> add caldav agenda feature (specific process need to be runned)
-# - "collaborative_document_edition" -> add support for collaborative document edition,
+# - content/file -> allow to upload all type of file like .pdf, .odt, .jpg, etc
+# - content/html-document -> allow to work on a standard html-based document
+#   which is editable through Tracim.
+# - content/folder -> allow to put content into folder.
+# - agenda -> add caldav agenda feature (specific process need to be runned)
+# - collaborative_document_edition -> add support for collaborative document edition,
 #   add support for collaborative edition server like collabora/libreofficeOnline.
-# - "share_content" -> allow user to share tracim content with external user
-# - "upload_permission" -> allow external with permission to upload some file in a workspace.
-# - "gallery" -> add gallery app in tracim
+# - share_content -> allow user to share tracim content with external user
+# - upload_permission -> allow external with permission to upload some file in a workspace.
+# - gallery -> add gallery app in tracim
 # default app.enabled config explicit list config:
 ; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,share_content,upload_permission,gallery
 # With all apps (add collaborative document edition):
@@ -69,9 +69,9 @@ basic_setup.session_secret = change_this_value_please!
 
 
 ### Plugins ###
-# if provided, this allow tracim to load package from this dir and if package follow
+# if provided, this allow Tracim to load package from this dir and if package follow
 # the convention "tracim_backend_{plugin_name}", hooks provided inside the package will
-# be loaded, allowing to add new feature to an existing tracim.
+# be loaded, allowing to add new feature to an existing Tracim.
 ; plugin.folder_path = %(here)s/plugins
 
 
@@ -84,6 +84,15 @@ basic_setup.session_secret = change_this_value_please!
 # You can set default display name for anonymized user.
 default_anonymized_user_display_name = "Lost Meerkat"
 
+## Build Version
+# If you leave build_version empty or unsetted here, Tracim will automatically
+# try to get a meaningful value according to context, it will try to
+# use last commit tag or hash as build_version. If your Tracim code is not placed
+# in a git repository or git isn't installed on the server, default value will be
+# "unknown".
+# You can override predefined build version.
+# Leave as empty to let Tracim find automatically build_version value.
+; build_version =
 
 ####
 # LIMITATION
@@ -91,7 +100,7 @@ default_anonymized_user_display_name = "Lost Meerkat"
 
 # limit number of sharespaces any user can be owner, 0 mean not limit, default to 0
 ; limitation.sharedspace_per_user = 0
-# max upload content length accepted by tracim for file in bytes
+# max upload content length accepted by Tracim for file in bytes
 # by default 0 meaning no limit. 104857600 (100MB) is a good value
 ; limitation.content_length_file_size = 104857600
 # max size of all files of a workspace in bytes
@@ -155,7 +164,7 @@ session.save_accessed_time = True
 session.cookie_expires = 604800
 session.timeout = 604800
 session.cookie_on_exception = True
-## custom tracim pyramid_beaker parameter
+## custom Tracim pyramid_beaker parameter
 ; session.reissue_time = 120
 
 ####
@@ -164,7 +173,7 @@ session.cookie_on_exception = True
 
 ### API KEY AUTH ###
 # Api key auth allow to access to any authenticated user using
-# 'Tracim-Api-Key'(secret share between client and tracim)
+# 'Tracim-Api-Key'(secret share between client and Tracim)
 # and 'Tracim-Api-Login' (mail of existing user) headers.
 
 ## Api key auth is disabled by default,
@@ -240,10 +249,10 @@ website.base_url = %(basic_setup.website_base_url)s
 
 
 ### Frontend ###
-## if you want to use tracim API without frontend, change this parameter to False
+## if you want to use Tracim API without frontend, change this parameter to False
 frontend.serve = True
-# You can set dist folder of tracim frontend. by default, system
-# will try to get it automatically according to tracim repository
+# You can set dist folder of Tracim frontend. by default, system
+# will try to get it automatically according to Tracim repository
 # organisation.
 ; frontend.dist_folder_path = /home/user/tracim/frontend/dist
 # if you need to add custom javascript code into Tracim, you can use custom toolbox
@@ -251,9 +260,19 @@ frontend.serve = True
 # of this folder will be serve in /custom_toolbox-assets
 # and all javascript ".js" file will be added to index.html file.
 ; frontend.custom_toolbox_folder_path = /tmp/custom_toolbox
+# Cache token is used to force browser fetching of static files if Tracim version has changed.
+# If you leave frontend.cache_token empty here, Tracim will automatically
+# try to get a meaningful value according to context, it will try to
+# use last commit hash as cache_token. If your Tracim code is not placed
+# in a git repository or git isn't installed on the server, Tracim will use an
+# autogenerated uuid. This uuid will change at each restart of Tracim
+# You can override predefined cache_token here.
+# Leave as empty to let Tracim find automatically cache_token value.
+; frontend.cache_token =
+
 
 ### Color ###
-# check for color.json file in tracim, check by default in tracim parent
+# check for color.json file in Tracim, check by default in Tracim parent
 # dir of backend.
 ## you can set a specific file path here
 ; color.config_file_path = /home/user/tracim/color.json
@@ -290,7 +309,7 @@ email.processing_mode = sync
 email.notification.activated = False
 ## you can enable or disable if invited user to shared space will be notified
 ## on this shared space by default (default: True).
-## NB: new users will not being notified until they login to tracim a first time
+## NB: new users will not being notified until they login to Tracim a first time
 ; email.notification.enabled_on_invitation = True
 # You can activate notification specific log using 'tracim_email_notification' logger.
 
@@ -356,7 +375,7 @@ email.notification.new_upload_event.template.html = %(email.template_dir)s/new_u
 ####
 
 # Email reply configuration:
-# Reply by email feature: allow user to answer directly to tracim in reply
+# Reply by email feature: allow user to answer directly to Tracim in reply
 # to notification.
 # This need api.key with non-empty value
 # This feature need to run mail_fetcher daemons.
@@ -420,7 +439,7 @@ webdav.listen = localhost:3030
 ### Webdav HTML dir browser ###
 ## Render HTML listing for GET requests on collections (default: True)
 ; webdav.dir_browser.enabled = True
-## Raw HTML code, appended as footer, if not set, let tracim created his own
+## Raw HTML code, appended as footer, if not set, let Tracim created his own
 ## footer.
 ; webdav.dir_browser.footer = Just another footer
 
@@ -431,7 +450,7 @@ webdav.listen = localhost:3030
 # This feature require application "agenda" in "app.enabled"
 
 ### Radicale Proxy config ##
-## path to tracim radicale server, usually at localhost:port
+## path to Tracim radicale server, usually at localhost:port
 caldav.radicale_proxy.base_url = http://localhost:5232
 
 ### Radicale config ###
@@ -443,12 +462,12 @@ caldav.radicale_proxy.base_url = http://localhost:5232
 ; [section]
 ; param_name = value
 caldav.radicale.server.host = localhost:5232
-## To make tracim work, we need to disable auth and rights.
+## To make Tracim work, we need to disable auth and rights.
 caldav.radicale.auth.type = None
 caldav.radicale.rights.type = None
 ## We do not need radicale web ui
 caldav.radicale.web.type = None
-## for tracim we do use file storage.
+## for Tracim we do use file storage.
 caldav.radicale.storage.type = multifilesystem
 caldav.radicale.storage.filesystem_folder = %(basic_setup.caldav_storage_dir)s
 # CORS config for radicale
@@ -461,7 +480,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # SEARCH (ElasticSearch)
 ####
 # choose search engine to use, available value are: simple, elasticsearch.
-# simple need nothing more than tracim but features are limited,
+# simple need nothing more than Tracim but features are limited,
 # elasticsearch is more effective but need an elasticsearch server.
 search.engine = simple
 # elasticsearch configuration
@@ -529,7 +548,7 @@ pyramid.default_locale_name = en
 ## https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/i18n.html#localization-deployment-settings
 
 ### pyramid optionals plugins ###
-#required plugin are imported directly in tracim source code
+#required plugin are imported directly in Tracim source code
 ; pyramid.includes =
 ;    pyramid_debugtoolbar
 

@@ -54,6 +54,7 @@ class TestCommandsList(object):
         assert output.find("search index-upgrade-experimental") > 0
         assert output.find("search index-drop") > 0
         assert output.find("dev parameters list") > 0
+        assert output.find("dev parameters value") > 0
 
 
 @pytest.mark.usefixtures("base_fixture")
