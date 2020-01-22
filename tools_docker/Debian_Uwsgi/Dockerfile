@@ -15,7 +15,7 @@ RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
     then echo "Its not possible to use ARG TAG and ARG BRANCH in same time." && exit 1;fi
 
 RUN \
-# create command to clone repo
+# Create command to clone repo
     get_source_from_github() { \
     if ([ "$TAG" != "" ] && [ "$BRANCH" = "" ]); \
     then git clone -b $TAG --single-branch https://github.com/tracim/tracim.git tracim; \
@@ -64,16 +64,16 @@ RUN \
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt update \
     && apt install -qy nodejs \
-# clone repo
+# Clone repo
     && get_source_from_github $TAG $BRANCH \
 # Go in repo folder
     && cd /tracim/ \
-# install frontend
+# Install frontend
     && ./install_frontend_dependencies.sh root \
     && ./build_full_frontend.sh \
 # Go in backend folder
     && cd backend \
-# install backend
+# Install backend
     && python3 -m pip install -U pip setuptools wheel \
     && python3 -m pip install -r requirements.txt \
     && python3 -m pip install -e ".[postgresql]" \
@@ -94,7 +94,6 @@ RUN \
     && apt purge -yq \
     build-essential \
     curl \
-    git \
     libjpeg-dev \
     libmagickwand-dev \
     nodejs \

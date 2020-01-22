@@ -37,10 +37,16 @@ from tracim_backend.models.roles import WorkspaceRoles
 
 class AboutModel(object):
     def __init__(
-        self, name: str, version: typing.Optional[str], datetime: datetime, website: str
+        self,
+        name: str,
+        version: typing.Optional[str],
+        build_version: str,
+        datetime: datetime,
+        website: str,
     ) -> None:
         self.name = name
         self.version = version
+        self.build_version = build_version
         self.datetime = datetime
         self.website = website
 

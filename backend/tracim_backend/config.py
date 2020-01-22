@@ -19,6 +19,8 @@ from tracim_backend.lib.collaborative_document_edition.data import COLLABORA_DOC
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
+from tracim_backend.lib.utils.utils import get_build_version
+from tracim_backend.lib.utils.utils import get_cache_token
 from tracim_backend.lib.utils.utils import is_dir_exist
 from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
@@ -266,7 +268,9 @@ class CFG(object):
 
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "true"))
         self.DEBUG = asbool(self.get_raw_config("debug", "false"))
-
+        self.BUILD_VERSION = self.get_raw_config(
+            "build_version", get_build_version(os.path.abspath(__file__))
+        )
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
             self.get_raw_config("preview.jpg.restricted_dims", "false")
         )
@@ -283,6 +287,10 @@ class CFG(object):
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_v2_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")
+
+        self.FRONTEND__CACHE_TOKEN = self.get_raw_config(
+            "frontend.cache_token", get_cache_token(os.path.abspath(__file__))
+        )
 
         self.BACKEND__I18N_FOLDER_PATH = self.get_raw_config(
             "backend.i18n_folder_path", backend_i18n_folder
