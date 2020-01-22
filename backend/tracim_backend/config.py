@@ -94,6 +94,24 @@ class CFG(object):
         else:
             return value
 
+    def deprecate_parameter(
+        self, parameter_name: str, parameter_value: typing.Any, extended_information: str
+    ) -> None:
+        """
+
+        :param parameter_name: name of the parameter, etc : "CALDAV_ENABLED"
+        :param parameter_value: value of the parameter.
+        :param extended_information: add some more information about deprecation
+        :return: None
+        """
+        if parameter_value:
+            logger.warning(
+                self,
+                "{parameter_name} parameter is deprecated. {extended_information}".format(
+                    parameter_name=parameter_name, extended_information=extended_information
+                ),
+            )
+
     def get_raw_config(
         self,
         config_file_name: str,
@@ -152,7 +170,7 @@ class CFG(object):
             "contents/file,"
             "contents/html-document,"
             "contents/folder,"
-            "{extend_apps}"
+            "agenda,"
             "share_content,"
             "upload_permission,"
             "gallery"
@@ -162,13 +180,19 @@ class CFG(object):
         #  CALDAV__ENABLED and COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
         # should be deprecated.
         self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "false"))
-        if self.CALDAV__ENABLED:
-            extend_apps += "agenda,"
+        self.deprecate_parameter(
+            "CALDAV_ENABLED",
+            self.CALDAV__ENABLED,
+            extended_information="It will not be taken into account.",
+        )
         self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
             self.get_raw_config("collaborative_document_edition.activated", "false")
         )
-        if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
-            extend_apps += "collaborative_document_edition,"
+        self.deprecate_parameter(
+            "COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED",
+            self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
+            extended_information="It will not be taken into account.",
+        )
         default_enabled_app = default_enabled_app.format(extend_apps=extend_apps)
         self.APP__ENABLED = string_to_unique_item_list(
             self.get_raw_config("app.enabled", default_enabled_app),
@@ -268,11 +292,6 @@ class CFG(object):
             do_strip=True,
         )
         self.REMOTE_USER_HEADER = self.get_raw_config("remote_user_header", None)
-        # TODO - G.M - 2018-09-11 - Deprecated param
-        # self.DATA_UPDATE_ALLOWED_DURATION = int(self.get_raw_config(
-        #     'content.update.allowed.duration',
-        #     0,
-        # ))
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
         self.SESSION__REISSUE_TIME = int(self.get_raw_config("session.reissue_time", "120"))
@@ -308,12 +327,12 @@ class CFG(object):
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         defaut_reset_password_validity = "900"
         self.USER__RESET_PASSWORD__VALIDITY = self.get_raw_config("user.reset_password.validity")
+        self.deprecate_parameter(
+            "USER__RESET_PASSWORD__VALIDITY",
+            self.USER__RESET_PASSWORD__VALIDITY,
+            extended_information="please use USER__RESET_PASSWORD__TOKEN_LIFETIME instead",
+        )
         if self.USER__RESET_PASSWORD__VALIDITY:
-            logger.warning(
-                self,
-                "user.reset_password.validity parameter is deprecated ! "
-                "please use user.reset_password.token_lifetime instead.",
-            )
             self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.USER__RESET_PASSWORD__VALIDITY
         else:
             self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(
@@ -406,12 +425,11 @@ class CFG(object):
             "email.notification.from.email", "noreply+{user_id}@trac.im"
         )
         self.EMAIL__NOTIFICATION__FROM = self.get_raw_config("email.notification.from")
-        if self.get_raw_config("email.notification.from"):
-            raise ConfigurationError(
-                "email.notification.from configuration is deprecated. "
-                "Use instead email.notification.from.email and "
-                "email.notification.from.default_label."
-            )
+        self.deprecate_parameter(
+            "EMAIL__NOTIFICATION__FROM",
+            self.EMAIL__NOTIFICATION__FROM,
+            extended_information="use instead EMAIL__NOTIFICATION__FROM__EMAIL and EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
+        )
 
         self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL = self.get_raw_config(
             "email.notification.from.default_label", "Tracim Notifications"

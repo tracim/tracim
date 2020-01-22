@@ -65,8 +65,8 @@ class AgendaApp(TracimApplication):
             raise ConfigurationError(
                 '"{}" should be set to "{}"'
                 " (currently only valid value)"
-                ' when "{}" is true'.format(
-                    "caldav.radicale.storage.type", "multifilesystem", "caldav.enabled"
+                " when {} app is active".format(
+                    "caldav.radicale.storage.type", "multifilesystem", "agenda"
                 )
             )
 

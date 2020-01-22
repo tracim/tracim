@@ -61,7 +61,7 @@ basic_setup.session_secret = change_this_value_please!
 # - "share_content" -> allow user to share tracim content with external user
 # - "upload_permission" -> allow external with permission to upload some file in a workspace.
 ## example of app.enabled config explicit list config
-; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission
+; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,share_content,upload_permission,gallery
 
 ### Plugins ###
 # if provided, this allow tracim to load package from this dir and if package follow
@@ -423,9 +423,6 @@ webdav.listen = localhost:3030
 # CALDAV (Radicale)
 ####
 
-### Main Config for Caldav ##
-caldav.enabled = True
-
 ### Radicale Proxy config ##
 ## path to tracim radicale server, usually at localhost:port
 caldav.radicale_proxy.base_url = http://localhost:5232
@@ -488,7 +485,7 @@ search.engine = simple
 ####
 # Collaborative Document Edition (Collabora, etc)
 ####
-collaborative_document_edition.activated = False
+
 # software used for collaborative document_edition. "collabora" software value give support for
 # both CollaboraOnline and LibreofficeOnline.
 collaborative_document_edition.software = collabora
