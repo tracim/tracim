@@ -44,11 +44,12 @@ basic_setup.session_secret = change_this_value_please!
 ; default_lang = en
 
 ### Apps ###
+
 ## app enabled explicit list:
 # this allow you to explictly disable default app or enabled beta app now
 # already added to default list.
 # This parameter is a list of app slug separated by ',' char.
-## Not exhaustive list of available apps:
+# Not exhaustive list of available apps:
 # - "content/thread" -> thread/topic/discussion : allow to discuss about one
 #   subject.
 # - "content/file" -> allow to upload all type of file like .pdf, .odt, .jpg, etc
@@ -60,8 +61,12 @@ basic_setup.session_secret = change_this_value_please!
 #   add support for collaborative edition server like collabora/libreofficeOnline.
 # - "share_content" -> allow user to share tracim content with external user
 # - "upload_permission" -> allow external with permission to upload some file in a workspace.
-## example of app.enabled config explicit list config
+# - "gallery" -> add gallery app in tracim
+# default app.enabled config explicit list config:
 ; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,share_content,upload_permission,gallery
+# With all apps (add collaborative document edition):
+# app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,collaborative_document_edition,share_content,upload_permission,gallery
+
 
 ### Plugins ###
 # if provided, this allow tracim to load package from this dir and if package follow
@@ -423,6 +428,8 @@ webdav.listen = localhost:3030
 # CALDAV (Radicale)
 ####
 
+# This feature require application "agenda" in "app.enabled"
+
 ### Radicale Proxy config ##
 ## path to tracim radicale server, usually at localhost:port
 caldav.radicale_proxy.base_url = http://localhost:5232
@@ -482,9 +489,13 @@ search.engine = simple
 # not be indexed using ingest mode.
 # default value to 52428800 = 50Mo
 ;search.elasticsearch.ingest.size_limit = 52428800
+
+
 ####
 # Collaborative Document Edition (Collabora, etc)
 ####
+
+# This feature require application "collaborative_document_edition" in "app.enabled"
 
 # software used for collaborative document_edition. "collabora" software value give support for
 # both CollaboraOnline and LibreofficeOnline.
