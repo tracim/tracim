@@ -97,7 +97,6 @@
     <script type='text/javascript' src='/app/share_folder.app.js?token=${cache_token}'></script>
     <script type='text/javascript' src='/app/admin_workspace_user.app.js?token=${cache_token}'></script>
     <script type='text/javascript' src='/app/workspace_advanced.app.js?token=${cache_token}'></script>
-    <script type='text/javascript' src='/app/gallery.app.js?token=${cache_token}'></script>
 
     <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js?token=${cache_token}'></script>
     <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js?token=${cache_token}'></script>
