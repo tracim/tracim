@@ -34,7 +34,7 @@ const style = {
 
 export const Checkbox = props =>
   <label
-    className={classnames('checkboxCustom', {'checked': props.checked})}
+    className={classnames('checkboxCustom', { 'checked': props.checked })}
     style={{
       ...style.label,
       ...(props.disabled ? style.disabled : {}),

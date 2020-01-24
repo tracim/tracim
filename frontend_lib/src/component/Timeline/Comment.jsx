@@ -34,7 +34,7 @@ const Comment = props => {
 
             <div
               className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
-              dangerouslySetInnerHTML={{__html: props.text}}
+              dangerouslySetInnerHTML={{ __html: props.text }}
             />
           </div>
         </div>
@@ -47,7 +47,7 @@ export default Comment
 
 Comment.propTypes = {
   customClass: PropTypes.string,
-  author:  PropTypes.string,
+  author: PropTypes.string,
   text: PropTypes.string,
   createdFormated: PropTypes.string,
   createdDistance: PropTypes.string,
@@ -56,7 +56,7 @@ Comment.propTypes = {
 
 Comment.defaultProps = {
   customClass: '',
-  author:  '',
+  author: '',
   text: '',
   createdFormated: '',
   createdDistance: '',

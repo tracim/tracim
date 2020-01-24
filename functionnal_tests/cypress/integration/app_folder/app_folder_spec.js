@@ -3,8 +3,8 @@ import { SELECTORS as s } from '../../support/generic_selector_commands.js'
 
 describe('App Folder Advanced', function () {
   let workspaceId
-  let folder1 = {label: 'first Folder'}
-  let folder2 = {label: 'second Folder'}
+  let folder1 = { label: 'first Folder' }
+  let folder2 = { label: 'second Folder' }
 
   before(function () {
     cy.resetDB()

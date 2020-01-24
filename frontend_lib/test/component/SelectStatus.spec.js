@@ -3,34 +3,15 @@ import { expect } from 'chai'
 import { mount } from 'enzyme'
 import SelectStatus from '../../src/component/Input/SelectStatus/SelectStatus.jsx'
 import sinon from 'sinon'
+import { status, statusList } from '../fixture/status.js'
 require('../../src/component/Input/SelectStatus/SelectStatus.styl')
 
 describe('<SelectStatus />', () => {
   const onChangeStatusCallBack = sinon.stub()
 
   const props = {
-    availableStatus: [
-      {
-        slug: 'randomSlug1',
-        customColor: 'randomCustomColor1',
-        faIcon: 'randomFaIcon1',
-        hexcolor: 'randomHexColor1',
-        label: 'randomLabel1'
-      },
-      {
-        slug: 'randomSlug2',
-        customColor: 'randomCustomColor2',
-        faIcon: 'randomFaIcon2',
-        hexcolor: 'randomHexColor2',
-        label: 'randomLabel2'
-      }],
-    selectedStatus: {
-      slug: 'randomSlug3',
-      customColor: 'randomCustomColor3',
-      faIcon: 'randomFaIcon3',
-      hexcolor: 'randomHexColor3',
-      label: 'randomLabel3'
-    },
+    availableStatus: statusList,
+    selectedStatus: status.VALIDATED,
     disabled: false,
     onChangeStatus: onChangeStatusCallBack
   }
@@ -56,8 +37,8 @@ describe('<SelectStatus />', () => {
       expect(wrapper.find('#dropdownMenu2')).to.have.text().contains(props.selectedStatus.label)
     })
 
-    it(`should have 2 submenu_item`, () => {
-      expect(wrapper.find(`button.selectStatus__submenu__item`)).to.have.lengthOf(2)
+    it(`should have ${props.availableStatus.length} submenu_item`, () => {
+      expect(wrapper.find(`button.selectStatus__submenu__item`)).to.have.lengthOf(props.availableStatus.length)
     })
 
     it(`first submenu_item should have its icon: "${props.availableStatus[0].faIcon}"`, () => {

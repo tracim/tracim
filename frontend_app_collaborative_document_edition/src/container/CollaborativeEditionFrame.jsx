@@ -90,7 +90,7 @@ export class CollaborativeEditionFrame extends React.Component {
   buildCompleteIframeUrl = (urlSource, accessToken) => {
     const { state } = this
     const protocol = window.location.protocol
-    const readyonly = !state.content.is_editable || !(state.loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id)
+    const readyonly = !state.content.is_editable || !(state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id)
     // INFO - B.L - 2019.08.01 - We assume frontend is on the same host than the API
     const host = window.location.host
     let url = `${urlSource}WOPISrc=${protocol}//${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1&lang=${state.loggedUser.lang}`
