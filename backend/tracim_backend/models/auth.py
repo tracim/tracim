@@ -23,7 +23,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
 from sqlalchemy import Table
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relation
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import synonym
 from sqlalchemy.types import Boolean
@@ -41,26 +40,7 @@ from tracim_backend.models.meta import metadata
 if TYPE_CHECKING:
     from tracim_backend.models.data import Workspace
     from tracim_backend.models.data import UserRoleInWorkspace
-__all__ = ["User", "Group", "Permission"]
-
-# This is the association table for the many-to-many relationship between
-# groups and permissions.
-group_permission_table = Table(
-    "group_permission",
-    metadata,
-    Column(
-        "group_id",
-        Integer,
-        ForeignKey("groups.group_id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    ),
-    Column(
-        "permission_id",
-        Integer,
-        ForeignKey("permissions.permission_id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    ),
-)
+__all__ = ["User", "Group"]
 
 # This is the association table for the many-to-many relationship between
 # groups and members - this is, the memberships.
@@ -226,14 +206,6 @@ class User(DeclarativeBase):
 
     def __unicode__(self):
         return self.display_name or self.email
-
-    @property
-    def permissions(self):
-        """Return a set with all permissions granted to the user."""
-        perms = set()
-        for g in self.groups:
-            perms = perms | set(g.permissions)
-        return perms
 
     @property
     def profile(self) -> Profile:
@@ -429,28 +401,3 @@ class User(DeclarativeBase):
         if difference > validity_seconds:
             return False
         return True
-
-
-class Permission(DeclarativeBase):
-    """
-    Permission definition.
-
-    Only the ``permission_name`` column is required.
-
-    """
-
-    __tablename__ = "permissions"
-
-    permission_id = Column(
-        Integer, Sequence("seq__permissions__permission_id"), autoincrement=True, primary_key=True
-    )
-    permission_name = Column(Unicode(63), unique=True, nullable=False)
-    description = Column(Unicode(255))
-
-    groups = relation(Group, secondary=group_permission_table, backref="permissions")
-
-    def __repr__(self):
-        return "<Permission: name=%s>" % repr(self.permission_name)
-
-    def __unicode__(self):
-        return self.permission_name
