@@ -14,6 +14,17 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
     <VirtualHost *:80>
         ServerName [domain_name]
 
+        Alias "/assets" "/tracim/frontend/dist/assets"
+        Alias "/favicon.ico" "/tracim/frontend/dist/assets/favicon.ico"
+        <Directory "/tracim/frontend/dist/assets">
+            Require all granted
+        </Directory>
+
+        Alias "/app" "/tracim/frontend/dist/app"
+        <Directory "/tracim/frontend/dist/app">
+            Require all granted
+        </Directory>
+
         <Directory "/">
             Require all granted
             Dav On
