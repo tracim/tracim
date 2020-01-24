@@ -12,7 +12,7 @@ Install `Apache` server and uWSGI:
 Create a file named `/etc/apache2/sites-available/tracim.conf` containing: 
 
     <VirtualHost *:80>
-        ServerName tracim
+        ServerName [domain_name]
 
         <Directory "/">
             Require all granted
@@ -44,6 +44,8 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
 
     </VirtualHost>
 
+You need to change `[domain_name]` by your domaine name, ex: `tracim` (and to test you just need to add `tracim` in your hosts file)
+
 If you want to used browser cache policy, an exemple is visible [here](https://github.com/tracim/tracim/blob/develop/tools_docker/Debian_Uwsgi/apache2.conf.sample).
 :warning: This line `RequestHeader edit "If-None-Match" '^"((.*)-(gzip|br))"$' '"$1", "$2"'` is make to solved apache2 issue visible [here](https://bz.apache.org/bugzilla/show_bug.cgi?id=45023#c26)
 In this case you need also to make sure you used cache token feature available in development.ini
@@ -52,6 +54,7 @@ Enable this configuration file:
 
     sudo ln -s /etc/apache2/sites-available/tracim.conf /etc/apache2/sites-enabled/tracim.conf
 
+#### Configuration uWSGI for tracim server
 
 Create the file named `/etc/uwsgi/apps-available/tracim.ini` containing:
 
@@ -60,18 +63,39 @@ Create the file named `/etc/uwsgi/apps-available/tracim.ini` containing:
     chdir = [TRACIM_PATH]/backend/
     module = wsgi.web:application
     env = TRACIM_CONF_PATH=[TRACIM_PATH]/backend/development.ini
+    virtualenv = [TRACIM_PATH]/backend/env
     http-socket = :6543
     socket-timeout = 360
     #workers = 1
     #threads = 8
     logto = /var/log/uwsgi/uwsgi_tracim.log
 
-Replace [TRACIM_PATH] by your path of tracim configuration file
+Replace `[TRACIM_PATH]` by your path of tracim configuration file
 
 Enable this configuration file:
 
     sudo ln -s /etc/uwsgi/apps-available/tracim.ini /etc/uwsgi/apps-enabled/tracim.ini
 
+#### Configuration uWSGI for tracim caldav
+
+Create the file named `/etc/uwsgi/apps-available/tracim_caldav.ini` containing:
+
+    [uwsgi]
+    plugins = python3
+    chdir = [TRACIM_PATH]/backend/
+    module = wsgi.caldav:application
+    env = TRACIM_CONF_PATH=[TRACIM_PATH]/backend/development.ini
+    virtualenv = [TRACIM_PATH]/backend/env
+    http-socket = :5232
+    socket-timeout = 360
+    threads = 8
+    logto = /var/log/uwsgi/uwsgi_tracim_caldav.log
+
+Replace `[TRACIM_PATH]` by your path of tracim configuration file
+
+Enable this configuration file:
+
+    sudo ln -s /etc/uwsgi/apps-available/tracim_caldav.ini /etc/uwsgi/apps-enabled/tracim_caldav.ini
 
 Restart `uwsgi` configuration:
 
