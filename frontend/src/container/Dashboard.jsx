@@ -489,7 +489,7 @@ class Dashboard extends React.Component {
               breadcrumbsList={props.breadcrumbs}
             >
               <div className='dashboard__header__advancedmode'>
-                {userRoleIdInWorkspace <= ROLE.workspaceManager.id &&
+                {userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
                   <button
                     type='button'
                     className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
@@ -519,7 +519,7 @@ class Dashboard extends React.Component {
 
                   <div className='dashboard__calltoaction'>
                     {contentTypeButtonList.map(app => {
-                      return (userRoleIdInWorkspace <= ROLE.contributor.id || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
+                      return (userRoleIdInWorkspace >= ROLE.contributor.id || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
                         <ContentTypeBtn
                           customClass='dashboard__calltoaction__button'
                           hexcolor={app.hexcolor}

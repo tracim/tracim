@@ -2,14 +2,14 @@ import React from 'react'
 import { expect, assert } from 'chai'
 import { shallow, mount, configure } from 'enzyme'
 import { HtmlDocument } from '../../src/component/HtmlDocument.jsx'
-import { MODE } from '../../src/helper.js'
 import {
   TextAreaApp,
-  DisplayState
+  DisplayState,
+  APP_FEATURE_MODE
 } from 'tracim_frontend_lib'
 
 const props = {
-  mode: MODE.VIEW,
+  mode: APP_FEATURE_MODE.VIEW,
   customColor: '#654321',
   wysiwygNewVersion: 'wysiwygNewVersionTest',
   disableValidateBtn: false,
@@ -119,7 +119,7 @@ describe('in REVISON mode', () => {
   const wrapper = shallow(
     <HtmlDocument
       {...props}
-      mode={MODE.REVISION}
+      mode={APP_FEATURE_MODE.REVISION}
     />
   )
 
@@ -135,7 +135,7 @@ describe('in EDIT mode', () => {
   const wrapper = shallow(
     <HtmlDocument
       {...props}
-      mode={MODE.EDIT}
+      mode={APP_FEATURE_MODE.EDIT}
     />
   )
 

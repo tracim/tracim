@@ -14,6 +14,7 @@ import {
   PROFILE,
   PROFILE_LIST,
   FETCH_CONFIG,
+  APP_FEATURE_MODE,
   displayFileSize,
   parserStringToList,
   checkEmailValidity,
@@ -21,6 +22,8 @@ import {
   removeExtensionOfFilename
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
+
+import { appContentFactory } from './appContentFactory.js'
 
 import { defaultDebug } from './debug.js'
 
@@ -75,7 +78,7 @@ import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
-const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
       i18n.changeLanguage(data)
@@ -90,6 +93,7 @@ export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 
 export {
+  appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
   displayDistanceDate,
@@ -130,6 +134,7 @@ export {
   PROFILE,
   PROFILE_LIST,
   FETCH_CONFIG,
+  APP_FEATURE_MODE,
   displayFileSize,
   parserStringToList,
   checkEmailValidity,
