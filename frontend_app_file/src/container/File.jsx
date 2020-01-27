@@ -207,7 +207,7 @@ class File extends React.Component {
           },
           mode: APP_FEATURE_MODE.VIEW
         })
-        this.setHeadTitle(fetchResultFile.body.label)
+        this.setHeadTitle(filenameNoExtension)
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading file'))

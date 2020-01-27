@@ -11,6 +11,7 @@ import {
   PageContent,
   CardPopup,
   handleFetchResult,
+  buildHeadTitle,
   BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
@@ -310,7 +311,14 @@ export class Gallery extends React.Component {
   })
 
   setHeadTitle = (title) => {
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([title, state.config.system.config.instance_name]) }
+      })
+    }
   }
 
   handleClickHideImageRaw = () => {

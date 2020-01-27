@@ -154,6 +154,7 @@ class Thread extends React.Component {
       await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     )
     this.setState({ content: response.body })
+    this.setHeadTitle(response.body.label)
 
     await putThreadRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
@@ -173,7 +174,6 @@ class Thread extends React.Component {
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
 
     this.setState({ listMessage: revisionWithComment })
-    this.setHeadTitle(resThread.body.label)
   }
 
   buildBreadcrumbs = () => {
