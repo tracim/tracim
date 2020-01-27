@@ -4,7 +4,7 @@ import argparse
 import plaster
 from pyramid.scripting import AppEnvironment
 
-from tracim_backend.application.agenda.lib import AgendaApi
+from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.command import AppContextCommand
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import CannotCreateAgenda
