@@ -6,7 +6,7 @@ import appFactory from '../appFactory.js'
 import {
   workspaceConfig
 } from '../helper.js'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -14,14 +14,47 @@ import HomeNoWorkspace from '../component/Home/HomeNoWorkspace.jsx'
 import HomeHasWorkspace from '../component/Home/HomeHasWorkspace.jsx'
 
 class Home extends React.Component {
+  constructor (props) {
+    super(props)
+
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  }
+
+  customEventReducer = async ({ detail: { type } }) => {
+    switch (type) {
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.setHeadTitle()
+        break
+    }
+  }
+
   handleClickCreateWorkspace = e => {
     e.preventDefault()
     const { props } = this
     props.renderAppPopupCreation(workspaceConfig, props.user, null, null)
   }
 
+  componentDidUpdate (prevProps, prevState) {
+    const { props } = this
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+      this.setHeadTitle()
+    }
+  }
+
   componentDidMount () {
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: this.props.t('Home') } })
+    this.setHeadTitle()
+  }
+
+  setHeadTitle = () => {
+    const { props } = this
+
+    if (props.system.config.instance_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('Home'), props.system.config.instance_name]) }
+      })
+    }
   }
 
   render () {

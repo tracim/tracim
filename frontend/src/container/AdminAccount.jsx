@@ -13,7 +13,8 @@ import {
   PageTitle,
   PageContent,
   BREADCRUMBS_TYPE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -68,15 +69,24 @@ class Account extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         this.buildBreadcrumbs()
-        this.setHeadTitle(this.props.t('Account edition'))
+        this.setHeadTitle()
         break
     }
   }
 
   async componentDidMount () {
     await this.getUserDetail()
+    this.setHeadTitle()
     this.getUserWorkspaceList()
     this.buildBreadcrumbs()
+  }
+
+  componentDidUpdate (prevProps) {
+    const { props } = this
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+      this.setHeadTitle()
+    }
   }
 
   getUserDetail = async () => {
@@ -91,7 +101,6 @@ class Account extends React.Component {
           subComponentMenu: prev.subComponentMenu
             .filter(menu => editableUserAuthTypeList.includes(fetchGetUser.json.auth_type) ? true : menu.name !== 'password')
         }))
-        this.setHeadTitle(props.t('Account edition'))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
     }
@@ -247,8 +256,14 @@ class Account extends React.Component {
     )
   }
 
-  setHeadTitle = (title) => {
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+  setHeadTitle = () => {
+    const { props, state } = this
+    if (props.system.config.instance_name && state.userToEdit.public_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([this.props.t('User administration'), state.userToEdit.public_name, props.system.config.instance_name]) }
+      })
+    }
   }
 
   render () {

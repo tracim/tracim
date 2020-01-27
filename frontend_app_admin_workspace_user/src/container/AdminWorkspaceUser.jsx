@@ -9,7 +9,8 @@ import {
   handleFetchResult,
   BREADCRUMBS_TYPE,
   ROLE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -128,7 +129,14 @@ class AdminWorkspaceUser extends React.Component {
   })
 
   setHeadTitle = (title) => {
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([title, state.config.system.config.instance_name]) }
+      })
+    }
   }
 
   loadWorkspaceContent = async () => {

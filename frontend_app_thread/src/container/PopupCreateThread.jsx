@@ -5,7 +5,8 @@ import {
   addAllResourceI18n,
   CardPopupCreateContent,
   handleFetchResult,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import { postThreadContent } from '../action.async.js'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -31,6 +32,10 @@ class PopupCreateThread extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
+  componentDidMount () {
+    this.setHeadTitle()
+  }
+
   componentWillUnmount () {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
@@ -46,7 +51,19 @@ class PopupCreateThread extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.setHeadTitle()
         break
+    }
+  }
+
+  setHeadTitle = () => {
+    const { state, props } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('New Thread'), state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
     }
   }
 

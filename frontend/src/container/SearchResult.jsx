@@ -10,7 +10,8 @@ import {
   displayDistanceDate,
   IconButton,
   BREADCRUMBS_TYPE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import {
   PAGE
@@ -61,12 +62,15 @@ class SearchResult extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<Search> Custom event', 'color: #28a745', type, data)
-        this.buildBreadcrumbs(); break
+        this.setHeadTitle()
+        this.buildBreadcrumbs()
+        break
     }
   }
 
   componentDidMount () {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: this.props.t('Search results') } })
+    this.setHeadTitle()
     this.buildBreadcrumbs()
     this.loadSearchUrl()
   }
@@ -81,6 +85,20 @@ class SearchResult extends React.Component {
 
     if (prevSearchedKeywords !== currentSearchedKeywords) {
       this.loadSearchUrl()
+    }
+    if (prevProps.system.config.instance_name !== this.props.system.config.instance_name || prevSearchedKeywords !== currentSearchedKeywords) {
+      this.setHeadTitle()
+    }
+  }
+
+  setHeadTitle = () => {
+    const { props } = this
+
+    if (props.system.config.instance_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([`${props.t('Search results')} : ${this.parseUrl().searchedKeywords}`, props.system.config.instance_name]) }
+      })
     }
   }
 
@@ -279,5 +297,5 @@ class SearchResult extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, searchResult, contentType, user }) => ({ breadcrumbs, searchResult, contentType, user })
+const mapStateToProps = ({ breadcrumbs, searchResult, contentType, system, user }) => ({ breadcrumbs, searchResult, contentType, system, user })
 export default connect(mapStateToProps)(translate()(SearchResult))

@@ -6,6 +6,7 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
+  buildHeadTitle,
   CUSTOM_EVENT,
   ProgressBar
 } from 'tracim_frontend_lib'
@@ -48,8 +49,18 @@ class GuestUpload extends React.Component {
     }
   }
 
+  customEventReducer = async ({ detail: { type } }) => {
+    switch (type) {
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.setHeadTitle()
+        break
+    }
+  }
+
   async componentDidMount () {
     const { props } = this
+
+    this.setHeadTitle()
 
     const response = await props.dispatch(getGuestUploadInfo(props.match.params.token))
     switch (response.status) {
@@ -69,6 +80,14 @@ class GuestUpload extends React.Component {
     }
   }
 
+  componentDidUpdate (prevProps) {
+    const { props } = this
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+      this.setHeadTitle()
+    }
+  }
+
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
@@ -77,6 +96,16 @@ class GuestUpload extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = () => {
+    const { props } = this
+    if (props.system.config.instance_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('Public upload'), props.system.config.instance_name]) }
+      })
+    }
+  }
 
   handleChangeFullName = e => this.setState({ guestFullname: { value: e.target.value, isInvalid: false } })
   handleChangeComment = e => this.setState({ guestComment: e.target.value, isInvalid: false })
@@ -253,4 +282,6 @@ class GuestUpload extends React.Component {
   }
 }
 
-export default connect(() => ({}))(translate()(GuestUpload))
+const mapStateToProps = ({ system }) => ({ system })
+
+export default connect(mapStateToProps)(translate()(GuestUpload))

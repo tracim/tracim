@@ -20,7 +20,8 @@ import {
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
   ROLE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -176,8 +177,15 @@ class HtmlDocument extends React.Component {
     }
   })
 
-  setHeadTitle = (title) => {
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+  setHeadTitle = (contentName) => {
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([contentName, state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
   }
 
   isValidLocalStorageType = type => ['rawContent', 'comment'].includes(type)

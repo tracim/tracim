@@ -5,7 +5,8 @@ import {
   CardPopupCreateContent,
   addAllResourceI18n,
   FileDropzone,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -47,6 +48,7 @@ class PopupCreateFile extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.setHeadTitle()
         break
     }
   }
@@ -54,6 +56,10 @@ class PopupCreateFile extends React.Component {
   componentWillUnmount () {
     // console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  }
+
+  componentDidMount () {
+    this.setHeadTitle()
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -64,6 +70,19 @@ class PopupCreateFile extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = () => {
+    const { state, props } = this
+
+    console.log('SETHEADTITLE', state.config)
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('New file'), state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
+  }
 
   handleChangeFile = newFile => {
     if (!newFile || !newFile[0]) return

@@ -26,7 +26,8 @@ import {
   PageTitle,
   PageContent,
   BREADCRUMBS_TYPE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -119,7 +120,7 @@ class WorkspaceContent extends React.Component {
 
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         this.buildBreadcrumbs()
-        this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
+        if (!state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
         break
     }
   }
@@ -128,6 +129,8 @@ class WorkspaceContent extends React.Component {
     const { props } = this
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
+
+    this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
 
     let wsToLoad = null
 
@@ -157,12 +160,15 @@ class WorkspaceContent extends React.Component {
 
     const hasWorkspaceIdChanged = prevState.workspaceIdInUrl !== workspaceId
 
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name || prevProps.currentWorkspace.label !== props.currentWorkspace.label || prevFilter !== currentFilter) {
+      this.setHeadTitle(this.getFilterName(currentFilter))
+    }
+
     if (hasWorkspaceIdChanged) this.loadWorkspaceDetail()
 
     if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
       this.setState({ workspaceIdInUrl: workspaceId })
       this.loadAllWorkspaceContent(workspaceId, false)
-      if (!hasWorkspaceIdChanged && prevFilter !== currentFilter) this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
     }
   }
 
@@ -194,8 +200,15 @@ class WorkspaceContent extends React.Component {
     }
   })
 
-  setHeadTitle = (title) => {
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SET_HEAD_TITLE, data: { title: title } })
+  setHeadTitle = (filterName) => {
+    const { props } = this
+
+    if (props.system.config.instance_name && props.currentWorkspace.label) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([filterName, props.currentWorkspace.label, props.system.config.instance_name]) }
+      })
+    }
   }
 
   loadWorkspaceDetail = async () => {
@@ -205,7 +218,6 @@ class WorkspaceContent extends React.Component {
     switch (fetchWorkspaceDetail.status) {
       case 200:
         props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
         break
       case 400:
         props.history.push(PAGE.HOME)

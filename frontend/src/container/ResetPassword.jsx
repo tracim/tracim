@@ -14,6 +14,7 @@ import {
   resetBreadcrumbs
 } from '../action-creator.sync.js'
 import { PAGE } from '../helper.js'
+import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 
@@ -27,10 +28,41 @@ export class ResetPassword extends React.Component {
       userEmail: query.email || '',
       userToken: query.token || ''
     }
+
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  }
+
+  customEventReducer = async ({ detail: { type } }) => {
+    switch (type) {
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.setHeadTitle()
+        break
+    }
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const { props } = this
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+      this.setHeadTitle()
+    }
   }
 
   componentDidMount () {
-    this.props.dispatch(resetBreadcrumbs())
+    const { props } = this
+    this.setHeadTitle()
+    props.dispatch(resetBreadcrumbs())
+  }
+
+  setHeadTitle = () => {
+    const { props } = this
+
+    if (props.system.config.instance_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('Password reset'), props.system.config.instance_name]) }
+      })
+    }
   }
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
@@ -129,5 +161,6 @@ export class ResetPassword extends React.Component {
   }
 }
 
-const mapStateToProps = () => ({})
+const mapStateToProps = ({ system }) => ({ system })
+
 export default connect(mapStateToProps)(withRouter(translate()(ResetPassword)))

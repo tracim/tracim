@@ -4,7 +4,7 @@ import {
   CardPopupCreateContent,
   handleFetchResult,
   addAllResourceI18n,
-  CUSTOM_EVENT
+  CUSTOM_EVENT, buildHeadTitle
 } from 'tracim_frontend_lib'
 import { postHtmlDocContent } from '../action.async.js'
 import i18n from '../i18n.js'
@@ -35,6 +35,21 @@ class PopupCreateHtmlDocument extends React.Component {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
+  componentDidMount () {
+    this.setHeadTitle()
+  }
+
+  setHeadTitle = () => {
+    const { state, props } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('New Html document'), state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
+  }
+
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -46,6 +61,7 @@ class PopupCreateHtmlDocument extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.setHeadTitle()
         break
     }
   }

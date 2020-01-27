@@ -13,7 +13,8 @@ import {
   ArchiveDeleteContent,
   CUSTOM_EVENT,
   ROLE,
-  appFeatureCustomEventHandlerShowApp
+  appFeatureCustomEventHandlerShowApp,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -108,6 +109,17 @@ class FolderAdvanced extends React.Component {
     }
   })
 
+  setHeadTitle = (folderName) => {
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([folderName, state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
+  }
+
   loadContent = async () => {
     const { props, state } = this
 
@@ -115,7 +127,10 @@ class FolderAdvanced extends React.Component {
     const fetchContentTypeList = await handleFetchResult(await getContentTypeList(state.config.apiUrl))
 
     switch (fetchFolder.apiResponse.status) {
-      case 200: this.setState({ content: fetchFolder.body }); break
+      case 200:
+        this.setState({ content: fetchFolder.body })
+        this.setHeadTitle(fetchFolder.body.label)
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder details'), 'warning')
     }
 
