@@ -204,33 +204,40 @@ class CFG(object):
         )
 
     def _load_enabled_app(
-        self, enabled_app_slug_list: typing.List[str], loaded_apps: typing.List[TracimApplication]
+        self,
+        enabled_app_slug_list: typing.List[str],
+        loaded_apps: typing.Dict[str, TracimApplication],
     ) -> None:
 
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var
         app_list.clear()
-        # INFO - G.M - 2020-01-09 - order of app in app_list should be:
-        # - all enabled app according to enabled_app_slug_list order
-        # - all disabled app
-        enabled_app_list = []
-        disabled_app_list = []
-        for app_slug in enabled_app_slug_list:
-            for app in loaded_apps:
-                if app.slug == app_slug:
+        # FIXME - G.M - 2020-01-27 - force specific order of apps
+        # see issue https://github.com/tracim/tracim/issues/2326
+        default_app_order = (
+            "contents/thread",
+            "contents/file",
+            "contents/html-document",
+            "contents/folder",
+            "agenda",
+            "collaborative_document_edition",
+            "share_content",
+            "upload_permission",
+            "gallery",
+        )
+        for app_name in default_app_order:
+            app = loaded_apps.get(app_name)
+            if app:
+                if app_name in enabled_app_slug_list:
                     app.load_content_types()
                     app.is_active = True
-                    enabled_app_list.append(app)
+                app_list.append(app)
 
-        for app in loaded_apps:
-            if app not in enabled_app_list:
-                disabled_app_list.append(app)
-
-        for app in enabled_app_list:
-            app_list.append(app)
-
-        for app in disabled_app_list:
-            app_list.append(app)
+        # FIXME - G.M - 2020-01-27 - Ordering: add unordered app at the end of the list.
+        # see issue https://github.com/tracim/tracim/issues/2326
+        for app in loaded_apps.values():
+            if app not in app_list:
+                app_list.append(app)
 
         # TODO - G.M - 2018-08-08 - We need to update validators each time
         # app_list is updated.
