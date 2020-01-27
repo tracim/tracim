@@ -27,7 +27,7 @@ import {
   parserStringToList,
   removeExtensionOfFilename,
   buildFilePreviewUrl,
-  buildHeadTitle
+  buildHeadTitle,
   ROLE,
   APP_FEATURE_MODE
 } from 'tracim_frontend_lib'
