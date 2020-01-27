@@ -3,6 +3,7 @@ import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
+  appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
@@ -14,31 +15,20 @@ import {
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus,
-  displayDistanceDate,
-  convertBackslashNToBr,
   generateLocalStorageContentId,
   BREADCRUMBS_TYPE,
-  appFeatureCustomEventHandlerShowApp,
   ROLE,
   CUSTOM_EVENT,
+  APP_FEATURE_MODE,
   buildHeadTitle
 } from 'tracim_frontend_lib'
-import {
-  MODE,
-  initWysiwyg
-} from '../helper.js'
+import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
   getHtmlDocComment,
   getHtmlDocRevision,
-  postHtmlDocNewComment,
   putHtmlDocContent,
-  putHtmlDocStatus,
-  putHtmlDocIsArchived,
-  putHtmlDocIsDeleted,
-  putHtmlDocRestoreArchived,
-  putHtmlDocRestoreDeleted,
   putHtmlDocRead
 } from '../action.async.js'
 import Radium from 'radium'
@@ -46,12 +36,16 @@ import Radium from 'radium'
 class HtmlDocument extends React.Component {
   constructor (props) {
     super(props)
+
+    const param = props.data || debug
+    props.setApiUrl(param.config.apiUrl)
+
     this.state = {
       appName: 'html-document',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
       externalTranslationList: [
         props.t('Text Document'),
         props.t('Text Documents'),
@@ -61,10 +55,10 @@ class HtmlDocument extends React.Component {
         props.t('Write a document')
       ],
       rawContentBeforeEdit: '',
-      timeline: props.data ? [] : [], // debug.timeline,
+      timeline: [],
       newComment: '',
       timelineWysiwyg: false,
-      mode: MODE.VIEW
+      mode: APP_FEATURE_MODE.VIEW
     }
 
     // i18n has been init, add resources from frontend
@@ -74,39 +68,29 @@ class HtmlDocument extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-    const { state } = this
+  customEventReducer = async ({ detail: { type, data } }) => {
+    const { props, state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) {
-          this.setState({ isVisible: true })
-          this.buildBreadcrumbs()
-          this.setHeadTitle(state.content.label)
-        }
+        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+        this.setHeadTitle(state.content.label)
         break
 
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
+        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
         tinymce.remove('#wysiwygNewVersion')
-        this.setState({
-          isVisible: false,
-          timelineWysiwyg: false
-        })
         break
 
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
+        props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
         tinymce.remove('#wysiwygNewVersion')
+        break
 
-        this.setState(prev => ({
-          content: { ...prev.content, ...data },
-          isVisible: true,
-          timelineWysiwyg: false
-        }))
+      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
+        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
         break
 
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -147,7 +131,7 @@ class HtmlDocument extends React.Component {
       wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
 
-    if (state.mode === MODE.EDIT && prevState.mode !== MODE.EDIT) {
+    if (state.mode === APP_FEATURE_MODE.EDIT && prevState.mode !== APP_FEATURE_MODE.EDIT) {
       tinymce.remove('#wysiwygNewVersion')
       wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
@@ -232,11 +216,11 @@ class HtmlDocument extends React.Component {
   }
 
   loadContent = async () => {
-    const { loggedUser, content, config, appName } = this.state
+    const { props, state } = this
 
-    const fetchResultHtmlDocument = getHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultComment = getHtmlDocComment(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultRevision = getHtmlDocRevision(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultComment = getHtmlDocComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
     const [resHtmlDocument, resComment, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultHtmlDocument),
@@ -244,36 +228,10 @@ class HtmlDocument extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const resCommentWithProperDate = resComment.body.map(c => ({
-      ...c,
-      created_raw: c.created,
-      created: displayDistanceDate(c.created, loggedUser.lang)
-    }))
-
-    const revisionWithComment = resRevision.body
-      .map((r, i) => ({
-        ...r,
-        created_raw: r.created,
-        created: displayDistanceDate(r.created, loggedUser.lang),
-        timelineType: 'revision',
-        commentList: r.comment_ids.map(ci => ({
-          timelineType: 'comment',
-          ...resCommentWithProperDate.find(c => c.content_id === ci)
-        })),
-        number: i + 1
-      }))
-      .reduce((acc, rev) => [
-        ...acc,
-        rev,
-        ...rev.commentList.map(comment => ({
-          ...comment,
-          customClass: '',
-          loggedUser: this.state.config.loggedUser
-        }))
-      ], [])
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
 
     const localStorageComment = localStorage.getItem(
-      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, appName, 'comment')
+      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, state.appName, 'comment')
     )
 
     // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
@@ -281,15 +239,15 @@ class HtmlDocument extends React.Component {
     // @fixme Côme - 2018/12/04 - this might not be a great idea
     const modeToRender = (
       resRevision.body.length === 1 && // if content has only one revision
-      loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && // if user has EDIT authorization
+      state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && // if user has EDIT authorization
       resRevision.body[0].raw_content === '' // has content been created with raw_content (means it's from webdav or import db)
     )
-      ? MODE.EDIT
-      : MODE.VIEW
+      ? APP_FEATURE_MODE.EDIT
+      : APP_FEATURE_MODE.VIEW
 
     // can't use this.getLocalStorageItem because it uses state that isn't yet initialized
     const localStorageRawContent = localStorage.getItem(
-      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, appName, 'rawContent')
+      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, state.appName, 'rawContent')
     )
     const hasLocalStorageRawContent = !!localStorageRawContent
 
@@ -297,7 +255,7 @@ class HtmlDocument extends React.Component {
       mode: modeToRender,
       content: {
         ...resHtmlDocument.body,
-        raw_content: modeToRender === MODE.EDIT && hasLocalStorageRawContent
+        raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
           ? localStorageRawContent
           : resHtmlDocument.body.raw_content
       },
@@ -307,36 +265,21 @@ class HtmlDocument extends React.Component {
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
-    await putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
+    await putHtmlDocRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
+  }
+
+  loadTimeline = () => {
+    // INFO - CH - 2019-01-03 - this function must exists to match app content interface. Although it isn't used here because
+    // we need some timeline data to initialize the app in loadContent(). So the timeline generation is handled by loadContent()
+    // The data required to initialize is the number of revisions and whether the first revision has raw_content === '' or not
+    // this is used to know whether we should open the app in EDIT or VIEW mode. See modeToRender in function loadContent()
+    return true
   }
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
-  }
-
-  handleSaveEditTitle = async newTitle => {
-    const { props, state } = this
-
-    const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle, state.content.raw_content)
-    )
-
-    switch (fetchResultSaveHtmlDoc.apiResponse.status) {
-      case 200:
-        this.loadContent()
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-        break
-      case 400:
-        switch (fetchResultSaveHtmlDoc.body.code) {
-          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
-        }
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
-    }
   }
 
   handleClickNewVersion = () => {
@@ -348,7 +291,7 @@ class HtmlDocument extends React.Component {
         raw_content: previouslyUnsavedRawContent || prev.content.raw_content
       },
       rawContentBeforeEdit: prev.content.raw_content, // for cancel btn
-      mode: MODE.EDIT
+      mode: APP_FEATURE_MODE.EDIT
     }))
   }
 
@@ -360,12 +303,12 @@ class HtmlDocument extends React.Component {
         ...prev.content,
         raw_content: prev.rawContentBeforeEdit
       },
-      mode: MODE.VIEW
+      mode: APP_FEATURE_MODE.VIEW
     }))
 
-    const { appName, content } = this.state
+    const { state } = this
     localStorage.removeItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent')
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
     )
   }
 
@@ -401,154 +344,59 @@ class HtmlDocument extends React.Component {
   }
 
   handleChangeNewComment = e => {
-    const newComment = e.target.value
-    this.setState({ newComment })
-
-    this.setLocalStorageItem('comment', newComment)
+    const { props, state } = this
+    props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
-
-    // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
-    // see https://github.com/tracim/tracim/issues/1101
-    const newCommentForApi = state.timelineWysiwyg
-      ? state.newComment
-      : `<p>${convertBackslashNToBr(state.newComment)}</p>`
-
-    const fetchResultSaveNewComment = await handleFetchResult(await postHtmlDocNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
-    switch (fetchResultSaveNewComment.apiResponse.status) {
-      case 200:
-        this.setState({ newComment: '' })
-        localStorage.removeItem(
-          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-        )
-        if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
-        this.loadContent()
-        break
-      case 400:
-        switch (fetchResultSaveNewComment.body.code) {
-          case 2003:
-            this.sendGlobalFlashMessage(props.t("You can't send an empty comment"))
-            break
-          default:
-            this.sendGlobalFlashMessage(props.t('Error while saving new comment'))
-            break
-        }
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
-    }
+    props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
+  handleSaveEditTitle = async newTitle => {
+    const { props, state } = this
+    props.appContentChangeTitle(state.content, newTitle, state.config.slug)
+  }
+
   handleChangeStatus = async newStatus => {
-    const { state, props } = this
-
-    if (newStatus === state.content.status) return
-
-    const fetchResultSaveEditStatus = await handleFetchResult(
-      await putHtmlDocStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
-    )
-
-    switch (fetchResultSaveEditStatus.status) {
-      case 204: this.loadContent(); break
-      default: this.sendGlobalFlashMessage(props.t('Error while changing status'))
-    }
+    const { props, state } = this
+    props.appContentChangeStatus(state.content, newStatus, state.config.slug)
   }
 
   handleClickArchive = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: true }, mode: MODE.VIEW }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while archiving document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+    const { props, state } = this
+    props.appContentArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
   handleClickDelete = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putHtmlDocIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: MODE.VIEW }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while deleting document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+    const { props, state } = this
+    props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  handleClickRestoreArchived = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putHtmlDocRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while restoring document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+  handleClickRestoreArchive = async () => {
+    const { props, state } = this
+    props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  handleClickRestoreDeleted = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putHtmlDocRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while restoring document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+  handleClickRestoreDelete = async () => {
+    const { props, state } = this
+    props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
   handleClickShowRevision = revision => {
-    const { mode, timeline } = this.state
+    const { state } = this
 
-    const revisionArray = timeline.filter(t => t.timelineType === 'revision')
+    const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
     const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
 
-    if (mode === MODE.REVISION && isLastRevision) {
+    if (state.mode === APP_FEATURE_MODE.REVISION && isLastRevision) {
       this.handleClickLastVersion()
       return
     }
 
-    if (mode === MODE.VIEW && isLastRevision) return
+    if (state.mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
 
     this.setState(prev => ({
       content: {
@@ -560,140 +408,141 @@ class HtmlDocument extends React.Component {
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted
       },
-      mode: MODE.REVISION
+      mode: APP_FEATURE_MODE.REVISION
     }))
   }
 
   handleClickLastVersion = () => {
     this.loadContent()
-    this.setState({ mode: MODE.VIEW })
+    this.setState({ mode: APP_FEATURE_MODE.VIEW })
   }
 
   render () {
-    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode, rawContentBeforeEdit } = this.state
-    const { t } = this.props
+    const { props, state } = this
 
-    if (!isVisible) return null
+    if (!state.isVisible) return null
 
     return (
       <PopinFixed
-        customClass={`${config.slug}`}
-        customColor={config.hexcolor}
+        customClass={`${state.config.slug}`}
+        customColor={state.config.hexcolor}
       >
         <PopinFixedHeader
-          customClass={`${config.slug}`}
-          customColor={config.hexcolor}
-          faIcon={config.faIcon}
-          rawTitle={content.label}
-          componentTitle={<div>{content.label}</div>}
-          userRoleIdInWorkspace={loggedUser.userRoleIdInWorkspace}
+          customClass={`${state.config.slug}`}
+          customColor={state.config.hexcolor}
+          faIcon={state.config.faIcon}
+          rawTitle={state.content.label}
+          componentTitle={<div>{state.content.label}</div>}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={!content.is_editable}
+          disableChangeTitle={!state.content.is_editable}
         />
 
         <PopinFixedOption
-          customColor={config.hexcolor}
-          customClass={`${config.slug}`}
+          customColor={state.config.hexcolor}
+          customClass={`${state.config.slug}`}
           i18n={i18n}
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
-                  customColor={config.hexcolor}
+                  customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={mode !== MODE.VIEW || !content.is_editable}
-                  label={t('Edit')}
+                  disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
+                  label={props.t('Edit')}
                 />
-              }
+              )}
 
-              {mode === MODE.REVISION &&
+              {state.mode === APP_FEATURE_MODE.REVISION && (
                 <button
                   className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn highlightBtn'
                   onClick={this.handleClickLastVersion}
-                  style={{ backgroundColor: config.hexcolor, color: '#fdfdfd' }}
+                  style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                 >
                   <i className='fa fa-history' />
-                  {t('Last version')}
+                  {props.t('Last version')}
                 </button>
-              }
+              )}
             </div>
 
             <div className='d-flex'>
-              {loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
-                  selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
-                  availableStatus={config.availableStatuses}
+                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                  availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
+                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
-              }
+              )}
 
-              {loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <ArchiveDeleteContent
-                  customColor={config.hexcolor}
+                  customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
+                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
-              }
+              )}
             </div>
           </div>
         </PopinFixedOption>
 
         <PopinFixedContent
-          customClass={`${config.slug}__contentpage`}
+          customClass={`${state.config.slug}__contentpage`}
         >
-          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using config.availableStatuses[3].slug
-            https://github.com/tracim/tracim/issues/1840 */}
+          {/*
+            FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
+            https://github.com/tracim/tracim/issues/1840
+          */}
           <HtmlDocumentComponent
-            mode={mode}
-            customColor={config.hexcolor}
+            mode={state.mode}
+            customColor={state.config.hexcolor}
             wysiwygNewVersion={'wysiwygNewVersion'}
             onClickCloseEditMode={this.handleCloseNewVersion}
-            disableValidateBtn={rawContentBeforeEdit === content.raw_content}
+            disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
             onClickValidateBtn={this.handleSaveHtmlDocument}
-            version={content.number}
-            lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
-            text={content.raw_content}
+            version={state.content.number}
+            lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+            text={state.content.raw_content}
             onChangeText={this.handleChangeText}
-            isArchived={content.is_archived}
-            isDeleted={content.is_deleted}
-            isDeprecated={content.status === config.availableStatuses[3].slug}
-            deprecatedStatus={config.availableStatuses[3]}
-            isDraftAvailable={mode === MODE.VIEW && loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
-            onClickRestoreArchived={this.handleClickRestoreArchived}
-            onClickRestoreDeleted={this.handleClickRestoreDeleted}
+            isArchived={state.content.is_archived}
+            isDeleted={state.content.is_deleted}
+            isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+            deprecatedStatus={state.config.availableStatuses[3]}
+            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
+            onClickRestoreArchived={this.handleClickRestoreArchive}
+            onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key={'html-document'}
           />
 
           <PopinFixedRightPart
-            customClass={`${config.slug}__contentpage`}
-            customColor={config.hexcolor}
-            menuItemList={[
-              {
-                id: 'timeline',
-                label: t('Timeline'),
-                icon: 'fa-history',
-                children: <Timeline
-                  customClass={`${config.slug}__contentpage`}
-                  customColor={config.hexcolor}
-                  loggedUser={loggedUser}
-                  timelineData={timeline}
-                  newComment={newComment}
-                  disableComment={mode === MODE.REVISION || mode === MODE.EDIT || !content.is_editable}
-                  availableStatusList={config.availableStatuses}
-                  wysiwyg={timelineWysiwyg}
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            menuItemList={[{
+              id: 'timeline',
+              label: props.t('Timeline'),
+              icon: 'fa-history',
+              children: (
+                <Timeline
+                  customClass={`${state.config.slug}__contentpage`}
+                  customColor={state.config.hexcolor}
+                  loggedUser={state.loggedUser}
+                  timelineData={state.timeline}
+                  newComment={state.newComment}
+                  disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+                  availableStatusList={state.config.availableStatuses}
+                  wysiwyg={state.timelineWysiwyg}
                   onChangeNewComment={this.handleChangeNewComment}
                   onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
-                  shouldScrollToBottom={mode !== MODE.REVISION}
+                  shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
                 />
-              }
-            ]}
+              )
+            }]}
           />
         </PopinFixedContent>
       </PopinFixed>
@@ -701,4 +550,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default translate()(Radium(HtmlDocument))
+export default translate()(Radium(appContentFactory(HtmlDocument)))

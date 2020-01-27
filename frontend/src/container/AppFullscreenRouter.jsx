@@ -2,11 +2,18 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { Route, Redirect } from 'react-router-dom'
-import { PAGE } from '../helper.js'
+import {
+  PAGE,
+  findUserRoleIdInWorkspace
+} from '../helper.js'
 import appFactory from '../appFactory.js'
-import { CUSTOM_EVENT, PROFILE } from 'tracim_frontend_lib'
+import {
+  CUSTOM_EVENT,
+  PROFILE,
+  ROLE_LIST
+} from 'tracim_frontend_lib'
 
-class AppFullscreenRouter extends React.Component {
+export class AppFullscreenRouter extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -21,78 +28,93 @@ class AppFullscreenRouter extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
+
+    const isDataReady = state.isMounted && props.workspaceList.length > 0 && props.workspaceList.every(ws => ws.memberList.length > 0)
+
+    if (!state.isMounted) return null
 
     return (
       <div className='AppFullScreenManager'>
+        <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => {
+          if (props.user.profile !== PROFILE.administrator.slug) return <Redirect to={{ pathname: '/ui' }} />
 
-        {this.state.isMounted && (// we must wait for the component to be fully mounted to be sure the div#appFullscreenContainer exists in DOM
-          <div className='emptyDivForRoute'>
-            <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => {
-              if (props.user.profile !== PROFILE.administrator.slug) return <Redirect to={{ pathname: '/ui' }} />
+          const content = {
+            workspaceList: [],
+            userList: []
+          }
 
-              const content = {
-                workspaceList: [],
-                userList: []
-              }
+          props.renderAppFullscreen({ slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'workspace' }, props.user, null, content)
+          return null
+        }} />
 
-              props.renderAppFullscreen({ slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'workspace' }, props.user, content)
-              return null
-            }} />
+        <Route exact path={PAGE.ADMIN.USER} render={() => {
+          if (props.user.profile !== PROFILE.administrator.slug) return <Redirect to={{ pathname: '/ui' }} />
 
-            <Route exact path={PAGE.ADMIN.USER} render={() => {
-              if (props.user.profile !== PROFILE.administrator.slug) return <Redirect to={{ pathname: '/ui' }} />
+          const content = {
+            workspaceList: [],
+            userList: []
+          }
 
-              const content = {
-                workspaceList: [],
-                userList: []
-              }
+          props.renderAppFullscreen({ slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'user' }, props.user, null, content)
+          return null
+        }} />
 
-              props.renderAppFullscreen({ slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'user' }, props.user, content)
-              return null
-            }} />
+        <Route exact path={PAGE.AGENDA} render={() => {
+          const agendaConfig = {
+            workspaceId: null,
+            forceShowSidebar: true
+          }
+          props.renderAppFullscreen({ slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig }, props.user, null, {})
+          return null
+        }} />
 
-            <Route exact path={PAGE.AGENDA} render={() => {
-              const agendaConfig = {
-                workspaceId: null,
-                forceShowSidebar: true
-              }
-              props.renderAppFullscreen({ slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig }, props.user, {})
-              return null
-            }} />
-
+        {isDataReady && (
+          <>
             <Route path={PAGE.WORKSPACE.AGENDA(':idws')} render={() => {
+              const workspaceId = parseInt(props.match.params.idws)
               const agendaConfig = {
-                workspaceId: props.match.params.idws,
+                workspaceId: workspaceId,
                 forceShowSidebar: false
               }
-              props.renderAppFullscreen({ slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig }, props.user, {})
+              const workspaceMemberList = (props.workspaceList.find(ws => ws.id === workspaceId) || { memberList: [] }).memberList
+              const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, workspaceMemberList, ROLE_LIST)
+
+              props.renderAppFullscreen({ slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig }, props.user, userRoleIdInWorkspace, {})
               return null
             }} />
 
             <Route path={PAGE.WORKSPACE.GALLERY(':idws')} render={() => {
+              const workspaceId = parseInt(props.match.params.idws)
               const galleryConfig = {
-                workspaceId: props.match.params.idws,
+                workspaceId: workspaceId,
                 forceShowSidebar: false
               }
-              props.renderAppFullscreen({ slug: 'gallery', hexcolor: '#7d4e24', appConfig: galleryConfig }, props.user, {})
+              const workspaceMemberList = (props.workspaceList.find(ws => ws.id === workspaceId) || { memberList: [] }).memberList
+              const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, workspaceMemberList, ROLE_LIST)
+
+              props.renderAppFullscreen({ slug: 'gallery', hexcolor: '#7d4e24', appConfig: galleryConfig }, props.user, userRoleIdInWorkspace, {})
               return null
             }} />
 
             <Route path={PAGE.WORKSPACE.CONTENT_EDITION(':idws', ':idcts')} render={({ match }) => {
+              const workspaceId = parseInt(props.match.params.idws)
               const content = {
-                workspace_id: match.params.idws,
+                workspace_id: workspaceId,
                 content_id: match.params.idcts
               }
-              props.renderAppFullscreen({ slug: 'collaborative_document_edition', hexcolor: '#7d4e24' }, props.user, content)
+              const workspaceMemberList = (props.workspaceList.find(ws => ws.id === workspaceId) || { memberList: [] }).memberList
+              const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, workspaceMemberList, ROLE_LIST)
+
+              props.renderAppFullscreen({ slug: 'collaborative_document_edition', hexcolor: '#7d4e24' }, props.user, userRoleIdInWorkspace, content)
               return null
             }} />
-          </div>
+          </>
         )}
       </div>
     )
   }
 }
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ user, workspaceList }) => ({ user, workspaceList })
 export default withRouter(connect(mapStateToProps)(appFactory(AppFullscreenRouter)))

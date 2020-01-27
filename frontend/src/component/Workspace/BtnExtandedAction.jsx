@@ -5,7 +5,7 @@ import { ROLE } from 'tracim_frontend_lib'
 import { PAGE } from '../../helper'
 import { Link } from 'react-router-dom'
 
-const ExtandedAction = props => {
+export const ExtandedAction = props => {
   return (
     <div
       className='extandedaction dropdown'
@@ -24,7 +24,7 @@ const ExtandedAction = props => {
       </button>
 
       <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-        {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace <= ROLE.contributor.id && (
+        {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace >= ROLE.contributor.id && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.edit.callback}
@@ -68,7 +68,7 @@ const ExtandedAction = props => {
           </div>
         )} */}
 
-        {props.userRoleIdInWorkspace <= ROLE.contentManager.id && (
+        {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.delete.callback}
@@ -88,6 +88,7 @@ const ExtandedAction = props => {
           <Link
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={e => e.stopPropagation()}
+            data-cy='extended_action_gallery'
             to={`${PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId)}?folder_ids=${props.folderData.id}`}
           >
             <div className='subdropdown__item__icon mr-3'>

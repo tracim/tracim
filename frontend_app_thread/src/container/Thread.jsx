@@ -3,6 +3,7 @@ import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import { debug } from '../debug.js'
 import {
+  appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
@@ -12,10 +13,7 @@ import {
   Timeline,
   SelectStatus,
   ArchiveDeleteContent,
-  displayDistanceDate,
-  convertBackslashNToBr,
   generateLocalStorageContentId,
-  appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE,
   ROLE,
   CUSTOM_EVENT,
@@ -25,26 +23,23 @@ import {
   getThreadContent,
   getThreadComment,
   getThreadRevision,
-  postThreadNewComment,
-  putThreadStatus,
-  putThreadContent,
-  putThreadIsArchived,
-  putThreadIsDeleted,
-  putThreadRestoreArchived,
-  putThreadRestoreDeleted,
   putThreadRead
 } from '../action.async.js'
 
 class Thread extends React.Component {
   constructor (props) {
     super(props)
+
+    const param = props.data || debug
+    props.setApiUrl(param.config.apiUrl)
+
     this.state = {
       appName: 'thread',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
-      listMessage: props.data ? [] : [], // debug.listMessage,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
+      listMessage: [],
       newComment: '',
       timelineWysiwyg: false,
       externalTranslationList: [
@@ -63,86 +58,62 @@ class Thread extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-    const { state } = this
+  customEventReducer = async ({ detail: { type, data } }) => {
+    const { props, state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) {
-          this.setState({ isVisible: true })
-          this.buildBreadcrumbs()
-          this.setHeadTitle(state.content.label)
-        }
+        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+        this.setHeadTitle(state.content.label)
         break
 
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
-        this.setState({
-          isVisible: false,
-          timelineWysiwyg: false
-        })
+        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
         break
 
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
+        props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+        break
 
-        const previouslyUnsavedComment = localStorage.getItem(
-          generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
-        )
-
-        this.setState(prev => ({
-          content: { ...prev.content, ...data },
-          isVisible: true,
-          timelineWysiwyg: false,
-          newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
-        }))
+      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
+        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
         break
 
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-
-        if (state.timelineWysiwyg) {
-          tinymce.remove('#wysiwygTimelineComment')
-          wysiwyg('#wysiwygTimelineComment', data, this.handleChangeNewComment)
-        }
-
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        this.loadContent()
+        props.appContentCustomEventHandlerAllAppChangeLanguage(
+          data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
+        )
+        this.loadTimeline()
         break
     }
   }
 
   async componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
+    const { state } = this
 
-    const { appName, content } = this.state
     const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
     )
     if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
 
     await this.loadContent()
+    this.loadTimeline()
     this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
-
     console.log('%c<Thread> did Update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
+      this.loadTimeline()
       this.buildBreadcrumbs()
     }
 
@@ -177,57 +148,32 @@ class Thread extends React.Component {
   }
 
   loadContent = async () => {
-    const { loggedUser, content, config } = this.state
+    const { state } = this
 
-    if (content.content_id === '-1') return // debug case
+    const response = await handleFetchResult(
+      await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    )
+    this.setState({ content: response.body })
 
-    const fetchResultThread = getThreadContent(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultThreadComment = getThreadComment(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultRevision = getThreadRevision(config.apiUrl, content.workspace_id, content.content_id)
+    await putThreadRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
+  }
+
+  loadTimeline = async () => {
+    const { props, state } = this
+
+    const fetchResultThreadComment = getThreadComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultRevision = getThreadRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
     const [resComment, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultThreadComment),
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const resCommentWithProperDate = resComment.body.map(c => ({
-      ...c,
-      created_raw: c.created,
-      created: displayDistanceDate(c.created, loggedUser.lang)
-    }))
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
 
-    const revisionWithComment = resRevision.body
-      .map((r, i) => ({
-        ...r,
-        created_raw: r.created,
-        created: displayDistanceDate(r.created, loggedUser.lang),
-        timelineType: 'revision',
-        commentList: r.comment_ids.map(ci => ({
-          timelineType: 'comment',
-          ...resCommentWithProperDate.find(c => c.content_id === ci)
-        })),
-        number: i + 1
-      }))
-      .reduce((acc, rev) => [
-        ...acc,
-        rev,
-        ...rev.commentList.map(comment => ({
-          ...comment,
-          customClass: '',
-          loggedUser: this.state.config.loggedUser
-        }))
-      ], [])
-
-    const resThread = await handleFetchResult(await fetchResultThread)
-
-    this.setState({
-      content: resThread.body,
-      listMessage: revisionWithComment
-    })
-
+    this.setState({ listMessage: revisionWithComment })
     this.setHeadTitle(resThread.body.label)
-    await putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
   buildBreadcrumbs = () => {
@@ -253,238 +199,115 @@ class Thread extends React.Component {
 
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
-
-    const fetchResultSaveThread = await handleFetchResult(
-      await putThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle)
-    )
-
-    switch (fetchResultSaveThread.apiResponse.status) {
-      case 200:
-        this.loadContent()
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-        break
-      case 400:
-        switch (fetchResultSaveThread.body.code) {
-          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
-        }
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
-    }
+    props.appContentChangeTitle(state.content, newTitle, state.config.slug)
   }
 
   handleChangeNewComment = e => {
-    const newComment = e.target.value
-    this.setState({ newComment })
-
-    const { appName, content } = this.state
-    localStorage.setItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment'),
-      newComment
-    )
+    const { props, state } = this
+    props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
-
-    // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
-    // see https://github.com/tracim/tracim/issues/1101
-    const newCommentForApi = state.timelineWysiwyg
-      ? state.newComment
-      : `<p>${convertBackslashNToBr(state.newComment)}</p>`
-
-    const fetchResultSaveNewComment = await handleFetchResult(await postThreadNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
-
-    switch (fetchResultSaveNewComment.apiResponse.status) {
-      case 200:
-        this.setState({ newComment: '' })
-        localStorage.removeItem(
-          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-        )
-        if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
-        this.loadContent()
-        break
-      case 400:
-        switch (fetchResultSaveNewComment.body.code) {
-          case 2003:
-            this.sendGlobalFlashMessage(props.t("You can't send an empty comment"))
-            break
-          default:
-            this.sendGlobalFlashMessage(props.t('Error while saving new comment'))
-            break
-        }
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
-    }
+    props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleChangeStatus = async newStatus => {
-    const { state, props } = this
-
-    if (newStatus === state.content.status) return
-
-    const fetchResultSaveEditStatus = await handleFetchResult(
-      await putThreadStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
-    )
-
-    switch (fetchResultSaveEditStatus.status) {
-      case 204: this.loadContent(); break
-      default: this.sendGlobalFlashMessage(props.t('Error while changing status'))
-    }
+    const { props, state } = this
+    props.appContentChangeStatus(state.content, newStatus, state.config.slug)
   }
 
   handleClickArchive = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putThreadIsArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: true } }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while archiving thread'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+    const { props, state } = this
+    props.appContentArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
   handleClickDelete = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putThreadIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while deleting thread'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+    const { props, state } = this
+    props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  handleClickRestoreArchived = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putThreadRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while restoring thread'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+  handleClickRestoreArchive = async () => {
+    const { props, state } = this
+    props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  handleClickRestoreDeleted = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putThreadRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
-        this.loadContent()
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while restoring thread'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+  handleClickRestoreDelete = async () => {
+    const { props, state } = this
+    props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
   render () {
-    const { config, isVisible, loggedUser, content, listMessage, newComment, timelineWysiwyg } = this.state
+    const { state } = this
 
-    if (!isVisible) return null
+    if (!state.isVisible) return null
 
     return (
-      <PopinFixed customClass={config.slug} customColor={config.hexcolor}>
+      <PopinFixed customClass={state.config.slug} customColor={state.config.hexcolor}>
         <PopinFixedHeader
-          customClass={`${config.slug}__contentpage`}
-          customColor={config.hexcolor}
-          faIcon={config.faIcon}
-          rawTitle={content.label}
-          componentTitle={<div>{content.label}</div>}
-          userRoleIdInWorkspace={loggedUser.userRoleIdInWorkspace}
+          customClass={`${state.config.slug}__contentpage`}
+          customColor={state.config.hexcolor}
+          faIcon={state.config.faIcon}
+          rawTitle={state.content.label}
+          componentTitle={<div>{state.content.label}</div>}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={!content.is_editable}
+          disableChangeTitle={!state.content.is_editable}
         />
 
         <PopinFixedOption
-          customClass={`${config.slug}__contentpage`}
-          customColor={config.hexcolor}
+          customClass={`${state.config.slug}__contentpage`}
+          customColor={state.config.hexcolor}
           i18n={i18n}
         >
           <div className='justify-content-end'>
-            {loggedUser.userRoleIdInWorkspace <= ROLE.contributor.id &&
+            {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
               <SelectStatus
-                selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
-                availableStatus={config.availableStatuses}
+                selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                availableStatus={state.config.availableStatuses}
                 onChangeStatus={this.handleChangeStatus}
-                disabled={content.is_archived || content.is_deleted}
+                disabled={state.content.is_archived || state.content.is_deleted}
               />
-            }
+            )}
 
-            {loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
+            {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
               <ArchiveDeleteContent
-                customColor={config.hexcolor}
+                customColor={state.config.hexcolor}
                 onClickArchiveBtn={this.handleClickArchive}
                 onClickDeleteBtn={this.handleClickDelete}
-                disabled={content.is_archived || content.is_deleted}
+                disabled={state.content.is_archived || state.content.is_deleted}
               />
-            }
+            )}
           </div>
         </PopinFixedOption>
 
-        <PopinFixedContent customClass={`${config.slug}__contentpage`}>
-          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using config.availableStatuses[3].slug
+        <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
+          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
           <Timeline
-            customClass={`${config.slug}__contentpage`}
-            customColor={config.hexcolor}
-            loggedUser={loggedUser}
-            timelineData={listMessage}
-            newComment={newComment}
-            disableComment={!content.is_editable}
-            availableStatusList={config.availableStatuses}
-            wysiwyg={timelineWysiwyg}
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            loggedUser={state.loggedUser}
+            timelineData={state.listMessage}
+            newComment={state.newComment}
+            disableComment={!state.content.is_editable}
+            availableStatusList={state.config.availableStatuses}
+            wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             allowClickOnRevision={false}
             onClickRevisionBtn={() => {}}
             shouldScrollToBottom
-            isArchived={content.is_archived}
-            onClickRestoreArchived={this.handleClickRestoreArchived}
-            isDeleted={content.is_deleted}
-            onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            isDeprecated={content.status === config.availableStatuses[3].slug}
-            deprecatedStatus={config.availableStatuses[3]}
+            isArchived={state.content.is_archived}
+            onClickRestoreArchived={this.handleClickRestoreArchive}
+            isDeleted={state.content.is_deleted}
+            onClickRestoreDeleted={this.handleClickRestoreDelete}
+            isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+            deprecatedStatus={state.config.availableStatuses[3]}
             showTitle={false}
           />
         </PopinFixedContent>
@@ -493,4 +316,4 @@ class Thread extends React.Component {
   }
 }
 
-export default translate()(Thread)
+export default translate()(appContentFactory(Thread))

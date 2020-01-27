@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from copy import deepcopy
+import sys
+import warnings
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
@@ -73,6 +75,11 @@ try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
+
+# INFO - G.M - 2020-01-08 - disable warning by default
+# useful to avoid apispec error
+if not sys.warnoptions:
+    warnings.simplefilter("ignore")
 
 
 def web(global_config: OrderedDict, **local_settings) -> Router:
@@ -274,7 +281,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     if app_config.FRONTEND__SERVE:
         configurator.include("pyramid_mako")
         frontend_controller = FrontendController(
-            app_config.FRONTEND__DIST_FOLDER_PATH, app_config.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH
+            dist_folder_path=app_config.FRONTEND__DIST_FOLDER_PATH,
+            custom_toolbox_folder_path=app_config.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH,
+            cache_token=app_config.FRONTEND__CACHE_TOKEN,
         )
         configurator.include(frontend_controller.bind)
 

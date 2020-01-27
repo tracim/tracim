@@ -36,23 +36,29 @@ export class Gallery extends React.Component {
   constructor (props) {
     super(props)
 
+    const param = props.data || debug
+
     this.state = {
       appName: 'gallery',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
       breadcrumbsList: [],
       appMounted: false,
       folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || 0) : debug.config.folderId,
+      folderDetail: {
+        fileName: '',
+        folderParentIdList: []
+      },
       imagesPreviews: [],
       fileCurrentPage: 1,
-      fileName: '',
       fileSelected: 0,
       autoPlay: null,
       fullscreen: false,
       displayPopupDelete: false,
-      imagesPreviewsLoaded: false
+      imagesPreviewsLoaded: false,
+      breadcrumbsLoaded: false
     }
 
     // i18n has been init, add resources from frontend
@@ -64,17 +70,17 @@ export class Gallery extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+  customEventReducer = ({ detail: { type, data } }) => {
     const { state, props } = this
 
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Gallery> Custom event', 'color: #28a745', type, data)
-        const currentFolderId = qs.parse(data.config.history.location.search).folder_ids
-        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || currentFolderId !== state.folderId) {
+        const newFolderId = qs.parse(data.config.history.location.search).folder_ids
+        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || newFolderId !== state.folderId) {
           this.setState({
             config: data.config,
-            folderId: currentFolderId
+            folderId: newFolderId
           })
         }
         break
@@ -100,10 +106,9 @@ export class Gallery extends React.Component {
 
     console.log('%c<Gallery> did mount', `color: ${state.config.hexcolor}`)
 
-    if (state.folderId) await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
-    await this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
-    if (state.config.appConfig.workspaceId !== null) await this.loadWorkspaceData()
-    this.buildBreadcrumbs()
+    this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
+    const contentDetail = await this.loadContentDetails()
+    this.buildBreadcrumbs(contentDetail.workspaceLabel, contentDetail.folderDetail, false)
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -112,13 +117,12 @@ export class Gallery extends React.Component {
     console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || prevState.folderId !== state.folderId) {
-      if (state.folderId) await this.loadFolderDetail(state.config.appConfig.workspaceId, state.folderId)
-      await this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
-      await this.loadWorkspaceData()
-      this.buildBreadcrumbs()
-    }
-    if (prevState.fileSelected !== state.fileSelected) {
-      this.buildBreadcrumbs()
+      this.setState({ imagesPreviewsLoaded: false, imagesPreviews: [] })
+      this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
+      const contentDetail = await this.loadContentDetails()
+      this.buildBreadcrumbs(contentDetail.workspaceLabel, contentDetail.folderDetail, false)
+    } else if (prevState.fileSelected !== state.fileSelected || prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded || prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded) {
+      this.buildBreadcrumbs(state.workspaceLabel, state.folderDetail, true)
     }
   }
 
@@ -127,23 +131,37 @@ export class Gallery extends React.Component {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  buildBreadcrumbs = () => {
+  async loadContentDetails () {
+    const { state } = this
+
+    const contentDetail = {}
+
+    contentDetail.workspaceLabel = await this.loadWorkspaceLabel()
+    if (state.folderId) {
+      contentDetail.folderDetail = await this.loadFolderDetailAndParentsDetails(state.config.appConfig.workspaceId, state.folderId)
+      this.setState({ folderDetail: contentDetail.folderDetail })
+    }
+    this.setState({ workspaceLabel: contentDetail.workspaceLabel })
+    return contentDetail
+  }
+
+  buildBreadcrumbs = (workspaceLabel, folderDetail, includeFile) => {
     const { props, state } = this
 
     const breadcrumbsList = [{
       link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
     }, {
-      link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{state.content.workspaceLabel}</Link>,
+      link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{workspaceLabel}</Link>,
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN
     }]
     if (state.folderId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId}`}>{state.fileName}</Link>,
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentIdList.join(',')}`}>{folderDetail.fileName}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
-    if (state.imagesPreviews && state.imagesPreviews.length > 0) {
+    if (includeFile && state.imagesPreviews && state.imagesPreviews.length > 0) {
       breadcrumbsList.push({
         link: <Link
           to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}>{state.imagesPreviews[state.fileSelected].fileName}</Link>,
@@ -155,22 +173,49 @@ export class Gallery extends React.Component {
     // app crash telling it cannot render a Link outside a router
     // see https://github.com/tracim/tracim/issues/1637
     // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
-    this.setState({ breadcrumbsList: breadcrumbsList })
+    this.setState({ breadcrumbsList, breadcrumbsLoaded: !includeFile })
   }
 
-  loadFolderDetail = async (workspaceId, folderId) => {
+  loadFolderDetailAndParentsDetails = async (workspaceId, folderId) => {
     const { state, props } = this
 
-    const fetchContentDetail = await handleFetchResult(
+    let folderDetail = {
+      fileName: '',
+      folderParentIdList: []
+    }
+
+    let fetchContentDetail = await handleFetchResult(
       await getFolderDetail(state.config.apiUrl, workspaceId, folderId)
     )
 
     switch (fetchContentDetail.apiResponse.status) {
       case 200:
-        this.setState({ fileName: fetchContentDetail.body.filename })
+        folderDetail.fileName = fetchContentDetail.body.filename
+        folderDetail.folderParentIdList = fetchContentDetail.body.parent_id ? [fetchContentDetail.body.parent_id] : []
+
+        let hasReachRootWorkspace = fetchContentDetail.body.parent_id !== null
+        while (hasReachRootWorkspace) {
+          const prevParentId = fetchContentDetail.body.parent_id
+
+          fetchContentDetail = await handleFetchResult(
+            await getFolderDetail(state.config.apiUrl, workspaceId, prevParentId)
+          )
+          if (fetchContentDetail.apiResponse.status === 200) {
+            if (fetchContentDetail.body.parent_id === null || prevParentId === fetchContentDetail.body.parent_id) {
+              hasReachRootWorkspace = false
+            } else {
+              folderDetail.folderParentIdList.push(fetchContentDetail.body.parent_id)
+            }
+          } else {
+            this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
+            hasReachRootWorkspace = false
+          }
+        }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
     }
+    return folderDetail
   }
 
   loadGalleryList = async (workspaceId, folderId) => {
@@ -235,8 +280,10 @@ export class Gallery extends React.Component {
     }))).filter(i => i !== false)
   }
 
-  loadWorkspaceData = async () => {
+  loadWorkspaceLabel = async () => {
     const { state, props } = this
+
+    let workspaceLabel = ''
 
     const fetchResultWorkspaceDetail = await handleFetchResult(
       await getWorkspaceDetail(state.config.apiUrl, state.config.appConfig.workspaceId)
@@ -244,16 +291,13 @@ export class Gallery extends React.Component {
 
     switch (fetchResultWorkspaceDetail.apiResponse.status) {
       case 200:
-        this.setState({
-          content: {
-            workspaceLabel: fetchResultWorkspaceDetail.body.label
-          }
-        })
+        workspaceLabel = fetchResultWorkspaceDetail.body.label
         this.setHeadTitle(`${props.t('Gallery')} · ${fetchResultWorkspaceDetail.body.label}`)
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
     }
+    return workspaceLabel
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -365,6 +409,8 @@ export class Gallery extends React.Component {
 
     if (fileSelected < 0 || fileSelected >= state.imagesPreviews.length || !direction) return
 
+    if (!state.imagesPreviews[fileSelected]) return
+
     const imagesPreviews = state.imagesPreviews
     let rotationAngle = 0
     switch (imagesPreviews[fileSelected].rotationAngle) {
@@ -417,7 +463,7 @@ export class Gallery extends React.Component {
     return (
       <PageWrapper customClass='gallery'>
         <PageTitle
-          title={state.folderId ? state.fileName : state.content.workspaceLabel}
+          title={state.folderId ? state.folderDetail.fileName : state.workspaceLabel}
           icon={'picture-o'}
           breadcrumbsList={state.breadcrumbsList}
         />
@@ -427,6 +473,7 @@ export class Gallery extends React.Component {
             <button
               className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__play'
               onClick={() => this.onClickSlickPlay(!state.autoPlay)}
+              data-cy='gallery__action__button__auto__play'
             >
               <span className='gallery__action__button__text'>
                 {state.autoPlay ? props.t('Pause') : props.t('Play')}
@@ -454,7 +501,11 @@ export class Gallery extends React.Component {
               INFO - CH - there is a bug with the property userRoleIdInWorkspace that comes from frontend, it might be it's default value which is 1
               So we won't use it for now and always display the delete button which will return 401 if user can't delete content
             */}
-            <button className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__delete' onClick={this.handleOpenDeleteFilePopup}>
+            <button
+              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__delete'
+              onClick={this.handleOpenDeleteFilePopup}
+              data-cy='gallery__action__button__delete'
+            >
               <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className={'fa fa-fw fa-trash'} />
             </button>
           </div>
@@ -498,7 +549,7 @@ export class Gallery extends React.Component {
                   toolbarButtons={[
                     <div className={'gallery__action__button__lightbox'}>
                       <button
-                        className={'btn iconBtn'}
+                        className='btn iconBtn'
                         onClick={() => this.onClickSlickPlay(!state.autoPlay)}
                         title={state.autoPlay ? props.t('Pause') : props.t('Play')}
                       >
@@ -506,9 +557,10 @@ export class Gallery extends React.Component {
                       </button>
 
                       <button
-                        className={'btn iconBtn'}
+                        className='btn iconBtn'
                         onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))}
                         title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}
+                        data-cy='gallery__action__button__lightbox__fullscreen'
                       >
                         <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
                       </button>
@@ -565,6 +617,7 @@ export class Gallery extends React.Component {
                     type='button'
                     className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
                     onClick={() => this.deleteFile(this.state.fileSelected)}
+                    data-cy='gallery__delete__file__popup__body__btn__delete'
                   >
                     {props.t('Delete')}
                   </button>

@@ -7,7 +7,7 @@ import { Avatar } from 'tracim_frontend_lib'
 
 require('./MenuProfil.styl')
 
-const MenuProfil = props => {
+export const MenuProfil = props => {
   if (!props.user.logged) return null
 
   return (

@@ -4,5 +4,6 @@ export const file = {
   isActive: true,
   faIcon: 'paperclip',
   hexcolor: '#ffa500',
-  config: {}
+  config: {},
+  creationLabel: 'Create a file'
 }
