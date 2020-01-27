@@ -14,7 +14,8 @@ const ArchiveDeleteContent = props => {
 
   return (
     <div className='d-flex align-items-center'>
-      {/* INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
+      {/* INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347 */}
+      {/*
       <button
         type='button'
         className='wsContentGeneric__option__menu__action d-none d-sm-block btn iconBtn'
@@ -26,7 +27,9 @@ const ArchiveDeleteContent = props => {
         data-cy='archive__button'
       >
         <i className='fa fa-fw fa-archive' />
-      </button> */}
+      </button>
+      */}
+
       <button
         type='button'
         className='wsContentGeneric__option__menu__action d-none d-sm-block btn iconBtn'

@@ -3,9 +3,12 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import PreviewComponent from './PreviewComponent.jsx'
-import { MODE } from '../helper.js'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
-import { DisplayState, FileDropzone } from 'tracim_frontend_lib'
+import {
+  DisplayState,
+  FileDropzone,
+  APP_FEATURE_MODE
+} from 'tracim_frontend_lib'
 
 const color = require('color')
 
@@ -43,7 +46,7 @@ export const FileComponent = props => (
       />
     )}
 
-    {(props.mode === MODE.VIEW || props.mode === MODE.REVISION) &&
+    {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) &&
       <PreviewComponent
         color={props.customColor}
         downloadRawUrl={props.downloadRawUrl}
@@ -60,7 +63,7 @@ export const FileComponent = props => (
       />
     }
 
-    {props.mode === MODE.EDIT &&
+    {props.mode === APP_FEATURE_MODE.EDIT &&
       <div className='file__contentpage__dropzone'>
         {props.progressUpload.display &&
           <PopupProgressUpload

@@ -249,9 +249,6 @@ jobs:
         - nohup tracimcli caldav start&
         - npm run travis-cypress-run
         - cd $TRAVIS_BUILD_DIR
-      after_failure:
-        - touch $PSERVE_LOG
-        - cat $PSERVE_LOG
       if: commit_message !~ /(\[skip ci cypress\])/
 
 stages:

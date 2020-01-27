@@ -16,14 +16,14 @@ export const SelectStatus = props => {
         data-toggle='dropdown'
         aria-haspopup='true'
         aria-expanded='false'
-        style={{color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent'}}
+        style={{ color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent' }}
         disabled={props.disabled}
       >
         <span className={classnames('selectStatus__dropdownbtn__label', { 'selectStatus__mobileVersion': props.mobileVersion })} >
           {props.t('Status')}:
         </span>
-        
-        <span className={classnames({ 'selectStatus__mobileVersion': props.mobileVersion })}> 
+
+        <span className={classnames({ 'selectStatus__mobileVersion': props.mobileVersion })}>
           {props.selectedStatus ? props.t(props.selectedStatus.label) : ''}
         </span>
 
@@ -49,7 +49,7 @@ export const SelectStatus = props => {
             <div className='selectStatus__submenu__item__icon'>
               <i
                 className={`fa fa-fw fa-${s.faIcon}`}
-                style={{color: s.hexcolor}}
+                style={{ color: s.hexcolor }}
               />
             </div>
           </button>

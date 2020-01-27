@@ -33,10 +33,10 @@ class PopupCreateContent extends React.Component {
           <div className='createcontent'>
             <div className='createcontent__contentname mb-4'>
               <div className='createcontent__contentname__icon ml-1 mr-3'>
-                <i className={`fa fa-${props.faIcon}`} style={{color: props.customColor}} />
+                <i className={`fa fa-${props.faIcon}`} style={{ color: props.customColor }} />
               </div>
 
-              <div className='createcontent__contentname__title' style={{color: props.customColor}}>
+              <div className='createcontent__contentname__title' style={{ color: props.customColor }}>
                 {props.label}
               </div>
             </div>

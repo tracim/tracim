@@ -1,13 +1,5 @@
-import os
-
 import sys
 from setuptools import setup, find_packages
-
-here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'README.md')) as f:
-    README = f.read()
-with open(os.path.join(here, 'CHANGES.txt')) as f:
-    CHANGES = f.read()
 
 requires = [
     # pyramid
@@ -42,6 +34,7 @@ requires = [
     'preview-generator>=0.13',
     'colour',
     'python-dateutil',
+    'gitpython',
     # mail-notifier
     'mako',
     'lxml',
@@ -84,7 +77,9 @@ tests_require = [
     'responses',
     'mock',
     'Pillow',
-    'freezegun',
+    # INFO - G.M - 2020-01-14 - static version of freezeguh due to regression
+    # with webtest, see https://github.com/spulec/freezegun/issues/326
+    'freezegun==0.3.12',
 ]
 
 devtools_require=[
@@ -112,27 +107,6 @@ if sys.version_info < (3, 5):
 
 
 setup(
-    name='tracim_backend',
-    version='1.9.1',
-    description='Rest API (Back-end) of Tracim v2',
-    long_description=README + '\n\n' + CHANGES,
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Programming Language :: Python',
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        'Framework :: Pyramid',
-        'Topic :: Internet :: WWW/HTTP',
-        'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
-        'Topic :: Communications :: File Sharing',
-        'Topic :: Communications',
-        'License :: OSI Approved :: MIT License',
-    ],
-    author='',
-    author_email='',
-    url='https://github.com/tracim/tracim_backend',
-    keywords='web pyramid tracim ',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
@@ -165,6 +139,7 @@ setup(
             'search index-upgrade-experimental = tracim_backend.command.search:SearchIndexUpgradeCommand',
             'search index-drop = tracim_backend.command.search:SearchIndexDeleteCommand',
             'dev parameters list = tracim_backend.command.devtools:ParametersListCommand',
+            'dev parameters value = tracim_backend.command.devtools:ParametersValueCommand',
             'user delete = tracim_backend.command.cleanup:DeleteUserCommand',
             'user anonymize = tracim_backend.command.cleanup:AnonymizeUserCommand',
         ]

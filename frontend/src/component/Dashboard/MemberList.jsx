@@ -46,7 +46,7 @@ export class MemberList extends React.Component {
             )
             : (
               <div>
-                <ul className={classnames('memberlist__list', { 'withAddBtn': props.userRoleIdInWorkspace <= ROLE.workspaceManager.id })}>
+                <ul className={classnames('memberlist__list', { 'withAddBtn': props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
                   {props.memberList.map(m =>
                     <li className='memberlist__list__item  primaryColorBgLightenHover' key={m.id}>
                       <div className='memberlist__list__item__avatar'>
@@ -63,7 +63,7 @@ export class MemberList extends React.Component {
                         </div>
                       </div>
 
-                      {props.userRoleIdInWorkspace <= ROLE.workspaceManager.id && m.id !== props.loggedUser.user_id && (
+                      {props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && m.id !== props.loggedUser.user_id && (
                         <div
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}
@@ -75,7 +75,7 @@ export class MemberList extends React.Component {
                   )}
                 </ul>
 
-                {props.userRoleIdInWorkspace <= ROLE.workspaceManager.id && (
+                {props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
                   <div className='memberlist__btnadd' data-cy='memberlist__btnadd' onClick={props.onClickAddMemberBtn}>
                     <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
                       <div className='memberlist__btnadd__button__avatar'>

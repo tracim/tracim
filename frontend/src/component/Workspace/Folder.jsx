@@ -78,7 +78,7 @@ class Folder extends React.Component {
             <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
           </div>
 
-          {props.userRoleIdInWorkspace <= ROLE.contentManager.id && (
+          {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
             <DragHandle
               connectDragSource={props.connectDragSource}
               title={props.t('Move this folder')}
@@ -104,7 +104,7 @@ class Folder extends React.Component {
 
           <div className='folder__header__button'>
             <div className='folder__header__button__addbtn'>
-              {props.userRoleIdInWorkspace <= ROLE.contributor.id && props.showCreateContentButton && folderAvailableApp.length > 0 && (
+              {props.userRoleIdInWorkspace >= ROLE.contributor.id && props.showCreateContentButton && folderAvailableApp.length > 0 && (
                 <div title={props.t('Create in folder')}>
                   <button
                     className={classnames(

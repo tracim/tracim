@@ -20,6 +20,9 @@ fi
 # Create file with all docker variable about TRACIM parameter
 printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 
+# Add variable for using xvfb with uwsgi
+echo "DISPLAY=:99.0" >> /var/tracim/data/tracim_env_variables
+
 case "$DATABASE_TYPE" in
   mysql)
     # Ensure DATABASE_PORT is set
@@ -69,7 +72,7 @@ chmod +x /tracim/backend/daemons/mail_fetcher.py
 chmod +x /tracim/backend/daemons/mail_notifier.py
 
 # activate apache mods
-a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav
+a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav expires
 
 # starting services
 service redis-server start  # async email sending
@@ -120,6 +123,9 @@ tracimcli search index-create -c /etc/tracim/development.ini
 
 # Reload apache config
 service apache2 restart
+
+# starting xvfb for preview-generator
+Xvfb :99 -screen 0 1x1x16 > /dev/null 2>&1 &
 
 # Start tracim
 set +e
