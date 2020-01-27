@@ -623,7 +623,7 @@ class WorkspaceContent extends React.Component {
         .filter(ct => userRoleIdInWorkspace === ROLE.contributor.id ? ct.slug !== CONTENT_TYPE.FOLDER : true),
 
       // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
-      ...(appList.find(app => app.slug === 'collaborative_document_edition')
+      ...(appList.find(app => app.slug === HACK_COLLABORA_CONTENT_TYPE(contentType).slug)
         ? [HACK_COLLABORA_CONTENT_TYPE(contentType)]
         : []
       )
