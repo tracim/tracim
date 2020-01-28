@@ -445,6 +445,8 @@ export class Gallery extends React.Component {
   }
 
   handleMouseMove = () => {
+    const { state } = this
+
     clearInterval(this.mouseMoveTimeout)
     if (this.state.displayLightbox) {
       // INFO - GM - 2019-12-11 - It use dom manipulation instead of react state because ReactImageLightBox doesn't offer custom style props for the toolbar
@@ -454,6 +456,7 @@ export class Gallery extends React.Component {
         e.style['transition-duration'] = '0.5s'
         e.style.transform = 'translateX(0px)'
       })
+      if (state.fullscreen) this.reactImageLightBoxModalRoot.style.cursor = 'default'
     }
     this.mouseMoveTimeout = setInterval(() => {
       if (this.state.displayLightbox) {
@@ -464,6 +467,7 @@ export class Gallery extends React.Component {
         document.getElementsByClassName('ril__navButtons').forEach(e => {
           e.style['transition-duration'] = '0.5s'
         })
+        if (state.fullscreen) this.reactImageLightBoxModalRoot.style.cursor = 'none'
       }
     }, 2000)
   }
@@ -551,7 +555,7 @@ export class Gallery extends React.Component {
             }
 
             <Fullscreen
-              enabled={this.state.fullscreen}
+              enabled={state.fullscreen}
               onChange={fullscreen => this.setState({ fullscreen })}
             >
               <div ref={modalRoot => (this.reactImageLightBoxModalRoot = modalRoot)} />
