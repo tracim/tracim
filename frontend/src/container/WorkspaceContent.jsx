@@ -550,7 +550,6 @@ class WorkspaceContent extends React.Component {
   getFilterName = urlFilter => {
     const { props } = this
     const contentType = props.contentType.find(ct => ct.slug === urlFilter)
-    console.log('CONTENT_TYPE', contentType)
     const filterName = contentType
       ? props.t(contentType.label.toLowerCase() + 's')
       : props.t('Contents')

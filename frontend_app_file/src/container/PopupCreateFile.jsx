@@ -74,8 +74,6 @@ class PopupCreateFile extends React.Component {
   setHeadTitle = () => {
     const { state, props } = this
 
-    console.log('SETHEADTITLE', state.config)
-
     if (state.config && state.config.system && state.config.system.config && state.config.workspace) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
