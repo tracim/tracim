@@ -72,7 +72,7 @@ chmod +x /tracim/backend/daemons/mail_fetcher.py
 chmod +x /tracim/backend/daemons/mail_notifier.py
 
 # activate apache mods
-a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav
+a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav expires
 
 # starting services
 service redis-server start  # async email sending

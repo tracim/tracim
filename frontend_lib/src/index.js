@@ -7,7 +7,6 @@ import {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
-  appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE,
   ROLE,
   ROLE_LIST,
@@ -15,11 +14,13 @@ import {
   PROFILE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
+  FILE_PREVIEW_STATE,
   displayFileSize,
   parserStringToList,
   checkEmailValidity,
   buildFilePreviewUrl,
-  removeExtensionOfFilename
+  removeExtensionOfFilename,
+  computeProgressionPercentage
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -70,6 +71,7 @@ import GenericButton from './component/Button/GenericButton.jsx'
 import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
+import FileUploadList from './component/FileDropzone/FileUploadList.jsx'
 
 import ShareDownload from './component/ShareDownload/ShareDownload.jsx'
 import ShareLink from './component/ShareLink/ShareLink.jsx'
@@ -103,6 +105,7 @@ export {
   generateRandomPassword,
   buildFilePreviewUrl,
   removeExtensionOfFilename,
+  computeProgressionPercentage,
   Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,
@@ -135,16 +138,17 @@ export {
   PROFILE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
+  FILE_PREVIEW_STATE,
   displayFileSize,
   parserStringToList,
   checkEmailValidity,
   defaultDebug,
-  appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,
   IconButton,
   ComposedIcon,
   DisplayState,
   FileDropzone,
+  FileUploadList,
   ShareLink,
   ShareDownload,
   ProgressBar,

@@ -208,8 +208,6 @@ auth_types = internal
 # If auth_type is ldap, uncomment following ldap_* parameters
 ## LDAP server address
 ; ldap_url = ldap://localhost:389
-## Base dn to make queries
-; ldap_base_dn = dc=directory,dc=fsf,dc=org
 ## Bind dn to identify the search
 ; ldap_bind_dn = cn=admin,dc=directory,dc=fsf,dc=org
 ## The bind password

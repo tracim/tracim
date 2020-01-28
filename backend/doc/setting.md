@@ -88,7 +88,6 @@ Priority order is (from less to most priority):
 |TRACIM_NEW_USER__INVITATION__DO_NOTIFY|new_user.invitation.do_notify |NEW_USER__INVITATION__DO_NOTIFY|
 |TRACIM_NEW_USER__INVITATION__MINIMAL_PROFILE|new_user.invitation.minimal_profile|NEW_USER__INVITATION__MINIMAL_PROFILE|
 |TRACIM_LDAP_URL               |ldap_url                      |LDAP_URL                      |
-|TRACIM_LDAP_BASE_URL          |ldap_base_url                 |LDAP_BASE_URL                 |
 |TRACIM_LDAP_BIND_DN           |ldap_bind_dn                  |LDAP_BIND_DN                  |
 |TRACIM_LDAP_BIND_PASS         |ldap_bind_pass                |LDAP_BIND_PASS                |
 |TRACIM_LDAP_TLS               |ldap_tls                      |LDAP_TLS                      |
@@ -208,7 +207,6 @@ https://github.com/rroemhild/docker-test-openldap :
 ```
 auth_types=ldap
 ldap_url = ldap://localhost:389
-ldap_base_dn = dc=planetexpress,dc=com
 ldap_bind_dn = cn=admin,dc=planetexpress,dc=com
 ldap_bind_pass = GoodNewsEveryone
 ldap_user_base_dn = ou=people,dc=planetexpress,dc=com
