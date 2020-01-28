@@ -95,7 +95,7 @@ export class Gallery extends React.Component {
         }))
         i18n.changeLanguage(data)
         this.buildBreadcrumbs()
-        this.setHeadTitle(`${props.t('Gallery')} · ${state.content.workspaceLabel}`)
+        if (state.workspaceLabel) this.setHeadTitle(`${props.t('Gallery')} · ${state.workspaceLabel}`)
         break
       default:
         break

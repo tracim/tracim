@@ -22,5 +22,6 @@
   "Error, these emails are invalid: ": "Error, these emails are invalid: ",
   "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.",
   "Validate": "Validate",
-  "Password": "Password"
+  "Password": "Password",
+  "Share folder": "Share folder"
 }

@@ -64,7 +64,7 @@ class Thread extends React.Component {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
-        this.setHeadTitle(state.content.label)
+        if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
         break
 
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
