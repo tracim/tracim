@@ -386,6 +386,10 @@ export class Gallery extends React.Component {
   }
 
   onClickSlickPlay (play) {
+    const { state } = this
+
+    if (state.displayLightbox) this.displayReactImageLightBoxArrows(!play)
+
     if (play) {
       this.setState({
         autoPlay: setInterval(() => this.handleClickPreviousNextPage(DIRECTION.RIGHT), 3000)
@@ -396,6 +400,12 @@ export class Gallery extends React.Component {
         autoPlay: null
       })
     }
+  }
+
+  displayReactImageLightBoxArrows (display) {
+    document.getElementsByClassName('ril__navButtons').forEach(arrow => {
+      if (arrow.style) arrow.style.visibility = display ? 'visible' : 'hidden'
+    })
   }
 
   rotateImg (fileSelected, direction) {
@@ -440,13 +450,28 @@ export class Gallery extends React.Component {
       // INFO - GM - 2019-12-11 - It use dom manipulation instead of react state because ReactImageLightBox doesn't offer custom style props for the toolbar
       document.getElementsByClassName('ril__toolbar')[0].style.transform = 'translateY(0px)'
       document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
+      document.getElementsByClassName('ril__navButtons').forEach(e => {
+        e.style['transition-duration'] = '0.5s'
+        e.style.transform = 'translateX(0px)'
+      })
     }
     this.mouseMoveTimeout = setInterval(() => {
       if (this.state.displayLightbox) {
         document.getElementsByClassName('ril__toolbar')[0].style.transform = 'translateY(-50px)'
         document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
+        document.getElementsByClassName('ril__navButtonNext')[0].style.transform = 'translateX(100%)'
+        document.getElementsByClassName('ril__navButtonPrev')[0].style.transform = 'translateX(-100%)'
+        document.getElementsByClassName('ril__navButtons').forEach(e => {
+          e.style['transition-duration'] = '0.5s'
+        })
       }
     }, 2000)
+  }
+
+  handleAfterOpenReactImageLightBox = () => {
+    const { state } = this
+
+    if (state.autoPlay) this.displayReactImageLightBoxArrows(false)
   }
 
   render () {
@@ -541,6 +566,7 @@ export class Gallery extends React.Component {
                     onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
                     onMoveNextRequest={() => { this.handleClickPreviousNextPage(DIRECTION.RIGHT) }}
                     imagePadding={0}
+                    onAfterOpen={this.handleAfterOpenReactImageLightBox}
                     reactModalProps={{ parentSelector: () => this.reactImageLightBoxModalRoot }}
                     toolbarButtons={[
                       <div className={'gallery__action__button__lightbox'}>
@@ -548,6 +574,7 @@ export class Gallery extends React.Component {
                           className='btn iconBtn'
                           onClick={() => this.onClickSlickPlay(!state.autoPlay)}
                           title={state.autoPlay ? props.t('Pause') : props.t('Play')}
+                          data-cy='gallery__action__button__lightbox__auto__play'
                         >
                           <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
                         </button>
