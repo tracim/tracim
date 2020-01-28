@@ -31,7 +31,7 @@ class TracimContentType(object):
         :param slug: slug of the content-type, ex: "file"
         :param fa_icon: font-awesome icon associated to the content-type, ex: paperclip
         :param label: label of the content-type, ex: "File"
-        :param creation_label: label for creation, ex: "Upload a file".
+        :param creation_label: label for creation, ex: "Upload files".
         :param available_statuses: status available for this content type
         :param app: associated app
         :param slug_aliases: list of alias slug which refer to same content-type
