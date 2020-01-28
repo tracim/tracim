@@ -65,5 +65,7 @@
   "YB": "Yo",
   "Recipient's email addresses": "Adresse email du ou des destinataires",
   "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "Pour ajouter plusieurs destinataires, séparez les adresses email par une virgule, un point virgule ou un retour à la ligne.",
-  "Password": "Mot de passe"
+  "Password": "Mot de passe",
+  "Uploaded files": "Fichiers téléversés",
+  "You have not yet chosen any files to upload.": "Vous n'avez pas encore sélectionné de fichiers à téléverser."
 }

@@ -272,3 +272,10 @@ export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, 
   `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview/jpg/${width}x${height}/${filenameNoExtension + '.jpg'}?page=${page}`
 
 export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
+
+export const computeProgressionPercentage = (progressionLoaded, progressionTotal, elementListLength = 1) => (progressionLoaded / progressionTotal * 99) / elementListLength
+
+export const FILE_PREVIEW_STATE = {
+  NO_PREVIEW: 'noPreview',
+  NO_FILE: 'noFile'
+}

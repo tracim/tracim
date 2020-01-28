@@ -822,7 +822,7 @@ class CFG(object):
         _file.add_content_type(
             slug="file",
             label="File",
-            creation_label="Upload a file",
+            creation_label="Upload files",
             available_statuses=content_status_list.get_all(),
         )
 
