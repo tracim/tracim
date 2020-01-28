@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { ROLE } from 'tracim_frontend_lib'
+import { connect } from 'react-redux'
 import { PAGE } from '../../helper'
 import { Link } from 'react-router-dom'
 
@@ -84,7 +85,8 @@ export const ExtandedAction = props => {
           </div>
         )}
 
-        {props.folderData && (
+        // FIXME - GM - 2019-04-16 - Don't use hardcoded slug and find a better way to handle app buttons like this one
+        {props.folderData && props.appList && props.appList.some((app) => app.slug === 'gallery') && (
           <Link
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={e => e.stopPropagation()}
@@ -105,7 +107,11 @@ export const ExtandedAction = props => {
   )
 }
 
-export default translate()(ExtandedAction)
+const mapStateToProps = ({ appList }) => ({
+  appList
+})
+
+export default connect(mapStateToProps)(translate()(ExtandedAction))
 
 ExtandedAction.propTypes = {
   onClickExtendedAction: PropTypes.object.isRequired,

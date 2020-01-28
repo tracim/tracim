@@ -19,22 +19,27 @@ const OptionalFeatures = props => {
         </div>
       )}
 
-      <div className='formBlock__field workspace_advanced__optionalfunctionalities__content' data-cy='download_enabled'>
-        <BtnSwitch
-          checked={props.downloadEnabled}
-          onChange={props.onToggleDownloadEnabled}
-          activeLabel={props.t('Download activated')}
-          inactiveLabel={props.t('Download deactivated')}
-        />
-      </div>
-      <div className='formBlock__field workspace_advanced__optionalfunctionalities__content' data-cy='upload_enabled'>
-        <BtnSwitch
-          checked={props.uploadEnabled}
-          onChange={props.onToggleUploadEnabled}
-          activeLabel={props.t('Upload activated')}
-          inactiveLabel={props.t('Upload deactivated')}
-        />
-      </div>
+      {props.appDownloadAvailable && (
+        <div className='formBlock__field workspace_advanced__optionalfunctionalities__content' data-cy='download_enabled'>
+          <BtnSwitch
+            checked={props.downloadEnabled}
+            onChange={props.onToggleDownloadEnabled}
+            activeLabel={props.t('Download activated')}
+            inactiveLabel={props.t('Download deactivated')}
+          />
+        </div>
+      )}
+
+      {props.appUploadAvailable && (
+        <div className='formBlock__field workspace_advanced__optionalfunctionalities__content' data-cy='upload_enabled'>
+          <BtnSwitch
+            checked={props.uploadEnabled}
+            onChange={props.onToggleUploadEnabled}
+            activeLabel={props.t('Upload activated')}
+            inactiveLabel={props.t('Upload deactivated')}
+          />
+        </div>
+      )}
     </div>
   )
 }

@@ -602,7 +602,7 @@ class WorkspaceContent extends React.Component {
   }
 
   render () {
-    const { breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t } = this.props
+    const { appList, breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t } = this.props
     const { state, props } = this
 
     const urlFilter = qs.parse(location.search).type
@@ -687,7 +687,7 @@ class WorkspaceContent extends React.Component {
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />
 
-                {currentWorkspace.uploadEnabled &&
+                {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') &&
                   <ShareFolder
                     workspaceId={state.workspaceIdInUrl}
                     availableApp={createContentAvailableApp}
@@ -799,7 +799,7 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType }) => ({
-  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType
+const mapStateToProps = ({ appList, breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType }) => ({
+  appList, breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))
