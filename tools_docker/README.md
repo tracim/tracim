@@ -43,6 +43,12 @@ If you don't want to use caldav (webdav is started by default):
 
 * START_CALDAV=0 (to deactivate agenda in tracim)
 
+If you want to use collaborative_document_edition feature:
+
+* ENABLE_COLLABORATIVE_DOCUMENT_EDITION=1 (In this case you need to set `collaborative_document_edition.*` parameters in [development.ini.sample](https://github.com/tracim/tracim/blob/master/backend/development.ini.sample))
+
+see also [setting documentation](https://github.com/tracim/tracim/blob/master/backend/doc/setting.md)
+
 If you want to use plugins and/or custom_toolbox you need to add files in `~/tracim/etc/plugins/` and `~/tracim/etc/custom_toolbox/` (default configuration). This two path are created when you start docker image for the first time.
 
 #### Updating index of ElasticSearch
