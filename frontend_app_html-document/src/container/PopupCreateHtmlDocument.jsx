@@ -45,7 +45,7 @@ class PopupCreateHtmlDocument extends React.Component {
     if (state.config && state.config.system && state.config.system.config && state.config.workspace) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('New Html document'), state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([props.t('New text document'), state.config.workspace.label, state.config.system.config.instance_name]) }
       })
     }
   }

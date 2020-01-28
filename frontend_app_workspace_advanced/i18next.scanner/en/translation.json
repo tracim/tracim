@@ -35,6 +35,11 @@
   "Upload deactivated": "Upload deactivated",
   "Error while activating agenda": "Error while activating agenda",
   "Error while deactivating agenda": "Error while deactivating agenda",
-  "Agenda": "Agenda",
-  "Optional functionalities": "Optional functionalities"
+  "Optional functionalities": "Optional functionalities",
+  "Error while activating upload": "Error while activating upload",
+  "Error while deactivating upload": "Error while deactivating upload",
+  "Error while activating download": "Error while activating download",
+  "Error while deactivating download": "Error while deactivating download",
+  "Members List": "Members List",
+  "Optional Functionalities": "Optional Functionalities"
 }

@@ -1,8 +1,5 @@
 {
   "Last version": "Dernière version",
-  "Error while archiving document": "Erreur lors de l'archivage d'un document",
-  "Error while deleting document": "Erreur lors de la suppression d'un document",
-  "Error while restoring document": "Erreur lors de la restauration du document",
   "Restore": "Restaurer",
   "Error while creating file": "Erreur lors de la création du fichier",
   "Cancel": "Annuler",
@@ -20,20 +17,16 @@
   "Error while loading file": "Erreur lors du chargement du fichier",
   "Update": "Mettre à jour",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
-  "Error while saving new comment": "Erreur lors de la sauvegarde du commentaire",
   "No preview available": "Prévisualisation indisponible",
   " of ": " sur ",
-  "Error while saving new title": "Erreur lors de la sauvegarde du nouveau titre",
   "This content is archived": "Ce contenu est archivé",
   "This content is deleted": "Ce contenu est supprimé",
-  "Error while changing status": "Erreur lors du changement de statut",
   "File": "Fichier",
   "file": "fichier",
   "files": "fichiers",
   "This content is deprecated": "Ce contenu est obsolète",
   "Previous page": "Page précédente",
   "Next page": "Page suivante",
-  "You can't send an empty comment": "Vous ne pouvez pas envoyer un commentaire vide",
   "Share": "Partage",
   "of": "sur",
   "Error in the URL": "Erreur dans l'URL",
@@ -56,5 +49,6 @@
   "Number of shares:": "Nombre de partages :",
   "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximale autorisée",
   "Error, the shared space exceed its maximum size": "Erreur, l'espace partagé dépasse sa taille maximale",
-  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers"
+  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
+  "New file": "Nouveau fichier"
 }

@@ -8,10 +8,14 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
-import { postResetPassword } from '../action-creator.async.js'
+import {
+  postResetPassword,
+  getConfig
+} from '../action-creator.async.js'
 import {
   newFlashMessage,
-  resetBreadcrumbs
+  resetBreadcrumbs,
+  setConfig
 } from '../action-creator.sync.js'
 import { PAGE } from '../helper.js'
 import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
@@ -48,10 +52,19 @@ export class ResetPassword extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     const { props } = this
-    this.setHeadTitle()
     props.dispatch(resetBreadcrumbs())
+    await this.loadConfig()
+  }
+
+  loadConfig = async () => {
+    const { props } = this
+
+    const fetchGetConfig = await props.dispatch(getConfig())
+    if (fetchGetConfig.status === 200) {
+      props.dispatch(setConfig(fetchGetConfig.json))
+    }
   }
 
   setHeadTitle = () => {

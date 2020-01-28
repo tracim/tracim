@@ -57,6 +57,8 @@ class AdminWorkspaceUser extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
+    const { props } = this
+
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(this.state.config.slug):
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
@@ -75,8 +77,13 @@ class AdminWorkspaceUser extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
-        if (this.state.config.type === 'workspace') this.loadWorkspaceContent()
-        else if (this.state.config.type === 'user') this.loadUserContent()
+        if (this.state.config.type === 'workspace') {
+          this.setHeadTitle(props.t('Shared space management'))
+          this.loadWorkspaceContent()
+        } else if (this.state.config.type === 'user') {
+          this.setHeadTitle(props.t('User account management'))
+          this.loadUserContent()
+        }
         this.buildBreadcrumbs()
         break
       default:
