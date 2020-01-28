@@ -10,7 +10,8 @@ const SELECTORS = {
   HEADER: 'header',
   ADMIN_USER_PAGE: 'adminUserPage',
   TRACIM_CONTENT: 'tracimContent',
-  GALLERY_FRAME: 'galleryFrame'
+  GALLERY_FRAME: 'galleryFrame',
+  CARD_POPUP_BODY: 'cardPopupBody'
 }
 
 const TAGS = {
@@ -25,7 +26,8 @@ const TAGS = {
   [SELECTORS.HEADER]: () => '.header',
   [SELECTORS.ADMIN_USER_PAGE]: () => '.adminUser.pageContentGeneric',
   [SELECTORS.TRACIM_CONTENT]: () => `.tracim__content-scrollview`,
-  [SELECTORS.GALLERY_FRAME]: () => `.gallery.pageWrapperGeneric`
+  [SELECTORS.GALLERY_FRAME]: () => `.gallery.pageWrapperGeneric`,
+  [SELECTORS.CARD_POPUP_BODY]: () => '.cardPopup__body'
 }
 
 /**

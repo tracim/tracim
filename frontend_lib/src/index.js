@@ -14,11 +14,13 @@ import {
   PROFILE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
+  FILE_PREVIEW_STATE,
   displayFileSize,
   parserStringToList,
   checkEmailValidity,
   buildFilePreviewUrl,
   removeExtensionOfFilename,
+  computeProgressionPercentage,
   buildHeadTitle
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -70,6 +72,7 @@ import GenericButton from './component/Button/GenericButton.jsx'
 import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
+import FileUploadList from './component/FileDropzone/FileUploadList.jsx'
 
 import ShareDownload from './component/ShareDownload/ShareDownload.jsx'
 import ShareLink from './component/ShareLink/ShareLink.jsx'
@@ -104,6 +107,7 @@ export {
   buildFilePreviewUrl,
   buildHeadTitle,
   removeExtensionOfFilename,
+  computeProgressionPercentage,
   Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,
@@ -136,6 +140,7 @@ export {
   PROFILE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
+  FILE_PREVIEW_STATE,
   displayFileSize,
   parserStringToList,
   checkEmailValidity,
@@ -145,6 +150,7 @@ export {
   ComposedIcon,
   DisplayState,
   FileDropzone,
+  FileUploadList,
   ShareLink,
   ShareDownload,
   ProgressBar,

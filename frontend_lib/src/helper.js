@@ -273,4 +273,11 @@ export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, 
 
 export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
 
+export const computeProgressionPercentage = (progressionLoaded, progressionTotal, elementListLength = 1) => (progressionLoaded / progressionTotal * 99) / elementListLength
+
+export const FILE_PREVIEW_STATE = {
+  NO_PREVIEW: 'noPreview',
+  NO_FILE: 'noFile'
+}
+
 export const buildHeadTitle = words => words.reduce((acc, curr) => acc !== '' ? `${acc} · ${curr}` : curr, '')

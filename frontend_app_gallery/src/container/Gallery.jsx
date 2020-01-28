@@ -259,7 +259,7 @@ export class Gallery extends React.Component {
 
           const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
           const previewUrl = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 1400, 1400)
-          const previewUrlForThumbnail = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 150, 150)
+          const previewUrlForThumbnail = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 125, 125)
           const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, j) =>
             buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, j + 1, 1920, 1920)
           )
@@ -469,172 +469,175 @@ export class Gallery extends React.Component {
     if (state.imagesPreviews[state.fileSelected]) this.lightboxRotation.changeAngle(state.imagesPreviews[state.fileSelected].rotationAngle)
 
     return (
-      <PageWrapper customClass='gallery'>
-        <PageTitle
-          title={state.folderId ? state.folderDetail.fileName : state.workspaceLabel}
-          icon={'picture-o'}
-          breadcrumbsList={state.breadcrumbsList}
-        />
+      <div className='gallery-scrollView'>
+        <PageWrapper customClass='gallery'>
+          <PageTitle
+            title={state.folderId ? state.folderDetail.fileName : state.workspaceLabel}
+            icon={'picture-o'}
+            breadcrumbsList={state.breadcrumbsList}
+            parentClass='gallery__header'
+          />
 
-        <PageContent>
-          <div className='gallery__action__button'>
-            <button
-              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__play'
-              onClick={() => this.onClickSlickPlay(!state.autoPlay)}
-              data-cy='gallery__action__button__auto__play'
-            >
-              <span className='gallery__action__button__text'>
-                {state.autoPlay ? props.t('Pause') : props.t('Play')}
-              </span>
-              <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
-            </button>
+          <PageContent>
+            <div className='gallery__action__button'>
+              <button
+                className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__play'
+                onClick={() => this.onClickSlickPlay(!state.autoPlay)}
+                data-cy='gallery__action__button__auto__play'
+              >
+                <span className='gallery__action__button__text'>
+                  {state.autoPlay ? props.t('Pause') : props.t('Play')}
+                </span>
+                <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+              </button>
 
-            <button
-              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__left'
-              onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
-            >
-              <span className='gallery__action__button__text'>{props.t('Rotate 90° left')}</span>
-              <i className={'fa fa-fw fa-undo'} />
-            </button>
+              <button
+                className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__left'
+                onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
+              >
+                <span className='gallery__action__button__text'>{props.t('Rotate 90° left')}</span>
+                <i className={'fa fa-fw fa-undo'} />
+              </button>
 
-            <button
-              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__right'
-              onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
-            >
-              <span className='gallery__action__button__text'>{props.t('Rotate 90° right')}</span>
-              <i className={'fa fa-fw fa-undo'} />
-            </button>
+              <button
+                className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__right'
+                onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
+              >
+                <span className='gallery__action__button__text'>{props.t('Rotate 90° right')}</span>
+                <i className={'fa fa-fw fa-undo'} />
+              </button>
 
-            {/*
-              INFO - CH - there is a bug with the property userRoleIdInWorkspace that comes from frontend, it might be it's default value which is 1
-              So we won't use it for now and always display the delete button which will return 401 if user can't delete content
-            */}
-            <button
-              className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__delete'
-              onClick={this.handleOpenDeleteFilePopup}
-              data-cy='gallery__action__button__delete'
-            >
-              <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className={'fa fa-fw fa-trash'} />
-            </button>
-          </div>
+              {/*
+                INFO - CH - there is a bug with the property userRoleIdInWorkspace that comes from frontend, it might be it's default value which is 1
+                So we won't use it for now and always display the delete button which will return 401 if user can't delete content
+              */}
+              <button
+                className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__delete'
+                onClick={this.handleOpenDeleteFilePopup}
+                data-cy='gallery__action__button__delete'
+              >
+                <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className={'fa fa-fw fa-trash'} />
+              </button>
+            </div>
 
-          {state.imagesPreviewsLoaded
-            ? (
-              <Carousel
-                fileSelected={state.fileSelected}
-                slides={state.imagesPreviews}
-                onCarouselPositionChange={this.onCarouselPositionChange}
-                handleClickShowImageRaw={this.handleClickShowImageRaw}
-                loggedUser={state.loggedUser}
-                disableAnimation={state.displayLightbox}
-                isWorkspaceRoot={state.folderId === 0}
-                autoPlay={state.autoPlay}
-              />
-            ) : (
-              <div className='gallery__loader'>
-                <i className='fa fa-spinner fa-spin gallery__loader__icon' />
-              </div>
-            )
-          }
-
-          <Fullscreen
-            enabled={this.state.fullscreen}
-            onChange={fullscreen => this.setState({ fullscreen })}
-          >
-            <div ref={modalRoot => (this.reactImageLightBoxModalRoot = modalRoot)} />
-
-            {state.displayLightbox && (
-              <div className='gallery__mouse__listener' onMouseMove={this.handleMouseMove}>
-                <ReactImageLightbox
-                  prevSrc={this.getPreviousImageUrl()}
-                  mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]}
-                  nextSrc={this.getNextImageUrl()}
-                  onCloseRequest={this.handleClickHideImageRaw}
-                  onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
-                  onMoveNextRequest={() => { this.handleClickPreviousNextPage(DIRECTION.RIGHT) }}
-                  imagePadding={0}
-                  reactModalProps={{ parentSelector: () => this.reactImageLightBoxModalRoot }}
-                  toolbarButtons={[
-                    <div className={'gallery__action__button__lightbox'}>
-                      <button
-                        className='btn iconBtn'
-                        onClick={() => this.onClickSlickPlay(!state.autoPlay)}
-                        title={state.autoPlay ? props.t('Pause') : props.t('Play')}
-                      >
-                        <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
-                      </button>
-
-                      <button
-                        className='btn iconBtn'
-                        onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))}
-                        title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}
-                        data-cy='gallery__action__button__lightbox__fullscreen'
-                      >
-                        <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
-                      </button>
-
-                      <button
-                        className='btn iconBtn gallery__action__button__lightbox__rotation__left'
-                        onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
-                        title={props.t('Rotate 90° left')}
-                      >
-                        <i className={'fa fa-fw fa-undo'} />
-                      </button>
-
-                      <button
-                        className='btn iconBtn gallery__action__button__lightbox__rotation__right'
-                        onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
-                        title={props.t('Rotate 90° right')}
-                      >
-                        <i className={'fa fa-fw fa-undo'} />
-                      </button>
-
-                      <a
-                        className='btn iconBtn gallery__action__button__lightbox__openRawContent'
-                        title={props.t('Open raw file')}
-                        href={this.getRawFileUrlSelectedFile()}
-                        target='_blank'
-                      >
-                        <i className={'fa fa-fw fa-download'} />
-                      </a>
-                    </div>
-                  ]}
+            {state.imagesPreviewsLoaded
+              ? (
+                <Carousel
+                  fileSelected={state.fileSelected}
+                  slides={state.imagesPreviews}
+                  onCarouselPositionChange={this.onCarouselPositionChange}
+                  handleClickShowImageRaw={this.handleClickShowImageRaw}
+                  loggedUser={state.loggedUser}
+                  disableAnimation={state.displayLightbox}
+                  isWorkspaceRoot={state.folderId === 0}
+                  autoPlay={state.autoPlay}
                 />
-              </div>
-            )}
-          </Fullscreen>
-
-          {state.displayPopupDelete && (
-            <CardPopup
-              customClass='gallery__delete__file__popup'
-              customHeaderClass='primaryColorBg'
-              onClose={this.handleCloseDeleteFilePopup}
-            >
-              <div className='gallery__delete__file__popup__body'>
-                <div className='gallery__delete__file__popup__body__msg'>{props.t('Are you sure ?')}</div>
-                <div className='gallery__delete__file__popup__body__btn'>
-                  <button
-                    type='button'
-                    className='btn outlineTextBtn primaryColorBorder primaryColorFont nohover'
-                    onClick={this.handleCloseDeleteFilePopup}
-                  >
-                    {props.t('Cancel')}
-                  </button>
-
-                  <button
-                    type='button'
-                    className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
-                    onClick={() => this.deleteFile(this.state.fileSelected)}
-                    data-cy='gallery__delete__file__popup__body__btn__delete'
-                  >
-                    {props.t('Delete')}
-                  </button>
+              ) : (
+                <div className='gallery__loader'>
+                  <i className='fa fa-spinner fa-spin gallery__loader__icon' />
                 </div>
-              </div>
-            </CardPopup>
-          )}
-        </PageContent>
-      </PageWrapper>
+              )
+            }
+
+            <Fullscreen
+              enabled={this.state.fullscreen}
+              onChange={fullscreen => this.setState({ fullscreen })}
+            >
+              <div ref={modalRoot => (this.reactImageLightBoxModalRoot = modalRoot)} />
+
+              {state.displayLightbox && (
+                <div className='gallery__mouse__listener' onMouseMove={this.handleMouseMove}>
+                  <ReactImageLightbox
+                    prevSrc={this.getPreviousImageUrl()}
+                    mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]}
+                    nextSrc={this.getNextImageUrl()}
+                    onCloseRequest={this.handleClickHideImageRaw}
+                    onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
+                    onMoveNextRequest={() => { this.handleClickPreviousNextPage(DIRECTION.RIGHT) }}
+                    imagePadding={0}
+                    reactModalProps={{ parentSelector: () => this.reactImageLightBoxModalRoot }}
+                    toolbarButtons={[
+                      <div className={'gallery__action__button__lightbox'}>
+                        <button
+                          className='btn iconBtn'
+                          onClick={() => this.onClickSlickPlay(!state.autoPlay)}
+                          title={state.autoPlay ? props.t('Pause') : props.t('Play')}
+                        >
+                          <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                        </button>
+
+                        <button
+                          className='btn iconBtn'
+                          onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))}
+                          title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}
+                          data-cy='gallery__action__button__lightbox__fullscreen'
+                        >
+                          <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
+                        </button>
+
+                        <button
+                          className='btn iconBtn gallery__action__button__lightbox__rotation__left'
+                          onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
+                          title={props.t('Rotate 90° left')}
+                        >
+                          <i className={'fa fa-fw fa-undo'} />
+                        </button>
+
+                        <button
+                          className='btn iconBtn gallery__action__button__lightbox__rotation__right'
+                          onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
+                          title={props.t('Rotate 90° right')}
+                        >
+                          <i className={'fa fa-fw fa-undo'} />
+                        </button>
+
+                        <a
+                          className='btn iconBtn gallery__action__button__lightbox__openRawContent'
+                          title={props.t('Open raw file')}
+                          href={this.getRawFileUrlSelectedFile()}
+                          target='_blank'
+                        >
+                          <i className={'fa fa-fw fa-download'} />
+                        </a>
+                      </div>
+                    ]}
+                  />
+                </div>
+              )}
+            </Fullscreen>
+
+            {state.displayPopupDelete && (
+              <CardPopup
+                customClass='gallery__delete__file__popup'
+                customHeaderClass='primaryColorBg'
+                onClose={this.handleCloseDeleteFilePopup}
+              >
+                <div className='gallery__delete__file__popup__body'>
+                  <div className='gallery__delete__file__popup__body__msg'>{props.t('Are you sure ?')}</div>
+                  <div className='gallery__delete__file__popup__body__btn'>
+                    <button
+                      type='button'
+                      className='btn outlineTextBtn primaryColorBorder primaryColorFont nohover'
+                      onClick={this.handleCloseDeleteFilePopup}
+                    >
+                      {props.t('Cancel')}
+                    </button>
+
+                    <button
+                      type='button'
+                      className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
+                      onClick={() => this.deleteFile(this.state.fileSelected)}
+                      data-cy='gallery__delete__file__popup__body__btn__delete'
+                    >
+                      {props.t('Delete')}
+                    </button>
+                  </div>
+                </div>
+              </CardPopup>
+            )}
+          </PageContent>
+        </PageWrapper>
+      </div>
     )
   }
 }
