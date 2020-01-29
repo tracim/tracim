@@ -249,7 +249,7 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         if hapic_data.body.profile:
-            profile = hapic_data.body.profile
+            profile = Profile.get_profile_from_slug(hapic_data.body.profile)
         else:
             profile = None
         password = hapic_data.body.password
