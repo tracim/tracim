@@ -519,7 +519,12 @@ class TestUserApi(object):
         assert u.user_id == one.user_id
 
     def test_unit__get_user_with_context__nominal_case(self, session, app_config):
-        user = User(email="admin@tracim.tracim", display_name="Admin", is_active=True)
+        user = User(
+            email="admin@tracim.tracim",
+            display_name="Admin",
+            is_active=True,
+            profile=Profile.NOBODY,
+        )
         api = UserApi(current_user=None, session=session, config=app_config)
         new_user = api.get_user_with_context(user)
         assert isinstance(new_user, UserInContext)

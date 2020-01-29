@@ -194,7 +194,7 @@ class UserApi(object):
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
         # should show only user in same workspace as user
         assert not (filter_results and not self._user)
-        if filter_results and self._user and self._user.profile.id <= Profile.ADMIN.id:
+        if filter_results and self._user and self._user.profile.id <= Profile.USER.id:
             user_workspaces_id_query = (
                 self._session.query(UserRoleInWorkspace.workspace_id)
                 .distinct(UserRoleInWorkspace.workspace_id)

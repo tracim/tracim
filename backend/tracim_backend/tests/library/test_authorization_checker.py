@@ -62,8 +62,6 @@ class TestAuthorizationChecker(object):
         assert ProfileChecker(Profile.USER).check(FakeTracimContext())
         with pytest.raises(InsufficientUserProfile):
             ProfileChecker(Profile.ADMIN).check(FakeTracimContext())
-        with pytest.raises(InsufficientUserProfile):
-            ProfileChecker(Profile(4, "super-admin")).check(FakeTracimContext())
 
     def test__unit__CandidateUserProfileChecker__ok__nominal_case(self):
         class FakeTracimContext(TracimContext):
@@ -81,8 +79,6 @@ class TestAuthorizationChecker(object):
         assert CandidateUserProfileChecker(Profile.TRUSTED_USER).check(FakeTracimContext())
         with pytest.raises(InsufficientUserProfile):
             CandidateUserProfileChecker(Profile.ADMIN).check(FakeTracimContext())
-        with pytest.raises(InsufficientUserProfile):
-            CandidateUserProfileChecker(Profile(4, "super-admin")).check(FakeTracimContext())
 
     def test__unit__RoleChecker__ok__nominal_case(self, session):
 

@@ -139,7 +139,7 @@ class User(DeclarativeBase):
     )
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
     allowed_space = Column(BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
-    profile = Column(Enum(Profile), nullable=True, server_default=Profile.NOBODY.name)
+    profile = Column(Enum(Profile), nullable=False, server_default=Profile.NOBODY.name)
 
     @hybrid_property
     def email_address(self):

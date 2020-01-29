@@ -97,11 +97,11 @@ class CandidateUserProfileChecker(AuthorizationChecker):
     is as high as profile level given
     """
 
-    def __init__(self, profile_level: int):
-        self.profile_level = profile_level
+    def __init__(self, profile: Profile):
+        self.profile = profile
 
     def check(self, tracim_context: TracimContext) -> bool:
-        if tracim_context.candidate_user.profile.id >= self.profile_level:
+        if tracim_context.candidate_user.profile.id >= self.profile.id:
             return True
         raise InsufficientUserProfile()
 
