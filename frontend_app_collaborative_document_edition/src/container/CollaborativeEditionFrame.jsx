@@ -6,11 +6,13 @@ import {
   handleFetchResult,
   CUSTOM_EVENT,
   addAllResourceI18n,
+  buildHeadTitle,
   ROLE
 } from 'tracim_frontend_lib'
 import {
   getWOPIToken,
-  getFileContent
+  getFileContent,
+  getWorkspaceDetail
 } from '../action.async.js'
 
 const FORM_ID = 'loleafletform'
@@ -67,6 +69,19 @@ export class CollaborativeEditionFrame extends React.Component {
     window.removeEventListener('message', this.handleIframeIsClosing)
   }
 
+  setHeadTitle = async (contentName) => {
+    const { state } = this
+
+    const workspaceLabel = await this.loadWorkspaceLabel()
+
+    if (state.config && state.config.system && state.config.system.config) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([contentName, workspaceLabel, state.config.system.config.instance_name]) }
+      })
+    }
+  }
+
   handleIframeIsClosing (event) {
     const { props, state } = this
     let data = {}
@@ -111,6 +126,7 @@ export class CollaborativeEditionFrame extends React.Component {
             ...response.body
           }
         })
+        this.setHeadTitle(response.body.label)
         break
       case 400:
         switch (response.body.code) {
@@ -135,6 +151,25 @@ export class CollaborativeEditionFrame extends React.Component {
         this.redirectTo()
         throw new Error('Unknown error')
     }
+  }
+
+  loadWorkspaceLabel = async () => {
+    const { props } = this
+
+    let workspaceLabel = ''
+
+    const fetchResultWorkspaceDetail = await handleFetchResult(
+      await getWorkspaceDetail(props.data.config.apiUrl, props.data.content.workspace_id)
+    )
+
+    switch (fetchResultWorkspaceDetail.apiResponse.status) {
+      case 200:
+        workspaceLabel = fetchResultWorkspaceDetail.body.label
+        break
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
+    }
+    return workspaceLabel
   }
 
   setIframeConfig = async () => {

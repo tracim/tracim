@@ -103,7 +103,7 @@ class ShareFolderAdvanced extends React.Component {
     if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Share folder'), state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([props.t('Received files'), state.config.workspace.label, state.config.system.config.instance_name]) }
       })
     }
   }
