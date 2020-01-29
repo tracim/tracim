@@ -243,7 +243,7 @@ class CleanupLib(object):
             )
             self.safe_delete(role)
 
-        logger.info(self, "delete user groups for user {}".format(user.user_id))
+        logger.info(self, "delete user profile for user {}".format(user.user_id))
         user.groups = []
         self.safe_update(user)
 

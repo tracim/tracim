@@ -12,7 +12,6 @@ from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
@@ -22,6 +21,7 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Profile
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
@@ -248,13 +248,10 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        gapi = GroupApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config  # User
-        )
         if hapic_data.body.profile:
-            groups = [gapi.get_one_with_name(hapic_data.body.profile)]
+            profile = hapic_data.body.profile
         else:
-            groups = []
+            profile = None
         password = hapic_data.body.password
         if not password and hapic_data.body.email_notification:
             password = password_generator()
@@ -268,7 +265,7 @@ class UserController(Controller):
             name=hapic_data.body.public_name,
             do_notify=hapic_data.body.email_notification,
             allowed_space=hapic_data.body.allowed_space,
-            groups=groups,
+            profile=profile,
             do_save=True,
         )
         uapi.execute_created_user_actions(user)
@@ -353,14 +350,11 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        gapi = GroupApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config  # User
-        )
-        groups = [gapi.get_one_with_name(hapic_data.body.profile)]
+        profile = Profile.get_profile_from_slug(hapic_data.body.profile)
         uapi.update(
             user=request.candidate_user,
             auth_type=request.candidate_user.auth_type,
-            groups=groups,
+            profile=profile,
             do_save=True,
         )
         return

@@ -9,7 +9,7 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserRoleNotFound
-from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -65,7 +65,7 @@ class RoleApi(object):
     #     return False
 
     def get_user_workspaces_ids(self, user_id: int, min_role: int) -> typing.List[int]:
-        assert self._user.profile == Group.TIM_ADMIN or self._user.user_id == user_id
+        assert self._user.profile == Profile.ADMIN or self._user.user_id == user_id
         workspaces_ids_tuples = (
             self._session.query(UserRoleInWorkspace.workspace_id)
             .filter(UserRoleInWorkspace.user_id == user_id)

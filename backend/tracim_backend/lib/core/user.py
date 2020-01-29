@@ -47,12 +47,11 @@ from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.agenda.agenda import AgendaApi
-from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import TypeUser
 from tracim_backend.models.context_models import UserInContext
@@ -195,7 +194,7 @@ class UserApi(object):
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
         # should show only user in same workspace as user
         assert not (filter_results and not self._user)
-        if filter_results and self._user and self._user.profile.id <= Group.TIM_USER:
+        if filter_results and self._user and self._user.profile.id <= Profile.ADMIN.id:
             user_workspaces_id_query = (
                 self._session.query(UserRoleInWorkspace.workspace_id)
                 .distinct(UserRoleInWorkspace.workspace_id)
@@ -293,20 +292,15 @@ class UserApi(object):
 
         # INFO - G.M - 2018-11-22 - Create new user
         if not user:
-            groups = None
+            profile = None
             # TODO - G.M - 2018-12-05 - [ldap_profile]
             # support for profile attribute disabled
             # Should be reenabled later probably with a better code
             # if self._config.LDAP_PROFILE_ATTR:
             #     ldap_profile = ldap_data[self._config.LDAP_PROFILE_ATTR][0]
             #     try:
-            #         gapi = GroupApi(
-            #             current_user=self._user,  # User
-            #             session=self._session,
-            #             config=self._config,
-            #         )
-            #         groups = [gapi.get_one_with_name(ldap_profile)]
-            #     except GroupDoesNotExist:
+            #         profile = Profile.get_one_by_slug(ldap_profile)
+            #     except ProfileDoesNotExist:
             #         logger.warning(self,
             #             'Profile {} does not exist, create ldap user'
             #             'with default profile.'.format(
@@ -320,7 +314,7 @@ class UserApi(object):
             user = self.create_user(
                 email=email,
                 name=name,
-                groups=groups,
+                profile=profile,
                 auth_type=AuthType.LDAP,
                 do_save=True,
                 do_notify=False,
@@ -398,9 +392,13 @@ class UserApi(object):
 
         # INFO - G.M - 2018-12-12 - Create new user
         if not user:
-            groups = None
+            profile = None
             user = self.create_user(
-                email=email, groups=groups, auth_type=AuthType.REMOTE, do_save=True, do_notify=False
+                email=email,
+                profile=profile,
+                auth_type=AuthType.REMOTE,
+                do_save=True,
+                do_notify=False,
             )
             self.execute_created_user_actions(user)
             transaction.commit()
@@ -642,7 +640,7 @@ class UserApi(object):
         timezone: str = None,
         lang: str = None,
         auth_type: AuthType = None,
-        groups: typing.Optional[typing.List[Group]] = None,
+        profile: typing.Optional[Profile] = None,
         allowed_space: typing.Optional[int] = None,
         do_save=True,
     ) -> User:
@@ -686,19 +684,12 @@ class UserApi(object):
         if lang is not None:
             user.lang = lang
 
-        if groups is not None:
+        if profile is not None:
             if self._user and self._user == user:
                 raise UserCantChangeIsOwnProfile(
                     "User {} can't change is own profile".format(user.user_id)
                 )
-            # INFO - G.M - 2018-07-18 - Delete old groups
-            for group in user.groups:
-                if group not in groups:
-                    user.groups.remove(group)
-            # INFO - G.M - 2018-07-18 - add new groups
-            for group in groups:
-                if group not in user.groups:
-                    user.groups.append(group)
+            user.profile = profile
 
         if allowed_space is not None:
             user.allowed_space = allowed_space
@@ -732,7 +723,7 @@ class UserApi(object):
         timezone: str = "",
         lang: str = None,
         auth_type: AuthType = AuthType.UNKNOWN,
-        groups=[],
+        profile: typing.Optional[Profile] = None,
         allowed_space: typing.Optional[int] = None,
         do_save: bool = True,
         do_notify: bool = True,
@@ -741,7 +732,7 @@ class UserApi(object):
             raise NotificationDisabledCantCreateUserWithInvitation(
                 "Can't create user with invitation mail because " "notification are disabled."
             )
-        new_user = self.create_minimal_user(email, groups, save_now=False)
+        new_user = self.create_minimal_user(email, profile, save_now=False)
         if allowed_space is None:
             allowed_space = self._config.LIMITATION__USER_DEFAULT_ALLOWED_SPACE
         self.update(
@@ -780,7 +771,9 @@ class UserApi(object):
             self.save(new_user)
         return new_user
 
-    def create_minimal_user(self, email, groups=[], save_now=False) -> User:
+    def create_minimal_user(
+        self, email, profile: typing.Optional[Profile] = None, save_now=False
+    ) -> User:
         """Previous create_user method"""
         lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
@@ -793,13 +786,9 @@ class UserApi(object):
         # incorrect according to user_public_name_validator
         user.display_name = email.split("@")[0]
         user.created = datetime.datetime.utcnow()
-        if not groups:
-            gapi = GroupApi(
-                current_user=self._user, session=self._session, config=self._config  # User
-            )
-            groups = [gapi.get_one_with_name(self._config.USER__DEFAULT_PROFILE)]
-        for group in groups:
-            user.groups.append(group)
+        if not profile:
+            profile = Profile.get_profile_from_slug(self._config.USER__DEFAULT_PROFILE)
+        user.profile = profile
 
         self._session.add(user)
 
@@ -964,12 +953,11 @@ class UserApi(object):
         ):
             return False
         # INFO - G.M - 2018-10-25 - do not allow all profile to invite new user
-        gapi = GroupApi(self._session, self._user, self._config)
-        invite_minimal_profile = gapi.get_one_with_name(
-            group_name=self._config.NEW_USER__INVITATION__MINIMAL_PROFILE
+        invite_minimal_profile = Profile.get_profile_from_slug(
+            self._config.NEW_USER__INVITATION__MINIMAL_PROFILE
         )
 
-        if not self._user.profile.id >= invite_minimal_profile.group_id:
+        if not self._user.profile.id >= invite_minimal_profile.id:
             return False
 
         return True

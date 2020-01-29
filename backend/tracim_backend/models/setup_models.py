@@ -15,7 +15,6 @@ import zope.sqlalchemy
 from tracim_backend.applications.share.models import ContentShare  # noqa: F401
 from tracim_backend.applications.upload_permissions.models import UploadPermission  # noqa: F401
 from tracim_backend.lib.utils.utils import sliced_dict
-from tracim_backend.models.auth import Group  # noqa: F401
 from tracim_backend.models.auth import User  # noqa: F401
 from tracim_backend.models.data import Content  # noqa: F401
 from tracim_backend.models.data import ContentRevisionRO  # noqa: F401

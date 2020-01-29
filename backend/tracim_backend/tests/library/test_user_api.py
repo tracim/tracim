@@ -13,6 +13,7 @@ from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -553,17 +554,15 @@ class TestUserApi(object):
         assert user.auth_type == AuthType.INTERNAL
 
     @pytest.mark.internal_auth
-    def test_unit__authenticate_user___err__user_not_active(
-        self, session, app_config, group_api_factory
-    ):
+    def test_unit__authenticate_user___err__user_not_active(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = api.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             do_save=True,
             do_notify=False,
@@ -584,15 +583,15 @@ class TestUserApi(object):
         with pytest.raises(AuthenticationFailed):
             api.authenticate("admin@admin.admin", "wrong_password")
 
-    def test_unit__disable_user___ok__nominal_case(self, session, app_config, group_api_factory):
+    def test_unit__disable_user___ok__nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = api.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             do_save=True,
             do_notify=False,
@@ -601,7 +600,7 @@ class TestUserApi(object):
             email="test2@test.test",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             do_save=True,
             do_notify=False,
@@ -615,17 +614,15 @@ class TestUserApi(object):
         assert updated_user2.user_id == user2.user_id
         assert updated_user2.email == user2.email
 
-    def test_unit__disable_user___err__user_cant_disable_itself(
-        self, session, app_config, group_api_factory
-    ):
+    def test_unit__disable_user___err__user_cant_disable_itself(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = api.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             do_save=True,
             do_notify=False,

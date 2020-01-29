@@ -26,7 +26,6 @@ from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.roles import WorkspaceRoles
@@ -452,7 +451,7 @@ class CFG(object):
         )
 
         self.NEW_USER__INVITATION__MINIMAL_PROFILE = self.get_raw_config(
-            "new_user.invitation.minimal_profile", Group.TIM_MANAGER_GROUPNAME
+            "new_user.invitation.minimal_profile", Profile.TRUSTED_USER.slug
         )
 
     def _load_webdav_config(self) -> None:

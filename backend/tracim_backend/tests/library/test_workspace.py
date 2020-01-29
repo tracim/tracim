@@ -3,7 +3,7 @@ import pytest
 
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
@@ -135,7 +135,7 @@ class TestThread(object):
         assert role_3 in wapi.get_notifiable_roles(workspace=workspace)
 
     def test_unit__get_all_manageable(
-        self, admin_user, session, app_config, user_api_factory, group_api_factory, role_api_factory
+        self, admin_user, session, app_config, user_api_factory, role_api_factory
     ):
 
         uapi = user_api_factory.get()
@@ -149,8 +149,8 @@ class TestThread(object):
         w1 = wapi.create_workspace(label="w1")
         assert [w1, w2, w3, w4] == wapi.get_all_manageable()
         # Checks a regular user gets none workspace.
-        gapi = group_api_factory.get()
-        u = uapi.create_minimal_user("u.s@e.r", [gapi.get_one(Group.TIM_USER)], True)
+
+        u = uapi.create_minimal_user("u.s@e.r", Profile.USER, True)
         wapi = WorkspaceApi(session=session, current_user=u, config=app_config)
         rapi = role_api_factory.get()
         rapi.create_one(u, w4, UserRoleInWorkspace.READER, False)
@@ -159,7 +159,7 @@ class TestThread(object):
         rapi.create_one(u, w1, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         assert [] == wapi.get_all_manageable()
         # Checks a manager gets only its own workspaces.
-        u.groups.append(gapi.get_one(Group.TIM_MANAGER))
+        u.profile = Profile.TRUSTED_USER
         rapi.delete_one(u.user_id, w2.workspace_id)
         rapi.create_one(u, w2, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         assert [w1, w2] == wapi.get_all_manageable()

@@ -8,13 +8,11 @@ import transaction
 from tracim_backend.command import AppContextCommand
 from tracim_backend.command import Extender
 from tracim_backend.exceptions import BadCommandError
-from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import UserAlreadyExistError
-from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 
 
@@ -38,20 +36,9 @@ class UserCommand(AppContextCommand):
         )
 
         parser.add_argument(
-            "-g",
-            "--add-to-group",
-            help="Add user to group",
-            dest="add_to_group",
-            nargs="*",
-            action=Extender,
-            default=[],
-        )
-
-        parser.add_argument(
-            "-rmg",
-            "--remove-from-group",
-            help="Remove user from group",
-            dest="remove_from_group",
+            "--profile",
+            help="set user profile",
+            dest="profile",
             nargs="*",
             action=Extender,
             default=[],
@@ -70,29 +57,6 @@ class UserCommand(AppContextCommand):
 
     def _user_exist(self, login: str) -> User:
         return self._user_api.user_with_email_exists(login)
-
-    def _get_group(self, name: str) -> Group:
-        groups_availables = [group.group_name for group in self._group_api.get_all()]
-        if name not in groups_availables:
-            msg = "Group '{}' does not exist, choose a group name in : ".format(name)
-            for group in groups_availables:
-                msg += "'{}',".format(group)
-            self._session.rollback()
-            raise GroupDoesNotExist(msg)
-        return self._group_api.get_one_with_name(name)
-
-    def _add_user_to_named_group(self, user: str, group_name: str) -> None:
-
-        group = self._get_group(group_name)
-        if user not in group.users:
-            group.users.append(user)
-        self._session.flush()
-
-    def _remove_user_from_named_group(self, user: User, group_name: str) -> None:
-        group = self._get_group(group_name)
-        if user in group.users:
-            group.users.remove(user)
-        self._session.flush()
 
     def _create_user(self, login: str, password: str, do_notify: bool, **kwargs) -> User:
         if not password:
@@ -135,11 +99,9 @@ class UserCommand(AppContextCommand):
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
         self._user_api = UserApi(current_user=None, session=self._session, config=self._app_config)
-        self._group_api = GroupApi(
-            current_user=None, session=self._session, config=self._app_config
-        )
         user = self._proceed_user(parsed_args)
-        self._proceed_groups(user, parsed_args)
+        if parsed_args.profile:
+            user.profile = Profile.get_profile_from_slug(parsed_args.profile)
 
         print("User created/updated")
 
@@ -172,16 +134,6 @@ class UserCommand(AppContextCommand):
             user = self._user_api.get_one_by_email(parsed_args.login)
 
         return user
-
-    def _proceed_groups(self, user: User, parsed_args: argparse.Namespace) -> None:
-        # User always in "users" group
-        self._add_user_to_named_group(user, "users")
-
-        for group_name in parsed_args.add_to_group:
-            self._add_user_to_named_group(user, group_name)
-
-        for group_name in parsed_args.remove_from_group:
-            self._remove_user_from_named_group(user, group_name)
 
     def _password_required(self) -> bool:
         # TODO - G.M - 04-04-2018 - [LDAP] Check this code

@@ -19,11 +19,8 @@ import uuid
 import sqlalchemy
 from sqlalchemy import BigInteger
 from sqlalchemy import Column
-from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
-from sqlalchemy import Table
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
 from sqlalchemy.orm import synonym
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
@@ -35,31 +32,11 @@ from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import ProfileDoesNotExist
 from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.models.meta import DeclarativeBase
-from tracim_backend.models.meta import metadata
 
 if TYPE_CHECKING:
     from tracim_backend.models.data import Workspace
     from tracim_backend.models.data import UserRoleInWorkspace
-__all__ = ["User", "Group"]
-
-# This is the association table for the many-to-many relationship between
-# groups and members - this is, the memberships.
-user_group_table = Table(
-    "user_group",
-    metadata,
-    Column(
-        "user_id",
-        Integer,
-        ForeignKey("users.user_id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    ),
-    Column(
-        "group_id",
-        Integer,
-        ForeignKey("groups.group_id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    ),
-)
+__all__ = ["User"]
 
 
 class AuthType(enum.Enum):
@@ -70,7 +47,7 @@ class AuthType(enum.Enum):
 
 
 class Profile(enum.Enum):
-    """This model is the "max" group associated to a given user."""
+    """This model is the "max" profile associated to a given user."""
 
     NOBODY = (0, "nobody")
     USER = (1, "users")
@@ -100,40 +77,6 @@ class Profile(enum.Enum):
         if len(profiles) != 1:
             raise ProfileDoesNotExist()
         return profiles[0]
-
-
-class Group(DeclarativeBase):
-
-    # TODO - G.M - 2019-10-08 - remove use of this legacy code
-    # (needed for retrocompat)
-    TIM_USER = Profile.USER.id
-    TIM_MANAGER = Profile.TRUSTED_USER.id
-    TIM_ADMIN = Profile.ADMIN.id
-
-    TIM_USER_GROUPNAME = "users"
-    TIM_MANAGER_GROUPNAME = "trusted-users"
-    TIM_ADMIN_GROUPNAME = "administrators"
-
-    __tablename__ = "groups"
-
-    group_id = Column(
-        Integer, Sequence("seq__groups__group_id"), autoincrement=True, primary_key=True
-    )
-    group_name = Column(Unicode(16), unique=True, nullable=False)
-    display_name = Column(Unicode(255))
-    created = Column(DateTime, default=datetime.utcnow)
-    users = relationship("User", secondary=user_group_table, backref="groups")
-
-    def __repr__(self):
-        return "<Group: name=%s>" % repr(self.group_name)
-
-    def __unicode__(self):
-        return self.group_name
-
-    @classmethod
-    def by_group_name(cls, group_name, dbsession):
-        """Return the user object whose email address is ``email``."""
-        return dbsession.query(cls).filter_by(group_name=group_name).first()
 
 
 class User(DeclarativeBase):
@@ -196,6 +139,7 @@ class User(DeclarativeBase):
     )
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
     allowed_space = Column(BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
+    profile = Column(Enum(Profile), nullable=True, server_default=Profile.NOBODY.name)
 
     @hybrid_property
     def email_address(self):
@@ -206,13 +150,6 @@ class User(DeclarativeBase):
 
     def __unicode__(self):
         return self.display_name or self.email
-
-    @property
-    def profile(self) -> Profile:
-        profile_id = 0
-        if len(self.groups) > 0:
-            profile_id = max(group.group_id for group in self.groups)
-        return Profile.get_profile_from_id(profile_id)
 
     @classmethod
     def by_email_address(cls, email, dbsession):

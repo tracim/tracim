@@ -18,8 +18,8 @@ from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
+from tracim_backend.fixtures.users import Base as BaseFixture
+from tracim_backend.fixtures.users import Test as FixtureTest
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
@@ -30,7 +30,6 @@ from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import ElasticSearchHelper
-from tracim_backend.tests.utils import GroupApiFactory
 from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
@@ -223,11 +222,6 @@ def share_lib_factory(session, app_config, admin_user) -> ShareLibFactory:
 @pytest.fixture
 def upload_permission_lib_factory(session, app_config, admin_user) -> UploadPermissionLibFactory:
     return UploadPermissionLibFactory(session, app_config, admin_user)
-
-
-@pytest.fixture
-def group_api_factory(session, app_config, admin_user) -> GroupApiFactory:
-    return GroupApiFactory(session, app_config, admin_user)
 
 
 @pytest.fixture
