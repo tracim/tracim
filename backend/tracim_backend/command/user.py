@@ -6,7 +6,6 @@ from sqlalchemy.exc import IntegrityError
 import transaction
 
 from tracim_backend.command import AppContextCommand
-from tracim_backend.command import Extender
 from tracim_backend.exceptions import BadCommandError
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationSendingFailed
@@ -35,14 +34,7 @@ class UserCommand(AppContextCommand):
             "-p", "--password", help="User password", dest="password", required=False, default=None
         )
 
-        parser.add_argument(
-            "--profile",
-            help="set user profile",
-            dest="profile",
-            nargs="*",
-            action=Extender,
-            default=[],
-        )
+        parser.add_argument("--profile", help="set user profile", dest="profile", default=None)
 
         parser.add_argument(
             "--send-email",
