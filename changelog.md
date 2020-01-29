@@ -1,5 +1,25 @@
 
 
+# 2.6.0 /2020-01-xx
+
+### New Feature
+- Multi-upload file directly available in tracim frontend
+- Preview generator now support raw file and 3D file (working with xvfb in docker container)
+- With proxy apache: you can now used browser cache policy. If you used Tracim with docker you need to backup and delete existing apache configuration file in `~/tracim/etc/` to make sure docker image re-create this file with new parameters.
+- Its now possible to delete user and anonymise information about him/her with tracimcli command
+
+### Fixed issues
+- Gallery: #2540, #2541, #2551, #2574, #2583 
+- Frontend: #1396, #1560, #2607, #2608, #2641 
+- Backend: #2588, #2570, #2610, #2129, #1484, #2010
+
+### Breaking change
+- 
+
+### Other Changes
+- 2 deprecated parameters (#2613): `ldap_base_url` and `ldap_base_dn`
+
+
 # 2.5.1 / 2019-12-06
 
 ### New Features
