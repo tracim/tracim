@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from collections import OrderedDict
 import json
 import os
 import typing
@@ -7,15 +6,15 @@ import typing
 from depot.manager import DepotManager
 from paste.deploy.converters import asbool
 
-from tracim_backend.app_models.applications import Application
-from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.validator import update_validators
+from tracim_backend.apps import load_apps
 from tracim_backend.exceptions import ConfigCodeError
 from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
-from tracim_backend.lib.collaborative_document_edition.data import COLLABORA_DOCUMENT_EDITION_SLUG
+from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
@@ -24,12 +23,11 @@ from tracim_backend.lib.utils.utils import get_cache_token
 from tracim_backend.lib.utils.utils import is_dir_exist
 from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
-from tracim_backend.lib.utils.utils import string_to_list
+from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.roles import WorkspaceRoles
 
 ENV_VAR_PREFIX = "TRACIM_"
 CONFIG_LOG_TEMPLATE = (
@@ -72,13 +70,23 @@ class CFG(object):
         # with object in some context
         self.settings = settings.copy()
         self.config_naming = []  # type: typing.List[ConfigParam]
-        logger.debug(self, "CONFIG_PROCESS:1: load config from settings")
+        logger.debug(self, "CONFIG_PROCESS:1: load enabled apps")
+        self.load_enabled_apps()
+        logger.debug(self, "CONFIG_PROCESS:3: load config from settings")
         self.load_config()
-        logger.debug(self, "CONFIG_PROCESS:2: check validity of config given")
+        logger.debug(self, "CONFIG_PROCESS:4: check validity of config given")
         self._check_consistency()
         self.check_config_validity()
-        logger.debug(self, "CONFIG_PROCESS:3: do post actions")
-        self.do_post_check_action()
+        logger.debug(self, "CONFIG_PROCESS:5: End of config process")
+
+        app_lib = ApplicationApi(app_list=app_list, show_inactive=True)
+        for app in app_lib.get_all():
+            logger.info(
+                self,
+                "LOADED_APP:{state}:{slug}:{label}".format(
+                    state="ENABLED" if app.is_active else "DISABLED", slug=app.slug, label=app.label
+                ),
+            )
 
     # INFO - G.M - 2019-04-05 - Utils Methods
 
@@ -87,6 +95,24 @@ class CFG(object):
             return "<value not shown>"
         else:
             return value
+
+    def deprecate_parameter(
+        self, parameter_name: str, parameter_value: typing.Any, extended_information: str
+    ) -> None:
+        """
+
+        :param parameter_name: name of the parameter, etc : "CALDAV_ENABLED"
+        :param parameter_value: value of the parameter.
+        :param extended_information: add some more information about deprecation
+        :return: None
+        """
+        if parameter_value:
+            logger.warning(
+                self,
+                "{parameter_name} parameter is deprecated. {extended_information}".format(
+                    parameter_name=parameter_name, extended_information=extended_information
+                ),
+            )
 
     def get_raw_config(
         self,
@@ -133,10 +159,92 @@ class CFG(object):
         )
         return config_value
 
-    # INFO - G.M - 2019-04-05 - Config loading methods
+    # INFO - G.M - 2019-04-05 - load of enabled app
+    def load_enabled_apps(self) -> None:
+        self._load_enabled_apps_config()
+        loaded_apps = load_apps()
+        self._load_enabled_app(self.APP__ENABLED, loaded_apps)
 
-    def load_config(self) -> None:
-        """Parse configuration file and env variables"""
+    def _load_enabled_apps_config(self) -> None:
+        self.log_config_header("App Enabled config parameters:")
+        default_enabled_app = (
+            "contents/thread,"
+            "contents/file,"
+            "contents/html-document,"
+            "contents/folder,"
+            "agenda,"
+            "share_content,"
+            "upload_permission,"
+            "gallery"
+        )
+        extend_apps = ""
+        # TODO - G.M - 2020-01-09 - remove this retrocompat code, as
+        #  CALDAV__ENABLED and COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
+        # should be deprecated.
+        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "false"))
+        self.deprecate_parameter(
+            "CALDAV_ENABLED",
+            self.CALDAV__ENABLED,
+            extended_information="It will not be taken into account.",
+        )
+        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
+            self.get_raw_config("collaborative_document_edition.activated", "false")
+        )
+        self.deprecate_parameter(
+            "COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED",
+            self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
+            extended_information="It will not be taken into account.",
+        )
+        default_enabled_app = default_enabled_app.format(extend_apps=extend_apps)
+        self.APP__ENABLED = string_to_unique_item_list(
+            self.get_raw_config("app.enabled", default_enabled_app),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
+
+    def _load_enabled_app(
+        self,
+        enabled_app_slug_list: typing.List[str],
+        loaded_apps: typing.Dict[str, TracimApplication],
+    ) -> None:
+
+        # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
+        # of tracim_backend, Be careful app_list is a global_var
+        app_list.clear()
+        # FIXME - G.M - 2020-01-27 - force specific order of apps
+        # see issue https://github.com/tracim/tracim/issues/2326
+        default_app_order = (
+            "contents/thread",
+            "contents/file",
+            "contents/html-document",
+            "contents/folder",
+            "agenda",
+            "collaborative_document_edition",
+            "share_content",
+            "upload_permission",
+            "gallery",
+        )
+        for app_name in default_app_order:
+            app = loaded_apps.get(app_name)
+            if app:
+                if app_name in enabled_app_slug_list:
+                    app.load_content_types()
+                    app.is_active = True
+                app_list.append(app)
+
+        # FIXME - G.M - 2020-01-27 - Ordering: add unordered app at the end of the list.
+        # see issue https://github.com/tracim/tracim/issues/2326
+        for app in loaded_apps.values():
+            if app not in app_list:
+                app_list.append(app)
+
+        # TODO - G.M - 2018-08-08 - We need to update validators each time
+        # app_list is updated.
+        update_validators()
+
+    def log_config_header(self, title: str) -> None:
+        logger.info(self, title)
         logger.info(
             self,
             CONFIG_LOG_TEMPLATE.format(
@@ -146,25 +254,27 @@ class CFG(object):
                 config_name_source="<config_name_source>",
             ),
         )
+
+    # INFO - G.M - 2019-04-05 - Config loading methods
+    def load_config(self) -> None:
+        """Parse configuration file and env variables"""
+        self.log_config_header("Global config parameters:")
         self._load_global_config()
+        self.log_config_header("Limitation config parameters:")
         self._load_limitation_config()
+        self.log_config_header("Email config parameters:")
         self._load_email_config()
+        self.log_config_header("LDAP config parameters:")
         self._load_ldap_config()
+        self.log_config_header("Webdav config parameters:")
         self._load_webdav_config()
-        self._load_caldav_config()
+        self.log_config_header("Search config parameters:")
         self._load_search_config()
-        self._load_collaborative_document_edition_config()
 
-        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
-        # to make thing easier later
-        # when app will be load dynamycally.
-        import tracim_backend.applications.share.config as share_app_config
-
-        share_app_config.load_config(self)
-
-        import tracim_backend.applications.upload_permissions.config as upload_permissions_config
-
-        upload_permissions_config.load_config(self)
+        app_lib = ApplicationApi(app_list=app_list)
+        for app in app_lib.get_all():
+            self.log_config_header('"{label}" app config parameters:'.format(label=app.label))
+            app.load_config(self)
 
     def _load_global_config(self) -> None:
         """
@@ -181,41 +291,16 @@ class CFG(object):
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
         )
-
-        default_enabled_app = (
-            "contents/thread,"
-            "contents/file,"
-            "contents/html-document,"
-            "contents/folder,"
-            "agenda,"
-            "collaborative_document_edition,"
-            "share_content,"
-            "upload_permission,"
-            "gallery"
-        )
-
-        self.APP__ENABLED = string_to_list(
-            self.get_raw_config("app.enabled", default_enabled_app),
-            separator=",",
-            cast_func=str,
-            do_strip=True,
-        )
-
         self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir")
         self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name")
         self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir")
-        self.AUTH_TYPES = string_to_list(
+        self.AUTH_TYPES = string_to_unique_item_list(
             self.get_raw_config("auth_types", "internal"),
             separator=",",
             cast_func=AuthType,
             do_strip=True,
         )
         self.REMOTE_USER_HEADER = self.get_raw_config("remote_user_header", None)
-        # TODO - G.M - 2018-09-11 - Deprecated param
-        # self.DATA_UPDATE_ALLOWED_DURATION = int(self.get_raw_config(
-        #     'content.update.allowed.duration',
-        #     0,
-        # ))
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
         self.SESSION__REISSUE_TIME = int(self.get_raw_config("session.reissue_time", "120"))
@@ -233,7 +318,7 @@ class CFG(object):
         else:
             default_cors_allowed_origin = self.WEBSITE__BASE_URL
 
-        self.CORS__ACCESS_CONTROL_ALLOWED_ORIGIN = string_to_list(
+        self.CORS__ACCESS_CONTROL_ALLOWED_ORIGIN = string_to_unique_item_list(
             self.get_raw_config("cors.access-control-allowed-origin", default_cors_allowed_origin),
             separator=",",
             cast_func=str,
@@ -251,12 +336,12 @@ class CFG(object):
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         defaut_reset_password_validity = "900"
         self.USER__RESET_PASSWORD__VALIDITY = self.get_raw_config("user.reset_password.validity")
+        self.deprecate_parameter(
+            "USER__RESET_PASSWORD__VALIDITY",
+            self.USER__RESET_PASSWORD__VALIDITY,
+            extended_information="please use USER__RESET_PASSWORD__TOKEN_LIFETIME instead",
+        )
         if self.USER__RESET_PASSWORD__VALIDITY:
-            logger.warning(
-                self,
-                "user.reset_password.validity parameter is deprecated ! "
-                "please use user.reset_password.token_lifetime instead.",
-            )
             self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.USER__RESET_PASSWORD__VALIDITY
         else:
             self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(
@@ -274,7 +359,7 @@ class CFG(object):
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
             self.get_raw_config("preview.jpg.restricted_dims", "false")
         )
-        self.PREVIEW__JPG__ALLOWED_DIMS = string_to_list(
+        self.PREVIEW__JPG__ALLOWED_DIMS = string_to_unique_item_list(
             self.get_raw_config("preview.jpg.allowed_dims", "256x256"),
             cast_func=PreviewDim.from_string,
             separator=",",
@@ -355,12 +440,11 @@ class CFG(object):
             "email.notification.from.email", "noreply+{user_id}@trac.im"
         )
         self.EMAIL__NOTIFICATION__FROM = self.get_raw_config("email.notification.from")
-        if self.get_raw_config("email.notification.from"):
-            raise ConfigurationError(
-                "email.notification.from configuration is deprecated. "
-                "Use instead email.notification.from.email and "
-                "email.notification.from.default_label."
-            )
+        self.deprecate_parameter(
+            "EMAIL__NOTIFICATION__FROM",
+            self.EMAIL__NOTIFICATION__FROM,
+            extended_information="use instead EMAIL__NOTIFICATION__FROM__EMAIL and EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
+        )
 
         self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL = self.get_raw_config(
             "email.notification.from.default_label", "Tracim Notifications"
@@ -498,33 +582,12 @@ class CFG(object):
         self.WEBDAV_SHOW_HISTORY = False
         self.WEBDAV_MANAGE_LOCK = True
 
-    def _load_caldav_config(self) -> None:
-        """
-        load config for caldav related stuff
-        """
-        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "false"))
-        self.CALDAV__RADICALE_PROXY__BASE_URL = self.get_raw_config(
-            "caldav.radicale_proxy.base_url", None
-        )
-        self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = self.get_raw_config(
-            "caldav.radicale.storage.filesystem_folder"
-        )
-        self.CALDAV__RADICALE__AGENDA_DIR = "agenda"
-        self.CALDAV__RADICALE__WORKSPACE_SUBDIR = "workspace"
-        self.CALDAV__RADICALE__USER_SUBDIR = "user"
-        self.CALDAV__RADICALE__BASE_PATH = "/{}/".format(self.CALDAV__RADICALE__AGENDA_DIR)
-        self.CALDAV__RADICALE__USER_PATH = "/{}/{}/".format(
-            self.CALDAV__RADICALE__AGENDA_DIR, self.CALDAV__RADICALE__USER_SUBDIR
-        )
-        self.CALDAV_RADICALE_WORKSPACE_PATH = "/{}/{}/".format(
-            self.CALDAV__RADICALE__AGENDA_DIR, self.CALDAV__RADICALE__WORKSPACE_SUBDIR
-        )
-
     def _load_ldap_config(self) -> None:
         """
         Load config for ldap related stuff
         """
         self.LDAP_URL = self.get_raw_config("ldap_url", "dc=directory,dc=fsf,dc=org")
+        self.LDAP_BASE_URL = self.get_raw_config("ldap_base_url", "dc=directory,dc=fsf,dc=org")
         self.LDAP_BIND_DN = self.get_raw_config(
             "ldap_bind_dn", "cn=admin, dc=directory,dc=fsf,dc=org"
         )
@@ -565,7 +628,7 @@ class CFG(object):
         )
         # FIXME - G.M - 2019-05-31 - limit default allowed mimetype to useful list instead of
         ALLOWED_INGEST_DEFAULT_MIMETYPE = ""
-        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_list(
+        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_unique_item_list(
             self.get_raw_config(
                 "search.elasticsearch.ingest.mimetype_whitelist", ALLOWED_INGEST_DEFAULT_MIMETYPE
             ),
@@ -573,7 +636,7 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
-        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST = string_to_list(
+        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST = string_to_unique_item_list(
             self.get_raw_config("search.elasticsearch.ingest.mimetype_blacklist", ""),
             separator=",",
             cast_func=str,
@@ -592,20 +655,6 @@ class CFG(object):
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
         )
 
-    def _load_collaborative_document_edition_config(self):
-        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
-            self.get_raw_config("collaborative_document_edition.activated", "false")
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE = self.get_raw_config(
-            "collaborative_document_edition.software"
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = self.get_raw_config(
-            "collaborative_document_edition.collabora.base_url"
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = self.get_raw_config(
-            "collaborative_document_edition.file_template_dir"
-        )
-
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -614,25 +663,11 @@ class CFG(object):
         """
         self._check_global_config_validity()
         self._check_email_config_validity()
-        self._check_caldav_config_validity()
         self._check_search_config_validity()
-        self._check_collaborative_document_edition_config_validity()
 
-        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
-        # to make thing easier later
-        # when app will be load dynamycally.
-        import tracim_backend.applications.share.config as share_app_config
-
-        share_app_config.check_config(self)
-
-    def _check_collaborative_document_edition_config_validity(self) -> None:
-        if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
-            if self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
-                self.check_mandatory_param(
-                    "COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL",
-                    self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL,
-                    when_str="if collabora feature is activated",
-                )
+        app_lib = ApplicationApi(app_list=app_list)
+        for app in app_lib.get_all():
+            app.check_config(self)
 
     def _check_global_config_validity(self) -> None:
         """
@@ -752,194 +787,6 @@ class CFG(object):
                     self.CST.ASYNC, self.CST.SYNC, self.EMAIL__PROCESSING_MODE
                 )
             )
-
-    def _check_caldav_config_validity(self) -> None:
-        """
-        Check if config is correctly setted for caldav features
-        """
-        if self.CALDAV__ENABLED:
-            self.check_mandatory_param(
-                "CALDAV__RADICALE_PROXY__BASE_URL",
-                self.CALDAV__RADICALE_PROXY__BASE_URL,
-                when_str="when caldav feature is enabled",
-            )
-            # TODO - G.M - 2019-05-06 - convert "caldav.radicale.storage.filesystem_folder"
-            # as tracim global parameter
-            self.check_mandatory_param(
-                "CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER",
-                self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-                when_str="if caldav feature is enabled",
-            )
-            self.check_directory_path_param(
-                "CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER",
-                self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-                writable=True,
-            )
-            radicale_storage_type = self.settings.get("caldav.radicale.storage.type")
-            if radicale_storage_type != "multifilesystem":
-                raise ConfigurationError(
-                    '"{}" should be set to "{}"'
-                    " (currently only valid value)"
-                    ' when "{}" is true'.format(
-                        "caldav.radicale.storage.type", "multifilesystem", "caldav.enabled"
-                    )
-                )
-
-    # INFO - G.M - 2019-04-05 - Post Actions Methods
-    def do_post_check_action(self) -> None:
-        self._set_default_app(self.APP__ENABLED)
-
-    def _set_default_app(self, enabled_app_list: typing.List[str]) -> None:
-
-        # init applications
-        html_documents = Application(
-            label="Text Documents",  # TODO - G.M - 24-05-2018 - Check label
-            slug="contents/html-document",
-            fa_icon="file-text-o",
-            is_active=True,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=html-document",
-            app_config=self,
-        )
-        html_documents.add_content_type(
-            slug="html-document",
-            label="Text Document",
-            creation_label="Write a document",
-            available_statuses=content_status_list.get_all(),
-            slug_alias=["page"],
-            file_extension=".document.html",
-        )
-
-        _file = Application(
-            label="Files",
-            slug="contents/file",
-            fa_icon="paperclip",
-            is_active=True,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=file",
-            app_config=self,
-        )
-        _file.add_content_type(
-            slug="file",
-            label="File",
-            creation_label="Upload files",
-            available_statuses=content_status_list.get_all(),
-        )
-
-        thread = Application(
-            label="Threads",
-            slug="contents/thread",
-            fa_icon="comments-o",
-            is_active=True,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
-            app_config=self,
-        )
-        thread.add_content_type(
-            slug="thread",
-            label="Thread",
-            creation_label="Start a topic",
-            available_statuses=content_status_list.get_all(),
-            file_extension=".thread.html",
-        )
-
-        folder = Application(
-            label="Folder",
-            slug="contents/folder",
-            fa_icon="folder-o",
-            is_active=True,
-            config={},
-            main_route="",
-            app_config=self,
-        )
-        folder.add_content_type(
-            slug="folder",
-            label="Folder",
-            creation_label="Create a folder",
-            available_statuses=content_status_list.get_all(),
-            allow_sub_content=True,
-            minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
-        )
-
-        markdownpluspage = Application(
-            label="Markdown Plus Documents",
-            # TODO - G.M - 24-05-2018 - Check label
-            slug="contents/markdownpluspage",
-            fa_icon="file-code-o",
-            is_active=False,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=markdownpluspage",
-            app_config=self,
-        )
-        markdownpluspage.add_content_type(
-            slug="markdownpage",
-            label="Rich Markdown File",
-            creation_label="Create a Markdown document",
-            available_statuses=content_status_list.get_all(),
-        )
-
-        agenda = Application(
-            label="Agenda",
-            slug="agenda",
-            fa_icon="calendar",
-            is_active=self.CALDAV__ENABLED,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/agenda",
-            app_config=self,
-        )
-
-        gallery = Application(
-            label="Gallery",
-            slug="gallery",
-            fa_icon="picture-o",
-            is_active=True,
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/gallery",
-            app_config=self,
-        )
-
-        collaborative_document_edition = Application(
-            label="Collaborative Document Edition",
-            slug="collaborative_document_edition",
-            fa_icon="file-o",
-            is_active=self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
-            config={},
-            main_route="",
-            app_config=self,
-        )
-        # INFO - G.M - 2019-08-08 - import app here instead of top of file,
-        # to make thing easier later
-        # when app will be load dynamycally.
-        import tracim_backend.applications.share.application as share_app
-
-        share_content = share_app.get_app(app_config=self)
-        import tracim_backend.applications.upload_permissions.application as upload_permissions_app
-
-        upload_permissions = upload_permissions_app.get_app(app_config=self)
-        # process activated app list
-        available_apps = OrderedDict(
-            [
-                (html_documents.slug, html_documents),
-                (_file.slug, _file),
-                (thread.slug, thread),
-                (folder.slug, folder),
-                (markdownpluspage.slug, markdownpluspage),
-                (agenda.slug, agenda),
-                (gallery.slug, gallery),
-                (collaborative_document_edition.slug, collaborative_document_edition),
-                (share_content.slug, share_content),
-                (upload_permissions.slug, upload_permissions),
-            ]
-        )
-        # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
-        # of tracim_backend, Be careful app_list is a global_var
-        app_list.clear()
-        for app_slug in enabled_app_list:
-            if app_slug in available_apps.keys():
-                app_list.append(available_apps[app_slug])
-        # TODO - G.M - 2018-08-08 - We need to update validators each time
-        # app_list is updated.
-        update_validators()
 
     def _check_search_config_validity(self):
         search_engine_valid = ["elasticsearch", "simple"]

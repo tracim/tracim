@@ -2,19 +2,11 @@
   "Validate and create": "Validate and create",
   "Topic's subject": "Topic's subject",
   "New Thread": "New Thread",
-  "Error while archiving thread": "Error while archiving thread",
-  "Error while deleting thread": "Error while deleting thread",
-  "Error while restoring thread": "Error while restoring thread",
   "Threads": "Threads",
   "Start a topic": "Start a topic",
   "A content with the same name already exists": "A content with the same name already exists",
   "Error while creating thread": "Error while creating thread",
-  "Error while saving new comment": "Error while saving new comment",
-  "A content with same name already exists": "A content with same name already exists",
-  "Error while saving new title": "Error while saving new title",
-  "Error while changing status": "Error while changing status",
   "Thread": "Thread",
   "thread": "thread",
-  "threads": "threads",
-  "You can't send an empty comment": "You can't send an empty comment"
+  "threads": "threads"
 }

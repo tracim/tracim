@@ -11,7 +11,8 @@ import {
   CUSTOM_EVENT,
   ROLE,
   ROLE_LIST,
-  PROFILE
+  PROFILE,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -80,11 +81,15 @@ class Dashboard extends React.Component {
         await this.loadWorkspaceDetail()
         this.buildBreadcrumbs()
         break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.buildBreadcrumbs()
+        this.setHeadTitle()
+        break
     }
   }
 
   async componentDidMount () {
+    this.setHeadTitle()
     await this.loadWorkspaceDetail()
     this.loadMemberList()
     this.loadRecentActivity()
@@ -95,6 +100,8 @@ class Dashboard extends React.Component {
     const { props } = this
 
     if (!prevProps.match || !props.match || prevProps.match.params.idws === props.match.params.idws) return
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) this.setHeadTitle()
 
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP) // to unmount advanced workspace
     this.setState({
@@ -130,6 +137,7 @@ class Dashboard extends React.Component {
         if (props.appList.some(a => a.slug === 'agenda') && fetchWorkspaceDetail.json.agenda_enabled) {
           this.loadCalendarDetail()
         }
+        this.setHeadTitle()
         break
       case 400:
         props.history.push(PAGE.HOME)
@@ -180,6 +188,17 @@ class Dashboard extends React.Component {
       case 200: props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
       case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
+    }
+  }
+
+  setHeadTitle = () => {
+    const { props } = this
+
+    if (props.system.config.instance_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('Dashboard'), props.system.config.instance_name]) }
+      })
     }
   }
 

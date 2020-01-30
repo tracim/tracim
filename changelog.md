@@ -7,6 +7,8 @@
 - Preview generator now support raw file and 3D file (working with xvfb in docker container)
 - With proxy apache: you can now used browser cache policy. If you used Tracim with docker you need to backup and delete existing apache configuration file in `~/tracim/etc/` to make sure docker image re-create this file with new parameters.
 - Its now possible to delete user and anonymise information about him/her with tracimcli command
+- Page title show where you are in Tracim
+- All app is now enabled/disabled directly with one parameter and its more simple to develop new app
 
 ### Fixed issues
 - Gallery: #2540, #2541, #2551, #2574, #2583 
@@ -14,10 +16,10 @@
 - Backend: #2588, #2570, #2610, #2129, #1484, #2010
 
 ### Breaking change
-- agenda, share_content, upload_permission, collaborative_document_edition are now real applications and add/remove them from app.enabled list add/remove the associated feature. 
+- `agenda`, `share_content`, `upload_permission` and `collaborative_document_edition` are now real applications, you can add/remove them from `app.enabled` list and its add/remove the associated feature 
   - `agenda` app is activated by default, so you must have `app.enabled` list according to your old `caldav.enabled`(deprecated) parameter, you should add or remove agenda app according to activate/desactivate `agenda` feature (or set `START_CALDAV` parameter in docker)
   - `upload_permission` and  `share_content` are activated by default but they now MUST be in app.enabled list to work properly, before 2.6.0 theses apps do work without being activated properly.
-  - `collaborative_document_edition` is now a real app. disable by default. to activate it you should not anymore set `collaborative_document_edition.activated` (this parameter is deprecated), but add/remove `collaborative_document_edition` in `app.enabled` list (or set `ENABLE_COLLABORATIVE_DOCUMENT_EDITION` parameter in docker)
+  - `collaborative_document_edition` is now a real app, disabled by default. To enable it you should not anymore set `collaborative_document_edition.activated` (this parameter is deprecated), but add/remove `collaborative_document_edition` in `app.enabled` list (or set `ENABLE_COLLABORATIVE_DOCUMENT_EDITION` parameter in docker)
 
 ### Other Changes
 - 2 deprecated ldap parameters: `ldap_base_url` and `ldap_base_dn` (not used by tracim backend code in oldest release)

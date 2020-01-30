@@ -44,14 +44,6 @@ SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS = generate_documentation_swag
 )
 
 
-def import_controller(
-    configurator: Configurator, app_config: CFG, route_prefix: str
-) -> Configurator:
-    upload_permission_controller = UploadPermissionController()
-    configurator.include(upload_permission_controller.bind, route_prefix=route_prefix)
-    return configurator
-
-
 class UploadPermissionController(Controller):
     """
     Endpoints for Upload Permission

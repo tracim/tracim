@@ -1,7 +1,6 @@
 import pytest
 import transaction
 
-from tracim_backend.app_models.contents import ContentType
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import InsufficientUserProfile
@@ -9,6 +8,7 @@ from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
+from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.authorization import AndAuthorizationChecker
 from tracim_backend.lib.utils.authorization import AuthorizationChecker
 from tracim_backend.lib.utils.authorization import CandidateUserProfileChecker
@@ -30,59 +30,64 @@ from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 
 
+class BaseFakeTracimContext(TracimContext):
+    app_config = None
+    dbsession = None
+
+
 class TestAuthorizationChecker(object):
     def test_unit__SameUserChecker_ok__nominal_case(self):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_user = User(user_id=3)
             candidate_user = User(user_id=3)
 
-        assert SameUserChecker().check(FakeTracimContext())
+        assert SameUserChecker().check(FakeBaseFakeTracimContext())
 
     def test_unit__SameUserChecker_err__not_same_user(self):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_user = User(user_id=2)
             candidate_user = User(user_id=3)
 
         with pytest.raises(UserGivenIsNotTheSameAsAuthenticated):
-            SameUserChecker().check(FakeTracimContext())
+            SameUserChecker().check(FakeBaseFakeTracimContext())
 
     def test__unit__ProfileChecker__ok__nominal_case(self):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_user = User(user_id=2)
             current_user.groups.append(Group(group_id=2))
 
-        assert ProfileChecker(1).check(FakeTracimContext())
-        assert ProfileChecker(2).check(FakeTracimContext())
+        assert ProfileChecker(1).check(FakeBaseFakeTracimContext())
+        assert ProfileChecker(2).check(FakeBaseFakeTracimContext())
 
     def test__unit__ProfileChecker__err__profile_insufficient(self):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_user = User(user_id=2)
             current_user.groups.append(Group(group_id=2))
 
-        assert ProfileChecker(2).check(FakeTracimContext())
+        assert ProfileChecker(2).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserProfile):
-            ProfileChecker(3).check(FakeTracimContext())
+            ProfileChecker(3).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserProfile):
-            ProfileChecker(4).check(FakeTracimContext())
+            ProfileChecker(4).check(FakeBaseFakeTracimContext())
 
     def test__unit__CandidateUserProfileChecker__ok__nominal_case(self):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             candidate_user = User(user_id=2)
             candidate_user.groups.append(Group(group_id=2))
 
-        assert CandidateUserProfileChecker(1).check(FakeTracimContext())
-        assert CandidateUserProfileChecker(2).check(FakeTracimContext())
+        assert CandidateUserProfileChecker(1).check(FakeBaseFakeTracimContext())
+        assert CandidateUserProfileChecker(2).check(FakeBaseFakeTracimContext())
 
     def test__unit__CandidateUserProfileChecker__err__profile_insufficient(self):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             candidate_user = User(user_id=2)
             candidate_user.groups.append(Group(group_id=2))
 
-        assert CandidateUserProfileChecker(2).check(FakeTracimContext())
+        assert CandidateUserProfileChecker(2).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserProfile):
-            CandidateUserProfileChecker(3).check(FakeTracimContext())
+            CandidateUserProfileChecker(3).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserProfile):
-            CandidateUserProfileChecker(4).check(FakeTracimContext())
+            CandidateUserProfileChecker(4).check(FakeBaseFakeTracimContext())
 
     def test__unit__RoleChecker__ok__nominal_case(self, session):
 
@@ -96,7 +101,7 @@ class TestAuthorizationChecker(object):
         session.flush()
         transaction.commit()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             @property
             def current_user(self):
                 return current_user
@@ -105,8 +110,8 @@ class TestAuthorizationChecker(object):
             def current_workspace(self):
                 return current_workspace
 
-        assert RoleChecker(1).check(FakeTracimContext())
-        assert RoleChecker(2).check(FakeTracimContext())
+        assert RoleChecker(1).check(FakeBaseFakeTracimContext())
+        assert RoleChecker(2).check(FakeBaseFakeTracimContext())
 
     def test__unit__RoleChecker__err_role_insufficient(self, session):
 
@@ -120,7 +125,7 @@ class TestAuthorizationChecker(object):
         session.flush()
         transaction.commit()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             @property
             def current_user(self):
                 return current_user
@@ -129,11 +134,11 @@ class TestAuthorizationChecker(object):
             def current_workspace(self):
                 return current_workspace
 
-        assert RoleChecker(2).check(FakeTracimContext())
+        assert RoleChecker(2).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            RoleChecker(3).check(FakeTracimContext())
+            RoleChecker(3).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            RoleChecker(4).check(FakeTracimContext())
+            RoleChecker(4).check(FakeBaseFakeTracimContext())
 
     def test__unit__RoleChecker__err_no_role_in_workspace(self, session):
 
@@ -145,7 +150,7 @@ class TestAuthorizationChecker(object):
         session.flush()
         transaction.commit()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             @property
             def current_user(self):
                 return current_user
@@ -154,15 +159,15 @@ class TestAuthorizationChecker(object):
             def current_workspace(self):
                 return current_workspace
 
-        assert RoleChecker(0).check(FakeTracimContext())
+        assert RoleChecker(0).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            RoleChecker(1).check(FakeTracimContext())
+            RoleChecker(1).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            RoleChecker(2).check(FakeTracimContext())
+            RoleChecker(2).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            RoleChecker(3).check(FakeTracimContext())
+            RoleChecker(3).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            RoleChecker(4).check(FakeTracimContext())
+            RoleChecker(4).check(FakeBaseFakeTracimContext())
 
     def test__unit__CandidateWorkspaceRoleChecker__ok__nominal_case(self, session):
 
@@ -176,7 +181,7 @@ class TestAuthorizationChecker(object):
         session.flush()
         transaction.commit()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             @property
             def current_user(self):
                 return current_user
@@ -185,8 +190,8 @@ class TestAuthorizationChecker(object):
             def candidate_workspace(self):
                 return candidate_workspace
 
-        assert CandidateWorkspaceRoleChecker(1).check(FakeTracimContext())
-        assert CandidateWorkspaceRoleChecker(2).check(FakeTracimContext())
+        assert CandidateWorkspaceRoleChecker(1).check(FakeBaseFakeTracimContext())
+        assert CandidateWorkspaceRoleChecker(2).check(FakeBaseFakeTracimContext())
 
     def test__unit__CandidateWorkspaceRoleChecker__err_role_insufficient(self, session):
 
@@ -200,7 +205,7 @@ class TestAuthorizationChecker(object):
         session.flush()
         transaction.commit()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             @property
             def current_user(self):
                 return current_user
@@ -209,11 +214,11 @@ class TestAuthorizationChecker(object):
             def candidate_workspace(self):
                 return candidate_workspace
 
-        assert CandidateWorkspaceRoleChecker(2).check(FakeTracimContext())
+        assert CandidateWorkspaceRoleChecker(2).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            CandidateWorkspaceRoleChecker(3).check(FakeTracimContext())
+            CandidateWorkspaceRoleChecker(3).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            CandidateWorkspaceRoleChecker(4).check(FakeTracimContext())
+            CandidateWorkspaceRoleChecker(4).check(FakeBaseFakeTracimContext())
 
     def test__unit__CandidateWorkspaceRoleChecker__err_no_role_in_workspace(self, session):
 
@@ -225,7 +230,7 @@ class TestAuthorizationChecker(object):
         session.flush()
         transaction.commit()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             @property
             def current_user(self):
                 return current_user
@@ -234,18 +239,18 @@ class TestAuthorizationChecker(object):
             def candidate_workspace(self):
                 return candidate_workspace
 
-        assert CandidateWorkspaceRoleChecker(0).check(FakeTracimContext())
+        assert CandidateWorkspaceRoleChecker(0).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            CandidateWorkspaceRoleChecker(1).check(FakeTracimContext())
+            CandidateWorkspaceRoleChecker(1).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            CandidateWorkspaceRoleChecker(2).check(FakeTracimContext())
+            CandidateWorkspaceRoleChecker(2).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            CandidateWorkspaceRoleChecker(3).check(FakeTracimContext())
+            CandidateWorkspaceRoleChecker(3).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            CandidateWorkspaceRoleChecker(4).check(FakeTracimContext())
+            CandidateWorkspaceRoleChecker(4).check(FakeBaseFakeTracimContext())
 
     def test__unit__ContentTypeChecker__ok_nominal_test(self, content_type_list):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_content = Content(content_id=15, type=content_type_list.Thread.slug)
 
         assert ContentTypeChecker(
@@ -254,44 +259,48 @@ class TestAuthorizationChecker(object):
                 content_type_list.Thread.slug,
                 content_type_list.Comment.slug,
             ]
-        ).check(FakeTracimContext())
-        assert ContentTypeChecker([content_type_list.Thread.slug]).check(FakeTracimContext())
+        ).check(FakeBaseFakeTracimContext())
+        assert ContentTypeChecker([content_type_list.Thread.slug]).check(
+            FakeBaseFakeTracimContext()
+        )
 
     def test__unit__ContentTypeChecker__err_content_type_not_allowed(self, content_type_list):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_content = Content(content_id=15, type=content_type_list.Thread.slug)
 
         with pytest.raises(ContentTypeNotAllowed):
             assert ContentTypeChecker(
                 [content_type_list.File.slug, content_type_list.Comment.slug]
-            ).check(FakeTracimContext())
+            ).check(FakeBaseFakeTracimContext())
 
         with pytest.raises(ContentTypeNotAllowed):
-            assert ContentTypeChecker([content_type_list.File.slug]).check(FakeTracimContext())
+            assert ContentTypeChecker([content_type_list.File.slug]).check(
+                FakeBaseFakeTracimContext()
+            )
 
     def test__unit__ContentTypeChecker__err_content_type_not_exist(self, content_type_list):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_content = Content(content_id=15, type="unexistent_type")
 
         with pytest.raises(ContentTypeNotExist):
             assert ContentTypeChecker(
                 ["unexistent_type", content_type_list.File.slug, content_type_list.Comment.slug]
-            ).check(FakeTracimContext())
+            ).check(FakeBaseFakeTracimContext())
 
         with pytest.raises(ContentTypeNotExist):
-            assert ContentTypeChecker(["unexistent_type"]).check(FakeTracimContext())
+            assert ContentTypeChecker(["unexistent_type"]).check(FakeBaseFakeTracimContext())
 
     def test__unit__CommentOwnerChecker__ok__nominal_case(self, content_type_list):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_user = User(user_id=2, email="toto@toto.toto")
             current_comment = Content(
                 content_id=15, type=content_type_list.Comment.slug, owner=current_user
             )
 
-        assert CommentOwnerChecker().check(FakeTracimContext())
+        assert CommentOwnerChecker().check(FakeBaseFakeTracimContext())
 
     def test__unit__CommentOwnerChecker__err_user_not_owner_case(self, content_type_list):
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_user = User(user_id=2, email="toto@toto.toto")
             current_comment = Content(
                 content_id=15,
@@ -300,17 +309,17 @@ class TestAuthorizationChecker(object):
             )
 
         with pytest.raises(UserIsNotContentOwner):
-            CommentOwnerChecker().check(FakeTracimContext())
+            CommentOwnerChecker().check(FakeBaseFakeTracimContext())
 
     def test__unit__AndAuthorizationChecker__ok__nominal_case(self):
         class OkChecker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 return True
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             pass
 
-        assert OkChecker().check(FakeTracimContext())
+        assert OkChecker().check(FakeBaseFakeTracimContext())
         assert AndAuthorizationChecker(OkChecker(), OkChecker())
         assert AndAuthorizationChecker([OkChecker] * 5)
 
@@ -319,30 +328,34 @@ class TestAuthorizationChecker(object):
             pass
 
         class OkChecker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 return True
 
         class ExceptionChecker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 raise CheckerFailed()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             pass
 
         with pytest.raises(CheckerFailed):
-            ExceptionChecker().check(FakeTracimContext())
+            ExceptionChecker().check(FakeBaseFakeTracimContext())
 
         with pytest.raises(CheckerFailed):
-            AndAuthorizationChecker(ExceptionChecker(), OkChecker()).check(FakeTracimContext())
+            AndAuthorizationChecker(ExceptionChecker(), OkChecker()).check(
+                FakeBaseFakeTracimContext()
+            )
 
         with pytest.raises(CheckerFailed):
-            AndAuthorizationChecker(OkChecker(), ExceptionChecker()).check(FakeTracimContext())
+            AndAuthorizationChecker(OkChecker(), ExceptionChecker()).check(
+                FakeBaseFakeTracimContext()
+            )
 
         with pytest.raises(CheckerFailed):
             checkers = [OkChecker()] * 5 + [ExceptionChecker()] + [OkChecker()] * 5
             and_auth_checker = AndAuthorizationChecker(*checkers)
             assert list(and_auth_checker.authorization_checkers) == checkers
-            and_auth_checker.check(FakeTracimContext())
+            and_auth_checker.check(FakeBaseFakeTracimContext())
 
     def test__unit__AndAuthorizationChecker__err__exception_order(self):
         class CheckerFailed(TracimException):
@@ -352,57 +365,57 @@ class TestAuthorizationChecker(object):
             pass
 
         class OkChecker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 return True
 
         class ExceptionChecker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 raise CheckerFailed()
 
         class Exception2Checker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 raise CheckerFailed2()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             pass
 
         with pytest.raises(CheckerFailed):
-            ExceptionChecker().check(FakeTracimContext())
+            ExceptionChecker().check(FakeBaseFakeTracimContext())
         with pytest.raises(CheckerFailed2):
-            Exception2Checker().check(FakeTracimContext())
+            Exception2Checker().check(FakeBaseFakeTracimContext())
 
         with pytest.raises(CheckerFailed2):
             AndAuthorizationChecker(Exception2Checker(), ExceptionChecker()).check(
-                FakeTracimContext()
+                FakeBaseFakeTracimContext()
             )
 
         with pytest.raises(CheckerFailed):
             AndAuthorizationChecker(ExceptionChecker(), Exception2Checker()).check(
-                FakeTracimContext()
+                FakeBaseFakeTracimContext()
             )
 
         with pytest.raises(CheckerFailed):
             checkers = [ExceptionChecker()] * 5 + [Exception2Checker()] * 5 + [OkChecker()]
             and_auth_checker = AndAuthorizationChecker(*checkers)
             assert list(and_auth_checker.authorization_checkers) == checkers
-            and_auth_checker.check(FakeTracimContext())
+            and_auth_checker.check(FakeBaseFakeTracimContext())
 
     def test__unit__OrAuthorizationChecker__ok__nominal_case(self):
         class CheckerFailed(TracimException):
             pass
 
         class OkChecker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 return True
 
         class ExceptionChecker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 raise CheckerFailed()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             pass
 
-        assert OkChecker().check(FakeTracimContext())
+        assert OkChecker().check(FakeBaseFakeTracimContext())
         assert OrAuthorizationChecker(OkChecker(), ExceptionChecker())
         assert OrAuthorizationChecker(ExceptionChecker(), OkChecker())
         assert OrAuthorizationChecker(
@@ -417,74 +430,73 @@ class TestAuthorizationChecker(object):
             pass
 
         class ExceptionChecker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 raise CheckerFailed()
 
         class Exception2Checker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 raise CheckerFailed2()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             pass
 
         with pytest.raises(CheckerFailed):
-            ExceptionChecker().check(FakeTracimContext())
+            ExceptionChecker().check(FakeBaseFakeTracimContext())
         with pytest.raises(CheckerFailed2):
-            Exception2Checker().check(FakeTracimContext())
+            Exception2Checker().check(FakeBaseFakeTracimContext())
 
         with pytest.raises(CheckerFailed2):
             OrAuthorizationChecker(ExceptionChecker(), Exception2Checker()).check(
-                FakeTracimContext()
+                FakeBaseFakeTracimContext()
             )
         with pytest.raises(CheckerFailed):
             OrAuthorizationChecker(Exception2Checker(), ExceptionChecker()).check(
-                FakeTracimContext()
+                FakeBaseFakeTracimContext()
             )
 
         with pytest.raises(CheckerFailed):
             checkers = [Exception2Checker()] * 5 + [ExceptionChecker()]
             or_auth_checker = OrAuthorizationChecker(*checkers)
             assert list(or_auth_checker.authorization_checkers) == checkers
-            or_auth_checker.check(FakeTracimContext())
+            or_auth_checker.check(FakeBaseFakeTracimContext())
 
     def test__unit__OrAuthorizationChecker__err__exception(self):
         class CheckerFailed(TracimException):
             pass
 
         class OkChecker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 return True
 
         class ExceptionChecker(AuthorizationChecker):
-            def check(self, tracim_context: TracimContext):
+            def check(self, tracim_context: BaseFakeTracimContext):
                 raise CheckerFailed()
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             pass
 
         with pytest.raises(CheckerFailed):
-            ExceptionChecker().check(FakeTracimContext())
+            ExceptionChecker().check(FakeBaseFakeTracimContext())
 
         with pytest.raises(CheckerFailed):
             OrAuthorizationChecker(ExceptionChecker(), ExceptionChecker()).check(
-                FakeTracimContext()
+                FakeBaseFakeTracimContext()
             )
 
         with pytest.raises(CheckerFailed):
             checkers = [ExceptionChecker()] * 5
             or_auth_checker = OrAuthorizationChecker(*checkers)
             assert list(or_auth_checker.authorization_checkers) == checkers
-            or_auth_checker.check(FakeTracimContext())
+            or_auth_checker.check(FakeBaseFakeTracimContext())
 
     def test__unit__ContentTypeCreationChecker__ok__implicit(self, session):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
         current_workspace = Workspace(workspace_id=3, owner=current_user)
-        candidate_content_type = ContentType(
+        candidate_content_type = TracimContentType(
             slug="test",
             fa_icon="",
-            hexcolor="",
             label="Test",
             creation_label="Test",
             available_statuses=[],
@@ -500,10 +512,10 @@ class TestAuthorizationChecker(object):
         transaction.commit()
 
         class FakeContentTypeList(object):
-            def get_one_by_slug(self, slug=str) -> ContentType:
+            def get_one_by_slug(self, slug=str) -> TracimContentType:
                 return candidate_content_type
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             @property
             def current_user(self):
                 return current_user
@@ -516,17 +528,16 @@ class TestAuthorizationChecker(object):
             def candidate_content_type(self):
                 return candidate_content_type
 
-        assert ContentTypeCreationChecker(FakeContentTypeList()).check(FakeTracimContext())
+        assert ContentTypeCreationChecker(FakeContentTypeList()).check(FakeBaseFakeTracimContext())
 
     def test__unit__ContentTypeCreationChecker__ok__explicit(self, session):
 
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
         current_workspace = Workspace(workspace_id=3, owner=current_user)
-        candidate_content_type = ContentType(
+        candidate_content_type = TracimContentType(
             slug="test",
             fa_icon="",
-            hexcolor="",
             label="Test",
             creation_label="Test",
             available_statuses=[],
@@ -542,10 +553,10 @@ class TestAuthorizationChecker(object):
         transaction.commit()
 
         class FakeContentTypeList(object):
-            def get_one_by_slug(self, slug=str) -> ContentType:
+            def get_one_by_slug(self, slug=str) -> TracimContentType:
                 return candidate_content_type
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             @property
             def current_user(self):
                 return current_user
@@ -555,7 +566,7 @@ class TestAuthorizationChecker(object):
                 return current_workspace
 
         assert ContentTypeCreationChecker(FakeContentTypeList(), content_type_slug="test").check(
-            FakeTracimContext()
+            FakeBaseFakeTracimContext()
         )
 
     def test__unit__ContentTypeCreationChecker__err__implicit_insufficent_role_in_workspace(
@@ -565,10 +576,9 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
         current_workspace = Workspace(workspace_id=3, owner=current_user)
-        candidate_content_type = ContentType(
+        candidate_content_type = TracimContentType(
             slug="test",
             fa_icon="",
-            hexcolor="",
             label="Test",
             creation_label="Test",
             available_statuses=[],
@@ -582,10 +592,10 @@ class TestAuthorizationChecker(object):
         transaction.commit()
 
         class FakeContentTypeList(object):
-            def get_one_by_slug(self, slug=str) -> ContentType:
+            def get_one_by_slug(self, slug=str) -> TracimContentType:
                 return candidate_content_type
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             @property
             def current_user(self):
                 return current_user
@@ -599,7 +609,9 @@ class TestAuthorizationChecker(object):
                 return candidate_content_type
 
         with pytest.raises(InsufficientUserRoleInWorkspace):
-            assert ContentTypeCreationChecker(FakeContentTypeList()).check(FakeTracimContext())
+            assert ContentTypeCreationChecker(FakeContentTypeList()).check(
+                FakeBaseFakeTracimContext()
+            )
 
     def test__unit__ContentTypeCreationChecker__err__explicit_insufficent_role_in_workspace(
         self, session
@@ -609,10 +621,9 @@ class TestAuthorizationChecker(object):
         current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
         current_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level)
-        candidate_content_type = ContentType(
+        candidate_content_type = TracimContentType(
             slug="test",
             fa_icon="",
-            hexcolor="",
             label="Test",
             creation_label="Test",
             available_statuses=[],
@@ -625,10 +636,10 @@ class TestAuthorizationChecker(object):
         transaction.commit()
 
         class FakeContentTypeList(object):
-            def get_one_by_slug(self, slug=str) -> ContentType:
+            def get_one_by_slug(self, slug=str) -> TracimContentType:
                 return candidate_content_type
 
-        class FakeTracimContext(TracimContext):
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             @property
             def current_user(self):
                 return current_user
@@ -640,4 +651,4 @@ class TestAuthorizationChecker(object):
         with pytest.raises(InsufficientUserRoleInWorkspace):
             assert ContentTypeCreationChecker(
                 FakeContentTypeList(), content_type_slug="test"
-            ).check(FakeTracimContext())
+            ).check(FakeBaseFakeTracimContext())

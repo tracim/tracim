@@ -16,7 +16,8 @@ import {
   generateLocalStorageContentId,
   BREADCRUMBS_TYPE,
   ROLE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -63,6 +64,7 @@ class Thread extends React.Component {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+        if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
         break
 
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
@@ -134,6 +136,17 @@ class Thread extends React.Component {
     }
   })
 
+  setHeadTitle = (contentName) => {
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([contentName, state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
+  }
+
   loadContent = async () => {
     const { state } = this
 
@@ -141,6 +154,7 @@ class Thread extends React.Component {
       await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     )
     this.setState({ content: response.body })
+    this.setHeadTitle(response.body.label)
 
     await putThreadRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })

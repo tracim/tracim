@@ -1,3 +1,4 @@
+from abc import abstractmethod
 import copy
 from typing import List
 from typing import Type
@@ -18,8 +19,9 @@ class Fixture(object):
         self._session = session
         self._config = config
 
+    @abstractmethod
     def insert(self):
-        raise NotImplementedError()
+        pass
 
 
 class FixturesLoader(object):
