@@ -19,7 +19,7 @@ class TestApplicationEndpoint(object):
     """
 
     def test_api__get_applications__ok_200__nominal_case(
-        self, application_api_factory, web_testapp
+        self, application_api_factory, web_testapp, app_config
     ):
         """
         Get applications list with a registered user.
@@ -27,9 +27,12 @@ class TestApplicationEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/v2/system/applications", status=200)
         res = res.json_body
-        applications = application_api_factory.get().get_all()
-        assert len(res) == len(applications)
-        for counter, application in enumerate(applications):
+        app_api = application_api_factory.get()
+        applications_in_context = [
+            app_api.get_application_in_context(app, app_config) for app in app_api.get_all()
+        ]
+        assert len(res) == len(applications_in_context)
+        for counter, application in enumerate(applications_in_context):
             assert res[counter]["label"] == application.label
             assert res[counter]["slug"] == application.slug
             assert res[counter]["fa_icon"] == application.fa_icon
@@ -56,18 +59,22 @@ class TestContentsTypesEndpoint(object):
     Tests for /api/v2/system/content_types
     """
 
-    def test_api__get_content_types__ok_200__nominal_case(self, web_testapp, content_type_list):
+    def test_api__get_content_types__ok_200__nominal_case(
+        self, web_testapp, content_type_list, app_config
+    ):
         """
         Get system content_types list with a registered user.
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/v2/system/content_types", status=200)
         res = res.json_body
-        assert len(res) == len(content_type_list.endpoint_allowed_types_slug())
-        content_types = content_type_list.endpoint_allowed_types_slug()
-
-        for counter, content_type_slug in enumerate(content_types):
-            content_type = content_type_list.get_one_by_slug(content_type_slug)
+        assert len(res) == len(content_type_list.endpoint_allowed_types())
+        content_types = content_type_list.endpoint_allowed_types()
+        content_types_in_context = [
+            content_type_list.get_content_type_in_context(content_type, app_config)
+            for content_type in content_types
+        ]
+        for counter, content_type in enumerate(content_types_in_context):
             assert res[counter]["slug"] == content_type.slug
             assert res[counter]["fa_icon"] == content_type.fa_icon
             assert res[counter]["hexcolor"] == content_type.hexcolor
@@ -243,7 +250,10 @@ class TestConfigEndpoint(object):
 @pytest.mark.usefixtures("base_fixture")
 class TestErrorCodeEndpoint(object):
     def test_api__get_error_code_endpoint__ok__200__nominal_case(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admCollaborativeDocumentEditionFactoryin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/v2/system/error_codes", status=200)
         # check if all error_codes are available by checking number of item
         # received

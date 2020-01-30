@@ -25,8 +25,9 @@ def add_new_hooks(plugin_manager: TracimPluginManager) -> None:
     Hooks can be used like this to implement new specfile:
 
     >>> @hookimpl
-    >>> def add_new_hooks(plugin_manager: TracimPluginManager):
-    >>>     plugin_manager.event_dispatcher.add_hookspecs(myplugin.spec)
+    ... def add_new_hooks(plugin_manager: TracimPluginManager):
+    ...     plugin_manager.event_dispatcher.add_hookspecs(myplugin.spec)
+    ... # doctest: +SKIP
 
     :param pluginmanager: plugin manager of tracim
     :return: nothing

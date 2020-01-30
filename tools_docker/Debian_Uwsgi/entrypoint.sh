@@ -106,16 +106,24 @@ if [ "$START_CALDAV" = "1" ]; then
     if [ ! -L /etc/uwsgi/apps-enabled/tracim_caldav.ini ]; then
         ln -s /etc/uwsgi/apps-available/tracim_caldav.ini /etc/uwsgi/apps-enabled/tracim_caldav.ini
     fi
-    sed -i "s|caldav.enabled = .*|caldav.enabled = True|g" /etc/tracim/development.ini
+    DEFAULT_APP_LIST="$DEFAULT_APP_LIST,agenda"
     sed -i "s|^\s*#ProxyPass /agenda http://127.0.0.1:8080/agenda|    ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
     sed -i "s|^\s*#ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_caldav.ini
-    sed -i "s|caldav.enabled = .*|caldav.enabled = False|g" /etc/tracim/development.ini
     sed -i "s|^\s*ProxyPass /agenda http://127.0.0.1:8080/agenda|    #ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
     sed -i "s|^\s*ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
 fi
 
+# INFO - G.M - 2020-01-28 - enable collaborative_document_edition app as default app
+# to work properly other config parameter should be setted correctly and external server for document
+# edition like collabora should be started.
+if [ "$ENABLE_COLLABORATIVE_DOCUMENT_EDITION" = "1" ]; then
+    DEFAULT_APP_LIST="$DEFAULT_APP_LIST,collaborative_document_edition"
+fi
+# INFO - G.M - 2020-01-28 - replace app.enabled in config file
+sed -i "s|^app.enabled = .*|app.enabled = $DEFAULT_APP_LIST|g" /etc/tracim/development.ini
+sed -i "s|^;\s*app.enabled = .*|app.enabled = $DEFAULT_APP_LIST|g" /etc/tracim/development.ini
 # TODO PA 2019-06-19 Rework the index-create part according to https://github.com/tracim/tracim/issues/1961
 # Make sure index is created in case of Elastic Search based search. (the command does nothing in case of simple search)
 cd /tracim/backend/

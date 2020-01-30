@@ -1,10 +1,10 @@
 import pytest
 import transaction
 
-from tracim_backend.error import ErrorCode
-from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
+from tracim_backend.applications.collaborative_document_edition.factory import (
     CollaborativeDocumentEditionFactory,
 )
+from tracim_backend.error import ErrorCode
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 

@@ -44,19 +44,29 @@ basic_setup.session_secret = change_this_value_please!
 ; default_lang = en
 
 ### Apps ###
+
 ## app enabled explicit list:
 # this allow you to explictly disable default app or enabled beta app now
 # already added to default list.
 # This parameter is a list of app slug separated by ',' char.
-## Not exhaustive list of available apps:
-# - content/thread -> thread/topic/discussion : allow to discuss about one
+# Not exhaustive list of available apps:
+# - "content/thread" -> thread/topic/discussion : allow to discuss about one
 #   subject.
 # - content/file -> allow to upload all type of file like .pdf, .odt, .jpg, etc
 # - content/html-document -> allow to work on a standard html-based document
 #   which is editable through Tracim.
 # - content/folder -> allow to put content into folder.
-## example of app.enabled config explicit list config
-; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder
+# - agenda -> add caldav agenda feature (specific process need to be runned)
+# - collaborative_document_edition -> add support for collaborative document edition,
+#   add support for collaborative edition server like collabora/libreofficeOnline.
+# - share_content -> allow user to share tracim content with external user
+# - upload_permission -> allow external with permission to upload some file in a workspace.
+# - gallery -> add gallery app in tracim
+# default app.enabled config explicit list config:
+; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,share_content,upload_permission,gallery
+# With all apps (add collaborative document edition):
+# app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,collaborative_document_edition,share_content,upload_permission,gallery
+
 
 ### Plugins ###
 # if provided, this allow Tracim to load package from this dir and if package follow
@@ -435,8 +445,7 @@ webdav.listen = localhost:3030
 # CALDAV (Radicale)
 ####
 
-### Main Config for Caldav ##
-caldav.enabled = True
+# This feature require application "agenda" in "app.enabled"
 
 ### Radicale Proxy config ##
 ## path to Tracim radicale server, usually at localhost:port
@@ -497,10 +506,14 @@ search.engine = simple
 # not be indexed using ingest mode.
 # default value to 52428800 = 50Mo
 ;search.elasticsearch.ingest.size_limit = 52428800
+
+
 ####
 # Collaborative Document Edition (Collabora, etc)
 ####
-collaborative_document_edition.activated = False
+
+# This feature require application "collaborative_document_edition" in "app.enabled"
+
 # software used for collaborative document_edition. "collabora" software value give support for
 # both CollaboraOnline and LibreofficeOnline.
 collaborative_document_edition.software = collabora

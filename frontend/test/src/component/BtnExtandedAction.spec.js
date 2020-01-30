@@ -5,6 +5,7 @@ import { ExtandedAction as ExtandedActionWithoutHOC } from '../../../src/compone
 import { ROLE } from 'tracim_frontend_lib'
 import sinon from 'sinon'
 import { Link } from 'react-router-dom'
+import { appList } from '../../hocMock/redux/appList/appList'
 
 describe('<ExtandedAction />', () => {
   const archiveCallBack = sinon.stub()
@@ -27,7 +28,8 @@ describe('<ExtandedAction />', () => {
     folderData: {
       workspaceId: 0,
       id: 0
-    }
+    },
+    appList
   }
 
   const wrapper = shallow(<ExtandedActionWithoutHOC {...props} t={key => key} />)

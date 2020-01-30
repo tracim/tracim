@@ -14,7 +14,7 @@ from webtest import TestApp
 from tracim_backend import CFG
 from tracim_backend import init_models
 from tracim_backend import web
-from tracim_backend.app_models.applications import Application
+from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
@@ -246,7 +246,7 @@ def admin_user(session: Session) -> User:
 
 
 @pytest.fixture()
-def app_list() -> typing.List[Application]:
+def app_list() -> typing.List[TracimApplicationInContext]:
     from tracim_backend.extensions import app_list as application_list_static
 
     return application_list_static

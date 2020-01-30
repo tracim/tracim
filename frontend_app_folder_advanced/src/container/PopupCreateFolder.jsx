@@ -4,7 +4,8 @@ import {
   CardPopupCreateContent,
   handleFetchResult,
   addAllResourceI18n,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import { postFolder } from '../action.async.js'
 import i18n from '../i18n.js'
@@ -31,6 +32,10 @@ class PopupCreateFolder extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
+  componentDidMount () {
+    this.setHeadTitle()
+  }
+
   componentWillUnmount () {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
@@ -46,7 +51,19 @@ class PopupCreateFolder extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.setHeadTitle()
         break
+    }
+  }
+
+  setHeadTitle = () => {
+    const { state, props } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('New folder'), state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
     }
   }
 
