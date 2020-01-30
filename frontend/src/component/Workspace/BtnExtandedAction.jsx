@@ -85,7 +85,7 @@ export const ExtandedAction = props => {
           </div>
         )}
 
-        {/*FIXME - GM - 2019-04-16 - Don't use hardcoded slug and find a better way to handle app buttons like this one*/}
+        {/*FIXME - GM - 2019-04-16 - Don't use hardcoded slug and find a better way to handle app buttons like this one - https://github.com/tracim/tracim/issues/2654*/}
         {props.folderData && props.appList && props.appList.some((app) => app.slug === 'gallery') && (
           <Link
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
