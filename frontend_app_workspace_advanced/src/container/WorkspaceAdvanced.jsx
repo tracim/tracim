@@ -153,7 +153,9 @@ class WorkspaceAdvanced extends React.Component {
       content: {
         ...resDetail.body,
         memberList: resMember.body,
-        appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda')
+        appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda'),
+        appDownloadAvailable: resAppList.body.some(a => a.slug === 'share_content'),
+        appUploadAvailable: resAppList.body.some(a => a.slug === 'upload_permission')
       }
     })
   }
@@ -544,8 +546,10 @@ class WorkspaceAdvanced extends React.Component {
                   agendaEnabled={state.content.agenda_enabled}
                   onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
                   downloadEnabled={state.content.public_download_enabled}
+                  appDownloadAvailable={state.content.appDownloadAvailable}
                   onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
                   uploadEnabled={state.content.public_upload_enabled}
+                  appUploadAvailable={state.content.appUploadAvailable}
                   onToggleUploadEnabled={this.handleToggleUploadEnabled}
                 />
               }

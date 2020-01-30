@@ -8,12 +8,17 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
-import { postResetPassword } from '../action-creator.async.js'
+import {
+  postResetPassword,
+  getConfig
+} from '../action-creator.async.js'
 import {
   newFlashMessage,
-  resetBreadcrumbs
+  resetBreadcrumbs,
+  setConfig
 } from '../action-creator.sync.js'
 import { PAGE } from '../helper.js'
+import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 
@@ -27,10 +32,50 @@ export class ResetPassword extends React.Component {
       userEmail: query.email || '',
       userToken: query.token || ''
     }
+
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  componentDidMount () {
-    this.props.dispatch(resetBreadcrumbs())
+  customEventReducer = async ({ detail: { type } }) => {
+    switch (type) {
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.setHeadTitle()
+        break
+    }
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const { props } = this
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+      this.setHeadTitle()
+    }
+  }
+
+  async componentDidMount () {
+    const { props } = this
+    props.dispatch(resetBreadcrumbs())
+    await this.loadConfig()
+  }
+
+  loadConfig = async () => {
+    const { props } = this
+
+    const fetchGetConfig = await props.dispatch(getConfig())
+    if (fetchGetConfig.status === 200) {
+      props.dispatch(setConfig(fetchGetConfig.json))
+    }
+  }
+
+  setHeadTitle = () => {
+    const { props } = this
+
+    if (props.system.config.instance_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('Password reset'), props.system.config.instance_name]) }
+      })
+    }
   }
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
@@ -129,5 +174,6 @@ export class ResetPassword extends React.Component {
   }
 }
 
-const mapStateToProps = () => ({})
+const mapStateToProps = ({ system }) => ({ system })
+
 export default connect(mapStateToProps)(withRouter(translate()(ResetPassword)))

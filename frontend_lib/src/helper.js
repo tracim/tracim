@@ -279,3 +279,5 @@ export const FILE_PREVIEW_STATE = {
   NO_PREVIEW: 'noPreview',
   NO_FILE: 'noFile'
 }
+
+export const buildHeadTitle = words => words.reduce((acc, curr) => acc !== '' ? `${acc} · ${curr}` : curr, '')

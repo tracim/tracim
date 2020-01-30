@@ -7,11 +7,59 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import { PAGE } from '../helper.js'
-import { resetBreadcrumbs } from '../action-creator.sync.js'
+import { resetBreadcrumbs, setConfig } from '../action-creator.sync.js'
+import { CUSTOM_EVENT, buildHeadTitle } from 'tracim_frontend_lib'
+import { getConfig } from '../action-creator.async'
 
 export class ForgotPasswordNoEmailNotif extends React.Component {
+  constructor (props) {
+    super(props)
+
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  }
+
+  customEventReducer = async ({ detail: { type } }) => {
+    switch (type) {
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.setHeadTitle()
+        break
+    }
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const { props } = this
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+      this.setHeadTitle()
+    }
+  }
+
   componentDidMount () {
-    this.props.dispatch(resetBreadcrumbs())
+    this.setHeadTitle()
+    const { props } = this
+
+    props.dispatch(resetBreadcrumbs())
+    if (!props.system.config.instance_name) this.loadConfig()
+  }
+
+  loadConfig = async () => {
+    const { props } = this
+
+    const fetchGetConfig = await props.dispatch(getConfig())
+    if (fetchGetConfig.status === 200) {
+      props.dispatch(setConfig(fetchGetConfig.json))
+    }
+  }
+
+  setHeadTitle = () => {
+    const { props } = this
+
+    if (props.system.config.instance_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('Forgotten password'), props.system.config.instance_name]) }
+      })
+    }
   }
 
   handleClickBack = () => this.props.history.push(PAGE.LOGIN)
@@ -59,5 +107,6 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
   }
 }
 
-const mapStateToProps = () => ({})
+const mapStateToProps = ({ system }) => ({ system })
+
 export default connect(mapStateToProps)(translate()(ForgotPasswordNoEmailNotif))

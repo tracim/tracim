@@ -4,7 +4,7 @@ import typing
 import pytest
 import transaction
 
-from tracim_backend.app_models.contents import ContentType
+from tracim_backend.app_models.contents import ContentTypeInContext
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -814,7 +814,7 @@ class TestContentApi(object):
         # INFO - G.M - 2019-01-16 - override get_allowed_content_types methods
         # to allow setting allowed content types of workspaces as tracim doesn't
         # support yet to change this.
-        def fake_get_allowed_content_types() -> typing.List[ContentType]:
+        def fake_get_allowed_content_types() -> typing.List[ContentTypeInContext]:
             return [content_type_list.File]
 
         workspace.get_allowed_content_types = fake_get_allowed_content_types
