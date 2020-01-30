@@ -42,6 +42,7 @@ export class OpenContentApp extends React.Component {
         const contentInformation = {
           ...contentType.find(ct => ct.slug === contentToOpen.type),
           workspace: {
+            label: currentWorkspace.label,
             downloadEnabled: currentWorkspace.downloadEnabled
           }
         }

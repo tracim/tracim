@@ -42,6 +42,7 @@ class SystemApi(object):
             content_length_file_size_limit=self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE,
             workspace_size_limit=self._config.LIMITATION__WORKSPACE_SIZE,
             workspaces_number_per_user_limit=self._config.LIMITATION__SHAREDSPACE_PER_USER,
+            instance_name=self._config.WEBSITE__TITLE,
         )
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:

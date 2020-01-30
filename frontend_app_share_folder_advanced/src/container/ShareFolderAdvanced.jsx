@@ -12,7 +12,8 @@ import {
   handleFetchResult,
   CUSTOM_EVENT,
   checkEmailValidity,
-  parserStringToList
+  parserStringToList,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -64,12 +65,14 @@ class ShareFolderAdvanced extends React.Component {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), () => {})
+        this.setHeadTitle()
         break
 
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
         this.loadContentTypeList()
+        this.setHeadTitle()
         break
     }
   }
@@ -77,6 +80,7 @@ class ShareFolderAdvanced extends React.Component {
   componentDidMount () {
     this.loadContentTypeList()
     this.loadImportAuthorizationsList()
+    this.setHeadTitle()
   }
 
   componentWillUnmount () {
@@ -92,6 +96,17 @@ class ShareFolderAdvanced extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = () => {
+    const { state, props } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('Received files'), state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
+  }
 
   loadContentTypeList = async () => {
     const { props, state } = this

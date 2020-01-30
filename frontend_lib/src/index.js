@@ -20,7 +20,8 @@ import {
   checkEmailValidity,
   buildFilePreviewUrl,
   removeExtensionOfFilename,
-  computeProgressionPercentage
+  computeProgressionPercentage,
+  buildHeadTitle
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -104,6 +105,7 @@ export {
   generateLocalStorageContentId,
   generateRandomPassword,
   buildFilePreviewUrl,
+  buildHeadTitle,
   removeExtensionOfFilename,
   computeProgressionPercentage,
   Breadcrumbs,

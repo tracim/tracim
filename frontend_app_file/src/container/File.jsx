@@ -27,6 +27,7 @@ import {
   parserStringToList,
   removeExtensionOfFilename,
   buildFilePreviewUrl,
+  buildHeadTitle,
   ROLE,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
@@ -96,6 +97,7 @@ class File extends React.Component {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+        if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
         break
 
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
@@ -174,6 +176,17 @@ class File extends React.Component {
     }
   })
 
+  setHeadTitle = (contentName) => {
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([contentName, state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
+  }
+
   loadContent = async (pageToLoad = null) => {
     const { state, props } = this
 
@@ -196,6 +209,7 @@ class File extends React.Component {
           },
           mode: APP_FEATURE_MODE.VIEW
         })
+        this.setHeadTitle(filenameNoExtension)
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading file'))

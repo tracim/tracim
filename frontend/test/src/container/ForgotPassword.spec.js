@@ -16,7 +16,10 @@ describe('<ForgotPassword />', () => {
     user: user,
     workspaceList: workspaceList.workspaceList,
     system: {
-      workspaceListLoaded: true
+      workspaceListLoaded: true,
+      config: {
+        instance_name: 'instanceTest'
+      }
     },
     canCreateWorkspace: true,
     renderAppPopupCreation: renderAppPopupCreationCallBack,
