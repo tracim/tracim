@@ -13,7 +13,10 @@ describe('<Home />', () => {
     user: user,
     workspaceList: workspaceList.workspaceList,
     system: {
-      workspaceListLoaded: true
+      workspaceListLoaded: true,
+      config: {
+        instance_name: 'instanceTest'
+      }
     },
     canCreateWorkspace: true,
     renderAppPopupCreation: renderAppPopupCreationCallBack
@@ -29,7 +32,7 @@ describe('<Home />', () => {
     )
 
     it('should not render if workspaceList is not loaded', () => {
-      wrapper.setProps({ system: { workspaceListLoaded: false } })
+      wrapper.setProps({ system: { ...props.system, workspaceListLoaded: false } })
       expect(wrapper.find('div.tracim__content').length).equal(0)
       wrapper.setProps({ system: props.system })
     })

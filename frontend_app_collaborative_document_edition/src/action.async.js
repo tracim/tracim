@@ -40,3 +40,13 @@ export const getFileContent = (apiUrl, workspaceId, contentId) =>
     },
     method: 'GET'
   })
+
+export const getWorkspaceDetail = (apiUrl, workspaceId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+}

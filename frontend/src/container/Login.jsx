@@ -11,7 +11,7 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setUserConnected,
@@ -53,10 +53,30 @@ class Login extends React.Component {
       },
       inputRememberMe: false
     }
+
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  }
+
+  customEventReducer = async ({ detail: { type } }) => {
+    switch (type) {
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.setHeadTitle()
+        break
+    }
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const { props } = this
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+      this.setHeadTitle()
+    }
   }
 
   async componentDidMount () {
     const { props } = this
+
+    this.setHeadTitle()
 
     props.dispatch(resetBreadcrumbs())
 
@@ -74,6 +94,17 @@ class Login extends React.Component {
     }
 
     await this.loadConfig()
+  }
+
+  setHeadTitle = () => {
+    const { props } = this
+
+    if (props.system.config.instance_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('Login'), props.system.config.instance_name]) }
+      })
+    }
   }
 
   handleChangeLogin = e => this.setState({ inputLogin: { ...this.state.inputLogin, value: e.target.value } })

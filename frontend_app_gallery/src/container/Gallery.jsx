@@ -11,6 +11,7 @@ import {
   PageContent,
   CardPopup,
   handleFetchResult,
+  buildHeadTitle,
   BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
@@ -71,7 +72,7 @@ export class Gallery extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
-    const { state } = this
+    const { state, props } = this
 
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
@@ -94,6 +95,7 @@ export class Gallery extends React.Component {
         }))
         i18n.changeLanguage(data)
         this.buildBreadcrumbs()
+        if (state.workspaceLabel) this.setHeadTitle(`${props.t('Gallery')} · ${state.workspaceLabel}`)
         break
       default:
         break
@@ -291,6 +293,7 @@ export class Gallery extends React.Component {
     switch (fetchResultWorkspaceDetail.apiResponse.status) {
       case 200:
         workspaceLabel = fetchResultWorkspaceDetail.body.label
+        this.setHeadTitle(`${props.t('Gallery')} · ${fetchResultWorkspaceDetail.body.label}`)
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
@@ -306,6 +309,17 @@ export class Gallery extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = (title) => {
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([title, state.config.system.config.instance_name]) }
+      })
+    }
+  }
 
   handleClickHideImageRaw = () => {
     this.setState({ displayLightbox: false, fullscreen: false })

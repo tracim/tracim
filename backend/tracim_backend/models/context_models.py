@@ -62,6 +62,7 @@ class ConfigModel(object):
         content_length_file_size_limit: int,
         workspace_size_limit: int,
         workspaces_number_per_user_limit: int,
+        instance_name: str,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -71,6 +72,7 @@ class ConfigModel(object):
         self.content_length_file_size_limit = content_length_file_size_limit
         self.workspace_size_limit = workspace_size_limit
         self.workspaces_number_per_user_limit = workspaces_number_per_user_limit
+        self.instance_name = instance_name
 
 
 class ErrorCodeModel(object):
