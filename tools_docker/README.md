@@ -50,8 +50,12 @@ If you want to use collaborative_document_edition feature:
 see also [setting documentation](https://github.com/tracim/tracim/blob/master/backend/doc/setting.md)
 
 You can override app activated in Tracim using `TRACIM_APP__ENABLED` env var, this allow to disable some default enabled apps like `contents/file`, see `app.enabled_app` parameter in [development.ini.sample](https://github.com/tracim/tracim/blob/master/backend/development.ini.sample) for more information about possible app enabled list values.
+⚠ if you decide to override app list, be careful about docker parameters : `ENABLE_COLLABORATIVE_DOCUMENT_EDITION`, `START_CALDAV` and `START_WEBDAV`, they need to be consistent with app list configuration, for example if you do not
+have `agenda` app in `app.enabled` list, you MUST have `START_CALDAV=0`.
+
 
 If you want to use plugins and/or custom_toolbox you need to add files in `~/tracim/etc/plugins/` and `~/tracim/etc/custom_toolbox/` (default configuration). This two path are created when you start docker image for the first time.
+
 
 #### Updating index of ElasticSearch
 
