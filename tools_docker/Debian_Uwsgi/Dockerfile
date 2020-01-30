@@ -4,8 +4,10 @@ MAINTAINER contact@tracim.fr
 ARG TAG=""
 ARG BRANCH=""
 
+ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission,gallery"
 ENV START_WEBDAV=1
 ENV START_CALDAV=1
+ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8

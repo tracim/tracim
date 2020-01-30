@@ -58,7 +58,9 @@ class FrontendController(Controller):
         # TODO - G.M - 2018-08-07 - Refactor autogen valid app list for frontend
         frontend_apps = []
         app_api = ApplicationApi(app_list=app_list)
-        applications = app_api.get_all()
+        applications = [
+            app_api.get_application_in_context(app, app_config) for app in app_api.get_all()
+        ]
         for app in applications:
             app_frontend_path = APP_FRONTEND_PATH.replace("{minislug}", app.minislug)
             app_path = os.path.join(self.dist_folder_path, app_frontend_path)

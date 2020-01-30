@@ -718,7 +718,7 @@ class WorkspaceContent extends React.Component {
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />
 
-                {currentWorkspace.uploadEnabled &&
+                {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') &&
                   <ShareFolder
                     workspaceId={state.workspaceIdInUrl}
                     availableApp={createContentAvailableApp}

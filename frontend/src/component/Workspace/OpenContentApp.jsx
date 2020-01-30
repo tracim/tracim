@@ -10,6 +10,7 @@ import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.js
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
     const {
+      appList,
       workspaceId,
       appOpenedType,
       user,
@@ -43,7 +44,7 @@ export class OpenContentApp extends React.Component {
           ...contentType.find(ct => ct.slug === contentToOpen.type),
           workspace: {
             label: currentWorkspace.label,
-            downloadEnabled: currentWorkspace.downloadEnabled
+            downloadEnabled: currentWorkspace.downloadEnabled && appList.some(a => a.slug === 'share_content')
           }
         }
         // open app
@@ -83,7 +84,8 @@ export class OpenContentApp extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, currentWorkspace, contentType }) => ({
+const mapStateToProps = ({ appList, user, currentWorkspace, contentType }) => ({
+  appList,
   user,
   currentWorkspace,
   contentType: [
