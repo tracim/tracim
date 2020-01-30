@@ -602,7 +602,7 @@ class WorkspaceContent extends React.Component {
   }
 
   render () {
-    const { appList, breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t } = this.props
+    const { breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t, appList } = this.props
     const { state, props } = this
 
     const urlFilter = qs.parse(location.search).type
@@ -623,7 +623,7 @@ class WorkspaceContent extends React.Component {
         .filter(ct => userRoleIdInWorkspace === ROLE.contributor.id ? ct.slug !== CONTENT_TYPE.FOLDER : true),
 
       // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
-      ...(contentType.find(ct => ct.slug === CONTENT_TYPE.FILE)
+      ...(appList.find(app => app.slug === HACK_COLLABORA_CONTENT_TYPE(contentType).slug)
         ? [HACK_COLLABORA_CONTENT_TYPE(contentType)]
         : []
       )
@@ -799,7 +799,7 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ appList, breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType }) => ({
-  appList, breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType
+const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList }) => ({
+  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))
