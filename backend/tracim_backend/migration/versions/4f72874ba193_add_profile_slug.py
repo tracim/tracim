@@ -133,7 +133,7 @@ def downgrade():
         sa.Column("group_id", sa.INTEGER(), nullable=False),
         sa.Column("group_name", sa.VARCHAR(length=16), nullable=False),
         sa.Column("display_name", sa.VARCHAR(length=255), nullable=True),
-        sa.Column("created", sa.DATETIME(), nullable=True),
+        sa.Column("created", DateTime, nullable=True),
         sa.PrimaryKeyConstraint("group_id", name="pk_groups"),
         sa.UniqueConstraint("group_name", name="uq__groups__group_name"),
     )
