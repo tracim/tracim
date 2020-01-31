@@ -1,4 +1,3 @@
-import Avatar from '../Avatar/Avatar.jsx'
 import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
@@ -10,7 +9,7 @@ import PropTypes from 'prop-types'
 const color = require('color')
 
 const Revision = props => {
-  const revisionType = revisionTypeList.find(r => r.id === props.revisionType) || {id: '', faIcon: '', label: ''}
+  const revisionType = revisionTypeList.find(r => r.id === props.revisionType) || { id: '', faIcon: '', label: '' }
 
   const showLabel = (revisionType, status) => revisionType.id === 'status-update'
     ? revisionType.label(props.t(status.label))
@@ -44,9 +43,9 @@ const Revision = props => {
             <span className='revision__data__infos__created' title={props.createdFormated}>{props.createdDistance}</span>
           </div>
           <span className='revision__data__infos__author'>
-            {props.t('by {{author}}', {author: props.authorPublicName, interpolation: {escapeValue: false}})}
+            {props.t('by {{author}}', { author: props.authorPublicName, interpolation: { escapeValue: false } })}
           </span>
-        </div>      
+        </div>
       </span>
     </li>
   )

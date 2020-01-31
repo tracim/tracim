@@ -102,7 +102,9 @@ class Profile(enum.Enum):
         self.slug = slug
 
     @classmethod
-    def get_all_valid_slugs(cls):
+    def get_all_valid_slugs(cls, include_nobody: bool = False):
+        if include_nobody:
+            return [item.slug for item in list(cls)]
         return [item.slug for item in list(cls) if item.id > 0]
 
     @classmethod

@@ -11,7 +11,7 @@ const CardPopup = props => {
       style={props.customStyle}
     >
       <div className='cardPopup__container'>
-        <div className={classnames(props.customHeaderClass, 'cardPopup__header')} style={{backgroundColor: props.customColor}} />
+        <div className={classnames(props.customHeaderClass, 'cardPopup__header')} style={{ backgroundColor: props.customColor }} />
 
         {props.hideCloseBtn === false &&
           <div className='cardPopup__close' onClick={props.onClose}>

@@ -229,6 +229,8 @@ jobs:
         - npm run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_admin_workspace_user
         - npm run test
+        - cd $TRAVIS_BUILD_DIR/frontend_app_gallery
+        - npm run test
         - cd $TRAVIS_BUILD_DIR
       if: commit_message !~ /(\[skip ci unit_test\])/
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
@@ -247,9 +249,6 @@ jobs:
         - nohup tracimcli caldav start&
         - npm run travis-cypress-run
         - cd $TRAVIS_BUILD_DIR
-      after_failure:
-        - touch $PSERVE_LOG
-        - cat $PSERVE_LOG
       if: commit_message !~ /(\[skip ci cypress\])/
 
 stages:

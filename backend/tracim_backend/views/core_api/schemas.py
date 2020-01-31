@@ -25,6 +25,7 @@ from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
 from tracim_backend.app_models.validator import user_password_validator
 from tracim_backend.app_models.validator import user_profile_validator
+from tracim_backend.app_models.validator import user_profile_validator_with_nobody
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
@@ -206,7 +207,7 @@ class UserSchema(UserDigestSchema):
     )
     profile = StrippedString(
         attribute="profile",
-        validate=user_profile_validator,
+        validate=user_profile_validator_with_nobody,
         example="trusted-users",
         description=FIELD_PROFILE_DESC,
     )
@@ -294,6 +295,7 @@ class SetUserProfileSchema(marshmallow.Schema):
         validate=user_profile_validator,
         example="trusted-users",
         description=FIELD_PROFILE_DESC,
+        required=True,
     )
 
     @post_load
@@ -964,9 +966,12 @@ class TimezoneSchema(marshmallow.Schema):
 
 class AboutSchema(marshmallow.Schema):
     name = StrippedString(example="Tracim", description="Software name")
-    version = StrippedString(example="2.0", allow_none=True, description="Version of Tracim")
+    version = StrippedString(example="2.6", description="Version of Tracim")
+    build_version = StrippedString(
+        example="release_02.06.00", description="Build Version of Tracim"
+    )
     datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
-    website = marshmallow.fields.URL(allow_none=True)
+    website = marshmallow.fields.URL()
 
 
 class ErrorCodeSchema(marshmallow.Schema):
@@ -1287,3 +1292,4 @@ class ConfigSchema(marshmallow.Schema):
     content_length_file_size_limit = marshmallow.fields.Integer()
     workspace_size_limit = marshmallow.fields.Integer()
     workspaces_number_per_user_limit = marshmallow.fields.Integer()
+    instance_name = marshmallow.fields.String()

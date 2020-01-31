@@ -13,7 +13,8 @@ import {
   PageTitle,
   PageContent,
   BREADCRUMBS_TYPE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -38,7 +39,7 @@ import {
 } from '../helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
-class Account extends React.Component {
+export class Account extends React.Component {
   constructor (props) {
     super(props)
 
@@ -77,15 +78,27 @@ class Account extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.buildBreadcrumbs()
+        this.setHeadTitle()
+        break
     }
   }
 
   componentDidMount () {
     const { props } = this
+    this.setHeadTitle()
     if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
     if (props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
     this.buildBreadcrumbs()
+  }
+
+  componentDidUpdate (prevProps) {
+    const { props } = this
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+      this.setHeadTitle()
+    }
   }
 
   loadAgendaUrl = async () => {
@@ -202,6 +215,16 @@ class Account extends React.Component {
   }
 
   handleChangeTimezone = newTimezone => console.log('(NYI) new timezone : ', newTimezone)
+
+  setHeadTitle = () => {
+    const { props } = this
+    if (props.system.config.instance_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('My Account'), props.system.config.instance_name]) }
+      })
+    }
+  }
 
   render () {
     const { props, state } = this

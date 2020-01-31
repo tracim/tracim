@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 require('./SubDropdownCreateButton.styl')
 
-const SubDropdownCreateButton = props => {
+export const SubDropdownCreateButton = props => {
   return (
     <div>
       {props.availableApp.map(app =>

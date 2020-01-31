@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 
-const FileItemHeader = props => {
+export const FileItemHeader = props => {
   return (
     <div className='content__header'>
       <div className='content__header__type'>

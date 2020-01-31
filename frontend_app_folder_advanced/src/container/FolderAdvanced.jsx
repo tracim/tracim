@@ -3,38 +3,38 @@ import FolderAdvancedComponent from '../component/FolderAdvanced.jsx'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  appContentFactory,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
   handleFetchResult,
   addAllResourceI18n,
-  // SelectStatus,
   ArchiveDeleteContent,
   CUSTOM_EVENT,
-  appFeatureCustomEventHandlerShowApp
+  ROLE,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
   getFolder,
   getContentTypeList,
-  putFolder,
-  // putFolderStatus,
-  putFolderIsArchived,
-  putFolderIsDeleted,
-  putFolderRestoreArchived,
-  putFolderRestoreDeleted
+  putFolder
 } from '../action.async.js'
 
 class FolderAdvanced extends React.Component {
   constructor (props) {
     super(props)
+
+    const param = props.data || debug
+    props.setApiUrl(param.config.apiUrl)
+
     this.state = {
       appName: 'folder',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
       externalTranslationList: [
         props.t('Create a folder'),
         props.t('Folder')
@@ -49,33 +49,33 @@ class FolderAdvanced extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-    const { state } = this
+  customEventReducer = ({ detail: { type, data } }) => {
+    const { props, state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) {
-          this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
-        }
+        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+        if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
         break
+
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState({ isVisible: false })
+        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
         break
+
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({ content: { ...prev.content, ...data }, isVisible: true }))
         break
+
+      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
+        console.log('%c<File> Custom event', 'color: #28a745', type, data)
+        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
+        break
+
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
+        props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
         this.loadContent()
         break
     }
@@ -107,6 +107,17 @@ class FolderAdvanced extends React.Component {
     }
   })
 
+  setHeadTitle = (folderName) => {
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([folderName, state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
+  }
+
   loadContent = async () => {
     const { props, state } = this
 
@@ -114,7 +125,10 @@ class FolderAdvanced extends React.Component {
     const fetchContentTypeList = await handleFetchResult(await getContentTypeList(state.config.apiUrl))
 
     switch (fetchFolder.apiResponse.status) {
-      case 200: this.setState({ content: fetchFolder.body }); break
+      case 200:
+        this.setState({ content: fetchFolder.body })
+        this.setHeadTitle(fetchFolder.body.label)
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder details'), 'warning')
     }
 
@@ -124,23 +138,18 @@ class FolderAdvanced extends React.Component {
     }
   }
 
+  loadTimeline = () => {}
+
+  buildBreadcrumbs = () => {}
+
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
-  handleSaveEditLabel = async newLabel => {
+  handleSaveEditLabel = async newTitle => {
     const { props, state } = this
-    const fetchPutWorkspaceLabel = await handleFetchResult(
-      await putFolder(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newLabel, '', state.content.sub_content_types)
-    )
-    switch (fetchPutWorkspaceLabel.apiResponse.status) {
-      case 200:
-        this.setState(prev => ({ content: { ...prev.content, label: newLabel } }))
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new folder label'), 'warning')
-    }
+    await props.appContentChangeTitle(state.content, newTitle, state.config.slug, { sub_content_types: state.content.sub_content_types })
   }
 
   handleClickCheckbox = async appSlug => {
@@ -183,69 +192,24 @@ class FolderAdvanced extends React.Component {
     }
   }
 
-  // Côme - 2018/11/23 - status not used for folders yet
-  // handleChangeStatus = async newStatus => {
-  //   const { state } = this
-  //
-  //   const fetchResultSaveEditStatus = putFolderStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
-  //
-  //   const fetchResultStatus = await handleFetchResult(await fetchResultSaveEditStatus)
-  //   switch (fetchResultStatus.status) { // 204 no content so dont take status from resSave.apiResponse.status
-  //     case 204: this.loadContent(); break
-  //     default: this.sendGlobalFlashMessage(this.props.t("Error saving folder's status, result:"), 'warning')
-  //   }
-  // }
-
   handleClickArchive = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putFolderIsArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: true } }))
-        this.loadContent()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while archiving folder'), 'warning')
-    }
+    const { props, state } = this
+    props.appContentArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
   handleClickDelete = async () => {
-    const { config, content } = this.state
-
-    const fetchResultArchive = await putFolderIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultArchive.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-        this.loadContent()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting folder'), 'warning')
-    }
+    const { props, state } = this
+    props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  handleClickRestoreArchived = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putFolderRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
-        this.loadContent()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring folder'), 'warning')
-    }
+  handleClickRestoreArchive = async () => {
+    const { props, state } = this
+    props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  handleClickRestoreDeleted = async () => {
-    const { config, content } = this.state
-
-    const fetchResultRestore = await putFolderRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    switch (fetchResultRestore.status) {
-      case 204:
-        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
-        this.loadContent()
-        break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring folder'), 'warning')
-    }
+  handleClickRestoreDelete = async () => {
+    const { props, state } = this
+    props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
   render () {
@@ -278,7 +242,7 @@ class FolderAdvanced extends React.Component {
                 />
               */}
 
-              {state.loggedUser.userRoleIdInWorkspace >= 4 &&
+              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
@@ -297,8 +261,8 @@ class FolderAdvanced extends React.Component {
             onClickApp={this.handleClickCheckbox}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
-            onClickRestoreArchived={this.handleClickRestoreArchived}
-            onClickRestoreDeleted={this.handleClickRestoreDeleted}
+            onClickRestoreArchived={this.handleClickRestoreArchive}
+            onClickRestoreDeleted={this.handleClickRestoreDelete}
           />
         </PopinFixedContent>
       </PopinFixed>
@@ -306,4 +270,4 @@ class FolderAdvanced extends React.Component {
   }
 }
 
-export default translate()(FolderAdvanced)
+export default translate()(appContentFactory(FolderAdvanced))

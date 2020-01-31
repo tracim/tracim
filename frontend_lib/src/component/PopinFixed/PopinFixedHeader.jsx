@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import ComposedIcon from '../Icon/ComposedIcon.jsx'
+import { ROLE } from '../../helper.js'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -75,7 +75,7 @@ class PopinFixedHeader extends React.Component {
           }
         </div>
 
-        {userRoleIdInWorkspace >= 2 && state.editTitle &&
+        {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle &&
           <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickUndoChangeTitleBtn}
@@ -85,13 +85,16 @@ class PopinFixedHeader extends React.Component {
           </button>
         }
 
-        {userRoleIdInWorkspace >= 2 && showChangeTitleButton &&
+        {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton &&
           <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickChangeTitleBtn}
             disabled={disableChangeTitle}
           >
-            {state.editTitle ? <i className='fa fa-check' title={t('Validate the title')} /> : <i className='fa fa-pencil' title={t('Edit title')} />}
+            {state.editTitle
+              ? <i className='fa fa-check' title={t('Validate the title')} />
+              : <i className='fa fa-pencil' title={t('Edit title')} />
+            }
           </button>
         }
 
@@ -127,7 +130,7 @@ PopinFixedHeader.defaultProps = {
   customColor: '',
   rawTitle: '',
   componentTitle: <div />,
-  userRoleIdInWorkspace: 1,
+  userRoleIdInWorkspace: ROLE.reader.id,
   onChangeTitle: () => {},
   disableChangeTitle: false,
   showChangeTitleButton: true

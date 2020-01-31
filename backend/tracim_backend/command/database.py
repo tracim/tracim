@@ -131,6 +131,9 @@ class DeleteDBCommand(AppContextCommand):
             except FileNotFoundError:
                 print("Warning! Can delete depots file, is depot path correctly" " configured?")
         else:
-            raise ForceArgumentNeeded(
-                "Warning, You should use --force if you really want to" " delete database."
+            force_arg_required = (
+                "Warning! You should use --force if you really want to delete database."
             )
+            print(force_arg_required)
+            print("Database not deleted")
+            raise ForceArgumentNeeded(force_arg_required)

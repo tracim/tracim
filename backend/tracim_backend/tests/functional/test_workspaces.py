@@ -129,6 +129,7 @@ class TestWorkspaceEndpoint(object):
         workspace_api_factory,
         role_api_factory,
         application_api_factory,
+        app_config,
     ) -> None:
         """
         Check obtain workspace reachable for user.
@@ -152,7 +153,7 @@ class TestWorkspaceEndpoint(object):
         workspace = workspace_api.get_one(workspace.workspace_id)
         app_api = application_api_factory.get()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
-            workspace=workspace
+            workspace=workspace, app_config=app_config
         )  # nope8
         transaction.commit()
 
@@ -181,6 +182,7 @@ class TestWorkspaceEndpoint(object):
         group_api_factory,
         application_api_factory,
         web_testapp,
+        app_config,
     ) -> None:
         """
         Check obtain workspace reachable for user.
@@ -198,8 +200,8 @@ class TestWorkspaceEndpoint(object):
         workspace = workspace_api.get_one(workspace.workspace_id)
         app_api = application_api_factory.get()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
-            workspace=workspace
-        )  # nope8
+            workspace=workspace, app_config=app_config
+        )
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -219,7 +221,7 @@ class TestWorkspaceEndpoint(object):
             workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
 
     def test_api__update_workspace__ok_200__nominal_case(
-        self, workspace_api_factory, application_api_factory, web_testapp
+        self, workspace_api_factory, application_api_factory, web_testapp, app_config
     ) -> None:
         """
         Test update workspace
@@ -229,7 +231,7 @@ class TestWorkspaceEndpoint(object):
         workspace = workspace_api.get_one(1)
         app_api = application_api_factory.get()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
-            workspace=workspace
+            workspace=workspace, app_config=app_config
         )  # nope8
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -283,7 +285,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_download_enabled"] is False
 
     def test_api__update_workspace__ok_200__partial_change_label_only(
-        self, workspace_api_factory, application_api_factory, web_testapp
+        self, workspace_api_factory, application_api_factory, web_testapp, app_config
     ) -> None:
         """
         Test update workspace
@@ -293,7 +295,7 @@ class TestWorkspaceEndpoint(object):
         workspace = workspace_api.get_one(1)
         app_api = application_api_factory.get()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
-            workspace=workspace
+            workspace=workspace, app_config=app_config
         )  # nope8
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -335,7 +337,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["agenda_enabled"] is True
 
     def test_api__update_workspace__ok_200__partial_change_agenda_enabled_only(
-        self, workspace_api_factory, application_api_factory, web_testapp
+        self, workspace_api_factory, application_api_factory, web_testapp, app_config
     ) -> None:
         """
         Test update workspace
@@ -345,7 +347,7 @@ class TestWorkspaceEndpoint(object):
         workspace = workspace_api.get_one(1)
         app_api = application_api_factory.get()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
-            workspace=workspace
+            workspace=workspace, app_config=app_config
         )  # nope8
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -387,7 +389,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["agenda_enabled"] is False
 
     def test_api__update_workspace__ok_200__partial_change_description_only(
-        self, workspace_api_factory, application_api_factory, web_testapp
+        self, workspace_api_factory, application_api_factory, web_testapp, app_config
     ) -> None:
         """
         Test update workspace
@@ -397,7 +399,7 @@ class TestWorkspaceEndpoint(object):
         workspace = workspace_api.get_one(1)
         app_api = application_api_factory.get()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
-            workspace=workspace
+            workspace=workspace, app_config=app_config
         )  # nope8
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))

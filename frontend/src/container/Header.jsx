@@ -25,13 +25,13 @@ import {
 import {
   COOKIE_FRONTEND,
   PAGE,
-  PROFILE,
   unLoggedAllowedPageList,
   ALL_CONTENT_TYPES
 } from '../helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
 import {
+  PROFILE,
   ComposedIcon,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
@@ -55,6 +55,7 @@ class Header extends React.Component {
       Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
       i18n.changeLanguage(langId)
       props.dispatch(setUserLang(langId))
+      props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, langId)
       return
     }
 
@@ -143,7 +144,7 @@ class Header extends React.Component {
                 </li>
               }
 
-              {props.user.profile === PROFILE.ADMINISTRATOR.slug && (
+              {props.user.profile === PROFILE.administrator.slug && (
                 <li className='header__menu__rightside__adminlink nav-item'>
                   <AdminLink />
                 </li>

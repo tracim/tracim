@@ -16,13 +16,14 @@ def web_include(configurator: Configurator, app_config: CFG) -> None:
     Allow to including custom web code in plugin if ´web_include´ method is provided
     at module root, example using a Controller class like in Tracim source code
 
-    >>> def MyController(Controller):
-    >>>     ...
+    >>> class MyController(Controller):
+    ...     pass
+    ... # doctest: +SKIP
     >>> @hookimpl
-    >>> def web_include(configurator: Configurator, app_config: CFG) -> None:
-    >>>      mycontroller = MyController()
-    >>>      configurator.include(mycontroller.bind, route_prefix=BASE_API_V2)
-
+    ... def web_include(configurator: Configurator, app_config: CFG) -> None:
+    ...     my_controller = MyController()
+    ...     configurator.include(mycontroller.bind, route_prefix=BASE_API_V2)
+    ... # doctest: +SKIP
 
     :param configurator: Tracim pyramid configurator
     :param app_config: current tracim config

@@ -7,6 +7,7 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import DisplayState from '../DisplayState/DisplayState.jsx'
+import { ROLE } from '../../helper.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -40,7 +41,7 @@ class Timeline extends React.Component {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  scrollToBottom = () => this.timelineBottom.scrollIntoView({behavior: 'instant'})
+  scrollToBottom = () => this.timelineBottom.scrollIntoView({ behavior: 'instant' })
 
   render () {
     const { props } = this
@@ -57,69 +58,73 @@ class Timeline extends React.Component {
             {props.t('Timeline')}
           </div>
         }
-          <div className='timeline__warning'>
-            {props.isDeprecated && !props.isArchived && !props.isDeleted && (
-              <DisplayState
-                msg={props.t('This content is deprecated')}
-                icon={props.deprecatedStatus.faIcon}
-              />
-            )}
+        <div className='timeline__warning'>
+          {props.isDeprecated && !props.isArchived && !props.isDeleted && (
+            <DisplayState
+              msg={props.t('This content is deprecated')}
+              icon={props.deprecatedStatus.faIcon}
+            />
+          )}
 
-            {props.isArchived && (
-              <DisplayState
-                msg={props.t('This content is archived')}
-                btnType='button'
-                icon='archive'
-                btnLabel={props.t('Restore')}
-                onClickBtn={props.onClickRestoreArchived}
-              />
-            )}
+          {props.isArchived && (
+            <DisplayState
+              msg={props.t('This content is archived')}
+              btnType='button'
+              icon='archive'
+              btnLabel={props.t('Restore')}
+              onClickBtn={props.onClickRestoreArchived}
+            />
+          )}
 
-            {props.isDeleted && (
-              <DisplayState
-                msg={props.t('This content is deleted')}
-                btnType='button'
-                icon='trash'
-                btnLabel={props.t('Restore')}
-                onClickBtn={props.onClickRestoreDeleted}
-              />
-            )}
-          </div>
+          {props.isDeleted && (
+            <DisplayState
+              msg={props.t('This content is deleted')}
+              btnType='button'
+              icon='trash'
+              btnLabel={props.t('Restore')}
+              onClickBtn={props.onClickRestoreDeleted}
+            />
+          )}
+        </div>
 
-          <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}>
+        <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}>
           {props.timelineData.map(content => {
             switch (content.timelineType) {
               case 'comment':
-                return <Comment
-                  customClass={props.customClass}
-                  customColor={props.customColor}
-                  author={content.author.public_name}
-                  createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
-                  createdDistance={content.created}
-                  text={content.raw_content}
-                  fromMe={props.loggedUser.user_id === content.author.user_id}
-                  key={`comment_${content.content_id}`}
-              />
+                return (
+                  <Comment
+                    customClass={props.customClass}
+                    customColor={props.customColor}
+                    author={content.author.public_name}
+                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdDistance={content.created}
+                    text={content.raw_content}
+                    fromMe={props.loggedUser.user_id === content.author.user_id}
+                    key={`comment_${content.content_id}`}
+                  />
+                )
               case 'revision':
-                return <Revision
-                  customClass={props.customClass}
-                  customColor={props.customColor}
-                  revisionType={content.revision_type}
-                  createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
-                  createdDistance={content.created}
-                  number={content.number}
-                  status={props.availableStatusList.find(status => status.slug === content.status)}
-                  authorPublicName={content.author.public_name}
-                  allowClickOnRevision={props.allowClickOnRevision}
-                  onClickRevision={() => props.onClickRevisionBtn(content)}
-                  key={`revision_${content.revision_id}`}
-                />
+                return (
+                  <Revision
+                    customClass={props.customClass}
+                    customColor={props.customColor}
+                    revisionType={content.revision_type}
+                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdDistance={content.created}
+                    number={content.number}
+                    status={props.availableStatusList.find(status => status.slug === content.status)}
+                    authorPublicName={content.author.public_name}
+                    allowClickOnRevision={props.allowClickOnRevision}
+                    onClickRevision={() => props.onClickRevisionBtn(content)}
+                    key={`revision_${content.revision_id}`}
+                  />
+                )
             }
           })}
-          <li style={{visibility: 'hidden'}} ref={el => { this.timelineBottom = el }} />
+          <li style={{ visibility: 'hidden' }} ref={el => { this.timelineBottom = el }} />
         </ul>
 
-        {props.loggedUser.userRoleIdInWorkspace >= 2 &&
+        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
           <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
             <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__texteditor__textinput')}>
               <textarea
@@ -215,7 +220,7 @@ Timeline.defaultProps = {
   loggedUser: {
     id: '',
     name: '',
-    userRoleIdInWorkspace: 1
+    userRoleIdInWorkspace: ROLE.reader.id
   },
   timelineData: [],
   wysiwyg: false,

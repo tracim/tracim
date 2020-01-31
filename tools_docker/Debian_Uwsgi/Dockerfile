@@ -4,8 +4,10 @@ MAINTAINER contact@tracim.fr
 ARG TAG=""
 ARG BRANCH=""
 
+ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission,gallery"
 ENV START_WEBDAV=1
 ENV START_CALDAV=1
+ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
@@ -15,7 +17,7 @@ RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
     then echo "Its not possible to use ARG TAG and ARG BRANCH in same time." && exit 1;fi
 
 RUN \
-# create command to clone repo
+# Create command to clone repo
     get_source_from_github() { \
     if ([ "$TAG" != "" ] && [ "$BRANCH" = "" ]); \
     then git clone -b $TAG --single-branch https://github.com/tracim/tracim.git tracim; \
@@ -58,21 +60,22 @@ RUN \
     uwsgi \
     uwsgi-plugin-python3 \
     vim \
+    xvfb \
     zlib1g-dev \
 # Install nodejs
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt update \
     && apt install -qy nodejs \
-# clone repo
+# Clone repo
     && get_source_from_github $TAG $BRANCH \
 # Go in repo folder
     && cd /tracim/ \
-# install frontend
+# Install frontend
     && ./install_frontend_dependencies.sh root \
     && ./build_full_frontend.sh \
 # Go in backend folder
     && cd backend \
-# install backend
+# Install backend
     && python3 -m pip install -U pip setuptools wheel \
     && python3 -m pip install -r requirements.txt \
     && python3 -m pip install -e ".[postgresql]" \
@@ -86,11 +89,13 @@ RUN \
     && rm -rf /tracim/frontend*/node_modules \
 # Remove default conf about apache2
     && rm /etc/apache2/sites-enabled/000-default.conf \
+# Do not show apache version
+    && sed -i "s|ServerTokens OS|ServerTokens Prod|g" /etc/apache2/conf-enabled/security.conf \
+    && sed -i "s|ServerSignature On|ServerSignature Off|g" /etc/apache2/conf-enabled/security.conf \
 # Purges useless packages
     && apt purge -yq \
     build-essential \
     curl \
-    git \
     libjpeg-dev \
     libmagickwand-dev \
     nodejs \

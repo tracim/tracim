@@ -11,5 +11,5 @@ export const globalManager = {
   public_name: 'Global manager',
   lang: 'en',
   agendaUrl: '',
-  is_deleted: false,
+  is_deleted: false
 }
