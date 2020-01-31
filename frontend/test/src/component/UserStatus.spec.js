@@ -6,8 +6,8 @@ import sinon from 'sinon'
 import { ROLE } from 'tracim_frontend_lib'
 
 describe('<UserStatus />', () => {
-  const onClickAddNotifyCallBack = sinon.stub()
-  const onClickRemoveNotifyCallBack = sinon.stub()
+  const onClickAddNotifyCallBack = sinon.spy()
+  const onClickRemoveNotifyCallBack = sinon.spy()
   const testRole = ROLE.workspaceManager
 
   const props = {

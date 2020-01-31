@@ -7,9 +7,9 @@ import sinon from 'sinon'
 import { Link } from 'react-router-dom'
 
 describe('<ExtandedAction />', () => {
-  const archiveCallBack = sinon.stub()
-  const deleteCallBack = sinon.stub()
-  const editCallBack = sinon.stub()
+  const archiveCallBack = sinon.spy()
+  const deleteCallBack = sinon.spy()
+  const editCallBack = sinon.spy()
 
   const props = {
     onClickExtendedAction: {

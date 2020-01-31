@@ -5,7 +5,7 @@ import sinon from 'sinon'
 import { MenuSubComponent as MenuSubComponentWithoutHOC } from '../../../src/component/Account/MenuSubComponent.jsx'
 
 describe('<MenuSubComponent />', () => {
-  const onClickMenuItemCallBack = sinon.stub()
+  const onClickMenuItemCallBack = sinon.spy()
 
   const props = {
     menu: [{

@@ -6,8 +6,8 @@ import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 import sinon from 'sinon'
 
 describe('<RecentActivity />', () => {
-  const onClickSeeMoreCallBack = sinon.stub()
-  const onClickEverythingAsReadCallBack = sinon.stub()
+  const onClickSeeMoreCallBack = sinon.spy()
+  const onClickEverythingAsReadCallBack = sinon.spy()
 
   const props = {
     recentActivityList: [{

@@ -6,9 +6,9 @@ import sinon from 'sinon'
 require('../../src/component/Input/TextAreaApp/TextAreaApp.styl')
 
 describe('<TextAreaApp />', () => {
-  const onChangeTextCallBack = sinon.stub()
-  const onClickCancelBtnCallBack = sinon.stub()
-  const onClickValidateBtnCallBack = sinon.stub()
+  const onChangeTextCallBack = sinon.spy()
+  const onClickCancelBtnCallBack = sinon.spy()
+  const onClickValidateBtnCallBack = sinon.spy()
 
   const props = {
     text: 'Lorem',

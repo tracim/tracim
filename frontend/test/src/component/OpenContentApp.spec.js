@@ -12,9 +12,9 @@ import {
 import { connectMock } from '../../hocMock/store'
 
 describe('<OpenContentApp />', () => {
-  const dispatchCustomEventCallBack = sinon.stub()
-  const updateAppOpenedTypeCallBack = sinon.stub()
-  const renderAppFeatureCallBack = sinon.stub()
+  const dispatchCustomEventCallBack = sinon.spy()
+  const updateAppOpenedTypeCallBack = sinon.spy()
+  const renderAppFeatureCallBack = sinon.spy()
 
   const props = {
     workspaceId: 1,

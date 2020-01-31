@@ -6,8 +6,8 @@ import { ROLE } from 'tracim_frontend_lib'
 import sinon from 'sinon'
 
 describe('<MemberList />', () => {
-  const onClickAddMemberBtnCallBack = sinon.stub()
-  const onClickRemoveMemberCallBack = sinon.stub()
+  const onClickAddMemberBtnCallBack = sinon.spy()
+  const onClickRemoveMemberCallBack = sinon.spy()
 
   const props = {
     memberList: [{

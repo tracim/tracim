@@ -5,7 +5,7 @@ import { ContentTypeBtn } from '../../../src/component/Dashboard/ContentTypeBtn.
 import sinon from 'sinon'
 
 describe('<ContentTypeBtn />', () => {
-  const onClickBtnCallBack = sinon.stub()
+  const onClickBtnCallBack = sinon.spy()
 
   const props = {
     hexcolor: '#ffffff',

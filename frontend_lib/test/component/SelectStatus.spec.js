@@ -7,7 +7,7 @@ import { status, statusList } from '../fixture/status.js'
 require('../../src/component/Input/SelectStatus/SelectStatus.styl')
 
 describe('<SelectStatus />', () => {
-  const onChangeStatusCallBack = sinon.stub()
+  const onChangeStatusCallBack = sinon.spy()
 
   const props = {
     availableStatus: statusList,

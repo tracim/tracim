@@ -7,7 +7,7 @@ import sinon from 'sinon'
 require('../../src/component/DisplayState/DisplayState.styl')
 
 describe('<DisplayState />', function () {
-  const onClickBtnCallBack = sinon.stub()
+  const onClickBtnCallBack = sinon.spy()
 
   const props = {
     msg: 'randomMessage',

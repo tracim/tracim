@@ -5,7 +5,7 @@ import Help from '../../../src/component/Header/MenuActionListItem/Help.jsx'
 import sinon from 'sinon'
 
 describe('<Help />', () => {
-  const onClickHelpCallBack = sinon.stub()
+  const onClickHelpCallBack = sinon.spy()
 
   const props = {
     onClickHelp: onClickHelpCallBack

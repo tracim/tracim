@@ -20,7 +20,7 @@ import { CUSTOM_EVENT } from '../src/customEvent.js'
 import { generateLocalStorageContentId } from '../src/helper.js'
 
 describe('appContentFactory.js', () => {
-  const fakeCheckApiUrl = sinon.stub() // TODO: Do I need a stub here ?
+  const fakeCheckApiUrl = sinon.spy()
   global.GLOBAL_dispatchEvent = sinon.spy()
   global.localStorage = {
     getItem: sinon.spy(),

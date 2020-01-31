@@ -6,7 +6,7 @@ import sinon from 'sinon'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 
 describe('<SubDropdownCreateButton />', () => {
-  const onClickCreateContentCallBack = sinon.stub()
+  const onClickCreateContentCallBack = sinon.spy()
 
   const props = {
     availableApp: contentType,

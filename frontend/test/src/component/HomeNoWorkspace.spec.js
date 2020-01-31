@@ -5,7 +5,7 @@ import { HomeNoWorkspace as HomeNoWorkspaceWithoutHOC } from '../../../src/compo
 import sinon from 'sinon'
 
 describe('<HomeNoWorkspace />', () => {
-  const onClickCreateWorkspaceCallBack = sinon.stub()
+  const onClickCreateWorkspaceCallBack = sinon.spy()
 
   const props = {
     canCreateWorkspace: true,
