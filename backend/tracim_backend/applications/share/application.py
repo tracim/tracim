@@ -15,15 +15,18 @@ class ShareApp(TracimApplication):
 
     def load_config(self, app_config: CFG) -> None:
         # share content email
+        template_dir = app_config.here_macro_replace("%(here)s/tracim_backend/templates/mail")
         app_config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML = app_config.get_raw_config(
-            "email.notification.share_content_to_receiver.template.html"
+            "email.notification.share_content_to_receiver.template.html",
+            "{}/{}".format(template_dir, "shared_content_to_receiver_body_html.mak"),
         )
         app_config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT = app_config.get_raw_config(
             "email.notification.share_content_to_receiver.subject",
             _('[{website_title}] {emitter_name} shared the file "{content_filename}" with you'),
         )
         app_config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML = app_config.get_raw_config(
-            "email.notification.share_content_to_emitter.template.html"
+            "email.notification.share_content_to_emitter.template.html",
+            "{}/{}".format(template_dir, "shared_content_to_emitter_body_html.mak"),
         )
         app_config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT = app_config.get_raw_config(
             "email.notification.share_content_to_emitter.subject",

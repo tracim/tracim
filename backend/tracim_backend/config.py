@@ -181,14 +181,14 @@ class CFG(object):
         # TODO - G.M - 2020-01-09 - remove this retrocompat code, as
         #  CALDAV__ENABLED and COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
         # should be deprecated.
-        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "false"))
+        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "False"))
         self.deprecate_parameter(
             "CALDAV_ENABLED",
             self.CALDAV__ENABLED,
             extended_information="It will not be taken into account.",
         )
         self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
-            self.get_raw_config("collaborative_document_edition.activated", "false")
+            self.get_raw_config("collaborative_document_edition.activated", "False")
         )
         self.deprecate_parameter(
             "COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED",
@@ -602,35 +602,11 @@ class CFG(object):
         self.WEBDAV_SHOW_HISTORY = False
         self.WEBDAV_MANAGE_LOCK = True
 
-    def _load_caldav_config(self) -> None:
-        """
-        load config for caldav related stuff
-        """
-        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "False"))
-        self.CALDAV__RADICALE_PROXY__BASE_URL = self.get_raw_config(
-            "caldav.radicale_proxy.base_url", "http://localhost:5232"
-        )
-        default_caldav_storage_dir = self.here_macro_replace("%(here)s/radicale_storage")
-        self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = self.get_raw_config(
-            "caldav.radicale.storage.filesystem_folder", default_caldav_storage_dir
-        )
-        self.CALDAV__RADICALE__AGENDA_DIR = "agenda"
-        self.CALDAV__RADICALE__WORKSPACE_SUBDIR = "workspace"
-        self.CALDAV__RADICALE__USER_SUBDIR = "user"
-        self.CALDAV__RADICALE__BASE_PATH = "/{}/".format(self.CALDAV__RADICALE__AGENDA_DIR)
-        self.CALDAV__RADICALE__USER_PATH = "/{}/{}/".format(
-            self.CALDAV__RADICALE__AGENDA_DIR, self.CALDAV__RADICALE__USER_SUBDIR
-        )
-        self.CALDAV_RADICALE_WORKSPACE_PATH = "/{}/{}/".format(
-            self.CALDAV__RADICALE__AGENDA_DIR, self.CALDAV__RADICALE__WORKSPACE_SUBDIR
-        )
-
     def _load_ldap_config(self) -> None:
         """
         Load config for ldap related stuff
         """
         self.LDAP_URL = self.get_raw_config("ldap_url", "ldap://localhost:389")
-        self.LDAP_BASE_DN = self.get_raw_config("ldap_base_dn")
         self.LDAP_BIND_DN = self.get_raw_config("ldap_bind_dn")
         self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", secret=True)
         self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
@@ -694,23 +670,6 @@ class CFG(object):
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
         )
 
-    def _load_collaborative_document_edition_config(self):
-        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
-            self.get_raw_config("collaborative_document_edition.activated", "False")
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE = self.get_raw_config(
-            "collaborative_document_edition.software"
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = self.get_raw_config(
-            "collaborative_document_edition.collabora.base_url"
-        )
-        default_file_template_dir = self.here_macro_replace(
-            "%(here)s/tracim_backend/templates/open_documents"
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = self.get_raw_config(
-            "collaborative_document_edition.file_template_dir", default_file_template_dir
-        )
-
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -720,7 +679,6 @@ class CFG(object):
         self._check_global_config_validity()
         self._check_email_config_validity()
         self._check_ldap_config_validity()
-        self._check_caldav_config_validity()
         self._check_search_config_validity()
 
         app_lib = ApplicationApi(app_list=app_list)
@@ -923,9 +881,6 @@ class CFG(object):
                 "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method"
             )
             self.check_mandatory_param(
-                "LDAP_BASE_DN", self.LDAP_BASE_DN, when_str="when ldap is in available auth method"
-            )
-            self.check_mandatory_param(
                 "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method"
             )
             self.check_mandatory_param(
@@ -948,38 +903,6 @@ class CFG(object):
                 self.LDAP_NAME_ATTRIBUTE,
                 when_str="when ldap is in available auth method",
             )
-
-    def _check_caldav_config_validity(self) -> None:
-        """
-        Check if config is correctly setted for caldav features
-        """
-        if self.CALDAV__ENABLED:
-            self.check_mandatory_param(
-                "CALDAV__RADICALE_PROXY__BASE_URL",
-                self.CALDAV__RADICALE_PROXY__BASE_URL,
-                when_str="when caldav feature is enabled",
-            )
-            # TODO - G.M - 2019-05-06 - convert "caldav.radicale.storage.filesystem_folder"
-            # as tracim global parameter
-            self.check_mandatory_param(
-                "CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER",
-                self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-                when_str="if caldav feature is enabled",
-            )
-            self.check_directory_path_param(
-                "CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER",
-                self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-                writable=True,
-            )
-            radicale_storage_type = self.settings.get("caldav.radicale.storage.type")
-            if radicale_storage_type != "multifilesystem":
-                raise ConfigurationError(
-                    '"{}" should be set to "{}"'
-                    " (currently only valid value)"
-                    ' when "{}" is true'.format(
-                        "caldav.radicale.storage.type", "multifilesystem", "caldav.enabled"
-                    )
-                )
 
     def _check_search_config_validity(self):
         search_engine_valid = ["elasticsearch", "simple"]
