@@ -8,7 +8,7 @@
 - Its now possible to delete user and anonymise information about him/her with tracimcli command
 - Preview generator now support raw file and 3D file (working with xvfb in docker container)
 - With proxy apache: you can now used browser cache policy. If you used Tracim with Docker you need to backup and delete existing apache configuration file in `~/tracim/etc/` (default path with Tracim Docker image). New file is created on next startup with new parameter inside.
-- All app is now enabled/disabled directly with one parameter and its more simple to develop new app
+- All apps are now enabled/disabled directly with one parameter and its more simple to develop new app
 
 ### Fixed issues
 - Gallery: #2540, #2541, #2551, #2574, #2583 
