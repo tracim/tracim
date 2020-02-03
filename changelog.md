@@ -3,7 +3,7 @@
 # 2.6.0 /2020-01-xx
 
 ### New Feature
-- Multi-upload file directly available in tracim frontend
+- Multi-upload file available in tracim frontend (not only in public upload)
 - Page title show where you are in Tracim
 - Its now possible to delete user and anonymise information about him/her with tracimcli command
 - Preview generator now support raw file and 3D file (working with xvfb in docker container)
