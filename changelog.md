@@ -23,7 +23,7 @@
 - If you use `collaborative_document_edition` with Tracim on Docker, you need to add `-e collaborative_document_edition=1` when you start docker with `docker run` command. You can also add `collaborative_document_edition=1` in your docker-compose.yml file
 
 ### Other Changes
-- 2 deprecated ldap parameters: `ldap_base_url` and `ldap_base_dn` (not used by tracim backend code in oldest release)
+- 2 deprecated ldap parameters: `ldap_base_url` and `ldap_base_dn` (they where not implemented in Tracim's backend code so using them had no impact)
 - 2 deprecated app parameters: `caldav.enabled` and `collaborative_document_edition.activated` (no more used with app refactor #617)
 
 
