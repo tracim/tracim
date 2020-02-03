@@ -531,7 +531,7 @@ class CFG(object):
             self.get_raw_config("email.reply.imap.use_ssl", "True")
         )
         self.EMAIL__REPLY__IMAP__USE_IDLE = asbool(
-            self.get_raw_config("email.reply.imap.use_idle", "True")
+            self.get_raw_config("email.reply.imap.use_idle", "False")
         )
         self.EMAIL__REPLY__CONNECTION__MAX_LIFETIME = int(
             self.get_raw_config("email.reply.connection.max_lifetime", "600")  # 10 minutes

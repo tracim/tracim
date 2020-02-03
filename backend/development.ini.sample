@@ -392,7 +392,7 @@ email.reply.imap.folder = INBOX
 email.reply.imap.use_ssl = True
 # IMAP IDLE feature is for real-time notifications (its not necessary to use function send & receive)
 # if this option is available in your imap server, change this parameter to True
-email.reply.imap.use_idle = True
+email.reply.imap.use_idle = False
 
 ### Connection ###
 ## Delay in seconds for re-new connection
