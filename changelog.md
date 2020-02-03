@@ -24,7 +24,7 @@
 
 ### Other Changes
 - 2 deprecated ldap parameters: `ldap_base_url` and `ldap_base_dn` (they where not implemented in Tracim's backend code so using them had no impact)
-- 2 deprecated app parameters: `caldav.enabled` and `collaborative_document_edition.activated` (no more used with app refactor #617)
+- 2 deprecated app parameters: `caldav.enabled` and `collaborative_document_edition.activated`
 
 
 # 2.5.1 / 2019-12-06
