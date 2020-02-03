@@ -18,7 +18,7 @@
 ### Breaking/Important change
 - `agenda`, `share_content`, `upload_permission` and `collaborative_document_edition` are now Tracim's applications (stand alone and optional), you can add/remove them from `app.enabled` list
   - `caldav.enabled` is now deprecated and agenda is enabled by default. To disable it, uncomment `app.enabled` parameter and put each enabled apps but agenda.
-  - `upload_permission` and  `share_content` are enabled by default but they now MUST be in `app.enabled` list to work properly. Before 2.6.0 theses apps can't be disabled.
+  - `upload_permission` and  `share_content` are enabled by default. Before 2.6.0 theses apps couldn't be disabled. To disable them, uncomment `app.enabled` parameter and put each enabled apps but `upload_permission` and/or  `share_content`.
   - `collaborative_document_edition` is now a real app, disabled by default. To enable it you should not anymore set `collaborative_document_edition.activated` (deprecated parameter), but add `collaborative_document_edition` in `app.enabled` list and uncomment parameter.
 - If you use `collaborative_document_edition` with Tracim on Docker, you need to add `-e collaborative_document_edition=1` when you start docker with `docker run` command or add `collaborative_document_edition=1` in your docker-compose.yml file
 
