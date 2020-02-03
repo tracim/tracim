@@ -20,7 +20,7 @@
   - `caldav.enabled` is now deprecated and agenda is enabled by default. To disable it, uncomment `app.enabled` parameter and put each enabled apps but agenda.
   - `upload_permission` and  `share_content` are enabled by default. Before 2.6.0 theses apps couldn't be disabled. To disable them, uncomment `app.enabled` parameter and put each enabled apps but `upload_permission` and/or  `share_content`.
   - `collaborative_document_edition.activated` is now deprecated and is disabled by default. To enable it, uncomment `app.enabled` parameter and put each enabled apps, including `collaborative_document_edition`
-- If you use `collaborative_document_edition` with Tracim on Docker, you need to add `-e collaborative_document_edition=1` when you start docker with `docker run` command or add `collaborative_document_edition=1` in your docker-compose.yml file
+- If you use `collaborative_document_edition` with Tracim on Docker, you need to add `-e collaborative_document_edition=1` when you start docker with `docker run` command. You can also add `collaborative_document_edition=1` in your docker-compose.yml file
 
 ### Other Changes
 - 2 deprecated ldap parameters: `ldap_base_url` and `ldap_base_dn` (not used by tracim backend code in oldest release)
