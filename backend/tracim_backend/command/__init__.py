@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import argparse
-from argparse import ArgumentParser
 from argparse import Namespace
 import logging
 import sys
 from typing import Any
 from typing import List
-from typing import Optional
 
 from cliff.app import App
 from cliff.command import Command
@@ -96,31 +94,3 @@ class AppContextCommand(Command):
             default=False,
         )
         return parser
-
-
-class Extender(argparse.Action):
-    """
-    Copied class from http://stackoverflow.com/a/12461237/801924
-    """
-
-    def __call__(
-        self,
-        parser: ArgumentParser,
-        namespace: Namespace,
-        values: List[str],
-        option_strings: Optional[str] = None,
-    ) -> None:
-        # Need None here incase `argparse.SUPPRESS` was supplied for `dest`
-        dest = getattr(namespace, self.dest, None)
-        # print dest,self.default,values,option_strings
-        if not hasattr(dest, "extend") or dest == self.default:
-            dest = []
-            setattr(namespace, self.dest, dest)
-            # if default isn't set to None, this method might be called
-            # with the default as `values` for other arguements which
-            # share this destination.
-            parser.set_defaults(**{self.dest: None})
-        try:
-            dest.extend(values)
-        except ValueError:
-            dest.append(values)
