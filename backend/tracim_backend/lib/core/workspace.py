@@ -6,6 +6,8 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
+from tracim_backend import app_list
+from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -13,6 +15,7 @@ from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
 from tracim_backend.exceptions import WorkspacePublicUploadDisabledException
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
@@ -320,9 +323,10 @@ class WorkspaceApi(object):
 
         # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
         # with event refactor, see https://github.com/tracim/tracim/issues/1487
-        from tracim_backend.lib.agenda.agenda import AgendaApi
+        from tracim_backend.applications.agenda.lib import AgendaApi
 
-        if self._config.CALDAV__ENABLED:
+        app_lib = ApplicationApi(app_list=app_list)
+        if app_lib.exist(AGENDA__APP_SLUG):
             if workspace.agenda_enabled:
                 agenda_api = AgendaApi(
                     current_user=self._user, session=self._session, config=self._config
@@ -356,11 +360,12 @@ class WorkspaceApi(object):
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_updated_workspace should start hook use by agenda app code.
 
-        # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
-        # with event refactor, see https://github.com/tracim/tracim/issues/1487
-        from tracim_backend.lib.agenda.agenda import AgendaApi
+        app_lib = ApplicationApi(app_list=app_list)
+        if app_lib.exist(AGENDA__APP_SLUG):
+            # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
+            # with event refactor, see https://github.com/tracim/tracim/issues/1487
+            from tracim_backend.applications.agenda.lib import AgendaApi
 
-        if self._config.CALDAV__ENABLED:
             if workspace.agenda_enabled:
                 agenda_api = AgendaApi(
                     current_user=self._user, session=self._session, config=self._config

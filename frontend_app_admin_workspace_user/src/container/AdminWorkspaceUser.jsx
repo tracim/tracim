@@ -9,7 +9,8 @@ import {
   handleFetchResult,
   BREADCRUMBS_TYPE,
   ROLE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -56,6 +57,8 @@ class AdminWorkspaceUser extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
+    const { props } = this
+
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(this.state.config.slug):
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
@@ -74,8 +77,13 @@ class AdminWorkspaceUser extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
-        if (this.state.config.type === 'workspace') this.loadWorkspaceContent()
-        else if (this.state.config.type === 'user') this.loadUserContent()
+        if (this.state.config.type === 'workspace') {
+          this.setHeadTitle(props.t('Shared space management'))
+          this.loadWorkspaceContent()
+        } else if (this.state.config.type === 'user') {
+          this.setHeadTitle(props.t('User account management'))
+          this.loadUserContent()
+        }
         this.buildBreadcrumbs()
         break
       default:
@@ -84,21 +92,33 @@ class AdminWorkspaceUser extends React.Component {
   }
 
   async componentDidMount () {
+    const { props } = this
+
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
 
-    if (this.state.config.type === 'workspace') await this.loadWorkspaceContent()
-    else if (this.state.config.type === 'user') await this.loadUserContent()
+    if (this.state.config.type === 'workspace') {
+      this.setHeadTitle(props.t('Shared space management'))
+      await this.loadWorkspaceContent()
+    } else if (this.state.config.type === 'user') {
+      this.setHeadTitle(props.t('User account management'))
+      await this.loadUserContent()
+    }
 
     this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { state } = this
+    const { state, props } = this
 
     console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`, prevState, state)
     if (prevState.config.type !== state.config.type) {
-      if (state.config.type === 'workspace') this.loadWorkspaceContent()
-      else if (state.config.type === 'user') this.loadUserContent()
+      if (this.state.config.type === 'workspace') {
+        this.setHeadTitle(props.t('Shared space management'))
+        this.loadWorkspaceContent()
+      } else if (this.state.config.type === 'user') {
+        this.setHeadTitle(props.t('User account management'))
+        this.loadUserContent()
+      }
       this.buildBreadcrumbs()
     }
   }
@@ -116,6 +136,17 @@ class AdminWorkspaceUser extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = (title) => {
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([title, state.config.system.config.instance_name]) }
+      })
+    }
+  }
 
   loadWorkspaceContent = async () => {
     const { props, state } = this

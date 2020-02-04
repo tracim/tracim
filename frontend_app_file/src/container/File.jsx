@@ -27,8 +27,11 @@ import {
   parserStringToList,
   removeExtensionOfFilename,
   buildFilePreviewUrl,
+  buildHeadTitle,
   ROLE,
-  APP_FEATURE_MODE
+  APP_FEATURE_MODE,
+  computeProgressionPercentage,
+  FILE_PREVIEW_STATE
 } from 'tracim_frontend_lib'
 import { PAGE } from '../helper.js'
 import { debug } from '../debug.js'
@@ -63,11 +66,11 @@ class File extends React.Component {
         props.t('Files'),
         props.t('file'),
         props.t('files'),
-        props.t('Upload a file')
+        props.t('Upload files')
       ],
       newComment: '',
       newFile: '',
-      newFilePreview: null,
+      newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
@@ -94,6 +97,7 @@ class File extends React.Component {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+        if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
         break
 
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
@@ -172,6 +176,17 @@ class File extends React.Component {
     }
   })
 
+  setHeadTitle = (contentName) => {
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([contentName, state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
+  }
+
   loadContent = async (pageToLoad = null) => {
     const { state, props } = this
 
@@ -194,6 +209,7 @@ class File extends React.Component {
           },
           mode: APP_FEATURE_MODE.VIEW
         })
+        this.setHeadTitle(filenameNoExtension)
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading file'))
@@ -389,26 +405,26 @@ class File extends React.Component {
 
     const fileToSave = newFile[0]
 
-    if (fileToSave.type.includes('image') && fileToSave.size > 2000000) { // allow preview
+    if (fileToSave.type.includes('image') && fileToSave.size <= 2000000) {
       this.setState({ newFile: fileToSave })
 
       var reader = new FileReader()
       reader.onload = e => {
-        this.setState({ newFilePreview: e.total > 0 ? e.target.result : false })
+        this.setState({ newFilePreview: e.total > 0 ? e.target.result : FILE_PREVIEW_STATE.NO_FILE })
         const img = new Image()
         img.src = e.target.result
-        img.onerror = () => this.setState({ newFilePreview: false })
+        img.onerror = () => this.setState({ newFilePreview: FILE_PREVIEW_STATE.NO_FILE })
       }
       reader.readAsDataURL(fileToSave)
-    } else { // no preview
+    } else {
       this.setState({
         newFile: fileToSave,
-        newFilePreview: false
+        newFilePreview: FILE_PREVIEW_STATE.NO_FILE
       })
     }
   }
 
-  handleClickDropzoneCancel = () => this.setState({ mode: APP_FEATURE_MODE.VIEW, newFile: '', newFilePreview: null })
+  handleClickDropzoneCancel = () => this.setState({ mode: APP_FEATURE_MODE.VIEW, newFile: '', newFilePreview: FILE_PREVIEW_STATE.NO_FILE })
 
   handleClickDropzoneValidate = async () => {
     const { props, state } = this
@@ -419,7 +435,7 @@ class File extends React.Component {
     // fetch still doesn't handle event progress. So we need to use old school xhr object :scream:
     const xhr = new XMLHttpRequest()
     xhr.upload.addEventListener('loadstart', () => this.setState({ progressUpload: { display: false, percent: 0 } }), false)
-    const uploadInProgress = e => e.lengthComputable && this.setState({ progressUpload: { display: true, percent: Math.round(e.loaded / e.total * 100) } })
+    const uploadInProgress = e => e.lengthComputable && this.setState({ progressUpload: { display: true, percent: Math.round(computeProgressionPercentage(e.loaded, e.total)) } })
     xhr.upload.addEventListener('progress', uploadInProgress, false)
     xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: false, percent: 0 } }), false)
 
@@ -434,7 +450,7 @@ class File extends React.Component {
           case 204:
             this.setState({
               newFile: '',
-              newFilePreview: null,
+              newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
               fileCurrentPage: 1,
               mode: APP_FEATURE_MODE.VIEW
             })

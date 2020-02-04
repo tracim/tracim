@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from abc import ABC
+from abc import abstractmethod
 import functools
 import typing
 from typing import TYPE_CHECKING
@@ -50,7 +52,7 @@ class AcceptAllAuthorizationPolicy(object):
         raise NotImplementedError()
 
 
-class AuthorizationChecker(object):
+class AuthorizationChecker(ABC):
     """
     Abstract class for AuthorizationChecker
     Authorization Checker are class who does check on tracim_context.
@@ -60,9 +62,10 @@ class AuthorizationChecker(object):
     )
     """
 
+    @abstractmethod
     def check(self, tracim_context: TracimContext) -> bool:
         """Return true or raise TracimException error if check doesnt pass"""
-        raise NotImplementedError()
+        pass
 
 
 class SameUserChecker(AuthorizationChecker):

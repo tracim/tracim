@@ -26,7 +26,8 @@ import {
   PageTitle,
   PageContent,
   BREADCRUMBS_TYPE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -113,10 +114,14 @@ class WorkspaceContent extends React.Component {
         props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, { encode: false }))
         this.setState({ appOpenedType: false })
 
+        this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
         this.props.dispatch(resetBreadcrumbsAppFeature())
         break
 
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.buildBreadcrumbs()
+        if (!state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
+        break
     }
   }
 
@@ -124,6 +129,8 @@ class WorkspaceContent extends React.Component {
     const { props } = this
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
+
+    this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
 
     let wsToLoad = null
 
@@ -152,6 +159,10 @@ class WorkspaceContent extends React.Component {
     const currentFilter = qs.parse(props.location.search).type
 
     const hasWorkspaceIdChanged = prevState.workspaceIdInUrl !== workspaceId
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name || prevProps.currentWorkspace.label !== props.currentWorkspace.label || prevFilter !== currentFilter) {
+      this.setHeadTitle(this.getFilterName(currentFilter))
+    }
 
     if (hasWorkspaceIdChanged) this.loadWorkspaceDetail()
 
@@ -188,6 +199,17 @@ class WorkspaceContent extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = (filterName) => {
+    const { props } = this
+
+    if (props.system.config.instance_name && props.currentWorkspace.label) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([filterName, props.currentWorkspace.label, props.system.config.instance_name]) }
+      })
+    }
+  }
 
   loadWorkspaceDetail = async () => {
     const { props } = this
@@ -525,6 +547,15 @@ class WorkspaceContent extends React.Component {
       : props.t('List of contents')
   }
 
+  getFilterName = urlFilter => {
+    const { props } = this
+    const contentType = props.contentType.find(ct => ct.slug === urlFilter)
+    const filterName = contentType
+      ? props.t(contentType.label.toLowerCase() + 's')
+      : props.t('Contents')
+    return filterName[0].toUpperCase() + filterName.toLowerCase().substr(1)
+  }
+
   getIcon = urlFilter => {
     const contentType = this.props.contentType.find(ct => ct.slug === urlFilter)
     return contentType
@@ -602,7 +633,7 @@ class WorkspaceContent extends React.Component {
   }
 
   render () {
-    const { breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t } = this.props
+    const { breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t, appList } = this.props
     const { state, props } = this
 
     const urlFilter = qs.parse(location.search).type
@@ -623,7 +654,7 @@ class WorkspaceContent extends React.Component {
         .filter(ct => userRoleIdInWorkspace === ROLE.contributor.id ? ct.slug !== CONTENT_TYPE.FOLDER : true),
 
       // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
-      ...(contentType.find(ct => ct.slug === CONTENT_TYPE.FILE)
+      ...(appList.find(app => app.slug === HACK_COLLABORA_CONTENT_TYPE(contentType).slug)
         ? [HACK_COLLABORA_CONTENT_TYPE(contentType)]
         : []
       )
@@ -687,7 +718,7 @@ class WorkspaceContent extends React.Component {
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />
 
-                {currentWorkspace.uploadEnabled &&
+                {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') &&
                   <ShareFolder
                     workspaceId={state.workspaceIdInUrl}
                     availableApp={createContentAvailableApp}
@@ -799,7 +830,7 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType }) => ({
-  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType
+const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList }) => ({
+  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))

@@ -1,15 +1,19 @@
 @import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
 .carousel
+  &__main
+    margin 0 30px
   &__thumbnail
-    margin-top 5px
-    border-radius 10px
-    background-color #E8E8E7
+    height 157px
+    margin-top 10px
+    background-color #f0f0f0
+    & > .slick-list
+      height 100%
     & .slick-current
       & .carousel__thumbnail__item__preview__content__image
         background-color #7d4e24
     &__item__preview__content
-      height 150px
+      height 125px
       margin 16px
       display flex
       align-items center
@@ -59,8 +63,11 @@
       left -20px
 
 .gallery
-  height 100%
-  overflow auto
+  .pageContentGeneric
+    padding 0
+  &-scrollView
+    height 100%
+    overflow-y auto
   &__action__button
     text-align center
     & button
@@ -71,6 +78,8 @@
       & > button
         padding 5px 8.5px
         cursor pointer
+        &:hover
+          color: #FFFFFF
       &__rotation
         &__right > i
           transform scaleX(-1)
@@ -83,7 +92,7 @@
         color #929292
         background-color rgba(0, 0, 0, 0.5)
         &:hover
-          color #929292
+          color #FFFFFF
     &__rotation__right > i
       transform scaleX(-1)
   &__delete__file__popup
@@ -142,7 +151,8 @@
   height 100%
 
 .carousel__main .slick-track
-  height 60vh
+  // INFO - GM - 2019-01-20 - 375px is the size of others elements which aren't responsive (header, app header, thumbnails...)
+  height calc(100vh - 375px)
 
 // MEDIAQUERIES
 

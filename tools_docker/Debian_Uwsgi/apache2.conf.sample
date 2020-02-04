@@ -4,11 +4,21 @@
     Alias "/favicon.ico" "/tracim/frontend/dist/assets/favicon.ico"
     <Directory "/tracim/frontend/dist/assets">
         Require all granted
+        RequestHeader edit "If-None-Match" '^"((.*)-(gzip|br))"$' '"$1", "$2"'
+        <IfModule mod_expires.c>
+            ExpiresActive On
+            ExpiresDefault "access plus 1 months"
+        </IfModule>
     </Directory>
 
     Alias "/app" "/tracim/frontend/dist/app"
     <Directory "/tracim/frontend/dist/app">
         Require all granted
+        RequestHeader edit "If-None-Match" '^"((.*)-(gzip|br))"$' '"$1", "$2"'
+        <IfModule mod_expires.c>
+            ExpiresActive On
+            ExpiresDefault "access plus 1 months"
+        </IfModule>
     </Directory>
 
     <Directory "/">

@@ -963,6 +963,7 @@ class TestAccountWorkspaceEndpoint(object):
         content_type_list,
         session,
         web_testapp,
+        app_config,
     ):
         """
         Check obtain all workspaces reachables for user with user auth.
@@ -973,8 +974,8 @@ class TestAccountWorkspaceEndpoint(object):
         app_api = application_api_factory.get()
 
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
-            workspace=workspace
-        )  # nope8
+            workspace=workspace, app_config=app_config
+        )
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/v2/users/me/workspaces", status=200)
         res = res.json_body

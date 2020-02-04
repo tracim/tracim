@@ -31,8 +31,12 @@ class SystemController(Controller):
         """
         Get list of alls applications installed in this tracim instance.
         """
+        app_config = request.registry.settings["CFG"]  # type: CFG
         app_api = ApplicationApi(app_list=app_list)
-        return app_api.get_all()
+        applications_in_context = [
+            app_api.get_application_in_context(app, app_config) for app in app_api.get_all()
+        ]
+        return applications_in_context
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
@@ -41,9 +45,14 @@ class SystemController(Controller):
         """
         Get list of alls content types availables in this tracim instance.
         """
+        app_config = request.registry.settings["CFG"]  # type: CFG
         content_types_slugs = content_type_list.endpoint_allowed_types_slug()
         content_types = [content_type_list.get_one_by_slug(slug) for slug in content_types_slugs]
-        return content_types
+        content_types_in_context = [
+            content_type_list.get_content_type_in_context(content_type, app_config)
+            for content_type in content_types
+        ]
+        return content_types_in_context
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)

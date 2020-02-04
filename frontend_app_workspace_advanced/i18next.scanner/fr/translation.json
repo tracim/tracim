@@ -35,6 +35,11 @@
   "Upload deactivated": "Téléversement désactivé",
   "Error while activating agenda": "Erreur lors de l'activation de l'agenda",
   "Error while deactivating agenda": "Erreur lors de la désactivation de l'agenda",
-  "Agenda": "Agenda",
-  "Optional functionalities": "Fonctionnalités optionnelles"
+  "Optional functionalities": "Fonctionnalités optionnelles",
+  "Error while activating upload": "Erreur lors de l'activation du téléversement",
+  "Error while deactivating upload": "Erreur lors de la désactivation du téléversement",
+  "Error while activating download": "Erreur lors de l'activation du téléchargement",
+  "Error while deactivating download": "Erreur lors de la désactivation du téléchargement",
+  "Members List": "Liste des membres",
+  "Optional Functionalities": "Fonctionnalités optionnelles"
 }

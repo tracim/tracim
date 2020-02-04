@@ -12,12 +12,15 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
+from tracim_backend import app_list
 from tracim_backend.app_models.validator import TracimValidator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
 from tracim_backend.app_models.validator import user_password_validator
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
+from tracim_backend.applications.agenda.lib import AgendaApi
+from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import AuthenticationFailed
@@ -46,7 +49,7 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
-from tracim_backend.lib.agenda.agenda import AgendaApi
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
@@ -876,7 +879,8 @@ class UserApi(object):
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_updated_user should start hook use by agenda  app code.
 
-        if self._config.CALDAV__ENABLED:
+        app_lib = ApplicationApi(app_list=app_list)
+        if app_lib.exist(AGENDA__APP_SLUG):
             agenda_api = AgendaApi(
                 current_user=self._user, session=self._session, config=self._config
             )
@@ -907,7 +911,8 @@ class UserApi(object):
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_created_user should start hook use by agenda  app code.
 
-        if self._config.CALDAV__ENABLED:
+        app_lib = ApplicationApi(app_list=app_list)
+        if app_lib.exist(AGENDA__APP_SLUG):
             agenda_api = AgendaApi(
                 current_user=self._user, session=self._session, config=self._config
             )

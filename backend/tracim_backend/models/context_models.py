@@ -11,13 +11,13 @@ from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
+from tracim_backend.applications.collaborative_document_edition.models import (
+    CollaborativeDocumentEditionConfig,
+)
 from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
 from tracim_backend.error import ErrorCode
 from tracim_backend.extensions import app_list
-from tracim_backend.lib.collaborative_document_edition.models import (
-    CollaborativeDocumentEditionConfig,
-)
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
@@ -62,6 +62,7 @@ class ConfigModel(object):
         content_length_file_size_limit: int,
         workspace_size_limit: int,
         workspaces_number_per_user_limit: int,
+        instance_name: str,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -71,6 +72,7 @@ class ConfigModel(object):
         self.content_length_file_size_limit = content_length_file_size_limit
         self.workspace_size_limit = workspace_size_limit
         self.workspaces_number_per_user_limit = workspaces_number_per_user_limit
+        self.instance_name = instance_name
 
 
 class ErrorCodeModel(object):
@@ -757,7 +759,7 @@ class WorkspaceInContext(object):
         # list should be able to change (depending on activated/disabled
         # apps)
         app_api = ApplicationApi(app_list)
-        return app_api.get_default_workspace_menu_entry(self.workspace)
+        return app_api.get_default_workspace_menu_entry(self.workspace, self.config)
 
     @property
     def frontend_url(self):

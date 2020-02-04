@@ -55,6 +55,7 @@ class Header extends React.Component {
       Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
       i18n.changeLanguage(langId)
       props.dispatch(setUserLang(langId))
+      props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, langId)
       return
     }
 

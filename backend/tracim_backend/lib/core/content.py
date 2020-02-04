@@ -24,7 +24,6 @@ from sqlalchemy.sql.elements import and_
 import transaction
 
 from tracim_backend.app_models.contents import FOLDER_TYPE
-from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
@@ -53,6 +52,7 @@ from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.search.search_factory import SearchFactory
+from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizerConfig
@@ -1137,10 +1137,10 @@ class ContentApi(object):
             # INFO - G.M - 2018-07-05 - convert with
             #  content type object to support legacy slug
             content_type_object = content_type_list.get_one_by_slug(content_type_slug)
-            all_slug_alias = [content_type_object.slug]
-            if content_type_object.slug_alias:
-                all_slug_alias.extend(content_type_object.slug_alias)
-            resultset = resultset.filter(Content.type.in_(all_slug_alias))
+            all_slug_aliases = [content_type_object.slug]
+            if content_type_object.slug_aliases:
+                all_slug_aliases.extend(content_type_object.slug_aliases)
+            resultset = resultset.filter(Content.type.in_(all_slug_aliases))
 
         if parent_ids is False:
             resultset = resultset.filter(Content.parent_id == None)  # noqa: E711
@@ -1506,8 +1506,8 @@ class ContentApi(object):
 
     def _get_allowed_content_type(
         self, allowed_content_dict: typing.Dict[str, str]
-    ) -> typing.List[ContentType]:
-        allowed_content_type = []  # type: typing.List[ContentType]
+    ) -> typing.List[TracimContentType]:
+        allowed_content_type = []  # type: typing.List[TracimContentType]
         for slug, value in allowed_content_dict.items():
             if value:
                 try:
@@ -1518,7 +1518,7 @@ class ContentApi(object):
         return allowed_content_type
 
     def _check_valid_content_type_in_dir(
-        self, content_type: ContentType, parent: Content, workspace: Workspace
+        self, content_type: TracimContentType, parent: Content, workspace: Workspace
     ) -> None:
         if parent:
             assert workspace == parent.workspace
@@ -2225,7 +2225,7 @@ class ContentApi(object):
             config=self._config, current_user=self._user, session=self._session
         ).notify_content_update(content)
 
-    def get_all_types(self) -> typing.List[ContentType]:
+    def get_all_types(self) -> typing.List[TracimContentType]:
         labels = content_type_list.endpoint_allowed_types_slug()
         content_types = []
         for label in labels:
