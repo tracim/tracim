@@ -1,5 +1,32 @@
 
 
+# 2.6.0 /2020-02-06
+
+### New Feature
+- Multi-upload file available in Tracim frontend (not only in public upload)
+- Page title show where you are in Tracim
+- It's now possible to delete user and anonymise their informations with tracimcli command
+- Preview generator now supports raw file and 3D file (working with xvfb in docker container)
+- With proxy apache: you can now use browser cache policy. If you used Tracim with Docker you need to backup and delete existing apache configuration file in `~/tracim/etc/` (default path with Tracim Docker image). On next startup, a new file will be created with the new parameters.
+- All apps are now enabled/disabled directly with one parameter and it's now easier to develop new app
+
+### Fixed issues
+- Gallery: #2540, #2541, #2551, #2574, #2583 
+- Frontend: #1396, #1560, #1656, #2607, #2608, #2611, #2641
+- Backend: #2588, #2570, #2610, #2129, #1484, #2010
+
+### Breaking/Important change
+- `agenda`, `share_content`, `upload_permission` and `collaborative_document_edition` are now Tracim's applications (stand alone and optional), you can add/remove them from `app.enabled` list
+  - `caldav.enabled` is now deprecated and agenda is enabled by default. To disable it, uncomment `app.enabled` parameter and put each enabled apps but agenda.
+  - `upload_permission` and  `share_content` are enabled by default. Before 2.6.0 theses apps couldn't be disabled. To disable them, uncomment `app.enabled` parameter and put each enabled apps but `upload_permission` and/or  `share_content`.
+  - `collaborative_document_edition.activated` is now deprecated and is disabled by default. To enable it, uncomment `app.enabled` parameter and put each enabled apps, including `collaborative_document_edition`
+- If you use `collaborative_document_edition` with Tracim on Docker, you need to add `-e collaborative_document_edition=1` when you start docker with `docker run` command. You can also add `collaborative_document_edition=1` in your docker-compose.yml file
+
+### Other Changes
+- 2 deprecated ldap parameters: `ldap_base_url` and `ldap_base_dn` (they where not implemented in Tracim's backend code so using them had no impact)
+- 2 deprecated app parameters: `caldav.enabled` and `collaborative_document_edition.activated`
+
+
 # 2.5.1 / 2019-12-06
 
 ### New Features
