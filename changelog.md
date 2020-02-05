@@ -1,6 +1,6 @@
 
 
-# 2.6.0 /2020-01-xx
+# 2.6.0 /2020-02-06
 
 ### New Feature
 - Multi-upload file available in Tracim frontend (not only in public upload)
