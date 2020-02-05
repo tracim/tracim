@@ -65,6 +65,20 @@ class DigestComments(InnerDoc):
     raw_content = Text(analyzer=html_folding, search_analyzer=folding)
 
 
+class FileData(InnerDoc):
+    content = Text(analyzer=folding)
+    content_fr = Text(analyzer="french")
+    content_en = Text(analyzer="english")
+    title = Text()
+    name = Text()
+    author = Text()
+    keywords = Keyword(multi=True)
+    date = Date()
+    content_type = Keyword()
+    content_length = Integer()
+    language = Keyword()
+
+
 class IndexedContent(Document):
     """
     ElasticSearch Content Models.
@@ -115,3 +129,4 @@ class IndexedContent(Document):
     # information about content are stored in the "file_data" fields not defined
     # in this mapping
     b64_file = Text()
+    file_data = Object(FileData)

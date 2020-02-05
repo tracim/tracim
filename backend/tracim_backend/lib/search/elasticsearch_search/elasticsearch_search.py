@@ -368,6 +368,8 @@ class ESSearchApi(SearchApi):
                 "raw_content^3",
                 "comments.raw_content",
                 "file_data.content^3",
+                "file_data.content_fr^3",
+                "file_data.content_en^3",
                 "file_data.title^4",
                 "file_data.author",
                 "file_data.keywords",
@@ -415,6 +417,26 @@ class ESSearchApi(SearchApi):
                 "processors": [
                     {"attachment": {"field": "b64_file", "target_field": "file_data"}},
                     {"remove": {"field": "b64_file"}},
+                    {
+                        "set": {
+                            "if": "ctx.file_data.language == 'fr'",
+                            "field": "file_data.content_fr",
+                            "value": "{{file_data.content}}",
+                        }
+                    },
+                    {
+                        "set": {
+                            "if": "ctx.file_data.language == 'en'",
+                            "field": "file_data.content_en",
+                            "value": "{{file_data.content}}",
+                        }
+                    },
+                    {
+                        "remove": {
+                            "if": "ctx.file_data.language == 'en' || ctx.file_data.language == 'fr'",
+                            "field": "file_data.content",
+                        }
+                    },
                 ],
             },
         )
