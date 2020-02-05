@@ -372,6 +372,7 @@ class ESSearchApi(SearchApi):
                 "file_data.author",
                 "file_data.keywords",
             ],
+            quote_field_suffix=".keyword",
         )
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         if not show_active:
