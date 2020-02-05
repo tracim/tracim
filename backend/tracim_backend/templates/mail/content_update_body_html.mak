@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="${lang}">
 <body>
-	<!--FIXME After discuss with Damien: dont add intelligent code in template -->
     <%
+        # FIXME - G.M - 2019-05-09 - After discuss with Damien: dont add intelligent code in template,
+        # see issue #1691
         call_to_action_url = content_in_context.frontend_url
         content_name_pattern = "<i><a href={call_to_action_url}>{content}</a></i>"
         content_name = content_name_pattern.format(
