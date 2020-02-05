@@ -52,7 +52,9 @@ class DigestWorkspace(InnerDoc):
 class DigestContent(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
-    label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
+    label = Text(
+        fields={"keyword": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+    )
     slug = Keyword()
     content_type = Keyword()
 
@@ -70,11 +72,12 @@ class IndexedContent(Document):
     """
 
     content_id = Integer()
-    # INFO - G.M - 2019-07-17 - as acp_label store ngram of limited size, we do need
-    # to store both acp_label and label to handle autocomplete up to max_gram of acp_label analyzer
+    # INFO - G.M - 2019-07-17 - as label.acp store ngram of limited size, we do need
+    # to store both label.acp and label.keyword to handle autocomplete up to max_gram of label.acp analyzer
     # but also support for exact naming for any size of label.
-    label = Keyword()
-    acp_label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
+    label = Text(
+        fields={"keyword": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+    )
     slug = Keyword()
     content_type = Keyword()
 
@@ -98,8 +101,12 @@ class IndexedContent(Document):
     is_editable = Boolean()
     is_active = Boolean()
     show_in_ui = Boolean()
-    file_extension = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
-    filename = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
+    file_extension = Text(
+        fields={"keyword": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+    )
+    filename = Text(
+        fields={"keyword": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+    )
     modified = Date()
     created = Date()
     current_revision_id = Integer()
