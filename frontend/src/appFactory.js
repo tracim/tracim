@@ -1,8 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { FETCH_CONFIG, ROLE, PROFILE, PAGE, findUserRoleIdInWorkspace } from './helper.js'
+import { FETCH_CONFIG, PAGE } from './helper.js'
 import i18n from './i18n.js'
+import { ROLE_LIST, PROFILE } from 'tracim_frontend_lib'
 
 const mapStateToProps = ({ system, currentWorkspace, workspaceList }) => ({ system, currentWorkspace, workspaceList })
 
@@ -19,16 +20,16 @@ export function appFactory (WrappedComponent) {
         apiHeader: FETCH_CONFIG.headers,
         translation: i18n.store.data,
         system: this.props.system,
-        roleList: ROLE,
+        roleList: ROLE_LIST,
         profileObject: PROFILE,
         history: this.props.history
       },
       content
     })
 
-    renderAppFullscreen = (appConfig, user, content) => GLOBAL_renderAppFullscreen({
+    renderAppFullscreen = (appConfig, user, userRoleIdInWorkspace, content) => GLOBAL_renderAppFullscreen({
       loggedUser: user.logged
-        ? { ...user, userRoleIdInWorkspace: findUserRoleIdInWorkspace(user.user_id, this.props.currentWorkspace.memberList, ROLE) }
+        ? { ...user, userRoleIdInWorkspace }
         : {},
       config: {
         ...appConfig,
@@ -37,7 +38,7 @@ export function appFactory (WrappedComponent) {
         apiHeader: FETCH_CONFIG.headers,
         translation: i18n.store.data,
         system: this.props.system,
-        roleList: ROLE,
+        roleList: ROLE_LIST,
         profileObject: PROFILE,
         history: this.props.history
       },
@@ -53,7 +54,7 @@ export function appFactory (WrappedComponent) {
         apiHeader: FETCH_CONFIG.headers, // should this be used by app ? right now, apps have their own headers
         translation: i18n.store.data,
         system: this.props.system,
-        roleList: ROLE,
+        roleList: ROLE_LIST,
         profileObject: PROFILE,
         history: this.props.history,
         PAGE: PAGE

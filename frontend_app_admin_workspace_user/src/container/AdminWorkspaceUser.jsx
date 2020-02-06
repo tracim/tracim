@@ -8,7 +8,9 @@ import {
   CardPopup,
   handleFetchResult,
   BREADCRUMBS_TYPE,
-  CUSTOM_EVENT
+  ROLE,
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -33,12 +35,14 @@ class AdminWorkspaceUser extends React.Component {
   constructor (props) {
     super(props)
 
+    const param = props.data || debug
+
     this.state = {
       appName: 'admin_workspace_user',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
       workspaceIdOpened: null,
@@ -52,7 +56,9 @@ class AdminWorkspaceUser extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+  customEventReducer = ({ detail: { type, data } }) => {
+    const { props } = this
+
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(this.state.config.slug):
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
@@ -71,8 +77,13 @@ class AdminWorkspaceUser extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
-        if (this.state.config.type === 'workspace') this.loadWorkspaceContent()
-        else if (this.state.config.type === 'user') this.loadUserContent()
+        if (this.state.config.type === 'workspace') {
+          this.setHeadTitle(props.t('Shared space management'))
+          this.loadWorkspaceContent()
+        } else if (this.state.config.type === 'user') {
+          this.setHeadTitle(props.t('User account management'))
+          this.loadUserContent()
+        }
         this.buildBreadcrumbs()
         break
       default:
@@ -81,21 +92,33 @@ class AdminWorkspaceUser extends React.Component {
   }
 
   async componentDidMount () {
+    const { props } = this
+
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
 
-    if (this.state.config.type === 'workspace') await this.loadWorkspaceContent()
-    else if (this.state.config.type === 'user') await this.loadUserContent()
+    if (this.state.config.type === 'workspace') {
+      this.setHeadTitle(props.t('Shared space management'))
+      await this.loadWorkspaceContent()
+    } else if (this.state.config.type === 'user') {
+      this.setHeadTitle(props.t('User account management'))
+      await this.loadUserContent()
+    }
 
     this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { state } = this
+    const { state, props } = this
 
     console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`, prevState, state)
     if (prevState.config.type !== state.config.type) {
-      if (state.config.type === 'workspace') this.loadWorkspaceContent()
-      else if (state.config.type === 'user') this.loadUserContent()
+      if (this.state.config.type === 'workspace') {
+        this.setHeadTitle(props.t('Shared space management'))
+        this.loadWorkspaceContent()
+      } else if (this.state.config.type === 'user') {
+        this.setHeadTitle(props.t('User account management'))
+        this.loadUserContent()
+      }
       this.buildBreadcrumbs()
     }
   }
@@ -109,10 +132,21 @@ class AdminWorkspaceUser extends React.Component {
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: this.props.t(msg),
-      type: 'warning',
+      type: type || 'warning',
       delay: undefined
     }
   })
+
+  setHeadTitle = (title) => {
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([title, state.config.system.config.instance_name]) }
+      })
+    }
+  }
 
   loadWorkspaceContent = async () => {
     const { props, state } = this
@@ -302,7 +336,7 @@ class AdminWorkspaceUser extends React.Component {
       GLOBAL_renderAppFeature({
         loggedUser: {
           ...state.loggedUser,
-          userRoleIdInWorkspace: 8 // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
+          userRoleIdInWorkspace: ROLE.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
         },
         config: {
           label: 'Advanced dashboard',
@@ -352,7 +386,6 @@ class AdminWorkspaceUser extends React.Component {
           <AdminUser
             userList={state.content.userList}
             loggedUserId={state.loggedUser.user_id}
-            profile={state.config.profileObject}
             emailNotifActivated={state.config.system.config.email_notification_activated}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}

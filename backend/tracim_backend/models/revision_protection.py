@@ -11,20 +11,22 @@ from tracim_backend.exceptions import ContentRevisionUpdateError
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.tracim_session import TracimSession
 
 
 def prevent_content_revision_delete(
-    session: Session, flush_context: UOWTransaction, instances: [DeclarativeBase]
+    session: TracimSession, flush_context: UOWTransaction, instances: [DeclarativeBase]
 ) -> None:
-    for instance in session.deleted:
-        if isinstance(instance, ContentRevisionRO) and instance.revision_id is not None:
-            raise ContentRevisionDeleteError(
-                "ContentRevision is not deletable. "
-                + "You must make a new revision with"
-                + "is_deleted set to True. Look at "
-                + "tracim.model.new_revision context "
-                + "manager to make a new revision"
-            )
+    if not session.get_allowed_revision_deletion():
+        for instance in session.deleted:
+            if isinstance(instance, ContentRevisionRO) and instance.revision_id is not None:
+                raise ContentRevisionDeleteError(
+                    "ContentRevision is not deletable. "
+                    + "You must make a new revision with"
+                    + "is_deleted set to True. Look at "
+                    + "tracim.model.new_revision context "
+                    + "manager to make a new revision"
+                )
 
 
 class RevisionsIntegrity(object):

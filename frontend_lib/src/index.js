@@ -7,16 +7,25 @@ import {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
-  appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE,
+  ROLE,
+  ROLE_LIST,
+  PROFILE,
+  PROFILE_LIST,
   FETCH_CONFIG,
+  APP_FEATURE_MODE,
+  FILE_PREVIEW_STATE,
   displayFileSize,
   parserStringToList,
   checkEmailValidity,
   buildFilePreviewUrl,
-  removeExtensionOfFilename
+  removeExtensionOfFilename,
+  computeProgressionPercentage,
+  buildHeadTitle
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
+
+import { appContentFactory } from './appContentFactory.js'
 
 import { defaultDebug } from './debug.js'
 
@@ -63,6 +72,7 @@ import GenericButton from './component/Button/GenericButton.jsx'
 import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
+import FileUploadList from './component/FileDropzone/FileUploadList.jsx'
 
 import ShareDownload from './component/ShareDownload/ShareDownload.jsx'
 import ShareLink from './component/ShareLink/ShareLink.jsx'
@@ -71,7 +81,7 @@ import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
-const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
       i18n.changeLanguage(data)
@@ -86,6 +96,7 @@ export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 
 export {
+  appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
   displayDistanceDate,
@@ -94,7 +105,9 @@ export {
   generateLocalStorageContentId,
   generateRandomPassword,
   buildFilePreviewUrl,
+  buildHeadTitle,
   removeExtensionOfFilename,
+  computeProgressionPercentage,
   Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,
@@ -121,17 +134,23 @@ export {
   NewMemberForm,
   CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
+  ROLE,
+  ROLE_LIST,
+  PROFILE,
+  PROFILE_LIST,
   FETCH_CONFIG,
+  APP_FEATURE_MODE,
+  FILE_PREVIEW_STATE,
   displayFileSize,
   parserStringToList,
   checkEmailValidity,
   defaultDebug,
-  appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,
   IconButton,
   ComposedIcon,
   DisplayState,
   FileDropzone,
+  FileUploadList,
   ShareLink,
   ShareDownload,
   ProgressBar,

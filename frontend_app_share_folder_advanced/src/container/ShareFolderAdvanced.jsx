@@ -1,9 +1,10 @@
 import React from 'react'
 import UploadFilesManagement from '../component/UploadFilesManagement.jsx'
 import NewUpload from '../component/NewUpload.jsx'
-import i18n from '../i18n'
+import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  appContentFactory,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedContent,
@@ -12,9 +13,9 @@ import {
   CUSTOM_EVENT,
   checkEmailValidity,
   parserStringToList,
-  appFeatureCustomEventHandlerShowApp
+  buildHeadTitle
 } from 'tracim_frontend_lib'
-import { debug } from '../debug'
+import { debug } from '../debug.js'
 import {
   getImportAuthorizationsList,
   deleteImportAuthorization,
@@ -31,12 +32,15 @@ class ShareFolderAdvanced extends React.Component {
       NEW_UPLOAD: 'newUpload'
     }
 
+    const param = props.data || debug
+    props.setApiUrl(param.config.apiUrl)
+
     this.state = {
       appName: 'share_folder',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
       externalTranslationList: [
         props.t('Received files')
       ],
@@ -55,25 +59,20 @@ class ShareFolderAdvanced extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
-    const { state } = this
+    const { props, state } = this
+
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) {
-          this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
-        }
+        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), () => {})
+        this.setHeadTitle()
         break
+
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
+        props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
         this.loadContentTypeList()
+        this.setHeadTitle()
         break
     }
   }
@@ -81,6 +80,7 @@ class ShareFolderAdvanced extends React.Component {
   componentDidMount () {
     this.loadContentTypeList()
     this.loadImportAuthorizationsList()
+    this.setHeadTitle()
   }
 
   componentWillUnmount () {
@@ -96,6 +96,17 @@ class ShareFolderAdvanced extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = () => {
+    const { state, props } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('Received files'), state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
+  }
 
   loadContentTypeList = async () => {
     const { props, state } = this
@@ -277,4 +288,4 @@ class ShareFolderAdvanced extends React.Component {
   }
 }
 
-export default translate()(ShareFolderAdvanced)
+export default translate()(appContentFactory(ShareFolderAdvanced))

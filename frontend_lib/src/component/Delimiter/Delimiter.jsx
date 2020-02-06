@@ -1,7 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import {SelectStatus} from "../Input/SelectStatus/SelectStatus";
+import { SelectStatus } from '../Input/SelectStatus/SelectStatus'
 
 // require('./Delimiter.styl') // see https://github.com/tracim/tracim/issues/1156
 

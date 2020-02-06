@@ -7,8 +7,11 @@ export const debug = {
     slug: 'file',
     faIcon: 'paperclip',
     hexcolor: '#ffa500',
-    creationLabel: 'Upload a file',
-    label: 'File'
+    creationLabel: 'Upload files',
+    label: 'File',
+    workspace: {
+      downloadEnabled: true
+    }
   },
   content: {
     ...defaultDebug.content,

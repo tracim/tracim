@@ -5,7 +5,7 @@ import 'regenerator-runtime/runtime'
 import PopupCreateOfficeDocument from './container/PopupCreateOfficeDocument.jsx'
 import CollaborativeEditionFrame from './container/CollaborativeEditionFrame.jsx'
 import { Router } from 'react-router'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, ROLE } from 'tracim_frontend_lib'
 import i18n from './i18n.js'
 
 // @TODO make a file that contains all events implemented by this App.
@@ -55,7 +55,7 @@ const appInterface = {
     if (!editorType) return null
 
     return {
-      label: editorType.associated_action === ACTION_EDIT && userRoleId >= 2 ? i18n.t('Edit online') : i18n.t('View online'),
+      label: editorType.associated_action === ACTION_EDIT && userRoleId >= ROLE.contributor.id ? i18n.t('Edit online') : i18n.t('View online'),
       callback: () => {
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.REDIRECT,

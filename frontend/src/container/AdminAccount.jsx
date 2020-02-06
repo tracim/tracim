@@ -13,7 +13,8 @@ import {
   PageTitle,
   PageContent,
   BREADCRUMBS_TYPE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -66,14 +67,26 @@ class Account extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.buildBreadcrumbs()
+        this.setHeadTitle()
+        break
     }
   }
 
   async componentDidMount () {
     await this.getUserDetail()
+    this.setHeadTitle()
     this.getUserWorkspaceList()
     this.buildBreadcrumbs()
+  }
+
+  componentDidUpdate (prevProps) {
+    const { props } = this
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+      this.setHeadTitle()
+    }
   }
 
   getUserDetail = async () => {
@@ -241,6 +254,16 @@ class Account extends React.Component {
         }}
       />
     )
+  }
+
+  setHeadTitle = () => {
+    const { props, state } = this
+    if (props.system.config.instance_name && state.userToEdit.public_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([this.props.t('User administration'), state.userToEdit.public_name, props.system.config.instance_name]) }
+      })
+    }
   }
 
   render () {

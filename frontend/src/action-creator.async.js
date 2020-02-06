@@ -3,7 +3,8 @@ import {
   FETCH_CONFIG,
   PAGE,
   COOKIE_FRONTEND,
-  unLoggedAllowedPageList
+  unLoggedAllowedPageList,
+  history
 } from './helper.js'
 import i18n from './i18n.js'
 import * as Cookies from 'js-cookie'
@@ -45,7 +46,6 @@ import {
   WORKSPACE_CONTENT_MOVE,
   SEARCHED_KEYWORDS
 } from './action-creator.sync.js'
-import { history } from './index.js'
 import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
 
 /*

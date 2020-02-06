@@ -5,10 +5,8 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
 import { DropTarget } from 'react-dnd'
-import {
-  DRAG_AND_DROP,
-  ROLE_OBJECT
-} from '../../helper.js'
+import { DRAG_AND_DROP } from '../../helper.js'
+import { ROLE } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 const color = require('color')
@@ -44,7 +42,7 @@ class WorkspaceListItem extends React.Component {
     const isDropActive = props.canDrop && props.isOver
 
     if (isDropActive) {
-      const isDropAllowed = props.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id
+      const isDropAllowed = props.userRoleIdInWorkspace >= ROLE.contributor.id
       const isDropAllowedOnWorkspaceRoot = props.draggedItem && (props.draggedItem.workspaceId !== props.workspaceId || props.draggedItem.parentId !== 0)
 
       if (isDropAllowed && isDropAllowedOnWorkspaceRoot) return <i className='fa fa-arrow-circle-down' />

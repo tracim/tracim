@@ -3,6 +3,7 @@ import WorkspaceAdvancedConfiguration from '../component/WorkspaceAdvancedConfig
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
+  appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
@@ -10,8 +11,7 @@ import {
   PopinFixedOption,
   PopinFixedContent,
   PopinFixedRightPart,
-  CUSTOM_EVENT,
-  appFeatureCustomEventHandlerShowApp
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -31,17 +31,21 @@ import {
 } from '../action.async.js'
 import Radium from 'radium'
 import WorkspaceMembersList from '../component/WorkspaceMembersList.jsx'
-import OptionalFunctionalities from '../component/OptionalFunctionalities.jsx'
+import OptionalFeatures from '../component/OptionalFeatures.jsx'
 
 class WorkspaceAdvanced extends React.Component {
   constructor (props) {
     super(props)
+
+    const param = props.data || debug
+    props.setApiUrl(param.config.apiUrl)
+
     this.state = {
       appName: 'workspace_advanced',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
       displayFormNewMember: false,
       newMember: {
         id: '',
@@ -63,36 +67,32 @@ class WorkspaceAdvanced extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-    const { state } = this
+  customEventReducer = ({ detail: { type, data } }) => {
+    const { props, state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) {
-          this.setState({ isVisible: true })
-          this.buildBreadcrumbs()
-        }
-        // this.setState({ isVisible: true })
-        // this.loadContent()
+        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
         break
+
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState({ isVisible: false })
+        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
         break
+
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({ content: { ...prev.content, ...data }, isVisible: true }))
         break
+
+      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
+        console.log('%c<File> Custom event', 'color: #28a745', type, data)
+        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, () => {}, () => {})
+        break
+
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
+        props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
         this.loadContent()
         break
     }
@@ -153,7 +153,9 @@ class WorkspaceAdvanced extends React.Component {
       content: {
         ...resDetail.body,
         memberList: resMember.body,
-        appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda')
+        appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda'),
+        appDownloadAvailable: resAppList.body.some(a => a.slug === 'share_content'),
+        appUploadAvailable: resAppList.body.some(a => a.slug === 'upload_permission')
       }
     })
   }
@@ -462,7 +464,7 @@ class WorkspaceAdvanced extends React.Component {
     const { state } = this
 
     if (!state.isVisible) return null
-    console.log(state.content.public_download_enabled)
+
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -528,7 +530,7 @@ class WorkspaceAdvanced extends React.Component {
                   autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
                   emailNotifActivated={state.config.system.config.email_notification_activated}
                   canSendInviteNewUser={
-                    [state.config.profileObject.ADMINISTRATOR.slug, state.config.profileObject.MANAGER.slug].includes(state.loggedUser.profile)
+                    [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
                   }
                   userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
                   autoCompleteClicked={state.autoCompleteClicked}
@@ -539,13 +541,15 @@ class WorkspaceAdvanced extends React.Component {
                 id: 'optional_functionalities',
                 label: this.props.t('Optional Functionalities'),
                 icon: 'fa-cog',
-                children: <OptionalFunctionalities
+                children: <OptionalFeatures
                   appAgendaAvailable={state.content.appAgendaAvailable}
                   agendaEnabled={state.content.agenda_enabled}
                   onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
                   downloadEnabled={state.content.public_download_enabled}
+                  appDownloadAvailable={state.content.appDownloadAvailable}
                   onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
                   uploadEnabled={state.content.public_upload_enabled}
+                  appUploadAvailable={state.content.appUploadAvailable}
                   onToggleUploadEnabled={this.handleToggleUploadEnabled}
                 />
               }
@@ -557,4 +561,4 @@ class WorkspaceAdvanced extends React.Component {
   }
 }
 
-export default translate()(Radium(WorkspaceAdvanced))
+export default translate()(Radium(appContentFactory(WorkspaceAdvanced)))

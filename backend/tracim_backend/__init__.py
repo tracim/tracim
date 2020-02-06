@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from copy import deepcopy
+import sys
+import warnings
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
@@ -9,10 +11,9 @@ import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
 
+from tracim_backend.applications.agenda.app_factory import CaldavAppFactory
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
-from tracim_backend.exceptions import CaldavNotAuthenticated
-from tracim_backend.exceptions import CaldavNotAuthorized
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentNotFoundInTracimRequest
@@ -30,12 +31,9 @@ from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
+from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.agenda import CaldavAppFactory
-from tracim_backend.lib.agenda.authorization import add_www_authenticate_header_for_caldav
-from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
-    CollaborativeDocumentEditionFactory,
-)
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
@@ -54,12 +52,7 @@ from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API_V2
-from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
 from tracim_backend.views.contents_api.comment_controller import CommentController
-from tracim_backend.views.contents_api.file_controller import FileController
-from tracim_backend.views.contents_api.folder_controller import FolderController
-from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController
-from tracim_backend.views.contents_api.threads_controller import ThreadController
 from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
@@ -73,6 +66,11 @@ try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
+
+# INFO - G.M - 2020-01-08 - disable warning by default
+# useful to avoid apispec error
+if not sys.warnoptions:
+    warnings.simplefilter("ignore")
 
 
 def web(global_config: OrderedDict, **local_settings) -> Router:
@@ -192,10 +190,6 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     reset_password_controller = ResetPasswordController()
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
-    html_document_controller = HTMLDocumentController()
-    thread_controller = ThreadController()
-    file_controller = FileController()
-    folder_controller = FolderController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -203,64 +197,17 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(reset_password_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(workspace_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(html_document_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
 
-    # INFO - G.M - 2019-08-08 - import app here instead of top of file,
-    # to make thing easier later
-    # when app will be load dynamycally.
-    import tracim_backend.applications.share.controller as share_app_controller
-
-    share_app_controller.import_controller(
-        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
-    )
-    import tracim_backend.applications.upload_permissions.controller as upload_permission_controller
-
-    upload_permission_controller.import_controller(
-        app_config=app_config, configurator=configurator, route_prefix=BASE_API_V2
-    )
-
-    if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
-        # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
-        # import is here because import WOPI of Collabora controller without adding it to
-        # pyramid make trouble in hapic which try to get view related
-        # to controller but failed.
-        from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_controller import (
-            WOPIController,
+    app_lib = ApplicationApi(app_list=app_list)
+    for app in app_lib.get_all():
+        app.load_controllers(
+            app_config=app_config,
+            configurator=configurator,
+            route_prefix=BASE_API_V2,
+            context=context,
         )
 
-        wopi_controller = WOPIController()
-        configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
-        collaborative_document_edition_controller = CollaborativeDocumentEditionFactory().get_controller(
-            app_config
-        )
-        configurator.include(
-            collaborative_document_edition_controller.bind, route_prefix=BASE_API_V2
-        )
     configurator.scan("tracim_backend.lib.utils.authentification")
-    if app_config.CALDAV__ENABLED:
-        # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,
-        # import is here because import AgendaController without adding it to
-        # pyramid make trouble in hapic which try to get view related
-        # to controller but failed.
-        from tracim_backend.views.agenda_api.agenda_controller import AgendaController
-
-        configurator.include(add_www_authenticate_header_for_caldav)
-        # caldav exception
-        context.handle_exception(CaldavNotAuthorized, HTTPStatus.FORBIDDEN)
-        context.handle_exception(CaldavNotAuthenticated, HTTPStatus.UNAUTHORIZED)
-        # controller
-        radicale_proxy_controller = RadicaleProxyController(
-            proxy_base_address=app_config.CALDAV__RADICALE_PROXY__BASE_URL,
-            radicale_base_path=app_config.CALDAV__RADICALE__BASE_PATH,
-            radicale_user_path=app_config.CALDAV__RADICALE__USER_PATH,
-            radicale_workspace_path=app_config.CALDAV_RADICALE_WORKSPACE_PATH,
-        )
-        agenda_controller = AgendaController()
-        configurator.include(agenda_controller.bind, route_prefix=BASE_API_V2)
-        configurator.include(radicale_proxy_controller.bind)
 
     # TODO - G.M - 2019-05-17 - check if possible to avoid this import here,
     # import is here because import SearchController without adding it to
@@ -274,7 +221,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     if app_config.FRONTEND__SERVE:
         configurator.include("pyramid_mako")
         frontend_controller = FrontendController(
-            app_config.FRONTEND__DIST_FOLDER_PATH, app_config.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH
+            dist_folder_path=app_config.FRONTEND__DIST_FOLDER_PATH,
+            custom_toolbox_folder_path=app_config.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH,
+            cache_token=app_config.FRONTEND__CACHE_TOKEN,
         )
         configurator.include(frontend_controller.bind)
 

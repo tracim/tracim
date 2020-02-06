@@ -9,16 +9,14 @@ import {
   USER_AGENDA_URL
 } from '../action-creator.sync.js'
 import { getBrowserLang } from '../helper.js'
+import { PROFILE } from 'tracim_frontend_lib'
 
 const defaultUser = {
   user_id: -1,
   logged: null, // null avoid to be redirected to /login while whoami ep has not responded yet
   auth_type: '',
   timezone: '',
-  profile: {
-    id: 1,
-    slug: 'user'
-  },
+  profile: PROFILE.user,
   email: '',
   is_active: true,
   avatar_url: null,

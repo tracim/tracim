@@ -16,10 +16,10 @@ Priority order is (from less to most priority):
 
 |<env_var_name>|<config_file_name>|<config_name>|
 |--------------|------------------|-------------|
+|TRACIM_APP__ENABLED           |app.enabled                   |APP__ENABLED                  |
 |TRACIM_SQLALCHEMY__URL        |sqlalchemy.url                |SQLALCHEMY__URL               |
 |TRACIM_DEFAULT_LANG           |default_lang                  |DEFAULT_LANG                  |
 |TRACIM_COLOR__CONFIG_FILE_PATH|color.config_file_path        |COLOR__CONFIG_FILE_PATH       |
-|TRACIM_APP__ENABLED           |app.enabled                   |APP__ENABLED                  |
 |TRACIM_DEPOT_STORAGE_DIR      |depot_storage_dir             |DEPOT_STORAGE_DIR             |
 |TRACIM_DEPOT_STORAGE_NAME     |depot_storage_name            |DEPOT_STORAGE_NAME            |
 |TRACIM_PREVIEW_CACHE_DIR      |preview_cache_dir             |PREVIEW_CACHE_DIR             |
@@ -33,15 +33,18 @@ Priority order is (from less to most priority):
 |TRACIM_WEBSITE__BASE_URL      |website.base_url              |WEBSITE__BASE_URL             |
 |TRACIM_API__BASE_URL          |api.base_url                  |API__BASE_URL                 |
 |TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN|cors.access-control-allowed-origin|CORS__ACCESS_CONTROL_ALLOWED_ORIGIN|
+|TRACIM_DEFAULT_ANONYMIZED_USER_DISPLAY_NAME|default_anonymized_user_display_name|DEFAULT_ANONYMIZED_USER_DISPLAY_NAME|
 |TRACIM_USER__AUTH_TOKEN__VALIDITY|user.auth_token.validity      |USER__AUTH_TOKEN__VALIDITY    |
 |TRACIM_USER__RESET_PASSWORD__VALIDITY|user.reset_password.validity  |USER__RESET_PASSWORD__VALIDITY|
 |TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME|user.reset_password.token_lifetime|USER__RESET_PASSWORD__TOKEN_LIFETIME|
 |TRACIM_USER__DEFAULT_PROFILE  |user.default_profile          |USER__DEFAULT_PROFILE         |
 |TRACIM_KNOWN_MEMBERS__FILTER  |known_members.filter          |KNOWN_MEMBERS__FILTER         |
 |TRACIM_DEBUG                  |debug                         |DEBUG                         |
+|TRACIM_BUILD_VERSION          |build_version                 |BUILD_VERSION                 |
 |TRACIM_PREVIEW__JPG__RESTRICTED_DIMS|preview.jpg.restricted_dims   |PREVIEW__JPG__RESTRICTED_DIMS |
 |TRACIM_PREVIEW__JPG__ALLOWED_DIMS|preview.jpg.allowed_dims      |PREVIEW__JPG__ALLOWED_DIMS    |
 |TRACIM_FRONTEND__SERVE        |frontend.serve                |FRONTEND__SERVE               |
+|TRACIM_FRONTEND__CACHE_TOKEN  |frontend.cache_token          |FRONTEND__CACHE_TOKEN         |
 |TRACIM_BACKEND__I18N_FOLDER_PATH|backend.i18n_folder_path      |BACKEND__I18N_FOLDER_PATH     |
 |TRACIM_FRONTEND__DIST_FOLDER_PATH|frontend.dist_folder_path     |FRONTEND__DIST_FOLDER_PATH    |
 |TRACIM_PLUGIN__FOLDER_PATH    |plugin.folder_path            |PLUGIN__FOLDER_PATH           |
@@ -52,7 +55,6 @@ Priority order is (from less to most priority):
 |TRACIM_LIMITATION__USER_DEFAULT_ALLOWED_SPACE|limitation.user_default_allowed_space|LIMITATION__USER_DEFAULT_ALLOWED_SPACE|
 |TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION|email.notification.enabled_on_invitation|EMAIL__NOTIFICATION__ENABLED_ON_INVITATION|
 |TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL|email.notification.from.email |EMAIL__NOTIFICATION__FROM__EMAIL|
-|TRACIM_EMAIL__NOTIFICATION__FROM|email.notification.from       |EMAIL__NOTIFICATION__FROM     |
 |TRACIM_EMAIL__NOTIFICATION__FROM|email.notification.from       |EMAIL__NOTIFICATION__FROM     |
 |TRACIM_EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL|email.notification.from.default_label|EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL|
 |TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL|email.notification.reply_to.email|EMAIL__NOTIFICATION__REPLY_TO__EMAIL|
@@ -102,9 +104,6 @@ Priority order is (from less to most priority):
 |TRACIM_WEBDAV__BLOCK_SIZE     |webdav.block_size             |WEBDAV__BLOCK_SIZE            |
 |TRACIM_WEBDAV__DIR_BROWSER__ENABLED|webdav.dir_browser.enabled    |WEBDAV__DIR_BROWSER__ENABLED  |
 |TRACIM_WEBDAV__DIR_BROWSER__FOOTER|webdav.dir_browser.footer     |WEBDAV__DIR_BROWSER__FOOTER   |
-|TRACIM_CALDAV__ENABLED        |caldav.enabled                |CALDAV__ENABLED               |
-|TRACIM_CALDAV__RADICALE_PROXY__BASE_URL|caldav.radicale_proxy.base_url|CALDAV__RADICALE_PROXY__BASE_URL|
-|TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|caldav.radicale.storage.filesystem_folder|CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|
 |TRACIM_SEARCH__ENGINE         |search.engine                 |SEARCH__ENGINE                |
 |TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS|search.elasticsearch.index_alias|SEARCH__ELASTICSEARCH__INDEX_ALIAS|
 |TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|search.elasticsearch.index_pattern_template|SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|
@@ -115,7 +114,8 @@ Priority order is (from less to most priority):
 |TRACIM_SEARCH__ELASTICSEARCH__HOST|search.elasticsearch.host     |SEARCH__ELASTICSEARCH__HOST   |
 |TRACIM_SEARCH__ELASTICSEARCH__PORT|search.elasticsearch.port     |SEARCH__ELASTICSEARCH__PORT   |
 |TRACIM_SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT|search.elasticsearch.request_timeout|SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT|
-|TRACIM_COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED|collaborative_document_edition.activated|COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED|
+|TRACIM_CALDAV__RADICALE_PROXY__BASE_URL|caldav.radicale_proxy.base_url|CALDAV__RADICALE_PROXY__BASE_URL|
+|TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|caldav.radicale.storage.filesystem_folder|CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|
 |TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE|collaborative_document_edition.software|COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE|
 |TRACIM_COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL|collaborative_document_edition.collabora.base_url|COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL|
 |TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR|collaborative_document_edition.file_template_dir|COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR|
@@ -208,7 +208,6 @@ https://github.com/rroemhild/docker-test-openldap :
 ```
 auth_types=ldap
 ldap_url = ldap://localhost:389
-ldap_base_dn = dc=planetexpress,dc=com
 ldap_bind_dn = cn=admin,dc=planetexpress,dc=com
 ldap_bind_pass = GoodNewsEveryone
 ldap_user_base_dn = ou=people,dc=planetexpress,dc=com

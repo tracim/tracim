@@ -19,11 +19,15 @@ APP_FRONTEND_PATH = "app/{minislug}.app.js"
 
 class FrontendController(Controller):
     def __init__(
-        self, dist_folder_path: str, custom_toolbox_folder_path: typing.Optional[str]
+        self,
+        dist_folder_path: str,
+        cache_token: str,
+        custom_toolbox_folder_path: typing.Optional[str],
     ) -> None:
         self.dist_folder_path = dist_folder_path
         self.custom_toolbox_folder_path = custom_toolbox_folder_path
         self.custom_toolbox_files = []  # type: typing.List["os.DirEntry"]
+        self.cache_token = cache_token
         if custom_toolbox_folder_path:
             self.custom_toolbox_files = self._get_custom_toolboxes_files(
                 self.custom_toolbox_folder_path
@@ -54,7 +58,9 @@ class FrontendController(Controller):
         # TODO - G.M - 2018-08-07 - Refactor autogen valid app list for frontend
         frontend_apps = []
         app_api = ApplicationApi(app_list=app_list)
-        applications = app_api.get_all()
+        applications = [
+            app_api.get_application_in_context(app, app_config) for app in app_api.get_all()
+        ]
         for app in applications:
             app_frontend_path = APP_FRONTEND_PATH.replace("{minislug}", app.minislug)
             app_path = os.path.join(self.dist_folder_path, app_frontend_path)
@@ -68,6 +74,7 @@ class FrontendController(Controller):
                 "applications": frontend_apps,
                 "website_title": app_config.WEBSITE__TITLE,
                 "custom_toolbox_files": self.custom_toolbox_files,
+                "cache_token": self.cache_token,
             },
         )
 

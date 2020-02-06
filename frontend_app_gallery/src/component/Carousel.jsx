@@ -9,7 +9,7 @@ import ThumbnailPreview from './ThumbnailPreview.jsx'
 import CarouselArrow from './CarouselArrow'
 import { DIRECTION } from '../helper'
 
-class Carousel extends React.Component {
+export class Carousel extends React.Component {
   constructor (props) {
     super(props)
 
@@ -61,9 +61,9 @@ class Carousel extends React.Component {
       centerMode: false,
       initialSlide: props.fileSelected,
       swipe: false,
-      arrows: !props.disableAnimation,
+      arrows: !props.disableAnimation && !props.autoPlay,
       afterChange: this.onMainSliderPositionChange.bind(this),
-      lazyLoad: 'ondemand',
+      lazyLoad: props.autoPlay ? 'progressive' : 'ondemand',
       centerPadding: '0px',
       className: 'carousel__main',
       nextArrow: <CarouselArrow direction={DIRECTION.RIGHT} />,
@@ -74,7 +74,7 @@ class Carousel extends React.Component {
       asNavFor: this.state.mainSlider,
       ref: slider => (this.thumbnailSlider = slider),
       slidesToShow: props.slides.length > 6 ? 7 : props.slides.length,
-      focusOnSelect: true,
+      focusOnSelect: !props.autoPlay,
       initialSlide: props.fileSelected,
       swipe: false,
       lazyLoad: 'progressive',

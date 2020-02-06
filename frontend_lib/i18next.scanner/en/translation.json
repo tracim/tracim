@@ -65,5 +65,7 @@
   "YB": "YB",
   "Recipient's email addresses": "Recipient's email addresses",
   "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.",
-  "Password": "Password"
+  "Password": "Password",
+  "Uploaded files": "Uploaded files",
+  "You have not yet chosen any files to upload.": "You have not yet chosen any files to upload."
 }

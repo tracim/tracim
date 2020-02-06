@@ -9,7 +9,9 @@ import {
   PageContent,
   BtnSwitch,
   ComposedIcon,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  PROFILE,
+  PROFILE_LIST
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
@@ -54,7 +56,7 @@ export class AdminUser extends React.Component {
 
     const { props } = this
 
-    if (props.userList.find(u => u.user_id === userId).profile === 'administrators') {
+    if (props.userList.find(u => u.user_id === userId).profile === PROFILE.administrator.slug) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
@@ -139,13 +141,12 @@ export class AdminUser extends React.Component {
 
           </div>
 
-          {state.displayAddUser &&
+          {state.displayAddUser && (
             <AddUserForm
-              profile={props.profile}
               onClickAddUser={this.handleClickAddUser}
               emailNotifActivated={props.emailNotifActivated}
             />
-          }
+          )}
 
           <Delimiter customClass={'adminUser__delimiter'} />
 
@@ -164,7 +165,7 @@ export class AdminUser extends React.Component {
 
               <tbody>
                 {props.userList.map(u => {
-                  const userProfile = getUserProfile(props.profile, u.profile)
+                  const userProfile = getUserProfile(PROFILE_LIST, u.profile)
                   return (
                     <tr
                       className={classnames('adminUser__table__tr', { 'user-deactivated': !u.is_active })}
@@ -200,8 +201,8 @@ export class AdminUser extends React.Component {
 
                       <td>
                         <BtnSwitch
-                          checked={u.profile === 'trusted-users' || u.profile === 'administrators'}
-                          onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === 'trusted-users' || u.profile === 'administrators'))}
+                          checked={u.profile === PROFILE.manager.slug || u.profile === PROFILE.administrator.slug}
+                          onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === PROFILE.manager.slug || u.profile === PROFILE.administrator.slug))}
                           activeLabel={props.t('Activated')}
                           inactiveLabel={props.t('Deactivated')}
                           disabled={!u.is_active}
@@ -210,8 +211,8 @@ export class AdminUser extends React.Component {
 
                       <td>
                         <BtnSwitch
-                          checked={u.profile === 'administrators'}
-                          onChange={e => this.handleToggleProfileAdministrator(e, u.user_id, !(u.profile === 'administrators'))}
+                          checked={u.profile === PROFILE.administrator.slug}
+                          onChange={e => this.handleToggleProfileAdministrator(e, u.user_id, !(u.profile === PROFILE.administrator.slug))}
                           activeLabel={props.t('Activated')}
                           inactiveLabel={props.t('Deactivated')}
                           disabled={!u.is_active}

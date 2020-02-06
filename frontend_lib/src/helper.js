@@ -33,7 +33,7 @@ export const handleFetchResult = async fetchResult => {
   if (status >= 200 && status <= 299) return generateFetchResponse(fetchResult)
   if (status >= 300 && status <= 399) return generateFetchResponse(fetchResult)
   if (status === 401) { // unauthorized
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.DISCONNECTED_FROM_API, date: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.DISCONNECTED_FROM_API, date: {} })
     return generateFetchResponse(fetchResult)
   }
   if (status >= 400 && status <= 499) return generateFetchResponse(fetchResult) // let specific handler handle it with fetchResult.body.code
@@ -55,7 +55,7 @@ export const addAllResourceI18n = (i18nFromApp, translation, activeLang) => {
   i18n.changeLanguage(activeLang) // set frontend_lib's i18n on app mount
 }
 
-export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
+export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, { locale: dateFnsLocale[lang], addSuffix: true })
 
 export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
@@ -92,7 +92,7 @@ export const revisionTypeList = [{
 }, {
   id: 'status-update',
   faIcon: 'random',
-  label: statusLabel => i18n.t('Status changed to {{status}}', {status: statusLabel})
+  label: statusLabel => i18n.t('Status changed to {{status}}', { status: statusLabel })
 }, {
   id: 'unarchiving',
   faIcon: 'file-archive-o',
@@ -113,13 +113,109 @@ export const revisionTypeList = [{
 
 export const generateLocalStorageContentId = (workspaceId, contentId, contentType, dataType) => `${workspaceId}/${contentId}/${contentType}_${dataType}`
 
-export const appFeatureCustomEventHandlerShowApp = (newContent, currentContentId, appName) => {
-  if (newContent.content_id !== currentContentId) {
-    const event = new CustomEvent(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, {detail: {type: CUSTOM_EVENT.RELOAD_CONTENT(appName), data: newContent}})
-    document.dispatchEvent(event)
-    return false
-  }
-  return true
+const WORKSPACE_MANAGER = {
+  id: 8,
+  slug: 'workspace-manager',
+  faIcon: 'gavel',
+  hexcolor: '#ed0007',
+  tradKey: [
+    i18n.t('Shared space manager'),
+    i18n.t('Content manager + add members and edit shared spaces')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Shared space manager', // label must be used in components
+  description: 'Content manager + add members and edit shared spaces'
+}
+const CONTENT_MANAGER = {
+  id: 4,
+  slug: 'content-manager',
+  faIcon: 'graduation-cap',
+  hexcolor: '#f2af2d',
+  tradKey: [
+    i18n.t('Content manager'),
+    i18n.t('Contributor + create folders and manage contents')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Content manager', // label must be used in components
+  description: 'Contributor + create folders and manage contents'
+}
+const CONTRIBUTOR = {
+  id: 2,
+  slug: 'contributor',
+  faIcon: 'pencil',
+  hexcolor: '#3145f7',
+  tradKey: [
+    i18n.t('Contributor'),
+    i18n.t('Reader + create/modify content')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Contributor', // label must be used in components
+  description: 'Reader + create/modify content'
+}
+const READER = {
+  id: 1,
+  slug: 'reader',
+  faIcon: 'eye',
+  hexcolor: '#15d948',
+  tradKey: [
+    i18n.t('Reader'),
+    i18n.t('Read contents')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Reader', // label must be used in components
+  description: 'Read contents'
+}
+export const ROLE = {
+  workspaceManager: WORKSPACE_MANAGER,
+  contentManager: CONTENT_MANAGER,
+  contributor: CONTRIBUTOR,
+  reader: READER
+}
+export const ROLE_LIST = [WORKSPACE_MANAGER, CONTENT_MANAGER, CONTRIBUTOR, READER]
+
+const ADMINISTRATOR = {
+  id: 3,
+  slug: 'administrators',
+  faIcon: 'shield',
+  hexcolor: '#ed0007',
+  tradKey: [
+    i18n.t('Administrator'),
+    i18n.t('Trusted user + create users, administration of instance')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Administrator', // label must be used in components
+  description: 'Trusted user + create users, administration of instance'
+}
+const MANAGER = {
+  id: 2,
+  slug: 'trusted-users',
+  faIcon: 'graduation-cap',
+  hexcolor: '#f2af2d',
+  tradKey: [
+    i18n.t('Trusted user'),
+    i18n.t('User + create shared spaces, add members in shared spaces')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Trusted user', // label must be used in components
+  description: 'User + create shared spaces, add members in shared spaces'
+}
+const USER = {
+  id: 1,
+  slug: 'users',
+  faIcon: 'user',
+  hexcolor: '#3145f7',
+  tradKey: [
+    i18n.t('User'),
+    i18n.t('Access to shared spaces where user is member')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'User', // label must be used in components
+  description: 'Access to shared spaces where user is member'
+}
+export const PROFILE = {
+  administrator: ADMINISTRATOR,
+  manager: MANAGER,
+  user: USER
+}
+export const PROFILE_LIST = [ADMINISTRATOR, MANAGER, USER]
+
+export const APP_FEATURE_MODE = {
+  VIEW: 'view',
+  EDIT: 'edit',
+  REVISION: 'revision'
 }
 
 // INFO - GB - 2019-07-05 - This password generetor function was based on
@@ -176,3 +272,12 @@ export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, 
   `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview/jpg/${width}x${height}/${filenameNoExtension + '.jpg'}?page=${page}`
 
 export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
+
+export const computeProgressionPercentage = (progressionLoaded, progressionTotal, elementListLength = 1) => (progressionLoaded / progressionTotal * 99) / elementListLength
+
+export const FILE_PREVIEW_STATE = {
+  NO_PREVIEW: 'noPreview',
+  NO_FILE: 'noFile'
+}
+
+export const buildHeadTitle = words => words.reduce((acc, curr) => acc !== '' ? `${acc} · ${curr}` : curr, '')

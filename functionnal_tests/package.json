@@ -15,11 +15,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "^3.4.1",
-    "cypress-file-upload": "^3.2.0",
-    "cypress-wait-until": "^1.2.1"
+    "cypress": "^3.8.1",
+    "cypress-file-upload": "^3.5.3",
+    "cypress-wait-until": "^1.6.1"
   },
-  "dependencies": {
-    "mocha": "^6.1.4"
-  }
+  "dependencies": {}
 }

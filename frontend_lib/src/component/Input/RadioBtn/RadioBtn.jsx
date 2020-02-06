@@ -1,26 +1,24 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 
-const POSITION_TOP = 'top'
 const POSITION_BOTTOM = 'bottom'
 const POSITION_RIGHT = 'right'
 const POSITION_LEFT = 'left'
 
 require('./RadioBtn.styl')
 
-class RadioBtn extends React.Component{
+class RadioBtn extends React.Component {
   handleClick () {
     this.props.onClick(this.props.index)
   }
 
   render () {
-    const { isChecked, value, text} = this.props
+    const { isChecked, value, text } = this.props
     return (
       <div
         className={'radio_btn_group__btn ' + (isChecked ? 'radio_btn_group__btn__checked' : '')}
         onClick={this.handleClick.bind(this)}
-        onKeyDown={this.props.handleKeyDown ? this.props.handleKeyDown: () => {}}
+        onKeyDown={this.props.handleKeyDown ? this.props.handleKeyDown : () => {}}
         data-value={value}
         tabIndex='0'
       >
@@ -44,7 +42,7 @@ RadioBtn.defaultProps = {
   text: ''
 }
 
-class RadioBtnWithImage extends React.Component{
+class RadioBtnWithImage extends React.Component {
   handleClick () {
     this.props.onClick(this.props.index)
   }
@@ -73,13 +71,13 @@ class RadioBtnWithImage extends React.Component{
           borderColor: customColor
         }}
         onClick={this.handleClick.bind(this)}
-        onKeyDown={this.props.handleKeyDown ? this.props.handleKeyDown: () => {}}
+        onKeyDown={this.props.handleKeyDown ? this.props.handleKeyDown : () => {}}
         tabIndex='0'
       >
         <img className={'radio_btn_group__btn__img__img'} src={img.src} alt={img.alt} height={img.height} width={img.width} />
         <div className={'radio_btn_group__btn__img__label'}>{text}</div>
       </div>
-      )
+    )
   }
 }
 
@@ -104,9 +102,9 @@ RadioBtnWithImage.defaultProps = {
 }
 
 export class RadioBtnGroup extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
-    const index = props.selectedIndex ? this.props.selectedIndex  : null
+    const index = props.selectedIndex ? this.props.selectedIndex : null
     const value = index && props.options ? props.options[index].value : null
     this.state = {
       selectedIndex: index,
@@ -156,9 +154,9 @@ export class RadioBtnGroup extends React.Component {
     })
   }
 
-  render() {
+  render () {
     return (
-      <div className="radio_btn_group">{this.buildButtons()}</div>
+      <div className='radio_btn_group'>{this.buildButtons()}</div>
     )
   }
 }

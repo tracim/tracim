@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
+import { ROLE } from '../../helper.js'
 
 // INFO - CH - 2019-09-16 - READ ME:
 // For this component to behave properly regarding responsive and text-overflow ellispsis, the parent of this component
@@ -29,9 +30,9 @@ class ShareLink extends React.Component {
               smallIcon='lock'
               // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
               // https://github.com/tracim/tracim/issues/2098
-              smallIconStyle={{color: '#252525'}}
+              smallIconStyle={{ color: '#252525' }}
             />
-            : <i className='shareLink__icon__unprotected fa fa-fw fa-link'/>
+            : <i className='shareLink__icon__unprotected fa fa-fw fa-link' />
           }
         </div>
         <div className='shareLink__linkInfos'>
@@ -58,10 +59,10 @@ class ShareLink extends React.Component {
           title={props.t('Copy link')}
           onClick={this.handleCopyToClipboard}
         >
-          <i className='fa fa-fw fa-files-o'/>
+          <i className='fa fa-fw fa-files-o' />
         </button>
 
-        {props.userRoleIdInWorkspace >= 4 &&
+        {props.userRoleIdInWorkspace >= ROLE.contentManager.id &&
           <button
             className='iconBtn'
             key='deleteShareLink'
@@ -74,7 +75,7 @@ class ShareLink extends React.Component {
             onClick={() => props.onClickDeleteShareLink(props.id)}
             data-cy='deleteShareLink'
           >
-            <i className='fa fa-fw fa-trash-o'/>
+            <i className='fa fa-fw fa-trash-o' />
           </button>
         }
       </div>

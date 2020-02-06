@@ -1,5 +1,5 @@
-import {appListAsSidebarEntry} from '../../hocMock/redux/appList/appListAsSidebarEntry.js'
-import {globalManagerAsMember} from '../user/globalManagerAsMember.js'
+import { appListAsSidebarEntry } from '../../hocMock/redux/appList/appListAsSidebarEntry.js'
+import { globalManagerAsMember } from '../user/globalManagerAsMember.js'
 
 export const firstWorkspace = {
   id: 1,
