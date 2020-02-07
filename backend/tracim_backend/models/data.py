@@ -34,7 +34,6 @@ from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 
 from tracim_backend.app_models.contents import ContentStatus
-from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
@@ -42,6 +41,7 @@ from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import CopyRevisionAbortedDepotCorrupted
 from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
+from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import get_locale
 from tracim_backend.models.auth import User
@@ -126,7 +126,7 @@ class Workspace(DeclarativeBase):
         """ this method is for interoperability with Content class"""
         return self.label
 
-    def get_allowed_content_types(self) -> typing.List[ContentType]:
+    def get_allowed_content_types(self) -> typing.List[TracimContentType]:
         # @see Content.get_allowed_content_types()
         return content_type_list.endpoint_allowed_types()
 
@@ -1453,7 +1453,7 @@ class Content(DeclarativeBase):
         # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
         return BeautifulSoup(self.description, "html.parser").text
 
-    def get_allowed_content_types(self) -> typing.List[ContentType]:
+    def get_allowed_content_types(self) -> typing.List[TracimContentType]:
         types = []
         allowed_types = self.properties["allowed_content"]
         for type_label, is_allowed in allowed_types.items():

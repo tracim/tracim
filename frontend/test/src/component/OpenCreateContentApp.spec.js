@@ -4,6 +4,7 @@ import sinon from 'sinon'
 import { mount } from 'enzyme'
 import { OpenCreateContentApp as OpenCreateContentAppWithoutHOC } from '../../../src/component/Workspace/OpenCreateContentApp.jsx'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
+import { firstWorkspace } from '../../fixture/workspace/firstWorkspace'
 import { user } from '../../hocMock/redux/user/user.js'
 import { connectMock } from '../../hocMock/store.js'
 import { withRouterMock } from '../../hocMock/withRouter.js'
@@ -26,7 +27,8 @@ describe('<OpenCreateContentApp />', () => {
 
   const mapStateToProps = {
     user,
-    contentType
+    contentType,
+    currentWorkspace: firstWorkspace
   }
 
   const ComponentWithHoc = withRouterMock(connectMock(mapStateToProps)(OpenCreateContentAppWithoutHOC))

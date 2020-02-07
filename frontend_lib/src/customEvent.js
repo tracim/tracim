@@ -18,6 +18,7 @@ export const CUSTOM_EVENT = {
   RELOAD_CONTENT: type => `${type}_reloadContent`,
   RELOAD_APP_FEATURE_DATA: type => `${type}_reloadAppFeatureData`,
   SET_BREADCRUMBS: 'setBreadcrumbs',
+  SET_HEAD_TITLE: 'setHeadTitle',
   SHOW_APP: type => `${type}_showApp`,
   SHOW_CREATE_WORKSPACE_POPUP: 'showCreateWorkspacePopup',
   UNMOUNT_APP: 'unmount_app',

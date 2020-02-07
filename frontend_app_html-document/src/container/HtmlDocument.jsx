@@ -19,7 +19,8 @@ import {
   BREADCRUMBS_TYPE,
   ROLE,
   CUSTOM_EVENT,
-  APP_FEATURE_MODE
+  APP_FEATURE_MODE,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -73,6 +74,7 @@ class HtmlDocument extends React.Component {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+        if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
         break
 
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
@@ -158,6 +160,17 @@ class HtmlDocument extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = (contentName) => {
+    const { state } = this
+
+    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([contentName, state.config.workspace.label, state.config.system.config.instance_name]) }
+      })
+    }
+  }
 
   isValidLocalStorageType = type => ['rawContent', 'comment'].includes(type)
 
@@ -251,6 +264,7 @@ class HtmlDocument extends React.Component {
       timeline: revisionWithComment
     })
 
+    this.setHeadTitle(resHtmlDocument.body.label)
     await putHtmlDocRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { connect } from 'react-redux'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -11,6 +12,7 @@ import {
 import {
   displayFileSize,
   handleFetchResult,
+  buildHeadTitle,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { PAGE } from '../helper.js'
@@ -32,10 +34,23 @@ class GuestDownload extends React.Component {
         isInvalid: false
       }
     }
+
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  }
+
+  customEventReducer = async ({ detail: { type } }) => {
+    switch (type) {
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        this.setHeadTitle()
+        break
+    }
   }
 
   async componentDidMount () {
     const { props } = this
+
+    this.setHeadTitle()
+
     const request = await getFileInfos(props.match.params.token)
     const response = await handleFetchResult(request)
 
@@ -64,6 +79,14 @@ class GuestDownload extends React.Component {
     }
   }
 
+  componentDidUpdate (prevProps) {
+    const { props } = this
+
+    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+      this.setHeadTitle()
+    }
+  }
+
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
@@ -72,6 +95,16 @@ class GuestDownload extends React.Component {
       delay: undefined
     }
   })
+
+  setHeadTitle = () => {
+    const { props } = this
+    if (props.system.config.instance_name) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('Public download'), props.system.config.instance_name]) }
+      })
+    }
+  }
 
   handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })
 
@@ -103,4 +136,7 @@ class GuestDownload extends React.Component {
     )
   }
 }
-export default translate()(GuestDownload)
+
+const mapStateToProps = ({ system }) => ({ system })
+
+export default connect(mapStateToProps)(translate()(GuestDownload))

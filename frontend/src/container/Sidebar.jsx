@@ -142,9 +142,9 @@ export class Sidebar extends React.Component {
                 {TRACIM_APP_VERSION}
               </div>
               <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
-                Copyright - 2013 - 2019
+                Copyright - 2013 - 2020
                 <div className='sidebar__footer__text__link'>
-                  <a href='http://www.tracim.fr/' target='_blank' className='ml-3'>tracim.fr</a>
+                  <a href='https://www.algoo.fr/fr/tracim' target='_blank' className='ml-3'>tracim.fr</a>
                 </div>
               </div>
             </div>

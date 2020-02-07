@@ -20,7 +20,7 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
-import { CUSTOM_EVENT, PROFILE } from 'tracim_frontend_lib'
+import { buildHeadTitle, CUSTOM_EVENT, PROFILE } from 'tracim_frontend_lib'
 import {
   PAGE,
   COOKIE_FRONTEND,
@@ -89,6 +89,10 @@ export class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(appendBreadcrumbs(data.breadcrumbs))
         break
+      case CUSTOM_EVENT.SET_HEAD_TITLE:
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        document.title = buildHeadTitle([data.title, 'Tracim'])
+        break
     }
   }
 
@@ -127,7 +131,9 @@ export class Tracim extends React.Component {
     const { props } = this
 
     const fetchGetConfig = await props.dispatch(getConfig())
-    if (fetchGetConfig.status === 200) props.dispatch(setConfig(fetchGetConfig.json))
+    if (fetchGetConfig.status === 200) {
+      props.dispatch(setConfig(fetchGetConfig.json))
+    }
 
     const fetchGetAppList = await props.dispatch(getAppList())
     // FIXME - GB - 2019-07-23 - Hack to add the share folder app at appList while he still doesn't exist in backend
