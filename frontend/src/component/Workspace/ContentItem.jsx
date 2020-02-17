@@ -80,7 +80,7 @@ class ContentItem extends React.Component {
             </div>
           </div>
 
-          {props.userRoleIdInWorkspace >= ROLE.contributor.id && (
+          {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
             <div className='d-none d-md-block' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
