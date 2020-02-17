@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="${lang}">
+<body>
 <p>${_('Hello {username},').format(username=emitter.display_name)}</p>
 <p>${_('You have invited {nb_receivers} people to upload files in this shared space <a href={sharedspace_url}>{sharedspace_name}</a>:').format(sharedspace_name=html_escape(workspace.label), sharedspace_url=html_escape(workspace.frontend_url), nb_receivers=html_escape(len(upload_permission_receivers)))|n}</p>
 <ul>
@@ -20,3 +23,5 @@ ${config.WEBSITE__TITLE}
 <a href="${config.WEBSITE__BASE_URL}">${config.WEBSITE__BASE_URL}</a>
 ${_("powered by tracim software")} - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
 </pre>
+</body>
+</html>

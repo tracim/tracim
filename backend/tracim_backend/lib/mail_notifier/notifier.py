@@ -449,7 +449,12 @@ class EmailManager(object):
                     "import humanize",
                 ],
             )
-            return template.render(_=translator.get_translation, config=self.config, **context)
+            return template.render(
+                _=translator.get_translation,
+                config=self.config,
+                lang=translator.default_lang,
+                **context
+            )
         except Exception as exc:
             logger.exception(self, "Failed to render email template: {}".format(exc.__str__()))
             raise EmailTemplateError("Failed to render email template: {}".format(exc.__str__()))
