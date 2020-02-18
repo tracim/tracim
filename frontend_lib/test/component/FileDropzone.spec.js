@@ -7,11 +7,10 @@ import sinon from 'sinon'
 require('../../src/component/FileDropzone/FileDropzone.styl')
 
 describe('<FileDropZone />', () => {
-  const onDropCallBack = sinon.spy()
   const onClickCallBack = sinon.spy()
 
   const props = {
-    onDrop: onDropCallBack,
+    onDrop: () => { },
     onClick: onClickCallBack,
     multipleFiles: true,
     filename: 'randomPreview',
@@ -76,6 +75,13 @@ describe('<FileDropZone />', () => {
 
     it('should display the preview in a img tag', () => {
       expect(wrapper.find('.filecontent__preview > img').prop('src')).to.equal(randomPreview)
+    })
+  })
+
+  describe('click on the dropzone', () => {
+    it('should call the onClick callback', () => {
+      wrapper.find('.filecontent__form').simulate('click')
+      expect(onClickCallBack.called).to.equal(true)
     })
   })
 })
