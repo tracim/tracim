@@ -6,8 +6,8 @@ import { ROLE } from '../../src/helper.js'
 import sinon from 'sinon'
 
 describe('<PopinFixedHeader />', () => {
-  const onClickCloseBtnCallBack = sinon.stub()
-  const onValidateChangeTitleCallBack = sinon.stub()
+  const onClickCloseBtnCallBack = sinon.spy()
+  const onValidateChangeTitleCallBack = sinon.spy()
 
   const props = {
     faIcon: 'randomFaIcon',

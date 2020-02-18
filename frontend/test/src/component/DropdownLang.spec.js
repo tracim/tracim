@@ -5,7 +5,7 @@ import DropdownLang from '../../../src/component/Header/MenuActionListItem/Dropd
 import sinon from 'sinon'
 
 describe('<DropdownLang />', () => {
-  const onChangeLangCallBack = sinon.stub()
+  const onChangeLangCallBack = sinon.spy()
 
   const props = {
     langList: [{

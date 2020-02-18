@@ -6,12 +6,12 @@ import sinon from 'sinon'
 import { ROLE } from '../../src/helper.js'
 
 describe('<Timeline />', () => {
-  const onClickWysiwygBtnCallBack = sinon.stub()
-  const onClickRevisionBtnCallBack = sinon.stub()
-  const onClickRestoreArchivedCallBack = sinon.stub()
-  const onClickRestoreDeletedCallBack = sinon.stub()
-  const onClickValidateNewCommentBtnCallBack = sinon.stub()
-  const onChangeNewCommentCallBack = sinon.stub()
+  const onClickWysiwygBtnCallBack = sinon.spy()
+  const onClickRevisionBtnCallBack = sinon.spy()
+  const onClickRestoreArchivedCallBack = sinon.spy()
+  const onClickRestoreDeletedCallBack = sinon.spy()
+  const onClickValidateNewCommentBtnCallBack = sinon.spy()
+  const onChangeNewCommentCallBack = sinon.spy()
 
   const props = {
     timelineData: [],

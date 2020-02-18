@@ -5,7 +5,7 @@ import NewVersionBtn from '../../src/component/OptionComponent/NewVersionBtn.jsx
 import sinon from 'sinon'
 
 describe('<NewVersionBtn />', () => {
-  const onClickCallBack = sinon.stub()
+  const onClickCallBack = sinon.spy()
 
   const props = {
     onClickNewVersionBtn: onClickCallBack,

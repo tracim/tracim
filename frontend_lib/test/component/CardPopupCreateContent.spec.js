@@ -6,9 +6,9 @@ import sinon from 'sinon'
 require('../../src/component/CardPopup/CardPopupCreateContent.styl')
 
 describe('<CardPopupCreateContent />', () => {
-  const onCloseCallBack = sinon.stub()
-  const onValidateCallBack = sinon.stub()
-  const onChangeContentNameCallBack = sinon.stub()
+  const onCloseCallBack = sinon.spy()
+  const onValidateCallBack = sinon.spy()
+  const onChangeContentNameCallBack = sinon.spy()
 
   const props = {
     onClose: onCloseCallBack,

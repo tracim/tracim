@@ -6,7 +6,7 @@ import sinon from 'sinon'
 import Select from 'react-select'
 
 describe('<Timezone />', () => {
-  const onChangeTimezoneCallBack = sinon.stub()
+  const onChangeTimezoneCallBack = sinon.spy()
 
   const props = {
     timezone: [{

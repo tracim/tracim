@@ -24,17 +24,23 @@ import {
   isFunction
 } from '../../hocMock/helper'
 import { shallow } from 'enzyme'
-const nock = require('nock')
+import {
+  mockGetLoggedUserCalendar200,
+  mockMyselfWorkspaceDoNotify204,
+  mockPutMyselfEmail200,
+  mockPutMyselfName200,
+  mockPutMyselfPassword204, mockPutMyselfPassword403
+} from '../../apiMock'
 
 describe('<Account />', () => {
-  const setWorkspaceListMemberListCallBack = sinon.stub()
-  const updateUserNameCallBack = sinon.stub()
-  const newFlashMessageWarningCallBack = sinon.stub()
-  const updateUserEmailCallBack = sinon.stub()
-  const updateUserWorkspaceSubscriptionNotifCallBack = sinon.stub()
-  const updateUserAgendaUrlCallBack = sinon.stub()
-  const setBreadcrumbsCallBack = sinon.stub()
-  const newFlashMessageInfoCallBack = sinon.stub()
+  const setWorkspaceListMemberListCallBack = sinon.spy()
+  const updateUserNameCallBack = sinon.spy()
+  const newFlashMessageWarningCallBack = sinon.spy()
+  const updateUserEmailCallBack = sinon.spy()
+  const updateUserWorkspaceSubscriptionNotifCallBack = sinon.spy()
+  const updateUserAgendaUrlCallBack = sinon.spy()
+  const setBreadcrumbsCallBack = sinon.spy()
+  const newFlashMessageInfoCallBack = sinon.spy()
 
   const dispatchCallBack = (param) => {
     if (isFunction(param)) {
@@ -88,35 +94,14 @@ describe('<Account />', () => {
     dispatch: dispatchCallBack
   }
 
+  const password = 'randomPassword'
+
   const wrapper = shallow(<AccountWithoutHOC {...props} />)
 
   describe('internal functions', () => {
     const invalidPassword = '0'
 
     beforeEach(() => {
-      nock(FETCH_CONFIG.apiUrl)
-        .put('/users/me')
-        .reply(200, { })
-
-      nock(FETCH_CONFIG.apiUrl)
-        .put('/users/me/email')
-        .reply(200, { })
-
-      nock(FETCH_CONFIG.apiUrl)
-        .put('/users/me/workspaces/1/notifications/activate')
-        .reply(204, { })
-
-      nock(FETCH_CONFIG.apiUrl)
-        .put('/users/me/password', body => body.loggedin_user_password === invalidPassword)
-        .reply(403, { })
-
-      nock(FETCH_CONFIG.apiUrl)
-        .put('/users/me/password', body => body.loggedin_user_password !== invalidPassword)
-        .reply(204, { })
-
-      nock(FETCH_CONFIG.apiUrl)
-        .get('/users/me/agenda')
-        .reply(200, [])
       restoreHistoryCallBack([
         setWorkspaceListMemberListCallBack,
         updateUserNameCallBack,
@@ -131,14 +116,20 @@ describe('<Account />', () => {
 
     describe('handleSubmitNameOrEmail', () => {
       it('updateUserNameCallBack should be called when the function handleSubmitNameOrEmail() is called with a new Name', (done) => {
-        wrapper.instance().handleSubmitNameOrEmail('randomNewName', '', '').then(() => {
+        const newName = 'randomNewName'
+
+        mockPutMyselfName200(FETCH_CONFIG.apiUrl, newName, props.user.timezone, props.user.lang)
+        wrapper.instance().handleSubmitNameOrEmail(newName, '', '').then(() => {
           expect(updateUserNameCallBack.called).to.equal(true)
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
       })
 
       it('updateUserEmailCallBack should be called when the function handleSubmitNameOrEmail() is called with a new Email', (done) => {
-        wrapper.instance().handleSubmitNameOrEmail('', 'randomNewEmail', 'randomPassword').then(() => {
+        const newMail = 'randomNewEmail'
+
+        mockPutMyselfEmail200(FETCH_CONFIG.apiUrl, newMail, password)
+        wrapper.instance().handleSubmitNameOrEmail('', newMail, password).then(() => {
           expect(updateUserEmailCallBack.called).to.equal(true)
         }).then(done, done)
       })
@@ -152,6 +143,7 @@ describe('<Account />', () => {
 
     describe('handleChangeSubscriptionNotif', () => {
       it('updateUserWorkspaceSubscriptionNotifCallBack should be called when the function handleChangeSubscriptionNotif() is called', (done) => {
+        mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
         wrapper.instance().handleChangeSubscriptionNotif(1, 'activate').then(() => {
           expect(updateUserWorkspaceSubscriptionNotifCallBack.called).to.equal(true)
           restoreHistoryCallBack([updateUserWorkspaceSubscriptionNotifCallBack])
@@ -159,6 +151,8 @@ describe('<Account />', () => {
       })
 
       it('newFlashMessageWarningCallBack should be called when the function handleChangeSubscriptionNotif() is called with invalid workspaceId', (done) => {
+        mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
+
         wrapper.instance().handleChangeSubscriptionNotif(0, 'activate').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
           restoreHistoryCallBack([newFlashMessageWarningCallBack])
@@ -168,12 +162,14 @@ describe('<Account />', () => {
 
     describe('handleSubmitPassword', () => {
       it('newFlashMessageInfoCallBack should be called when handleSubmitPassword() is called with valid password', (done) => {
+        mockPutMyselfPassword204(FETCH_CONFIG.apiUrl, 'randomOldPassword')
         wrapper.instance().handleSubmitPassword('randomOldPassword', 'randomPassWord', 'randomPassWord').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
       })
 
       it('newFlashMessageWarningCallBack should be called when handleSubmitPassword() is called with invalid oldPassword', (done) => {
+        mockPutMyselfPassword403(FETCH_CONFIG.apiUrl, invalidPassword)
         wrapper.instance().handleSubmitPassword(invalidPassword, 'randomPassWord', 'randomPassWord').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
           expect(newFlashMessageInfoCallBack.called).to.equal(false)
@@ -183,6 +179,7 @@ describe('<Account />', () => {
 
     describe('loadAgendaUrl', () => {
       it('updateUserAgendaUrlCallBack should be called when loadAgendaUrl() is called', (done) => {
+        mockGetLoggedUserCalendar200(FETCH_CONFIG.apiUrl)
         wrapper.instance().loadAgendaUrl().then(() => {
           expect(updateUserAgendaUrlCallBack.called).to.equal(true)
         }).then(done, done)

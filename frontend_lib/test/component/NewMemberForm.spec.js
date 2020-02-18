@@ -7,12 +7,12 @@ import { ROLE } from '../../src/helper.js'
 require('../../src/component/NewMemberForm/NewMemberForm.styl')
 
 describe('<NewMemberForm />', () => {
-  const onClickCloseAddMemberBtnCallBack = sinon.stub()
-  const onClickAutoCompleteCallBack = sinon.stub()
-  const onClickBtnValidateCallBack = sinon.stub()
-  const onChangeRoleCallBack = sinon.stub()
-  const onClickKnownMemberCallBack = sinon.stub()
-  const onChangeNameOrEmailCallBack = sinon.stub()
+  const onClickCloseAddMemberBtnCallBack = sinon.spy()
+  const onClickAutoCompleteCallBack = sinon.spy()
+  const onClickBtnValidateCallBack = sinon.spy()
+  const onChangeRoleCallBack = sinon.spy()
+  const onClickKnownMemberCallBack = sinon.spy()
+  const onChangeNameOrEmailCallBack = sinon.spy()
 
   const props = {
     onClickCloseAddMemberBtn: onClickCloseAddMemberBtnCallBack,

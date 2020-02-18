@@ -5,7 +5,7 @@ import { Search as SearchWithoutHOC } from '../../../src/component/Header/Search
 import sinon from 'sinon'
 
 describe('<Search />', () => {
-  const onClickSearchCallBack = sinon.stub()
+  const onClickSearchCallBack = sinon.spy()
 
   const props = {
     onClickSearch: onClickSearchCallBack

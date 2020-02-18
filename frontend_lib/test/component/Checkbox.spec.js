@@ -5,7 +5,7 @@ import sinon from 'sinon'
 import Checkbox from '../../src/component/Input/Checkbox.jsx'
 
 describe('<Checkbox />', () => {
-  const onClickCheckbox = sinon.stub()
+  const onClickCheckbox = sinon.spy()
 
   const props = {
     name: 'randomName',

@@ -5,7 +5,7 @@ import Button from '../../../src/component/common/Input/Button.jsx'
 import sinon from 'sinon'
 
 describe('<Button />', () => {
-  const onClickCallBack = sinon.stub()
+  const onClickCallBack = sinon.spy()
 
   const props = {
     htmlType: 'button',

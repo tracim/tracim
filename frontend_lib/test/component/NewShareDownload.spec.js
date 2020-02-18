@@ -7,11 +7,11 @@ import { NewShareDownload as NewShareDownloadWithoutHOC } from '../../src/compon
 require('../../src/component/ShareDownload/ShareDownload.styl')
 
 describe('<NewShareDownload />', () => {
-  const onChangeEmailsCallBack = sinon.stub()
-  const onKeyDownEnterCallBack = sinon.stub()
-  const onChangePasswordCallBack = sinon.stub()
-  const onClickCancelButtonCallBack = sinon.stub()
-  const onClickNewShareCallBack = sinon.stub()
+  const onChangeEmailsCallBack = sinon.spy()
+  const onKeyDownEnterCallBack = sinon.spy()
+  const onChangePasswordCallBack = sinon.spy()
+  const onClickCancelButtonCallBack = sinon.spy()
+  const onClickNewShareCallBack = sinon.spy()
 
   const props = {
     shareEmails: 'randomEmail@randomEmail.randomEmail',

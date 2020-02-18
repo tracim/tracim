@@ -5,7 +5,7 @@ import { MenuProfil as MenuProfilWithoutHOC } from '../../../src/component/Heade
 import sinon from 'sinon'
 
 describe('<MenuProfil />', () => {
-  const onClickLogoutCallBack = sinon.stub()
+  const onClickLogoutCallBack = sinon.spy()
 
   const props = {
     user: {

@@ -9,7 +9,7 @@ import { PAGE } from '../../../src/helper'
 import { ROLE } from 'tracim_frontend_lib'
 
 describe('<AppFullscreenRouter />', () => {
-  const renderAppFullscreenCallBack = sinon.stub()
+  const renderAppFullscreenCallBack = sinon.spy()
 
   const props = {
     user: user,

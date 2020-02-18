@@ -9,8 +9,8 @@ import { withRouterMock } from '../../hocMock/withRouter'
 import { translateMock } from '../../hocMock/translate'
 
 describe('<ForgotPassword />', () => {
-  const renderAppPopupCreationCallBack = sinon.stub()
-  const dispatchCallBack = sinon.stub()
+  const renderAppPopupCreationCallBack = sinon.spy()
+  const dispatchCallBack = sinon.spy()
 
   const props = {
     user: user,

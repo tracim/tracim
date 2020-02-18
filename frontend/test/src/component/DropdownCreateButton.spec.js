@@ -6,7 +6,7 @@ import sinon from 'sinon'
 import { appList } from '../../hocMock/redux/appList/appList.js'
 
 describe('<DropdownCreateButton />', () => {
-  const onClickCreateContentCallBack = sinon.stub()
+  const onClickCreateContentCallBack = sinon.spy()
 
   const props = {
     availableApp: appList,
