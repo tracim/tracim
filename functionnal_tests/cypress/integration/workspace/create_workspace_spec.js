@@ -33,8 +33,9 @@ describe('Workspace', () => {
           .get('[data-cy="popup__createcontent__form__button"]').should('be.visible').click()
       }
 
-      const getWorkspaceSidebarChevronIcon = (workspaceTitle) => (
-        cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"] + .sidebar__content__navigation__workspace__item__icon`)
+      const getWorkspaceItemByName = (workspaceTitle) => (
+        cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"]`)
+          .parent().parent()
       )
 
       it('should display the new workspaces properly with the right workspace opened in the sidebar', () => {
@@ -46,8 +47,8 @@ describe('Workspace', () => {
           .get('[data-cy="dashboardWorkspaceLabel"]')
           .contains(workspaceTitle1)
 
-        getWorkspaceSidebarChevronIcon(workspaceTitle1)
-          .find('.fa-chevron-up')
+        getWorkspaceItemByName(workspaceTitle1)
+          .find('.sidebar__content__navigation__workspace__item__submenu')
           .should('be.visible')
 
         createOneWorkspace(cy, workspaceTitle2)
@@ -55,8 +56,8 @@ describe('Workspace', () => {
           .get('[data-cy="dashboardWorkspaceLabel"]')
           .contains(workspaceTitle2)
 
-        getWorkspaceSidebarChevronIcon(workspaceTitle2)
-          .find('.fa-chevron-up')
+        getWorkspaceItemByName(workspaceTitle2)
+          .find('.sidebar__content__navigation__workspace__item__submenu')
           .should('be.visible')
       })
     })
