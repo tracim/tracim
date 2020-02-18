@@ -38,7 +38,7 @@ export const FileDropzone = props => {
                   </div>
                 </div>
               )
-            case FILE_PREVIEW_STATE.NO_FILE:
+            case FILE_PREVIEW_STATE.NO_PREVIEW:
               return (
                 <div className='filecontent__preview' drop='true'>
                   <i className='filecontent__preview__nopreview-icon fa fa-paperclip' style={{ color: props.hexcolor }} />
