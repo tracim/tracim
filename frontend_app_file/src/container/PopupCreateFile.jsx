@@ -89,6 +89,7 @@ class PopupCreateFile extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
 
     if (uploadedFileFailedList.length === 0) {
+      this.handleClose(false)
       if (state.fileToUploadList.length === 1) {
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.OPEN_CONTENT_URL,
@@ -99,7 +100,6 @@ class PopupCreateFile extends React.Component {
           }
         })
       }
-      this.handleClose(false)
       return
     }
 
