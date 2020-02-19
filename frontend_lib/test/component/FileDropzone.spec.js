@@ -8,15 +8,17 @@ require('../../src/component/FileDropzone/FileDropzone.styl')
 
 describe('<FileDropZone />', () => {
   const onClickCallBack = sinon.spy()
+  const onDropCallBack = sinon.spy()
 
   const props = {
-    onDrop: () => { },
+    onDrop: onDropCallBack,
     onClick: onClickCallBack,
     multipleFiles: true,
     filename: 'randomPreview',
     preview: FILE_PREVIEW_STATE.NO_FILE
   }
 
+  // INFO - GM - 2019-02-19 - Use mount instead of shallow here to be able to render react-dropzone which is wrapped by FileDropzone
   const wrapper = mount(
     <FileDropzone
       t={(key) => key}
@@ -82,6 +84,14 @@ describe('<FileDropZone />', () => {
     it('should call the onClick callback', () => {
       wrapper.find('.filecontent__form').simulate('click')
       expect(onClickCallBack.called).to.equal(true)
+    })
+  })
+
+  describe('Call the onDrop props', () => {
+    it('should call the onDrop callback', () => {
+      // INFO - GM - 2020-02-19 - Don't simulate drop event because react-dropzone doesn't support well enzyme
+      wrapper.props().onDrop()
+      expect(onDropCallBack.called).to.equal(true)
     })
   })
 })
