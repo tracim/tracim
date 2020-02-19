@@ -35,7 +35,8 @@ describe('Workspace', () => {
 
       const getWorkspaceItemByName = (workspaceTitle) => (
         cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"]`)
-          .parent().parent()
+          .parent('.sidebar__content__navigation__workspace__item__wrapper')
+          .parent('li.sidebar__content__navigation__workspace__item')
       )
 
       it('should display the new workspaces properly with the right workspace opened in the sidebar', () => {
