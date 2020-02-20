@@ -1,5 +1,11 @@
 
 
+# 2.6.1 /2020-02-21
+
+### Fixed issues
+- Frontend: #2663, #2669, #2680, #2683
+- Backend: #2592
+
 # 2.6.0 /2020-02-06
 
 ### New Feature
@@ -75,7 +81,7 @@
 - Preview-generator: #2503, #2492
 
 ### Known issues
-- Manual modification to install tracim on Ubuntu Trusty (14.04) is necessary (#2514)
+- Manual modification to install Tracim on Ubuntu Trusty (14.04) is necessary (#2514)
 
 
 # 2.4.3 / 2019-09-26
@@ -102,8 +108,8 @@
 ### New Features
 
 - Online document edition through CollaboraOnline/LibreofficeOnline integration
-- Public file share in download (allow remote users to access to a file stored in tracim, eventually through a password protected access)
-- Public file upload (allow remote users to upload to tracim their files, eventually through a password protected access)
+- Public file share in download (allow remote users to access to a file stored in Tracim, eventually through a password protected access)
+- Public file upload (allow remote users to upload to Tracim their files, eventually through a password protected access)
 - Content meta-information panel (timeline, info) UI rework
 - Space Limitations (experimental) - allow some controls on file/workspace sizes, number of workspace per user, etc
 
@@ -158,16 +164,17 @@ Archive button not more used in Tracim. All archive buttons is hide (#2347)
 ### New Features
 
 - Search:
-  - lite search similar to tracim v1
+  - lite search similar to Tracim v1
   - smart search base on ElasticSearch (full text) ([Documentation here](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md#search-method-using-elastic_search-tracim-23))
 - Easy content move using Drag & Drop
 - Lots of UX improvement
 
 ### New Features (technical)
 
-- It's now possible to configure tracim using environment variables ([Documentation here](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md#tracim-22-fully-supported-var))
+- It's now possible to configure Tracim using environment variables ([Documentation here](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md#tracim-22-fully-supported-var))
+If you have used Tracim on Docker before this release, you need to delete this files `tracim_web.ini` `tracim_web.ini` `tracim_caldav.ini` available in this default folder `~/tracim/etc` before starting Tracim 2.3.0 (all files are created on startup)
 - New licence: combination of MIT, LGPLv3 and AGPLv3
-- Since 2.3 version, following services are automatically launched when tracim start with docker:
+- Since 2.3 version, following services are automatically launched when Tracim start with docker:
   - Radicale (agenda)
   - WebDAV
 
@@ -200,7 +207,7 @@ website.server_name parameter is now deleted in config file and code. Not more u
 ### New Features
 
 - Agenda is available
-- Migration of agenda from tracim_v1 to tracim_v2 is now available
+- Migration of agenda from Tracim v1 to Tracim v2 is now available
 - Breadcrumbs to know exactly where you are
 - Links for webdav and agenda are visible in dashboard
 - Link for personal agenda is visible in My account
@@ -208,7 +215,7 @@ website.server_name parameter is now deleted in config file and code. Not more u
 
 ### Known issues
 
-- Search & filters not yet migrated from tracim v1
+- Search & filters not yet migrated from Tracim v1
 - Creating a content may appear duplicated on slow network (issue #1361)
 - It's possible to rename a content or workspace with an already in use label in some special cases (issue #1770)
 - If you create shared spaces while radicale server is not running (tracimcli caldav start), the agendas are not available (issue #1537)
@@ -246,9 +253,9 @@ website.server_name parameter is now deleted in config file and code. Not more u
 
 ### New Features
 - Folders
-- Progressive web app support (possibility to "install" tracim on smartphone)
+- Progressive web app support (possibility to "install" Tracim on smartphone)
 - Webdav + create/move operations
-- Full database migration from tracim v1
+- Full database migration from Tracim v1
 - Authentication:
     - LDAP authentication
     - Web SSO Authentication - beta (based on HTTP Headers)
@@ -256,8 +263,8 @@ website.server_name parameter is now deleted in config file and code. Not more u
 
 ### Known issues
 
-- Calendar support still missing (migration from tracim v1 will be available in tracim 2.2 - see #1181)
-- Search & filtering not yet migrated from tracim v1
+- Calendar support still missing (migration from Tracim v1 will be available in Tracim 2.2 - see #1181)
+- Search & filtering not yet migrated from Tracim v1
 - Duplicated creation of content may appear on slow network (issue #1361)
 
 ### Fixed issues
