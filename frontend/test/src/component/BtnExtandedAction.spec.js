@@ -15,13 +15,16 @@ describe('<ExtandedAction />', () => {
   const props = {
     onClickExtendedAction: {
       archive: {
-        callback: archiveCallBack
+        callback: archiveCallBack,
+        allowedRoleId: ROLE.contentManager.id
       },
       delete: {
-        callback: deleteCallBack
+        callback: deleteCallBack,
+        allowedRoleId: ROLE.contentManager.id
       },
       edit: {
-        callback: editCallBack
+        callback: editCallBack,
+        allowedRoleId: ROLE.contributor.id
       }
     },
     userRoleIdInWorkspace: ROLE.workspaceManager.id,
@@ -35,19 +38,19 @@ describe('<ExtandedAction />', () => {
   const wrapper = shallow(<ExtandedActionWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
-    it('should hide all dropdown buttons when userRoleIdInWorkspace = 8', () => {
+    it(`should hide all dropdown buttons when userRoleIdInWorkspace = ${ROLE.contributor.id}`, () => {
       wrapper.setProps({ userRoleIdInWorkspace: ROLE.reader.id })
       expect(wrapper.find('div.subdropdown__item').length).to.equal(0)
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })
     })
 
-    it('should show only one dropdown buttons when userRoleIdInWorkspace = 4', () => {
+    it(`should show only one dropdown buttons when userRoleIdInWorkspace = ${ROLE.contributor.id}`, () => {
       wrapper.setProps({ userRoleIdInWorkspace: ROLE.contributor.id })
       expect(wrapper.find('div.subdropdown__item').length).to.equal(1)
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })
     })
 
-    it('should show all dropdown buttons when userRoleIdInWorkspace = 1', () => {
+    it(`should show all dropdown buttons when userRoleIdInWorkspace = ${ROLE.workspaceManager.id}`, () => {
       wrapper.setProps({ userRoleIdInWorkspace: ROLE.workspaceManager.id })
       expect(wrapper.find('div.subdropdown__item').length).to.equal(2)
       expect(wrapper.find(Link)).to.have.lengthOf(1)
