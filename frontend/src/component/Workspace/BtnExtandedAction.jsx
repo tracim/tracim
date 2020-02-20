@@ -25,7 +25,7 @@ export const ExtandedAction = props => {
       </button>
 
       <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-        {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace >= ROLE.contributor.id && (
+        {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace >= props.onClickExtendedAction.edit.allowedRoleId && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.edit.callback}
@@ -53,7 +53,7 @@ export const ExtandedAction = props => {
         */}
 
         {/* INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
-        {props.userRoleIdInWorkspace >= 4 && (
+        {props.onClickExtendedAction.archive && props.userRoleIdInWorkspace >= props.onClickExtendedAction.archive.allowedRoleId && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.archive.callback}
@@ -69,7 +69,7 @@ export const ExtandedAction = props => {
           </div>
         )} */}
 
-        {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
+        {props.onClickExtendedAction.delete && props.userRoleIdInWorkspace >= props.onClickExtendedAction.delete.allowedRoleId && (
           <div
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.delete.callback}
