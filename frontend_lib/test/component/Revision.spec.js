@@ -5,7 +5,7 @@ import Revision from '../../src/component/Timeline/Revision.jsx'
 import sinon from 'sinon'
 
 describe('<Revision />', () => {
-  const onClickRevisionCallBack = sinon.stub()
+  const onClickRevisionCallBack = sinon.spy()
 
   const props = {
     customClass: 'randomCustomClass',

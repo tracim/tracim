@@ -5,7 +5,7 @@ import GenericButton from '../../src/component/Button/GenericButton.jsx'
 import sinon from 'sinon'
 
 describe('<GenericButton />', () => {
-  const onClickCallBack = sinon.stub()
+  const onClickCallBack = sinon.spy()
 
   const props = {
     onClick: onClickCallBack,

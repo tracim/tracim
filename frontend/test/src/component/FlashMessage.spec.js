@@ -5,7 +5,7 @@ import { FlashMessage as FlashMessageWithoutHOC } from '../../../src/component/F
 import sinon from 'sinon'
 
 describe('<FlashMessage />', () => {
-  const removeFlashMessageCallBack = sinon.stub()
+  const removeFlashMessageCallBack = sinon.spy()
 
   const props = {
     flashMessage: [{

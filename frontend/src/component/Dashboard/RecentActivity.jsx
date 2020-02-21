@@ -43,7 +43,7 @@ export const RecentActivity = props =>
             </div>
           )
 
-          if (content.type === 'folder' && props.roleIdForLoggedUser > ROLE.contentManager.id) {
+          if (content.type === 'folder' && props.roleIdForLoggedUser < ROLE.contentManager.id) {
             return (
               <div
                 className={classnames('recentactivity__list__item nolink primaryColorBgLightenHover')}

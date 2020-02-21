@@ -6,7 +6,7 @@ import sinon from 'sinon'
 require('../../src/component/Input/BtnSwitch/BtnSwitch.styl')
 
 describe('<BtnSwitch />', () => {
-  const onChangeCallBack = sinon.stub()
+  const onChangeCallBack = sinon.spy()
 
   const props = {
     checked: false,

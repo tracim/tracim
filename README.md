@@ -200,3 +200,32 @@ You can watch the tests running directly from a (graphical) web interface:
 
     cd functionnal_tests/
     npm run cypress-open
+
+### Running frontend unit tests
+
+#### Prerequisite for unit tests
+
+To run unit tests, you need to install frontend dependencies and build the full frontend:
+
+    ./install_frontend_dependencies.sh
+    ./build_full_frontend.sh
+
+This first script uses sudo, make sure it is installed and configured.
+Alternatively, under root:
+
+    ./install_frontend_dependencies.sh root
+
+#### Run tests
+
+To run all the unit tests:
+
+    ./run_frontend_unit_test.sh
+
+To run the unit tests of a specific frontend app or of frontend_lib:
+
+    cd frontend_app_file # (or any frontend app)
+    npm run test
+    
+Note: to retrieve all frontend apps, run this command:
+
+    ls -d frontend*

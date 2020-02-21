@@ -5,8 +5,8 @@ import MoreInfo from '../../../src/component/Dashboard/MoreInfo.jsx'
 import sinon from 'sinon'
 
 describe('<MoreInfo />', () => {
-  const onClickToggleWebdavCallBack = sinon.stub()
-  const onClickToggleCalendarCallBack = sinon.stub()
+  const onClickToggleWebdavCallBack = sinon.spy()
+  const onClickToggleCalendarCallBack = sinon.spy()
 
   const props = {
     onClickToggleWebdav: onClickToggleWebdavCallBack,

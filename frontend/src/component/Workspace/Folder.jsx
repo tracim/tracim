@@ -148,19 +148,23 @@ class Folder extends React.Component {
                   onClickExtendedAction={{
                     edit: {
                       callback: e => props.onClickExtendedAction.edit(e, props.folderData),
-                      label: props.t('Edit')
+                      label: props.t('Edit'),
+                      allowedRoleId: ROLE.contentManager.id
                     },
                     download: {
                       callback: e => props.onClickExtendedAction.download(e, props.folderData),
-                      label: props.t('Download')
+                      label: props.t('Download'),
+                      allowedRoleId: ROLE.reader.id
                     },
                     archive: {
                       callback: e => props.onClickExtendedAction.archive(e, props.folderData),
-                      label: props.t('Archive')
+                      label: props.t('Archive'),
+                      allowedRoleId: ROLE.contentManager.id
                     },
                     delete: {
                       callback: e => props.onClickExtendedAction.delete(e, props.folderData),
-                      label: props.t('Delete')
+                      label: props.t('Delete'),
+                      allowedRoleId: ROLE.contentManager.id
                     }
                   }}
                   folderData={props.folderData}

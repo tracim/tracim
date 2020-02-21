@@ -7,7 +7,7 @@ import { user } from '../../hocMock/redux/user/user'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
 
 describe('<Home />', () => {
-  const renderAppPopupCreationCallBack = sinon.stub()
+  const renderAppPopupCreationCallBack = sinon.spy()
 
   const props = {
     user: user,

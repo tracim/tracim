@@ -5,7 +5,7 @@ import IconButton from '../../src/component/Button/IconButton.jsx'
 import sinon from 'sinon'
 
 describe('<IconButton />', () => {
-  const onClickCallBack = sinon.stub()
+  const onClickCallBack = sinon.spy()
 
   const props = {
     icon: 'test',

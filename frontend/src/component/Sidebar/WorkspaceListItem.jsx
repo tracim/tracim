@@ -42,7 +42,7 @@ class WorkspaceListItem extends React.Component {
     const isDropActive = props.canDrop && props.isOver
 
     if (isDropActive) {
-      const isDropAllowed = props.userRoleIdInWorkspace >= ROLE.contributor.id
+      const isDropAllowed = props.userRoleIdInWorkspace >= ROLE.contentManager.id
       const isDropAllowedOnWorkspaceRoot = props.draggedItem && (props.draggedItem.workspaceId !== props.workspaceId || props.draggedItem.parentId !== 0)
 
       if (isDropAllowed && isDropAllowedOnWorkspaceRoot) return <i className='fa fa-arrow-circle-down' />

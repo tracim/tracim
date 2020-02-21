@@ -5,8 +5,8 @@ import ArchiveDeleteContent from '../../src/component/OptionComponent/ArchiveDel
 import sinon from 'sinon'
 
 describe('<ArchiveDeleteContent />', () => {
-  const onClickDeleteBtnCallBack = sinon.stub()
-  const onClickArchiveBtnCallBack = sinon.stub()
+  const onClickDeleteBtnCallBack = sinon.spy()
+  const onClickArchiveBtnCallBack = sinon.spy()
 
   const props = {
     onClickDeleteBtn: onClickDeleteBtnCallBack,
