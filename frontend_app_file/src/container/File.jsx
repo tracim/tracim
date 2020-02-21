@@ -410,16 +410,16 @@ class File extends React.Component {
 
       var reader = new FileReader()
       reader.onload = e => {
-        this.setState({ newFilePreview: e.total > 0 ? e.target.result : FILE_PREVIEW_STATE.NO_FILE })
+        this.setState({ newFilePreview: e.total > 0 ? e.target.result : FILE_PREVIEW_STATE.NO_PREVIEW })
         const img = new Image()
         img.src = e.target.result
-        img.onerror = () => this.setState({ newFilePreview: FILE_PREVIEW_STATE.NO_FILE })
+        img.onerror = () => this.setState({ newFilePreview: FILE_PREVIEW_STATE.NO_PREVIEW })
       }
       reader.readAsDataURL(fileToSave)
     } else {
       this.setState({
         newFile: fileToSave,
-        newFilePreview: FILE_PREVIEW_STATE.NO_FILE
+        newFilePreview: FILE_PREVIEW_STATE.NO_PREVIEW
       })
     }
   }
