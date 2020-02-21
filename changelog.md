@@ -183,7 +183,7 @@ Archive button not more used in Tracim. All archive buttons is hide (#2347)
 
 ### Migration from <= 2.2.0 to 2.3.0
 
-- Only if you are using Docker: before starting Tracim, you need to delete files `tracim_web.ini`, `tracim_webdav.ini` and `tracim_caldav.ini` available in default folder `~/tracim/etc` (all files are created on startup)
+- Only if you are using Docker: before starting Tracim, you need to delete files `tracim_web.ini`, `tracim_webdav.ini` and `tracim_caldav.ini` available in the default folder `~/tracim/etc` (all files are created on startup)
 
 ### Known issues
 
