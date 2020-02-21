@@ -205,7 +205,7 @@ You can watch the tests running directly from a (graphical) web interface:
 
 #### Prerequisite for unit tests
 
-To run unit tests, you need to install frontend dependencies:
+To run unit tests, you need to install frontend dependencies and build the full frontend:
 
     ./install_frontend_dependencies.sh
     ./build_full_frontend.sh
