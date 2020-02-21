@@ -223,5 +223,9 @@ To run all the unit tests:
 
 To run the unit tests of a specific frontend app or of frontend_lib:
 
-    cd $FRONTEND_APP_FOLDER
+    cd frontend_app_file # (or any frontend app)
     npm run test
+    
+Note: to retrieve all frontend apps, run this command:
+
+    ls -d frontend*
