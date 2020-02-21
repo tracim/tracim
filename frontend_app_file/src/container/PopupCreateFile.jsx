@@ -198,11 +198,11 @@ class PopupCreateFile extends React.Component {
 
     this.setState({ uploadStarted: true })
 
-    Promise.all(state.fileToUploadList.map(async (file) =>
+    Promise.all(state.fileToUploadList.map((file) =>
       this.buildUploadedFileResponse(file)
     )).then(async uploadedFileResponseList => {
-      const fileUploadList = await Promise.all(uploadedFileResponseList.map(async (uploadedFileResponse) => this.handleFileUploadEnd(uploadedFileResponse.xhr, uploadedFileResponse.file)))
-      this.handleAllFileUploadEnd(fileUploadList)
+      const fileUploadListPromise = uploadedFileResponseList.map((fileResponse) => this.handleFileUploadEnd(fileResponse.xhr, fileResponse.file))
+      this.handleAllFileUploadEnd(await Promise.all(fileUploadListPromise))
     }).catch(() => {
       this.sendGlobalFlashMessage(props.t('Error while creating file'))
       this.handleClose(false)
