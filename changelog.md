@@ -176,11 +176,14 @@ Archive button not more used in Tracim. All archive buttons is hide (#2347)
 ### New Features (technical)
 
 - It's now possible to configure Tracim using environment variables ([Documentation here](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md#tracim-22-fully-supported-var))
-If you have used Tracim on Docker before this release, you need to delete this files `tracim_web.ini` `tracim_web.ini` `tracim_caldav.ini` available in this default folder `~/tracim/etc` before starting Tracim 2.3.0 (all files are created on startup)
 - New licence: combination of MIT, LGPLv3 and AGPLv3
 - Since 2.3 version, following services are automatically launched when Tracim start with docker:
   - Radicale (agenda)
   - WebDAV
+
+### Migration from <= 2.2.0 to 2.3.0
+
+- Docker: you need to delete this files `tracim_web.ini` `tracim_web.ini` `tracim_caldav.ini` available in this default folder `~/tracim/etc` before starting Tracim (all files are created on startup)
 
 ### Known issues
 
