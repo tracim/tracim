@@ -33,7 +33,12 @@ describe('Workspace', () => {
           .get('[data-cy="popup__createcontent__form__button"]').should('be.visible').click()
       }
 
-      it('should display the new workspaces properly', () => {
+      const getWorkspaceItemByName = (workspaceTitle) => (
+        cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"]`)
+          .parents('li.sidebar__content__navigation__workspace__item')
+      )
+
+      it('should display the new workspaces properly with the right workspace opened in the sidebar', () => {
         const workspaceTitle1 = 'second workspace'
         const workspaceTitle2 = 'third workspace'
 
@@ -42,10 +47,18 @@ describe('Workspace', () => {
           .get('[data-cy="dashboardWorkspaceLabel"]')
           .contains(workspaceTitle1)
 
+        getWorkspaceItemByName(workspaceTitle1)
+          .find('.sidebar__content__navigation__workspace__item__submenu')
+          .should('be.visible')
+
         createOneWorkspace(cy, workspaceTitle2)
           .get('.dashboard')
           .get('[data-cy="dashboardWorkspaceLabel"]')
           .contains(workspaceTitle2)
+
+        getWorkspaceItemByName(workspaceTitle2)
+          .find('.sidebar__content__navigation__workspace__item__submenu')
+          .should('be.visible')
       })
     })
   })
