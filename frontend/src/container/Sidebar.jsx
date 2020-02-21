@@ -86,65 +86,66 @@ export class Sidebar extends React.Component {
     if (!this.shouldDisplaySidebar(this.props)) return null
 
     return (
-      <div className={classnames('sidebar', { 'sidebarclose': sidebarClose })}>
-        <div className='sidebar__scrollview'>
-          <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
-            {sidebarClose
-              ? <i className={classnames('fa fa-chevron-right')} title={t('See sidebar')} />
-              : <i className={classnames('fa fa-chevron-left')} title={t('Hide sidebar')} />
-            }
-          </div>
-
-          {/*
-          FIXME - CH - 2019-04-04 - button scroll to top removed for now
-          see https://github.com/tracim/tracim/issues/1554
-          <div className='sidebar__scrollup' onClick={this.handleClickScrollUp}>
-            <i className='fa fa-chevron-up' />
-          </div>
-          */}
-
-          <div className='sidebar__content'>
-            <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
-
-            <nav className={classnames('sidebar__content__navigation', { 'sidebarclose': sidebarClose })}>
-              <ul className='sidebar__content__navigation__workspace'>
-                { workspaceList.map(ws =>
-                  <WorkspaceListItem
-                    workspaceId={ws.id}
-                    userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.user_id, ws.memberList, ROLE_LIST)}
-                    label={ws.label}
-                    allowedAppList={ws.sidebarEntry}
-                    activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
-                    isOpenInSidebar={ws.isOpenInSidebar}
-                    onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
-                    onClickAllContent={this.handleClickAllContent}
-                    key={ws.id}
-                  />
-                )}
-              </ul>
-            </nav>
-
-            {getUserProfile(user.profile).id >= PROFILE.manager.id &&
-              <div className='sidebar__content__btnnewworkspace'>
-                <button
-                  className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                  onClick={this.handleClickNewWorkspace}
-                  data-cy='sidebarCreateWorkspaceBtn'
-                >
-                  {t('Create a shared space')}
-                </button>
-              </div>
-            }
-          </div>
-
-          <div className='sidebar__footer mb-2'>
-            <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
-              {TRACIM_APP_VERSION}
+      <div className='sidebar'>
+        <div className={classnames('sidebar__expand', { 'sidebarclose': sidebarClose })} onClick={this.handleClickToggleSidebar}>
+          {sidebarClose
+            ? <i className={classnames('fa fa-chevron-right')} title={t('See sidebar')} />
+            : <i className={classnames('fa fa-chevron-left')} title={t('Hide sidebar')} />
+          }
+        </div>
+        <div className={classnames('sidebar__frame', { 'sidebarclose': sidebarClose })}>
+          <div className='sidebar__scrollview'>
+            {/*
+            FIXME - CH - 2019-04-04 - button scroll to top removed for now
+            see https://github.com/tracim/tracim/issues/1554
+            <div className='sidebar__scrollup' onClick={this.handleClickScrollUp}>
+              <i className='fa fa-chevron-up' />
             </div>
-            <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
-              Copyright - 2013 - 2020
-              <div className='sidebar__footer__text__link'>
-                <a href='https://www.algoo.fr/fr/tracim' target='_blank' className='ml-3'>tracim.fr</a>
+            */}
+
+            <div className='sidebar__content'>
+              <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
+
+              <nav className={classnames('sidebar__content__navigation', { 'sidebarclose': sidebarClose })}>
+                <ul className='sidebar__content__navigation__workspace'>
+                  { workspaceList.map(ws =>
+                    <WorkspaceListItem
+                      workspaceId={ws.id}
+                      userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.user_id, ws.memberList, ROLE_LIST)}
+                      label={ws.label}
+                      allowedAppList={ws.sidebarEntry}
+                      activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
+                      isOpenInSidebar={ws.isOpenInSidebar}
+                      onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
+                      onClickAllContent={this.handleClickAllContent}
+                      key={ws.id}
+                    />
+                  )}
+                </ul>
+              </nav>
+
+              {getUserProfile(user.profile).id >= PROFILE.manager.id &&
+                <div className='sidebar__content__btnnewworkspace'>
+                  <button
+                    className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+                    onClick={this.handleClickNewWorkspace}
+                    data-cy='sidebarCreateWorkspaceBtn'
+                  >
+                    {t('Create a shared space')}
+                  </button>
+                </div>
+              }
+            </div>
+
+            <div className='sidebar__footer mb-2'>
+              <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
+                {TRACIM_APP_VERSION}
+              </div>
+              <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
+                Copyright - 2013 - 2020
+                <div className='sidebar__footer__text__link'>
+                  <a href='https://www.algoo.fr/fr/tracim' target='_blank' className='ml-3'>tracim.fr</a>
+                </div>
               </div>
             </div>
           </div>
