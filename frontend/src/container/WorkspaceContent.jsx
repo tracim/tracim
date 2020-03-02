@@ -140,6 +140,7 @@ class WorkspaceContent extends React.Component {
     } else wsToLoad = props.match.params.idws
 
     this.loadAllWorkspaceContent(wsToLoad, true)
+    this.buildBreadcrumbs()
     this.loadWorkspaceDetail()
   }
 
@@ -169,6 +170,7 @@ class WorkspaceContent extends React.Component {
     if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
       this.setState({ workspaceIdInUrl: workspaceId })
       this.loadAllWorkspaceContent(workspaceId, false)
+      this.buildBreadcrumbs()
     }
   }
 
@@ -186,7 +188,6 @@ class WorkspaceContent extends React.Component {
       return false
     }
 
-    this.buildBreadcrumbs()
     if (shouldScrollToContent) this.scrollToActiveContent()
     return true
   }
@@ -300,6 +301,7 @@ class WorkspaceContent extends React.Component {
             props.dispatch(newFlashMessage(props.t('Content not found'), 'warning'))
             props.history.push(`/ui/workspaces/${workspaceId}/contents`)
             this.loadAllWorkspaceContent(workspaceId, false) // INFO - CH - 2019-08-27 - force reload data because, in this case, componentDidUpdate wont
+            this.buildBreadcrumbs()
             throw new Error(fetchContentList.json.message)
           // INFO - B.L - 2019.08.06 - workspace does not exists or forbidden
           case 1002:
