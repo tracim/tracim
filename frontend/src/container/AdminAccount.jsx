@@ -129,6 +129,9 @@ class Account extends React.Component {
       type: BREADCRUMBS_TYPE.CORE,
       notALink: true
     }, {
+      link: <Link to={PAGE.ADMIN.USER}>{props.t('Users')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
       link: (
         <Link to={PAGE.ADMIN.USER_EDIT(state.userToEdit.user_id)}>
           {state.userToEdit.public_name}
