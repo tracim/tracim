@@ -69,7 +69,11 @@ export class OpenContentApp extends React.Component {
     const { props } = this
     console.log('%c<OpenContentApp> did Update', 'color: #dcae84', this.props)
 
-    if (props.match && prevProps.match && (props.match.params.idws !== prevProps.match.params.idws || !props.match.params.idcts)) {
+    if (
+      props.match &&
+      prevProps.match &&
+      (props.match.params.idws !== prevProps.match.params.idws || (!props.match.params.idcts && prevProps.match.params.idcts))
+    ) {
       props.updateAppOpenedType(false)
       props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
     }
