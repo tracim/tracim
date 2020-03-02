@@ -190,9 +190,6 @@ describe('App Gallery', function () {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']:visible`)
         .click()
-      cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.gallery__action__button__lightbox`)
-        .should('be.visible')
     })
     it('should enable fullscreen when the fullscreen button is clicked', () => {
       cy.visitPage({
