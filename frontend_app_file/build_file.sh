@@ -32,7 +32,7 @@ fi
 
 log "creating debug file"
 cp src/debug.js.sample src/debug.js
-log "build frontend_app_file"
+log "building frontend_app_file"
 npm run build$dev$windoz  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/file.app.js ../frontend/dist/app && loggood "success" || logerror "some error"
