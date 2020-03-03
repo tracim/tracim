@@ -70,7 +70,7 @@ class WebdavTracimContext(TracimContext):
         try:
             if not self.environ["http_authenticator.username"]:
                 raise UserNotFoundInTracimRequest(
-                    "You request a current user " "but the context not permit to found one"
+                    "No current user has been found in the context"
                 )
         except UserNotFoundInTracimRequest as exc:
             raise NotAuthenticated("User not found") from exc
