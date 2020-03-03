@@ -28,7 +28,7 @@ except ImportError:  # python3.4
 if TYPE_CHECKING:
     from tracim_backend.lib.utils.request import TracimRequest
 ###
-# Pyramid default permission/authorization mecanism
+# Pyramid default permission/authorization mechanism
 
 # INFO - G.M - 12-04-2018 - Setiing a Default permission on view is
 #  needed to activate AuthentificationPolicy and
@@ -41,7 +41,7 @@ class AcceptAllAuthorizationPolicy(object):
     """
     Empty AuthorizationPolicy : Allow all request. As Pyramid need
     a Authorization policy when we use AuthentificationPolicy, this
-    class permit use to disable pyramid authorization mecanism with
+    class permit use to disable pyramid authorization mechanism with
     working a AuthentificationPolicy.
     """
 
@@ -298,7 +298,7 @@ can_delete_comment = OrAuthorizationChecker(
 # Authorization decorators for views
 
 # INFO - G.M - 12-04-2018
-# Instead of relying on pyramid authorization mecanism
+# Instead of relying on pyramid authorization mechanism
 # We prefer to use decorators
 
 

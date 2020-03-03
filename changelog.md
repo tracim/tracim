@@ -12,13 +12,13 @@
 
 # 2.6.0 /2020-02-06
 
-### New Feature
+### New Feature
 - Multi-upload file available in Tracim frontend (not only in public upload)
-- Page title show where you are in Tracim
-- It's now possible to delete user and anonymise their informations with tracimcli command
-- Preview generator now supports raw file and 3D file (working with xvfb in docker container)
-- With proxy apache: you can now use browser cache policy. If you used Tracim with Docker you need to backup and delete existing apache configuration file in `~/tracim/etc/` (default path with Tracim Docker image). On next startup, a new file will be created with the new parameters.
-- All apps are now enabled/disabled directly with one parameter and it's now easier to develop new app
+- The titles of the pages show where you are in Tracim
+- It is now possible to delete users and anonymise their data with the tracimcli command
+- The preview generator now supports raw and 3D files (works with Xvfb in a Docker container)
+- With Apache as a proxy, it is now possible to use the browser cache policy. If you used Tracim with Docker you need to backup and delete existing Apache configuration files in `~/tracim/etc/` (default path with Tracim Docker image). On the next startup, a new file will be created with the new parameters.
+- All apps are now directly enabled/disabled with one parameter and it is now easier to develop new apps.
 
 ### Fixed issues
 - Gallery: #2540, #2541, #2551, #2574, #2583 
@@ -135,7 +135,7 @@
 
 - Debian 9 is released with Firefox ESR v60.8.0. In this version, long title are not limited in upload file popup (issue #2062)
 - Opening file with special characters in label on CollaboraOnline/LibreofficeOnline is not possible (issue #2219)
-- Tracim not support lock mecanism in collaborative edition (issue #2073)
+- Tracim not support lock mechanism in collaborative edition (issue #2073)
 
 ### Other changes
 

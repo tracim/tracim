@@ -1,9 +1,9 @@
-# Running Tracim through Apache #
+# Using Apache as a proxy for Tracim #
 
 ### Installation ###
 
-Install `tracim` first.
-Install `Apache` server and uWSGI:
+Install Tracim first.
+Install the Apache server and uWSGI:
 
     sudo apt install apache2 libapache2-mod-wsgi-py3 uwsgi uwsgi-plugin-python3
 
@@ -69,7 +69,7 @@ Enable this configuration file:
 
     sudo ln -s /etc/apache2/sites-available/tracim.conf /etc/apache2/sites-enabled/tracim.conf
 
-#### Configuration uWSGI for tracim server
+#### Configuring uWSGI for the Tracim Server
 
 Create the file named `/etc/uwsgi/apps-available/tracim.ini` containing:
 
@@ -85,13 +85,13 @@ Create the file named `/etc/uwsgi/apps-available/tracim.ini` containing:
     #threads = 8
     logto = /var/log/uwsgi/uwsgi_tracim.log
 
-Replace `[TRACIM_PATH]` by your path of tracim configuration file
+Replace `[TRACIM_PATH]` by the path of your Tracim configuration file.
 
 Enable this configuration file:
 
     sudo ln -s /etc/uwsgi/apps-available/tracim.ini /etc/uwsgi/apps-enabled/tracim.ini
 
-#### Configuration uWSGI for tracim caldav
+#### Configuring uWSGI for the Tracim CalDAV App
 
 Create the file named `/etc/uwsgi/apps-available/tracim_caldav.ini` containing:
 
@@ -129,4 +129,4 @@ In case you have some permission problem, check if `www-data` can access to fold
 
 ## Documentation Links ##
 
-* [Apache](https://httpd.apache.org/docs/2.4/fr/)
+* [Apache](https://httpd.apache.org/docs/2.4/)

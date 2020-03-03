@@ -30,7 +30,7 @@ from tracim_backend.models.data import Workspace
 
 class TracimContext(ABC):
     """
-    Abstract class, Context of Tracim, neede for tracim authorization mecanism.
+    Abstract class, Context of Tracim, neede for tracim authorization mechanism.
     """
 
     def __init__(self) -> None:

@@ -37,11 +37,11 @@ If you want to use reply_by_email feature:
 
 If you don't want to use webdav (webdav is started by default):
 
-* START_WEBDAV=0 (to deactivate webdav in tracim)
+* START_WEBDAV=0 (to deactivate webdav in Tracim)
 
 If you don't want to use caldav (webdav is started by default):
 
-* START_CALDAV=0 (to deactivate agenda in tracim)
+* START_CALDAV=0 (to deactivate agenda in Tracim)
 
 If you want to use collaborative_document_edition feature:
 
@@ -59,14 +59,14 @@ If you want to use plugins and/or custom_toolbox you need to add files in `~/tra
 
 #### Updating index of ElasticSearch
 
-⚠ Prerequiste: elasticsearch is running and you have starting tracim with parameter to communicate with elasticsearch
+⚠ Prerequiste: elasticsearch is running and you have starting Tracim with parameter to communicate with elasticsearch
 
-To make an update of elasticsearch index you need to go inside you tracim container running:
+To make an update of elasticsearch index you need to go inside you Tracim container running:
 
         docker ps
         docker exec -it {CONTAINER ID} /bin/bash
 
-Now you are in your tracim container.
+Now you are in your Tracim container.
 
         cd /tracim/backend
         tracimcli search index-drop -c /etc/tracim/development.ini -d
@@ -77,13 +77,13 @@ When is finished, you can quit your container. Index is now updated with all of 
 
 #### Example commands
 
-Exemple with basic instance of tracim (local usage with webdav and caldav):
+Exemple with basic instance of Tracim (local usage with webdav and caldav):
 
         docker run -e DATABASE_TYPE=sqlite \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
-To run tracim container with MySQL or PostgreSQL, you must set environment ``DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME`` variable.
+To run the Tracim container with MySQL or PostgreSQL, you must set the ``DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME`` environment variables.
 
 Example with PostgreSQL:
 
@@ -92,20 +92,20 @@ Example with PostgreSQL:
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
-Example with MySQL
+Example with MySQL:
 
     docker run -e DATABASE_TYPE=mysql -e DATABASE_HOST=192.168.1.2 -e DATABASE_PORT=3306 \
                -e DATABASE_USER=tracim -e DATABASE_PASSWORD=tracim -e DATABASE_NAME=tracim \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
-Example with SQLite
+Example with SQLite:
 
     docker run -e DATABASE_TYPE=sqlite \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
-Exemple with SQlite, email_notification and some small instance personnalisation:
+Exemple with SQlite, email notifications and some small customisations:
 
     docker run -e DATABASE_TYPE=sqlite \
                -e TRACIM_EMAIL__NOTIFICATION__ACTIVATED=True \
@@ -118,9 +118,9 @@ Exemple with SQlite, email_notification and some small instance personnalisation
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
-With this exemple, tracim is now accessible on my network and I can send notification by email when content change.
+With this exemple, Tracim is now accessible on my network and I can send notification by email when content change.
 
-Exemple to use tracim with ElasticSearch: (you need to start elasticsearch first)
+Exemple to use Tracim with ElasticSearch: (you need to start elasticsearch first)
 
     docker run -e DATABASE_TYPE=sqlite \
                -e TRACIM_SEARCH__ENGINE=elasticsearch \
@@ -130,7 +130,7 @@ Exemple to use tracim with ElasticSearch: (you need to start elasticsearch first
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
-Exemple to use tracim with ElasticSearch-ingest: (you need to create your elasticsearch-ingest image first and start this image before tracim)
+Exemple to use Tracim with ElasticSearch-ingest: (you need to create your elasticsearch-ingest image first and start this image before Tracim)
 
     docker run -e DATABASE_TYPE=sqlite \
                -e TRACIM_SEARCH__ENGINE=elasticsearch \
@@ -141,7 +141,7 @@ Exemple to use tracim with ElasticSearch-ingest: (you need to create your elasti
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
-⚠ After execute one of these command, tracim will be available on your system on port 8080.
+⚠ After execute one of these command, Tracim will be reachable on your system on port 8080.
 
 ### Build images
 
