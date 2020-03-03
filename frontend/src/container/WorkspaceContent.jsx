@@ -140,7 +140,6 @@ class WorkspaceContent extends React.Component {
     } else wsToLoad = props.match.params.idws
 
     this.loadAllWorkspaceContent(wsToLoad, true)
-    this.buildBreadcrumbs()
     this.loadWorkspaceDetail()
   }
 
@@ -165,13 +164,19 @@ class WorkspaceContent extends React.Component {
       this.setHeadTitle(this.getFilterName(currentFilter))
     }
 
+    // INFO - GM - 2020/03/03 - hide opened app according to the current url
+    if (PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) === props.location.pathname && state.appOpenedType) {
+      props.dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(state.appOpenedType))
+      this.setState({ appOpenedType: false })
+      this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
+    }
+
     if (hasWorkspaceIdChanged) this.loadWorkspaceDetail()
 
     if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
       this.setState({ workspaceIdInUrl: workspaceId })
       this.loadAllWorkspaceContent(workspaceId, false)
-      this.buildBreadcrumbs()
-    }
+    } else if (!state.appOpenedType && prevState.appOpenedType) { this.buildBreadcrumbs() }
   }
 
   componentWillUnmount () {
@@ -188,6 +193,7 @@ class WorkspaceContent extends React.Component {
       return false
     }
 
+    this.buildBreadcrumbs()
     if (shouldScrollToContent) this.scrollToActiveContent()
     return true
   }
@@ -264,6 +270,9 @@ class WorkspaceContent extends React.Component {
       })
     }
 
+    // INFO - GM - 2020/03/03 - add file breadcrumbs link if it exists
+    if (props.breadcrumbs.length === 4 && state.appOpenedType) breadcrumbsList.push(props.breadcrumbs[3])
+
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
@@ -301,7 +310,6 @@ class WorkspaceContent extends React.Component {
             props.dispatch(newFlashMessage(props.t('Content not found'), 'warning'))
             props.history.push(`/ui/workspaces/${workspaceId}/contents`)
             this.loadAllWorkspaceContent(workspaceId, false) // INFO - CH - 2019-08-27 - force reload data because, in this case, componentDidUpdate wont
-            this.buildBreadcrumbs()
             throw new Error(fetchContentList.json.message)
           // INFO - B.L - 2019.08.06 - workspace does not exists or forbidden
           case 1002:
@@ -424,7 +432,8 @@ class WorkspaceContent extends React.Component {
     }
 
     props.dispatch(toggleFolderOpen(folderId))
-    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
+    props.history.push(props.location.pathname + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
+    this.buildBreadcrumbs()
 
     if (!props.workspaceContentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
@@ -599,7 +608,7 @@ class WorkspaceContent extends React.Component {
       }
     }))
 
-    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
+    props.history.push(props.location.pathname + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
   }
 
   filterWorkspaceContent = (contentList, filter) => filter.length === 0
