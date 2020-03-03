@@ -26,7 +26,7 @@ export class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      sidebarClose: false
+      sidebarClose: window.innerWidth < 575 // INFO - GM - 03/03/2020 - the value 575 is provided by Variable.styl in frontend_lib for max-xs
     }
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
