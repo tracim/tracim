@@ -32,7 +32,7 @@ class UploadForm extends React.Component {
     const { props } = this
 
     return (
-      <form className='guestupload__card__form'>
+      <form className='guestupload__card__form__container'>
         <div className='guestupload__card__form__left'>
           <InputGroupText
             parentClassName='guestupload__card__form__fullname'

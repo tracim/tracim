@@ -29,16 +29,16 @@
 .guestupload
   &__card
     &__form
-      display flex
-      flex-wrap wrap
-      width 100%
-      &__left
-        width 48%
+      &__container
+        display flex
+        flex-flow row
+      &__left, &__right
+        flex-grow 1
+        flex-basis 50%
       &__right
         display flex
         flex-flow column
-        margin-left 4%
-        width 48%
+        margin-left 20px
 
 .importConfirmation
   width 425px
@@ -59,9 +59,7 @@
   .guestupload
     &__card
       &__form
-        &__left
-          width 100%
+        &__container
+          flex-flow column
         &__right
           margin-left 0
-          margin-top 20px
-          width 100%
