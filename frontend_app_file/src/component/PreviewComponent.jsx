@@ -4,6 +4,7 @@ import { translate } from 'react-i18next'
 import Radium from 'radium'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
+import { IMG_LOAD_STATE } from '../helper'
 
 require('./PreviewComponent.styl')
 
@@ -12,7 +13,7 @@ export class PreviewComponent extends React.Component {
     super(props)
     this.state = {
       displayLightbox: false,
-      isJpegPreviewDisplayable: true
+      isJpegPreviewDisplayable: IMG_LOAD_STATE.LOADING
       // isPdfPageDisplayable: true,
       // isPdfFullDisplayable: true
     }
@@ -28,7 +29,7 @@ export class PreviewComponent extends React.Component {
     const { props, state } = this
 
     if (prevProps.previewUrl !== props.previewUrl && state.displayLightbox === false) {
-      this.setState({ isJpegPreviewDisplayable: true })
+      this.setState({ isJpegPreviewDisplayable: IMG_LOAD_STATE.LOADING })
       this.isJpegPreviewDisplayable()
     }
     // if (prevProps.downloadPdfPageUrl !== props.downloadPdfPageUrl) {
@@ -55,7 +56,8 @@ export class PreviewComponent extends React.Component {
     if (props.isJpegAvailable) {
       const img = document.createElement('img')
       img.src = props.previewUrl
-      img.onerror = () => this.setState({ isJpegPreviewDisplayable: false })
+      img.onerror = () => this.setState({ isJpegPreviewDisplayable: IMG_LOAD_STATE.ERROR })
+      img.onload = () => this.setState({ isJpegPreviewDisplayable: IMG_LOAD_STATE.LOADED })
     }
   }
 
@@ -85,7 +87,7 @@ export class PreviewComponent extends React.Component {
     return (
       <div className='previewcomponent'>
         <div className='previewcomponent__dloption'>
-          {state.isJpegPreviewDisplayable && props.isPdfAvailable && (
+          {state.isJpegPreviewDisplayable === IMG_LOAD_STATE.LOADED && props.isPdfAvailable && (
             <a
               className='previewcomponent__dloption__icon btn iconBtn'
               href={props.downloadPdfPageUrl}
@@ -99,7 +101,7 @@ export class PreviewComponent extends React.Component {
             </a>
           )}
 
-          {state.isJpegPreviewDisplayable && props.isPdfAvailable && (
+          {state.isJpegPreviewDisplayable === IMG_LOAD_STATE.LOADED && props.isPdfAvailable && (
             <a
               className='previewcomponent__dloption__icon btn iconBtn'
               href={props.downloadPdfFullUrl}
@@ -127,7 +129,7 @@ export class PreviewComponent extends React.Component {
         </div>
 
         <div className='previewcomponent__filepreview'>
-          {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
+          {state.isJpegPreviewDisplayable === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
             <button
               type='button'
               className='previewcomponent__icon btn iconBtn'
@@ -143,25 +145,38 @@ export class PreviewComponent extends React.Component {
 
           <div
             className={
-              classnames('previewcomponent__fileimg', { 'previewAvailable': state.isJpegPreviewDisplayable && props.isJpegAvailable })
+              classnames(
+                'previewcomponent__fileimg',
+                { 'previewAvailable': state.isJpegPreviewDisplayable === IMG_LOAD_STATE.LOADED && props.isJpegAvailable }
+              )
             }
-            onClick={state.isJpegPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
+            onClick={state.isJpegPreviewDisplayable === IMG_LOAD_STATE.LOADED && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
           >
-            {state.isJpegPreviewDisplayable && props.isJpegAvailable
+            {props.isJpegAvailable && state.isJpegPreviewDisplayable === IMG_LOAD_STATE.LOADED
               ? (
-                <img src={props.previewUrl} className='img-thumbnail mx-auto' />
+                <img src={props.previewUrl} className='img-thumbnail previewcomponent__fileimg__img' />
               )
               : (
-                <div className='filecontent__preview' drop='true'>
-                  <i className='filecontent__preview__nopreview-icon fa fa-eye-slash' style={{ color: props.color }} />
-                  <div className='filecontent__preview__nopreview-msg'>
-                    {props.t('No preview available')}
-                  </div>
+                <div className='previewcomponent__fileimg__text'>
+                  {props.isJpegAvailable && state.isJpegPreviewDisplayable === IMG_LOAD_STATE.LOADING
+                    ? (
+                      <div className='previewcomponent__fileimg__text-msg'>
+                        {props.t('Preview loading...')}
+                      </div>
+                    )
+                    : (
+                      <>
+                        <i className='previewcomponent__fileimg__text-icon fa fa-eye-slash' style={{ color: props.color }} />
+                        <div className='previewcomponent__fileimg__text-msg'>
+                          {props.t('No preview available')}
+                        </div>
+                      </>
+                    )}
                 </div>
               )
             }
 
-            {state.isJpegPreviewDisplayable && props.isJpegAvailable && state.displayLightbox
+            {state.isJpegPreviewDisplayable === IMG_LOAD_STATE.LOADED && props.isJpegAvailable && state.displayLightbox
               ? (
                 <Lightbox
                   prevSrc={props.lightboxUrlList[props.fileCurrentPage - 2]}
@@ -178,7 +193,7 @@ export class PreviewComponent extends React.Component {
             }
           </div>
 
-          {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
+          {state.isJpegPreviewDisplayable === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
             <button
               type='button'
               className='previewcomponent__icon btn iconBtn'
@@ -192,7 +207,7 @@ export class PreviewComponent extends React.Component {
             </button>
           )}
         </div>
-        {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
+        {state.isJpegPreviewDisplayable === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
           <div className='previewcomponent__pagecount'>
             {props.fileCurrentPage}{props.t(' of ')}{props.filePageNb}
           </div>

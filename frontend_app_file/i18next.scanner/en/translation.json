@@ -52,5 +52,6 @@
   "Some file(s) couldn't be uploaded": "Some file(s) couldn't be uploaded",
   "Files already uploaded:": "Files already uploaded:",
   "Upload files": "Upload files",
-  "New file": "New file"
+  "New file": "New file",
+  "Preview loading...": "Preview loading..."
 }
