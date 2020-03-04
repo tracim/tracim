@@ -33,7 +33,7 @@ describe('App File', () => {
 
   describe('Switching between 2 content type Files', () => {
     describe('While being in mode REVISION', () => {
-      it('should open app in VIEW mode', () => {
+      it('should open app in VIEW mode and update the breadcrumbs correctly', () => {
         cy.visitPage({
           pageName: p.CONTENT_OPEN,
           params: { workspaceId: workspaceId, contentType: 'file', contentId: secondContentId }
@@ -71,6 +71,16 @@ describe('App File', () => {
 
         cy.get('[data-cy="appFileLastVersionBtn"]')
           .should('be.not.visible')
+
+        cy.get(formatTag({selectorName: s.SIDEBAR_ARROW}))
+          .click()
+
+        cy.get('.breadcrumbs__item a')
+          .contains('All contents')
+          .click()
+
+        cy.get('[data-cy="popinFixed"]')
+          .should('not.be.visible')
       })
     })
   })
