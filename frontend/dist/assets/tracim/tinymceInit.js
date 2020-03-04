@@ -43,6 +43,8 @@
       menubar: false,
       resize: false,
       skin: 'lightgray',
+      relative_urls: false,
+      remove_script_host : false,
       plugins:'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
       toolbar: [
         'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
