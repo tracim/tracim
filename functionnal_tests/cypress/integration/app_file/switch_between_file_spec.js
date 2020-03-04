@@ -42,11 +42,22 @@ describe('App File', () => {
         cy.get('[data-cy="revision_data_2"]')
           .click()
 
+        cy.get('.breadcrumbs__item')
+          .its('length')
+          .should('eq', 4)
+
+        cy.get('.breadcrumbs__item a')
+          .contains(fileTitle_2)
+
         cy.get('[data-cy="appFileLastVersionBtn"]')
           .should('be.visible')
 
         cy.get('[data-cy="popinFixed__header__button__close"]')
           .click()
+
+        cy.get('.breadcrumbs__item')
+          .its('length')
+          .should('eq', 3)
 
         cy.get('[data-cy="popinFixed"]')
           .should('not.be.visible')
