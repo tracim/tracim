@@ -164,7 +164,7 @@ class WorkspaceContent extends React.Component {
       this.setHeadTitle(this.getFilterName(currentFilter))
     }
 
-    // INFO - GM - 2020/03/03 - hide opened app according to the current url
+    // INFO - GM - 2020/03/03 - hide opened app if the current url is /contents
     if (PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) === props.location.pathname && state.appOpenedType) {
       props.dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(state.appOpenedType))
       this.setState({ appOpenedType: false })
