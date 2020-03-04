@@ -433,7 +433,6 @@ class WorkspaceContent extends React.Component {
 
     props.dispatch(toggleFolderOpen(folderId))
     props.history.push(props.location.pathname + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
-    this.buildBreadcrumbs()
 
     if (!props.workspaceContentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
