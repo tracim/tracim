@@ -251,5 +251,15 @@ describe('App Gallery', function () {
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']`)
         .should('be.not.visible')
     })
+    it(`should no display the delete button if user don't have right to delete file`, () => {
+      cy.loginAs('users')
+      cy.visitPage({
+        pageName: PAGES.GALLERY,
+        params: { workspaceId }
+      })
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`[data-cy=gallery__action__button__delete]`)
+        .should('be.not.visible')
+    })
   })
 })
