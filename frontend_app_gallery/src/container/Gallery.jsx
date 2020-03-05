@@ -12,7 +12,8 @@ import {
   CardPopup,
   handleFetchResult,
   buildHeadTitle,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  ROLE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
 import {
@@ -535,17 +536,15 @@ export class Gallery extends React.Component {
                 <i className={'fa fa-fw fa-undo'} />
               </button>
 
-              {/*
-                INFO - CH - there is a bug with the property userRoleIdInWorkspace that comes from frontend, it might be it's default value which is 1
-                So we won't use it for now and always display the delete button which will return 401 if user can't delete content
-              */}
-              <button
-                className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__delete'
-                onClick={this.handleOpenDeleteFilePopup}
-                data-cy='gallery__action__button__delete'
-              >
-                <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className={'fa fa-fw fa-trash'} />
-              </button>
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
+                <button
+                  className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__delete'
+                  onClick={this.handleOpenDeleteFilePopup}
+                  data-cy='gallery__action__button__delete'
+                >
+                  <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className={'fa fa-fw fa-trash'} />
+                </button>
+              )}
             </div>
 
             {state.imagesPreviewsLoaded
@@ -555,7 +554,6 @@ export class Gallery extends React.Component {
                   slides={state.imagesPreviews}
                   onCarouselPositionChange={this.onCarouselPositionChange}
                   handleClickShowImageRaw={this.handleClickShowImageRaw}
-                  loggedUser={state.loggedUser}
                   disableAnimation={state.displayLightbox}
                   isWorkspaceRoot={state.folderId === 0}
                   autoPlay={state.autoPlay}
