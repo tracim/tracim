@@ -609,6 +609,7 @@ export class Gallery extends React.Component {
                           className='btn iconBtn'
                           onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
                           title={props.t('Rotate 90° left')}
+                          data-cy='gallery__action__button__lightbox__rotation__left'
                         >
                           <i className={'fa fa-fw fa-undo'} />
                         </button>
