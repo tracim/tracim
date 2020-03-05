@@ -117,8 +117,10 @@ class Login extends React.Component {
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
 
-  handleClickSubmit = async () => {
+  handleClickSubmit = async (event) => {
     const { props, state } = this
+
+    event.preventDefault()
 
     if (state.inputLogin.value === '' || state.inputPassword.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
@@ -286,7 +288,7 @@ class Login extends React.Component {
 
                 <div className='col-12 col-sm-6 d-flex align-items-end'>
                   <Button
-                    htmlType='button'
+                    htmlType='submit'
                     bootstrapType=''
                     customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__card__form__btnsubmit ml-auto'
                     label={props.t('Connection')}
