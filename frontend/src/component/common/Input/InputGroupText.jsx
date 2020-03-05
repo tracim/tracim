@@ -31,7 +31,7 @@ export default InputGroupText
 
 InputGroupText.propTypes = {
   parentClassName: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
   type: PropTypes.oneOf(['text', 'email', 'password', 'tel']).isRequired,
   customClass: PropTypes.string,
   icon: PropTypes.string,

@@ -256,10 +256,10 @@ class Login extends React.Component {
                 placeHolder={props.t('Email Address')}
                 invalidMsg={props.t('Invalid email')}
                 isInvalid={state.inputLogin.isInvalid}
-                value={state.inputLogin.value}
                 onChange={this.handleChangeLogin}
                 onKeyDown={this.handleInputKeyDown}
                 maxLength={512}
+                name='email'
               />
 
               <InputGroupText
