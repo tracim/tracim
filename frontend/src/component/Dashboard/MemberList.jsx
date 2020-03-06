@@ -46,9 +46,34 @@ export class MemberList extends React.Component {
             )
             : (
               <div>
+                {props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
+                  <div className='memberlist__btnadd' data-cy='memberlist__btnadd' onClick={props.onClickAddMemberBtn}>
+                    <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
+                      <div className='memberlist__btnadd__button__avatar'>
+                        <div className='memberlist__btnadd__button__avatar__icon'>
+                          <i className='fa fa-plus' />
+                        </div>
+                      </div>
+
+                      <div className='memberlist__btnadd__button__text'>
+                        {props.t('Add a member')}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <ul className={classnames('memberlist__list', { 'withAddBtn': props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
-                  {props.memberList.map(m =>
-                    <li className='memberlist__list__item  primaryColorBgLightenHover' key={m.id}>
+                  {props.memberList.map((m, index) =>
+                    <li
+                      className={
+                        classnames(
+                          'memberlist__list__item',
+                          'primaryColorBgLightenHover',
+                          { 'memberlist__list__item__last': props.memberList.length === index + 1 }
+                        )
+                      }
+                      key={m.id}
+                    >
                       <div className='memberlist__list__item__avatar'>
                         <Avatar publicName={m.publicName} />
                       </div>
@@ -74,22 +99,6 @@ export class MemberList extends React.Component {
                     </li>
                   )}
                 </ul>
-
-                {props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
-                  <div className='memberlist__btnadd' data-cy='memberlist__btnadd' onClick={props.onClickAddMemberBtn}>
-                    <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
-                      <div className='memberlist__btnadd__button__avatar'>
-                        <div className='memberlist__btnadd__button__avatar__icon'>
-                          <i className='fa fa-plus' />
-                        </div>
-                      </div>
-
-                      <div className='memberlist__btnadd__button__text'>
-                        {props.t('Add a member')}
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )
           }

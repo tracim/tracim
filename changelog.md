@@ -1,8 +1,9 @@
 
 
-# 2.6.1 /2020-02-21
+## 2.6.1 / 2020-02-21
 
 ### Fixed issues
+
 - Frontend: #2665, #2676, #2680, #2683
 - General UX: #1891
 - File app: #2669, #2674, #2676
@@ -10,9 +11,10 @@
 - Sidebar: #2665
 - Backend: #2592
 
-# 2.6.0 /2020-02-06
+## 2.6.0 / 2020-02-06
 
-### New Feature
+### New Features
+
 - Multi-upload file available in Tracim frontend (not only in public upload)
 - The titles of the pages show where you are in Tracim
 - It is now possible to delete users and anonymise their data with the tracimcli command
@@ -21,11 +23,13 @@
 - All apps are now directly enabled/disabled with one parameter and it is now easier to develop new apps.
 
 ### Fixed issues
+
 - Gallery: #2540, #2541, #2551, #2574, #2583 
 - Frontend: #1396, #1560, #1656, #2607, #2608, #2611, #2641
 - Backend: #2588, #2570, #2610, #2129, #1484, #2010
 
 ### Breaking/Important change
+
 - `agenda`, `share_content`, `upload_permission` and `collaborative_document_edition` are now Tracim's applications (stand alone and optional), you can add/remove them from `app.enabled` list
   - `caldav.enabled` is now deprecated and agenda is enabled by default. To disable it, uncomment `app.enabled` parameter and put each enabled apps but agenda.
   - `upload_permission` and  `share_content` are enabled by default. Before 2.6.0 theses apps couldn't be disabled. To disable them, uncomment `app.enabled` parameter and put each enabled apps but `upload_permission` and/or  `share_content`.
@@ -33,79 +37,89 @@
 - If you use `collaborative_document_edition` with Tracim on Docker, you need to add `-e collaborative_document_edition=1` when you start docker with `docker run` command. You can also add `collaborative_document_edition=1` in your docker-compose.yml file
 
 ### Other Changes
+
 - 2 deprecated ldap parameters: `ldap_base_url` and `ldap_base_dn` (they where not implemented in Tracim's backend code so using them had no impact)
 - 2 deprecated app parameters: `caldav.enabled` and `collaborative_document_edition.activated`
 
 
-# 2.5.1 / 2019-12-06
+## 2.5.1 / 2019-12-06
 
 ### New Features
+
 - Custom_toolbox feature is now available - beta
 
 ### Fixed issues
+
 - Email: #2565
 - Frontend: #2345
 - Backend: #2558
 
 
-# 2.5.0 / 2019-11-29
+## 2.5.0 / 2019-11-29
 
 ### New Features
+
 - Application gallery
 
 ### Fixed issues
+
 - Preview-generator: #2532
 - Backend: #2518, #2526
 
 ### Breaking change api
+
 - remove "size" parameter from create/update/get/get all workspaces endpoint
 
 
-# 2.4.5 / 2019-11-21
+## 2.4.5 / 2019-11-21
 
 ### New Features
+
 - Creation of multiple shared spaces with same name
 - Configure default profile of new users 
 - Space Limitations (experimental) - allow some controls on users allowed space, etc
 
 ### Fixed issues
+
 - General UX: #2494
 - Timeline: #2455
 - File App: #2501 
 - Backend & system: #2392, #2474, #2475, #2476, #2477, #2489, #2500, #2511
 
-
-# 2.4.4 / 2019-11-13
+## 2.4.4 / 2019-11-13
 
 ### New Features
 
 - Preview of 3D files (*.stl), videos (10 image per each video) are now available
 
 ### Fixed issues
+
 - Preview-generator: #2503, #2492
 
 ### Known issues
+
 - Manual modification to install Tracim on Ubuntu Trusty (14.04) is necessary (#2514)
 
 
-# 2.4.3 / 2019-09-26
+## 2.4.3 / 2019-09-26
 
 ### Fixed issues
+
 - Docker: #2445
 - Content Listing: extended action button not working correctly
 
 
-# 2.4.2 / 2019-09-24
+## 2.4.2 / 2019-09-24
 
 ### Fixed issues
 - Timeline: Missing css rule about word-break for comment
 
 
-# 2.4.1 / 2019-09-20
+## 2.4.1 / 2019-09-20
 
 ### Fixed issues
-- Migration issue introduced with 2.4.0
 
+- Migration issue introduced with 2.4.0
 
 ## 2.4.0 / 2019-09-19
 
@@ -129,7 +143,6 @@
 - Documentation: #2117, #2155
 - General: #1887, #1910, #1956, #1992, #2011, #2064, #2091, #2141, #2149
 - General UX: #573, #1198, #2076, #2092, #2096, #2121, #2159, #2237, #2299, #2395
-
 
 ### Known issues
 
@@ -181,7 +194,7 @@ Archive button not more used in Tracim. All archive buttons is hide (#2347)
   - Radicale (agenda)
   - WebDAV
 
-### Migration from <= 2.2.0 to 2.3.0
+### Migration from <= 2.2.0 to 2.3.0
 
 - Only if you are using Docker: before starting Tracim, you need to delete files `tracim_web.ini`, `tracim_webdav.ini` and `tracim_caldav.ini` available in the default folder `~/tracim/etc` (all files are created on startup)
 
