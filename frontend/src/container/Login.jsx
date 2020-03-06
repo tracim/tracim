@@ -268,6 +268,7 @@ class Login extends React.Component {
                 invalidMsg={props.t('Invalid password')}
                 isInvalid={state.inputPassword.isInvalid}
                 maxLength={512}
+                name='password'
               />
 
               <div className='row mt-4 mb-4'>
