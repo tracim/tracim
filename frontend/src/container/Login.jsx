@@ -43,14 +43,6 @@ class Login extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      inputLogin: {
-        value: '',
-        isInvalid: false
-      },
-      inputPassword: {
-        value: '',
-        isInvalid: false
-      },
       inputRememberMe: false
     }
 
@@ -107,8 +99,6 @@ class Login extends React.Component {
     }
   }
 
-  handleChangeLogin = e => this.setState({ inputLogin: { ...this.state.inputLogin, value: e.target.value } })
-  handleChangePassword = e => this.setState({ inputPassword: { ...this.state.inputPassword, value: e.target.value } })
   handleChangeRememberMe = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -236,7 +226,7 @@ class Login extends React.Component {
   }
 
   render () {
-    const { props, state } = this
+    const { props } = this
     if (props.user.logged) return <Redirect to={{ pathname: '/ui' }} />
 
     return (
@@ -266,7 +256,6 @@ class Login extends React.Component {
                 type='password'
                 placeHolder={props.t('Password')}
                 invalidMsg={props.t('Invalid password')}
-                isInvalid={state.inputPassword.isInvalid}
                 maxLength={512}
                 name='password'
               />
