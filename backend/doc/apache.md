@@ -1,4 +1,4 @@
-# Using Apache as a proxy for Tracim #
+# Using Apache as a Proxy for Tracim #
 
 ### Installation ###
 
