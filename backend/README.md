@@ -1,5 +1,5 @@
-tracim_backend
-==============
+The Tracim Backend
+==================
 
 Backend source code of Tracim v2, using Pyramid Framework.
 
@@ -8,7 +8,7 @@ Installation
 
 ### Distribution dependencies ###
 
-on Debian Stretch (9) with sudo:
+On Debian Stretch (9) with sudo:
 
     sudo apt update && sudo apt install \
     ghostscript \
@@ -32,12 +32,12 @@ on Debian Stretch (9) with sudo:
     zlib1g-dev \
     exiftool
 
-for better preview support:
+For better preview support:
 
     sudo apt install libreoffice # most office documents file and text format
     sudo apt install inkscape # for .svg files.
 
-### Get the source ###
+### Get the Source ###
 
 get source from github:
 
@@ -98,7 +98,7 @@ You need to create a color.json file at root of Tracim:
 
     cp ../color.json.sample ../color.json
 
-You should also create requested folder for running tracim:
+You should also create requested folder for running Tracim:
 
     mkdir sessions_data sessions_lock depot previews radicale_storage
 
@@ -202,7 +202,7 @@ in` development.ini.sample`
 :warning: By default, python warning are disabled. To enable warning please set
 `PYTHONWARNINGS` env var, for example `export PYTHONWARNINGS=default` .
 
-Run the tracim_backend web api:
+Run the Tracim backend web API:
 
     pserve development.ini
 
@@ -220,9 +220,9 @@ Running Tracim Backend Daemon
 Feature such as async email notification and email reply system need additional
 daemons to work correctly.
 
-### The Python way
+### The Python Way
 
-#### Run daemons
+#### Run Daemons
 
     # set tracim_conf_file path
     export TRACIM_CONF_PATH="$(pwd)/development.ini"
@@ -232,22 +232,22 @@ daemons to work correctly.
     # email fetcher (if email reply is enabled)
     python3 daemons/mail_fetcher.py &
 
-#### Stop daemons
+#### Stop Daemons
 
     # email notifier
     killall python3 daemons/mail_notifier.py
     # email fetcher
     killall python3 daemons/mail_fetcher.py
 
-### Using supervisor
+### Using Supervisor
 
-#### Install supervisor
+#### Install Supervisor
 
     sudo apt install supervisor
 
-#### Configure supervisord.conf file
+#### Setting up `supervisord.conf`
 
-Example of supervisord.conf file:
+Example of `supervisord.conf`:
 
     [supervisord]
     ; You need to replace <PATH> with correct absolute path
@@ -276,14 +276,14 @@ Run with (supervisord.conf should be provided, see [supervisord.conf default_pat
 
     supervisord
 
-## Run tests and others checks ##
+## Run Tests and Others Checks ##
 
-### Run tests ###
+### Run Tests ###
 
-Some directory are required to make tests functional, you can create them and do some other check
+Some directories are required to make tests functional, you can create them and do some other check
 with this script:
 
-    # in backend folder
+    # in the backend folder
     python3 ./setup_dev_env.py
 
 Before running some functional test related to email, you need a local working *MailHog*
@@ -316,7 +316,7 @@ Run your project's tests:
 
     pytest
 
-### Lints and others checks ###
+### Lints and Others Checks ###
 
 Run mypy checks:
 
@@ -334,7 +334,7 @@ Flake8 check(unused import, variable and many other checks):
 
     flake8 tracim_backend
 
-### About Pytest tests config ###
+### About Pytest Tests Config ###
 
 For running tests, Tracim tests need config to be set:
 - specific config for specific tests is
@@ -354,26 +354,41 @@ Order of usage is (from less to more important, last is used if set):
 - default env var setting in .test.env
 - env var set by user
 
-Tracim API
+The Tracim API
 ----------
 
-Tracim_backend give access to a REST API in */api/v2*.
+Tracim_backend gives access to a REST API in */api/v2*.
 This API is auto-documented with [Hapic](https://github.com/algoo/hapic).
 The specification is accessible when you run Tracim, go to */api/v2/doc* .
 
-For example, with default config:
+For example, with the default configuration:
 
     # run Tracim
     pserve development.ini
     # launch your favorite web-browser
     firefox http://localhost:6543/api/v2/doc/
 
-## Roles, profile and access rights
+## Roles, Profile and Access Rights
 
-In Tracim, only some user can access to some informations, this is also true in
-Tracim REST API. you can check the [roles documentation](doc/roles.md) to check
+In Tracim, only some users can access to some information, this is also true in
+the Tracim REST API. you can check the [roles documentation](doc/roles.md) to check
 what a specific user can do.
 
-# Known issues
+# Known Issues
 
 see [here](doc/known_issues.md)
+
+# Documentation
+- [apache.md](apache.md): Using Apache as a proxy for Tracim
+- [api.md](api.md): Using the Tracim API
+- [cli.md](cli.md): Controlling Tracim from the Command Line Using `tracimcli`
+- [database.md](database.md): Handling the Database (deprecated)
+- [devtools.md](devtools.md): Miscellaneous Information About the Developer Tools
+- [hello_world_plugin.py](hello_world_plugin.py): an hello world plugin
+- [i18n.md](i18n.md): Translating the Backend
+- [known_issues.md](known_issues.md): Known issues with the Tracim Backend
+- [migrate_from_v1.md](migrate_from_v1.md): Migrate from Tracim v1
+- [migration.md](migration.md): Performing Migrations
+- [roles.md](roles.md): Roles in Tracim
+- [setting.md](setting.md): Setting up Tracim
+- [webdav.md](webdav.md): Using WebDAV on Various Operating Systems

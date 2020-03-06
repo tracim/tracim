@@ -14,7 +14,7 @@ CALDAV_MANAGER_METHODS = ["DELETE", "MOVE"]
 
 
 class CaldavAuthorizationDeterminer(object):
-    # TODO - G.M - 2019-04-11 - Determiner mecanism is not nice anymore
+    # TODO - G.M - 2019-04-11 - Determiner mechanism is not nice anymore
     # see https://github.com/tracim/tracim/issues/1594
     def determine_requested_mode(self, request: "TracimRequest") -> DavAuthorization:
         if request.method in CALDAV_READ_METHODS:

@@ -1,6 +1,6 @@
-# This documentation is potentially deprecated (made for tracim_v1)
+# Handling the Database #
 
-# Database #
+Note: This documentation is potentially deprecated (made for Tracim v1)
 
 *Note: This page helps you setting up a **development** environment for `Tracim` and its ORM `SQLAlchemy` with `PostgreSQL` and `MySQL`. To set up a **production** environment, changing default database name, database user name and moreover its password is mandatory.*
 
@@ -108,11 +108,11 @@ You can now quit `MySQL` prompt:
 
 ## SQLAlchemy settings ##
 
-In the file `tracim/development.ini`, search the lines corresponding to the `SQLAlchemy` database url parameter `sqlalchemy.url`. `SQLite` is the default active database and others should be commented.
+In file `tracim/development.ini`, search the lines corresponding to the `SQLAlchemy` database url parameter `sqlalchemy.url`. `SQLite` is the default active database and others should be commented.
 
-If you're willing to choose `PostgreSQL` or `MySQL`, comment the `sqlalchemy.url` line corresponding to `SQLite` and uncomment the one of your choice.
+If you are willing to choose `PostgreSQL` or `MySQL`, comment the `sqlalchemy.url` line corresponding to `SQLite` and uncomment the one of your choice.
 
-For example with `PostgreSQL`, this should gives you:
+For instance, with `PostgreSQL`, this should give you:
 
     sqlalchemy.url = postgresql://tracimuser:tracimpassword@127.0.0.1:5432/tracimdb?client_encoding=utf8
     # sqlalchemy.url = mysql+pymysql://tracimuser:tracimpassword@127.0.0.1/tracimdb
@@ -124,10 +124,10 @@ Proceed as above for the file `tracim/tests.ini`, except that you need to reprod
 - [app:ldap]
 - [app:radicale]
 
-Again with `PostgreSQL`, this should gives you:
+Again with `PostgreSQL`, this should give you:
 
     sqlalchemy.url = postgresql://tracimuser:tracimpassword@127.0.0.1:5432/tracimdb_test?client_encoding=utf8
     # sqlalchemy.url = mysql+pymysql://tracimuser:tracimpassword@127.0.0.1/tracimdb_test
     # sqlalchemy.url = sqlite:///tracimdb_test.sqlite
 
-*Note: Do not copy the lines from the file `tracim/development.ini` to the file `tracim/tests.ini`, the database names aren't the same.*
+*Note: Do not copy the lines from the file `tracim/development.ini` to the file `tracim/tests.ini`, the database names are not the same.*

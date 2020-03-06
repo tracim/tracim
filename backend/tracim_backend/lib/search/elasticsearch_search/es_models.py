@@ -12,7 +12,7 @@ from elasticsearch_dsl import analyzer
 
 # INFO - G.M - 2019-05-31 - Analyzer/indexing explained:
 # Instead of relying of wildcard for autocompletion which is costly and make some feature doesn't
-# work correctly, for example ranking, We use ngram mecanism.
+# work correctly, for example ranking, We use ngram mechanism.
 # This means that for work "elephant", we will index thing like "ele", "elep", "lepha", etc...
 # As we don't want to have a *text* matching but only an autocomplete matching like text*, we use
 # edge_ngram, we will only index for "elephant": "ele" , "elep" , "eleph" , etc..

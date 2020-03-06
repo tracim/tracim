@@ -318,7 +318,7 @@ class WorkspaceApi(object):
         """
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
-        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event mechanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_created_workspace should start hook use by agenda app code.
 
         # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
@@ -357,7 +357,7 @@ class WorkspaceApi(object):
         """
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
-        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event mechanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_updated_workspace should start hook use by agenda app code.
 
         app_lib = ApplicationApi(app_list=app_list)

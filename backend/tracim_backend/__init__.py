@@ -144,7 +144,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.set_authentication_policy(authn_policy)
     # INFO - GM - 11-04-2018 - set default perm
     # setting default perm is needed to force authentification
-    # mecanism in all views.
+    # mechanism in all views.
     configurator.set_default_permission(TRACIM_DEFAULT_PERM)
     # Override default request
     configurator.set_request_factory(TracimRequest)
