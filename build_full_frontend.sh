@@ -46,71 +46,13 @@ cd $DEFAULTDIR/frontend_lib || exit 1
 log "building frontend_lib"
 npm run buildtracimlib$windoz && loggood "success" || logerror "some error"
 
+log "building applications"
+for appfolder in $DEFAULTDIR/frontend_app_*; do
+	log "cd $appfolder"
+	cd $appfolder || exit 1
+	./build_*.sh $dev
+done
 
-# app Html Document
-log "cd $DEFAULTDIR/frontend_app_html-document"
-cd $DEFAULTDIR/frontend_app_html-document || exit 1
-./build_html-document.sh $dev
-
-
-# app Thread
-log "cd $DEFAULTDIR/frontend_app_thread"
-cd $DEFAULTDIR/frontend_app_thread || exit 1
-./build_thread.sh $dev
-
-
-# app Workspace
-log "cd $DEFAULTDIR/frontend_app_workspace"
-cd $DEFAULTDIR/frontend_app_workspace || exit 1
-./build_workspace.sh $dev
-
-
-# app Workspace Advanced
-log "cd $DEFAULTDIR/frontend_app_workspace_advanced"
-cd $DEFAULTDIR/frontend_app_workspace_advanced || exit 1
-./build_workspace_advanced.sh $dev
-
-
-# app File
-log "cd $DEFAULTDIR/frontend_app_file"
-cd $DEFAULTDIR/frontend_app_file || exit 1
-./build_file.sh $dev
-
-
-# app Admin Workspace User
-log "cd $DEFAULTDIR/frontend_app_admin_workspace_user"
-cd $DEFAULTDIR/frontend_app_admin_workspace_user || exit 1
-./build_admin_workspace_user.sh $dev
-
-
-# app Folder Advanced
-log "cd $DEFAULTDIR/frontend_app_folder_advanced"
-cd $DEFAULTDIR/frontend_app_folder_advanced || exit 1
-./build_folder.sh $dev
-
-
-# app Share Folder Advanced
-log "cd $DEFAULTDIR/frontend_app_share_folder_advanced"
-cd $DEFAULTDIR/frontend_app_share_folder_advanced || exit 1
-./build_share_folder.sh $dev
-
-
-# app Calendar
-log "cd $DEFAULTDIR/frontend_app_agenda"
-cd $DEFAULTDIR/frontend_app_agenda || exit 1
-./build_agenda.sh $dev
-
-# app Gallery
-log "cd $DEFAULTDIR/frontend_app_gallery"
-cd $DEFAULTDIR/frontend_app_gallery || exit 1
-./build_gallery.sh $dev
-
-# app Collaborative document edition
-log "cd $DEFAULTDIR/frontend_app_collaborative_document_edition"
-cd $DEFAULTDIR/frontend_app_collaborative_document_edition || exit 1
-./build_app.sh $dev
-
-# build Tracimtracim
 log "building the frontend"
 log "cd $DEFAULTDIR/frontend"
 cd $DEFAULTDIR/frontend || exit 1
