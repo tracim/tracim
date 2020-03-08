@@ -43,7 +43,7 @@ mkdir -p $DEFAULTDIR/frontend/dist/app/ && loggood "success" || logerror "some e
 # Tracim Lib
 log "cd $DEFAULTDIR/frontend_lib"
 cd $DEFAULTDIR/frontend_lib || exit 1
-log "build frontend_lib"
+log "building frontend_lib"
 npm run buildtracimlib$windoz && loggood "success" || logerror "some error"
 
 
@@ -111,9 +111,9 @@ cd $DEFAULTDIR/frontend_app_collaborative_document_edition || exit 1
 ./build_app.sh $dev
 
 # build Tracimtracim
+log "building the frontend"
 log "cd $DEFAULTDIR/frontend"
 cd $DEFAULTDIR/frontend || exit 1
-log "build Tracim"
 npm run build && loggood "success" || logerror "some error"
 
 
