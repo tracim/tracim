@@ -174,7 +174,3 @@ setup_config_file
 create_require_dirs
 setup_db
 translate_email
-
-# Return to "$DEFAULTDIR/"
-log "cd $DEFAULTDIR"
-cd $DEFAULTDIR || exit 1
