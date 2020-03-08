@@ -35,19 +35,14 @@ DEFAULTDIR=$(pwd)
 export DEFAULTDIR
 echo "This is DEFAULTDIR \"$DEFAULTDIR\""
 
-# install npm and nodjs if not installed
-log "check whether npm is installed"
-npm -v
-if [ $? -eq 0 ]; then
-    loggood "npm \"$(npm -v)\" and node \"$(node -v)\" are installed"
-else
-    logerror "npm not installed"
+if ! npm -v > /dev/null; then
+    log "npm not installed"
     log "install npm with nodejs"
     $SUDO apt install -y curl && loggood "install curl success" || logerror "failed to install curl"
     curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
     $SUDO apt update
     $SUDO apt install -y nodejs && loggood "install nodejs success" || logerror "failed to install nodejs"
-    log "check whether nodejs 10.x is now installed"
+    log "verify if nodejs 10.x is now installed"
     dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s10.'
     if [ $? -eq 0 ]; then
         loggood "node \"$(node -v)\" is correctly installed"
@@ -64,25 +59,31 @@ else
     fi
 fi
 
-
-
-
-# install Tracim Lib
-log "cd $DEFAULTDIR/frontend_lib"
-cd $DEFAULTDIR/frontend_lib  || exit 1
-log "npm i"
+log "merging dependencies"
+python3 mergefrontenddeps.py || logerror "Unable to merge the frontend dependencies. Please fix any conflict."
+cd "$DEFAULTDIR/.frontend-apps-node-modules"
+log "installing dependencies"
+rm -f "node_modules/tracim_frontend_lib"
 npm i --loglevel warn && loggood "success" || logerror "some error"
-log "$USER npm link"
-$SUDO npm link && loggood "success" || logerror "some error"
+
+for project in "$DEFAULTDIR"/frontend_app_* "$DEFAULTDIR/frontend" "$DEFAULTDIR/frontend_lib"; do
+	if ! [ -L "$project/node_modules" ]; then
+		cd "$project"
+		rm -rf "node_modules" # If it is a regular directory
+		ln -s "../.frontend-apps-node-modules/node_modules"	 || exit 1
+	fi
+done
 
 
-# install Tracim Frontend
+# Link the frontend Lib
+if ! [ -e $DEFAULTDIR/.frontend-apps-node-modules/node_modules/tracim_frontend_lib ]; then
+	cd "$DEFAULTDIR/.frontend-apps-node-modules/node_modules/"
+	ln -s "../../frontend_lib" "tracim_frontend_lib"
+fi
+
+# Install the Tracim Frontend
 log "cd $DEFAULTDIR/frontend"
 cd $DEFAULTDIR/frontend  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
 log "check if configEnv.json exist"
 if [ ! -f configEnv.json ]; then
     log "cp configEnv.json.sample configEnv.json ..."
@@ -90,105 +91,6 @@ if [ ! -f configEnv.json ]; then
 else
     loggood "configEnv.json already exist"
 fi
-
-
-# install app Html Document
-log "cd $DEFAULTDIR/frontend_app_html-document"
-cd $DEFAULTDIR/frontend_app_html-document  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-
-# install app Thread
-log "cd $DEFAULTDIR/frontend_app_thread"
-cd $DEFAULTDIR/frontend_app_thread  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-
-# install app Workspace
-log "cd $DEFAULTDIR/frontend_app_workspace"
-cd $DEFAULTDIR/frontend_app_workspace  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-
-
-# install app workspace advanced
-log "cd $DEFAULTDIR/frontend_app_workspace_advanced"
-cd $DEFAULTDIR/frontend_app_workspace_advanced  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-
-# install app file
-log "cd $DEFAULTDIR/frontend_app_file"
-cd $DEFAULTDIR/frontend_app_file  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-
-# install app Admin Workspace User
-log "cd $DEFAULTDIR/frontend_app_admin_workspace_user"
-cd $DEFAULTDIR/frontend_app_admin_workspace_user  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-
-# install app Folder Advanced
-log "cd $DEFAULTDIR/frontend_app_folder_advanced"
-cd $DEFAULTDIR/frontend_app_folder_advanced  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-
-# install app Share Folder Advanced
-log "cd $DEFAULTDIR/frontend_app_share_folder_advanced"
-cd $DEFAULTDIR/frontend_app_share_folder_advanced  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-
-# install app Agenda
-log "cd $DEFAULTDIR/frontend_app_agenda"
-cd $DEFAULTDIR/frontend_app_agenda  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-# install app Gallery
-log "cd $DEFAULTDIR/frontend_app_gallery"
-cd $DEFAULTDIR/frontend_app_gallery  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-# install app Collaborative document edition
-log "cd $DEFAULTDIR/frontend_app_collaborative_document_edition"
-cd $DEFAULTDIR/frontend_app_collaborative_document_edition  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
 
 # Return to "$DEFAULTDIR/"
 log "cd $DEFAULTDIR"
