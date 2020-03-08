@@ -66,7 +66,7 @@
     "jsdom": "^15.1.1",
     "json-server": "^0.15.0",
     "mocha": "^6.1.4",
-    "nock": "^10.0.6",
+    "nock": "^11.7.2",
     "redux-mock-store": "^1.5.3",
     "sinon": "^7.4.1",
     "standard": "^12.0.1",
