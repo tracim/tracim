@@ -1,0 +1,15 @@
+{
+  "New folder": "Nova pasta",
+  "Validate and create": "Validar e criar",
+  "Folder's name": "Nome da pasta",
+  "Error while saving new folder": "Erro ao salvar a nova pasta",
+  "Allowed content type for this folder": "Tipo de conteúdo permitido para esta pasta",
+  "Error while loading folder details": "Erro ao carregar detalhes da pasta",
+  "Error while saving new available apps list": "Erro ao salvar a nova lista de aplicaçãos disponíveis",
+  "Create a folder": "Criar a pasta",
+  "Folder": "Pasta",
+  "Restore": "Restaurar",
+  "This folder is archived": "Esta pasta foi arquivada",
+  "This folder is deleted": "Esta pasta foi eliminada",
+  "Error while loading tracim's content type list": "Erro ao carregar a lista de tipos de conteúdo do tracim"
+}
