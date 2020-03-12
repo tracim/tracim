@@ -164,4 +164,10 @@ You can also build image with specific tag (This build is make just with necessa
 
 Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`
 
+By default, the Docker image is built from the main repository of Tracim. To clone Tracim from another repository, use the REPO argument. Don't forget to set a suitable image name.
+
+Ex: `docker build --build-arg REPO=~/repos/tracim/.git -t algoo/tracim:localrepo .`
+
+
+
 ⚠ **Its not possible to build image with ARG TAG and ARG BRANCH in same time.**
