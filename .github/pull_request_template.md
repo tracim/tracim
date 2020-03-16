@@ -15,6 +15,7 @@ If one or more of these checkpoints are out of scope, please write below why the
 **For developper**
 
 - [ ] Manual tests done to ensure stability on whole application layers, issue expectation follow
+- [ ] Original issue have been updated with a short resume of implemented solution
 
 **For quality team**
 
