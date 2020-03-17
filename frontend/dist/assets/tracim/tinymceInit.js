@@ -55,6 +55,7 @@
       content_style: 'div {height: 100%;}',
       setup: function ($editor) {
         $editor.on('init', function (e) {
+          // INFO - GM - 2020/03/17 - theses 3 lines enable autofocus at the end of the document
           $editor.focus()
           $editor.selection.select($editor.getBody(), true)
           $editor.selection.collapse(false)
