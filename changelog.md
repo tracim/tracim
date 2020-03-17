@@ -5,7 +5,7 @@
 ### Fixed issues
 
 - General UX: #1503, #1513, #2437, #2646
-- Frontend: #1294, #2692
+- Frontend: #1294, #2692, #2749
 - Documentation: #2739
 
 
