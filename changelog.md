@@ -1,5 +1,14 @@
 
 
+## 2.6.2 / 2020-02-20
+
+### Fixed issues
+
+- General UX: #1503, #1513, #2437, #2646
+- Frontend: #1294, #2692
+- Documentation: #2739
+
+
 ## 2.6.1 / 2020-02-21
 
 ### Fixed issues
@@ -10,6 +19,7 @@
 - Contents: #1342
 - Sidebar: #2665
 - Backend: #2592
+
 
 ## 2.6.0 / 2020-02-06
 
