@@ -28,7 +28,7 @@ describe('<Sidebar />', () => {
 
   const wrapper = shallow(
     <ComponentWithHOC {...props} />
-  ).dive() // INFO - GM - 2020-03-04 - Need to dive here because we can't use mount (Dnd problems)
+  ).dive() // INFO - GM - 2020-03-04 - Need to dive here because we can't use mount (React DnD issue, see: https://github.com/react-dnd/react-dnd/issues/1485)
 
   describe('static design', () => {
     it('should close the sidebar with a mobile (isMobile = true)', () => {
