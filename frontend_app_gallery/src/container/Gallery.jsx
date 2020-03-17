@@ -586,7 +586,7 @@ export class Gallery extends React.Component {
                     onAfterOpen={this.handleAfterOpenReactImageLightBox}
                     reactModalProps={{ parentSelector: () => this.reactImageLightBoxModalRoot }}
                     toolbarButtons={[
-                      <div className={'gallery__action__button__lightbox'}>
+                      (
                         <button
                           className='btn iconBtn'
                           onClick={() => this.onClickSlickPlay(!state.autoPlay)}
@@ -595,7 +595,7 @@ export class Gallery extends React.Component {
                         >
                           <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
                         </button>
-
+                      ), (
                         <button
                           className='btn iconBtn'
                           onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))}
@@ -604,15 +604,16 @@ export class Gallery extends React.Component {
                         >
                           <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
                         </button>
-
+                      ), (
                         <button
-                          className='btn iconBtn gallery__action__button__lightbox__rotation__left'
+                          className='btn iconBtn'
                           onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
                           title={props.t('Rotate 90° left')}
+                          data-cy='gallery__action__button__lightbox__rotation__left'
                         >
                           <i className={'fa fa-fw fa-undo'} />
                         </button>
-
+                      ), (
                         <button
                           className='btn iconBtn gallery__action__button__lightbox__rotation__right'
                           onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
@@ -620,7 +621,7 @@ export class Gallery extends React.Component {
                         >
                           <i className={'fa fa-fw fa-undo'} />
                         </button>
-
+                      ), (
                         <a
                           className='btn iconBtn gallery__action__button__lightbox__openRawContent'
                           title={props.t('Open raw file')}
@@ -629,7 +630,7 @@ export class Gallery extends React.Component {
                         >
                           <i className={'fa fa-fw fa-download'} />
                         </a>
-                      </div>
+                      )
                     ]}
                   />
                 </div>

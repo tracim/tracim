@@ -190,9 +190,6 @@ describe('App Gallery', function () {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']:visible`)
         .click()
-      cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.gallery__action__button__lightbox`)
-        .should('be.visible')
     })
     it('should enable fullscreen when the fullscreen button is clicked', () => {
       cy.visitPage({
@@ -226,6 +223,32 @@ describe('App Gallery', function () {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.ril-prev-button.ril__navButtons`)
         .should('be.not.visible')
+    })
+    it('should be responsive on mobile', () => {
+      cy.visitPage({
+        pageName: PAGES.GALLERY,
+        params: { workspaceId }
+      })
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']:visible`)
+        .click()
+      cy.viewport('iphone-4') // INFO - GM - 2020/03/05 - 320x480, smallest common screen which is used these days (Iphone SE)
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`[data-cy=gallery__action__button__lightbox__auto__play]`)
+        .should('be.visible')
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`[data-cy=gallery__action__button__lightbox__fullscreen]`)
+        .should('be.visible')
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`.gallery__action__button__lightbox__rotation__right`)
+        .should('be.visible')
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`[data-cy=gallery__action__button__lightbox__rotation__left]`)
+        .should('be.visible')
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`.gallery__action__button__lightbox__openRawContent`)
+        .should('be.visible')
+
     })
   })
 
