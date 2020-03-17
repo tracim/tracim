@@ -30,7 +30,7 @@ if [[ $1 = "-d" || $2 = "-d" ]]; then
     dev="-dev"
 fi
 
-log "build frontend_app_agenda"
+log "building frontend_app_agenda"
 npm run build$dev$windoz  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/agenda.app.js ../frontend/dist/app  && loggood "success" || logerror "some error"

@@ -214,7 +214,7 @@ export class Account extends React.Component {
     }
   }
 
-  handleChangeTimezone = newTimezone => console.log('(NYI) new timezone : ', newTimezone)
+  handleChangeTimezone = newTimezone => console.log('(NYI) new timezone: ', newTimezone)
 
   setHeadTitle = () => {
     const { props } = this
