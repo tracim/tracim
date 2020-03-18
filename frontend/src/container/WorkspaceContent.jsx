@@ -176,7 +176,7 @@ class WorkspaceContent extends React.Component {
     if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
       this.setState({ workspaceIdInUrl: workspaceId })
       this.loadAllWorkspaceContent(workspaceId, false)
-    } else if (!state.appOpenedType && prevState.appOpenedType) { this.buildBreadcrumbs() }
+    } else if (!state.appOpenedType && prevState.appOpenedType) this.buildBreadcrumbs()
   }
 
   componentWillUnmount () {
@@ -271,7 +271,7 @@ class WorkspaceContent extends React.Component {
     }
 
     // INFO - GM - 2020/03/03 - add file breadcrumbs link if it exists
-    if (props.breadcrumbs.length === 4 && state.appOpenedType) breadcrumbsList.push(props.breadcrumbs[3])
+    if (props.breadcrumbs.length === breadcrumbsList.length + 1 && state.appOpenedType) breadcrumbsList.push(props.breadcrumbs[props.breadcrumbs.length - 1])
 
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
