@@ -58,7 +58,7 @@ describe('<PreviewComponent />', () => {
         expect(wrapper.find('img.previewcomponent__fileimg__img').prop('src')).to.equal(props.previewUrl)
       )
 
-      it('should display the 3 pdf dlbuttons if pdf are available', () => {
+      it('should display the 3 pdf download buttons if pdf is available', () => {
         wrapper.setProps({ isPdfAvailable: true })
         expect(wrapper.find('.previewcomponent__dloption__icon')).to.have.lengthOf(3)
         wrapper.setProps({ isPdfAvailable: props.isPdfAvailable })
