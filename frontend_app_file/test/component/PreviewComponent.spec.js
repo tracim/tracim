@@ -27,7 +27,7 @@ describe('<PreviewComponent />', () => {
   describe('static design', () => {
     describe('when the image is available but not loaded yet to be able to know if it is displayable', () => {
       before(() =>
-        wrapper.setState({ jpegPreviewDisplayable: IMG_LOAD_STATE.LOADING })
+        wrapper.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.LOADING })
       )
 
       it('should display the loading message', () =>
@@ -41,7 +41,7 @@ describe('<PreviewComponent />', () => {
 
     describe('when the image is available but not displayable', () => {
       before(() =>
-        wrapper.setState({ jpegPreviewDisplayable: IMG_LOAD_STATE.ERROR })
+        wrapper.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.ERROR })
       )
 
       it('should display the noPreview message', () =>
@@ -51,7 +51,7 @@ describe('<PreviewComponent />', () => {
 
     describe('when the image is available and displayable', () => {
       before(() =>
-        wrapper.setState({ jpegPreviewDisplayable: IMG_LOAD_STATE.LOADED })
+        wrapper.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.LOADED })
       )
 
       it('should display the preview in `img` html tag', () =>
