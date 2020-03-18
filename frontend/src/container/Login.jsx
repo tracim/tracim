@@ -266,7 +266,7 @@ class Login extends React.Component {
                     className='loginpage__card__form__pwforgot'
                     onClick={this.handleClickForgotPassword}
                   >
-                    {props.t('Forgotten password ?')}
+                    {props.t('Forgotten password?')}
                   </div>
                 </div>
 
