@@ -37,6 +37,7 @@ html_folding = analyzer(
     filter=["lowercase", "asciifolding", edge_ngram_token_filter],
     char_filter="html_strip",
 )
+html_exact_folding = analyzer("html_exact_folding", tokenizer="standard", char_filter="html_strip",)
 
 
 class DigestUser(InnerDoc):
@@ -52,7 +53,7 @@ class DigestWorkspace(InnerDoc):
 class DigestContent(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
-    label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
+    label = Text(fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding)
     slug = Keyword()
     content_type = Keyword()
 
@@ -60,7 +61,11 @@ class DigestContent(InnerDoc):
 class DigestComments(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
-    raw_content = Text(analyzer=html_folding, search_analyzer=folding)
+    raw_content = Text(
+        fields={"exact": Text(analyzer=html_exact_folding)},
+        analyzer=html_folding,
+        search_analyzer=folding,
+    )
 
 
 class IndexedContent(Document):
@@ -70,11 +75,10 @@ class IndexedContent(Document):
     """
 
     content_id = Integer()
-    # INFO - G.M - 2019-07-17 - as acp_label store ngram of limited size, we do need
-    # to store both acp_label and label to handle autocomplete up to max_gram of acp_label analyzer
+    # INFO - G.M - 2019-07-17 - as label store ngram of limited size, we do need
+    # to store both label and label.exact to handle autocomplete up to max_gram of label analyzer
     # but also support for exact naming for any size of label.
-    label = Keyword()
-    acp_label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
+    label = Text(fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding)
     slug = Keyword()
     content_type = Keyword()
 
@@ -98,12 +102,20 @@ class IndexedContent(Document):
     is_editable = Boolean()
     is_active = Boolean()
     show_in_ui = Boolean()
-    file_extension = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
-    filename = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
+    file_extension = Text(
+        fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+    )
+    filename = Text(
+        fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+    )
     modified = Date()
     created = Date()
     current_revision_id = Integer()
-    raw_content = Text(analyzer=html_folding, search_analyzer=folding)
+    raw_content = Text(
+        fields={"exact": Text(analyzer=html_exact_folding)},
+        analyzer=html_folding,
+        search_analyzer=folding,
+    )
     # INFO - G.M - 2019-05-31 - file is needed to store file content b64 value,
     # information about content are stored in the "file_data" fields not defined
     # in this mapping
