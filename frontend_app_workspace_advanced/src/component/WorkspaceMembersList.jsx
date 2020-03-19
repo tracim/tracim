@@ -5,7 +5,7 @@ import {
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
-const WorkspaceMembersList = props => {
+export const WorkspaceMembersList = props => {
   return (
     <div className='formBlock workspace_advanced__userlist'>
       {props.displayFormNewMember === false && (
