@@ -14,6 +14,23 @@ const WorkspaceMembersList = props => {
             {props.t('Members list')}
           </div>
 
+          <div
+            className='formBlock__bottom workspace_advanced__userlist__adduser'
+            onClick={props.onClickToggleFormNewMember}
+          >
+            <div className='workspace_advanced__userlist__adduser__button primaryColorFontHover primaryColorBorderHover'>
+              <div className='workspace_advanced__userlist__adduser__button__avatar'>
+                <div className='workspace_advanced__userlist__adduser__button__avatar__icon'>
+                  <i className='fa fa-plus' />
+                </div>
+              </div>
+
+              <div className='workspace_advanced__userlist__adduser__button__text'>
+                {props.t('Add a member')}
+              </div>
+            </div>
+          </div>
+
           <ul className='formBlock__field workspace_advanced__userlist__list'>
             {props.memberList && props.memberList.filter(m => m.user).map(m =>
               <li className='workspace_advanced__userlist__list__item' key={`member_${m.user_id}`}>
@@ -81,23 +98,6 @@ const WorkspaceMembersList = props => {
               </li>
             )}
           </ul>
-
-          <div
-            className='formBlock__bottom workspace_advanced__userlist__adduser'
-            onClick={props.onClickToggleFormNewMember}
-          >
-            <div className='workspace_advanced__userlist__adduser__button primaryColorFontHover primaryColorBorderHover'>
-              <div className='workspace_advanced__userlist__adduser__button__avatar'>
-                <div className='workspace_advanced__userlist__adduser__button__avatar__icon'>
-                  <i className='fa fa-plus' />
-                </div>
-              </div>
-
-              <div className='workspace_advanced__userlist__adduser__button__text'>
-                {props.t('Add a member')}
-              </div>
-            </div>
-          </div>
         </div>
       )}
 
