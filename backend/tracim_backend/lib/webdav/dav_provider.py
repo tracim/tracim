@@ -69,9 +69,7 @@ class WebdavTracimContext(TracimContext):
     def _get_current_user_email(self) -> str:
         try:
             if not self.environ["http_authenticator.username"]:
-                raise UserNotFoundInTracimRequest(
-                    "You request a current user " "but the context not permit to found one"
-                )
+                raise UserNotFoundInTracimRequest("No current user has been found in the context")
         except UserNotFoundInTracimRequest as exc:
             raise NotAuthenticated("User not found") from exc
         return self.environ["http_authenticator.username"]
@@ -84,7 +82,7 @@ class WebdavTracimContext(TracimContext):
         current_workspace will be 3.
         """
         return self._generate_if_none(
-            self._current_workspace, self._get_workspace, self._get_current_workspace_label
+            self._current_workspace, self._get_workspace, self._get_current_workspace_label,
         )
 
     def _get_workspace(self, workspace_id_fetcher):
@@ -116,7 +114,7 @@ class WebdavTracimContext(TracimContext):
         splited_local_path = content_path.strip("/").split("/")
         workspace_name = webdav_convert_file_name_to_bdd(splited_local_path[0])
         wapi = WorkspaceApi(
-            current_user=self.current_user, session=self.dbsession, config=self.app_config
+            current_user=self.current_user, session=self.dbsession, config=self.app_config,
         )
         workspace = wapi.get_one_by_label(workspace_name)
         parents = []
@@ -125,7 +123,7 @@ class WebdavTracimContext(TracimContext):
             parents = [webdav_convert_file_name_to_bdd(x) for x in parent_string]
 
         content_api = ContentApi(
-            config=self.app_config, current_user=self.current_user, session=self.dbsession
+            config=self.app_config, current_user=self.current_user, session=self.dbsession,
         )
         return content_api.get_one_by_filename_and_parent_labels(
             content_label=webdav_convert_file_name_to_bdd(basename(path)),
@@ -156,7 +154,7 @@ class WebdavTracimContext(TracimContext):
     @property
     def candidate_workspace(self) -> Workspace:
         return self._generate_if_none(
-            self._candidate_workspace, self._get_workspace, self._get_candidate_workspace_path
+            self._candidate_workspace, self._get_workspace, self._get_candidate_workspace_path,
         )
 
     def reduce_path(self, path: str) -> str:
@@ -282,11 +280,11 @@ class Provider(DAVProvider):
             )
         elif content.type == content_type_list.File.slug:
             return resources.FileResource(
-                path=path, environ=environ, content=content, tracim_context=tracim_context
+                path=path, environ=environ, content=content, tracim_context=tracim_context,
             )
         else:
             return resources.OtherFileResource(
-                path=path, environ=environ, content=content, tracim_context=tracim_context
+                path=path, environ=environ, content=content, tracim_context=tracim_context,
             )
 
     def exists(self, path, environ) -> bool:

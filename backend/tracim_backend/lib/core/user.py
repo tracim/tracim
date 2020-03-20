@@ -428,16 +428,16 @@ class UserApi(object):
         """
         try:
             if not self._config.REMOTE_USER_HEADER:
-                raise RemoteUserAuthDisabled("Remote User Auth mecanism disabled")
+                raise RemoteUserAuthDisabled("Remote User Auth mechanism disabled")
             return self._remote_authenticate(email)
         except AuthenticationFailed as exc:
             raise exc
         except WrongAuthTypeForUser as exc:
-            raise AuthenticationFailed("Auth mecanism for this user is not activated") from exc
+            raise AuthenticationFailed("Auth mechanism for this user is not activated") from exc
 
     def _remote_authenticate(self, email: str):
         """
-        Authenticate user with email given using remote mecanism,
+        Authenticate user with email given using remote mechanism,
         raise AuthenticationFailed if uncorrect.
         :param email: email of the user
         :return: User who was authenticated.
@@ -469,7 +469,7 @@ class UserApi(object):
         :return: User who was authenticated.
         """
         user_auth_type_not_available = AuthenticationFailed(
-            "Auth mecanism for this user is not activated"
+            "Auth mechanism for this user is not activated"
         )
         for auth_type in self._config.AUTH_TYPES:
             try:
@@ -887,7 +887,7 @@ class UserApi(object):
         user.ensure_auth_token(validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY)
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
-        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event mechanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_updated_user should start hook use by agenda  app code.
 
         app_lib = ApplicationApi(app_list=app_list)
@@ -919,7 +919,7 @@ class UserApi(object):
         user.ensure_auth_token(validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY)
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
-        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event mechanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_created_user should start hook use by agenda  app code.
 
         app_lib = ApplicationApi(app_list=app_list)

@@ -63,10 +63,10 @@ class FakeFileStream(object):
         :param content:
         :param parent:
         """
-        # TODO - G.M - 2019-06-13 - use true streaming mecanism,
-        # instead of a true streaming mecanism we use
+        # TODO - G.M - 2019-06-13 - use true streaming mechanism,
+        # instead of a true streaming mechanism we use
         # a temporary file to avoid big file in memory without needing to refactor all
-        # upload mecanism of webdav
+        # upload mechanism of WebDAV
         # see https://github.com/tracim/tracim/issues/1911
         self.temp_file = tempfile.NamedTemporaryFile(suffix="tracim_webdav_upload_")
         self._session = session

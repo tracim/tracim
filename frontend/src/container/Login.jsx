@@ -43,14 +43,6 @@ class Login extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      inputLogin: {
-        value: '',
-        isInvalid: false
-      },
-      inputPassword: {
-        value: '',
-        isInvalid: false
-      },
       inputRememberMe: false
     }
 
@@ -107,25 +99,25 @@ class Login extends React.Component {
     }
   }
 
-  handleChangeLogin = e => this.setState({ inputLogin: { ...this.state.inputLogin, value: e.target.value } })
-  handleChangePassword = e => this.setState({ inputPassword: { ...this.state.inputPassword, value: e.target.value } })
   handleChangeRememberMe = e => {
     e.preventDefault()
     e.stopPropagation()
     this.setState(prev => ({ inputRememberMe: !prev.inputRememberMe }))
   }
 
-  handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
-
-  handleClickSubmit = async () => {
+  handleClickSubmit = async (event) => {
     const { props, state } = this
 
-    if (state.inputLogin.value === '' || state.inputPassword.value === '') {
+    event.preventDefault()
+
+    const { email, password } = event.target
+
+    if (email.value === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
       return
     }
 
-    const fetchPostUserLogin = await props.dispatch(postUserLogin(state.inputLogin.value, state.inputPassword.value, state.inputRememberMe))
+    const fetchPostUserLogin = await props.dispatch(postUserLogin(email.value, password.value, state.inputRememberMe))
 
     switch (fetchPostUserLogin.status) {
       case 200:
@@ -234,7 +226,7 @@ class Login extends React.Component {
   }
 
   render () {
-    const { props, state } = this
+    const { props } = this
     if (props.user.logged) return <Redirect to={{ pathname: '/ui' }} />
 
     return (
@@ -245,7 +237,7 @@ class Login extends React.Component {
           </CardHeader>
 
           <CardBody formClass='loginpage__card__form'>
-            <form>
+            <form onSubmit={this.handleClickSubmit}>
               <InputGroupText
                 parentClassName='loginpage__card__form__groupemail'
                 customClass='mb-3 mt-4'
@@ -253,11 +245,8 @@ class Login extends React.Component {
                 type='email'
                 placeHolder={props.t('Email Address')}
                 invalidMsg={props.t('Invalid email')}
-                isInvalid={state.inputLogin.isInvalid}
-                value={state.inputLogin.value}
-                onChange={this.handleChangeLogin}
-                onKeyDown={this.handleInputKeyDown}
                 maxLength={512}
+                name='email'
               />
 
               <InputGroupText
@@ -267,11 +256,8 @@ class Login extends React.Component {
                 type='password'
                 placeHolder={props.t('Password')}
                 invalidMsg={props.t('Invalid password')}
-                isInvalid={state.inputPassword.isInvalid}
-                value={state.inputPassword.value}
-                onChange={this.handleChangePassword}
-                onKeyDown={this.handleInputKeyDown}
                 maxLength={512}
+                name='password'
               />
 
               <div className='row mt-4 mb-4'>
@@ -280,17 +266,16 @@ class Login extends React.Component {
                     className='loginpage__card__form__pwforgot'
                     onClick={this.handleClickForgotPassword}
                   >
-                    {props.t('Forgotten password ?')}
+                    {props.t('Forgotten password?')}
                   </div>
                 </div>
 
                 <div className='col-12 col-sm-6 d-flex align-items-end'>
                   <Button
-                    htmlType='button'
+                    htmlType='submit'
                     bootstrapType=''
                     customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__card__form__btnsubmit ml-auto'
                     label={props.t('Connection')}
-                    onClick={this.handleClickSubmit}
                   />
                 </div>
               </div>

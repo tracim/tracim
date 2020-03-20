@@ -1,18 +1,18 @@
-# Settings #
+# Setting up Tracim #
 
-## Parameters names
+## Parameters Names
 
-Most setting in Tracim are configurable by both config ini file and env var.
+Most settings in Tracim are configurable using both the INI configuration file and environment variables.
 
-### Tracim 2.2 fully supported var:
+### Tracim 2.2 fully supported variables:
 
-You can set those params in ini config file (see `config_file_name`) or
+You can set those parameters in INI configuration file (see `config_file_name`) or
 environnement variable (see `env_var_name`).
 
-Priority order is (from less to most priority):
-- default value
+The priority order is (from less to more priority):
+- default values
 - configuration file
-- environnement variable
+- environnement variables
 
 |<env_var_name>|<config_file_name>|<config_name>|
 |--------------|------------------|-------------|
@@ -130,9 +130,9 @@ Priority order is (from less to most priority):
 |TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML|email.notification.new_upload_event.template.html|EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML|
 |TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT|email.notification.new_upload_event.subject|EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT|
 
-### Currently config-file only params:
+### Parameters Only Working in the Configuration File
 
-Those params are only configurable through config file now:
+These parameters are currently only configurable through the configuration file:
 - all not global config (all config not setted in `[DEFAULT]` sections, sections not supported included: `[alembic]`, `[app:*]`, `[server:*]`, `[loggers]`)
 - Sqlalchemy parameters `sqalchemy.*` not listed as supported.
 - Beaker sessions parameters `sessions.*` not listed as supported.
@@ -142,68 +142,61 @@ Those params are only configurable through config file now:
 
 ## Tracim `.ini` config file #
 
-The default config file is `development.ini`, a template is available in the repo: [development.ini.sample](../development.ini.sample).
+The default configuration file is `development.ini`. A documented template is available in the repo: [development.ini.sample](../development.ini.sample).
 
-The file includes documentation which should be enough in most cases.
+## Configure URL for Tracim Access - Simple Case ##
 
-## Configure URL for tracim access - simple case ##
-
-To have a working tracim instance, you need to explicitly define where backend and frontend are.
-If backend serve frontend or if you do not need frontend at all, you can just set:
+To have a working Tracim instance, you need to explicitly define where the backend and the frontend are.
+If the backend serves the frontend or if you do not need the frontend at all, you can just set:
 
     website.base_url = http://mysuperdomainame.ndd
 
-or (non-default http port):
+or (non-default HTTP port):
 
     website.base_url = http://mysuperdomainame.ndd:8080
 
-or (for https):
+or (for HTTPS):
 
     website.base_url = https://mysuperdomainame.ndd
 
-you also need to NOT set api.base_url
+You also need to NOT set `api.base_url`.
 
-## Configure URL for tracim access - complex case ##
+## Configure URL for Tracim Access - Complex Case ##
 
 If the `website.base_url` trick is not enough for your own configuration, you can:
-- Explicitly set backend base url different from frontend url with `api.base_url`
-- Override allowed access control allowed origin for cors.
+- Explicitly set the backend base url as different from the frontend URL with `api.base_url`
+- Override allowed origins for CORS.
 
-with this configuration, i allowed cors to work with 2 different server with 2 different port
-that may be needed if frontend is in another computer distinct from backend.
-you can add how many server you want separated by ','
+With this configuration, CORS can work with 2 different servers with 2 different ports.
+This may be needed if the frontend and the backend are on different domains.
+You can add as many servers as you want, separated by ','.
 
      cors.access-control-allowed-origin = http://mysuperservername.ndd:6543,http://myotherservername.ndd:8090
 
-
 ## Authentication in Tracim
 
-Tracim comes with several types of authentication:
+Tracim comes with several authentication methods:
 
 - internal database
-- ldap
-- special auth mecanism like Api-Key
-- REMOTE AUTH like Apache Auth later explained in the documentation.
+- LDAP
+- Special authentifications mechanisms like Api-Key
+- REMOTE AUTH, like Apache Auth, later explained in the documentation.
 
-You can chose valid auth_source and order them by priority with `auth_types` params in conf ini file
+You can chose valid auth_source and order them by priority with `auth_types` paramaters in the INI configuration file.
 
-Example:
+For instance:
 
-`auth_types = internal`
+- `auth_types = internal`
+- `auth_types = internal,ldap`
 
-or:
-
-`auth_types = internal,ldap`
-
-This one will check user internal database in a first check, then if the auth fails, it will also try to authenticate the user based on LDAP data.
+The last one will check the internal user database first. Then, if the auth fails, it will also try to authenticate the user using LDAP.
 
 ### LDAP Authentication
 
-LDAP authentication require some extra parameters, you need to set them all correctly
-to have a working ldap authentication system.
+LDAP authentication requires setting some extra parameters.
 
-example of the ldap config working with
-https://github.com/rroemhild/docker-test-openldap :
+Example of the LDAP config working with
+[rroemhild/docker-test-openldap](https://github.com/rroemhild/docker-test-openldap):
 
 ```
 auth_types=ldap
@@ -216,65 +209,63 @@ ldap_name_attribute = givenName
 ldap_tls = False
 ```
 
-:heavy_exclamation_mark: At connection in tracim, if a valid ldap user doesn't
-exist in tracim, it will be created as standard user.
+:heavy_exclamation_mark: When logging in Tracim, if a valid LDAP user doesn't
+exist in Tracim, it will be created as a standard user.
 
-## Special auth mecanisms
+## Special Authentication Mecanisms
 
-Thoses special auth mecanism are not linked to `auth_types` in config.
+Thoses special authentication mechanisms are not linked to `auth_types` in the configuration.
 
 ### API-Key Authentification
 
-:heavy_exclamation_mark: Unlike other mecanism of auth, this mecanism is not build
-for normal user auth but for administrators or daemon like email reply daemon. This
-auth mecanism is the only one that bypass auth mecanism check (user are linked
-one specific mecanism and can't connect with an other one), so
-you can impersonate any user linked to any auth mecanisms.
+:heavy_exclamation_mark: Unlike other authentication mechanism, this mechanism is not built
+for normal user authentication.
+It is aimed at administrators or daemons (e.g. an email reply daemon).
+This authentication mechanism is the only one that bypasses the authentication mechanism check (user are linked to
+one specific mechanism and can't connect with another one).
+As a consequence, you can impersonate any user linked to any authentication mechanisms.
 
-API key is a auth mecanism of tracim which allow user with the key to have
-a superadmin right on tracim api, this allow user with the key to act as anyone
-and to do anything possible with the right of theses persons.
+API key is an authentication mechanism of Tracim which allows user with a key to have a superadmin right on the Tracim API.
+This allow user with the key to act as anyone and to do anything possible with the right of these people.
 
-It rely on 2 HTTP headers:
+It relies on 2 HTTP headers:
 
 - `Tracim-Api-Key` : Tracim api key, as marked in config in `api.key`
 - `Tracim-Api-Login` : User email login, in order to act as the user given
 
-If you let `api.key` with empty value, API key auth will be disabled.
+If `api.key` is empty, the API key authentication will be disabled.
 
 ### Remote Auth Authentification (eg apache authentication)
 
-It is possible to connect to tracim using remote auth authentification like
-apache auth for apache.
-The idea is that webserver authenticate user and then pass by uwsgi env var or
-http header email user of the authenticated user.
+It is possible to connect to Tracim using remote authentification (e.g. the Apache authentication method).
+The idea is that the webserver authenticates user and then pass the email of the authenticated user trhough uWSGI environment variables or an HTTP header.
 
-:heavy_exclamation_mark: At connection in tracim, if a valid remote user doesn't
-exist in tracim, it will be created as standard user
+:heavy_exclamation_mark: When logging in Tracim, if a valid remote user doesn't
+exist in Tracim, it will be created as a standard user.
 
-to do this, you need to configure properly your webserver in order to do
-authentication and to pass correctly uwsgi env var or http header.
+To do this, you need to properly configure your webserver in order to do
+authentication and to correctly pass the uWSGI environment variable or the HTTP header.
 
-in tracim, you just need to change value of `remote_user_header` in ini conf
-file. Value should be a env var in CGI like style, so  `Remote-User` http header
-become  `HTTP-REMOTE-USER`.
+In Tracim, you just need to change value of `remote_user_header` in the INI configuration
+file. The value should be an CGI-like environment variable name, so the `Remote-User` HTTP header
+becomes `HTTP-REMOTE-USER`.
 
-:warning: You should be very carefull using this feature with http header, your
-webserver should be configured properly to not allow someone to set custom
-remote user header. You should also be sure if you use the webserver as proxy
-that no one could bypass this proxy and access to tracim in a way that allow
-them to authenticate as anyone without password.
+:warning: You should be very careful using this feature with the HTTP header, your
+webserver should be properly configured to prevent someone from setting a custom
+remote user header. You should also make sure that, if you use the web server as a proxy,
+no one can bypass this proxy and access Tracim in a way that lets
+them authenticate as anyone without password.
 
 #### Example of remote_user with basic auth using apache as http proxy
 
-in tracim ini conf file :
+In the Tracim INI configuration file:
 
 `
    auth_
    remote_user_header = HTTP_X_REMOTE_USER
 `
 
-apache_virtualhost (tracim should be listening on port 6543):
+apache_virtualhost (Tracim should be listening on port 6543):
 
 
 ```
@@ -300,9 +291,9 @@ Listen 6544
 </VirtualHost>
 ```
 
-## Activating Mail Notification feature ##
+## Enabling the Mail Notification Feature ##
 
-to activate mail notification, smallest config is this:
+to enable mail notification, smallest config is this:
 
     email.notification.activated = True
     # from header of mail, need to be a valid adress
@@ -318,25 +309,24 @@ to activate mail notification, smallest config is this:
     email.notification.smtp.user = test_user
     email.notification.smtp.password = just_a_password
 
-don't forgot to set website.base_url and website.title for frontend, as some feature use this to return
-link to frontend in email.
+Don't forget to set `website.base_url` and `website.title` for the frontend, as some features use them to
+link the frontend in emails.
 
-## Invitation in workspace configuration ##
+## Configuring Invitation in Workspace ##
 
-You can set behaviour of invitation feature depending of how you use tracim.
+You can set the behaviour of the invitation feature depending on how you use Tracim.
 
 You can choose if you enabled or disabled email notification
 for new invitation.
 - Enabling it allow user to receive mail with autogenerated internal auth password.
 - Disabling it allow to create user without password, **only account with
-external auth mecanism can connect to these user**.
+external auth mechanism can connect to these user**.
 
 
-Enabling is nice if you use tracim mostly with internal auth whereas if
-you rely mostly on external auth, disabling it is better.
+Enabling it is nice if you use Tracim mostly with internal authentication.
+However, if you rely mostly on external authentication, disabling it is better.
 
-invitation of non-existent user in tracim behaviour according to config:
-email.notification.activated = False
+Configure how to handle invitation of non-existent users in Tracim with these parameters:
 
 | email.notification.activated | new_user.invitation.do_notify | behaviour                                                |
 |------------------------------|---------------------------------|----------------------------------------------------------|
@@ -345,13 +335,12 @@ email.notification.activated = False
 | False                        | True                            | **account invitation disabled**
 | False                        | False                           | create **account without password** and do not send email
 
-## Activating reply by email feature ##
+## Enabling the Reply by Email Feature ##
 
-to activate reply by email feature,
-you first need to activate api key auth mecansim (see Activating API key authentification section),
-without this, email_reply feature can't work correctly.
+To enable the reply by email feature,
+you first need to activate the API key authentication mechanism (see section Activating API Key Authentification),
 
-to activate reply by email, smallest config is this:
+to activate reply by email, the smallest config is as follows:
 
     # Email reply configuration
     email.reply.activated = True
@@ -374,13 +363,13 @@ If you want to adapt this to your environment, edit the `.ini` file and setup th
     ...
     listen = localhost:6543
 
-To allow other computer to access to this website, listen to "*" instead of localhost:
+To allow other computers to access to this website, listen to "*" instead of localhost:
 
     [server:main]
     ...
     listen = *:6534
 
-## Database path ##
+## Database Path ##
 
 To configure a database, you need to provide a valid sqlalchemy url:
 
@@ -390,42 +379,43 @@ for sqlite, a valid value is something like this:
 
 to know more about this, see [sqlalchemy documentation](http://docs.sqlalchemy.org/en/latest/core/engines.html).
 
-Be carefull, if sqlalchemy support many kind of Database, Tracim support is **not** guarantee.
-Tracim is officially supporting sqlite, postgresql and mysql.
+Be careful, while SQLAlchemy supports many kind of Database, support from Tracim is **not** guaranteed.
+Tracim officially supports SQLite, PostgreSQL and MySQL.
 
 ## Debugging and Logs ##
 ### Debug params ###
 
 
-For debugging you can uncomment this 2 lines in '/backend/development.ini' to
-enable pyramid debugtoolbar.
-If you use debugtoolbar, you can seen one red button on right of the Tracim web interface.
+For debugging, you can uncomment these 2 lines in '/backend/development.ini' to
+enable the Pyramid debugging toolbar.
+If you use it, you can seen one red button on right of the Tracim web interface.
 
     ~~~
     #pyramid.includes =
     #    pyramid_debugtoolbar
     ~~~
 
-you can add this line to active pyramid debug mode for almost anything:
+You can add this line to enable the Pyramid debugging mode for almost everything:
 
     ~~~
     pyramid.debug_all = true
     ~~~
 
 
-Hapic debug mode: this line is needed for more explicit json error,
-raised error traceback will be send through json. you can uncomment it
+Hapic debug mode: this line is needed to get more explicit JSON errors.
+The traceback of raised errors will be send through JSON. You can uncomment it by removing the hash sign:
 
    ~~~
    # debug = True
    ~~~
 
-pyramid.reload_templates = true
 
-### Prod/Debug configuration example ###
+    pyramid.reload_templates = true
+
+### Prod/Debug Configuration Example ###
 
 
-To enable simple debug conf:
+To enable simple debug configuration:
 
     [app:tracim_web]
     ...
@@ -439,7 +429,7 @@ To enable simple debug conf:
     debug = True
 
 
-production conf (no reload, no debugtoolbar):
+Production configuration (no reload, no debugtoolbar):
 
     [app:tracim_web]
     ...
@@ -461,96 +451,95 @@ to have more/less log about something.
 
 # Color File #
 
-You can change default color of apps by setting color.json file, by default,
-placed at root of tracim dir, see [color.json.sample](../../color.json.sample)
-for default config file.
+You can change default color of apps by editing file `color.json `, by default,
+placed at root of the Tracim directory. See [color.json.sample](../../color.json.sample)
+for the default configuration file.
 
-# Search method using elastic_search (tracim 2.3+) #
+# Search Method Using Elasticsearch (Tracim v2.3+) #
 
-First, you need an elastic_search server. An easy way to have one with docker can be (don't use for production):
+First, you need an Elasticsearch server. An easy way to have one with docker can be (don't use this for production):
 
-`docker run -d -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch -v esconfig:/usr/share/elasticsearch/config -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0`
+    docker run -d -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch -v esconfig:/usr/share/elasticsearch/config -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
 
-You then need to setup config file:
+You then need to setup the configuration file:
 
     search.engine = elasticsearch
     search.elasticsearch.host = localhost
     search.elasticsearch.port = 9200
     search.elasticsearch.index_alias = tracim_contents
 
-You're elasticsearch server need to be running. You can then setup index with:
+Your Elasticsearch server needs to be running. You can then set up the index with:
 
-`tracimcli search index-create`
+    tracimcli search index-create
 
 You can (re)sync data with:
 
-`tracimcli search index-populate`
+    tracimcli search index-populate
 
-you can delete index using:
+You can delete the index using:
 
-`tracimcli search index-drop`
+    tracimcli search index-drop
 
-If there is an update of tracim, use this one to migrate index (experimental, prefer delete,init,index mecanism):
+If there is an update of Tracim, use this one to migrate the index (experimental, prefer delete, init, index mechanism):
 
-`tracimcli search index-upgrade-experimental`
+    tracimcli search index-upgrade-experimental
 
-Your data are correctly indexed now, you can go to tracim ui and use search mecanism.
+Your data are correctly indexed now, you can go to the Tracim UI and use the search mechanism.
 
-# Collaborative Edition online (tracim v2.4+) #
+# Collaborative Edition Online (Tracim v2.4+) #
 
-## Collaborative edition server ##
+## Collaborative Edition Server ##
 
-In tracim 2.4, Collaborative Edition online does support CollaboraOnline/libreofficeOnline.
+In Tracim v2.4, Collaborative Edition Online does support CollaboraOnline/LibreOfficeOnline.
 
 It is tested with CollaboraOnline (professional version of Collabora), with [Collabora CODE](https://hub.docker.com/r/collabora/code) and with [LibreofficeOnline](https://hub.docker.com/r/libreoffice/online). More information about CollaboraOnline [here](https://www.collaboraoffice.com/)
-We do not support yet other collaborative edition online service but we do support WOPI protocol making support for WOPI compatible software easy.
+We do not support other collaborative edition online service for now but we do support the WOPI protocol, making support for WOPI-compatible software easy.
 
 **To set up a `Collabora CODE` server using docker for testing purpose ([image](https://hub.docker.com/r/collabora/code)):**
 
 note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like `domain=tracim\\.mysuperdomain\\.com`):
 
 
-`sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.0.5.2`
+    sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.0.5.2
 
-:warning: Tracim is tested with the version 4.0.5.2, you can use the latest version at your own risk
-
-
-**To set up a `LibreofficeOnline` server(rolling release, unstable :warning:) using docker ([image](https://hub.docker.com/r/libreoffice/online)):**
+:warning: Tracim is tested with version 4.0.5.2. Use the latest version at your own risk.
 
 
-`sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always libreoffice/online:master`
+**To set up a `LibreOfficeOnline` server(rolling release, unstable :warning:) using docker ([image](https://hub.docker.com/r/libreoffice/online)):**
+
+
+    sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always libreoffice/online:master
 
 
 :information_source: All the information to set up a `Collabora CODE/ LibreofficelOnline` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
 
-:warning: Be really careful about configuring domain parameter, as [official documentation](https://www.collaboraoffice.com/code/docker/) said, value should be dot escaped, ex: `domain=.*\\.mysuperdomain\\.com`
+:warning: Be really careful about configuring the domain parameter. As written at the [official documentation](https://www.collaboraoffice.com/code/docker/), dots should be escaped (e.g. `domain=.*\\.mysuperdomain\\.com`).
 
-:information_source: you can add username/password parameter to set collabora admin console too :
+:information_source: You can configure Collabora administration username/password too:
 
-`-e "username=admin" -e "password=S3cRet"`
+    -e "username=admin" -e "password=S3cRet"
 
-admin interface is available at `https://<collabora_host>/loleaflet/dist/admin/admin.html`
+The administration interface is available at `https://<collabora_host>/loleaflet/dist/admin/admin.html`.
 
-with collabora host can be value like `collaboradomain.ndd` or `localhost:9980`
+With a Collabora host, `<collabora_host>` may look like `collaboradomain.ndd` or `localhost:9980`
 
-:information_source: to avoid using automatic ssl/tls encryption in collabora, you should disable it:
+:information_source: To avoid using automatic SSL/TLS encryption in Collabora, you should disable it:
 
-`-e "extra_params=--o:ssl.enable=false"`
+    -e "extra_params=--o:ssl.enable=false"
 
 
-
-## Configuring tracim in development.ini ##
+## Configuring Tracim in `development.ini` ##
 
 To enable online edition on Tracim and allow communication with your edition software.
 
 First you need to enable the edition on the API:
 
-`collaborative_document_edition.activated = True`
-`collaborative_document_edition.software = collabora`
+    collaborative_document_edition.activated = True
+    collaborative_document_edition.software = collabora`
 
 Then you need to indicate the ip adress of the server for the protocol `WOPI`:
 
-`collaborative_document_edition.collabora.base_url = <collabora_base_url>`
+    collaborative_document_edition.collabora.base_url = <collabora_base_url>
 
 with collabora_base_url can be value like `http://localhost:9980` or `http://mycollaboraserver.ndd`
 
@@ -559,13 +548,13 @@ Then you can set up default office document templates files, these templates wil
 
 Basic templates are provided by default with Tracim:
 
-`basic_setup.file_template_dir = %(here)s/tracim_backend/templates/open_documents`
+    basic_setup.file_template_dir = %(here)s/tracim_backend/templates/open_documents
 
 But you can change the default directory to use your templates files:
 
-`collaborative_document_edition.file_template_dir =  PATH_TO_YOUR_TEMPLATE_DIRECTORY`
+    collaborative_document_edition.file_template_dir =  PATH_TO_YOUR_TEMPLATE_DIRECTORY
 
-Filenames of the templates inside the directory are not relevant only their extensions matter and need correspond to the software's default extensions.
-For example `CODE` edit `Libre Office` files, so extensions will be `odt`, `odp`, `ods`.
+Filenames of the templates inside the directory are not relevant. Only their extensions matter and need to match the software's default extensions.
+For instance, `CODE` edits `Libre Office` files, so extensions will be `odt`, `odp`, `ods`.
 
-After all theses change in config, you should restart all tracim process (web, webdav, etc...)
+After all these changes in the configuration, you should restart all  process (web, webdav, etc...).

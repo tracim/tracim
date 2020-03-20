@@ -32,7 +32,7 @@ class WebdavAppFactory(object):
         config["acceptbasic"] = True
         config["acceptdigest"] = False
         config["defaultdigest"] = False
-        # check this for apache auth mecanism
+        # check this for apache authentication mechanism
         if app_config.REMOTE_USER_HEADER:
             config["trusted_auth_header"] = app_config.REMOTE_USER_HEADER
 

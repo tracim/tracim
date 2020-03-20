@@ -30,7 +30,7 @@ from tracim_backend.models.data import Workspace
 
 class TracimContext(ABC):
     """
-    Abstract class, Context of Tracim, neede for tracim authorization mecanism.
+    Abstract class, Context of Tracim, neede for tracim authorization mechanism.
     """
 
     def __init__(self) -> None:
@@ -109,7 +109,7 @@ class TracimContext(ABC):
         will be A but candidate workspace will be B.
         """
         return self._generate_if_none(
-            self._candidate_workspace, self._get_workspace, self._get_candidate_workspace_id
+            self._candidate_workspace, self._get_workspace, self._get_candidate_workspace_id,
         )
 
     @property
@@ -281,7 +281,7 @@ class TracimRequest(TracimContext, Request):
     # INFO - G.M - 2018-12-03 - Internal utils function to simplify ID fetching
 
     def _get_path_id(
-        self, name: str, exception_if_none: Exception, exception_if_invalid_id: Exception
+        self, name: str, exception_if_none: Exception, exception_if_invalid_id: Exception,
     ) -> int:
         """
         Get id from pyramid path or raise one of the Exception
@@ -299,7 +299,7 @@ class TracimRequest(TracimContext, Request):
         return int(id_param_as_str)
 
     def _get_body_id(
-        self, name: str, exception_if_none: Exception, exception_if_invalid_id: Exception
+        self, name: str, exception_if_none: Exception, exception_if_invalid_id: Exception,
     ) -> int:
         """
         Get id from pyramid json_body or raise one of the Exception
@@ -346,9 +346,7 @@ class TracimRequest(TracimContext, Request):
     def _get_current_user_id(self) -> int:
         try:
             if not self.authenticated_userid:
-                raise UserNotFoundInTracimRequest(
-                    "You request a current user " "but the context not permit to found one"
-                )
+                raise UserNotFoundInTracimRequest("No current user has been found in the context")
         except UserNotFoundInTracimRequest as exc:
             raise NotAuthenticated("User not found") from exc
         return self.authenticated_userid
@@ -376,7 +374,7 @@ class TracimRequest(TracimContext, Request):
 
     def _get_candidate_user_id(self) -> int:
         exception_if_none = UserNotFoundInTracimRequest(
-            "You request a candidate user but the " "context not permit to found one"
+            "No candidate user has been found in the context"
         )
         exception_if_invalid_id = InvalidUserId("user_id is not a correct integer")
         return self._get_path_id("user_id", exception_if_none, exception_if_invalid_id)

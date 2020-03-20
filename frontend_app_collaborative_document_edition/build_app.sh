@@ -30,7 +30,7 @@ if [[ $1 = "-d" || $2 = "-d" ]]; then
     dev="-dev"
 fi
 
-log "build frontend_app_collaborative_document_edition"
+log "building frontend_app_collaborative_document_edition"
 npm run build$dev$windoz && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/collaborative_document_edition.app.js ../frontend/dist/app && loggood "success" || logerror "some error"

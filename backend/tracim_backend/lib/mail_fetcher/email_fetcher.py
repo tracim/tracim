@@ -186,7 +186,7 @@ class DecodedMail(object):
         see https://arp242.net/autoreply.html for more info
         """
         # INFO - G.M - 2019-06-28 - RFC 3834, https://tools.ietf.org/html/rfc3834
-        # standard mecanism
+        # standard mechanism
         auto_submitted_header = self._decode_header("Auto-submitted")
         if auto_submitted_header and auto_submitted_header.lower().strip().startswith(
             "auto-replied"
