@@ -16,6 +16,7 @@ import {
   SHARE_FOLDER_ID
 } from '../../helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
+import { Link } from 'react-router-dom'
 
 require('./Folder.styl')
 
@@ -70,10 +71,15 @@ class Folder extends React.Component {
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
           className='folder__header align-items-center primaryColorBgLightenHover'
-          onClick={() => props.onClickFolder(props.folderData.id)}
           ref={props.connectDropTarget}
           title={props.folderData.label}
         >
+          <Link
+            to={props.openFolderLink}
+            onClick={(e) => props.onClickFolder(e, props.folderData.id)}
+            className='folder__header__link'
+          />
+
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
           </div>
@@ -182,6 +188,7 @@ class Folder extends React.Component {
             ? (
               <FolderContainer
                 availableApp={props.availableApp}
+                openFolderLink={props.buildOpenFolderLink(content.id)}
                 folderData={content}
                 workspaceContentList={props.workspaceContentList}
                 getContentParentList={props.getContentParentList}

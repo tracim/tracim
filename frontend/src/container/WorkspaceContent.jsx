@@ -407,22 +407,12 @@ class WorkspaceContent extends React.Component {
     }
   }
 
-  handleClickFolder = async folderId => {
+  handleClickFolder = async (e, folderId) => {
     const { props, state } = this
     const folder = props.workspaceContentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.find(c => c.id === folderId)
-
-    const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
-    const newUrlSearchList = (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
-      ? folderListInUrl.filter(id => id !== folderId)
-      : uniq([...folderListInUrl, folderId])
-
-    const newUrlSearchObject = {
-      ...qs.parse(props.location.search),
-      folder_open: newUrlSearchList.join(',')
-    }
+    if (e.ctrlKey) return
 
     props.dispatch(toggleFolderOpen(folderId))
-    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
 
     if (!props.workspaceContentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
@@ -433,6 +423,22 @@ class WorkspaceContent extends React.Component {
       const fetchContentList = await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
       if (fetchContentList.status === 200) props.dispatch(addWorkspaceShareFolderContentList(fetchContentList.json))
     }
+  }
+
+  buildOpenFolderLink = folderId => {
+    const { props, state } = this
+
+    const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
+    const newUrlSearchList = folderListInUrl.some(id => id === folderId)
+      ? folderListInUrl.filter(id => id !== folderId)
+      : uniq([...folderListInUrl, folderId])
+
+    const newUrlSearchObject = {
+      ...qs.parse(props.location.search),
+      folder_open: newUrlSearchList.join(',')
+    }
+
+    return PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false })
   }
 
   handleClickCreateContent = (e, folderId, contentType) => {
@@ -728,6 +734,7 @@ class WorkspaceContent extends React.Component {
                     onClickFolder={this.handleClickFolder}
                     onClickCreateContent={this.handleClickCreateContent}
                     setFolderRead={this.handleSetFolderRead}
+                    buildOpenFolderLink={this.buildOpenFolderLink}
                     userRoleIdInWorkspace={userRoleIdInWorkspace}
                     shareFolderContentList={workspaceShareFolderContentList}
                     onClickExtendedAction={{
@@ -763,6 +770,8 @@ class WorkspaceContent extends React.Component {
                         }}
                         onDropMoveContentItem={this.handleDropMoveContent}
                         onClickFolder={this.handleClickFolder}
+                        openFolderLink={this.buildOpenFolderLink(content.id)}
+                        buildOpenFolderLink={this.buildOpenFolderLink}
                         onClickCreateContent={this.handleClickCreateContent}
                         contentType={contentType}
                         readStatusList={currentWorkspace.contentReadStatusList}
