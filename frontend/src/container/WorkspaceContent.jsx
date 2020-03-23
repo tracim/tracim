@@ -409,8 +409,10 @@ class WorkspaceContent extends React.Component {
 
   handleClickFolder = async (e, folderId) => {
     const { props, state } = this
-    const folder = props.workspaceContentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.find(c => c.id === folderId)
+
     if (e.ctrlKey) return
+
+    const folder = props.workspaceContentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.find(c => c.id === folderId)
 
     props.dispatch(toggleFolderOpen(folderId))
 
