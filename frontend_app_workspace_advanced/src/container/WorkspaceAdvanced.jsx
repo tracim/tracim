@@ -152,7 +152,7 @@ class WorkspaceAdvanced extends React.Component {
     this.setState({
       content: {
         ...resDetail.body,
-        memberList: resMember.body,
+        memberList: resMember.body.filter(m => m.is_active),
         appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda'),
         appDownloadAvailable: resAppList.body.some(a => a.slug === 'share_content'),
         appUploadAvailable: resAppList.body.some(a => a.slug === 'upload_permission')
