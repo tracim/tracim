@@ -75,7 +75,7 @@ class Folder extends React.Component {
           title={props.folderData.label}
         >
           <Link
-            to={props.openFolderLink}
+            to={props.buildOpenFolderLink(props.folderData.id)}
             onClick={(e) => props.onClickFolder(e, props.folderData.id)}
             className='folder__header__link'
           />
@@ -188,7 +188,7 @@ class Folder extends React.Component {
             ? (
               <FolderContainer
                 availableApp={props.availableApp}
-                openFolderLink={props.buildOpenFolderLink(content.id)}
+                buildOpenFolderLink={props.buildOpenFolderLink}
                 folderData={content}
                 workspaceContentList={props.workspaceContentList}
                 getContentParentList={props.getContentParentList}

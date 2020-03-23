@@ -770,7 +770,6 @@ class WorkspaceContent extends React.Component {
                         }}
                         onDropMoveContentItem={this.handleDropMoveContent}
                         onClickFolder={this.handleClickFolder}
-                        openFolderLink={this.buildOpenFolderLink(content.id)}
                         buildOpenFolderLink={this.buildOpenFolderLink}
                         onClickCreateContent={this.handleClickCreateContent}
                         contentType={contentType}
