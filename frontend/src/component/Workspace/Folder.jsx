@@ -4,6 +4,7 @@ import { withRouter } from 'react-router'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
+import { Link } from 'react-router-dom'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
@@ -16,7 +17,6 @@ import {
   SHARE_FOLDER_ID
 } from '../../helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
-import { Link } from 'react-router-dom'
 
 require('./Folder.styl')
 
