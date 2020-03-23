@@ -168,7 +168,7 @@ export class Tracim extends React.Component {
 
       props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
       this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
-      if (idWsToOpen) document.getElementById(idWsToOpen).scrollIntoView()
+      if (idWsToOpen && document.getElementById(idWsToOpen)) document.getElementById(idWsToOpen).scrollIntoView()
       this.setState({ workspaceListLoaded: true })
 
       return true
