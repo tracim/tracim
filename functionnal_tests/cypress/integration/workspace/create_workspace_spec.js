@@ -25,19 +25,19 @@ describe('Workspace', () => {
       .should('exist')
   })
 
+  const createOneWorkspace = (cy, workspaceName) => {
+    return cy.get('[data-cy="sidebarCreateWorkspaceBtn"]').should('be.visible').click()
+      .get('[data-cy="createcontent__form__input"]').should('be.visible').type(workspaceName)
+      .get('[data-cy="popup__createcontent__form__button"]').should('be.visible').click()
+  }
+
+  const getWorkspaceItemByName = (workspaceTitle) => (
+    cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"]`)
+      .parents('li.sidebar__content__navigation__workspace__item')
+  )
+
   describe('Dashboard', () => {
     describe('Creating two new workspaces', () => {
-      const createOneWorkspace = (cy, workspaceName) => {
-        return cy.get('[data-cy="sidebarCreateWorkspaceBtn"]').should('be.visible').click()
-          .get('[data-cy="createcontent__form__input"]').should('be.visible').type(workspaceName)
-          .get('[data-cy="popup__createcontent__form__button"]').should('be.visible').click()
-      }
-
-      const getWorkspaceItemByName = (workspaceTitle) => (
-        cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"]`)
-          .parents('li.sidebar__content__navigation__workspace__item')
-      )
-
       it('should display the new workspaces properly with the right workspace opened in the sidebar', () => {
         const workspaceTitle1 = 'second workspace'
         const workspaceTitle2 = 'third workspace'
@@ -60,6 +60,28 @@ describe('Workspace', () => {
           .find('.sidebar__content__navigation__workspace__item__submenu')
           .should('be.visible')
       })
+    })
+  })
+
+  describe('Creating a workspace while a lot of workspace is already created', () => {
+    const nbWorkspace = 20
+
+    beforeEach(() => {
+      cy.resetDB()
+      cy.setupBaseDB()
+      cy.loginAs('administrators')
+      for (let i = 1; i < nbWorkspace; i++) {
+        cy.createRandomWorkspace()
+      }
+    })
+
+    it('should scroll to the new workspace in the sidebar', () => {
+      cy.visit('/ui')
+      cy.get('.sidebar__scrollview').scrollTo('bottom')
+      createOneWorkspace(cy, '0')
+      getWorkspaceItemByName('0')
+        .find('.sidebar__content__navigation__workspace__item__submenu')
+        .should('be.visible')
     })
   })
 })
