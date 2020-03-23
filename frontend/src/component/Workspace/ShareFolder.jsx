@@ -131,7 +131,6 @@ class ShareFolder extends React.Component {
                 key={content.id}
                 t={props.t}
                 buildOpenFolderLink={props.buildOpenFolderLink}
-                openFolderLink={props.buildOpenFolderLink(content.id)}
               />
             )
             : (
