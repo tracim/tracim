@@ -74,7 +74,6 @@ describe('Scroll to active content when refreshing the page', () => {
     describe('Open a file when a folder is open', () => {
       it('should scroll to file and not folder when refreshing the page', () => {
         cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: firstFolder.content_id}})
-          .find('.folder__header__link')
           .click()
 
         cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + nbContent}})
