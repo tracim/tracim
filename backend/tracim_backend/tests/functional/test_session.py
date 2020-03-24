@@ -355,6 +355,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
 class TestWhoamiEndpoint(object):
     def test_api__try_whoami_enpoint__ok_200__nominal_case(self, web_testapp):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
         res = web_testapp.get("/api/v2/auth/whoami", status=200)
         assert res.json_body["public_name"] == "Global manager"
         assert res.json_body["email"] == "admin@admin.admin"

@@ -225,7 +225,6 @@ class UserApi(object):
         If no user found raise UserDoesNotExist exception
         """
         user = None
-
         if user_id:
             try:
                 user = self.get_one(user_id)

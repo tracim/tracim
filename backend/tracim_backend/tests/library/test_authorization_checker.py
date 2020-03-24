@@ -33,6 +33,7 @@ from tracim_backend.tests.fixtures import *  # noqa F403,F401
 class BaseFakeTracimContext(TracimContext):
     app_config = None
     dbsession = None
+    current_user = None
 
 
 class TestAuthorizationChecker(object):
