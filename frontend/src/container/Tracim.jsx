@@ -71,7 +71,8 @@ export class Tracim extends React.Component {
         break
       case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        this.loadWorkspaceList(data.openInSidebarId ? data.openInSidebarId : undefined)
+        await this.loadWorkspaceList(data.openInSidebarId ? data.openInSidebarId : undefined)
+        if (data.openInSidebarId && document.getElementById(data.openInSidebarId)) document.getElementById(data.openInSidebarId).scrollIntoView()
         break
       case CUSTOM_EVENT.DISCONNECTED_FROM_API:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
@@ -168,7 +169,6 @@ export class Tracim extends React.Component {
 
       props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
       this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
-      if (idWsToOpen && document.getElementById(idWsToOpen)) document.getElementById(idWsToOpen).scrollIntoView()
       this.setState({ workspaceListLoaded: true })
 
       return true
