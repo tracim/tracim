@@ -26,9 +26,9 @@ describe('Workspace', () => {
   })
 
   const createOneWorkspace = (cy, workspaceName) => {
-    return cy.get('[data-cy="sidebarCreateWorkspaceBtn"]').should('be.visible').click()
-      .get('[data-cy="createcontent__form__input"]').should('be.visible').type(workspaceName)
-      .get('[data-cy="popup__createcontent__form__button"]').should('be.visible').click()
+    return cy.get('[data-cy="sidebarCreateWorkspaceBtn"]').click()
+      .get('[data-cy="createcontent__form__input"]').type(workspaceName)
+      .get('[data-cy="popup__createcontent__form__button"]').click()
   }
 
   const getWorkspaceItemByName = (workspaceTitle) => (
