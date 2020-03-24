@@ -36,7 +36,7 @@ export const WorkspaceMembersList = props => {
               <li
                 className='workspace_advanced__userlist__list__item'
                 key={`member_${m.user_id}`}
-                data-cy={m.user_id}
+                data-cy={`workspace_advanced__member-${m.user_id}`}
               >
                 <div className='workspace_advanced__userlist__list__item__avatar'>
                   <Avatar width={'50px'} publicName={m.user.public_name} />

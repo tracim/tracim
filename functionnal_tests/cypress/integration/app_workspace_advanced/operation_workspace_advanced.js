@@ -100,7 +100,7 @@ describe('App Workspace Advanced', function () {
         .click()
 
       cy.getTag({selectorName: s.CONTENT_FRAME})
-        .find(`.workspace_advanced__userlist__list__item[data-cy=${userId}]`)
+        .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)
         .should('be.not.visible')
 
       cy.enableUser(userId)
