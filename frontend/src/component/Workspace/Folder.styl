@@ -66,10 +66,6 @@ folderopen()
           // INFO - CH - 2019-08-07 - In the HTML, the .folder__header__triangleborder__triangle class also has .primaryColorFontLighten
           // So it always has it's font in the primary color but only uses it as border color on mousehover through "currentColor"
           border-top-color currentColor
-    &__link
-      position absolute
-      height 100%
-      width 100%
     &__triangleborder
       display none
       position absolute
@@ -131,7 +127,6 @@ folderopen()
         &:hover > .folder__header__name__addbtn__text
           color white
         &__text
-          position relative
           margin-right 40px
           font-size 17px
           &::after

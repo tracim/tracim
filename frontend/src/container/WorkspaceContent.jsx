@@ -349,6 +349,16 @@ class WorkspaceContent extends React.Component {
     console.log('%c<WorkspaceContent> download nyi', 'color: #c17838', content)
   }
 
+  handleClickOpenGalleryContentItem = (e, content) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.ctrlKey) {
+      window.open(`${PAGE.WORKSPACE.GALLERY(content.workspaceId)}?folder_ids=${content.id}`, '_blank')
+    } else {
+      this.props.history.push(`${PAGE.WORKSPACE.GALLERY(content.workspaceId)}?folder_ids=${content.id}`)
+    }
+  }
+
   handleClickArchiveContentItem = async (e, content) => {
     const { props, state } = this
 
@@ -407,10 +417,8 @@ class WorkspaceContent extends React.Component {
     }
   }
 
-  handleClickFolder = async (e, folderId) => {
+  handleClickFolder = async folderId => {
     const { props, state } = this
-
-    if (e.ctrlKey) return
 
     const folder = props.workspaceContentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.find(c => c.id === folderId)
 
@@ -743,7 +751,8 @@ class WorkspaceContent extends React.Component {
                       edit: this.handleClickEditContentItem,
                       download: this.handleClickDownloadContentItem,
                       archive: this.handleClickArchiveShareFolderContentItem,
-                      delete: this.handleClickDeleteShareFolderContentItem
+                      delete: this.handleClickDeleteShareFolderContentItem,
+                      gallery: this.handleClickOpenGalleryContentItem
                     }}
                     onClickShareFolder={this.handleClickShareFolder}
                     contentType={contentType}
@@ -768,7 +777,8 @@ class WorkspaceContent extends React.Component {
                           edit: this.handleClickEditContentItem,
                           download: this.handleClickDownloadContentItem,
                           archive: this.handleClickArchiveContentItem,
-                          delete: this.handleClickDeleteContentItem
+                          delete: this.handleClickDeleteContentItem,
+                          gallery: this.handleClickOpenGalleryContentItem
                         }}
                         onDropMoveContentItem={this.handleDropMoveContent}
                         onClickFolder={this.handleClickFolder}
