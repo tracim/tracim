@@ -130,7 +130,6 @@ class ShareFolder extends React.Component {
                 isLast={index === props.shareFolderContentList.length - 1}
                 key={content.id}
                 t={props.t}
-                buildOpenFolderLink={props.buildOpenFolderLink}
               />
             )
             : (

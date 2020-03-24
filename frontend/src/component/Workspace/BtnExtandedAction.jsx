@@ -2,6 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { ROLE } from 'tracim_frontend_lib'
+import { connect } from 'react-redux'
+import { PAGE } from '../../helper'
+import { Link } from 'react-router-dom'
 
 export const ExtandedAction = props => {
   return (
@@ -82,27 +85,33 @@ export const ExtandedAction = props => {
           </div>
         )}
 
-        {props.onClickExtendedAction.gallery && (
-          <div
+        {/* FIXME - GM - 2019-04-16 - Don't use hardcoded slug and find a better way to handle app buttons like this one - https://github.com/tracim/tracim/issues/2654 */}
+        {props.folderData && props.appList && props.appList.some((app) => app.slug === 'gallery') && (
+          <Link
             className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
-            onClick={props.onClickExtendedAction.gallery.callback}
+            onClick={e => e.stopPropagation()}
             data-cy='extended_action_gallery'
+            to={`${PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId)}?folder_ids=${props.folderData.id}`}
           >
             <div className='subdropdown__item__icon mr-3'>
               <i className='fa fa-fw fa-picture-o' />
             </div>
 
             <div className='subdropdown__item__text'>
-              {props.onClickExtendedAction.gallery.label}
+              {props.t('Gallery')}
             </div>
-          </div>
+          </Link>
         )}
       </div>
     </div>
   )
 }
 
-export default translate()(ExtandedAction)
+const mapStateToProps = ({ appList }) => ({
+  appList
+})
+
+export default connect(mapStateToProps)(translate()(ExtandedAction))
 
 ExtandedAction.propTypes = {
   onClickExtendedAction: PropTypes.object.isRequired,

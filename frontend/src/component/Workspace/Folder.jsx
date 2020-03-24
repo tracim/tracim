@@ -1,11 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router'
-import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
-import { Link } from 'react-router-dom'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
@@ -68,14 +66,13 @@ class Folder extends React.Component {
         data-cy={`folder_${props.folderData.id}`}
         id={props.folderData.id}
       >
-        <Link
+        <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
           className='folder__header align-items-center primaryColorBgLightenHover'
+          onClick={(e) => props.onClickFolder(props.folderData.id, e)}
           ref={props.connectDropTarget}
           title={props.folderData.label}
-          to={props.buildOpenFolderLink(props.folderData.id)}
-          onClick={(e) => !e.ctrlKey && props.onClickFolder(props.folderData.id)}
         >
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
@@ -168,15 +165,9 @@ class Folder extends React.Component {
                       callback: e => props.onClickExtendedAction.delete(e, props.folderData),
                       label: props.t('Delete'),
                       allowedRoleId: ROLE.contentManager.id
-                    },
-                    /* FIXME - GM - 2020-03-24 - Don't use hardcoded slug and find a better way to handle app buttons like this one - https://github.com/tracim/tracim/issues/2654 */
-                    ...props.appList && props.appList.some((app) => app.slug === 'gallery') && {
-                      gallery: {
-                        callback: e => props.onClickExtendedAction.gallery(e, props.folderData),
-                        label: props.t('Gallery')
-                      }
                     }
                   }}
+                  folderData={props.folderData}
                 />
               </div>
             </div>
@@ -184,14 +175,13 @@ class Folder extends React.Component {
 
           <div className='folder__header__status' />
 
-        </Link>
+        </div>
 
         <div className='folder__content'>
           {folderContentList.sort(sortWorkspaceContents).map((content, i) => content.type === 'folder'
             ? (
               <FolderContainer
                 availableApp={props.availableApp}
-                buildOpenFolderLink={props.buildOpenFolderLink}
                 folderData={content}
                 workspaceContentList={props.workspaceContentList}
                 getContentParentList={props.getContentParentList}
@@ -206,7 +196,6 @@ class Folder extends React.Component {
                 isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
                 t={props.t}
-                appList={props.appList}
                 location={props.location}
               />
             )
@@ -255,10 +244,6 @@ class Folder extends React.Component {
     )
   }
 }
-
-const mapStateToProps = ({ appList }) => ({
-  appList
-})
 
 const folderDragAndDropTarget = {
   drop: props => {
@@ -312,7 +297,7 @@ const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDragAndDrop
   )
 )
 
-export default connect(mapStateToProps)(translate()(FolderContainer))
+export default translate()(FolderContainer)
 
 Folder.propTypes = {
   folderData: PropTypes.object,
