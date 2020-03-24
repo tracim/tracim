@@ -63,7 +63,7 @@ describe('Workspace', () => {
     })
   })
 
-  describe('Creating a workspace while a lot of workspace is already created', () => {
+  describe('Creating a workspace while a lot of workspace are already created', () => {
     const nbWorkspace = 20
 
     beforeEach(() => {
