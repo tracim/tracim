@@ -1237,7 +1237,7 @@ class TestContentApi(object):
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
         c = api2.create(content_type_list.Folder.slug, workspace, None, "parent", "", True)
         assert c.owner_id == user2.user_id
-        assert c.get_current_revision().owner_id == user2.user_id
+        assert c.current_revision.owner_id == user2.user_id
         api = ContentApi(current_user=user, session=session, config=app_config)
         with new_revision(session=session, tm=transaction.manager, content=c):
             for new_status in [
@@ -1251,7 +1251,7 @@ class TestContentApi(object):
 
         assert new_status == c.status
         assert ActionDescription.STATUS_UPDATE == c.revision_type
-        assert c.get_current_revision().owner_id == user.user_id
+        assert c.current_revision.owner_id == user.user_id
 
     def test_create_file__ok__another_namespace(
         self,
@@ -1381,7 +1381,7 @@ class TestContentApi(object):
         assert text_file == text_file_after_move
         assert comment_before_move_id == comment_after_move.id
         assert text_file_after_move.revision_type == ActionDescription.MOVE
-        assert text_file_after_move.get_current_revision().owner_id == user2.user_id
+        assert text_file_after_move.current_revision.owner_id == user2.user_id
 
     def test_unit_move_file_with_comments__different_parent_different_workspace(
         self,
@@ -1609,7 +1609,7 @@ class TestContentApi(object):
         assert text_file_copy.type == text_file.type
         assert text_file_copy.parent.content_id == folderb.content_id
         assert text_file_copy.owner.user_id == user2.user_id
-        assert text_file_copy.get_current_revision().owner_id == user2.user_id
+        assert text_file_copy.current_revision.owner_id == user2.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
@@ -1675,7 +1675,7 @@ class TestContentApi(object):
         assert text_file_copy.type == text_file.type
         assert text_file_copy.content_namespace == ContentNamespaces.UPLOAD
         assert text_file_copy.owner.user_id == user2.user_id
-        assert text_file_copy.get_current_revision().owner_id == user2.user_id
+        assert text_file_copy.current_revision.owner_id == user2.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype

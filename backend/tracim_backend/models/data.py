@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import namedtuple
 import datetime as datetime_root
 from datetime import datetime
 from datetime import timedelta
@@ -890,6 +891,12 @@ class Content(DeclarativeBase):
     )  # This flag allow to serialize a given revision if required by the user
 
     id = Column(Integer, primary_key=True)
+    revision_id = Column(Integer, ForeignKey("content_revisions.revision_id"), nullable=True)
+
+    current_revision = relationship(
+        "ContentRevisionRO", uselist=False, foreign_keys=[revision_id], post_update=True
+    )
+
     # TODO - A.P - 2017-09-05 - revisions default sorting
     # The only sorting that makes sens is ordering by "updated" field. But:
     # - its content will soon replace the one of "created",
@@ -922,17 +929,14 @@ class Content(DeclarativeBase):
     def content_id(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.content_id
 
-    @hybrid_property
-    def revision_id(self) -> int:
-        return self.revision.revision_id
-
-    @revision_id.setter
-    def revision_id(self, value: int):
-        self.revision.revision_id = value
-
-    @revision_id.expression
-    def revision_id(cls) -> InstrumentedAttribute:
-        return ContentRevisionRO.revision_id
+    @property
+    def revision(self) -> ContentRevisionRO:
+        if not self.current_revision:
+            if not self.revisions:
+                self.current_revision = ContentRevisionRO()
+                self.current_revision.node = self
+            self.current_revision = self.revisions[-1]
+        return self.current_revision
 
     # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
     # and should be author of first revision.
@@ -1252,10 +1256,6 @@ class Content(DeclarativeBase):
         return children
 
     @property
-    def revision(self) -> ContentRevisionRO:
-        return self.get_current_revision()
-
-    @property
     def first_revision(self) -> ContentRevisionRO:
         return self.revisions[0]  # FIXME
 
@@ -1279,18 +1279,6 @@ class Content(DeclarativeBase):
     def depot_file(self, value):
         self.revision.depot_file = value
 
-    def get_current_revision(self) -> ContentRevisionRO:
-        if not self.revisions:
-            return self.new_revision()
-
-        # If last revisions revision don't have revision_id, return it we just add it.
-        if self.revisions[-1].revision_id is None:
-            return self.revisions[-1]
-
-        # Revisions should be ordred by revision_id but we ensure that here
-        revisions = sorted(self.revisions, key=lambda revision: revision.revision_id)
-        return revisions[-1]
-
     def new_revision(self) -> ContentRevisionRO:
         """
         Return and assign to this content a new revision.
@@ -1298,12 +1286,12 @@ class Content(DeclarativeBase):
         If this content already own revision, revision is build from last revision.
         :return:
         """
-        if not self.revisions:
-            self.revisions.append(ContentRevisionRO())
-            return self.revisions[0]
-
-        new_rev = ContentRevisionRO.new_from(self.get_current_revision())
-        self.revisions.append(new_rev)
+        if not self.current_revision:
+            new_rev = ContentRevisionRO()
+        else:
+            new_rev = ContentRevisionRO.new_from(self.current_revision)
+        new_rev.node = self
+        self.current_revision = new_rev
         return new_rev
 
     def get_valid_children(self, content_types: list = None) -> ["Content"]:
@@ -1396,7 +1384,9 @@ class Content(DeclarativeBase):
         :return: bool, True if there is new information for given user else False
                        False if the user is None
         """
-        revision = self.get_current_revision()
+        revision = self.current_revision
+        if not revision:
+            return False
 
         if not user:
             return False
@@ -1515,6 +1505,23 @@ class Content(DeclarativeBase):
             revisions.extend(child.revisions)
         revisions = sorted(revisions, key=lambda revision: revision.revision_id)
         return revisions
+
+    def get_tree_revisions_advanced(self) -> typing.List[ContentRevisionRO]:
+        """Get all revision sorted by id of content and all his children recursively"""
+        # revisions = []  # type: typing.List[ContentRevisionRO]
+        RevisionsData = namedtuple("revision_data", ["revision", "is_current_rev"])
+        revisions_data = []
+        for revision in self.revisions:
+            is_current_rev = bool(revision == self.current_revision)
+            revisions_data.append(RevisionsData(revision, is_current_rev))
+        for child in self.get_children(recursively=True):
+            for revision in child.revisions:
+                is_current_rev = bool(revision == child.current_revision)
+                revisions_data.append(RevisionsData(revision, is_current_rev))
+        revisions_data = sorted(
+            revisions_data, key=lambda revision_data: revision_data.revision.revision_id
+        )
+        return revisions_data
 
 
 class RevisionReadStatus(DeclarativeBase):

@@ -1666,7 +1666,8 @@ class ContentApi(object):
         # revision related to old data. key of dict is original content id.
         original_content_children = {}  # type: typing.Dict[int,Content]
 
-        for rev in content.get_tree_revisions():
+        for rev, is_current_rev in content.get_tree_revisions_advanced():
+
             if rev.content_id == content.content_id:
                 related_content = new_content
                 related_parent = new_parent
@@ -1683,7 +1684,9 @@ class ContentApi(object):
                     related_parent = new_content_children[rev.parent_id]
             # INFO - G.M - 2019-04-30 - copy of revision itself.
             cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
-            related_content.revisions.append(cpy_rev)
+            cpy_rev.node = related_content
+            if is_current_rev:
+                related_content.current_revision = cpy_rev
             self._session.add(related_content)
             self._session.flush()
         return AddCopyRevisionsResult(

@@ -136,6 +136,7 @@ class CleanupLib(object):
             for children in content.get_children(recursively=recursively):
                 self.delete_content(children)
 
+        content.revision_id = None
         for revision in content.revisions:
             deleted_contents.append(self.delete_revision(revision))
 
