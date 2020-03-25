@@ -31,7 +31,7 @@ describe('Workspace', () => {
       .get('[data-cy="popup__createcontent__form__button"]').click()
   }
 
-  const getWorkspaceItemByName = (workspaceTitle) => (
+  const getWorkspaceItemByName = (cy, workspaceTitle) => (
     cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"]`)
       .parents('li.sidebar__content__navigation__workspace__item')
   )
@@ -47,7 +47,7 @@ describe('Workspace', () => {
           .get('[data-cy="dashboardWorkspaceLabel"]')
           .contains(workspaceTitle1)
 
-        getWorkspaceItemByName(workspaceTitle1)
+        getWorkspaceItemByName(cy, workspaceTitle1)
           .find('.sidebar__content__navigation__workspace__item__submenu')
           .should('be.visible')
 
@@ -56,7 +56,7 @@ describe('Workspace', () => {
           .get('[data-cy="dashboardWorkspaceLabel"]')
           .contains(workspaceTitle2)
 
-        getWorkspaceItemByName(workspaceTitle2)
+        getWorkspaceItemByName(cy, workspaceTitle2)
           .find('.sidebar__content__navigation__workspace__item__submenu')
           .should('be.visible')
       })
@@ -65,6 +65,7 @@ describe('Workspace', () => {
 
   describe('Creating a workspace while a lot of workspace are already created', () => {
     const nbWorkspace = 20
+    const newWorkspaceName = '0'
 
     beforeEach(() => {
       cy.resetDB()
@@ -78,8 +79,8 @@ describe('Workspace', () => {
     it('should scroll to the new workspace in the sidebar', () => {
       cy.visit('/ui')
       cy.get('.sidebar__scrollview').scrollTo('bottom')
-      createOneWorkspace(cy, '0')
-      getWorkspaceItemByName('0')
+      createOneWorkspace(cy, newWorkspaceName)
+      getWorkspaceItemByName(cy, newWorkspaceName)
         .find('.sidebar__content__navigation__workspace__item__submenu')
         .should('be.visible')
     })
