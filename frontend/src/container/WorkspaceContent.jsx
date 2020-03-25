@@ -422,7 +422,8 @@ class WorkspaceContent extends React.Component {
     }
 
     if (e && e.ctrlKey) {
-      window.open(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false }), '_blank')
+      const url = PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false })
+      window.open(url, '_blank')
       return
     }
     props.dispatch(toggleFolderOpen(folderId))
