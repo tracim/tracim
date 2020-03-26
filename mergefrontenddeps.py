@@ -14,11 +14,13 @@ import sys
 import glob
 import json
 
-# This function takes two semver strings without carret, and returns
-# the closest compatible version, with the carret, following the rules
-# of the carret when specifying a dependency.
-# Returns the empty string if the two semver are incompatible.
+
 def compatible_carret_version(v1, v2):
+    """ This function takes two semver strings without carret, and returns
+    the closest compatible version, with the carret, following the rules
+    of the carret when specifying a dependency.
+    returns the empty string if the two semver are incompatible. """
+
     if v1 == v2:
         return "^" + v1
 
@@ -41,11 +43,12 @@ def compatible_carret_version(v1, v2):
     return ""
 
 
-# This function takes two semver strings without tilda, and returns
-# the closest compatible version, with the tilda, following the rules
-# of the tilda when specifying a dependency.
-# Returns the empty string if the two semver are incompatible.
 def compatible_tilda_version(v1, v2):
+    """ This function takes two semver strings without tilda, and returns
+    the closest compatible version, with the tilda, following the rules
+    of the tilda when specifying a dependency.
+    Returns the empty string if the two semver are incompatible. """
+
     if v1 == v2:
         return "~" + v1
 
@@ -60,9 +63,10 @@ def compatible_tilda_version(v1, v2):
     return ""
 
 
-# Returns a semver dependency string that is compatible with both semver v1 and
-# semver v2, or the empty string if v1 and v2 are incompatible
 def compatible_with_both_version(v1, v2, rec=False):
+    """ Returns a semver dependency string that is compatible with both semver v1 and
+    semver v2, or the empty string if v1 and v2 are incompatible """
+
     if v1 == v2:
         return v1
 
