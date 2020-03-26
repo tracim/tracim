@@ -63,6 +63,12 @@ class RoleApi(object):
     #     if reader_role in cls.members_read_rights:
     #         return tested_role in cls.members_read_rights[reader_role]
     #     return False
+    def _base_query(self, workspace: Workspace = None):
+        return (
+            self._session.query(UserRoleInWorkspace)
+            .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id)
+            .order_by(UserRoleInWorkspace.workspace_id, UserRoleInWorkspace.user_id)
+        )
 
     def get_user_workspaces_ids(self, user_id: int, min_role: int) -> typing.List[int]:
         assert self._user.profile == Group.TIM_ADMIN or self._user.user_id == user_id
@@ -184,12 +190,10 @@ class RoleApi(object):
         if flush:
             self._session.flush()
 
-    def get_all_for_workspace(self, workspace: Workspace, show_disabled_user=False) -> typing.List[UserRoleInWorkspace]:
-        query = (
-            self._session.query(UserRoleInWorkspace)
-            .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id)
-            .order_by(UserRoleInWorkspace.workspace_id, UserRoleInWorkspace.user_id)
-        )
+    def get_all_for_workspace(
+        self, workspace: Workspace, show_disabled_user=False
+    ) -> typing.List[UserRoleInWorkspace]:
+        query = self._base_query(workspace)
         if not show_disabled_user:
             query = query.join(User).filter(User.is_active)
         return query.all()
