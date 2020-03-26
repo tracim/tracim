@@ -27,7 +27,7 @@ export const HomeHasWorkspace = props =>
     </div>
 
     <div className='homepagecard__endtext'>
-      {props.t('Have a good day !')}
+      {props.t('Have a good day!')}
     </div>
   </div>
 

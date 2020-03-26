@@ -105,7 +105,6 @@ export class Carousel extends React.Component {
         >
           {props.slides.map((slide, index) => (
             <MainPreview
-              loggedUser={props.loggedUser}
               previewSrc={slide.src}
               index={index}
               handleClickShowImageRaw={props.handleClickShowImageRaw}
@@ -139,7 +138,6 @@ Carousel.propTypes = {
   handleClickShowImageRaw: PropTypes.func.isRequired,
   fileSelected: PropTypes.number.isRequired,
   onFileDeleted: PropTypes.func.isRequired,
-  loggedUser: PropTypes.object,
   disableAnimation: PropTypes.bool,
   isWorkspaceRoot: PropTypes.bool
 }
@@ -149,7 +147,6 @@ Carousel.defaultProps = {
   onCarouselPositionChange: () => {},
   handleClickShowImageRaw: () => {},
   onFileDeleted: () => {},
-  loggedUser: {},
   disableAnimation: false,
   fileSelected: 0,
   isWorkspaceRoot: true

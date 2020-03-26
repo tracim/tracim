@@ -56,8 +56,8 @@ done
 log "building the frontend"
 log "cd $DEFAULTDIR/frontend"
 cd $DEFAULTDIR/frontend || exit 1
-npm run build && loggood "success" || logerror "some error"
 
+npm run build && loggood "success" || logerror "some error"
 
 loggood "-- frontend build successful."
 

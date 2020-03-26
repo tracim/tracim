@@ -234,7 +234,7 @@ jobs:
         - cd $TRAVIS_BUILD_DIR
       if: commit_message !~ /(\[skip ci unit_test\])/
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
-    - stage: functional
+    - stage: frontend
       name: Functional tests using Cypress
       <<: *_install_full_tracim
       env:
