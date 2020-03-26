@@ -24,7 +24,7 @@ class RoleApi(object):
         session: Session,
         current_user: typing.Optional[User],
         config: CFG,
-        show_disabled_user: bool = False,
+        show_disabled_user: bool = True,
     ) -> None:
         self._session = session
         self._user = current_user
