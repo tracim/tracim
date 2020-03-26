@@ -407,9 +407,8 @@ class WorkspaceContent extends React.Component {
     }
   }
 
-  handleClickFolder = async (folderId, e) => {
+  handleClickFolder = async (e, folderId) => {
     const { props, state } = this
-    const folder = props.workspaceContentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.find(c => c.id === folderId)
 
     const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
     const newUrlSearchList = folderListInUrl.some(id => id === folderId)
@@ -425,18 +424,9 @@ class WorkspaceContent extends React.Component {
       window.open(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false }), '_blank')
       return
     }
-    props.dispatch(toggleFolderOpen(folderId))
     props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
 
-    if (!props.workspaceContentList.some(c => c.parentId === folderId)) {
-      const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
-    }
-
-    if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceShareFolderContentList.some(c => c.parentId === folderId)) {
-      const fetchContentList = await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceShareFolderContentList(fetchContentList.json))
-    }
+    this.handleToggleFolderOpen(folderId)
   }
 
   handleClickCreateContent = (e, folderId, contentType) => {
@@ -459,9 +449,26 @@ class WorkspaceContent extends React.Component {
       folder_open: newFolderOpenList.join(',')
     }
 
-    if (folderId && !folderOpen) this.handleClickFolder(folderId)
+    if (folderId && !folderOpen) this.handleToggleFolderOpen(folderId)
 
     props.history.push(`${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`)
+  }
+
+  handleToggleFolderOpen = async folderId => {
+    const { props, state } = this
+    const folder = props.workspaceContentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.find(c => c.id === folderId)
+
+    props.dispatch(toggleFolderOpen(folderId))
+
+    if (!props.workspaceContentList.some(c => c.parentId === folderId)) {
+      const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
+      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
+    }
+
+    if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceShareFolderContentList.some(c => c.parentId === folderId)) {
+      const fetchContentList = await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
+      if (fetchContentList.status === 200) props.dispatch(addWorkspaceShareFolderContentList(fetchContentList.json))
+    }
   }
 
   getContentParentList = (content, contentList) => {
