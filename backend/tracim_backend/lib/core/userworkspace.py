@@ -19,10 +19,17 @@ __author__ = "damien"
 
 
 class RoleApi(object):
-    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
+    def __init__(
+        self,
+        session: Session,
+        current_user: typing.Optional[User],
+        config: CFG,
+        show_disabled_user: bool = False,
+    ) -> None:
         self._session = session
         self._user = current_user
         self._config = config
+        self._show_disabled_user = show_disabled_user
 
     # TODO - G.M - 29-06-2018 - [Cleanup] Drop this
     # ALL_ROLE_VALUES = UserRoleInWorkspace.get_all_role_values()
@@ -63,17 +70,17 @@ class RoleApi(object):
     #     if reader_role in cls.members_read_rights:
     #         return tested_role in cls.members_read_rights[reader_role]
     #     return False
-    def _base_query(self, workspace: Workspace = None):
-        return (
-            self._session.query(UserRoleInWorkspace)
-            .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id)
-            .order_by(UserRoleInWorkspace.workspace_id, UserRoleInWorkspace.user_id)
-        )
+    def _base_query(self):
+        query = self._session.query(UserRoleInWorkspace)
+        if not self._show_disabled_user:
+            query = query.join(User).filter(User.is_active)
+        return query
 
     def get_user_workspaces_ids(self, user_id: int, min_role: int) -> typing.List[int]:
         assert self._user.profile == Group.TIM_ADMIN or self._user.user_id == user_id
         workspaces_ids_tuples = (
-            self._session.query(UserRoleInWorkspace.workspace_id)
+            self._base_query()
+            .with_entities(UserRoleInWorkspace.workspace_id)
             .filter(UserRoleInWorkspace.user_id == user_id)
             .filter(UserRoleInWorkspace.role >= min_role)
             .join(Workspace)
@@ -190,12 +197,12 @@ class RoleApi(object):
         if flush:
             self._session.flush()
 
-    def get_all_for_workspace(
-        self, workspace: Workspace, show_disabled_user=False
-    ) -> typing.List[UserRoleInWorkspace]:
-        query = self._base_query(workspace)
-        if not show_disabled_user:
-            query = query.join(User).filter(User.is_active)
+    def get_all_for_workspace(self, workspace: Workspace) -> typing.List[UserRoleInWorkspace]:
+        query = (
+            self._base_query()
+            .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id)
+            .order_by(UserRoleInWorkspace.user_id)
+        )
         return query.all()
 
     def save(self, role: UserRoleInWorkspace) -> None:

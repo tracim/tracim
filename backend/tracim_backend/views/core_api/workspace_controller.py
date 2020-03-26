@@ -244,13 +244,13 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         rapi = RoleApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
-        )
-
-        roles = rapi.get_all_for_workspace(
-            workspace=request.current_workspace,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
             show_disabled_user=hapic_data.query.show_disabled_user == 1,
         )
+
+        roles = rapi.get_all_for_workspace(workspace=request.current_workspace)
         return [rapi.get_user_role_workspace_with_context(user_role) for user_role in roles]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
