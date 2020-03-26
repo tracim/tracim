@@ -63,11 +63,11 @@ from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMemberFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.core_api.schemas import WorkspaceModifySchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
-from tracim_backend.views.core_api.schemas import WorkspaceMemberFilterQuerySchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ALL_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ARCHIVE_AND_RESTORE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
@@ -248,7 +248,8 @@ class WorkspaceController(Controller):
         )
 
         roles = rapi.get_all_for_workspace(
-            workspace=request.current_workspace, show_disabled_user=hapic_data.query.show_disabled_user == 1
+            workspace=request.current_workspace,
+            show_disabled_user=hapic_data.query.show_disabled_user == 1,
         )
         return [rapi.get_user_role_workspace_with_context(user_role) for user_role in roles]
 
