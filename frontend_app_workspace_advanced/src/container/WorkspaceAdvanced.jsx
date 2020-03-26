@@ -131,7 +131,7 @@ class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     const fetchWorkspaceDetail = handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, state.content.workspace_id))
-    const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMember(state.config.apiUrl, state.content.workspace_id))
+    const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMember(state.config.apiUrl, state.content.workspace_id, false))
     const fetchAppList = handleFetchResult(await getAppList(state.config.apiUrl))
 
     const [resDetail, resMember, resAppList] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember, fetchAppList])
@@ -152,7 +152,7 @@ class WorkspaceAdvanced extends React.Component {
     this.setState({
       content: {
         ...resDetail.body,
-        memberList: resMember.body.filter(m => m.is_active),
+        memberList: resMember.body,
         appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda'),
         appDownloadAvailable: resAppList.body.some(a => a.slug === 'share_content'),
         appUploadAvailable: resAppList.body.some(a => a.slug === 'upload_permission')

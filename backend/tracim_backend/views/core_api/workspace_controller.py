@@ -67,6 +67,7 @@ from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.core_api.schemas import WorkspaceModifySchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMemberFilterQuerySchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ALL_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ARCHIVE_AND_RESTORE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
@@ -233,6 +234,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_see_workspace_information)
     @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.input_query(WorkspaceMemberFilterQuerySchema())
     @hapic.output_body(WorkspaceMemberSchema(many=True))
     def workspaces_members(
         self, context, request: TracimRequest, hapic_data=None
@@ -245,7 +247,9 @@ class WorkspaceController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
 
-        roles = rapi.get_all_for_workspace(request.current_workspace)
+        roles = rapi.get_all_for_workspace(
+            workspace=request.current_workspace, show_disabled_user=hapic_data.query.show_disabled_user == 1
+        )
         return [rapi.get_user_role_workspace_with_context(user_role) for user_role in roles]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])

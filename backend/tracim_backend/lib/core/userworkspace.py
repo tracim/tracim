@@ -184,13 +184,15 @@ class RoleApi(object):
         if flush:
             self._session.flush()
 
-    def get_all_for_workspace(self, workspace: Workspace) -> typing.List[UserRoleInWorkspace]:
-        return (
+    def get_all_for_workspace(self, workspace: Workspace, show_disabled_user=False) -> typing.List[UserRoleInWorkspace]:
+        query = (
             self._session.query(UserRoleInWorkspace)
             .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id)
             .order_by(UserRoleInWorkspace.workspace_id, UserRoleInWorkspace.user_id)
-            .all()
         )
+        if not show_disabled_user:
+            query = query.join(User).filter(User.is_active)
+        return query.all()
 
     def save(self, role: UserRoleInWorkspace) -> None:
         self._session.flush()
