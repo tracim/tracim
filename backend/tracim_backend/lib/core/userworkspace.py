@@ -70,6 +70,9 @@ class RoleApi(object):
     #     if reader_role in cls.members_read_rights:
     #         return tested_role in cls.members_read_rights[reader_role]
     #     return False
+
+    # TODO - Gui.M - 26-03-2020 - For now it only filters enabled/disabled user, it does not filters deleted
+    #  workspaces/users
     def _base_query(self):
         query = self._session.query(UserRoleInWorkspace)
         if not self._show_disabled_user:

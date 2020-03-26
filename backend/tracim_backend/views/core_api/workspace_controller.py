@@ -247,7 +247,7 @@ class WorkspaceController(Controller):
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
-            show_disabled_user=hapic_data.query.show_disabled_user == 1,
+            show_disabled_user=hapic_data.query.show_disabled_user,
         )
 
         roles = rapi.get_all_for_workspace(workspace=request.current_workspace)
