@@ -114,6 +114,7 @@ class ShareLib(object):
             config.EMAIL__NOTIFICATION__SMTP__PORT,
             config.EMAIL__NOTIFICATION__SMTP__USER,
             config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+            config.EMAIL__NOTIFICATION__SMTP__IMPLICIT_SSL,
         )
 
         return ShareEmailManager(config=config, smtp_config=smtp_config, session=session)
@@ -164,7 +165,7 @@ class ShareLib(object):
                 .filter(ContentShare.content_id == content.content_id)
                 .filter(ContentShare.share_id == share_id)
                 .one()
-            )  # type: ContentShare
+            )
         except NoResultFound as exc:
             raise ContentShareNotFound(
                 'Content Share "{}" not found in database'.format(share_id)

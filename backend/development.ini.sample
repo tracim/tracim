@@ -317,6 +317,10 @@ email.notification.smtp.server = your_smtp_server
 email.notification.smtp.port = 25
 email.notification.smtp.user = your_smtp_user
 email.notification.smtp.password = your_smtp_password
+## active implicit ssl if you are using implicit smtp with encryption port like 465
+## by default, tracim will try to use explicit smtp encryption using starttls, and unencrypted
+## connection as fallback.
+email.notification.smtp.implicit_ssl = false
 
 ### Headers ###
 email.notification.from.default_label = Tracim Notifications

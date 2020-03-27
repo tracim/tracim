@@ -308,6 +308,10 @@ to enable mail notification, smallest config is this:
     email.notification.smtp.port = 1025
     email.notification.smtp.user = test_user
     email.notification.smtp.password = just_a_password
+    ## active implicit ssl if you are using implicit smtp with encryption port like 465
+    ## by default, tracim will try to use explicit smtp encryption using starttls, and unencrypted
+    ## connection as fallback.
+    email.notification.smtp.implicit_ssl = false
 
 Don't forget to set `website.base_url` and `website.title` for the frontend, as some features use them to
 link the frontend in emails.

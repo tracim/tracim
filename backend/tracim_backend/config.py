@@ -498,6 +498,9 @@ class CFG(object):
         self.EMAIL__NOTIFICATION__SMTP__PASSWORD = self.get_raw_config(
             "email.notification.smtp.password", secret=True
         )
+        self.EMAIL__NOTIFICATION__SMTP__IMPLICIT_SSL = asbool(
+            self.get_raw_config("email.notification.smtp.implicit_ssl", "false")
+        )
 
         self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config("email.reply.activated", "false"))
 

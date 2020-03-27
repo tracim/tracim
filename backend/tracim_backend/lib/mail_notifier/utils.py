@@ -1,11 +1,12 @@
 class SmtpConfiguration(object):
     """Container class for SMTP configuration used in Tracim."""
 
-    def __init__(self, server: str, port: int, login: str, password: str):
+    def __init__(self, server: str, port: int, login: str, password: str, implicit_ssl: bool):
         self.server = server
         self.port = port
         self.login = login
         self.password = password
+        self.implicit_ssl = implicit_ssl
 
 
 class EST(object):

@@ -131,6 +131,7 @@ class UploadPermissionLib(object):
             config.EMAIL__NOTIFICATION__SMTP__PORT,
             config.EMAIL__NOTIFICATION__SMTP__USER,
             config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+            config.EMAIL__NOTIFICATION__SMTP__IMPLICIT_SSL,
         )
 
         return UploadPermissionEmailManager(config=config, smtp_config=smtp_config, session=session)
@@ -194,7 +195,7 @@ class UploadPermissionLib(object):
                 .filter(UploadPermission.workspace_id == workspace.workspace_id)
                 .filter(UploadPermission.upload_permission_id == upload_permission_id)
                 .one()
-            )  # type: UploadPermission
+            )
         except NoResultFound as exc:
             raise UploadPermissionNotFound(
                 'Upload permission "{}" not found in database'.format(upload_permission_id)
