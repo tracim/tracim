@@ -50,6 +50,12 @@ describe('<Timeline />', () => {
     it(`The textarea should have the value:"${props.newComment}"`, () => {
       expect(wrapper.find('#wysiwygTimelineComment').prop('value')).to.equal(props.newComment)
     })
+    it('The advanced mode button should be disabled when disableComment is true', () => {
+      expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('style')).to.have.property('cursor', 'pointer')
+      wrapper.setProps({ disableComment: true })
+      expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('style')).to.have.property('cursor', 'not-allowed')
+      wrapper.setProps({ disableComment: false })
+    })
   })
 
   describe('Handlers', () => {
