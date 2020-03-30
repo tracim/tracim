@@ -209,21 +209,6 @@ class ContentApi(object):
         # TODO - G.M - 2018-06-173 - create revision in context object
         return RevisionInContext(revision, self._session, self._config, self._user)
 
-    # def _get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
-    #     """
-    #     Return the Content/ContentRevision query join condition
-    #     :return: Content/ContentRevision query join condition
-    #     """
-    #     return and_(
-    #         Content.id == ContentRevisionRO.content_id,
-    #         ContentRevisionRO.revision_id
-    #         == self._session.query(ContentRevisionRO.revision_id)
-    #         .filter(ContentRevisionRO.content_id == Content.id)
-    #         .order_by(ContentRevisionRO.revision_id.desc())
-    #         .limit(1)
-    #         .correlate(Content),
-    #     )
-
     def get_canonical_query(self) -> Query:
         """
         Return the Content/ContentRevision base query who join these table on the last revision.
