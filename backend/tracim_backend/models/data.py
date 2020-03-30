@@ -891,7 +891,9 @@ class Content(DeclarativeBase):
     )  # This flag allow to serialize a given revision if required by the user
 
     id = Column(Integer, primary_key=True)
-    revision_id = Column(Integer, ForeignKey("content_revisions.revision_id"), nullable=True)
+    revision_id = Column(
+        Integer, ForeignKey("content_revisions.revision_id", ondelete="SET NULL"), nullable=True
+    )
 
     current_revision = relationship(
         "ContentRevisionRO", uselist=False, foreign_keys=[revision_id], post_update=True
