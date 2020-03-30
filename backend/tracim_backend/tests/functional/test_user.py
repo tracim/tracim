@@ -1613,7 +1613,7 @@ class TestUserSetContentAsRead(object):
         web_testapp.put(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=workspace.workspace_id,
-                content_id=comments.content_id,
+                content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
             )
         )

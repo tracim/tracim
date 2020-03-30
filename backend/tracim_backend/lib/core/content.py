@@ -2127,23 +2127,8 @@ class ContentApi(object):
             revision.read_by[self._user] = read_datetime
 
         if recursive:
-            # mark read :
-            # - all children
-            # - parent stuff (if you mark a comment as read,
-            #                 then you have seen the parent)
-            # - parent comments
             for child in content.recursive_children:
-                self.mark_read(child, read_datetime=read_datetime, do_flush=False)
-
-            if content_type_list.Comment.slug == content.type:
-                self.mark_read(
-                    content.parent, read_datetime=read_datetime, do_flush=False, recursive=False
-                )
-                for comment in content.parent.get_comments():
-                    if comment != content:
-                        self.mark_read(
-                            comment, read_datetime=read_datetime, do_flush=False, recursive=False
-                        )
+                self.mark_read(child, read_datetime=read_datetime, do_flush=False, recursive=True)
 
         if do_flush:
             self.flush()

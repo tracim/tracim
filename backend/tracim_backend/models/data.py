@@ -1385,7 +1385,7 @@ class Content(DeclarativeBase):
 
         if recursive:
             for child in self.recursive_children:
-                if user not in child.read_by.keys():
+                if child.has_new_information_for(user, recursive=False):
                     # The user did not read this item, so yes!
                     return True
 
