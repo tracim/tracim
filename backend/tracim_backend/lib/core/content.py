@@ -2132,7 +2132,7 @@ class ContentApi(object):
             # - parent stuff (if you mark a comment as read,
             #                 then you have seen the parent)
             # - parent comments
-            for child in content.get_valid_children():
+            for child in content.recursive_children:
                 self.mark_read(child, read_datetime=read_datetime, do_flush=False)
 
             if content_type_list.Comment.slug == content.type:

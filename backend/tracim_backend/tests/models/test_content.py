@@ -247,7 +247,7 @@ class TestContent(object):
         )
         session.add(parent_folder)
         session.flush()
-        assert parent_folder.children == []
+        assert parent_folder.children.all() == []
         children_folder = Content(
             owner=admin_user,
             workspace=workspace,
@@ -267,7 +267,7 @@ class TestContent(object):
         with new_revision(session=session, tm=transaction.manager, content=children_folder):
             children_folder.parent = None
         session.flush()
-        assert parent_folder.children == []
+        assert parent_folder.children.all() == []
 
     def test_unit__query_content__ok__nominal_case(self, admin_user, session, content_type_list):
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)

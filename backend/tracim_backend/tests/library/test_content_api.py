@@ -1749,8 +1749,8 @@ class TestContentApi(object):
         transaction.commit()
         text_file_copy = api2.get_one_by_label_and_parent("test_file_copy", folderb)
 
-        assert len(text_file.children) == 2
-        assert len(text_file_copy.children) == 2
+        assert len(text_file.children.all()) == 2
+        assert len(text_file_copy.children.all()) == 2
         assert text_file.children[0].description == "just a comment"
         assert text_file_copy.children[0].description == text_file.children[0].description
         assert text_file_copy.children[0].id != text_file.children[0].id
