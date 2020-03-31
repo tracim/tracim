@@ -34,7 +34,7 @@
 
 ### Fixed issues
 
-- Gallery: #2540, #2541, #2551, #2574, #2583
+- Gallery: #2540, #2541, #2551, #2574, #2583 
 - Frontend: #1396, #1560, #1656, #2607, #2608, #2611, #2641
 - Backend: #2588, #2570, #2610, #2129, #1484, #2010
 
@@ -86,14 +86,14 @@
 ### New Features
 
 - Creation of multiple shared spaces with same name
-- Configure default profile of new users
+- Configure default profile of new users 
 - Space Limitations (experimental) - allow some controls on users allowed space, etc
 
 ### Fixed issues
 
 - General UX: #2494
 - Timeline: #2455
-- File App: #2501
+- File App: #2501 
 - Backend & system: #2392, #2474, #2475, #2476, #2477, #2489, #2500, #2511
 
 ## 2.4.4 / 2019-11-13
