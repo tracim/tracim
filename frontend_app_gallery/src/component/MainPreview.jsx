@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import { IMG_LOAD_STATE } from '../helper.js'
 
-class MainPreview extends React.Component {
+export class MainPreview extends React.Component {
   constructor (props) {
     super(props)
 
