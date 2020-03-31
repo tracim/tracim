@@ -1506,6 +1506,9 @@ class Content(DeclarativeBase):
         return revisions_data
 
 
+Index("idx__content__revision_id", Content.revision_id)
+
+
 class RevisionReadStatus(DeclarativeBase):
 
     __tablename__ = "revision_read_status"
