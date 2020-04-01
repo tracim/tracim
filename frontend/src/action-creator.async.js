@@ -457,7 +457,7 @@ export const getWorkspaceDetail = (user, workspaceId) => dispatch => {
 
 export const getWorkspaceMemberList = (workspaceId, showDisabledUser = false) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members?show_disabled_user=${showDisabledUser ? 1 : 0}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`,
     param: {
       credentials: 'include',
       headers: {

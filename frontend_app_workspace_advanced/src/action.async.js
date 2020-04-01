@@ -8,7 +8,7 @@ export const getWorkspaceDetail = (apiUrl, workspaceId) =>
   })
 
 export const getWorkspaceMember = (apiUrl, workspaceId, showDisabledUser = false) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/members?show_disabled_user=${showDisabledUser ? 1 : 0}`, {
+  fetch(`${apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`, {
     credentials: 'include',
     headers: { ...FETCH_CONFIG.headers },
     method: 'GET'
