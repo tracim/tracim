@@ -56,8 +56,17 @@
       margin-right 15px
       &__btn
         width max-content
+        border none
+        background-color transparent
         color #999
         text-decoration underline
+        cursor pointer
+        &:hover
+          color #252525
+        &:disabled
+          cursor not-allowed
+          &:hover
+            color #999
     &__submit
       &__btn
         display inline-block

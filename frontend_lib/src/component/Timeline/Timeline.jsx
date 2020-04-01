@@ -138,21 +138,17 @@ class Timeline extends React.Component {
 
             <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__texteditor__wrapper')}>
               <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'timeline__texteditor__advancedtext')}>
-                <div
+                <button
+                  type='button'
                   className={classnames(
                     `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn`
                   )}
-                  onClick={(e) => !props.disableComment && props.onClickWysiwygBtn(e)}
-                  style={{
-                    cursor: props.disableComment ? 'not-allowed' : 'pointer',
-                    ':hover': {
-                      color: props.disableComment ? '#999' : '#252525'
-                    }
-                  }}
+                  onClick={props.onClickWysiwygBtn}
+                  disabled={props.disableComment}
                   key={'timeline__comment__advancedtext'}
                 >
                   {props.wysiwyg ? props.t('Simple text') : props.t('Rich text')}
-                </div>
+                </button>
               </div>
 
               <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit')}>
