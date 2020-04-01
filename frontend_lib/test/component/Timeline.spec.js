@@ -51,9 +51,9 @@ describe('<Timeline />', () => {
       expect(wrapper.find('#wysiwygTimelineComment').prop('value')).to.equal(props.newComment)
     })
     it('The advanced mode button should be disabled when disableComment is true', () => {
-      expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('style')).to.have.property('cursor', 'pointer')
+      expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('disabled')).to.equal(false)
       wrapper.setProps({ disableComment: true })
-      expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('style')).to.have.property('cursor', 'not-allowed')
+      expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('disabled')).to.equal(true)
       wrapper.setProps({ disableComment: false })
     })
   })
