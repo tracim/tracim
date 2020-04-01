@@ -75,7 +75,7 @@ describe('App File', () => {
         .get('[data-cy=popin_right_part_share]').should('be.visible')
     })
 
-    it('should display the download share button when the user is logged as a contributor', () => {
+    it('should not display the download share button when the user is logged as contributor', () => {
       cy.loginAs('users')
       cy.visitPage({
         pageName: p.CONTENT_OPEN,
