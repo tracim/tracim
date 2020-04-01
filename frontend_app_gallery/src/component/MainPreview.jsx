@@ -15,7 +15,7 @@ export class MainPreview extends React.Component {
     }
   }
 
-  onLoad = ({ target: img }) => {
+  onImageLoad = ({ target: img }) => {
     this.setState({
       height: img.height,
       width: img.width,
@@ -23,7 +23,7 @@ export class MainPreview extends React.Component {
     })
   }
 
-  onError = () => {
+  onImageError = () => {
     this.setState({
       imageLoaded: IMG_LOAD_STATE.ERROR
     })
@@ -45,25 +45,25 @@ export class MainPreview extends React.Component {
               <i className='fa fa-spinner fa-spin gallery__loader__icon' />
             </div>
           )}
-          {state.imageLoaded !== IMG_LOAD_STATE.ERROR
+          {state.imageLoaded === IMG_LOAD_STATE.ERROR
             ? (
-              <div className='carousel__item__preview__content__image'>
-                <img
-                  src={props.previewSrc}
-                  className={classnames(`rotate${props.rotationAngle}`, state.imageLoaded ? 'img-thumbnail' : null)}
-                  onClick={props.handleClickShowImageRaw}
-                  onLoad={this.onLoad}
-                  onError={this.onError}
-                  width={width && state.width > width ? width : null}
-                  alt={props.fileName}
-                />
-              </div>
-            ) : (
               <div className='carousel__item__preview__error'>
                 <div className='carousel__item__preview__error__message'>
                   <i className='fa fa-fw fa-exclamation-triangle carousel__item__preview__error__icon' />
                   <div>{props.t('No preview available')}</div>
                 </div>
+              </div>
+            ) : (
+              <div className='carousel__item__preview__content__image'>
+                <img
+                  src={props.previewSrc}
+                  className={classnames(`rotate${props.rotationAngle}`, state.imageLoaded ? 'img-thumbnail' : null)}
+                  onClick={props.handleClickShowImageRaw}
+                  onLoad={this.onImageLoad}
+                  onError={this.onImageError}
+                  width={width && state.width > width ? width : null}
+                  alt={props.fileName}
+                />
               </div>
             )
           }
