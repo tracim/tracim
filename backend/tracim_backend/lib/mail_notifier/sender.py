@@ -73,6 +73,8 @@ class EmailSender(object):
                 )
             self._smtp_connection.ehlo()
 
+            # TODO - G.M - 2020-04-02 - Starttls usage should be explicit in configuration, see
+            # https://github.com/tracim/tracim/issues/2815
             if self._smtp_config.login and not self._smtp_config.use_implicit_ssl:
                 try:
                     starttls_result = self._smtp_connection.starttls()
