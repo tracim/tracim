@@ -1,5 +1,16 @@
 
 
+## 2.6.3 / 2020-03-xx
+
+### Improvement
+
+- Database index improvement to increase Tracim reactivity (#2787)
+
+### Fixed issues
+
+- Backend: #2793, #2811, #2812
+
+
 ## 2.6.2 / 2020-03-20
 
 ### Fixed issues
