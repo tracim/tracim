@@ -195,7 +195,7 @@ class UploadPermissionLib(object):
                 .filter(UploadPermission.workspace_id == workspace.workspace_id)
                 .filter(UploadPermission.upload_permission_id == upload_permission_id)
                 .one()  # type: UploadPermission
-            )
+            )  # INFO - GM - 2020-04-02 - do not put typing here, black error : https://github.com/psf/black/issues/1329
         except NoResultFound as exc:
             raise UploadPermissionNotFound(
                 'Upload permission "{}" not found in database'.format(upload_permission_id)

@@ -165,7 +165,7 @@ class ShareLib(object):
                 .filter(ContentShare.content_id == content.content_id)
                 .filter(ContentShare.share_id == share_id)
                 .one()  # type: ContentShare
-            )
+            )  # INFO - GM - 2020-04-02 - do not put typing here, black error : https://github.com/psf/black/issues/1329
         except NoResultFound as exc:
             raise ContentShareNotFound(
                 'Content Share "{}" not found in database'.format(share_id)
