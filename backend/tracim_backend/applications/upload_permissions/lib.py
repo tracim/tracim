@@ -194,7 +194,7 @@ class UploadPermissionLib(object):
                 self.base_query()
                 .filter(UploadPermission.workspace_id == workspace.workspace_id)
                 .filter(UploadPermission.upload_permission_id == upload_permission_id)
-                .one()
+                .one()  # type: UploadPermission
             )
         except NoResultFound as exc:
             raise UploadPermissionNotFound(

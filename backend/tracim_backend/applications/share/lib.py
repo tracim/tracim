@@ -164,7 +164,7 @@ class ShareLib(object):
                 self.base_query()
                 .filter(ContentShare.content_id == content.content_id)
                 .filter(ContentShare.share_id == share_id)
-                .one()
+                .one()  # type: ContentShare
             )
         except NoResultFound as exc:
             raise ContentShareNotFound(
