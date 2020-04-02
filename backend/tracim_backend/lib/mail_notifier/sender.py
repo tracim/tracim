@@ -63,7 +63,7 @@ class EmailSender(object):
         if not self._smtp_connection:
             log = "Connecting to SMTP server {}"
             logger.info(self, log.format(self._smtp_config.server))
-            if self._smtp_config.implicit_ssl:
+            if self._smtp_config.use_implicit_ssl:
                 self._smtp_connection = smtplib.SMTP_SSL(
                     self._smtp_config.server, self._smtp_config.port
                 )
@@ -73,7 +73,7 @@ class EmailSender(object):
                 )
             self._smtp_connection.ehlo()
 
-            if self._smtp_config.login and not self._smtp_config.implicit_ssl:
+            if self._smtp_config.login and not self._smtp_config.use_implicit_ssl:
                 try:
                     starttls_result = self._smtp_connection.starttls()
 

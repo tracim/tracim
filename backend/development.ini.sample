@@ -320,7 +320,7 @@ email.notification.smtp.password = your_smtp_password
 ## active implicit ssl if you are using implicit smtp with encryption port like 465
 ## by default, tracim will try to use explicit smtp encryption using starttls, and unencrypted
 ## connection as fallback.
-email.notification.smtp.implicit_ssl = false
+email.notification.smtp.use_implicit_ssl = false
 
 ### Headers ###
 email.notification.from.default_label = Tracim Notifications
