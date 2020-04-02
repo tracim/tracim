@@ -4,7 +4,7 @@
 
 Most settings in Tracim are configurable using both the INI configuration file and environment variables.
 
-### Tracim 2.2 fully supported variables:
+### Tracim fully supported variables:
 
 You can set those parameters in INI configuration file (see `config_file_name`) or
 environnement variable (see `env_var_name`).
@@ -14,8 +14,8 @@ The priority order is (from less to more priority):
 - configuration file
 - environnement variables
 
-|<env_var_name>|<config_file_name>|<config_name>|
-|--------------|------------------|-------------|
+|<env_var_name>                |<config_file_name>            |<config_name>                 |
+|------------------------------|------------------------------|------------------------------|
 |TRACIM_APP__ENABLED           |app.enabled                   |APP__ENABLED                  |
 |TRACIM_SQLALCHEMY__URL        |sqlalchemy.url                |SQLALCHEMY__URL               |
 |TRACIM_DEFAULT_LANG           |default_lang                  |DEFAULT_LANG                  |
@@ -70,6 +70,7 @@ The priority order is (from less to more priority):
 |TRACIM_EMAIL__NOTIFICATION__SMTP__PORT|email.notification.smtp.port  |EMAIL__NOTIFICATION__SMTP__PORT|
 |TRACIM_EMAIL__NOTIFICATION__SMTP__USER|email.notification.smtp.user  |EMAIL__NOTIFICATION__SMTP__USER|
 |TRACIM_EMAIL__NOTIFICATION__SMTP__PASSWORD|email.notification.smtp.password|EMAIL__NOTIFICATION__SMTP__PASSWORD|
+|TRACIM_EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL|email.notification.smtp.use_implicit_ssl|EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL|
 |TRACIM_EMAIL__REPLY__ACTIVATED|email.reply.activated         |EMAIL__REPLY__ACTIVATED       |
 |TRACIM_EMAIL__REPLY__IMAP__SERVER|email.reply.imap.server       |EMAIL__REPLY__IMAP__SERVER    |
 |TRACIM_EMAIL__REPLY__IMAP__PORT|email.reply.imap.port         |EMAIL__REPLY__IMAP__PORT      |
