@@ -289,7 +289,6 @@ class EmailManager(object):
             reply_to_label = _("{username} & all members of {workspace}").format(
                 username=user.display_name, workspace=main_content.workspace.label
             )
-
             message = MIMEMultipart("alternative")
             message["Subject"] = subject
             message["From"] = self._get_sender(user)
@@ -300,7 +299,13 @@ class EmailManager(object):
             # contains only message_id from parents post in thread.
             # To link this email to a content we create a virtual parent
             # in reference who contain the content_id.
-            message["References"] = formataddr(("", reference_addr))
+            references = formataddr(("", reference_addr))
+            # INFO - G.M - 2020-04-03 - Enforce bracket in references header if not provided,
+            # formataddr add them only if label is not empty, but we need them here to ensure best
+            # compat from parsing software
+            if reference_addr[0] != "<":
+                references = "<{}>".format(references)
+            message["References"] = references
             content_in_context = content_api.get_content_in_context(content)
             parent_in_context = None
             if content.parent_id:
