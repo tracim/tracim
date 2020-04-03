@@ -60,7 +60,3 @@ cd $DEFAULTDIR/frontend || exit 1
 npm run build && loggood "success" || logerror "some error"
 
 loggood "-- frontend build successful."
-
-# Return to "$DEFAULTDIR/"
-log "cd $DEFAULTDIR"
-cd $DEFAULTDIR || exit 1
