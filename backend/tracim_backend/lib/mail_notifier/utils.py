@@ -6,7 +6,7 @@ from email.utils import make_msgid
 from email.utils import parseaddr
 import typing
 
-from bs4 import BeautifulSoup
+import html2text
 
 
 class SmtpConfiguration(object):
@@ -89,7 +89,8 @@ class EmailNotificationMessage(MIMEMultipart):
         self["X-Auto-Response-Suppress"] = "All"
         self["Auto-Submitted"] = "auto-generated"
 
-        part1 = MIMEText(BeautifulSoup(body_html).get_text(), "plain", "utf-8")
+        body_text = html2text.HTML2Text().handle(body_html)
+        part1 = MIMEText(body_text, "plain", "utf-8")
         part2 = MIMEText(body_html, "html", "utf-8")
         # Attach parts into message container.
         # According to RFC 2046, the last part of a multipart message,
