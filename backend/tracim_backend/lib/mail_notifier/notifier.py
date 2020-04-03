@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.utils import formataddr
 import logging
 import typing
 
@@ -16,6 +13,8 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.mail_notifier.utils import EST
+from tracim_backend.lib.mail_notifier.utils import EmailAddress
+from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
@@ -148,7 +147,7 @@ class EmailManager(object):
         #     session_factory = get_session_factory(engine)
         #     app_config = CFG(settings)
 
-    def _get_sender(self, user: User = None) -> str:
+    def _get_sender(self, user: User = None) -> EmailAddress:
         """
         Return sender string like "Bob Dylan
             (via Tracim) <notification@mail.com>"
@@ -171,7 +170,7 @@ class EmailManager(object):
         else:
             email_address = email_template.replace("{user_id}", "0")
 
-        return formataddr((mail_sender_name, email_address))
+        return EmailAddress(label=mail_sender_name, email=email_address)
 
     # Content Notification
 
@@ -260,7 +259,6 @@ class EmailManager(object):
             )
             translator = Translator(app_config=self.config, default_lang=role.user.lang)
             _ = translator.get_translation
-            to_addr = formataddr((role.user.display_name, role.user.email))
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
             replyto_addr = self.config.EMAIL__NOTIFICATION__REPLY_TO__EMAIL.replace(
@@ -290,17 +288,6 @@ class EmailManager(object):
                 username=user.display_name, workspace=main_content.workspace.label
             )
 
-            message = MIMEMultipart("alternative")
-            message["Subject"] = subject
-            message["From"] = self._get_sender(user)
-            message["To"] = to_addr
-            message["Reply-to"] = formataddr((reply_to_label, replyto_addr))
-            # INFO - G.M - 2017-11-15
-            # References can theorically have label, but in pratice, references
-            # contains only message_id from parents post in thread.
-            # To link this email to a content we create a virtual parent
-            # in reference who contain the content_id.
-            message["References"] = formataddr(("", reference_addr))
             content_in_context = content_api.get_content_in_context(content)
             parent_in_context = None
             if content.parent_id:
@@ -316,11 +303,20 @@ class EmailManager(object):
                 translator,
             )
 
-            part2 = MIMEText(body_html, "html", "utf-8")
-            # Attach parts into message container.
-            # According to RFC 2046, the last part of a multipart message, in this case
-            # the HTML message, is best and preferred.
-            message.attach(part2)
+            message = EmailNotificationMessage(
+                subject=subject,
+                from_header=self._get_sender(user),
+                to_header=EmailAddress(role.user.display_name, role.user.email),
+                reply_to=EmailAddress(reply_to_label, replyto_addr),
+                # INFO - G.M - 2017-11-15
+                # References can theorically have label, but in pratice, references
+                # contains only message_id from parents post in thread.
+                # To link this email to a content we create a virtual parent
+                # in reference who contain the content_id.
+                references=EmailAddress("", reference_addr),
+                body_html=body_html,
+                lang=translator.default_lang,
+            )
 
             self.log_email_notification(
                 msg="an email was created to {}".format(message["To"]),
@@ -351,11 +347,8 @@ class EmailManager(object):
             self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT
         )
         subject = translated_subject.replace(EST.WEBSITE_TITLE, str(self.config.WEBSITE__TITLE))
-        message = MIMEMultipart("alternative")
-        message["Subject"] = subject
-        message["From"] = self._get_sender(origin_user)
-        message["To"] = formataddr((user.get_display_name(), user.email))
-
+        from_header = self._get_sender(origin_user)
+        to_header = EmailAddress(user.get_display_name(), user.email)
         html_template_file_path = self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML
 
         context = {
@@ -369,13 +362,13 @@ class EmailManager(object):
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator
         )
-
-        part2 = MIMEText(body_html, "html", "utf-8")
-
-        # Attach parts into message container.
-        # According to RFC 2046, the last part of a multipart message,
-        # in this case the HTML message, is best and preferred.
-        message.attach(part2)
+        message = EmailNotificationMessage(
+            subject=subject,
+            from_header=from_header,
+            to_header=to_header,
+            body_html=body_html,
+            lang=translator.default_lang,
+        )
 
         send_email_through(
             config=self.config, sendmail_callable=email_sender.send_mail, message=message
@@ -397,10 +390,8 @@ class EmailManager(object):
             self.config.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT
         )
         subject = translated_subject.replace(EST.WEBSITE_TITLE, str(self.config.WEBSITE__TITLE))
-        message = MIMEMultipart("alternative")
-        message["Subject"] = subject
-        message["From"] = self._get_sender()
-        message["To"] = formataddr((user.get_display_name(), user.email))
+        from_header = self._get_sender()
+        to_header = EmailAddress(user.get_display_name(), user.email)
 
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML
@@ -417,14 +408,13 @@ class EmailManager(object):
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator
         )
-
-        part2 = MIMEText(body_html, "html", "utf-8")
-
-        # Attach parts into message container.
-        # According to RFC 2046, the last part of a multipart message,
-        # in this case the HTML message, is best and preferred.
-        message.attach(part2)
-
+        message = EmailNotificationMessage(
+            subject=subject,
+            from_header=from_header,
+            to_header=to_header,
+            body_html=body_html,
+            lang=translator.default_lang,
+        )
         send_email_through(
             config=self.config, sendmail_callable=email_sender.send_mail, message=message
         )

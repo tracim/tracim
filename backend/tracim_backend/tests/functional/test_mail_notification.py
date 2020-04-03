@@ -9,6 +9,8 @@ from rq import SimpleWorker
 import transaction
 
 from tracim_backend.lib.mail_notifier.sender import EmailSender
+from tracim_backend.lib.mail_notifier.utils import EmailAddress
+from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.utils import get_redis_connection
 from tracim_backend.lib.utils.utils import get_rq_queue
@@ -72,6 +74,54 @@ class TestEmailSender(object):
         assert response[0]["MIME"]["Parts"][0]["Body"] == text
         assert response[0]["MIME"]["Parts"][1]["Body"] == html
 
+    def test__func__send_email_notification__ok__nominal_case(self, app_config, mailhog):
+        smtp_config = SmtpConfiguration(
+            app_config.EMAIL__NOTIFICATION__SMTP__SERVER,
+            app_config.EMAIL__NOTIFICATION__SMTP__PORT,
+            app_config.EMAIL__NOTIFICATION__SMTP__USER,
+            app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+        )
+        sender = EmailSender(app_config, smtp_config, True)
+        html = """\
+        <html>
+          <head></head>
+          <body>
+            <p>test__func__send_email__ok__nominal_case</p>
+          </body>
+        </html>
+        """.replace(
+            " ", ""
+        ).replace(
+            "\n", ""
+        )
+        msg = EmailNotificationMessage(
+            subject="test__func__send_email__ok__nominal_case",
+            from_header=EmailAddress("", "test_send_mail@localhost"),
+            to_header=EmailAddress("", "receiver_test_send_mail@localhost"),
+            reply_to=EmailAddress("", "replyto@localhost"),
+            references=EmailAddress("", "references@localhost"),
+            lang="en",
+            body_html=html,
+        )
+        sender.send_mail(msg)
+        sender.disconnect()
+
+        # check mail received
+        response = mailhog.get_mailhog_mails()
+        headers = response[0]["Content"]["Headers"]
+        assert headers["From"][0] == "test_send_mail@localhost"
+        assert headers["To"][0] == "receiver_test_send_mail@localhost"
+        assert headers["Subject"][0] == "test__func__send_email__ok__nominal_case"
+        assert headers["Content-Language"][0] == "en"
+        assert headers["Message-ID"]
+        assert headers["Date"]
+        assert headers["Reply-to"][0] == "replyto@localhost"
+        assert headers["References"][0] == "references@localhost"
+        assert headers["X-Auto-Response-Suppress"][0] == "All"
+        assert headers["Auto-Submitted"][0] == "auto-generated"
+        assert response[0]["MIME"]["Parts"][0]["Body"]
+        assert response[0]["MIME"]["Parts"][1]["Body"]
+
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
@@ -114,7 +164,7 @@ class TestNotificationsSync(object):
         uapi = user_api_factory.get(current_user=None)
         current_user = uapi.get_one_by_email("admin@admin.admin")
         # set admin as french, useful to verify if i18n work properly
-        current_user.lang = "fr"
+        current_user.lang = "en"
         # Create new user with notification enabled on w1 workspace
         wapi = workspace_api_factory.get(current_user=current_user)
         workspace = wapi.get_one_by_label("Recipes")
