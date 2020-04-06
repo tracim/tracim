@@ -260,7 +260,7 @@ def downgrade():
 
 ### Updating database content in migration revision
 
-There does exist few way to update dabase content in migration revision:
+There are a few ways to update the database content in migration revision:
 
 #### Use SQLAlchemy Table
 
