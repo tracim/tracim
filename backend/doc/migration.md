@@ -147,7 +147,7 @@ See [182b9f7aa837_add_remote_value_to_auth_type_list.py]("../tracim_backend/migr
 
 When updating a table, it seems not always require to set the type, for exemple if you need just
 to rename a column. Due to database specific behaviour, alembic require to always
-set the type.
+setting the type.
 
 ```python
 from alembic import op
