@@ -149,8 +149,8 @@ class EmailManager(object):
 
     def _get_sender(self, user: User = None) -> EmailAddress:
         """
-        Return sender string like "Bob Dylan
-            (via Tracim) <notification@mail.com>"
+        Return sender EmailAdress object, which permit to get rfc compliant address:
+        "Bob Dylan (via Tracim) <notification@mail.com>"
         :param user: user to extract display name
         :return: sender string
         """
