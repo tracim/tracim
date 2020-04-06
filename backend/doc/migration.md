@@ -68,7 +68,7 @@ def upgrade():
         batch_op.add_column(sa.Column("lang", sa.Unicode(length=3), nullable=True))
 ```
 
-There are many exemple of this in tracim migration revision :
+There are many examples of this in Tracim migration revision:
 - [2b4043fa2502_remove_webdav_right_digest_response_.py]("../tracim_backend/migration/2b4043fa2502_remove_webdav_right_digest_response_.py")
 - [5a4962fb875f_add_allowed_space_to_user.py]("../tracim_backend/migration/5a4962fb875f_add_allowed_space_to_user.py")
 - [32e629b17e2e_change_calendar_enabled_to_agenda_enabled_colum.py]("../tracim_backend/migration/32e629b17e2e_change_calendar_enabled_to_agenda_enabled_colum.py")
