@@ -103,7 +103,7 @@ def downgrade():
 
 see [ab7c7f4bcbc5_add_auth_type_enum_to_user.py]("../tracim_backend/migration/ab7c7f4bcbc5_add_auth_type_enum_to_user.py")
 
-But updating enum list a bit more tricky:
+But updating an enum list is a bit more tricky:
 
 ```python
 from alembic import op
