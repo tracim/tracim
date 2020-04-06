@@ -353,7 +353,7 @@ For best support, it is better to use one email address per id, like:
 
 This configuration should work out of the box on some providers since they already support "+" subaddressing, and provide
 the best compatibility.
-An other way to make the feature working is by setting a wildcard alias in your email provided, for example:
+As an alternative, you can also set a wildcard alias for your provided email, for example:
 
     tracim.content.{content_id}@supersmtpserver.ndd -> tracim.notification@supersmtpserver.ndd
 
