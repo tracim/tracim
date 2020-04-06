@@ -141,7 +141,7 @@ def upgrade():
 ```
 
 
-see [182b9f7aa837_add_remote_value_to_auth_type_list.py]("../tracim_backend/migration/182b9f7aa837_add_remote_value_to_auth_type_list.py") for a complete working sample with downgrade.
+See [182b9f7aa837_add_remote_value_to_auth_type_list.py]("../tracim_backend/migration/182b9f7aa837_add_remote_value_to_auth_type_list.py") for a complete working sample with downgrade.
 
 ## Mysql require always type to be defined when altering column
 
