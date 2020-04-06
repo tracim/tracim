@@ -402,7 +402,7 @@ if dialect.name == "mysql":
    pass
 ```
 
-in mysql case, dialect does not tell all the true, you can use specific method to
+In the case of MySQL, dialect does not tell all the truth, you can use specific method to
 check if we are in mariadb or mysql:
 
 ```python
