@@ -47,7 +47,7 @@ here are some tricks to help us.
 
 ## sqlite support of alter table is limited, use always batch_op !
 
-sqlite database has limited support for alter table ops, which mean you can't easily add/remove/rename columns.
+SQLite has limited support for ops altering tables. As a consequence, you can't easily add/remove/rename columns.
 
 This code doesn't work
 
