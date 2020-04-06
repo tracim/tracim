@@ -146,7 +146,7 @@ See [182b9f7aa837_add_remote_value_to_auth_type_list.py]("../tracim_backend/migr
 ## MySQL Always Requires the Type When Altering a Column
 
 When updating a table, setting the type does not always seem to be required, for instance when you just need
-to rename a column. Due to database specific behaviour, alembic require to always
+to rename a column. Due to differing behaviors across database engines, Alembic always requires
 setting the type.
 
 ```python
