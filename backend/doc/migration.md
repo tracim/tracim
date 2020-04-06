@@ -181,7 +181,7 @@ see [32e629b17e2e_change_calendar_enabled_to_agenda_enabled_colum.py]("../tracim
 This example is a bit tricky because, it is in fact, not working properly on recent versions of MariaDB and MySQL (versions 8 and later),
 this is related to issue in alembic support for these database.
 
-A fix that should work on any database, should be :
+A fix that should work on any database, should be:
 
 ```python
 from alembic import op
