@@ -73,7 +73,7 @@ There are many examples of this in Tracim migration revision:
 - [5a4962fb875f_add_allowed_space_to_user.py]("../tracim_backend/migration/5a4962fb875f_add_allowed_space_to_user.py")
 - [32e629b17e2e_change_calendar_enabled_to_agenda_enabled_colum.py]("../tracim_backend/migration/32e629b17e2e_change_calendar_enabled_to_agenda_enabled_colum.py")
 
-## Postgresql Support real Enum type
+## Postgresql Support for Real Enum Type
 
 PostgreSQL does support real enum whereas other database engines support enum as a "check" constraint.
 This means different code to support postgresql specificity in alembic.
