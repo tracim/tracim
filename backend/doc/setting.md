@@ -345,7 +345,7 @@ you first need to activate the API key authentication mechanism (see section Act
 To use this feature, you need working email notifications (see section Enabling the Mail Notification Feature)
 
 #### Multiple email address notification
-For best support, it's better to use email address per id, like:
+For best support, it is better to use one email address per id, like:
 
     email.notification.from.email = test_user+{user_id}@supersmtpserver.ndd
     email.notification.reply_to.email = test_user+{content_id}@supersmtpserver.ndd
