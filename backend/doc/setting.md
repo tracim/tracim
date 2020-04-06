@@ -351,7 +351,7 @@ For best support, it is better to use one email address per id, like:
     email.notification.reply_to.email = test_user+{content_id}@supersmtpserver.ndd
     email.notification.references.email = test_user+{content_id}@supersmtpserver.ndd
 
-This configuration should work out of the box on some provider as they do already support "+" subaddressing, and provide
+This configuration should work out of the box on some providers since they already support "+" subaddressing, and provide
 the most compatibility.
 An other way to make the feature working is by setting a wildcard alias in your email provided, for example:
 
