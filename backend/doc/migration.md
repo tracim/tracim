@@ -157,7 +157,7 @@ def upgrade():
 ```
 
 will work on both postgresql and sqlite but will fail on mysql, you need to specify
-type_ like this :
+type_ like this:
 
 
 ```python
