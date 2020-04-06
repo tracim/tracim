@@ -366,7 +366,7 @@ with a configuration like that:
 #### One email address notification
 
 if you can't provide a wildcard and can't support subadressing and want a reply-to feature with only one named email address,
-the only last solution is by setting References Header.
+as a last resort, you can set the References Header.
 
 This solution is worst as it give less compatibility throught email
 client. Some email client (like Sogo) have issue to return properly References Header in mail response, which break threading
