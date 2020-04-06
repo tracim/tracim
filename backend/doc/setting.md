@@ -368,7 +368,7 @@ with a configuration like that:
 if you can't provide a wildcard and can't support subadressing and want a reply-to feature with only one named email address,
 as a last resort, you can set the References Header.
 
-This solution is worst as it give less compatibility throught email
+However, be aware that support across email clients is not great.
 client. Some email client (like Sogo) have issue to return properly References Header in mail response, which break threading
 behavior, and does break reply to feature too .
 Email from these client are retrieved but can't be correctly associated to one item.
