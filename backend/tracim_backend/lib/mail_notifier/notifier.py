@@ -122,12 +122,8 @@ class EmailNotifier(INotifier):
                 EmailManager(self._smtp_config, self.config, self.session).notify_content_update(
                     self._user.user_id, content.content_id
                 )
-        except Exception as e:
-            # TODO - G.M - 2018-08-27 - Do Better catching for exception here
-            logger.error(
-                self, "Exception catched during email notification: {}".format(e.__str__())
-            )
-            logger.exception(self, e)
+        except Exception:
+            logger.exception(self, "Exception catched during email notification")
 
 
 class EmailManager(object):
@@ -455,9 +451,9 @@ class EmailManager(object):
                 lang=translator.default_lang,
                 **context
             )
-        except Exception as exc:
-            logger.exception(self, "Failed to render email template: {}".format(exc.__str__()))
-            raise EmailTemplateError("Failed to render email template: {}".format(exc.__str__()))
+        except Exception:
+            logger.exception(self, "Failed to render email template")
+            raise EmailTemplateError("Failed to render email template")
 
     def _build_context_for_content_update(
         self,
