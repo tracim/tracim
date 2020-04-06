@@ -143,7 +143,7 @@ def upgrade():
 
 See [182b9f7aa837_add_remote_value_to_auth_type_list.py]("../tracim_backend/migration/182b9f7aa837_add_remote_value_to_auth_type_list.py") for a complete working sample with downgrade.
 
-## Mysql require always type to be defined when altering column
+## MySQL Always Requires the Type When Altering a Column
 
 When updating a table, it seems not always require to set the type, for exemple if you need just
 to rename a column. Due to database specific behaviour, alembic require to always
