@@ -8,6 +8,8 @@ import typing
 
 import html2text
 
+from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
+
 
 class SmtpConfiguration(object):
     """Container class for SMTP configuration used in Tracim."""
@@ -89,7 +91,7 @@ class EmailNotificationMessage(MIMEMultipart):
         self["X-Auto-Response-Suppress"] = "All"
         self["Auto-Submitted"] = "auto-generated"
 
-        body_text = html2text.HTML2Text().handle(body_html)
+        body_text = html2text.HTML2Text().handle(HtmlSanitizer(body_html).sanitize())
         part1 = MIMEText(body_text, "plain", "utf-8")
         part2 = MIMEText(body_html, "html", "utf-8")
         # Attach parts into message container.
