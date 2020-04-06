@@ -63,4 +63,26 @@ describe('App File', () => {
       })
     })
   })
+
+  describe('Open file with different role', () => {
+    it('should display the download share button when the user is logged as shared space manager', () => {
+      cy.loginAs('administrators')
+      cy.visitPage({
+        pageName: p.CONTENT_OPEN,
+        params: { workspaceId: workspaceId, contentType: 'file', contentId: secondContentId }
+      })
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
+        .get('[data-cy=popin_right_part_share]').should('be.visible')
+    })
+
+    it('should not display the download share button when the user is logged as contributor', () => {
+      cy.loginAs('users')
+      cy.visitPage({
+        pageName: p.CONTENT_OPEN,
+        params: { workspaceId: workspaceId, contentType: 'file', contentId: secondContentId }
+      })
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
+        .get('[data-cy=popin_right_part_share]').should('be.not.visible')
+    })
+  })
 })
