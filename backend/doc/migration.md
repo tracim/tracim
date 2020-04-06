@@ -156,7 +156,7 @@ def upgrade():
         bop.alter_column("calendar_enabled", new_column_name="agenda_enabled")
 ```
 
-will work on both postgresql and sqlite but will failed on mysql, you need to specify
+will work on both postgresql and sqlite but will fail on mysql, you need to specify
 type_ like this :
 
 
