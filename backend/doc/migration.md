@@ -229,7 +229,7 @@ constraint to be sure constraint will be readded.
 ## Mysql does already add index to foreign keys
 
 MySQL automatically adds indexes to foreign keys, this leads to issues with migration downgrades as we cannot drop these indexes.
-Current way to deal with this, is just ignoring mysql for index add/remove on foreign key as it is really complicated
+The current way to deal with this, is just ignoring mysql for index add/remove on foreign key as it is really complicated
 to handle this properly with the correct index names.
 
 ```python
