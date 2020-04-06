@@ -426,5 +426,5 @@ if dialect.server_version_info >= (8, 0, 0):
 
 ### Avoid Multiple Heads
 
-Currently tracim tests doesn't support multiple head, so we do need to have a linear migration tree.
+Currently, Tracim tests do not support multiple heads, so we do need to have a linear migration tree.
 So we need to modify "down_revision" in your new revision to the last one in order to fix this kind of issue.
