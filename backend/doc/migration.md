@@ -373,7 +373,7 @@ see :
 
 #### Use Raw SQL
 
-In some specific case, using raw sql query is the easiest solution, be careful about
+In some specific cases, using raw sql query is the easiest solution, be careful about
 using sql that does work on all your supported database.
 
 
