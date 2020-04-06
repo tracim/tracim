@@ -164,7 +164,7 @@ class TestNotificationsSync(object):
         uapi = user_api_factory.get(current_user=None)
         current_user = uapi.get_one_by_email("admin@admin.admin")
         # set admin as french, useful to verify if i18n work properly
-        current_user.lang = "en"
+        current_user.lang = "fr"
         # Create new user with notification enabled on w1 workspace
         wapi = workspace_api_factory.get(current_user=current_user)
         workspace = wapi.get_one_by_label("Recipes")
