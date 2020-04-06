@@ -43,7 +43,7 @@ in `tracim_backend/migration/versions/` ending with `migration_label.py`:
 # Creating working migration #
 
 Creating a working alembic migration for all database engines supported by Tracim is not so easy,
-here are some trick to help us.
+here are some tricks to help us.
 
 ## sqlite support of alter table is limited, use always batch_op !
 
