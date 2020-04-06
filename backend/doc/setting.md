@@ -342,7 +342,7 @@ you first need to activate the API key authentication mechanism (see section Act
 
 ## Adapt Email Notification Feature
 
-To make this feature work you first need a working email notification(section Enabling the Mail Notification Feature)
+To use this feature, you need working email notifications (see section Enabling the Mail Notification Feature)
 
 #### Multiple email address notification
 For best support, it's better to use email address per id, like:
