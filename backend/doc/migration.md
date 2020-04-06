@@ -75,7 +75,7 @@ There are many examples of this in Tracim migration revision:
 
 ## Postgresql Support real Enum type
 
-Postgresql does support real enum whereas others database support enum as a "check" constraint.
+PostgreSQL does support real enum whereas other database engines support enum as a "check" constraint.
 This means different code to support postgresql specificity in alembic.
 
 creating enum is not too complex:
