@@ -371,7 +371,7 @@ as a last resort, you can set the References Header.
 However, be aware that support across email clients is not great.
 clients. Some email client (like Sogo) do not properly return the References Header in mail replies, which breaks threading
 behavior, and also breaks the reply-to feature.
-Email from these client are retrieved but can't be correctly associated to one item.
+Emails from these clients are retrieved but can't be correctly associated to one item.
 
 You can do this with a configuration like that:
 
