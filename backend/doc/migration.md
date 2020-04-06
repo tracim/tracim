@@ -264,7 +264,7 @@ There does exist few way to update dabase content in migration revision:
 
 #### Use SQLAlchemy Table
 
-You can use sa table to make updating of database content easier. To do this, you must
+You can use `sa.Table` to ease updating the database content. To do this, you must
 create a new table (content from the revision must be completely independant from current code) which
 is attached to an existing table. You don't need to field all column and in most case, it's not
 needed to add constraint too.
