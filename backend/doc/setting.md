@@ -342,18 +342,18 @@ you first need to activate the API key authentication mechanism (see section Act
 
 ## Adapt Email Notification Feature
 
-To make this feature work you first need a working email notification(section Enabling the Mail Notification Feature)
+To use this feature, you need working email notifications (see section Enabling the Mail Notification Feature)
 
 #### Multiple email address notification
-For best support, it's better to use email address per id, like:
+For best support, it is better to use one email address per id, like:
 
     email.notification.from.email = test_user+{user_id}@supersmtpserver.ndd
     email.notification.reply_to.email = test_user+{content_id}@supersmtpserver.ndd
     email.notification.references.email = test_user+{content_id}@supersmtpserver.ndd
 
-This configuration should work out of the box on some provider as they do already support "+" subaddressing, and provide
-the most compatibility.
-An other way to make the feature working is by setting a wildcard alias in your email provided, for example:
+This configuration should work out of the box on some providers since they already support "+" subaddressing, and provide
+the best compatibility.
+As an alternative, you can also set a wildcard alias for your provided email, for example:
 
     tracim.content.{content_id}@supersmtpserver.ndd -> tracim.notification@supersmtpserver.ndd
 
@@ -366,12 +366,12 @@ with a configuration like that:
 #### One email address notification
 
 if you can't provide a wildcard and can't support subadressing and want a reply-to feature with only one named email address,
-the only last solution is by setting References Header.
+as a last resort, you can set the References Header.
 
-This solution is worst as it give less compatibility throught email
-client. Some email client (like Sogo) have issue to return properly References Header in mail response, which break threading
-behavior, and does break reply to feature too .
-Email from these client are retrieved but can't be correctly associated to one item.
+However, be aware that support across email clients is not great.
+clients. Some email client (like Sogo) do not properly return the References Header in mail replies, which breaks threading
+behavior, and also breaks the reply-to feature.
+Emails from these clients are retrieved but can't be correctly associated to one item.
 
 You can do this with a configuration like that:
 
