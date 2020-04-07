@@ -5,13 +5,30 @@ import {
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
-const WorkspaceMembersList = props => {
+export const WorkspaceMembersList = props => {
   return (
     <div className='formBlock workspace_advanced__userlist'>
       {props.displayFormNewMember === false && (
         <div>
           <div className='formBlock__title workspace_advanced__userlist__title'>
             {props.t('Members list')}
+          </div>
+
+          <div
+            className='formBlock__bottom workspace_advanced__userlist__adduser'
+            onClick={props.onClickToggleFormNewMember}
+          >
+            <div className='workspace_advanced__userlist__adduser__button primaryColorFontHover primaryColorBorderHover'>
+              <div className='workspace_advanced__userlist__adduser__button__avatar'>
+                <div className='workspace_advanced__userlist__adduser__button__avatar__icon'>
+                  <i className='fa fa-plus' />
+                </div>
+              </div>
+
+              <div className='workspace_advanced__userlist__adduser__button__text'>
+                {props.t('Add a member')}
+              </div>
+            </div>
           </div>
 
           <ul className='formBlock__field workspace_advanced__userlist__list'>
@@ -81,23 +98,6 @@ const WorkspaceMembersList = props => {
               </li>
             )}
           </ul>
-
-          <div
-            className='formBlock__bottom workspace_advanced__userlist__adduser'
-            onClick={props.onClickToggleFormNewMember}
-          >
-            <div className='workspace_advanced__userlist__adduser__button primaryColorFontHover primaryColorBorderHover'>
-              <div className='workspace_advanced__userlist__adduser__button__avatar'>
-                <div className='workspace_advanced__userlist__adduser__button__avatar__icon'>
-                  <i className='fa fa-plus' />
-                </div>
-              </div>
-
-              <div className='workspace_advanced__userlist__adduser__button__text'>
-                {props.t('Add a member')}
-              </div>
-            </div>
-          </div>
         </div>
       )}
 

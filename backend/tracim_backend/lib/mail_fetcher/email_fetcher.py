@@ -137,8 +137,8 @@ class DecodedMail(object):
             key = DecodedMail.find_key_from_mail_address(
                 to_address, self.reply_to_pattern, "{content_id}"
             )
-        if not key and first_ref:
-            key = DecodedMail.find_key_from_mail_address(
+        if first_ref:
+            return DecodedMail.find_key_from_mail_address(
                 first_ref, self.references_pattern, "{content_id}"
             )
         if key:
@@ -345,43 +345,38 @@ class MailFetcher(object):
                         self.stop()
                         break
             # Socket
-            except (socket.error, socket.gaierror, socket.herror) as e:
-                log = "Socket fail with IMAP connection {}"
-                logger.error(self, log.format(e.__str__()))
-
-            except socket.timeout as e:
-                log = "Socket timeout on IMAP connection {}"
-                logger.error(self, log.format(e.__str__()))
-
+            except (socket.error, socket.gaierror, socket.herror):
+                log = "Socket fail with IMAP connection"
+                logger.exception(self, log)
+            except socket.timeout:
+                log = "Socket timeout on IMAP connection"
+                logger.exception(self, log)
             # SSL
-            except ssl.SSLError as e:
+            except ssl.SSLError:
                 log = "SSL error on IMAP connection"
-                logger.error(self, log.format(e.__str__()))
-
-            except ssl.CertificateError as e:
+                logger.exception(self, log)
+            except ssl.CertificateError:
                 log = "SSL Certificate verification failed on IMAP connection"
-                logger.error(self, log.format(e.__str__()))
-
+                logger.exception(self, log)
             # Filelock
-            except filelock.Timeout as e:
-                log = "Mail Fetcher Lock Timeout {}"
-                logger.warning(self, log.format(e.__str__()))
+            except filelock.Timeout:
+                log = "Mail Fetcher Lock Timeout"
+                logger.warning(self, log, exc_info=True)
 
             # IMAP
             # TODO - G.M - 10-01-2017 - Support imapclient exceptions
             # when Imapclient stable will be 2.0+
 
-            except BadIMAPFetchResponse as e:
+            except BadIMAPFetchResponse:
                 log = (
                     "Imap Fetch command return bad response."
-                    "Is someone else connected to the mailbox ?: "
-                    "{}"
+                    "Is someone else connected to the mailbox ?"
                 )
-                logger.error(self, log.format(e.__str__()))
+                logger.exception(self, log)
             # Others
-            except Exception as e:
-                log = "Mail Fetcher error {}"
-                logger.error(self, log.format(e.__str__()))
+            except Exception:
+                log = "Mail Fetcher error"
+                logger.exception(self, log)
 
             finally:
                 # INFO - G.M - 2018-01-09 - Connection closing
@@ -396,9 +391,9 @@ class MailFetcher(object):
                     except Exception:
                         try:
                             imapc.shutdown()
-                        except Exception as e:
-                            log = "Can't logout, connection broken ? {}"
-                            logger.error(self, log.format(e.__str__()))
+                        except Exception:
+                            log = "Can't logout, connection broken ?"
+                            logger.exception(self, log)
 
             if self.burst:
                 self.stop()
@@ -472,9 +467,9 @@ class MailFetcher(object):
             mail = mails.pop()
             try:
                 method, endpoint, json_body_dict = self._create_comment_request(mail)
-            except NoKeyFound as exc:
-                log = "Failed to create comment request due to missing specialkey in mail {}"
-                logger.error(self, log.format(exc.__str__()))
+            except NoKeyFound:
+                log = "Failed to create comment request due to missing specialkey in mail"
+                logger.exception(self, log)
                 continue
             except EmptyEmailBody:
                 log = "Empty body, skip mail"
@@ -484,9 +479,9 @@ class MailFetcher(object):
                 log = "Autoreply mail, skip mail"
                 logger.warning(self, log)
                 continue
-            except Exception as exc:
-                log = "Failed to create comment request in mail fetcher error : {}"
-                logger.error(self, log.format(exc.__str__()))
+            except Exception:
+                log = "Failed to create comment request in mail fetcher error"
+                logger.exception(self, log)
                 continue
 
             try:
@@ -497,12 +492,12 @@ class MailFetcher(object):
                     endpoint=endpoint,
                     json_body_dict=json_body_dict,
                 )
-            except requests.exceptions.Timeout as e:
-                log = "Timeout error to transmit fetched mail to tracim : {}"
-                logger.error(self, log.format(str(e)))
-            except requests.exceptions.RequestException as e:
-                log = "Fail to transmit fetched mail to tracim : {}"
-                logger.error(self, log.format(str(e)))
+            except requests.exceptions.Timeout:
+                log = "Timeout error to transmit fetched mail to tracim"
+                logger.exception(self, log)
+            except requests.exceptions.RequestException:
+                log = "Fail to transmit fetched mail to tracim"
+                logger.exception(self, log)
 
     def _get_auth_headers(self, user_email) -> dict:
         return {TRACIM_API_KEY_HEADER: self.api_key, TRACIM_API_USER_EMAIL_LOGIN_HEADER: user_email}
