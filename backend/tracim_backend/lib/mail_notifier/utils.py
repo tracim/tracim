@@ -55,7 +55,7 @@ class EmailAddress(object):
         formatted_address = formataddr((self.label, self.email))
         if not self.force_angle_bracket or self.label:
             return formatted_address
-        if formatted_address[0] != "<":
+        if formatted_address and formatted_address[0] != "<":
             return "<{}>".format(formatted_address)
         return formatted_address
 

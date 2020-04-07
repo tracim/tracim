@@ -164,14 +164,15 @@ class DecodedMail(object):
             before, after = static_parts
             if mail_address.startswith(before) and mail_address.endswith(after):
                 key = mail_address.replace(before, "").replace(after, "")
-                assert key.isalnum()
-                return key
+                if key.isalnum():
+                    return key
+                logger.warning(
+                    cls, "key found {} is not alphanumeric, cannot retrieve value".format(key)
+                )
             logger.warning(
                 cls, "pattern {} does not match email address {} ".format(pattern, mail_address)
             )
-            return None
-        else:
-            return None
+        return None
 
     def check_validity_for_comment_content(self) -> None:
         """

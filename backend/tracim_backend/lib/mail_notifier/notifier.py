@@ -309,7 +309,10 @@ class EmailManager(object):
                 # contains only message_id from parents post in thread.
                 # To link this email to a content we create a virtual parent
                 # in reference who contain the content_id.
-                references=EmailAddress("", reference_addr),
+                # INFO - G.M - 2020-04-03 - Enforce angle bracket in references header
+                # we need that to ensure best software compatibility
+                # compat from parsing software
+                references=EmailAddress("", reference_addr, force_angle_bracket=True),
                 body_html=body_html,
                 lang=translator.default_lang,
             )
