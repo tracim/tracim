@@ -8,7 +8,12 @@
 
 ### Fixed issues
 
-- Backend: #2793, #2811, #2812
+- Frontend: #2688
+- Backend: #2687, #2793, #2811, #2812
+
+### Other Changes
+
+- ElasticSearch: Refactor of indexing organization. So its necessary to drop existing index and create it again to use ElasticSearch, use CLI command for this (#2660)
 
 
 ## 2.6.2 / 2020-03-20
