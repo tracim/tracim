@@ -70,10 +70,12 @@ class TestDecodedMail(object):
 
     def test_unit__find_key_from_mail_subadress__err_not_alphanum(self):
         mail_address = "reply+%@mydomainname.tld"
-        with pytest.raises(AssertionError):
+        assert (
             DecodedMail.find_key_from_mail_address(
                 mail_address, marker_str="{key}", pattern="reply+{key}@mydomainname.tld"
             )
+            is None
+        )
 
     def test_unit__find_key_from_mail_address__dot_adress_no_key(self):
         mail_address = "reply@mydomainname.tld"
