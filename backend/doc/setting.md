@@ -312,6 +312,9 @@ to enable mail notification, smallest config is this:
 Don't forget to set `website.base_url` and `website.title` for the frontend, as some features use them to
 link the frontend in emails.
 
+:warning: its necessary to check if your smtp configuration working good before using tracim.
+In next release we purpose a quick solution to test if your smtp configuration work properly.
+
 ## Configuring Invitation in Workspace ##
 
 You can set the behaviour of the invitation feature depending on how you use Tracim.
