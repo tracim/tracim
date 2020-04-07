@@ -15,6 +15,11 @@
 
 - ElasticSearch: Refactor of indexing organization. So its necessary to drop existing index and create it again to use ElasticSearch, use CLI command for this (#2660)
 
+### Known issues
+
+- SMTP server using implicit ssl can cause problem with Tracim. If you not activate `email.notification.smtp.use_implicit_ssl = True` and you use `email.processing_mode = sync`, when Tracim try to send email, backend error 500 appear after 5min and its also not possible to create new account.
+In next release we had simple information [here](https://github.com/tracim/tracim/blob/master/backend/doc/setting.md) to test your SMTP with Tracim configuration file.
+
 
 ## 2.6.2 / 2020-03-20
 
