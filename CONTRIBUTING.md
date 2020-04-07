@@ -12,6 +12,9 @@ To accept, you have to sign all your commits with the `-s` arg of `git commit` c
 ## Code formatting and others checks
 
 ### Pre-commit
+
+:warning: you need at least python 3.6 to run pre-commit (because of black requirement)
+
 In order to follow most tracim guideline in yours commit, please use the precommit mecanism, this
 will do some automatic check before committing to tracim and propose you fix.
 
