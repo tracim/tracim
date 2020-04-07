@@ -15,6 +15,7 @@ import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
 // https://github.com/tracim/tracim/issues/2066
 import { debug } from '../debug.js'
+import { putMyselfFileRead } from '../action.async'
 
 class PopupCreateFile extends React.Component {
   constructor (props) {
@@ -197,23 +198,27 @@ class PopupCreateFile extends React.Component {
 
     this.setState({ uploadStarted: true })
 
-    Promise.all(state.fileToUploadList.map(async (file) =>
+    Promise.all(state.fileToUploadList.map((file) =>
       this.buildUploadedFileResponse(file)
-    )).then(uploadedFileResponseList => {
-      this.handleAllFileUploadEnd(uploadedFileResponseList.map((uploadedFileResponse) => this.handleFileUploadEnd(uploadedFileResponse.xhr, uploadedFileResponse.file)))
+    )).then(async uploadedFileResponseList => {
+      const fileUploadList = await Promise.all(uploadedFileResponseList.map((uploadedFileResponse) =>
+        this.handleFileUploadEnd(uploadedFileResponse.xhr, uploadedFileResponse.file)
+      ))
+      this.handleAllFileUploadEnd(fileUploadList)
     }).catch(() => {
       this.sendGlobalFlashMessage(props.t('Error while creating file'))
       this.handleClose(false)
     })
   }
 
-  handleFileUploadEnd = (xhr, file) => {
-    const { props } = this
+  handleFileUploadEnd = async (xhr, file) => {
+    const { state, props } = this
 
     const filePosted = new File([file], file.name)
     switch (xhr.status) {
       case 200:
         const jsonResult200 = JSON.parse(xhr.responseText)
+        await putMyselfFileRead(state.config.apiUrl, state.workspaceId, jsonResult200.content_id)
 
         filePosted.jsonResult = { ...jsonResult200, code: 200 }
         break

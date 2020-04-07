@@ -751,8 +751,8 @@ class CFG(object):
         if not self.EMAIL__NOTIFICATION__ACTIVATED:
             logger.warning(
                 self,
-                "Notification by email mecanism is disabled ! "
-                "Notification and mail invitation mecanisms will not work.",
+                "Notification by email mechanism is disabled! "
+                "Notification and mail invitation mechanisms will not work.",
             )
 
         if not self.EMAIL__REPLY__LOCKFILE_PATH and self.EMAIL__REPLY__ACTIVATED:
@@ -829,7 +829,7 @@ class CFG(object):
     def configure_filedepot(self) -> None:
 
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
-        # of tracim_backend, Be careful DepotManager is a Singleton !
+        # of tracim_backend, Be careful DepotManager is a Singleton!
 
         depot_storage_name = self.DEPOT_STORAGE_NAME
         depot_storage_path = self.DEPOT_STORAGE_DIR

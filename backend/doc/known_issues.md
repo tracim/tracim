@@ -1,23 +1,20 @@
-# Known issue with Tracim Backend
+# Known issues with the Tracim Backend
 
-## Uwsgi
+## uWSGI
 
 ### plaster.exceptions.LoaderNotFound
 
-If you obtain error with :
+If you see the following error:
 
 
     plaster.exceptions.LoaderNotFound: Could not find a matching loader for the scheme "file+ini"".
 
 
-you most probably don't set correctly TRACIM_CONF_PATH or TRACIM_WEBDAV_CONF_PATH.
-You have to set a correct absolute path.
-be careful for uwsgi ini file :
+Check the values of TRACIM_CONF_PATH and TRACIM_WEBDAV_CONF_PATH in the uWSGI configuration file.
+These variables should contain absolute paths and should be quoted.
 
-
-    # incorrect
+- Incorrect:
     env = TRACIM_CONF_PATH="/home/me/tracim/backend/development.ini"
-
-    # correct
+- Correct:
     env = TRACIM_CONF_PATH=/home/me/tracim/backend/development.ini
 

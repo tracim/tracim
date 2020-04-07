@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
+import { isMobile } from 'react-device-detect'
 import appFactory from '../appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
@@ -26,7 +27,7 @@ export class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      sidebarClose: false
+      sidebarClose: isMobile
     }
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)

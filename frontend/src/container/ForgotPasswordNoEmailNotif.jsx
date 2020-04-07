@@ -77,7 +77,7 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
           <CardBody formClass='forgotpassword__card__body'>
             <div>
               <div className='forgotpassword__card__body__title'>
-                {props.t('Did you forget your password ?')}
+                {props.t('Did you forget your password?')}
               </div>
 
               <div className='forgotpassword__card__body__submsg'>

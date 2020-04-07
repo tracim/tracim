@@ -36,7 +36,7 @@ export DEFAULTDIR
 echo "This is DEFAULTDIR \"$DEFAULTDIR\""
 
 # install npm and nodjs if not installed
-log "verify if npm is installed"
+log "check whether npm is installed"
 npm -v
 if [ $? -eq 0 ]; then
     loggood "npm \"$(npm -v)\" and node \"$(node -v)\" are installed"
@@ -47,7 +47,7 @@ else
     curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
     $SUDO apt update
     $SUDO apt install -y nodejs && loggood "install nodejs success" || logerror "failed to install nodejs"
-    log "verify if nodejs 10.x is now installed"
+    log "check whether nodejs 10.x is now installed"
     dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s10.'
     if [ $? -eq 0 ]; then
         loggood "node \"$(node -v)\" is correctly installed"

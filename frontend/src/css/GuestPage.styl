@@ -29,13 +29,16 @@
 .guestupload
   &__card
     &__form
-      &__left
-        width 50%
+      &__container
+        display flex
+        flex-flow row
+      &__left, &__right
+        flex-grow 1
+        flex-basis 50%
       &__right
-        margin-left 20px
-        width 50%
         display flex
         flex-flow column
+        margin-left 20px
 
 .importConfirmation
   width 425px
@@ -51,3 +54,13 @@
     margin 10px
     -webkit-text-stroke 1px black
     color transparent
+
+@media (max-width: max-xs)
+  .guestupload
+    &__card
+      &__form
+        &__container
+          flex-flow column
+        &__right
+          margin-left 0
+          margin-top 20px

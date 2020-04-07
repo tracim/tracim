@@ -19,7 +19,7 @@ describe('Login page', function () {
     cy.get('input[type=password]').should('be.visible')
     cy.get('input[type=password]').should('have.attr', 'placeholder')
     cy.get('.loginpage__card__form__btnsubmit').should('be.visible')
-    cy.get('.loginpage__card__form__btnsubmit').should('have.attr', 'type', 'button')
+    cy.get('.loginpage__card__form__btnsubmit').should('have.attr', 'type', 'submit')
     cy.get('.loginpage__card__form__pwforgot').should('be.visible')
   })
 })

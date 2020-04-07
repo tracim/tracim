@@ -11,7 +11,7 @@ const Search = props => {
         <input
           type='text'
           className='search__input form-control'
-          placeholder={`${props.t('Search...')}`}
+          placeholder={`${props.t('Search…')}`}
           aria-describedby='headerInputSearch'
           onChange={props.onChangeInput}
         />
