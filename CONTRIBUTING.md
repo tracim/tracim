@@ -24,7 +24,7 @@ you can then install hooks with:
 
 Then, you will be able to notice the automatic checks when running `git commit`.
 
-Note: the pre-commit hooks require Python 3.6 or later to work.
+Note: the pre-commit hook requires Python 3.6 or later to work.
 
 ### More Information
 - see [backend/README.md](backend/README.txt) for more information about formatting checks work for the backend.
