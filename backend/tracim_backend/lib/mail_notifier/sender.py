@@ -2,7 +2,6 @@
 from email.message import Message
 from email.mime.multipart import MIMEMultipart
 import smtplib
-import traceback
 import typing
 
 from tracim_backend.config import CFG
@@ -82,10 +81,9 @@ class EmailSender(object):
                 except smtplib.SMTPResponseException as exc:
                     log = "SMTP start TLS return error code: {} with message: {}"
                     logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
-                except Exception as exc:
-                    log = "Unexpected exception during SMTP start TLS process: {}"
-                    logger.error(self, log.format(exc.__str__()))
-                    logger.error(self, traceback.format_exc())
+                except Exception:
+                    log = "Unexpected exception during SMTP start TLS process"
+                    logger.exception(self, log)
 
             if self._smtp_config.login:
                 try:
@@ -101,7 +99,6 @@ class EmailSender(object):
                     log = "SMTP login return code: {} with message: {}"
                     logger.debug(self, log.format(login_res[0], login_res[1].decode("utf-8")))
                 except smtplib.SMTPAuthenticationError as exc:
-
                     log = "SMTP auth return error code: {} with message: {}"
                     logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
                     logger.error(
@@ -110,10 +107,9 @@ class EmailSender(object):
                 except smtplib.SMTPResponseException as exc:
                     log = "SMTP login return error code: {} with message: {}"
                     logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
-                except Exception as exc:
-                    log = "Unexpected exception during SMTP login {}"
-                    logger.error(self, log.format(exc.__str__()))
-                    logger.error(self, traceback.format_exc())
+                except Exception:
+                    log = "Unexpected exception during SMTP login"
+                    logger.exception(self, log)
 
     def disconnect(self):
         if self._smtp_connection:
@@ -152,14 +148,13 @@ class EmailSender(object):
                     logger.debug(self, log.format(send_message_result))
                     action = failed_action
 
-            except smtplib.SMTPException as exc:
-                log = "SMTP sending message return error: {}"
-                logger.error(self, log.format(str(exc)))
+            except smtplib.SMTPException:
+                log = "SMTP sending message return error"
+                logger.exception(self, log)
                 action = failed_action
-            except Exception as exc:
-                log = "Unexpected exception during sending email message using SMTP: {}"
-                logger.error(self, log.format(exc.__str__()))
-                logger.error(self, traceback.format_exc())
+            except Exception:
+                log = "Unexpected exception during sending email message using SMTP"
+                logger.exception(self, log)
                 action = failed_action
 
             from tracim_backend.lib.mail_notifier.notifier import EmailManager

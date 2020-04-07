@@ -33,7 +33,7 @@ fi
 
 
 # install npm and nodjs if not installed
-log "verify if npm is installed"
+log "Checking whether npm is installed"
 npm -v
 if [ $? -eq 0 ]; then
     loggood "npm \"$(npm -v)\" and node \"$(node -v)\" are installed"
@@ -44,7 +44,7 @@ else
     curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
     $SUDO apt update
     $SUDO apt install -y nodejs && loggood "install nodejs success" || logerror "failed to install nodejs"
-    log "verify if nodejs 10.x is now installed"
+    log "Checking whether nodejs 10.x is now installed"
     dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s10.'
     if [ $? -eq 0 ]; then
         loggood "node \"$(node -v)\" is correctly installed"
@@ -63,11 +63,11 @@ fi
 
 
 # install Cypress
-log "Go to functionnal_tests subdir.."
+log "Entering the functionnal_tests directory..."
 cd  functionnal_tests || exit 1
 CURRENTDIR=$(pwd)
-loggood "Your are now here: \"$CURRENTDIR\""
-log "Install cypress."
+loggood "Current directory: '$CURRENTDIR'"
+log "Installing Cypress."
 $SUDO apt update && loggood "success" || logerror "some error"
 $SUDO apt install -y xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 && loggood "success" || logerror "some error"
 npm install && loggood "success" || logerror "some error"
@@ -75,23 +75,22 @@ loggood "Cypress is now installed."
 
 
 # modify cypress.json
-log "Check if cypress.json exist."
+log "Checking whether cypress.json exists."
 if [ ! -f cypress.json ]; then
-    log "cypress.json not exist => copy from cypress.json.sample"
+    log "cypress.json does not exist => copying from cypress.json.sample"
     cp cypress.json.sample cypress.json && loggood "success" || logerror "some error"
-    loggood "cypress.json is now available."
-    log "Write path in cypress.json"
+    log "Writing path to cypress.json"
     SUBDIR=$(pwd)
     sed -i "s|{path_test_file}|$SUBDIR/cypress_test|g" cypress.json && loggood "success" || logerror "some error"
     loggood "Path is now configured."
 else
-    log "cypress.json exist => check if integrationFolder have path."
+    log "cypress.json exists => checking whether integrationFolder has the path."
     if grep -q "\"integrationFolder\"\:\s\"{path_test_file}\"" cypress.json ; then
-        log "No path => write path in cypress.json"
+        log "No. Writing the path in cypress.json"
         SUBDIR=$(pwd)
         sed -i "s|{path_test_file}|$SUBDIR|g" cypress.json && loggood "success" || logerror "some error"
         loggood "Path is now configured."
     else
-        loggood "Path exist. Modify manualy if necessary."
+        loggood "Yes. Manually change if necessary."
     fi
 fi

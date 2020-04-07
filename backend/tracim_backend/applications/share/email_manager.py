@@ -1,14 +1,13 @@
 import email
 from email.message import Message
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.utils import formataddr
 import typing
 
 from tracim_backend.applications.share.models_in_context import ContentShareInContext
 from tracim_backend.lib.mail_notifier.notifier import EmailManager
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.sender import send_email_through
+from tracim_backend.lib.mail_notifier.utils import EmailAddress
+from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import EmailUser
@@ -84,18 +83,16 @@ class ShareEmailManager(EmailManager):
                 emitter.user_id, shared_content.content_id
             ),
         )
-        message = MIMEMultipart("alternative")
         translated_subject = translator.get_translation(
             self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT
         )
-        message["Subject"] = translated_subject.format(
+        subject = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
             content_filename=shared_content.filename,
             nb_receivers=len(content_share_receivers),
         )
-        message["From"] = self._get_sender()
-        to_addr = formataddr((emitter.display_name, emitter.email))
-        message["To"] = to_addr
+        from_header = self._get_sender()
+        to_header = EmailAddress(emitter.display_name, emitter.email)
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML
         )
@@ -108,12 +105,14 @@ class ShareEmailManager(EmailManager):
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator
         )
+        message = EmailNotificationMessage(
+            subject=subject,
+            from_header=from_header,
+            to_header=to_header,
+            body_html=body_html,
+            lang=translator.default_lang,
+        )
 
-        part2 = MIMEText(body_html, "html", "utf-8")
-        # Attach parts into message container.
-        # According to RFC 2046, the last part of a multipart message,
-        # in this case the HTML message, is best and preferred.
-        message.attach(part2)
         return message
 
     def _notify_receiver(
@@ -130,17 +129,16 @@ class ShareEmailManager(EmailManager):
                 emitter.user_id, shared_content.content_id, content_share.email
             ),
         )
-        message = MIMEMultipart("alternative")
         translated_subject = translator.get_translation(
             self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT
         )
-        message["Subject"] = translated_subject.format(
+        subject = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
             content_filename=shared_content.filename,
             emitter_name=emitter.display_name,
         )
-        message["From"] = self._get_sender(emitter)
-        message["To"] = content_share.email
+        from_header = self._get_sender(emitter)
+        to_header = EmailAddress.from_rfc_email_address(content_share.email)
         username, address = email.utils.parseaddr(content_share.email)
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML
@@ -157,9 +155,11 @@ class ShareEmailManager(EmailManager):
             mako_template_filepath=html_template_file_path, context=context, translator=translator
         )
 
-        part2 = MIMEText(body_html, "html", "utf-8")
-        # Attach parts into message container.
-        # According to RFC 2046, the last part of a multipart message,
-        # in this case the HTML message, is best and preferred.
-        message.attach(part2)
+        message = EmailNotificationMessage(
+            subject=subject,
+            from_header=from_header,
+            to_header=to_header,
+            body_html=body_html,
+            lang=translator.default_lang,
+        )
         return message

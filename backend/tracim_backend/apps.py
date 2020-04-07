@@ -5,7 +5,7 @@ from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.utils import find_direct_submodule_path
 
 # TODO - G.M - 2020-01-17 - remove these slug (no need anymore to do app_lib.exist(SLUG)
-# when event mecanism will be fully implemented, see https://github.com/tracim/tracim/issues/1487
+# when event mechanism will be fully implemented, see https://github.com/tracim/tracim/issues/1487
 AGENDA__APP_SLUG = "agenda"
 COLLABORATIVE_DOCUMENT_EDITION__APP_SLUG = "collaborative_document_edition"
 

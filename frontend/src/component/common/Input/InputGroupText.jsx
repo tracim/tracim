@@ -31,7 +31,7 @@ export default InputGroupText
 
 InputGroupText.propTypes = {
   parentClassName: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
   type: PropTypes.oneOf(['text', 'email', 'password', 'tel']).isRequired,
   customClass: PropTypes.string,
   icon: PropTypes.string,
@@ -40,7 +40,8 @@ InputGroupText.propTypes = {
   isInvalid: PropTypes.bool,
   onChange: PropTypes.func,
   onKeyDown: PropTypes.func,
-  maxLength: PropTypes.number
+  maxLength: PropTypes.number,
+  name: PropTypes.string
 }
 
 InputGroupText.defaultProps = {
@@ -51,5 +52,6 @@ InputGroupText.defaultProps = {
   isInvalid: false,
   onChange: () => {},
   onKeyDown: () => {},
-  maxLength: 512
+  maxLength: 512,
+  name: ''
 }

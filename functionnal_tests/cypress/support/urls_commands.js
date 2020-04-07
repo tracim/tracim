@@ -8,7 +8,8 @@ const PAGES = {
   SEARCH: 'search',
   ADMIN_WORKSPACE: 'adminWorkspace',
   SHARE_FOLDER: 'share_folder',
-  GALLERY: 'gallery'
+  GALLERY: 'gallery',
+  CONTENT_OPEN: 'contentOpen'
 }
 
 const URLS = {

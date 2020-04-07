@@ -185,9 +185,9 @@ api.key = %(basic_setup.api_key)s
 ### Remote User Auth ###
 # remote user auth give authorized access to user using a simple header with
 # email of user, if user does not exist, new user will be created.
-# This allow to delegate auth mecanism to webserver.
-# this a true auth mecanism like internal or ldap,
-# this mean user created this way will be attached to this mecanism.
+# This allow to delegate auth mechanism to webserver.
+# this a true auth mechanism like internal or ldap,
+# this mean user created this way will be attached to this mechanism.
 
 
 ## Remote user header should be a CGI env var.
@@ -230,7 +230,7 @@ user.reset_password.token_lifetime = 900
 
 ## active or disable filter on known user, if activate user cannot see at all informations about
 ## member with no common workspace. if false, it can access to these informations.
-## This is used by search mecanism for invitation of user in workspace.
+## This is used by search mechanism for invitation of user in workspace.
 ## default value to true.
 ; known_members.filter = true
 ####

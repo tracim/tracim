@@ -60,7 +60,7 @@ class ESSearchApi(SearchApi):
         # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
         from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
 
-        # INFO - G.M - 2019-05-15 - alias migration mecanism to allow easily updatable index.
+        # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updatable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # Configure index with our indexing preferences
         logger.info(self, "Create index settings ...")
@@ -108,7 +108,7 @@ class ESSearchApi(SearchApi):
         any and all searches without any loss of functionality. It should, however,
         not perform any writes at this time as those might be lost.
         """
-        # INFO - G.M - 2019-05-15 - alias migration mecanism to allow easily updatable index.
+        # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updatable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # construct a new index name by appending current timestamp
         next_index = self.index_document_pattern_template.replace(
@@ -210,7 +210,6 @@ class ESSearchApi(SearchApi):
         indexed_content = IndexedContent(
             content_id=content.content_id,
             label=content.label,
-            acp_label=content.label,
             slug=content.slug,
             status=content.status,
             workspace_id=content.workspace_id,
@@ -362,11 +361,14 @@ class ESSearchApi(SearchApi):
             # important too, content of comment is less important. filename and file_extension is
             # only useful to allow matching "png" or "nameofmycontent.png".
             fields=[
-                "label^8",
-                "acp_label^5",
+                "label.exact^8",
+                "label^5",
+                "filename.exact",
                 "filename",
                 "file_extension",
+                "raw_content.exact^3",
                 "raw_content^3",
+                "comments.raw_content.exact",
                 "comments.raw_content",
                 "file_data.content^3",
                 "file_data.title^4",

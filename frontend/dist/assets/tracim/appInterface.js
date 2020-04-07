@@ -55,7 +55,7 @@ function GLOBAL_renderAppFeature (app, retryCount) {
   if (selectedApp === APP_NOT_LOADED) {
     retryCount = retryCount || 0 // INFO - CH - 2019-06-18 - old school way for default param
 
-    console.log(app.config.slug + ' does not exists. Maybe it hasn\'t finished loading yet ? Retrying in ' + TIME_TO_RETRY + 'ms')
+    console.log(app.config.slug + ' does not exist. Maybe it hasn\'t finished loading yet? Retrying in ' + TIME_TO_RETRY + 'ms')
     var retryTime = retryCount + TIME_TO_RETRY
 
     if (retryTime < RETRY_TIMEOUT) {
@@ -63,7 +63,7 @@ function GLOBAL_renderAppFeature (app, retryCount) {
       return
     }
 
-    console.error('Timed out waiting for app ' + app.config.slug + ' to exists')
+    console.error('Timed out waiting for app ' + app.config.slug + ' to exist')
     return
   }
 
@@ -87,8 +87,7 @@ function GLOBAL_renderAppFullscreen (app, retryCount) {
   if (selectedApp === APP_NOT_LOADED) {
     retryCount = retryCount || 0 // INFO - CH - 2019-06-18 - old school way for default param
 
-    console.log(app.config.slug + ' does not exists. Maybe it hasn\'t finished loading yet ? Retrying in ' + TIME_TO_RETRY + 'ms')
-
+    console.log(app.config.slug + ' does not exist. Maybe it hasn\'t finished loading yet? Retrying in ' + TIME_TO_RETRY + 'ms')
     var retryTime = retryCount + TIME_TO_RETRY
 
     if (retryTime < RETRY_TIMEOUT) {
@@ -96,7 +95,7 @@ function GLOBAL_renderAppFullscreen (app, retryCount) {
       return
     }
 
-    console.error('Timed out waiting for app ' + app.config.slug + ' to exists')
+    console.error('Timed out waiting for app ' + app.config.slug + ' to exist')
     return
   }
 
@@ -118,7 +117,7 @@ function GLOBAL_renderAppPopupCreation (app, retryCount) {
   if (selectedApp === APP_NOT_LOADED) {
     retryCount = retryCount || 0 // INFO - CH - 2019-06-18 - old school way for default param
 
-    console.log(app.config.slug + ' does not exists. Maybe it hasn\'t finished loading yet ? Retrying in ' + TIME_TO_RETRY + 'ms')
+    console.log(app.config.slug + ' does not exist. Maybe it hasn\'t finished loading yet? Retrying in ' + TIME_TO_RETRY + 'ms')
     var retryTime = retryCount + TIME_TO_RETRY
 
     if (retryTime < RETRY_TIMEOUT) {
@@ -126,7 +125,7 @@ function GLOBAL_renderAppPopupCreation (app, retryCount) {
       return
     }
 
-    console.error('Timed out waiting for app ' + app.config.slug + ' to exists')
+    console.error('Timed out waiting for app ' + app.config.slug + ' to exist')
     return
   }
 
