@@ -62,12 +62,19 @@ class EmailSender(object):
         if not self._smtp_connection:
             log = "Connecting to SMTP server {}"
             logger.info(self, log.format(self._smtp_config.server))
-            # TODO - G.M - 2019-01-29 - Support for SMTP SSL-only port connection
-            # using smtplib.SMTP_SSL
-            self._smtp_connection = smtplib.SMTP(self._smtp_config.server, self._smtp_config.port)
+            if self._smtp_config.use_implicit_ssl:
+                self._smtp_connection = smtplib.SMTP_SSL(
+                    self._smtp_config.server, self._smtp_config.port
+                )
+            else:
+                self._smtp_connection = smtplib.SMTP(
+                    self._smtp_config.server, self._smtp_config.port
+                )
             self._smtp_connection.ehlo()
 
-            if self._smtp_config.login:
+            # TODO - G.M - 2020-04-02 - Starttls usage should be explicit in configuration, see
+            # https://github.com/tracim/tracim/issues/2815
+            if self._smtp_config.login and not self._smtp_config.use_implicit_ssl:
                 try:
                     starttls_result = self._smtp_connection.starttls()
 
