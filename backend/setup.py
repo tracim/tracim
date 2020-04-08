@@ -40,6 +40,7 @@ requires = [
     'lxml',
     'redis<3.0.0',
     'rq',
+    'html2text',
     # mail-fetcher
     'markdown',
     'email_reply_parser',

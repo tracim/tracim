@@ -1,7 +1,4 @@
 from email.message import Message
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.utils import formataddr
 import typing
 
 from tracim_backend.applications.upload_permissions.models_in_context import (
@@ -11,6 +8,8 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.notifier import EmailManager
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.sender import send_email_through
+from tracim_backend.lib.mail_notifier.utils import EmailAddress
+from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import EmailUser
@@ -73,21 +72,18 @@ class UploadPermissionEmailManager(EmailManager):
                 receiver.user_id, workspace_in_context.workspace_id
             ),
         )
-        message = MIMEMultipart("alternative")
         translated_subject = translator.get_translation(
             self.config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT
         )
-        message["Subject"] = translated_subject.format(
+        subject = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
             uploader_username=uploader.username,
             nb_uploaded_contents=len(uploaded_contents),
             workspace_name=workspace_in_context.label,
         )
-        message["From"] = self._get_sender()
-        to_addr = formataddr((receiver.display_name, receiver.email))
-        message["To"] = to_addr
+        from_header = self._get_sender()
+        to_header = EmailAddress(receiver.display_name, receiver.email)
         html_template_file_path = self.config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML
-
         context = {
             "receiver": receiver,
             "workspace": workspace_in_context,
@@ -98,12 +94,13 @@ class UploadPermissionEmailManager(EmailManager):
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator
         )
-
-        part2 = MIMEText(body_html, "html", "utf-8")
-        # Attach parts into message container.
-        # According to RFC 2046, the last part of a multipart message,
-        # in this case the HTML message, is best and preferred.
-        message.attach(part2)
+        message = EmailNotificationMessage(
+            subject=subject,
+            from_header=from_header,
+            to_header=to_header,
+            body_html=body_html,
+            lang=translator.default_lang,
+        )
         return message
 
     def notify_upload_permission(
@@ -173,18 +170,16 @@ class UploadPermissionEmailManager(EmailManager):
                 emitter.user_id, workspace_in_context.workspace_id
             ),
         )
-        message = MIMEMultipart("alternative")
         translated_subject = translator.get_translation(
             self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT
         )
-        message["Subject"] = translated_subject.format(
+        subject = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE,
             nb_receivers=len(upload_permission_receivers),
             workspace_name=workspace_in_context.label,
         )
-        message["From"] = self._get_sender()
-        to_addr = formataddr((emitter.display_name, emitter.email))
-        message["To"] = to_addr
+        from_header = self._get_sender()
+        to_header = EmailAddress(emitter.display_name, emitter.email)
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML
         )
@@ -198,11 +193,13 @@ class UploadPermissionEmailManager(EmailManager):
             mako_template_filepath=html_template_file_path, context=context, translator=translator
         )
 
-        part2 = MIMEText(body_html, "html", "utf-8")
-        # Attach parts into message container.
-        # According to RFC 2046, the last part of a multipart message,
-        # in this case the HTML message, is best and preferred.
-        message.attach(part2)
+        message = EmailNotificationMessage(
+            subject=subject,
+            from_header=from_header,
+            to_header=to_header,
+            body_html=body_html,
+            lang=translator.default_lang,
+        )
         return message
 
     def _notify_receiver(
@@ -219,15 +216,14 @@ class UploadPermissionEmailManager(EmailManager):
                 emitter.user_id, workspace.workspace_id, upload_permission.email
             ),
         )
-        message = MIMEMultipart("alternative")
         translated_subject = translator.get_translation(
             self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT
         )
-        message["Subject"] = translated_subject.format(
+        subject = translated_subject.format(
             website_title=self.config.WEBSITE__TITLE, emitter_name=emitter.display_name
         )
-        message["From"] = self._get_sender(emitter)
-        message["To"] = upload_permission.email
+        from_header = self._get_sender(emitter)
+        to_header = EmailAddress.from_rfc_email_address(upload_permission.email)
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML
         )
@@ -242,10 +238,11 @@ class UploadPermissionEmailManager(EmailManager):
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path, context=context, translator=translator
         )
-
-        part2 = MIMEText(body_html, "html", "utf-8")
-        # Attach parts into message container.
-        # According to RFC 2046, the last part of a multipart message,
-        # in this case the HTML message, is best and preferred.
-        message.attach(part2)
+        message = EmailNotificationMessage(
+            subject=subject,
+            from_header=from_header,
+            to_header=to_header,
+            body_html=body_html,
+            lang=translator.default_lang,
+        )
         return message
