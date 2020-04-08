@@ -18,7 +18,7 @@ import requests
 from tracim_backend.exceptions import AutoReplyEmailNotAllowed
 from tracim_backend.exceptions import BadStatusCode
 from tracim_backend.exceptions import EmptyEmailBody
-from tracim_backend.exceptions import NoSpecialKeyFound
+from tracim_backend.exceptions import NoKeyFound
 from tracim_backend.exceptions import UnsupportedRequestMethod
 from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
@@ -133,15 +133,16 @@ class DecodedMail(object):
         if special_key:
             return special_key
         if to_address:
-            return DecodedMail.find_key_from_mail_address(
+            key = DecodedMail.find_key_from_mail_address(
                 to_address, self.reply_to_pattern, "{content_id}"
             )
         if first_ref:
             return DecodedMail.find_key_from_mail_address(
                 first_ref, self.references_pattern, "{content_id}"
             )
-
-        raise NoSpecialKeyFound()
+        if key:
+            return key
+        raise NoKeyFound("Can't find key of item in this email")
 
     @classmethod
     def find_key_from_mail_address(
@@ -158,18 +159,19 @@ class DecodedMail(object):
         # ex with {content_id} as marker_str
         # noreply+{content_id}@website.tld -> ['noreply+','@website.tld']
         static_parts = pattern.split(marker_str)
-        assert len(static_parts) > 1
-        assert len(static_parts) < 3
         if len(static_parts) == 2:
             before, after = static_parts
             if mail_address.startswith(before) and mail_address.endswith(after):
                 key = mail_address.replace(before, "").replace(after, "")
-                assert key.isalnum()
-                return key
+                if key.isalnum():
+                    return key
+                logger.warning(
+                    cls, "key found {} is not alphanumeric, cannot retrieve value".format(key)
+                )
             logger.warning(
                 cls, "pattern {} does not match email address {} ".format(pattern, mail_address)
             )
-            return None
+        return None
 
     def check_validity_for_comment_content(self) -> None:
         """
@@ -465,7 +467,7 @@ class MailFetcher(object):
             mail = mails.pop()
             try:
                 method, endpoint, json_body_dict = self._create_comment_request(mail)
-            except NoSpecialKeyFound:
+            except NoKeyFound:
                 log = "Failed to create comment request due to missing specialkey in mail"
                 logger.exception(self, log)
                 continue

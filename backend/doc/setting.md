@@ -345,6 +345,48 @@ Configure how to handle invitation of non-existent users in Tracim with these pa
 To enable the reply by email feature,
 you first need to activate the API key authentication mechanism (see section Activating API Key Authentification),
 
+## Adapt Email Notification Feature
+
+To use this feature, you need working email notifications (see section Enabling the Mail Notification Feature)
+
+#### Multiple email address notification
+For best support, it is better to use one email address per id, like:
+
+    email.notification.from.email = test_user+{user_id}@supersmtpserver.ndd
+    email.notification.reply_to.email = test_user+{content_id}@supersmtpserver.ndd
+    email.notification.references.email = test_user+{content_id}@supersmtpserver.ndd
+
+This configuration should work out of the box on some providers since they already support "+" subaddressing, and provide
+the best compatibility.
+As an alternative, you can also set a wildcard alias for your provided email, for example:
+
+    tracim.content.{content_id}@supersmtpserver.ndd -> tracim.notification@supersmtpserver.ndd
+
+with a configuration like that:
+
+    email.notification.from.email = tracim.notification@supersmtpserver.ndd
+    email.notification.reply_to.email = tracim.content.{content_id}@supersmtpserver.ndd
+    email.notification.references.email = tracim.content.{content_id}@supersmtpserver.ndd
+
+#### One email address notification
+
+if you can't provide a wildcard and can't support subadressing and want a reply-to feature with only one named email address,
+as a last resort, you can set the References Header.
+
+However, be aware that support across email clients is not great.
+Some email clients (like Sogo) do not properly return the References Header in mail replies, which breaks threading
+behavior, and also breaks the reply-to feature.
+Emails from these clients are retrieved but can't be correctly associated to one item.
+
+You can do this with a configuration like that:
+
+    email.notification.from.email = tracim.notification@supersmtpserver.ndd
+    email.notification.reply_to.email = tracim.notification@supersmtpserver.ndd
+    # References headers doesn't have to be a true email address.
+    email.notification.references.email = tracim.content.{content_id}@supersmtpserver.ndd
+
+### Install Email Feature
+
 to activate reply by email, the smallest config is as follows:
 
     # Email reply configuration

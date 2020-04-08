@@ -187,7 +187,7 @@ class TestNotificationsSync(object):
         assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[TRACIM] [Recipes] file1 (Opened)"
-        assert headers["References"][0] == "test_user_refs+22@localhost"
+        assert headers["References"][0] == "<test_user_refs+22@localhost>"
         assert (
             headers["Reply-to"][0]
             == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'
@@ -227,7 +227,7 @@ class TestNotificationsSync(object):
         assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[TRACIM] [Recipes] file1 (Opened)"
-        assert headers["References"][0] == "test_user_refs+22@localhost"
+        assert headers["References"][0] == "<test_user_refs+22@localhost>"
         assert (
             headers["Reply-to"][0]
             == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'
@@ -315,7 +315,7 @@ class TestNotificationsAsync(object):
         assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[TRACIM] [Recipes] file1 (Opened)"
-        assert headers["References"][0] == "test_user_refs+22@localhost"
+        assert headers["References"][0] == "<test_user_refs+22@localhost>"
         assert (
             headers["Reply-to"][0]
             == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'

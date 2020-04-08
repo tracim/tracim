@@ -331,7 +331,7 @@ class AutoReplyEmailNotAllowed(TracimException):
     pass
 
 
-class NoSpecialKeyFound(EmptyValueNotAllowed):
+class NoKeyFound(EmptyValueNotAllowed):
     pass
 
 
