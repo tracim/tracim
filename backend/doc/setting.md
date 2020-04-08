@@ -369,7 +369,7 @@ if you can't provide a wildcard and can't support subadressing and want a reply-
 as a last resort, you can set the References Header.
 
 However, be aware that support across email clients is not great.
-clients. Some email client (like Sogo) do not properly return the References Header in mail replies, which breaks threading
+Some email clients (like Sogo) do not properly return the References Header in mail replies, which breaks threading
 behavior, and also breaks the reply-to feature.
 Emails from these clients are retrieved but can't be correctly associated to one item.
 
