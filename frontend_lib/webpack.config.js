@@ -4,6 +4,8 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 // const isStylusFileRegex = /.+\.styl$/gm
 
+const PnpWebpackPlugin = require('pnp-webpack-plugin')
+
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
@@ -87,7 +89,7 @@ module.exports = {
       use: ['style-loader', 'css-loader']
     }, {
       test: /\.styl$/,
-      use: ['style-loader', 'css-loader', 'stylus-loader']
+      use: ['style-loader', 'css-loader', 'stylus-native-loader']
     // }, {
     //   test: /\.(jpg|png|svg)$/,
     //   loader: 'url-loader',
@@ -97,9 +99,17 @@ module.exports = {
     }]
   },
   resolve: {
+    plugins: [
+      PnpWebpackPlugin,
+    ],
     extensions: ['.js', '.jsx']
   },
-  plugins:[
+  resolveLoader: {
+    plugins: [
+      PnpWebpackPlugin.moduleLoader(module),
+    ],
+  },
+  plugins: [
     ...[], // generic plugins always present
     ...(isProduction
       ? [] // production specific plugins

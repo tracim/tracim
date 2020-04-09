@@ -57,11 +57,12 @@
     "jsdom": "^15.1.1",
     "mocha": "^7.1.1",
     "nock": "^11.7.2",
+    "pnp-webpack-plugin": "^1.6.4",
     "standard": "^14.3.3",
     "standard-loader": "^7.0.0",
     "style-loader": "^0.23.1",
     "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.2",
+    "stylus-native-loader": "^1.1.0",
     "url-loader": "^2.0.1",
     "webpack-dev-server": "^3.10.3"
   },

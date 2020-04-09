@@ -59,7 +59,8 @@
     "ignore-styles": "^5.0.1",
     "jsdom": "^15.1.1",
     "mocha": "^7.1.1",
-    "stylus-loader": "^3.0.2",
+    "pnp-webpack-plugin": "^1.6.4",
+    "stylus-native-loader": "^1.1.0",
     "webpack-dev-server": "^3.10.3"
   },
   "standard": {
