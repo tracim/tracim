@@ -1,8 +1,8 @@
 ---
 name: Bug report
 about: Report a bug you detected using tracim
-title: ""
-labels: to sort, bug
+title: "Bug:"
+labels: to sort
 assignees: ""
 ---
 ## Bug description & symptom
