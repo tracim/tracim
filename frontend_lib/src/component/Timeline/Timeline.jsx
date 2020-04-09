@@ -147,7 +147,7 @@ class Timeline extends React.Component {
                   disabled={props.disableComment}
                   key={'timeline__comment__advancedtext'}
                 >
-                  {props.wysiwyg ? props.t('Simple text') : props.t('Rich text')}
+                  {props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
                 </button>
               </div>
 
