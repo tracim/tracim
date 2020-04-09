@@ -31,7 +31,7 @@ if [[ $1 = "-d" || $2 = "-d" ]]; then
 fi
 
 log "building frontend_app_admin_workspace_user"
-npm run build$dev$windoz  && loggood "success" || logerror "some error"
+yarn run build$dev$windoz  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/admin_workspace_user.app.js ../frontend/dist/app  && loggood "success" || logerror "some error"
 log "copying en translation.json"

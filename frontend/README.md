@@ -5,25 +5,25 @@ This project is the frontend part of Tracim.
 ## Installation
 
 Install all dependencies
-`$ npm install`
+`$ yarn install`
 
 Build the sources
-`$ npm run build`
+`$ yarn run build`
 
 Load `dist/index.html` in your webserver.
 
 ## Development
 
 Install all dependencies
-`$ npm install`
+`$ yarn install`
 
 Start development server (webpack dev server)
-`$ npm run servdev`
+`$ yarn run servdev`
 
-Alternatively, you can use `$ npm run servdev-dashboard` to use webpack-dashboard to have a better server interface.
+Alternatively, you can use `$ yarn run servdev-dashboard` to use webpack-dashboard to have a better server interface.
 
 Start mockapi server
-`$ npm run mockapi`
+`$ yarn run mockapi`
 
 
 ## Apps
@@ -42,7 +42,7 @@ To do that
 1) go to each Apps repositories; currently 2: (more to come)
 - https://github.com/tracim/tracim_frontend_app_pagehtml
 - https://github.com/tracim/tracim_frontend_app_thread
-2) install and build the sources `npm install && npm run build`
+2) install and build the sources `yarn install && yarn run build`
 3) copy the __appRepository__/dist/__appName__.app.js file generated and past it to tracim_frontend/dist/app folder
 
 By default, for development, the Tracim frontend expects every apps but wont crash if one is missing (currenlt not all of them are exists anyway)

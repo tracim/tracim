@@ -15,3 +15,8 @@ functionnal_tests/cypress/screenshots
 
 #ignore preview files as it is by default in backend folder
 previews
+
+#ignore yarn
+.yarn
+.yarnrc.yml
+node_modules

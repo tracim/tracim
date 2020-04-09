@@ -33,7 +33,7 @@ fi
 log "creating debug file"
 cp src/debug.js.sample src/debug.js
 log "building frontend_app_thread"
-npm run build$dev$windoz  && loggood "success" || logerror "some error"
+yarn run build$dev$windoz  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/thread.app.js ../frontend/dist/app && loggood "success" || logerror "some error"
 log "copying en translation.json"

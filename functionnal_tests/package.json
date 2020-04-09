@@ -2,14 +2,15 @@
   "name": "functionnal_tests",
   "version": "1.0.0",
   "description": "",
+  "private": true,
   "main": "index.js",
   "scripts": {
-    "precypress-run": "npm run reset-db",
-    "cypress-run": "node_modules/cypress/bin/cypress run",
-    "precypress-open": "npm run reset-db",
-    "cypress-open": "cd ../backend/ && . env/bin/activate && cd - && node_modules/cypress/bin/cypress open",
-    "reset-db": "cd ../backend/ && . env/bin/activate && tracimcli db delete --force -c ./cypress_test.ini && tracimcli db init -c ./cypress_test.ini && cp /tmp/tracim_cypress.sqlite /tmp/tracim_cypress.sqlite.tmp && cd - ",
-    "travis-cypress-run": "cd ../backend/ && tracimcli db delete --force -c ./cypress_test.ini && tracimcli db init -c ./cypress_test.ini && ls -la && cp /tmp/tracim_cypress.sqlite /tmp/tracim_cypress.sqlite.tmp && cd - && node_modules/cypress/bin/cypress run"
+    "precypress-run": "yarn run reset-db",
+    "cypress-run": "yarn precypress-run && cypress run",
+    "precypress-open": "yarn run reset-db",
+    "cypress-open": "yarn precypress-open && npm-scripts/cypress-open",
+    "reset-db": "npm-scripts/reset-db",
+    "travis-cypress-run": "npm-scripts/travis-cypress-run"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +19,5 @@
     "cypress": "^3.8.1",
     "cypress-file-upload": "^3.5.3",
     "cypress-wait-until": "^1.6.1"
-  },
-  "dependencies": {}
+  }
 }
