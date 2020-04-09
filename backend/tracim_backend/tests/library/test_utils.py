@@ -1,3 +1,4 @@
+from tracim_backend.lib.mail_notifier.utils import EmailAddress
 from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR
 from tracim_backend.lib.utils.utils import DEFAULT_PASSWORD_GEN_CHAR_LENGTH
 from tracim_backend.lib.utils.utils import ExtendedColor
@@ -83,3 +84,73 @@ class TestStringToList(object):
             3,
             4,
         ]
+
+
+class TestEmailAddress(object):
+    def test_unit__email_address_address__ok__nominal_case(self):
+        john_address = EmailAddress(label="John Doe", email="john.doe@domainame.ndl")
+        assert john_address.domain == "domainame.ndl"
+        assert john_address.label == "John Doe"
+        assert john_address.email == "john.doe@domainame.ndl"
+        assert john_address.force_angle_bracket is False
+        assert john_address.address == "John Doe <john.doe@domainame.ndl>"
+
+    def test_unit__email_address_address__ok__force_angle_brackets(self):
+        john_address = EmailAddress(
+            label="John Doe", email="john.doe@domainame.ndl", force_angle_bracket=True
+        )
+        assert john_address.domain == "domainame.ndl"
+        assert john_address.label == "John Doe"
+        assert john_address.email == "john.doe@domainame.ndl"
+        assert john_address.force_angle_bracket is True
+        assert john_address.address == "John Doe <john.doe@domainame.ndl>"
+
+    def test_unit__email_address_address__ok__empty_label(self):
+        john_address = EmailAddress(label="", email="john.doe@domainame.ndl")
+        assert john_address.domain == "domainame.ndl"
+        assert john_address.label == ""
+        assert john_address.email == "john.doe@domainame.ndl"
+        assert john_address.force_angle_bracket is False
+        assert john_address.address == "john.doe@domainame.ndl"
+
+    def test_unit__email_address_address__ok__empty_label_and_force_angle_brackets(self):
+        john_address = EmailAddress(
+            label="", email="john.doe@domainame.ndl", force_angle_bracket=True
+        )
+        assert john_address.domain == "domainame.ndl"
+        assert john_address.label == ""
+        assert john_address.email == "john.doe@domainame.ndl"
+        assert john_address.force_angle_bracket is True
+        assert john_address.address == "<john.doe@domainame.ndl>"
+
+    def test_unit__email_address_address__ok__from_rfc_email_address__no_label_no_bracket(self):
+        john_address = EmailAddress.from_rfc_email_address("john.doe@domainame.ndl")
+        assert john_address.domain == "domainame.ndl"
+        assert john_address.label == ""
+        assert john_address.email == "john.doe@domainame.ndl"
+        assert john_address.force_angle_bracket is False
+        assert john_address.address == "john.doe@domainame.ndl"
+
+    def test_unit__email_address_address__ok__from_rfc_email_address__no_label_with_bracket(self):
+        john_address = EmailAddress.from_rfc_email_address("<john.doe@domainame.ndl>")
+        assert john_address.domain == "domainame.ndl"
+        assert john_address.label == ""
+        assert john_address.email == "john.doe@domainame.ndl"
+        assert john_address.force_angle_bracket is False
+        assert john_address.address == "john.doe@domainame.ndl"
+
+    def test_unit__email_address_address__ok__from_rfc_email_address__nominal_case(self):
+        john_address = EmailAddress.from_rfc_email_address("John Doe <john.doe@domainame.ndl>")
+        assert john_address.domain == "domainame.ndl"
+        assert john_address.label == "John Doe"
+        assert john_address.email == "john.doe@domainame.ndl"
+        assert john_address.force_angle_bracket is False
+        assert john_address.address == "John Doe <john.doe@domainame.ndl>"
+
+    def test_unit__email_address_address__ok__from_rfc_email_address__with_label_quotation(self):
+        john_address = EmailAddress.from_rfc_email_address('"John Doe" <john.doe@domainame.ndl>')
+        assert john_address.domain == "domainame.ndl"
+        assert john_address.label == "John Doe"
+        assert john_address.email == "john.doe@domainame.ndl"
+        assert john_address.force_angle_bracket is False
+        assert john_address.address == "John Doe <john.doe@domainame.ndl>"

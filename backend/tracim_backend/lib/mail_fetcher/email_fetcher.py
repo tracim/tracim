@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from email import message_from_bytes
 from email.header import decode_header
 from email.header import make_header
@@ -19,7 +18,7 @@ import requests
 from tracim_backend.exceptions import AutoReplyEmailNotAllowed
 from tracim_backend.exceptions import BadStatusCode
 from tracim_backend.exceptions import EmptyEmailBody
-from tracim_backend.exceptions import NoSpecialKeyFound
+from tracim_backend.exceptions import NoKeyFound
 from tracim_backend.exceptions import UnsupportedRequestMethod
 from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
@@ -134,15 +133,16 @@ class DecodedMail(object):
         if special_key:
             return special_key
         if to_address:
-            return DecodedMail.find_key_from_mail_address(
+            key = DecodedMail.find_key_from_mail_address(
                 to_address, self.reply_to_pattern, "{content_id}"
             )
         if first_ref:
             return DecodedMail.find_key_from_mail_address(
                 first_ref, self.references_pattern, "{content_id}"
             )
-
-        raise NoSpecialKeyFound()
+        if key:
+            return key
+        raise NoKeyFound("Can't find key of item in this email")
 
     @classmethod
     def find_key_from_mail_address(
@@ -159,18 +159,19 @@ class DecodedMail(object):
         # ex with {content_id} as marker_str
         # noreply+{content_id}@website.tld -> ['noreply+','@website.tld']
         static_parts = pattern.split(marker_str)
-        assert len(static_parts) > 1
-        assert len(static_parts) < 3
         if len(static_parts) == 2:
             before, after = static_parts
             if mail_address.startswith(before) and mail_address.endswith(after):
                 key = mail_address.replace(before, "").replace(after, "")
-                assert key.isalnum()
-                return key
+                if key.isalnum():
+                    return key
+                logger.warning(
+                    cls, "key found {} is not alphanumeric, cannot retrieve value".format(key)
+                )
             logger.warning(
                 cls, "pattern {} does not match email address {} ".format(pattern, mail_address)
             )
-            return None
+        return None
 
     def check_validity_for_comment_content(self) -> None:
         """
@@ -344,43 +345,38 @@ class MailFetcher(object):
                         self.stop()
                         break
             # Socket
-            except (socket.error, socket.gaierror, socket.herror) as e:
-                log = "Socket fail with IMAP connection {}"
-                logger.error(self, log.format(e.__str__()))
-
-            except socket.timeout as e:
-                log = "Socket timeout on IMAP connection {}"
-                logger.error(self, log.format(e.__str__()))
-
+            except (socket.error, socket.gaierror, socket.herror):
+                log = "Socket fail with IMAP connection"
+                logger.exception(self, log)
+            except socket.timeout:
+                log = "Socket timeout on IMAP connection"
+                logger.exception(self, log)
             # SSL
-            except ssl.SSLError as e:
+            except ssl.SSLError:
                 log = "SSL error on IMAP connection"
-                logger.error(self, log.format(e.__str__()))
-
-            except ssl.CertificateError as e:
+                logger.exception(self, log)
+            except ssl.CertificateError:
                 log = "SSL Certificate verification failed on IMAP connection"
-                logger.error(self, log.format(e.__str__()))
-
+                logger.exception(self, log)
             # Filelock
-            except filelock.Timeout as e:
-                log = "Mail Fetcher Lock Timeout {}"
-                logger.warning(self, log.format(e.__str__()))
+            except filelock.Timeout:
+                log = "Mail Fetcher Lock Timeout"
+                logger.warning(self, log, exc_info=True)
 
             # IMAP
             # TODO - G.M - 10-01-2017 - Support imapclient exceptions
             # when Imapclient stable will be 2.0+
 
-            except BadIMAPFetchResponse as e:
+            except BadIMAPFetchResponse:
                 log = (
                     "Imap Fetch command return bad response."
-                    "Is someone else connected to the mailbox ?: "
-                    "{}"
+                    "Is someone else connected to the mailbox ?"
                 )
-                logger.error(self, log.format(e.__str__()))
+                logger.exception(self, log)
             # Others
-            except Exception as e:
-                log = "Mail Fetcher error {}"
-                logger.error(self, log.format(e.__str__()))
+            except Exception:
+                log = "Mail Fetcher error"
+                logger.exception(self, log)
 
             finally:
                 # INFO - G.M - 2018-01-09 - Connection closing
@@ -395,9 +391,9 @@ class MailFetcher(object):
                     except Exception:
                         try:
                             imapc.shutdown()
-                        except Exception as e:
-                            log = "Can't logout, connection broken ? {}"
-                            logger.error(self, log.format(e.__str__()))
+                        except Exception:
+                            log = "Can't logout, connection broken ?"
+                            logger.exception(self, log)
 
             if self.burst:
                 self.stop()
@@ -471,9 +467,9 @@ class MailFetcher(object):
             mail = mails.pop()
             try:
                 method, endpoint, json_body_dict = self._create_comment_request(mail)
-            except NoSpecialKeyFound as exc:
-                log = "Failed to create comment request due to missing specialkey in mail {}"
-                logger.error(self, log.format(exc.__str__()))
+            except NoKeyFound:
+                log = "Failed to create comment request due to missing specialkey in mail"
+                logger.exception(self, log)
                 continue
             except EmptyEmailBody:
                 log = "Empty body, skip mail"
@@ -483,9 +479,9 @@ class MailFetcher(object):
                 log = "Autoreply mail, skip mail"
                 logger.warning(self, log)
                 continue
-            except Exception as exc:
-                log = "Failed to create comment request in mail fetcher error : {}"
-                logger.error(self, log.format(exc.__str__()))
+            except Exception:
+                log = "Failed to create comment request in mail fetcher error"
+                logger.exception(self, log)
                 continue
 
             try:
@@ -496,12 +492,12 @@ class MailFetcher(object):
                     endpoint=endpoint,
                     json_body_dict=json_body_dict,
                 )
-            except requests.exceptions.Timeout as e:
-                log = "Timeout error to transmit fetched mail to tracim : {}"
-                logger.error(self, log.format(str(e)))
-            except requests.exceptions.RequestException as e:
-                log = "Fail to transmit fetched mail to tracim : {}"
-                logger.error(self, log.format(str(e)))
+            except requests.exceptions.Timeout:
+                log = "Timeout error to transmit fetched mail to tracim"
+                logger.exception(self, log)
+            except requests.exceptions.RequestException:
+                log = "Fail to transmit fetched mail to tracim"
+                logger.exception(self, log)
 
     def _get_auth_headers(self, user_email) -> dict:
         return {TRACIM_API_KEY_HEADER: self.api_key, TRACIM_API_USER_EMAIL_LOGIN_HEADER: user_email}
