@@ -5,7 +5,7 @@ import sinon from 'sinon'
 import { PersonalData as PersonalDataWithoutHOC } from '../../../src/component/Account/PersonalData.jsx'
 
 describe('<PersonnalData />', () => {
-  const onClickSubmitCallBack = sinon.stub()
+  const onClickSubmitCallBack = sinon.spy()
 
   const props = {
     onClickSubmit: onClickSubmitCallBack,

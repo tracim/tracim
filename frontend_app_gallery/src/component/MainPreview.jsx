@@ -56,7 +56,6 @@ class MainPreview extends React.Component {
 export default MainPreview
 
 MainPreview.propTypes = {
-  loggedUser: PropTypes.object,
   previewSrc: PropTypes.string,
   index: PropTypes.number,
   handleClickShowImageRaw: PropTypes.func,
@@ -64,7 +63,6 @@ MainPreview.propTypes = {
 }
 
 MainPreview.defaultProps = {
-  loggedUser: {},
   previewSrc: '',
   index: 0,
   handleClickShowImageRaw: () => {},

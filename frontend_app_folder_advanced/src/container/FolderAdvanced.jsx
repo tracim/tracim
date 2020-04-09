@@ -242,7 +242,7 @@ class FolderAdvanced extends React.Component {
                 />
               */}
 
-              {state.loggedUser.userRoleIdInWorkspace <= ROLE.contentManager.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id &&
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}

@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="${lang}">
+<body>
 %if receiver.username:
     <p>${_('Hello {username},').format(username=receiver.username)}</p>
 %else:
@@ -28,3 +31,5 @@ ${config.WEBSITE__TITLE}
 <a href="${config.WEBSITE__BASE_URL}">${config.WEBSITE__BASE_URL}</a>
 ${_("powered by tracim software")} - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
 </pre>
+</body>
+</html>

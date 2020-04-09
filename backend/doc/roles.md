@@ -1,11 +1,11 @@
-# Introduction
+# Roles in Tracim
 
-In Tracim, you have 2 system of "roles".
+In Tracim, there are two systems of "roles".
 
-One is global to whole tracim instance and is called "global profile" (Groups).
-The other is workspace related and is called "workspace role".
+One is global to whole Tracim instance and is called "global profile" (Groups).
+The other is workspace-related and is called "workspace role".
 
-## Global profile
+## Global Profile
 
 |                               | Normal User | Trusted User    | Admin          |
 |-------------------------------|-------------|-------------|----------------|
@@ -15,7 +15,7 @@ The other is workspace related and is called "workspace role".
 
 |                               | Normal User | Trusted User    | Admin   |
 |-------------------------------|-------------|-------------|---------|
-| access to tracim apps/contents_types/timezones_list         |  yes        | yes         | yes     |
+| access to Tracim apps/contents_types/timezones_list         |  yes        | yes         | yes     |
 | participate to workspaces     |  yes        | yes         | yes     |
 |-------------------------------|-------------|-------------|---------|
 | get list of user workspace    | personal-only        | personal_only       | yes     |
@@ -26,7 +26,7 @@ The other is workspace related and is called "workspace role".
 | enable/disable user notification for workspace | personal-only | personal-only | yes |
 |-------------------------------|-------------|-------------|---------|
 | create workspace              |  no         | yes         | yes     |
-| invite user to tracim         |  no         | yes, if manager of a given workspace         | yes     |
+| invite user to Tracim         |  no         | yes, if manager of a given workspace         | yes     |
 | delete workspace              |  no         | yes, if manager of a given workspace         | yes     |
 |-------------------------------|-------------|-------------|---------|
 | get list of all user          | no          | no          | yes     |
@@ -77,8 +77,7 @@ The other is workspace related and is called "workspace role".
 
  *: folder content not included.
 
- **: share with link/email to external user. share content feature need to be activated in workspace by
+ **: share with link/email to external user. The share content feature needs to be activated in the workspace by the
  workspace manager (see "edit workspace").
 
- ***: allow with link/email external user to upload some file in workspace inbox. upload permission feature need to be activated in workspace by
-  workspace manager (see "edit workspace").
+ ***: allow with link/email external user to upload some files in workspace inbox. The upload permission feature needs to be activated in the workspace by the workspace manager (see "edit workspace").

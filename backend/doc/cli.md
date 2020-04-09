@@ -1,4 +1,4 @@
-# TracimCli #
+# Controlling Tracim from the Command Line Using `tracimcli` #
 
 Tracim has a build-in command line tool.
 
@@ -14,17 +14,17 @@ and active the Tracim virtualenv:
 
 ## Database ##
 
-### Create database
+### Create the database
 
     tracimcli db init
 
-### Create database with some default test data (many users, workspaces, etc…)
+### Create the database with some default test data (many users, workspaces, etc…)
 
     tracimcli db init --test-data
 
-### Delete database /!\
+### Delete the database /!\
 
-This will drop all your database, be carefull !
+This will drop the entire database, be careful!
 
     tracimcli db delete --force
 
@@ -45,12 +45,11 @@ This will drop all your database, be carefull !
 
 ### Delete user(s)
 
-Theses commands allow to delete user from database. Unlike deletion from tracim
-ui which only make data not visible anymore, this command does delete content in
-database, so you need to be careful using this.
+Theses commands allow deleting users from the database. Unlike deletion from the Tracim
+UI which only hides data, this command does delete the content from database, so be careful using this.
 
-user delete provide many parameter in order to choose how you want to delete user,
-we suggest to anonymize them (see `-a` or `-b` ) if deleting them could create trouble.
+`user delete` provides many parameters in order to choose how you want to delete an user.
+We suggest to anonymize them (see `-a` or `-b` ) in case deleting them might cause trouble.
 
 ```
 $ tracimcli user delete -h
@@ -65,7 +64,7 @@ optional arguments:
   -c CONFIG_FILE, --config CONFIG_FILE
                         application config file to read (default:
                         development.ini)
-  -d, --debug_mode      enable tracim log for debug
+  -d, --debug_mode      enable Tracim log for debug
   -w, --delete-owned-sharespaces
                         delete also owned sharespaces of user
   -a, --anonymize-if-required
@@ -86,10 +85,10 @@ optional arguments:
                         option is activated
 ```
 
-### Anonymize user(s)
+### Anonymize User(s)
 
 You can also anonymize user without deleting any user data user using
-`tracimcli anonymize` command.
+command `tracimcli anonymize`.
 
 ```
 $ tracimcli user anonymize -h
@@ -115,21 +114,21 @@ optional arguments:
 
 ## Caldav ##
 
-### Run service ###
+### Run the Service ###
 
     tracimcli caldav start
 
-### Check and recreate agenda for user/workspace ###
+### Check and Recreate the Agenda for a User/Workspace ###
 
-in some case, agenda of user or workspace can failed to be created,
-to check if all agenda are created and force their creation if they're not,
-you can do:
+In some cases, creating the agenda of an user or a workspace can fail.
+To check if all agendas are created and to force their creation if they are not,
+you can run:
 
     tracimcli caldav sync
 
-## Webdav ##
+## WebDAV ##
 
-### Run service ###
+### Run the Service ###
 
     tracimcli webdav start
 

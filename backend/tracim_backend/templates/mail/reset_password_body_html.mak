@@ -1,4 +1,6 @@
-## -*- coding: utf-8 -*-
+<!DOCTYPE html>
+<html lang="${lang}">
+<body>
 <p>${_('Hello {username},').format(username=user.display_name)}</p>
 
 <p>${_('Someone has requested to reset the password for your account on <i>{website_title}</i>.').format(website_title=html_escape(config.WEBSITE__TITLE))| n}</p>
@@ -22,3 +24,5 @@ ${config.WEBSITE__TITLE}
 <a href="${config.WEBSITE__BASE_URL}">${config.WEBSITE__BASE_URL}</a>
 ${_("powered by tracim software")} - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
 </pre>
+</body>
+</html>

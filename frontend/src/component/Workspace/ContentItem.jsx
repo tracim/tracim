@@ -87,19 +87,23 @@ class ContentItem extends React.Component {
                 onClickExtendedAction={{
                   edit: {
                     callback: e => props.onClickExtendedAction.edit.callback(e, props.folderData),
-                    label: props.onClickExtendedAction.edit.label
+                    label: props.onClickExtendedAction.edit.label,
+                    allowedRoleId: ROLE.contributor.id
                   },
                   download: {
                     callback: e => props.onClickExtendedAction.download.callback(e, props.folderData),
-                    label: props.onClickExtendedAction.download.label
+                    label: props.onClickExtendedAction.download.label,
+                    allowedRoleId: ROLE.reader.id
                   },
                   archive: {
                     callback: e => props.onClickExtendedAction.archive.callback(e, props.folderData),
-                    label: props.onClickExtendedAction.archive.label
+                    label: props.onClickExtendedAction.archive.label,
+                    allowedRoleId: ROLE.contentManager.id
                   },
                   delete: {
                     callback: e => props.onClickExtendedAction.delete.callback(e, props.folderData),
-                    label: props.onClickExtendedAction.delete.label
+                    label: props.onClickExtendedAction.delete.label,
+                    allowedRoleId: ROLE.contentManager.id
                   }
                 }}
               />

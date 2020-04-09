@@ -1,4 +1,6 @@
-## -*- coding: utf-8 -*-
+<!DOCTYPE html>
+<html lang="${lang}">
+<body>
 <% a_link='<a href="{url}">{url}</a>'.format(url=html_escape(login_url)) %>
 <p>${_('Hello {username},').format(username=user.display_name)}</p>
 
@@ -29,3 +31,5 @@ ${config.WEBSITE__TITLE}
 <a href="${config.WEBSITE__BASE_URL}">${config.WEBSITE__BASE_URL}</a>
 ${_("powered by tracim software")} - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
 </pre>
+</body>
+</html>

@@ -1,6 +1,6 @@
-# Devtools
+# Miscellaneous Information About the Developer Tools
 
-# Check third party licences
+# Checking third party licences
 
 Install `yolk3k` pip package:
 

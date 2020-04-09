@@ -70,16 +70,54 @@ class TestDecodedMail(object):
 
     def test_unit__find_key_from_mail_subadress__err_not_alphanum(self):
         mail_address = "reply+%@mydomainname.tld"
-        with pytest.raises(AssertionError):
+        assert (
             DecodedMail.find_key_from_mail_address(
                 mail_address, marker_str="{key}", pattern="reply+{key}@mydomainname.tld"
             )
+            is None
+        )
 
     def test_unit__find_key_from_mail_address__dot_adress_no_key(self):
         mail_address = "reply@mydomainname.tld"
         assert (
             DecodedMail.find_key_from_mail_address(
                 mail_address, marker_str="{key}", pattern="reply.{key}@mydomainname.tld"
+            )
+            is None
+        )
+
+    def test_unit__find_key_from_mail_address__no_key_in_pattern(self):
+        """
+        Automatically failed to obtain key when pattern as no key
+        """
+        mail_address = "reply@mydomainname.tld"
+        assert (
+            DecodedMail.find_key_from_mail_address(
+                mail_address, marker_str="{key}", pattern="reply@mydomainname.tld"
+            )
+            is None
+        )
+
+    def test_unit__find_key_from_mail_address__mismatch_pattern(self):
+        """
+        Automatically failed to obtain key when pattern don't match
+        """
+        mail_address = "reply+1@mydomainname.tld"
+        assert (
+            DecodedMail.find_key_from_mail_address(
+                mail_address, marker_str="{key}", pattern="toto+{key}@mydomainname.tld"
+            )
+            is None
+        )
+
+    def test_unit__find_key_from_mail_address__multiple_key(self):
+        """
+        Automatically failed to obtain key when pattern as multiple key.
+        """
+        mail_address = "key.reply.key@mydomainname.tld"
+        assert (
+            DecodedMail.find_key_from_mail_address(
+                mail_address, marker_str="{key}", pattern="{key}reply{key}@mydomainname.tld"
             )
             is None
         )

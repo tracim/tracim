@@ -5,8 +5,8 @@ import { Password as PasswordWithoutHOC } from '../../../src/component/Account/P
 import sinon from 'sinon'
 
 describe('<Password />', () => {
-  const onClickSubmitCallBack = sinon.stub()
-  const dispatchMock = sinon.stub()
+  const onClickSubmitCallBack = sinon.spy()
+  const dispatchMock = sinon.spy()
 
   const props = {
     onClickSubmit: onClickSubmitCallBack,

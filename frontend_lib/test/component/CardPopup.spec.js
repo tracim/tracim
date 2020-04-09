@@ -6,7 +6,7 @@ import CardPopup from '../../src/component/CardPopup/CardPopup.jsx'
 require('../../src/component/CardPopup/CardPopup.styl')
 
 describe('<CardPopup />', () => {
-  const onCloseCallBack = sinon.stub()
+  const onCloseCallBack = sinon.spy()
 
   const props = {
     customClass: 'randomCustomClass',

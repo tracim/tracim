@@ -10,7 +10,7 @@ import { connectMock } from '../../hocMock/store.js'
 import { withRouterMock } from '../../hocMock/withRouter.js'
 
 describe('<OpenCreateContentApp />', () => {
-  const renderAppPopupCreationCallBack = sinon.stub()
+  const renderAppPopupCreationCallBack = sinon.spy()
 
   const props = {
     workspaceId: 1,

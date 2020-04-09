@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="${lang}">
+<body>
 <p>${_('Hello {username},').format(username=emitter.display_name)}</p>
 <p>${_('You shared the file <i>{content_filename}</i> with:').format(content_filename=html_escape(shared_content.filename))|n}</p>
 <ul>
@@ -20,3 +23,5 @@ ${config.WEBSITE__TITLE}
 <a href="${config.WEBSITE__BASE_URL}">${config.WEBSITE__BASE_URL}</a>
 ${_("powered by tracim software")} - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
 </pre>
+</body>
+</html>

@@ -4,10 +4,11 @@ import { shallow } from 'enzyme'
 import { RecentActivity as RecentActivityWithoutHOC } from '../../../src/component/Dashboard/RecentActivity.jsx'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 import sinon from 'sinon'
+import { ROLE } from 'tracim_frontend_lib'
 
 describe('<RecentActivity />', () => {
-  const onClickSeeMoreCallBack = sinon.stub()
-  const onClickEverythingAsReadCallBack = sinon.stub()
+  const onClickSeeMoreCallBack = sinon.spy()
+  const onClickEverythingAsReadCallBack = sinon.spy()
 
   const props = {
     recentActivityList: [{
@@ -40,10 +41,23 @@ describe('<RecentActivity />', () => {
       expect(wrapper.find('div.recentactivity__list__item__name').length).to.equal(props.recentActivityList.length)
     )
 
-    it(`should display the label of each recent activity`, () => {
+    it('should display the label of each recent activity', () => {
       for (let i = 0; i < props.recentActivityList.length; i++) {
         expect(wrapper.find('div.recentactivity__list__item__name').at(i)).to.text().contains(props.recentActivityList[i].label)
       }
+    })
+
+    it(`should use a link if the logged User is a contentManager`, () => {
+      wrapper.setProps({ roleIdForLoggedUser: ROLE.contentManager.id })
+      expect(wrapper.find('.recentactivity__list__item').length).to.equal(3)
+      expect(wrapper.find('.recentactivity__list__item.nolink').length).to.equal(0)
+      wrapper.setProps({ roleIdForLoggedUser: props.roleIdForLoggedUser })
+    })
+
+    it(`should not use a link if the logged User is a contributor`, () => {
+      wrapper.setProps({ roleIdForLoggedUser: ROLE.contributor.id })
+      expect(wrapper.find('.recentactivity__list__item.nolink').length).to.equal(1)
+      wrapper.setProps({ roleIdForLoggedUser: props.roleIdForLoggedUser })
     })
   })
 

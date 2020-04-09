@@ -6,7 +6,7 @@ import RadioBtnGroup from '../../src/component/Input/RadioBtn/RadioBtn.jsx'
 require('../../src/component/Input/RadioBtn/RadioBtn.styl')
 
 describe('<RadioBtn />', () => {
-  const handleNewSelectedValueCallBack = sinon.stub()
+  const handleNewSelectedValueCallBack = sinon.spy()
 
   const img = {
     src: 'randomImg',

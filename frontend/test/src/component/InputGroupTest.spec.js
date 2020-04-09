@@ -5,8 +5,8 @@ import InputGroupText from '../../../src/component/common/Input/InputGroupText.j
 import sinon from 'sinon'
 
 describe('<InputGroupText />', () => {
-  const onChangeCallBack = sinon.stub()
-  const onKeyDownCallBack = sinon.stub()
+  const onChangeCallBack = sinon.spy()
+  const onKeyDownCallBack = sinon.spy()
 
   const props = {
     parentClassName: 'randomParentClassName',

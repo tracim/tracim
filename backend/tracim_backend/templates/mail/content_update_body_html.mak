@@ -1,6 +1,9 @@
-## -*- coding: utf-8 -*-
-	<!--FIXME After discuss with Damien: dont add intelligent code in template -->
+<!DOCTYPE html>
+<html lang="${lang}">
+<body>
     <%
+        # FIXME - G.M - 2019-05-09 - After discuss with Damien: dont add intelligent code in template,
+        # see issue #1691
         call_to_action_url = content_in_context.frontend_url
         content_name_pattern = "<i><a href={call_to_action_url}>{content}</a></i>"
         content_name = content_name_pattern.format(
@@ -62,3 +65,5 @@
     ${_("You're receiving this email because of your account on {website_title}.").format(website_title=config.WEBSITE__TITLE)}
     ${_("If you'd like to receive fewer emails, you can <a href=\"{website_title}/ui/account\">unsubscribe from notifications</a>.").format(website_title=html_escape(config.WEBSITE__BASE_URL))|n}
 </pre>
+</body>
+</html>

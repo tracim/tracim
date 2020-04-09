@@ -5,7 +5,7 @@ import sinon from 'sinon'
 import { Notification as NotificationWithoutHOC } from '../../../src/component/Account/Notification.jsx'
 
 describe('<Notification />', () => {
-  const onChangeSubscriptionNotifCallBack = sinon.stub()
+  const onChangeSubscriptionNotifCallBack = sinon.spy()
 
   const props = {
     userLoggedId: 0,

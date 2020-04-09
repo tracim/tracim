@@ -4,6 +4,7 @@ import { Tracim as TracimWithoutHOC } from '../../../src/container/Tracim'
 import sinon from 'sinon'
 import { mount } from 'enzyme'
 import { user } from '../../hocMock/redux/user/user'
+import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 import { appList } from '../../hocMock/redux/appList/appList'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
 import configureMockStore from 'redux-mock-store'
@@ -19,19 +20,25 @@ import {
 } from '../../../src/action-creator.sync'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { FETCH_CONFIG } from '../../../src/helper'
-const nock = require('nock')
+import {
+  mockGetAppList200,
+  mockGetConfig200,
+  mockGetContentType200,
+  mockGetMyselfWorkspaceList200,
+  mockGetWorkspaceMemberList200
+} from '../../apiMock'
 
 describe('<Tracim />', () => {
-  const newFlashMessageWarningCallBack = sinon.stub()
-  const newFlashMessageInfoCallBack = sinon.stub()
-  const setConfigCallBack = sinon.stub()
-  const setAppListCallBack = sinon.stub()
-  const setContentTypeListCallBack = sinon.stub()
-  const setUserConnectedCallBack = sinon.stub()
-  const setWorkspaceListCallBack = sinon.stub()
-  const setBreadcrumbsCallBack = sinon.stub()
-  const appendBreadcrumbsCallBack = sinon.stub()
-  const setWorkspaceListMemberListCallBack = sinon.stub()
+  const newFlashMessageWarningCallBack = sinon.spy()
+  const newFlashMessageInfoCallBack = sinon.spy()
+  const setConfigCallBack = sinon.spy()
+  const setAppListCallBack = sinon.spy()
+  const setContentTypeListCallBack = sinon.spy()
+  const setUserConnectedCallBack = sinon.spy()
+  const setWorkspaceListCallBack = sinon.spy()
+  const setBreadcrumbsCallBack = sinon.spy()
+  const appendBreadcrumbsCallBack = sinon.spy()
+  const setWorkspaceListMemberListCallBack = sinon.spy()
 
   const dispatchCallBack = (param) => {
     if (isFunction(param)) {
@@ -107,43 +114,23 @@ describe('<Tracim />', () => {
   const wrapperInstance = wrapper.find(TracimWithoutHOC)
 
   describe('intern function', () => {
-    before(() => {
-      nock(FETCH_CONFIG.apiUrl)
-        .get('/system/config')
-        .reply(200, {})
-
-      nock(FETCH_CONFIG.apiUrl)
-        .get('/system/applications')
-        .reply(200, [])
-
-      nock(FETCH_CONFIG.apiUrl)
-        .get('/system/content_types')
-        .reply(200, { })
-
-      nock(FETCH_CONFIG.apiUrl)
-        .get('/users/me/workspaces')
-        .query({ show_owned_workspace: 0 })
-        .reply(200, [])
-
-      nock(FETCH_CONFIG.apiUrl)
-        .get(new RegExp('/workspaces/[0-9]/members'))
-        .reply(200, { })
-    })
-
     describe('loadAppConfig', () => {
       it('setConfigCallBack should be called when loadAppConfig() is called', (done) => {
+        mockGetConfig200(FETCH_CONFIG.apiUrl)
         wrapperInstance.instance().loadAppConfig().then(() => {
           expect(setConfigCallBack.called).to.equal(true)
         }).then(done, done)
       })
 
       it('setAppListCallBack should be called when loadAppConfig() is called', (done) => {
+        mockGetAppList200(FETCH_CONFIG.apiUrl, appList)
         wrapperInstance.instance().loadAppConfig().then(() => {
           expect(setAppListCallBack.called).to.equal(true)
         }).then(done, done)
       })
 
       it('setContentTypeListCallBack should be called when loadAppConfig() is called', (done) => {
+        mockGetContentType200(FETCH_CONFIG.apiUrl, contentType)
         wrapperInstance.instance().loadAppConfig().then(() => {
           expect(setContentTypeListCallBack.called).to.equal(true)
         }).then(done, done)
@@ -152,6 +139,7 @@ describe('<Tracim />', () => {
 
     describe('loadWorkspaceList', () => {
       it('setWorkspaceListCallBack should be called when loadWorkspaceList() is called', (done) => {
+        mockGetMyselfWorkspaceList200(FETCH_CONFIG.apiUrl, false, workspaceList.workspaceList)
         wrapperInstance.instance().loadWorkspaceList().then(() => {
           expect(setWorkspaceListCallBack.called).to.equal(true)
         }).then(done, done)
@@ -160,6 +148,7 @@ describe('<Tracim />', () => {
 
     describe('loadWorkspaceListMemberList', () => {
       it('setWorkspaceListMemberListCallBack should be called when loadWorkspaceListMemberList() is called', (done) => {
+        workspaceList.workspaceList.map(ws => mockGetWorkspaceMemberList200(FETCH_CONFIG.apiUrl, ws.id, ws.memberList))
         wrapperInstance.instance().loadWorkspaceListMemberList(workspaceList.workspaceList).then(() => {
           expect(setWorkspaceListMemberListCallBack.called).to.equal(true)
         }).then(done, done)
