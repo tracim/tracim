@@ -48,7 +48,7 @@ module.exports = {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',
-      exclude: [/node_modules/]
+      exclude: [/node_modules/, /frontend_lib/]
     }, {
       test: [/\.js$/, /\.jsx$/],
       loader: 'babel-loader',

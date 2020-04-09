@@ -45,7 +45,7 @@ module.exports = {
     rules: [{
       test: /\.jsx?$/,
       enforce: 'pre',
-      exclude: [/node_modules/],
+      exclude: [/node_modules/, /frontend_lib/],
       use: 'standard-loader',
     }, {
       test: [/\.js$/, /\.jsx$/],
