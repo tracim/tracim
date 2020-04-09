@@ -34,7 +34,8 @@ and activate the Tracim virtualenv:
 
 ### Creating a New Schema Migration ###
 
-This creates a new auto-generated python migration file
+This creates a new auto-generated python migration file:
+
 in `tracim_backend/migration/versions/` ending with `migration_label.py`:
 
     alembic -c development.ini revision --autogenerate -m "migration label"
@@ -45,11 +46,11 @@ in `tracim_backend/migration/versions/` ending with `migration_label.py`:
 Creating a working alembic migration for all database engines supported by Tracim is not so easy,
 here are some tricks to help us.
 
-## sqlite support of alter table is limited, use always batch_op !
+## sqlite support of alter table is limited, use always batch_op!
 
 SQLite has limited support for ops altering tables. As a consequence, you can't easily add/remove/rename columns.
 
-This code doesn't work
+This code doesn't work:
 
 ```python
 from alembic import op
@@ -60,6 +61,7 @@ def upgrade():
 ```
 
 you should instead use [batch ops]("https://alembic.sqlalchemy.org/en/latest/batch.html"), do:
+
 ```python
 from alembic import op
 import sqlalchemy as sa
@@ -78,7 +80,7 @@ There are many examples of this in Tracim migration revision:
 PostgreSQL does support real enum whereas other database engines support enum as a "check" constraint.
 This means different code to support the specificities of PostgreSQL in alembic.
 
-creating enum is not too complex:
+Creating enum is not too complex:
 
 ```python
 from alembic import op
@@ -156,7 +158,7 @@ def upgrade():
         bop.alter_column("calendar_enabled", new_column_name="agenda_enabled")
 ```
 
-will work on both postgresql and sqlite but will fail on mysql, you need to specify
+Will work on both postgresql and sqlite but will fail on mysql, you need to specify
 type_ like this:
 
 
@@ -224,7 +226,7 @@ def downgrade():
 As you see, for the version of Alembic (1.0.5) currently used in Tracim, you need to:
 - drop explicit constraint for MySQL 8.0+ 
 - do rename for MySQL and MariaDB without creating constraint, then reapply type with
-constraint to be sure constraint will be readded.
+the constraint to be sure the constraint will be readded.
 
 ## Mysql does already add index to foreign keys
 
@@ -366,7 +368,7 @@ def upgrade():
     session.commit()
 ```
 
-see :
+See:
 - [354d62d490ad_remove_page_slug_from_properties.py](../tracim_backend/migration/354d62d490ad_remove_page_slug_from_properties.py)
 - [cd79614189ac_add_owner_to_workspace.py](../tracim_backend/migration/cd79614189ac_add_owner_to_workspace.py)
 
@@ -375,7 +377,6 @@ see :
 
 In some specific cases, using raw sql query is the easiest solution, be careful about
 using sql that does work on all your supported database.
-
 
 ```python
 from alembic import op
@@ -393,7 +394,7 @@ def upgrade():
 
 ### Doing specific database code
 
-to make specific code for some database, we can rely on sqlalchemy dialect:
+To make specific code for some database, we can rely on sqlalchemy dialect:
 
 ```python
 from alembic import op
