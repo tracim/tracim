@@ -12,7 +12,7 @@ export const debug = {
     translation: { en: {}, fr: {} },
     apiUrl: 'http://localhost:6543/api/v2',
     apiHeader: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json'
     },
     system: {

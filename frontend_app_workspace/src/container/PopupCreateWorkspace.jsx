@@ -20,7 +20,7 @@ const debug = {
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543',
     apiHeader: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json'
     },
     translation: {

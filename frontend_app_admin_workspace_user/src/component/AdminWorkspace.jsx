@@ -10,9 +10,9 @@ import {
 const AdminWorkspace = props =>
   <PageWrapper customClass='adminWorkspace'>
     <PageTitle
-      parentClass={'adminWorkspace'}
+      parentClass='adminWorkspace'
       title={props.t('Shared space management')}
-      icon={'bank'}
+      icon='bank'
       breadcrumbsList={props.breadcrumbsList}
     />
 
@@ -30,7 +30,7 @@ const AdminWorkspace = props =>
         {props.t('List of every shared spaces')}
       </div>
 
-      <Delimiter customClass={'adminWorkspace__delimiter'} />
+      <Delimiter customClass='adminWorkspace__delimiter' />
 
       <div className='adminWorkspace__workspaceTable'>
 
@@ -88,8 +88,7 @@ const AdminWorkspace = props =>
                   <td />
                   <td />
                 </tr>
-              )
-            }
+              )}
           </tbody>
         </table>
       </div>

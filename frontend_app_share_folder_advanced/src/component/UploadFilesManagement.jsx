@@ -11,7 +11,7 @@ const UploadFilesManagement = props => {
   return (
     <div className='share_folder_advanced__content'>
       <div className='share_folder_advanced__content__title'>
-        { props.t('Public upload links') }
+        {props.t('Public upload links')}
 
         <button
           className='share_folder_advanced__content__btnupload btn highlightBtn'
@@ -45,8 +45,7 @@ const UploadFilesManagement = props => {
           <div className='share_folder_advanced__content__empty'>
             {props.t('No upload link has been created yet')}
           </div>
-        )
-      }
+        )}
     </div>
   )
 }

@@ -35,7 +35,7 @@ export const WorkspaceMembersList = props => {
             {props.memberList && props.memberList.filter(m => m.user).map(m =>
               <li className='workspace_advanced__userlist__list__item' key={`member_${m.user_id}`}>
                 <div className='workspace_advanced__userlist__list__item__avatar'>
-                  <Avatar width={'50px'} publicName={m.user.public_name} />
+                  <Avatar width='50px' publicName={m.user.public_name} />
                 </div>
 
                 <div className='workspace_advanced__userlist__list__item__name'>
@@ -93,8 +93,7 @@ export const WorkspaceMembersList = props => {
                       <i className='fa fa-trash-o' />
                     </div>
                   )
-                  : <div className='workspace_advanced__userlist__list__item__delete' />
-                }
+                  : <div className='workspace_advanced__userlist__list__item__delete' />}
               </li>
             )}
           </ul>

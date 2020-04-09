@@ -25,8 +25,7 @@ export const HomeNoWorkspace = props =>
             </div>
             <div>{props.t('Please refer to an administrator or a trusted user')}</div>
           </div>
-        )
-      }
+        )}
     </div>
 
     {props.canCreateWorkspace && (

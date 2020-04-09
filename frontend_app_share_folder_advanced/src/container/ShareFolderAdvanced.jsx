@@ -171,7 +171,7 @@ class ShareFolderAdvanced extends React.Component {
     const { state, props } = this
 
     let uploadEmailList = parserStringToList(state.uploadEmails)
-    let invalidEmails = []
+    const invalidEmails = []
 
     uploadEmailList.forEach(uploadEmail => {
       if (!checkEmailValidity(uploadEmail)) invalidEmails.push(uploadEmail)
@@ -180,7 +180,7 @@ class ShareFolderAdvanced extends React.Component {
     uploadEmailList = uploadEmailList.filter(uploadEmail => !invalidEmails.includes(uploadEmail))
 
     if (invalidEmails.length > 0) {
-      this.sendGlobalFlashMessage(`${props.t(`Error, these emails are invalid: `)} ${invalidEmails.join(', ')}`)
+      this.sendGlobalFlashMessage(`${props.t('Error, these emails are invalid: ')} ${invalidEmails.join(', ')}`)
     } else {
       const fetchResultPostImportAuthorizations = await handleFetchResult(await postImportAuthorizationsList(
         state.config.apiUrl,
@@ -224,8 +224,8 @@ class ShareFolderAdvanced extends React.Component {
 
   handleKeyDownEnter = e => {
     if (e.key === 'Enter') {
-      let emailList = parserStringToList(this.state.uploadEmails)
-      let invalidEmails = []
+      const emailList = parserStringToList(this.state.uploadEmails)
+      const invalidEmails = []
 
       emailList.forEach(email => {
         if (!checkEmailValidity(email)) invalidEmails.push(email)
@@ -248,7 +248,7 @@ class ShareFolderAdvanced extends React.Component {
     return (
       <PopinFixed customClass='share_folder_advanced'>
         <PopinFixedHeader
-          customClass={'folderAdvanced'}
+          customClass='folderAdvanced'
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
           componentTitle={<div>{props.t('Received files')}</div>}
@@ -280,8 +280,7 @@ class ShareFolderAdvanced extends React.Component {
                 onKeyDownEnter={this.handleKeyDownEnter}
                 emailNotifActivated={state.config.system.config.email_notification_activated}
               />
-            )
-          }
+            )}
         </PopinFixedContent>
       </PopinFixed>
     )

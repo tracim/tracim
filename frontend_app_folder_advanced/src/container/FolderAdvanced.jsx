@@ -220,7 +220,7 @@ class FolderAdvanced extends React.Component {
     return (
       <PopinFixed customClass='folder_advanced'>
         <PopinFixedHeader
-          customClass={'folderAdvanced'}
+          customClass='folderAdvanced'
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
           rawTitle={state.content.label}
@@ -248,8 +248,7 @@ class FolderAdvanced extends React.Component {
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
                   disabled={state.content.is_archived || state.content.is_deleted}
-                />
-              }
+                />}
             </div>
           </div>
         </PopinFixedOption>

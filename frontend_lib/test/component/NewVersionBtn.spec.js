@@ -31,7 +31,7 @@ describe('<NewVersionBtn />', () => {
       expect(wrapper.find('button').prop('style').color).to.equal(props.style.color)
     )
 
-    it(`the button should be disabled when disabled is set to true`, () => {
+    it('the button should be disabled when disabled is set to true', () => {
       wrapper.setProps({ disabled: true })
       expect(wrapper.find('button').prop('disabled')).to.equal(true)
       wrapper.setProps({ disabled: props.disabled })

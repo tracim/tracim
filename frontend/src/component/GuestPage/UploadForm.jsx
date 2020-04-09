@@ -78,8 +78,7 @@ class UploadForm extends React.Component {
                   {props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}
                 </PopoverBody>
               </Popover>
-            </div>
-          }
+            </div>}
 
           <InputTextArea
             placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
@@ -103,7 +102,8 @@ class UploadForm extends React.Component {
             customTitle={props.t('Attached files')}
           />
 
-          <button type='button'
+          <button
+            type='button'
             className='guestupload__card__form__right__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
             onClick={props.onClickSend}
             disabled={this.sendButtonIsDisabled()}

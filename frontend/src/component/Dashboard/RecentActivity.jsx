@@ -57,7 +57,7 @@ export const RecentActivity = props =>
           } else {
             return (
               <Link
-                className={classnames('recentactivity__list__item primaryColorBgLightenHover', { 'read': props.readByUserList.includes(content.id) })}
+                className={classnames('recentactivity__list__item primaryColorBgLightenHover', { read: props.readByUserList.includes(content.id) })}
                 to={PAGE.WORKSPACE.CONTENT(props.workspaceId, content.type, content.id)}
                 title={content.label}
                 key={content.id}
@@ -68,8 +68,7 @@ export const RecentActivity = props =>
             )
           }
         })
-        : <div className='recentactivity__empty'>{props.t('No recent activity')}</div>
-      }
+        : <div className='recentactivity__empty'>{props.t('No recent activity')}</div>}
 
       <div
         className='recentactivity__more'

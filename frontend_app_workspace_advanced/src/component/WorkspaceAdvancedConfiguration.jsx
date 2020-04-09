@@ -22,7 +22,7 @@ const WorkspaceAdvancedConfiguration = props => {
             placeholder={props.t("Shared space's description")}
             value={props.description}
             onChange={props.onChangeDescription}
-            rows={'3'}
+            rows='3'
           />
         </div>
 
@@ -81,8 +81,7 @@ const WorkspaceAdvancedConfiguration = props => {
                 </button>
               </div>
             </div>
-          </CardPopup>
-        }
+          </CardPopup>}
       </div>
 
       <div

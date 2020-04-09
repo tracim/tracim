@@ -241,54 +241,73 @@ export class Tracim extends React.Component {
 
           <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id >= PROFILE.manager.id} />} />
 
-          <Route path='/ui/workspaces/:idws?' render={() =>
-            <>
-              <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
-                <Redirect to={{ pathname: PAGE.HOME, state: { from: props.location } }} />
-              } />
+          <Route
+            path='/ui/workspaces/:idws?'
+            render={() =>
+              <>
+                <Route
+                  exact
+                  path={PAGE.WORKSPACE.ROOT}
+                  render={() => <Redirect to={{ pathname: PAGE.HOME, state: { from: props.location } }} />}
+                />
 
-              <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
-                <Redirect to={{ pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: { from: props.location } }} />
-              } />
+                <Route
+                  exact
+                  path={`${PAGE.WORKSPACE.ROOT}/:idws`}
+                  render={props2 => // handle '/workspaces/:id' and add '/contents'
+                    <Redirect to={{ pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: { from: props.location } }} />}
+                />
 
-              <Route
-                path={[
-                  PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
-                  PAGE.WORKSPACE.CONTENT_LIST(':idws'),
-                  PAGE.WORKSPACE.SHARE_FOLDER(':idws')
-                ]}
-                render={() =>
-                  <div className='tracim__content fullWidthFullHeight'>
-                    <WorkspaceContent />
-                  </div>
-                }
-              />
+                <Route
+                  path={[
+                    PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
+                    PAGE.WORKSPACE.CONTENT_LIST(':idws'),
+                    PAGE.WORKSPACE.SHARE_FOLDER(':idws')
+                  ]}
+                  render={() => (
+                    <div className='tracim__content fullWidthFullHeight'>
+                      <WorkspaceContent />
+                    </div>
+                  )}
+                />
 
-              <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} render={() =>
-                <div className='tracim__content fullWidthFullHeight'>
-                  <Dashboard />
-                </div>
-              } />
+                <Route
+                  path={PAGE.WORKSPACE.DASHBOARD(':idws')}
+                  render={() => (
+                    <div className='tracim__content fullWidthFullHeight'>
+                      <Dashboard />
+                    </div>
+                  )}
+                />
 
-              <Route path={PAGE.WORKSPACE.AGENDA(':idws')} render={() =>
-                <AppFullscreenRouter />
-              } />
-            </>
-          } />
+                <Route
+                  path={PAGE.WORKSPACE.AGENDA(':idws')}
+                  render={() => <AppFullscreenRouter />}
+                />
+              </>}
+          />
 
           <Route path={PAGE.ACCOUNT} render={() => <Account />} />
 
-          <Route exact path={PAGE.ADMIN.USER_EDIT(':userid')} render={() => <AdminAccount />} />
+          <Route
+            exact
+            path={PAGE.ADMIN.USER_EDIT(':userid')}
+            render={() => <AdminAccount />}
+          />
 
-          <Route exact path={[
-            PAGE.ADMIN.USER,
-            PAGE.ADMIN.WORKSPACE,
-            PAGE.AGENDA,
-            PAGE.WORKSPACE.CONTENT_EDITION(),
-            PAGE.WORKSPACE.GALLERY()
-          ]} render={() => <AppFullscreenRouter />} />
+          <Route
+            exact
+            path={[
+              PAGE.ADMIN.USER,
+              PAGE.ADMIN.WORKSPACE,
+              PAGE.AGENDA,
+              PAGE.WORKSPACE.CONTENT_EDITION(),
+              PAGE.WORKSPACE.GALLERY()
+            ]}
+            render={() => <AppFullscreenRouter />}
+          />
 
-          <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
+          <Route path='/wip/:cp' component={WIPcomponent} /> {/* for testing purpose only */}
 
           <Route path={PAGE.SEARCH_RESULT} component={SearchResult} />
 

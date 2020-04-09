@@ -49,7 +49,7 @@ class Agenda extends React.Component {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
         if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
-          this.setState({config: data.config})
+          this.setState({ config: data.config })
         }
         break
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -117,7 +117,7 @@ class Agenda extends React.Component {
   }
 
   loadAgendaList = async workspaceId => {
-    const { state } = this
+    const { state, props } = this
 
     const fetchResultUserWorkspace = await handleFetchResult(
       await getAgendaList(state.config.apiUrl, workspaceId)
@@ -144,7 +144,10 @@ class Agenda extends React.Component {
     const fetchResultList = await Promise.all(
       agendaList
         .filter(a => a.agenda_type === 'workspace')
-        .map(async a => await handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, a.workspace_id)))
+        .map(async a => {
+          const fetchWorkspaceMemberList = await handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, a.workspace_id))
+          return fetchWorkspaceMemberList
+        })
     )
 
     const fetchResultSuccess = fetchResultList.filter(result => result.apiResponse.status === 200)
@@ -184,7 +187,7 @@ class Agenda extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
     }]
 
@@ -198,7 +201,7 @@ class Agenda extends React.Component {
       })
     } else {
       breadcrumbsList.push({
-        link: <Link to={`/ui/agenda`}>{props.t('All my agendas')}</Link>,
+        link: <Link to='/ui/agenda'>{props.t('All my agendas')}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
@@ -207,7 +210,7 @@ class Agenda extends React.Component {
     // app crash telling it cannot render a Link outside a router
     // see https://github.com/tracim/tracim/issues/1637
     // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
-    this.setState({breadcrumbsList: breadcrumbsList})
+    this.setState({ breadcrumbsList: breadcrumbsList })
   }
 
   loadWorkspaceData = async () => {
@@ -254,16 +257,25 @@ class Agenda extends React.Component {
     // https://github.com/tracim/tracim/issues/1847
     const pageTitle = state.config.appConfig.workspaceId === null
       ? props.t('All my agendas')
-      : <div dangerouslySetInnerHTML={
-        {__html: props.t('Agenda of shared space {{workspaceLabel}}', {workspaceLabel: state.content.workspaceLabel, interpolation: {escapeValue: false}})}
-        } />
+      : (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: props.t(
+              'Agenda of shared space {{workspaceLabel}}', {
+                workspaceLabel: state.content.workspaceLabel,
+                interpolation: { escapeValue: false }
+              }
+            )
+          }}
+        />
+      )
 
     return (
       <PageWrapper customClass='agendaPage'>
         <PageTitle
           parentClass='agendaPage'
           title={pageTitle}
-          icon={'calendar'}
+          icon='calendar'
           breadcrumbsList={state.breadcrumbsList}
         />
 
@@ -274,7 +286,7 @@ class Agenda extends React.Component {
             allow='fullscreen'
             allowfullscreen
             data-config={JSON.stringify(config)}
-            ref={f => this.agendaIframe = f}
+            ref={f => { this.agendaIframe = f }}
           />
         </PageContent>
       </PageWrapper>

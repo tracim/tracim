@@ -134,8 +134,7 @@ export class NewUpload extends React.Component {
                 {props.t('Protect by password')}
               </span>
             </div>
-          )
-        }
+          )}
 
         <div className='d-flex'>
           <button

@@ -88,13 +88,12 @@ export class Sidebar extends React.Component {
 
     return (
       <div className='sidebar'>
-        <div className={classnames('sidebar__expand', { 'sidebarclose': sidebarClose })} onClick={this.handleClickToggleSidebar}>
+        <div className={classnames('sidebar__expand', { sidebarclose: sidebarClose })} onClick={this.handleClickToggleSidebar}>
           {sidebarClose
             ? <i className={classnames('fa fa-chevron-right')} title={t('See sidebar')} />
-            : <i className={classnames('fa fa-chevron-left')} title={t('Hide sidebar')} />
-          }
+            : <i className={classnames('fa fa-chevron-left')} title={t('Hide sidebar')} />}
         </div>
-        <div className={classnames('sidebar__frame', { 'sidebarclose': sidebarClose })}>
+        <div className={classnames('sidebar__frame', { sidebarclose: sidebarClose })}>
           <div className='sidebar__scrollview'>
             {/*
             FIXME - CH - 2019-04-04 - button scroll to top removed for now
@@ -107,9 +106,9 @@ export class Sidebar extends React.Component {
             <div className='sidebar__content'>
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
-              <nav className={classnames('sidebar__content__navigation', { 'sidebarclose': sidebarClose })}>
+              <nav className={classnames('sidebar__content__navigation', { sidebarclose: sidebarClose })}>
                 <ul className='sidebar__content__navigation__workspace'>
-                  { workspaceList.map(ws =>
+                  {workspaceList.map(ws =>
                     <WorkspaceListItem
                       workspaceId={ws.id}
                       userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.user_id, ws.memberList, ROLE_LIST)}
@@ -134,8 +133,7 @@ export class Sidebar extends React.Component {
                   >
                     {t('Create a shared space')}
                   </button>
-                </div>
-              }
+                </div>}
             </div>
 
             <div className='sidebar__footer mb-2'>
@@ -145,7 +143,7 @@ export class Sidebar extends React.Component {
               <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
                 Copyright - 2013 - 2020
                 <div className='sidebar__footer__text__link'>
-                  <a href='https://www.algoo.fr/fr/tracim' target='_blank' className='ml-3'>tracim.fr</a>
+                  <a href='https://www.algoo.fr/fr/tracim' target='_blank' rel='noopener noreferrer' className='ml-3'>tracim.fr</a>
                 </div>
               </div>
             </div>

@@ -16,8 +16,7 @@ const FolderAdvanced = props => {
             <i className='fa fa-fw fa-archive' />
             {props.t('Restore')}
           </button>
-        </div>
-      }
+        </div>}
 
       {props.isDeleted &&
         <div className='folder_advanced__content__state'>
@@ -30,8 +29,7 @@ const FolderAdvanced = props => {
             <i className='fa fa-fw fa-trash' />
             {props.t('Restore')}
           </button>
-        </div>
-      }
+        </div>}
 
       <div className='formBlock folder_advanced__content'>
         <div className='formBlock__title folder_advanced__content__title'>

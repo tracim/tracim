@@ -216,13 +216,14 @@ class PopupCreateFile extends React.Component {
 
     const filePosted = new File([file], file.name)
     switch (xhr.status) {
-      case 200:
+      case 200: {
         const jsonResult200 = JSON.parse(xhr.responseText)
         await putMyselfFileRead(state.config.apiUrl, state.workspaceId, jsonResult200.content_id)
 
         filePosted.jsonResult = { ...jsonResult200, code: 200 }
         break
-      case 400:
+      }
+      case 400: {
         const jsonResult400 = JSON.parse(xhr.responseText)
 
         let errorMessage = props.t('Error while creating file')
@@ -243,6 +244,7 @@ class PopupCreateFile extends React.Component {
         filePosted.jsonResult = jsonResult400
         filePosted.errorMessage = errorMessage
         break
+      }
       default:
         filePosted.jsonResult = { code: 0 }
         filePosted.errorMessage = props.t('Error while creating file')
@@ -281,7 +283,7 @@ class PopupCreateFile extends React.Component {
 
   loadUploadFilePreview = (file) => {
     if (file.type.includes('image') && file.size <= 2000000) {
-      let reader = new FileReader()
+      const reader = new FileReader()
       reader.onload = e => {
         this.setState({ uploadFilePreview: e.total > 0 ? e.target.result : FILE_PREVIEW_STATE.NO_FILE })
         const img = new Image()
@@ -312,8 +314,8 @@ class PopupCreateFile extends React.Component {
             <PopupProgressUpload
               color={state.config.hexcolor}
               percent={this.getPercentUpload()}
-            />
-          }
+            />}
+
           <FileDropzone
             onDrop={this.handleChangeFile}
             hexcolor={state.config.hexcolor}

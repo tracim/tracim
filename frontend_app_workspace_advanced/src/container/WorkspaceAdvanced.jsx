@@ -425,7 +425,7 @@ class WorkspaceAdvanced extends React.Component {
       case 400:
         switch (fetchWorkspaceNewMember.body.code) {
           case 2042: this.sendGlobalFlashMessage(props.t('This account is deactivated'), 'warning'); break
-          case 1001:
+          case 1001: {
             const ErrorMsg = () => (
               <div>
                 {props.t('Unknown user')}<br />
@@ -434,6 +434,7 @@ class WorkspaceAdvanced extends React.Component {
             )
             this.sendGlobalFlashMessage(<ErrorMsg />, 'warning')
             break
+          }
           case 3008: this.sendGlobalFlashMessage(props.t('This user already is in the shared space'), 'warning'); break
           default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space'), 'warning')
         }
@@ -500,7 +501,7 @@ class WorkspaceAdvanced extends React.Component {
             onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
             onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
             onChangeDescription={this.handleChangeDescription}
-            key={'workspace_advanced'}
+            key='workspace_advanced'
           />
 
           <PopinFixedRightPart
@@ -511,47 +512,51 @@ class WorkspaceAdvanced extends React.Component {
                 id: 'members_list',
                 label: this.props.t('Members List'),
                 icon: 'fa-users',
-                children: <WorkspaceMembersList
-                  displayFormNewMember={state.displayFormNewMember}
-                  memberList={state.content.memberList}
-                  roleList={state.config.roleList}
-                  onClickNewRole={this.handleClickNewRole}
-                  loggedUser={state.loggedUser}
-                  onClickDeleteMember={this.handleClickDeleteMember}
-                  onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-                  newMemberName={state.newMember.nameOrEmail}
-                  isEmail={state.newMember.isEmail}
-                  onChangeNewMemberName={this.handleChangeNewMemberName}
-                  searchedKnownMemberList={state.searchedKnownMemberList}
-                  onClickKnownMember={this.handleClickKnownMember}
-                  newMemberRole={state.newMember.role}
-                  onClickNewMemberRole={this.handleClickNewMemberRole}
-                  onClickValidateNewMember={this.handleClickValidateNewMember}
-                  autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                  emailNotifActivated={state.config.system.config.email_notification_activated}
-                  canSendInviteNewUser={
-                    [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
-                  }
-                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-                  autoCompleteClicked={state.autoCompleteClicked}
-                  onClickAutoComplete={this.handleClickAutoComplete}
-                />
+                children: (
+                  <WorkspaceMembersList
+                    displayFormNewMember={state.displayFormNewMember}
+                    memberList={state.content.memberList}
+                    roleList={state.config.roleList}
+                    onClickNewRole={this.handleClickNewRole}
+                    loggedUser={state.loggedUser}
+                    onClickDeleteMember={this.handleClickDeleteMember}
+                    onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
+                    newMemberName={state.newMember.nameOrEmail}
+                    isEmail={state.newMember.isEmail}
+                    onChangeNewMemberName={this.handleChangeNewMemberName}
+                    searchedKnownMemberList={state.searchedKnownMemberList}
+                    onClickKnownMember={this.handleClickKnownMember}
+                    newMemberRole={state.newMember.role}
+                    onClickNewMemberRole={this.handleClickNewMemberRole}
+                    onClickValidateNewMember={this.handleClickValidateNewMember}
+                    autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+                    emailNotifActivated={state.config.system.config.email_notification_activated}
+                    canSendInviteNewUser={
+                      [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
+                    }
+                    userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                    autoCompleteClicked={state.autoCompleteClicked}
+                    onClickAutoComplete={this.handleClickAutoComplete}
+                  />
+                )
               },
               {
                 id: 'optional_functionalities',
                 label: this.props.t('Optional Functionalities'),
                 icon: 'fa-cog',
-                children: <OptionalFeatures
-                  appAgendaAvailable={state.content.appAgendaAvailable}
-                  agendaEnabled={state.content.agenda_enabled}
-                  onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
-                  downloadEnabled={state.content.public_download_enabled}
-                  appDownloadAvailable={state.content.appDownloadAvailable}
-                  onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
-                  uploadEnabled={state.content.public_upload_enabled}
-                  appUploadAvailable={state.content.appUploadAvailable}
-                  onToggleUploadEnabled={this.handleToggleUploadEnabled}
-                />
+                children: (
+                  <OptionalFeatures
+                    appAgendaAvailable={state.content.appAgendaAvailable}
+                    agendaEnabled={state.content.agenda_enabled}
+                    onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
+                    downloadEnabled={state.content.public_download_enabled}
+                    appDownloadAvailable={state.content.appDownloadAvailable}
+                    onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
+                    uploadEnabled={state.content.public_upload_enabled}
+                    appUploadAvailable={state.content.appUploadAvailable}
+                    onToggleUploadEnabled={this.handleToggleUploadEnabled}
+                  />
+                )
               }
             ]}
           />

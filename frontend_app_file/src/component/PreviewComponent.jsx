@@ -90,10 +90,11 @@ export class PreviewComponent extends React.Component {
               className='previewcomponent__dloption__icon btn iconBtn'
               href={props.downloadPdfPageUrl}
               target='_blank'
+              rel='noopener noreferrer'
               download
               style={{ ':hover': { color: props.color } }}
               title={props.t('Download current page as PDF')}
-              key={'file_btn_dl_pdfall'}
+              key='file_btn_dl_pdfall'
             >
               <i className='fa fa-file-o' />
             </a>
@@ -104,10 +105,11 @@ export class PreviewComponent extends React.Component {
               className='previewcomponent__dloption__icon btn iconBtn'
               href={props.downloadPdfFullUrl}
               target='_blank'
+              rel='noopener noreferrer'
               download
               style={{ ':hover': { color: props.color } }}
               title={props.t('Download as PDF')}
-              key={'file_btn_dl_pdfpage'}
+              key='file_btn_dl_pdfpage'
             >
               <i className='fa fa-file-pdf-o' />
             </a>
@@ -117,10 +119,11 @@ export class PreviewComponent extends React.Component {
             className='previewcomponent__dloption__icon btn iconBtn'
             href={props.downloadRawUrl}
             target='_blank'
+            rel='noopener noreferrer'
             download
             style={{ ':hover': { color: props.color } }}
             title={props.t('Download file')}
-            key={'file_btn_dl_raw'}
+            key='file_btn_dl_raw'
           >
             <i className='fa fa-download' />
           </a>
@@ -135,7 +138,7 @@ export class PreviewComponent extends React.Component {
               style={{ ':hover': { color: props.color } }}
               title={props.t('Previous page')}
               disabled={props.fileCurrentPage === 1}
-              key={'file_btn_previouspage'}
+              key='file_btn_previouspage'
             >
               <i className='fa fa-chevron-left' />
             </button>
@@ -143,7 +146,7 @@ export class PreviewComponent extends React.Component {
 
           <div
             className={
-              classnames('previewcomponent__fileimg', { 'previewAvailable': state.isJpegPreviewDisplayable && props.isJpegAvailable })
+              classnames('previewcomponent__fileimg', { previewAvailable: state.isJpegPreviewDisplayable && props.isJpegAvailable })
             }
             onClick={state.isJpegPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
           >
@@ -158,8 +161,7 @@ export class PreviewComponent extends React.Component {
                     {props.t('No preview available')}
                   </div>
                 </div>
-              )
-            }
+              )}
 
             {state.isJpegPreviewDisplayable && props.isJpegAvailable && state.displayLightbox
               ? (
@@ -174,8 +176,7 @@ export class PreviewComponent extends React.Component {
                   imagePadding={55}
                 />
               )
-              : null
-            }
+              : null}
           </div>
 
           {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
@@ -186,7 +187,7 @@ export class PreviewComponent extends React.Component {
               style={{ ':hover': { color: props.color } }}
               title={props.t('Next page')}
               disabled={props.fileCurrentPage === props.filePageNb}
-              key={'file_btn_nextpage'}
+              key='file_btn_nextpage'
             >
               <i className='fa fa-chevron-right' />
             </button>

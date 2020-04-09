@@ -21,7 +21,7 @@ class ThumbnailPreview extends React.Component {
     const { props, state } = this
 
     return (
-      <div className={'carousel__thumbnail__item__preview__content'}>
+      <div className='carousel__thumbnail__item__preview__content'>
         {!state.imageLoaded && (
           <div className='gallery__loader'>
             <i className='fa fa-spinner fa-spin gallery__loader__icon' />

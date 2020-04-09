@@ -24,15 +24,15 @@ describe('<UserInfo />', () => {
       expect(wrapper.find('a.userinfo__email')).to.text().contains(props.user.email)
     )
 
-    it(`should display the profile label of the user in a div`, () =>
+    it('should display the profile label of the user in a div', () =>
       expect(wrapper.find('div.userinfo__profile')).to.text().contains(PROFILE.administrator.label)
     )
 
-    it(`should display the administrator icon`, () =>
+    it('should display the administrator icon', () =>
       expect(wrapper.find(`div.userinfo__profile > i.fa.fa-${PROFILE.administrator.faIcon}`).length).to.equal(1)
     )
 
-    it(`the icon should have the administrator hexcolor`, () => {
+    it('the icon should have the administrator hexcolor', () => {
       expect(wrapper.find(`i.fa.fa-${PROFILE.administrator.faIcon}`).prop('style').color).to.equal(PROFILE.administrator.hexcolor)
     })
   })

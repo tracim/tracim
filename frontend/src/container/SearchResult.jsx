@@ -79,8 +79,8 @@ class SearchResult extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    let prevSearchedKeywords = qs.parse(prevProps.location.search).q
-    let currentSearchedKeywords = this.parseUrl().searchedKeywords
+    const prevSearchedKeywords = qs.parse(prevProps.location.search).q
+    const currentSearchedKeywords = this.parseUrl().searchedKeywords
 
     if (prevSearchedKeywords !== currentSearchedKeywords) {
       this.loadSearchUrl()
@@ -184,11 +184,10 @@ class SearchResult extends React.Component {
     const { props } = this
     const { searchResult } = props
 
-    let subtitle
-    let numberResults = searchResult.resultsList.length
-    let text = numberResults === 1 ? props.t('best result for') : props.t('best results for')
+    const numberResults = searchResult.resultsList.length
+    const text = numberResults === 1 ? props.t('best result for') : props.t('best results for')
 
-    subtitle = `${numberResults} ${text} "${searchResult.searchedKeywords}"`
+    const subtitle = `${numberResults} ${text} "${searchResult.searchedKeywords}"`
 
     return subtitle
   }
@@ -230,21 +229,18 @@ class SearchResult extends React.Component {
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='searchResult'>
             <PageTitle
-              parentClass={'searchResult'}
+              parentClass='searchResult'
               title={currentNumberSearchResults === 1
                 ? props.t('Search result')
-                : props.t('Search results')
-              }
+                : props.t('Search results')}
               icon='search'
               subtitle={this.getSubtitle()}
               breadcrumbsList={props.breadcrumbs}
             />
 
             <PageContent parentClass='searchResult'>
-              <div className='folder__content' data-cy={'search__content'}>
-                {currentNumberSearchResults > 0 &&
-                  <ContentItemHeader showSearchDetails />
-                }
+              <div className='folder__content' data-cy='search__content'>
+                {currentNumberSearchResults > 0 && <ContentItemHeader showSearchDetails />}
 
                 {currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
@@ -277,16 +273,17 @@ class SearchResult extends React.Component {
                 ))}
               </div>
               <div className='searchResult__btnSeeMore'>
-                { this.hasMoreResults()
-                  ? <IconButton
-                    className='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                    onClick={this.handleClickSeeMore}
-                    icon='chevron-down'
-                    text={props.t('See more')}
-                  />
+                {this.hasMoreResults()
+                  ? (
+                    <IconButton
+                      className='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                      onClick={this.handleClickSeeMore}
+                      icon='chevron-down'
+                      text={props.t('See more')}
+                    />
+                  )
                   : currentNumberSearchResults > props.searchResult.numberResultsByPage &&
-                    props.t('No more results')
-                }
+                    props.t('No more results')}
               </div>
             </PageContent>
           </PageWrapper>

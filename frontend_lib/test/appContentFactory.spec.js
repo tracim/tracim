@@ -71,7 +71,7 @@ describe('appContentFactory.js', () => {
   })
 
   describe('function setApiUrl', () => {
-    it(`should set the class property apiUrl`, () => {
+    it('should set the class property apiUrl', () => {
       expect(wrapper.instance().apiUrl).to.equal(null)
       wrapper.instance().setApiUrl(fakeApiUrl)
       expect(wrapper.instance().apiUrl).to.equal(fakeApiUrl)

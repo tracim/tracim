@@ -100,7 +100,7 @@ class WorkspaceContent extends React.Component {
         break
 
       case CUSTOM_EVENT.APP_CLOSED:
-      case CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT:
+      case CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT: {
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.workspaceIdInUrl)
 
         const contentFolderPath = props.workspaceContentList.filter(c => c.isOpen).map(c => c.id)
@@ -117,7 +117,7 @@ class WorkspaceContent extends React.Component {
         this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
         this.props.dispatch(resetBreadcrumbsAppFeature())
         break
-
+      }
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         this.buildBreadcrumbs()
         if (!state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
@@ -247,7 +247,7 @@ class WorkspaceContent extends React.Component {
       breadcrumbsList.push({
         link: (
           <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}?type=${urlFilter}`}>
-            { props.t((props.contentType.find(ct => ct.slug === urlFilter) || { label: '' }).label + 's') }
+            {props.t((props.contentType.find(ct => ct.slug === urlFilter) || { label: '' }).label + 's')}
           </Link>
         ),
         type: BREADCRUMBS_TYPE.CORE
@@ -284,13 +284,14 @@ class WorkspaceContent extends React.Component {
     const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
 
     switch (fetchContentList.status) {
-      case 200:
+      case 200: {
         const folderToOpen = [
           ...folderIdInUrl,
           ...fetchContentList.json.filter(c => c.parent_id !== null).map(c => c.parent_id)
         ]
         props.dispatch(setWorkspaceContentList(fetchContentList.json, folderToOpen))
         break
+      }
       case 400:
         switch (fetchContentList.json.code) {
           // INFO - B.L - 2019.08.06 - content id does not exists in db
@@ -495,12 +496,13 @@ class WorkspaceContent extends React.Component {
 
     const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
     switch (fetchMoveContent.status) {
-      case 200:
+      case 200: {
         const { dropEffect, ...actionDestination } = destination
         props.dispatch(moveWorkspaceContent(source, actionDestination))
         this.loadContentList(state.workspaceIdInUrl)
         this.loadShareFolderContent(state.workspaceIdInUrl)
         break
+      }
       case 400:
         switch (fetchMoveContent.json.code) {
           case 3002:
@@ -570,13 +572,14 @@ class WorkspaceContent extends React.Component {
     const response = await props.dispatch(getShareFolderContentList(workspaceId))
 
     switch (response.status) {
-      case 200:
+      case 200: {
         const publicSharedContentList = response.json.map(file => file.parent_id === null
           ? { ...file, parent_id: SHARE_FOLDER_ID }
           : file
         )
         props.dispatch(setWorkspaceShareFolderContentList(publicSharedContentList, folderIdToOpen))
         return true
+      }
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
         return false
@@ -676,24 +679,28 @@ class WorkspaceContent extends React.Component {
           )}
 
           {state.contentLoaded && (
-            <Route path={PAGE.WORKSPACE.SHARE_FOLDER(':idws')} component={() =>
-              <OpenShareFolderApp
-                // automatically open the share folder advanced
-                workspaceId={state.workspaceIdInUrl}
-                appOpenedType={state.appOpenedType}
-                updateAppOpenedType={this.handleUpdateAppOpenedType}
-              />
-            } />
+            <Route
+              path={PAGE.WORKSPACE.SHARE_FOLDER(':idws')}
+              component={() =>
+                <OpenShareFolderApp
+                  // automatically open the share folder advanced
+                  workspaceId={state.workspaceIdInUrl}
+                  appOpenedType={state.appOpenedType}
+                  updateAppOpenedType={this.handleUpdateAppOpenedType}
+                />}
+            />
           )}
 
           {state.contentLoaded && (
-            <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
-              <OpenCreateContentApp
-                // automatically open the popup create content of the app in url
-                workspaceId={state.workspaceIdInUrl}
-                appOpenedType={state.appOpenedType}
-              />
-            } />
+            <Route
+              path={PAGE.WORKSPACE.NEW(':idws', ':type')}
+              component={() =>
+                <OpenCreateContentApp
+                  // automatically open the popup create content of the app in url
+                  workspaceId={state.workspaceIdInUrl}
+                  appOpenedType={state.appOpenedType}
+                />}
+            />
           )}
 
           <PageWrapper customClass='workspace'>
@@ -742,8 +749,7 @@ class WorkspaceContent extends React.Component {
                     rootContentList={rootContentList}
                     isLast={isWorkspaceEmpty || isFilteredWorkspaceEmpty}
                     t={t}
-                  />
-                }
+                  />}
 
                 {state.contentLoaded && (isWorkspaceEmpty || isFilteredWorkspaceEmpty)
                   ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
@@ -810,8 +816,7 @@ class WorkspaceContent extends React.Component {
                         key={content.id}
                       />
                     )
-                  )
-                }
+                  )}
 
                 {userRoleIdInWorkspace >= ROLE.contributor.id && workspaceContentList.length >= 10 && (
                   <DropdownCreateButton

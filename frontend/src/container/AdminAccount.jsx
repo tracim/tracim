@@ -274,7 +274,7 @@ class Account extends React.Component {
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='account'>
             <PageTitle
-              parentClass={'account'}
+              parentClass='account'
               title={this.setTitle()}
               icon='user-o'
               breadcrumbsList={props.breadcrumbs}
@@ -283,7 +283,7 @@ class Account extends React.Component {
             <PageContent parentClass='account'>
               <UserInfo user={state.userToEdit} />
 
-              <Delimiter customClass={'account__delimiter'} />
+              <Delimiter customClass='account__delimiter' />
 
               <div className='account__userpreference'>
                 <MenuSubComponent
@@ -295,18 +295,22 @@ class Account extends React.Component {
                   {(() => {
                     switch (state.subComponentMenu.find(({ active }) => active).name) {
                       case 'personalData':
-                        return <PersonalData
-                          userAuthType={state.userToEdit.auth_type}
-                          onClickSubmit={this.handleSubmitNameOrEmail}
-                          displayAdminInfo
-                        />
+                        return (
+                          <PersonalData
+                            userAuthType={state.userToEdit.auth_type}
+                            onClickSubmit={this.handleSubmitNameOrEmail}
+                            displayAdminInfo
+                          />
+                        )
 
                       case 'notification':
-                        return <Notification
-                          userLoggedId={parseInt(state.userToEditId)}
-                          workspaceList={state.userToEditWorkspaceList}
-                          onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
-                        />
+                        return (
+                          <Notification
+                            userLoggedId={parseInt(state.userToEditId)}
+                            workspaceList={state.userToEditWorkspaceList}
+                            onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                          />
+                        )
 
                       case 'password':
                         return <Password onClickSubmit={this.handleSubmitPassword} displayAdminInfo />

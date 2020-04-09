@@ -81,8 +81,7 @@ class WorkspaceListItem extends React.Component {
           <div className='sidebar__content__navigation__workspace__item__icon'>
             {props.isOpenInSidebar
               ? <i className={classnames('fa fa-chevron-up')} title={props.t('Hide shared space')} />
-              : <i className={classnames('fa fa-chevron-down')} title={props.t('See shared space')} />
-            }
+              : <i className={classnames('fa fa-chevron-down')} title={props.t('See shared space')} />}
           </div>
         </div>
 
@@ -96,8 +95,8 @@ class WorkspaceListItem extends React.Component {
                 <Link to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}>
                   <div className={classnames(
                     'sidebar__content__navigation__workspace__item__submenu__dropdown',
-                    { 'activeFilter': this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeWorkspaceId, allowedApp) }
-                  )}>
+                    { activeFilter: this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeWorkspaceId, allowedApp) })}
+                  >
                     <div className='dropdown__icon' style={{ backgroundColor: allowedApp.hexcolor }}>
                       <i className={classnames(`fa fa-${allowedApp.faIcon}`)} />
                     </div>

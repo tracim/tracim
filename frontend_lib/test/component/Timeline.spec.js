@@ -53,18 +53,18 @@ describe('<Timeline />', () => {
   })
 
   describe('Handlers', () => {
-    it(`onClickWysiwygBtnCallBack should be called when the advancedText button is clicked`, () => {
+    it('onClickWysiwygBtnCallBack should be called when the advancedText button is clicked', () => {
       wrapper.find(`.${props.customClass}__texteditor__advancedtext__btn`).simulate('click')
       expect(onClickWysiwygBtnCallBack.called).to.equal(true)
     })
 
-    it(`onClickValidateNewCommentBtnCallBack should be called when the submit button is clicked`, () => {
+    it('onClickValidateNewCommentBtnCallBack should be called when the submit button is clicked', () => {
       wrapper.find(`.${props.customClass}__texteditor__submit__btn`).simulate('click')
       expect(onClickValidateNewCommentBtnCallBack.called).to.equal(true)
     })
 
-    it(`onChangeNewCommentCallBack should be called when comment is changing`, () => {
-      wrapper.find(`#wysiwygTimelineComment`).simulate('change')
+    it('onChangeNewCommentCallBack should be called when comment is changing', () => {
+      wrapper.find('#wysiwygTimelineComment').simulate('change')
       expect(onChangeNewCommentCallBack.called).to.equal(true)
     })
   })

@@ -27,7 +27,7 @@ describe('<ListItemWrapper />', () => {
     expect(wrapper.find('.content.primaryColorBgLightenHover').prop('title')).to.equal(props.label)
   )
 
-  it(`should have its children`, () =>
+  it('should have its children', () =>
     expect(wrapper.find('.content.primaryColorBgLightenHover').find(Children).length).equal(1)
   )
 
@@ -35,15 +35,15 @@ describe('<ListItemWrapper />', () => {
     expect(wrapper.find(`.content.primaryColorBgLightenHover.${props.customClass}`)).to.have.lengthOf(1)
   )
 
-  it(`should have the class "item-last" when isLast is set to true`, () => {
+  it('should have the class "item-last" when isLast is set to true', () => {
     wrapper.setProps({ isLast: true })
-    expect(wrapper.find(`.content.primaryColorBgLightenHover.item-last`)).to.have.lengthOf(1)
+    expect(wrapper.find('.content.primaryColorBgLightenHover.item-last')).to.have.lengthOf(1)
     wrapper.setProps({ isLast: props.isLast })
   })
 
-  it(`should have the class "read" when read is set to true`, () => {
+  it('should have the class "read" when read is set to true', () => {
     wrapper.setProps({ read: true })
-    expect(wrapper.find(`.content.primaryColorBgLightenHover.read`)).to.have.lengthOf(1)
+    expect(wrapper.find('.content.primaryColorBgLightenHover.read')).to.have.lengthOf(1)
     wrapper.setProps({ read: props.read })
   })
 })

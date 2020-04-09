@@ -42,8 +42,7 @@ export const UserStatus = props => {
           >
             {mySelf.doNotify
               ? props.t('Click here to unsubscribe')
-              : props.t('Click here to subscribe')
-            }
+              : props.t('Click here to subscribe')}
           </div>
         </div>
       )}

@@ -96,13 +96,13 @@ describe('<PopinFixedHeader />', () => {
   })
 
   describe('Handlers', () => {
-    it(`onValidateChangeTitleCallBack should be call when click the undo button`, () => {
+    it('onValidateChangeTitleCallBack should be call when click the undo button', () => {
       wrapper.find(`button.${(props.customClass)}__header__changetitle`).at(0).simulate('click')
       wrapper.find(`button.${(props.customClass)}__header__changetitle`).at(1).simulate('click')
       expect(onValidateChangeTitleCallBack.called).to.equal(true)
     })
 
-    it(`onClickCloseBtnCallBack should be call when click the close button`, () => {
+    it('onClickCloseBtnCallBack should be call when click the close button', () => {
       wrapper.find(`div.${(props.customClass)}__header__close`).simulate('click')
       expect(onClickCloseBtnCallBack.called).to.equal(true)
     })

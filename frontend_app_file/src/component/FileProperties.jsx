@@ -53,11 +53,11 @@ export class FileProperties extends React.Component {
               {props.t('Number of shares:')} {props.activesShares}
             </div>
 
-            <div className='fileProperties__content__detail__item' title={props.creationDateFormatted} >
+            <div className='fileProperties__content__detail__item' title={props.creationDateFormatted}>
               {props.t('Creation date:')} {props.creationDateFormattedWithTime}
             </div>
 
-            <div className='fileProperties__content__detail__item' title={props.lastModificationFormatted} >
+            <div className='fileProperties__content__detail__item' title={props.lastModificationFormatted}>
               {props.t('Last modification:')} {props.lastModification}
             </div>
 
@@ -107,8 +107,7 @@ export class FileProperties extends React.Component {
                 <div className='fileProperties__content__detail__description__text'>
                   {props.description}
                 </div>
-              )
-            }
+              )}
 
             {props.displayChangeDescriptionBtn && !state.displayFormNewDescription &&
               <button
@@ -124,8 +123,7 @@ export class FileProperties extends React.Component {
                 disabled={props.disableChangeDescription}
               >
                 {props.t('Change description')}
-              </button>
-            }
+              </button>}
           </div>
         </div>
       </div>

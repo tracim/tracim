@@ -47,14 +47,14 @@ describe('<RecentActivity />', () => {
       }
     })
 
-    it(`should use a link if the logged User is a contentManager`, () => {
+    it('should use a link if the logged User is a contentManager', () => {
       wrapper.setProps({ roleIdForLoggedUser: ROLE.contentManager.id })
       expect(wrapper.find('.recentactivity__list__item').length).to.equal(3)
       expect(wrapper.find('.recentactivity__list__item.nolink').length).to.equal(0)
       wrapper.setProps({ roleIdForLoggedUser: props.roleIdForLoggedUser })
     })
 
-    it(`should not use a link if the logged User is a contributor`, () => {
+    it('should not use a link if the logged User is a contributor', () => {
       wrapper.setProps({ roleIdForLoggedUser: ROLE.contributor.id })
       expect(wrapper.find('.recentactivity__list__item.nolink').length).to.equal(1)
       wrapper.setProps({ roleIdForLoggedUser: props.roleIdForLoggedUser })
@@ -62,13 +62,13 @@ describe('<RecentActivity />', () => {
   })
 
   describe('handlers', () => {
-    it(`onClickEverythingAsReadCallBack should be called when the button is clicked`, () => {
-      wrapper.find(`button.recentactivity__header__allread`).simulate('click')
+    it('onClickEverythingAsReadCallBack should be called when the button is clicked', () => {
+      wrapper.find('button.recentactivity__header__allread').simulate('click')
       expect(onClickEverythingAsReadCallBack.called).to.equal(true)
     })
 
-    it(`onClickSeeMoreCallBack should be called when the see more button is clicked`, () => {
-      wrapper.find(`button.recentactivity__more__btn`).simulate('click')
+    it('onClickSeeMoreCallBack should be called when the see more button is clicked', () => {
+      wrapper.find('button.recentactivity__more__btn').simulate('click')
       expect(onClickSeeMoreCallBack.called).to.equal(true)
     })
   })

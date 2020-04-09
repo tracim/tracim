@@ -25,7 +25,7 @@ describe('<ContentTypeBtn />', () => {
     )
 
     it(`the background color should be: ${props.hexcolor}`, () =>
-      expect(wrapper.find(`div.contentTypeBtn`).prop('style').backgroundColor).to.equal(props.hexcolor)
+      expect(wrapper.find('div.contentTypeBtn').prop('style').backgroundColor).to.equal(props.hexcolor)
     )
 
     it(`a div should have the class: ${props.customClass}__text`, () =>
@@ -51,7 +51,7 @@ describe('<ContentTypeBtn />', () => {
 
   describe('handler', () => {
     it('onClickBtnCallBack should be called when the root div is clicked', () => {
-      wrapper.find(`div.contentTypeBtn`).simulate('click')
+      wrapper.find('div.contentTypeBtn').simulate('click')
       expect(onClickBtnCallBack.called).to.equal(true)
     })
   })

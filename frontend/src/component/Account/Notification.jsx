@@ -60,8 +60,7 @@ export const Notification = props =>
                 <td />
                 <td />
               </tr>
-            )
-          }
+            )}
         </tbody>
       </table>
     </div>

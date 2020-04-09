@@ -15,8 +15,8 @@ const color = require('color')
 export const FileComponent = props => (
   <div className={classnames(
     'file__contentpage__statewrapper',
-    { 'displayState': props.isArchived || props.isDeleted || props.isDeprecated }
-  )}>
+    { displayState: props.isArchived || props.isDeleted || props.isDeprecated })}
+  >
     <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
 
     {props.isArchived && (
@@ -60,8 +60,7 @@ export const FileComponent = props => (
         lightboxUrlList={props.lightboxUrlList}
         onClickPreviousPage={props.onClickPreviousPage}
         onClickNextPage={props.onClickNextPage}
-      />
-    }
+      />}
 
     {props.mode === APP_FEATURE_MODE.EDIT &&
       <div className='file__contentpage__dropzone'>
@@ -70,8 +69,7 @@ export const FileComponent = props => (
             color={props.customColor}
             percent={props.progressUpload.percent}
             filename={props.newFile ? props.newFile.name : ''}
-          />
-        }
+          />}
 
         <FileDropzone
           onDrop={props.onChangeFile}
@@ -96,9 +94,7 @@ export const FileComponent = props => (
             className='file__contentpage__dropzone__btn__validate btn highlightBtn'
             style={{
               backgroundColor: props.customColor,
-              ':hover': {
-                backgroundColor: color(props.customColor).darken(0.15).hex()
-              }
+              ':hover': { backgroundColor: color(props.customColor).darken(0.15).hex() }
             }}
             onClick={props.onClickDropzoneValidate}
             disabled={props.newFile === ''}
@@ -106,8 +102,7 @@ export const FileComponent = props => (
             {props.t('Validate')}
           </button>
         </div>
-      </div>
-    }
+      </div>}
   </div>
 )
 

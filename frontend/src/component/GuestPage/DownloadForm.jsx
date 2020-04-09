@@ -47,7 +47,7 @@ class DownloadForm extends React.Component {
     if (response.apiResponse) {
       switch (response.apiResponse.status) {
         case 204:
-          this.refs['test'].submit()
+          this.refs.test.submit()
           return true
         case 400:
           this.sendGlobalFlashMessage(props.t('Error in the URL'))
@@ -65,7 +65,7 @@ class DownloadForm extends React.Component {
           this.sendGlobalFlashMessage(props.t('Error while downloading file'))
       }
     } else {
-      this.refs['test'].submit()
+      this.refs.test.submit()
     }
     return false
   }
@@ -119,8 +119,7 @@ class DownloadForm extends React.Component {
                   {props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}
                 </PopoverBody>
               </Popover>
-            </div>
-          }
+            </div>}
         </form>
         <div className='d-flex'>
           {/* INFO - G.B. - 2019-08-22 - This button should be always outside the form, to not trigger the submit. */}

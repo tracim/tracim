@@ -105,10 +105,11 @@ export class Account extends React.Component {
     const { props } = this
     const fetchUserAgenda = await props.dispatch(getLoggedUserCalendar())
     switch (fetchUserAgenda.status) {
-      case 200:
+      case 200: {
         const newAgendaUrl = (fetchUserAgenda.json.find(a => a.agenda_type === 'private') || { agenda_url: '' }).agenda_url
         props.dispatch(updateUserAgendaUrl(newAgendaUrl))
         break
+      }
       default:
         props.dispatch(newFlashMessage(props.t('Error while loading your agenda'), 'warning'))
     }
@@ -234,7 +235,7 @@ export class Account extends React.Component {
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='account'>
             <PageTitle
-              parentClass={'account'}
+              parentClass='account'
               title={props.t('My account')}
               icon='user-o'
               breadcrumbsList={props.breadcrumbs}
@@ -243,7 +244,7 @@ export class Account extends React.Component {
             <PageContent parentClass='account'>
               <UserInfo user={props.user} />
 
-              <Delimiter customClass={'account__delimiter'} />
+              <Delimiter customClass='account__delimiter' />
 
               <div className='account__userpreference'>
                 <MenuSubComponent
