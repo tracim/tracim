@@ -82,6 +82,7 @@ class TestEmailSender(object):
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             app_config.EMAIL__NOTIFICATION__SMTP__USER,
             app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+            app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
         )
         sender = EmailSender(app_config, smtp_config, True)
         html = """\
