@@ -94,9 +94,9 @@ _install_full_tracim: &_install_full_tracim
     - alembic -c $BACKEND_TEST_CONFIG_FILE stamp head
     # install frontend
     - cd $TRAVIS_BUILD_DIR
-    - ./install_frontend_dependencies.sh root
-    - ./build_full_frontend.sh root
-    - ./setup_functionnal_tests.sh root
+    - ./install_frontend_dependencies.sh
+    - ./build_full_frontend.sh
+    - IGNORE_APT_INSTALL=true ./setup_functionnal_tests.sh
 
 _backend_quick_test: &_backend_quick_test
   <<: *_install_backend
@@ -204,8 +204,8 @@ jobs:
     - stage: frontend
       name: Frontend unit tests
       install:
-        - ./install_frontend_dependencies.sh root
-        - ./build_full_frontend.sh root
+        - ./install_frontend_dependencies.sh
+        - ./build_full_frontend.sh
       env:
         - TRAVIS_NODE_VERSION="10"
       script:
