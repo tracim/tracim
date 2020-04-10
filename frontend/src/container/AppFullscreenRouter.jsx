@@ -38,7 +38,8 @@ export class AppFullscreenRouter extends React.Component {
       <div className='AppFullScreenManager'>
         <Route
           exact
-          path={PAGE.ADMIN.WORKSPACE} render={() => {
+          path={PAGE.ADMIN.WORKSPACE}
+          render={() => {
             if (props.user.profile !== PROFILE.administrator.slug) return <Redirect to={{ pathname: '/ui' }} />
 
             const content = {
@@ -53,7 +54,8 @@ export class AppFullscreenRouter extends React.Component {
 
         <Route
           exact
-          path={PAGE.ADMIN.USER} render={() => {
+          path={PAGE.ADMIN.USER}
+          render={() => {
             if (props.user.profile !== PROFILE.administrator.slug) return <Redirect to={{ pathname: '/ui' }} />
 
             const content = {
@@ -68,7 +70,8 @@ export class AppFullscreenRouter extends React.Component {
 
         <Route
           exact
-          path={PAGE.AGENDA} render={() => {
+          path={PAGE.AGENDA}
+          render={() => {
             const agendaConfig = {
               workspaceId: null,
               forceShowSidebar: true
