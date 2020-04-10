@@ -13,7 +13,8 @@ import {
   ArchiveDeleteContent,
   CUSTOM_EVENT,
   ROLE,
-  buildHeadTitle
+  buildHeadTitle,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -69,7 +70,7 @@ class FolderAdvanced extends React.Component {
         break
 
       case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
-        console.log('%c<File> Custom event', 'color: #28a745', type, data)
+        console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
         break
 
@@ -81,8 +82,9 @@ class FolderAdvanced extends React.Component {
     }
   }
 
-  componentDidMount () {
-    this.loadContent()
+  async componentDidMount () {
+    await this.loadContent()
+    this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -90,6 +92,7 @@ class FolderAdvanced extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.loadContent()
+      this.buildBreadcrumbs()
     }
   }
 
@@ -140,7 +143,21 @@ class FolderAdvanced extends React.Component {
 
   loadTimeline = () => {}
 
-  buildBreadcrumbs = () => {}
+  buildBreadcrumbs = () => {
+    const { state } = this
+
+    GLOBAL_dispatchEvent({
+      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
+      data: {
+        breadcrumbs: [{
+          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
+          label: state.content.label,
+          link: null,
+          type: BREADCRUMBS_TYPE.APP_FEATURE
+        }]
+      }
+    })
+  }
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
