@@ -240,7 +240,9 @@ class SearchResult extends React.Component {
 
             <PageContent parentClass='searchResult'>
               <div className='folder__content' data-cy='search__content'>
-                {currentNumberSearchResults > 0 && <ContentItemHeader showSearchDetails />}
+                {currentNumberSearchResults > 0 && (
+                  <ContentItemHeader showSearchDetails />
+                )}
 
                 {currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
