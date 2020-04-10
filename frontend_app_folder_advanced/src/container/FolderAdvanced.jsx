@@ -87,11 +87,11 @@ class FolderAdvanced extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     if (prevState.content.content_id !== state.content.content_id) {
-      this.loadContent()
+      await this.loadContent()
       this.buildBreadcrumbs()
     }
   }
