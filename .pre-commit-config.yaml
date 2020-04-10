@@ -31,6 +31,5 @@ repos:
       rev: stable
       hooks:
           - id: black
-            language_version: python3.6
             args: [-l 100]
             files: 'backend/tracim_backend'
