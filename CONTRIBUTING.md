@@ -15,6 +15,7 @@ To accept, sign all your commits with the `-s` arg of `git commit` command ([mor
 
 To enforce most required guidelines, please use the precommit mechanism.
 This will perform some automatic checks before committing.
+This is required to contribute to Tracim.
 
 To use it, you need the `pre-commit` Python package (installed automatically with `pip install -e ".[dev]"` on the backend)
 you can then install hooks with:
@@ -23,7 +24,7 @@ you can then install hooks with:
 
 Then, you will be able to notice the automatic checks when running `git commit`.
 
-Note: the pre-commit hooks require Python 3.6 or later to work.
+Note: the pre-commit hook requires Python 3.6 or later to work.
 
 ### More Information
 - see [backend/README.md](backend/README.txt) for more information about formatting checks work for the backend.

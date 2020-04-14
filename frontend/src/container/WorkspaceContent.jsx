@@ -86,7 +86,7 @@ class WorkspaceContent extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = async ({ detail: { type, data } }) => {
+  customEventReducer = ({ detail: { type, data } }) => {
     const { props, state } = this
     switch (type) {
       case CUSTOM_EVENT.REFRESH_CONTENT_LIST:
@@ -164,12 +164,19 @@ class WorkspaceContent extends React.Component {
       this.setHeadTitle(this.getFilterName(currentFilter))
     }
 
+    // INFO - GM - 2020/03/03 - hide opened app if the current url is /contents
+    if (PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) === props.location.pathname && state.appOpenedType) {
+      props.dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(state.appOpenedType))
+      this.setState({ appOpenedType: false })
+      this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
+    }
+
     if (hasWorkspaceIdChanged) this.loadWorkspaceDetail()
 
     if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
       this.setState({ workspaceIdInUrl: workspaceId })
       this.loadAllWorkspaceContent(workspaceId, false)
-    }
+    } else if (!state.appOpenedType && prevState.appOpenedType) this.buildBreadcrumbs()
   }
 
   componentWillUnmount () {
@@ -262,6 +269,9 @@ class WorkspaceContent extends React.Component {
         type: BREADCRUMBS_TYPE.CORE
       })
     }
+
+    // INFO - GM - 2020/03/03 - add file breadcrumbs link if it exists
+    if (props.breadcrumbs.length === breadcrumbsList.length + 1 && state.appOpenedType) breadcrumbsList.push(props.breadcrumbs[props.breadcrumbs.length - 1])
 
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
@@ -421,11 +431,11 @@ class WorkspaceContent extends React.Component {
     }
 
     if (e && e.ctrlKey) {
-      const url = PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false })
+      const url = props.location.pathname + '?' + qs.stringify(newUrlSearchObject, { encode: false })
       window.open(url, '_blank')
       return
     }
-    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
+    props.history.push(props.location.pathname + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
 
     this.handleToggleFolderOpen(folderId)
   }
@@ -609,7 +619,7 @@ class WorkspaceContent extends React.Component {
       }
     }))
 
-    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
+    props.history.push(props.location.pathname + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
   }
 
   filterWorkspaceContent = (contentList, filter) => filter.length === 0

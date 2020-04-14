@@ -4,7 +4,7 @@
 
 Most settings in Tracim are configurable using both the INI configuration file and environment variables.
 
-### Tracim 2.2 fully supported variables:
+### Tracim fully supported variables:
 
 You can set those parameters in INI configuration file (see `config_file_name`) or
 environnement variable (see `env_var_name`).
@@ -14,8 +14,8 @@ The priority order is (from less to more priority):
 - configuration file
 - environnement variables
 
-|<env_var_name>|<config_file_name>|<config_name>|
-|--------------|------------------|-------------|
+|<env_var_name>                |<config_file_name>            |<config_name>                 |
+|------------------------------|------------------------------|------------------------------|
 |TRACIM_APP__ENABLED           |app.enabled                   |APP__ENABLED                  |
 |TRACIM_SQLALCHEMY__URL        |sqlalchemy.url                |SQLALCHEMY__URL               |
 |TRACIM_DEFAULT_LANG           |default_lang                  |DEFAULT_LANG                  |
@@ -70,6 +70,7 @@ The priority order is (from less to more priority):
 |TRACIM_EMAIL__NOTIFICATION__SMTP__PORT|email.notification.smtp.port  |EMAIL__NOTIFICATION__SMTP__PORT|
 |TRACIM_EMAIL__NOTIFICATION__SMTP__USER|email.notification.smtp.user  |EMAIL__NOTIFICATION__SMTP__USER|
 |TRACIM_EMAIL__NOTIFICATION__SMTP__PASSWORD|email.notification.smtp.password|EMAIL__NOTIFICATION__SMTP__PASSWORD|
+|TRACIM_EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL|email.notification.smtp.use_implicit_ssl|EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL|
 |TRACIM_EMAIL__REPLY__ACTIVATED|email.reply.activated         |EMAIL__REPLY__ACTIVATED       |
 |TRACIM_EMAIL__REPLY__IMAP__SERVER|email.reply.imap.server       |EMAIL__REPLY__IMAP__SERVER    |
 |TRACIM_EMAIL__REPLY__IMAP__PORT|email.reply.imap.port         |EMAIL__REPLY__IMAP__PORT      |
@@ -308,9 +309,16 @@ to enable mail notification, smallest config is this:
     email.notification.smtp.port = 1025
     email.notification.smtp.user = test_user
     email.notification.smtp.password = just_a_password
+    # active implicit ssl if you are using implicit smtp with encryption port like 465
+    # by default, tracim will try to use explicit smtp encryption using starttls, and unencrypted
+    # connection as fallback.
+    email.notification.smtp.use_implicit_ssl = false
 
 Don't forget to set `website.base_url` and `website.title` for the frontend, as some features use them to
 link the frontend in emails.
+
+:warning: It is necessary to check if your SMTP configuration is working correctly before using Tracim.
+In the next release we will include a quick solution to test if your STMP configuration works properly.
 
 ## Configuring Invitation in Workspace ##
 
@@ -339,6 +347,48 @@ Configure how to handle invitation of non-existent users in Tracim with these pa
 
 To enable the reply by email feature,
 you first need to activate the API key authentication mechanism (see section Activating API Key Authentification),
+
+## Adapt Email Notification Feature
+
+To use this feature, you need working email notifications (see section Enabling the Mail Notification Feature)
+
+#### Multiple email address notification
+For best support, it is better to use one email address per id, like:
+
+    email.notification.from.email = test_user+{user_id}@supersmtpserver.ndd
+    email.notification.reply_to.email = test_user+{content_id}@supersmtpserver.ndd
+    email.notification.references.email = test_user+{content_id}@supersmtpserver.ndd
+
+This configuration should work out of the box on some providers since they already support "+" subaddressing, and provide
+the best compatibility.
+As an alternative, you can also set a wildcard alias for your provided email, for example:
+
+    tracim.content.{content_id}@supersmtpserver.ndd -> tracim.notification@supersmtpserver.ndd
+
+with a configuration like that:
+
+    email.notification.from.email = tracim.notification@supersmtpserver.ndd
+    email.notification.reply_to.email = tracim.content.{content_id}@supersmtpserver.ndd
+    email.notification.references.email = tracim.content.{content_id}@supersmtpserver.ndd
+
+#### One email address notification
+
+if you can't provide a wildcard and can't support subadressing and want a reply-to feature with only one named email address,
+as a last resort, you can set the References Header.
+
+However, be aware that support across email clients is not great.
+Some email clients (like Sogo) do not properly return the References Header in mail replies, which breaks threading
+behavior, and also breaks the reply-to feature.
+Emails from these clients are retrieved but can't be correctly associated to one item.
+
+You can do this with a configuration like that:
+
+    email.notification.from.email = tracim.notification@supersmtpserver.ndd
+    email.notification.reply_to.email = tracim.notification@supersmtpserver.ndd
+    # References headers doesn't have to be a true email address.
+    email.notification.references.email = tracim.content.{content_id}@supersmtpserver.ndd
+
+### Install Email Feature
 
 to activate reply by email, the smallest config is as follows:
 

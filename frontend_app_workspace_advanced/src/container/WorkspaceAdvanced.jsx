@@ -131,7 +131,7 @@ class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     const fetchWorkspaceDetail = handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, state.content.workspace_id))
-    const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMember(state.config.apiUrl, state.content.workspace_id))
+    const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMember(state.config.apiUrl, state.content.workspace_id, false))
     const fetchAppList = handleFetchResult(await getAppList(state.config.apiUrl))
 
     const [resDetail, resMember, resAppList] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember, fetchAppList])

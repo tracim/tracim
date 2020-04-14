@@ -2,8 +2,10 @@ import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
+import PropTypes from 'prop-types'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
+import { IMG_LOAD_STATE } from '../helper'
 
 require('./PreviewComponent.styl')
 
@@ -12,14 +14,14 @@ export class PreviewComponent extends React.Component {
     super(props)
     this.state = {
       displayLightbox: false,
-      isJpegPreviewDisplayable: true
+      jpegPreviewLoadingState: IMG_LOAD_STATE.LOADING
       // isPdfPageDisplayable: true,
       // isPdfFullDisplayable: true
     }
   }
 
   componentDidMount () {
-    this.isJpegPreviewDisplayable()
+    this.isjpegPreviewLoadingState()
     // this.isPdfPageDisplayable()
     // this.isPdfFullDisplayable()
   }
@@ -28,8 +30,8 @@ export class PreviewComponent extends React.Component {
     const { props, state } = this
 
     if (prevProps.previewUrl !== props.previewUrl && state.displayLightbox === false) {
-      this.setState({ isJpegPreviewDisplayable: true })
-      this.isJpegPreviewDisplayable()
+      this.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.LOADING })
+      this.isjpegPreviewLoadingState()
     }
     // if (prevProps.downloadPdfPageUrl !== props.downloadPdfPageUrl) {
     //   this.setState({ isPdfPageDisplayable: true })
@@ -49,13 +51,14 @@ export class PreviewComponent extends React.Component {
     this.setState({ displayLightbox: false })
   }
 
-  isJpegPreviewDisplayable = () => {
+  isjpegPreviewLoadingState = () => {
     const { props } = this
 
     if (props.isJpegAvailable) {
       const img = document.createElement('img')
       img.src = props.previewUrl
-      img.onerror = () => this.setState({ isJpegPreviewDisplayable: false })
+      img.onerror = () => this.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.ERROR })
+      img.onload = () => this.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.LOADED })
     }
   }
 
@@ -85,7 +88,7 @@ export class PreviewComponent extends React.Component {
     return (
       <div className='previewcomponent'>
         <div className='previewcomponent__dloption'>
-          {state.isJpegPreviewDisplayable && props.isPdfAvailable && (
+          {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isPdfAvailable && (
             <a
               className='previewcomponent__dloption__icon btn iconBtn'
               href={props.downloadPdfPageUrl}
@@ -99,7 +102,7 @@ export class PreviewComponent extends React.Component {
             </a>
           )}
 
-          {state.isJpegPreviewDisplayable && props.isPdfAvailable && (
+          {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isPdfAvailable && (
             <a
               className='previewcomponent__dloption__icon btn iconBtn'
               href={props.downloadPdfFullUrl}
@@ -127,10 +130,10 @@ export class PreviewComponent extends React.Component {
         </div>
 
         <div className='previewcomponent__filepreview'>
-          {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
+          {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
             <button
               type='button'
-              className='previewcomponent__icon btn iconBtn'
+              className='previewcomponent__navigationButton btn iconBtn'
               onClick={props.onClickPreviousPage}
               style={{ ':hover': { color: props.color } }}
               title={props.t('Previous page')}
@@ -143,25 +146,38 @@ export class PreviewComponent extends React.Component {
 
           <div
             className={
-              classnames('previewcomponent__fileimg', { 'previewAvailable': state.isJpegPreviewDisplayable && props.isJpegAvailable })
+              classnames(
+                'previewcomponent__fileimg',
+                { 'previewAvailable': state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable }
+              )
             }
-            onClick={state.isJpegPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
+            onClick={state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
           >
-            {state.isJpegPreviewDisplayable && props.isJpegAvailable
+            {props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED
               ? (
-                <img src={props.previewUrl} className='img-thumbnail mx-auto' />
+                <img src={props.previewUrl} className='img-thumbnail previewcomponent__fileimg__img' />
               )
               : (
-                <div className='filecontent__preview' drop='true'>
-                  <i className='filecontent__preview__nopreview-icon fa fa-eye-slash' style={{ color: props.color }} />
-                  <div className='filecontent__preview__nopreview-msg'>
-                    {props.t('No preview available')}
-                  </div>
+                <div className='previewcomponent__fileimg__text'>
+                  {props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADING
+                    ? (
+                      <div className='previewcomponent__fileimg__text-msg'>
+                        {props.t('Preview loading...')}
+                      </div>
+                    )
+                    : (
+                      <>
+                        <i className='previewcomponent__fileimg__text-icon fa fa-eye-slash' style={{ color: props.color }} />
+                        <div className='previewcomponent__fileimg__text-msg'>
+                          {props.t('No preview available')}
+                        </div>
+                      </>
+                    )}
                 </div>
               )
             }
 
-            {state.isJpegPreviewDisplayable && props.isJpegAvailable && state.displayLightbox
+            {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable && state.displayLightbox
               ? (
                 <Lightbox
                   prevSrc={props.lightboxUrlList[props.fileCurrentPage - 2]}
@@ -178,10 +194,10 @@ export class PreviewComponent extends React.Component {
             }
           </div>
 
-          {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
+          {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
             <button
               type='button'
-              className='previewcomponent__icon btn iconBtn'
+              className='previewcomponent__navigationButton btn iconBtn'
               onClick={props.onClickNextPage}
               style={{ ':hover': { color: props.color } }}
               title={props.t('Next page')}
@@ -192,7 +208,7 @@ export class PreviewComponent extends React.Component {
             </button>
           )}
         </div>
-        {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
+        {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
           <div className='previewcomponent__pagecount'>
             {props.fileCurrentPage}{props.t(' of ')}{props.filePageNb}
           </div>
@@ -203,3 +219,32 @@ export class PreviewComponent extends React.Component {
 }
 
 export default translate()(Radium(PreviewComponent))
+
+PreviewComponent.propTypes = {
+  filePageNb: PropTypes.number,
+  fileCurrentPage: PropTypes.number,
+  isJpegAvailable: PropTypes.bool,
+  isPdfAvailable: PropTypes.bool,
+  previewUrl: PropTypes.string,
+  downloadPdfPageUrl: PropTypes.string,
+  color: PropTypes.string,
+  downloadRawUrl: PropTypes.string,
+  onClickPreviousPage: PropTypes.func,
+  onClickNextPage: PropTypes.func,
+  lightboxUrlList: PropTypes.array
+
+}
+
+PreviewComponent.defaultProps = {
+  filePageNb: 0,
+  fileCurrentPage: 0,
+  isJpegAvailable: false,
+  isPdfAvailable: true,
+  previewUrl: '',
+  downloadPdfPageUrl: '',
+  color: '',
+  downloadRawUrl: '',
+  onClickPreviousPage: () => {},
+  onClickNextPage: () => {},
+  lightboxUrlList: []
+}
