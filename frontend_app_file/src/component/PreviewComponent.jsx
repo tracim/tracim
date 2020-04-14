@@ -5,7 +5,7 @@ import Radium from 'radium'
 import PropTypes from 'prop-types'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
-import { IMG_LOAD_STATE } from '../helper'
+import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
 require('./PreviewComponent.styl')
 

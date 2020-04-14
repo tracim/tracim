@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { MainPreview } from '../../src/component/MainPreview'
 import sinon from 'sinon'
-import { IMG_LOAD_STATE } from '../../src/helper'
+import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
 describe('<MainPreview />', () => {
   const handleClickShowImageRaw = sinon.spy()

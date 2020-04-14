@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
-import { IMG_LOAD_STATE } from '../helper.js'
+import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
 export class MainPreview extends React.Component {
   constructor (props) {

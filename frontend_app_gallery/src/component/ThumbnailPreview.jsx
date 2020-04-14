@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import { IMG_LOAD_STATE } from '../helper.js'
+import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
 class ThumbnailPreview extends React.Component {
   constructor (props) {

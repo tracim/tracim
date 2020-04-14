@@ -2,7 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import ThumbnailPreview from '../../src/component/ThumbnailPreview.jsx'
-import { IMG_LOAD_STATE } from '../../src/helper'
+import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
 describe('<ThumbnailPreview />', () => {
   const props = {
