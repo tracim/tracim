@@ -56,6 +56,7 @@ class WorkspaceListItem extends React.Component {
     const { props } = this
     return (
       <li
+        id={props.workspaceId}
         className='sidebar__content__navigation__workspace__item'
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
         ref={props.connectDropTarget}

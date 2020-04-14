@@ -25,19 +25,19 @@ describe('Workspace', () => {
       .should('exist')
   })
 
+  const createOneWorkspace = (cy, workspaceName) => {
+    return cy.get('[data-cy="sidebarCreateWorkspaceBtn"]').click()
+      .get('[data-cy="createcontent__form__input"]').type(workspaceName)
+      .get('[data-cy="popup__createcontent__form__button"]').click()
+  }
+
+  const getWorkspaceItemByName = (cy, workspaceTitle) => (
+    cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"]`)
+      .parents('li.sidebar__content__navigation__workspace__item')
+  )
+
   describe('Dashboard', () => {
     describe('Creating two new workspaces', () => {
-      const createOneWorkspace = (cy, workspaceName) => {
-        return cy.get('[data-cy="sidebarCreateWorkspaceBtn"]').should('be.visible').click()
-          .get('[data-cy="createcontent__form__input"]').should('be.visible').type(workspaceName)
-          .get('[data-cy="popup__createcontent__form__button"]').should('be.visible').click()
-      }
-
-      const getWorkspaceItemByName = (workspaceTitle) => (
-        cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"]`)
-          .parents('li.sidebar__content__navigation__workspace__item')
-      )
-
       it('should display the new workspaces properly with the right workspace opened in the sidebar', () => {
         const workspaceTitle1 = 'second workspace'
         const workspaceTitle2 = 'third workspace'
@@ -47,7 +47,7 @@ describe('Workspace', () => {
           .get('[data-cy="dashboardWorkspaceLabel"]')
           .contains(workspaceTitle1)
 
-        getWorkspaceItemByName(workspaceTitle1)
+        getWorkspaceItemByName(cy, workspaceTitle1)
           .find('.sidebar__content__navigation__workspace__item__submenu')
           .should('be.visible')
 
@@ -56,10 +56,33 @@ describe('Workspace', () => {
           .get('[data-cy="dashboardWorkspaceLabel"]')
           .contains(workspaceTitle2)
 
-        getWorkspaceItemByName(workspaceTitle2)
+        getWorkspaceItemByName(cy, workspaceTitle2)
           .find('.sidebar__content__navigation__workspace__item__submenu')
           .should('be.visible')
       })
+    })
+  })
+
+  describe('Creating a workspace while a lot of workspace are already created', () => {
+    const nbWorkspace = 20
+    const newWorkspaceName = '0'
+
+    beforeEach(() => {
+      cy.resetDB()
+      cy.setupBaseDB()
+      cy.loginAs('administrators')
+      for (let i = 1; i < nbWorkspace; i++) {
+        cy.createRandomWorkspace()
+      }
+    })
+
+    it('should scroll to the new workspace in the sidebar', () => {
+      cy.visit('/ui')
+      cy.get('.sidebar__scrollview').scrollTo('bottom')
+      createOneWorkspace(cy, newWorkspaceName)
+      getWorkspaceItemByName(cy, newWorkspaceName)
+        .find('.sidebar__content__navigation__workspace__item__submenu')
+        .should('be.visible')
     })
   })
 })

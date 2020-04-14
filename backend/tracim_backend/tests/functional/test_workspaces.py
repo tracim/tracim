@@ -1006,6 +1006,88 @@ class TestWorkspaceMembersEndpoint(object):
         # by correct value when avatar feature will be enabled
         assert user_role["user"]["avatar_url"] is None
 
+    def test_api__get_workspace_members__ok_200_show_disabled_users(
+        self,
+        web_testapp,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
+    ):
+        """
+            Check obtain workspace members list with also disabled users
+        """
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("trusted-users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
+        rapi = role_api_factory.get(current_user=admin_user)
+        uapi.disable(user, do_save=True)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        user_id = user.user_id
+        workspace_id = workspace.workspace_id
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/members?show_disabled_user=1".format(workspace_id), status=200
+        ).json_body
+        assert len(res) == 2
+        user_role = res[1]
+        assert user_role["role"] == "reader"
+        assert user_role["user_id"] == user_id
+        assert user_role["workspace_id"] == workspace_id
+        assert user_role["is_active"] is False
+        assert user_role["do_notify"] is False
+
+    def test_api__get_workspace_members__ok_200_show_only_enabled_users(
+        self,
+        web_testapp,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
+    ):
+        """
+            Check obtain workspace members list with only enabled users
+        """
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
+        groups = [gapi.get_one_with_name("trusted-users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
+        rapi = role_api_factory.get(current_user=admin_user)
+        uapi.disable(user, do_save=True)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        workspace_id = workspace.workspace_id
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/v2/workspaces/{}/members?show_disabled_user=0".format(workspace_id), status=200
+        ).json_body
+        assert len(res) == 1
+        user_role = res[0]
+        assert user_role["user_id"] == admin_user.user_id
+        assert user_role["workspace_id"] == workspace_id
+        assert user_role["is_active"] is True
+        assert user_role["do_notify"] is True
+
     def test_api__get_workspace_members__ok_200__as_admin(
         self,
         web_testapp,

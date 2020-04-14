@@ -1,8 +1,29 @@
 
 
+## 2.6.3 / 2020-04-09
+
+### Improvement
+
+- Better Tracim reactivity by improving Database indexing (#2787)
+
+### Fixed Issues
+
+- Frontend: #2688
+- Backend: #2687, #2793, #2811, #2812
+
+### Other Changes
+
+- ElasticSearch: ElasticSearch: Refactor of the indexing logic. It is necessary to drop the existing index and to create it again to use ElasticSearch, use the CLI command for this (#2660)
+
+### Known Issues
+
+- SMTP servers using implicit SSL may cause issues with Tracim. If you not activate `email.notification.smtp.use_implicit_ssl` and you use `email.processing_mode = sync`, when Tracim tries to send email, 500 errors appear after a 5 minute timeout and its also not possible to create a new account.
+In next release we will add information [here](https://github.com/tracim/tracim/blob/master/backend/doc/setting.md#enabling-the-mail-notification-feature) to test your SMTP configuration with the Tracim configuration file (issue #2827)
+
+
 ## 2.6.2 / 2020-03-20
 
-### Fixed issues
+### Fixed Issues
 
 - General UX: #1503, #1513, #2437, #2447, #2646, #2648
 - Frontend: #1294, #2692, #2749
@@ -11,7 +32,7 @@
 
 ## 2.6.1 / 2020-02-21
 
-### Fixed issues
+### Fixed Issues
 
 - Frontend: #2665, #2676, #2680, #2683
 - General UX: #1891
@@ -32,7 +53,7 @@
 - With Apache as a proxy, it is now possible to use the browser cache policy. If you used Tracim with Docker you need to backup and delete existing Apache configuration files in `~/tracim/etc/` (default path with Tracim Docker image). On the next startup, a new file will be created with the new parameters.
 - All apps are now directly enabled/disabled with one parameter and it is now easier to develop new apps.
 
-### Fixed issues
+### Fixed Issues
 
 - Gallery: #2540, #2541, #2551, #2574, #2583 
 - Frontend: #1396, #1560, #1656, #2607, #2608, #2611, #2641
@@ -58,7 +79,7 @@
 
 - Custom_toolbox feature is now available - beta
 
-### Fixed issues
+### Fixed Issues
 
 - Email: #2565
 - Frontend: #2345
@@ -71,7 +92,7 @@
 
 - Application gallery
 
-### Fixed issues
+### Fixed Issues
 
 - Preview-generator: #2532
 - Backend: #2518, #2526
@@ -89,7 +110,7 @@
 - Configure default profile of new users 
 - Space Limitations (experimental) - allow some controls on users allowed space, etc
 
-### Fixed issues
+### Fixed Issues
 
 - General UX: #2494
 - Timeline: #2455
@@ -102,18 +123,18 @@
 
 - Preview of 3D files (*.stl), videos (10 image per each video) are now available
 
-### Fixed issues
+### Fixed Issues
 
 - Preview-generator: #2503, #2492
 
-### Known issues
+### Known Issues
 
 - Manual modification to install Tracim on Ubuntu Trusty (14.04) is necessary (#2514)
 
 
 ## 2.4.3 / 2019-09-26
 
-### Fixed issues
+### Fixed Issues
 
 - Docker: #2445
 - Content Listing: extended action button not working correctly
@@ -121,13 +142,13 @@
 
 ## 2.4.2 / 2019-09-24
 
-### Fixed issues
+### Fixed Issues
 - Timeline: Missing css rule about word-break for comment
 
 
 ## 2.4.1 / 2019-09-20
 
-### Fixed issues
+### Fixed Issues
 
 - Migration issue introduced with 2.4.0
 
@@ -141,7 +162,7 @@
 - Content meta-information panel (timeline, info) UI rework
 - Space Limitations (experimental) - allow some controls on file/workspace sizes, number of workspace per user, etc
 
-### Fixed issues
+### Fixed Issues
 
 - Content Listing: #1986, #2046, #2232, #2262, #2360
 - File App: #2062, #2174, #2203, #2265, #2273, #2294
@@ -154,27 +175,27 @@
 - General: #1887, #1910, #1956, #1992, #2011, #2064, #2091, #2141, #2149
 - General UX: #573, #1198, #2076, #2092, #2096, #2121, #2159, #2237, #2299, #2395
 
-### Known issues
+### Known Issues
 
 - Debian 9 is released with Firefox ESR v60.8.0. In this version, long title are not limited in upload file popup (issue #2062)
 - Opening file with special characters in label on CollaboraOnline/LibreofficeOnline is not possible (issue #2219)
 - Tracim not support lock mechanism in collaborative edition (issue #2073)
 
-### Other changes
+### Other Changes
 
 Archive button not more used in Tracim. All archive buttons is hide (#2347)
 
 
 ## 2.3.2 / 2019-08-01
 
-### Fixed issues
+### Fixed Issues
 
 - Email notifications: #2134
 
 
 ## 2.3.1 / 2019-07-05
 
-### Fixed issues
+### Fixed Issues
 
 - Search: #2001, #2016, #2025
 - Docker: #2005, #2054
@@ -208,11 +229,11 @@ Archive button not more used in Tracim. All archive buttons is hide (#2347)
 
 - Only if you are using Docker: before starting Tracim, you need to delete files `tracim_web.ini`, `tracim_webdav.ini` and `tracim_caldav.ini` available in the default folder `~/tracim/etc` (all files are created on startup)
 
-### Known issues
+### Known Issues
 
 - Debian 9 is released with Firefox ESR v60.x.x. In this version, there is a known bug with the drag & drop feature: when hovering a content over a workspace in the sidebar, only the first one gets to have its icon updated (issue #1997)
 
-### Fixed issues
+### Fixed Issues
 
 - Search: #1667, #1668, #1671, #1904, #1914, #1923, #1955
 - Drag & Drop: #789, #1669, #1958, #1974
@@ -243,7 +264,7 @@ website.server_name parameter is now deleted in config file and code. Not more u
 - Link for personal agenda is visible in My account
 - Timeline's revisions now shows its author
 
-### Known issues
+### Known Issues
 
 - Search & filters not yet migrated from Tracim v1
 - Creating a content may appear duplicated on slow network (issue #1361)
@@ -252,7 +273,7 @@ website.server_name parameter is now deleted in config file and code. Not more u
 - Changing parameter caldav.radicale.server.host in development.ini with specific IP address show wrong url after starting caldav (issue #1535)
 - File extension is not visible in recent activity after click on See More (issue #1774)
 
-### Fixed issues
+### Fixed Issues
 
 - Documentation: #1493, #1612, #1672, #1751
 - Agenda: #1181, #1250, #1486, #1498, #1527, #1532, #1533, #1536, #1539, #1540, #1545, #1556, #1573, #1575, #1577, #1584, #1600, #1605, #1608, #1631, #1644, #1700, #1723, #1730
@@ -291,13 +312,13 @@ website.server_name parameter is now deleted in config file and code. Not more u
     - Web SSO Authentication - beta (based on HTTP Headers)
     - Authentication chaining - beta (internal, ldap, apache)
 
-### Known issues
+### Known Issues
 
 - Calendar support still missing (migration from Tracim v1 will be available in Tracim 2.2 - see #1181)
 - Search & filtering not yet migrated from Tracim v1
 - Duplicated creation of content may appear on slow network (issue #1361)
 
-### Fixed issues
+### Fixed Issues
 
 - Documentation: #993, #1005, #1211, #1310, #1337
 - Folders: #650, #1119, #1173, #1191, #1210, #1256, #1325, #1353

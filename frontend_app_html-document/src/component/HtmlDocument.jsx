@@ -65,16 +65,18 @@ export const HtmlDocument = props => {
         )}
 
         {props.mode === APP_FEATURE_MODE.EDIT &&
-          <TextAreaApp
-            id={props.wysiwygNewVersion}
-            customClass={'html-document__editionmode'}
-            customColor={props.customColor}
-            onClickCancelBtn={props.onClickCloseEditMode}
-            disableValidateBtn={props.disableValidateBtn}
-            onClickValidateBtn={props.onClickValidateBtn}
-            text={props.text}
-            onChangeText={props.onChangeText}
-          />
+          <div className='html-document__editionmode__container'>
+            <TextAreaApp
+              id={props.wysiwygNewVersion}
+              customClass={'html-document__editionmode'}
+              customColor={props.customColor}
+              onClickCancelBtn={props.onClickCloseEditMode}
+              disableValidateBtn={props.disableValidateBtn}
+              onClickValidateBtn={props.onClickValidateBtn}
+              text={props.text}
+              onChangeText={props.onChangeText}
+            />
+          </div>
         }
       </div>
     </div>
