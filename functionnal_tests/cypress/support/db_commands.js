@@ -40,6 +40,14 @@ Cypress.Commands.add('enableAgenda', (workspace, enabled = true) => {
   cy.request('PUT', `/api/v2/workspaces/${workspace.workspace_id}`, data).then(response => response.body)
 })
 
+Cypress.Commands.add('disableUser', (userId) =>
+  cy.request('PUT', `/api/v2/users/${userId}/disabled`).then(response => response.body)
+)
+
+Cypress.Commands.add('enableUser', (userId) =>
+  cy.request('PUT', `/api/v2/users/${userId}/enabled`).then(response => response.body)
+)
+
 Cypress.Commands.add('createRandomUser', (profile = 'users') => {
   const userName = makeRandomString()
 
