@@ -53,6 +53,7 @@
       insert_button_items: 'media anchor insertdatetime',
       // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1
       content_style: 'div {height: 100%;}',
+      height: '100%',
       setup: function ($editor) {
         $editor.on('init', function (e) {
           // INFO - GM - 2020/03/17 - theses 3 lines enable autofocus at the end of the document

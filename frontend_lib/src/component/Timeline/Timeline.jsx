@@ -126,7 +126,13 @@ class Timeline extends React.Component {
 
         {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
           <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
-            <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__texteditor__textinput')}>
+            <div
+              className={classnames(
+                `${props.customClass}__texteditor__textinput`,
+                'timeline__texteditor__textinput',
+                props.wysiwyg ? 'timeline__texteditor__textinput__wysiwyg' : null
+              )}
+            >
               <textarea
                 id='wysiwygTimelineComment'
                 placeholder={props.t('Your message...')}
