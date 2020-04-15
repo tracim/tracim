@@ -34,7 +34,7 @@ export class MainPreview extends React.Component {
 
   computeImageRatioForRotation () {
     if (this.props.rotationAngle % 180) {
-      // if the image is rotated such as the height "becomes" the width,
+      // INFO - RJ - 2020/04/15 - if the image is rotated such as the height "becomes" the width,
       // let us fix its maximum dimensions when the DOM is ready
 
       window.requestAnimationFrame(() => {
