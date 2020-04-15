@@ -18,7 +18,6 @@
   "Shared space's description": "Descrição do espaço partilhado",
   "Delete shared space": "Eliminar espaço partilhado",
   "Delete": "Eliminar",
-  "Are you sure?": "Tem certeza?",
   "Cancel": "Anular",
   "Unknown user": "Utilizador desconhecido",
   "Error while deleting shared space": "Erro ao eliminar o espaço partilhado",
@@ -41,5 +40,6 @@
   "Error while activating download": "Erro ao ativar o download",
   "Error while deactivating download": "Erro ao desativar o download",
   "Members List": "Lista dos Membros",
-  "Optional Functionalities": "Funcionalidades Opcionais"
+  "Optional Functionalities": "Funcionalidades Opcionais",
+  "Are you sure ?": "Tem certeza?"
 }

@@ -1,8 +1,6 @@
 {
   "Timeline": "Linha cronológica",
   "Restore": "Restaurar",
-  "Simple text": "Texto simples",
-  "Rich text": "Texto rico",
   "Send": "Enviar",
   "Your message...": "Sua mensagem...",
   "Validate the title": "Validar o título",
@@ -81,5 +79,7 @@
   "Trusted user": "Utilizador confiável",
   "User + create shared spaces, add members in shared spaces": "Utilizador + criar espaços partilhados, acrescentar membros nos espaços partilhados",
   "User": "Utilizador",
-  "Access to shared spaces where user is member": "Acesso a espaços partilhados onde o utilizador é membro"
+  "Access to shared spaces where user is member": "Acesso a espaços partilhados onde o utilizador é membro",
+  "Simple edition": "Edição simples",
+  "Advanced edition": "Edição avançada"
 }

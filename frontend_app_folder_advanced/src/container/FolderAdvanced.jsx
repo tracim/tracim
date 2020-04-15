@@ -137,7 +137,7 @@ class FolderAdvanced extends React.Component {
 
     switch (fetchContentTypeList.apiResponse.status) {
       case 200: this.setState({ tracimContentTypeList: fetchContentTypeList.body.filter(ct => ct.slug !== 'comment') }); break
-      default: this.sendGlobalFlashMessage(props.t("Error while loading tracim's content type list"), 'warning')
+      default: this.sendGlobalFlashMessage(props.t("Error while loading Tracim's content type list"), 'warning')
     }
   }
 
