@@ -418,7 +418,7 @@ class WorkspaceContent extends React.Component {
   }
 
   handleClickFolder = async (e, folderId) => {
-    const { props, state } = this
+    const { props } = this
 
     const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
     const newUrlSearchList = folderListInUrl.some(id => id === folderId)
