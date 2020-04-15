@@ -20,7 +20,7 @@ export class MainPreview extends React.Component {
     }
   }
 
-  onImageLoad = ({ target: img }) => {
+  onImageLoad = () => {
     this.setState({
       imageLoaded: IMG_LOAD_STATE.LOADED
     })
