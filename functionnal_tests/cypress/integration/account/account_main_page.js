@@ -12,7 +12,7 @@ describe('Account page', function () {
     cy.visitPage({ pageName: PAGES.HOME })
   })
 
-  it("should be able it access it through header's buttons", () => {
+  it("should be able to access the account page through header's buttons", () => {
     cy.getTag({ selectorName: s.HEADER })
       .find('[data-cy=menuprofil__dropdown__button]')
       .click()
