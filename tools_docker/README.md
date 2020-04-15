@@ -152,7 +152,7 @@ To build image
 
 #### With Custom Branch or Tag
 
-⚠ **Its not possible to build image with ARG TAG and ARG BRANCH in same time.**
+⚠ **It is not possible to build an image with both ARG TAG and ARG BRANCH at same time.**
 
 You can build with specific branch
 
