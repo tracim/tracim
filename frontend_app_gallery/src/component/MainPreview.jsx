@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import { translate } from 'react-i18next'
+import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
 export class MainPreview extends React.Component {
   constructor (props) {
@@ -8,7 +10,7 @@ export class MainPreview extends React.Component {
     this.imgContainer = React.createRef()
     this.img = React.createRef()
     this.state = {
-      imageLoaded: false,
+      imageLoaded: IMG_LOAD_STATE.LOADING,
       style: {
         maxWidth: '100%',
         maxHeight: '100%',
@@ -18,9 +20,15 @@ export class MainPreview extends React.Component {
     }
   }
 
-  onLoad ({ target: img }) {
+  onImageLoad = ({ target: img }) => {
     this.setState({
-      imageLoaded: true
+      imageLoaded: IMG_LOAD_STATE.LOADED
+    })
+  }
+
+  onImageError = () => {
+    this.setState({
+      imageLoaded: IMG_LOAD_STATE.ERROR
     })
   }
 
@@ -88,32 +96,43 @@ export class MainPreview extends React.Component {
     return (
       <div className='carousel__item__preview'>
         <span className='carousel__item__preview__content'>
-          {!state.imageLoaded && (
+          {state.imageLoaded === IMG_LOAD_STATE.LOADING && (
             <div className='gallery__loader'>
               <i className='fa fa-spinner fa-spin gallery__loader__icon' />
             </div>
           )}
-          <div className='carousel__item__preview__content__image' ref={this.imgContainer}>
-            <img
-              src={props.previewSrc}
-              className={classnames(`rotate${props.rotationAngle}`, state.imageLoaded ? 'img-thumbnail' : null)}
-              onClick={props.handleClickShowImageRaw}
-              onLoad={this.onLoad.bind(this)}
-              alt={props.fileName}
-              style={this.state.style}
-              ref={this.img}
-            />
-          </div>
+          {state.imageLoaded === IMG_LOAD_STATE.ERROR
+            ? (
+              <div className='carousel__item__preview__error'>
+                <div className='carousel__item__preview__error__message'>
+                  <i className='fa fa-fw fa-exclamation-triangle carousel__item__preview__error__icon' />
+                  <div>{props.t('No preview available')}</div>
+                </div>
+              </div>
+            ) : (
+              <div className='carousel__item__preview__content__image' ref={this.imgContainer}>
+                <img
+                  src={props.previewSrc}
+                  className={classnames(`rotate${props.rotationAngle}`, state.imageLoaded ? 'img-thumbnail' : null)}
+                  onClick={props.handleClickShowImageRaw}
+                  onLoad={this.onImageLoad}
+                  onError={this.onImageError}
+                  style={this.state.style}
+                  ref={this.img}
+                  alt={props.fileName}
+                />
+              </div>
+            )
+          }
         </span>
       </div>
     )
   }
 }
 
-export default MainPreview
+export default translate()(MainPreview)
 
 MainPreview.propTypes = {
-  loggedUser: PropTypes.object,
   previewSrc: PropTypes.string,
   index: PropTypes.number,
   handleClickShowImageRaw: PropTypes.func,
@@ -121,7 +140,6 @@ MainPreview.propTypes = {
 }
 
 MainPreview.defaultProps = {
-  loggedUser: {},
   previewSrc: '',
   index: 0,
   handleClickShowImageRaw: () => {},

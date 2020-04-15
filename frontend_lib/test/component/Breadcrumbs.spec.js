@@ -23,15 +23,17 @@ describe('<Breadcrumbs />', () => {
 
   describe('The first level', () => {
     it('should display "First level"', () => expect(wrapper.find('.nolink')).to.have.text().to.be.equal('First level'))
-    it('should NOT have the class primaryColorFontDarkenHover', () =>
+    it('should NOT have the class primaryColorFontDarkenHover and primaryColorFont', () => {
       expect(wrapper.find('.nolink').parent()).to.have.attr('class').to.not.contains('primaryColorFontDarkenHover')
-    )
+      expect(wrapper.find('.nolink').parent()).to.have.attr('class').to.not.contains('primaryColorFont')
+    })
   })
 
   describe('The second level', () => {
     it('should display "Second level"', () => expect(wrapper.find('.secondlvl')).to.have.text().to.be.equal('Second level'))
-    it('should have the class primaryColorFontDarkenHover', () =>
+    it('should have the class primaryColorFontDarkenHover and primaryColorFont', () => {
       expect(wrapper.find('.secondlvl').parent()).to.have.attr('class').to.contains('primaryColorFontDarkenHover')
-    )
+      expect(wrapper.find('.secondlvl').parent()).to.have.attr('class').to.contains('primaryColorFont')
+    })
   })
 })

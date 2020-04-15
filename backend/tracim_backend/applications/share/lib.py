@@ -114,6 +114,7 @@ class ShareLib(object):
             config.EMAIL__NOTIFICATION__SMTP__PORT,
             config.EMAIL__NOTIFICATION__SMTP__USER,
             config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+            config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
         )
 
         return ShareEmailManager(config=config, smtp_config=smtp_config, session=session)
@@ -163,8 +164,8 @@ class ShareLib(object):
                 self.base_query()
                 .filter(ContentShare.content_id == content.content_id)
                 .filter(ContentShare.share_id == share_id)
-                .one()
-            )  # type: ContentShare
+                .one()  # type: ContentShare
+            )  # INFO - GM - 2020-04-02 - do not put typing here, black error : https://github.com/psf/black/issues/1329
         except NoResultFound as exc:
             raise ContentShareNotFound(
                 'Content Share "{}" not found in database'.format(share_id)

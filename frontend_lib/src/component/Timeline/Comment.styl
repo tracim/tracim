@@ -13,6 +13,8 @@
     border 1px solid darkGrey
     background-color offWhite
     display flex
+    &__content
+      width calc(100% - 44px) // 44px is the avatar size
     &__author
       margin-left 20px
     &__date
@@ -21,6 +23,7 @@
     &__text
       margin-left 20px
       margin-top 10px
+      overflow-wrap break-word
   p
     margin 0
     & img

@@ -281,3 +281,9 @@ export const FILE_PREVIEW_STATE = {
 }
 
 export const buildHeadTitle = words => words.reduce((acc, curr) => acc !== '' ? `${acc} · ${curr}` : curr, '')
+
+export const IMG_LOAD_STATE = {
+  LOADED: 'loaded',
+  LOADING: 'loading',
+  ERROR: 'error'
+}

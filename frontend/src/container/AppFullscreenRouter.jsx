@@ -32,7 +32,7 @@ export class AppFullscreenRouter extends React.Component {
 
     const isDataReady = state.isMounted && props.workspaceList.length > 0 && props.workspaceList.every(ws => ws.memberList.length > 0)
 
-    if (!state.isMounted) return null
+    if (!state.isMounted || !props.user.logged) return null
 
     return (
       <div className='AppFullScreenManager'>
