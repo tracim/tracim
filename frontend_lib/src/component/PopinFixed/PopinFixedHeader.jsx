@@ -70,6 +70,7 @@ class PopinFixedHeader extends React.Component {
               value={state.editTitleValue}
               onChange={this.onChangeTitle}
               onKeyDown={this.handleInputKeyPress}
+              autoFocus
             />
             : componentTitle
           }

@@ -18,7 +18,7 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = async ({ detail: { type } }) => {
+  customEventReducer = ({ detail: { type } }) => {
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         this.setHeadTitle()
@@ -77,7 +77,7 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
           <CardBody formClass='forgotpassword__card__body'>
             <div>
               <div className='forgotpassword__card__body__title'>
-                {props.t('Did you forget your password ?')}
+                {props.t('Did you forget your password?')}
               </div>
 
               <div className='forgotpassword__card__body__submsg'>

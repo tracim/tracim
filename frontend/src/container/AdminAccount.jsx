@@ -129,6 +129,9 @@ class Account extends React.Component {
       type: BREADCRUMBS_TYPE.CORE,
       notALink: true
     }, {
+      link: <Link to={PAGE.ADMIN.USER}>{props.t('Users')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
       link: (
         <Link to={PAGE.ADMIN.USER_EDIT(state.userToEdit.user_id)}>
           {state.userToEdit.public_name}
@@ -240,7 +243,7 @@ class Account extends React.Component {
     }
   }
 
-  handleChangeTimezone = newTimezone => console.log('(NYI) new timezone : ', newTimezone)
+  handleChangeTimezone = newTimezone => console.log('(NYI) new timezone: ', newTimezone)
 
   // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
   // https://github.com/tracim/tracim/issues/1847

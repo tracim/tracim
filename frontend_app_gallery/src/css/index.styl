@@ -12,18 +12,24 @@
     & .slick-current
       & .carousel__thumbnail__item__preview__content__image
         background-color #7d4e24
-    &__item__preview__content
-      height 125px
-      margin 16px
-      display flex
-      align-items center
-      cursor pointer
-      &__image
-        margin 0 auto
-        box-shadow 0 0 8px 4px rgba(0,0,0,0.2)
-        border none
-        &:hover
-          box-shadow 0 0 16px 4px rgba(0,0,0,0.3)
+      & .carousel__thumbnail__item__preview__error
+        color #7d4e24
+    &__item__preview
+      &__content
+        height 125px
+        margin 16px
+        display flex
+        align-items center
+        cursor pointer
+        &__image
+          margin 0 auto
+          box-shadow 0 0 8px 4px rgba(0,0,0,0.2)
+          border none
+          &:hover
+            box-shadow 0 0 16px 4px rgba(0,0,0,0.3)
+      &__error
+        margin auto
+        font-size 30px
   &__item__preview
     height 100%
     &__content
@@ -40,6 +46,14 @@
           object-fit contain
           cursor pointer
           box-shadow 0 0 8px 2px rgba(0,0,0,0.2)
+    &__error
+      height 100%
+      display flex
+      align-items center
+      &__message
+        margin auto
+      &__icon
+        font-size 30px
   &__arrow
     position absolute
     height 100%
@@ -75,18 +89,14 @@
     & i
       margin-left 10px
     &__lightbox
-      & > button
-        padding 5px 8.5px
-        cursor pointer
-        &:hover
-          color: #FFFFFF
       &__rotation
         &__right > i
           transform scaleX(-1)
       &__openRawContent
         // INFO - GM - 2019-11-29 - Copy the style of lightbox button because it is a <a> tag
         margin 2px
-        padding 5px 8.5px
+        height 35px
+        width 40px
         font-size 1.1rem
         border-radius 0.25rem
         color #929292
@@ -140,12 +150,24 @@
 .ril__caption, .ril__toolbar
   background none
 
-.ril__toolbarRightSide button
-  margin 2px
-  border-radius 0.25rem
-  background-color rgba(0, 0, 0, 0.5)
-  font-size 1.1rem
-  color #929292
+.ril
+  &__toolbarRightSide
+    width 100%
+    padding-right 10px
+    text-align right
+    & button
+      height 35px
+      width 40px
+      margin 2px
+      border-radius 0.25rem
+      background-color rgba(0, 0, 0, 0.5)
+      font-size 1.1rem
+      color #929292
+      cursor pointer
+      &:hover
+        color: #FFFFFF
+  &__toolbarLeftSide
+    display none
 
 .slick-slide > div
   height 100%
@@ -163,3 +185,11 @@
         margin-left: 0
       &__text
         display none
+      &__lightbox__openRawContent
+        height 30px
+        width 35px
+        padding 3px
+  .ril__toolbarRightSide button
+    height 30px
+    width 35px
+    padding 0

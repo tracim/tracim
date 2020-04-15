@@ -21,7 +21,7 @@ export const MoreInfo = props =>
       {props.displayWebdavBtn === true &&
       <div className='moreinfo__webdav__information genericBtnInfoDashboard__info'>
         <div className='moreinfo__webdav__information__text genericBtnInfoDashboard__info__text'>
-          {props.t('Find all your documents deposited online directly on your computer via the workstation, without going through the software.')}'
+          {props.t('Find all your documents put online directly on your computer via the workstation, without going through the software.')}'
         </div>
 
         <div className='moreinfo__webdav__information__link genericBtnInfoDashboard__info__link'>

@@ -40,7 +40,7 @@ export const HomeNoWorkspace = props =>
     )}
 
     <div className='homepagecard__endtext'>
-      {props.t('Have a good day !')}
+      {props.t('Have a good day!')}
     </div>
   </div>
 

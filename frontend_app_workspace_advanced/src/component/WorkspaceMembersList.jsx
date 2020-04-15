@@ -5,7 +5,7 @@ import {
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
-const WorkspaceMembersList = props => {
+export const WorkspaceMembersList = props => {
   return (
     <div className='formBlock workspace_advanced__userlist'>
       {props.displayFormNewMember === false && (
@@ -14,9 +14,30 @@ const WorkspaceMembersList = props => {
             {props.t('Members list')}
           </div>
 
+          <div
+            className='formBlock__bottom workspace_advanced__userlist__adduser'
+            onClick={props.onClickToggleFormNewMember}
+          >
+            <div className='workspace_advanced__userlist__adduser__button primaryColorFontHover primaryColorBorderHover'>
+              <div className='workspace_advanced__userlist__adduser__button__avatar'>
+                <div className='workspace_advanced__userlist__adduser__button__avatar__icon'>
+                  <i className='fa fa-plus' />
+                </div>
+              </div>
+
+              <div className='workspace_advanced__userlist__adduser__button__text'>
+                {props.t('Add a member')}
+              </div>
+            </div>
+          </div>
+
           <ul className='formBlock__field workspace_advanced__userlist__list'>
             {props.memberList && props.memberList.filter(m => m.user).map(m =>
-              <li className='workspace_advanced__userlist__list__item' key={`member_${m.user_id}`}>
+              <li
+                className='workspace_advanced__userlist__list__item'
+                key={`member_${m.user_id}`}
+                data-cy={`workspace_advanced__member-${m.user_id}`}
+              >
                 <div className='workspace_advanced__userlist__list__item__avatar'>
                   <Avatar width={'50px'} publicName={m.user.public_name} />
                 </div>
@@ -81,23 +102,6 @@ const WorkspaceMembersList = props => {
               </li>
             )}
           </ul>
-
-          <div
-            className='formBlock__bottom workspace_advanced__userlist__adduser'
-            onClick={props.onClickToggleFormNewMember}
-          >
-            <div className='workspace_advanced__userlist__adduser__button primaryColorFontHover primaryColorBorderHover'>
-              <div className='workspace_advanced__userlist__adduser__button__avatar'>
-                <div className='workspace_advanced__userlist__adduser__button__avatar__icon'>
-                  <i className='fa fa-plus' />
-                </div>
-              </div>
-
-              <div className='workspace_advanced__userlist__adduser__button__text'>
-                {props.t('Add a member')}
-              </div>
-            </div>
-          </div>
         </div>
       )}
 
