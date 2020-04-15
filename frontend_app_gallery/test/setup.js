@@ -32,4 +32,7 @@ window.matchMedia = window.matchMedia || function() {
     removeListener: function() {}
   }
 }
+// INFO - GM - 2020/04/15 - Mock some window functions used by MainPreview
+window.requestAnimationFrame = (cb) => setTimeout(cb, 10)
+window.getComputedStyle = () => ({})
 console.log = () => {}

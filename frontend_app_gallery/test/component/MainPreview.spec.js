@@ -13,10 +13,6 @@ describe('<MainPreview />', () => {
     handleClickShowImageRaw
   }
 
-  // INFO - GM - 2020/04/15 - Mock some window functions used by MainPreview
-  window.requestAnimationFrame = (cb) => { cb() }
-  window.getComputedStyle = () => { return {} }
-
   // INFO - GM - 2020/04/15 - Use mount here because MainPreview is using refs
   const wrapper = mount(<MainPreview {...props} t={tradKey => tradKey} />)
 
