@@ -33,6 +33,6 @@ window.matchMedia = window.matchMedia || function() {
   }
 }
 // INFO - GM - 2020/04/15 - Mock some window functions used by MainPreview
-window.requestAnimationFrame = (cb) => setTimeout(cb, 10)
-window.getComputedStyle = () => ({})
+window.requestAnimationFrame = window.requestAnimationFrame || function(cb) { setTimeout(cb, 10) }
+window.getComputedStyle = window.getComputedStyle || function() { return {} }
 console.log = () => {}
