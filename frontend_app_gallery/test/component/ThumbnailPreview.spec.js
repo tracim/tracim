@@ -2,6 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import ThumbnailPreview from '../../src/component/ThumbnailPreview.jsx'
+import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
 describe('<ThumbnailPreview />', () => {
   const props = {
@@ -23,14 +24,20 @@ describe('<ThumbnailPreview />', () => {
       })
     })
 
-    describe('image loading', () => {
+    describe('image state', () => {
       it('should not display the loading spinner when the image is already loaded', () => {
-        wrapper.setState({ imageLoaded: true })
+        wrapper.setState({ imageLoaded: IMG_LOAD_STATE.LOADED })
         expect(wrapper.find('i.fa.fa-spinner.fa-spin')).to.have.lengthOf(0)
       })
       it('should display the loading spinner when the image is not loaded yet', () => {
-        wrapper.setState({ imageLoaded: false })
+        wrapper.setState({ imageLoaded: IMG_LOAD_STATE.LOADING })
         expect(wrapper.find('i.fa.fa-spinner.fa-spin')).to.have.lengthOf(1)
+        wrapper.setState({ imageLoaded: IMG_LOAD_STATE.LOADED })
+      })
+      it('should display the error icon when the file can not have a preview', () => {
+        wrapper.setState({ imageLoaded: IMG_LOAD_STATE.ERROR })
+        expect(wrapper.find('i.carousel__thumbnail__item__preview__error')).to.have.lengthOf(1)
+        wrapper.setState({ imageLoaded: IMG_LOAD_STATE.LOADED })
       })
     })
   })

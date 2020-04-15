@@ -7,9 +7,3 @@ export const PAGE = {
   },
   ONLINE_EDITION: (contentId) => `/api/v2/collaborative-document-edition/wopi/files/${contentId}`
 }
-
-export const IMG_LOAD_STATE = {
-  LOADED: 'loaded',
-  LOADING: 'loading',
-  ERROR: 'error'
-}
