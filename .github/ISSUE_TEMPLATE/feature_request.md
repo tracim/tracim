@@ -1,7 +1,9 @@
 ---
 name: Feature request
 about: Suggest a new feature
-
+title: "Feat:"
+labels: to sort
+assignees: ""
 ---
 
 ## Feature description

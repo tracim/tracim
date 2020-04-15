@@ -20,7 +20,7 @@ const Comment = props => {
         >
           <Avatar width={'44px'} publicName={props.author} />
 
-          <div>
+          <div className='comment__body__content'>
             <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>
               {props.author}
             </div>
