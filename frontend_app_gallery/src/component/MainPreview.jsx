@@ -24,7 +24,7 @@ export class MainPreview extends React.Component {
     })
   }
 
-  fixImageSize () {
+  computeImageRatioForRotation () {
     if (this.props.rotationAngle % 180) {
       // if the image is rotated such as the height "becomes" the width,
       // let us fix its maximum dimensions when the DOM is ready
@@ -57,8 +57,8 @@ export class MainPreview extends React.Component {
           style: {
             maxWidth: '',
             maxHeight: '',
-            width: width,
-            height: height
+            width: height > width ? width : '',
+            height: width > height ? height : ''
           }
         })
       })
@@ -75,11 +75,11 @@ export class MainPreview extends React.Component {
   }
 
   componentDidMount () {
-    this.fixImageSize()
+    this.computeImageRatioForRotation()
   }
 
-  componentDidUpdate () {
-    this.fixImageSize()
+  componentDidUpdate (prevProps) {
+    if (prevProps.rotationAngle !== this.props.rotationAngle) this.computeImageRatioForRotation()
   }
 
   render () {
