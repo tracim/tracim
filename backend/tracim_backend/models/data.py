@@ -892,7 +892,7 @@ class Content(DeclarativeBase):
 
     id = Column(Integer, primary_key=True)
     cached_revision_id = Column(
-        Integer, ForeignKey("content_revisions.revision_id", ondelete="RESTRICT"), nullable=True
+        Integer, ForeignKey("content_revisions.revision_id", ondelete="RESTRICT")
     )
 
     current_revision = relationship(

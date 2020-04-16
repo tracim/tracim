@@ -18,7 +18,9 @@ def upgrade():
     # INFO G.M - 2020-03-31 - mysql create automatically index on foreign key, do not need to update index
     # and it's very complicated to drop/delete index in a working way to be sure getting the correct index name here.
     if dialect.name != "mysql":
-        op.create_index("idx__content__revision_id", "content", ["revision_id"], unique=False)
+        op.create_index(
+            "idx__content__cached_revision_id", "content", ["cached_revision_id"], unique=False
+        )
     # ### end Alembic commands ###
 
 
@@ -28,5 +30,5 @@ def downgrade():
     # INFO G.M - 2020-03-31 - mysql create automatically index on foreign key, do not need to update index
     # and it's very complicated to drop/delete index in a working way to be sure getting the correct index name here.
     if dialect.name != "mysql":
-        op.drop_index("idx__content__revision_id", table_name="content")
+        op.drop_index("idx__content__cached_revision_id", table_name="content")
     # ### end Alembic commands ###
