@@ -891,12 +891,12 @@ class Content(DeclarativeBase):
     )  # This flag allow to serialize a given revision if required by the user
 
     id = Column(Integer, primary_key=True)
-    revision_id = Column(
-        Integer, ForeignKey("content_revisions.revision_id", ondelete="SET NULL"), nullable=True
+    cached_revision_id = Column(
+        Integer, ForeignKey("content_revisions.revision_id", ondelete="RESTRICT"), nullable=True
     )
 
     current_revision = relationship(
-        "ContentRevisionRO", uselist=False, foreign_keys=[revision_id], post_update=True
+        "ContentRevisionRO", uselist=False, foreign_keys=[cached_revision_id], post_update=True
     )
 
     # TODO - A.P - 2017-09-05 - revisions default sorting
@@ -931,13 +931,23 @@ class Content(DeclarativeBase):
     def content_id(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.content_id
 
+    @hybrid_property
+    def revision_id(self) -> int:
+        return self.cached_revision_id
+
+    @revision_id.setter
+    def revision_id(self, value: int) -> None:
+        self.cached_revision_id = value
+
+    @revision_id.expression
+    def revision_id(cls) -> InstrumentedAttribute:
+        return Content.cached_revision_id
+
     @property
     def revision(self) -> ContentRevisionRO:
-        if not self.current_revision:
-            if not self.revisions:
-                self.current_revision = ContentRevisionRO()
-                self.current_revision.node = self
-            self.current_revision = self.revisions[-1]
+        if not self.revisions:
+            self.current_revision = ContentRevisionRO()
+            self.current_revision.node = self
         return self.current_revision
 
     # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
@@ -1215,7 +1225,7 @@ class Content(DeclarativeBase):
         return (
             object_session(self)
             .query(Content)
-            .join(ContentRevisionRO, Content.revision_id == ContentRevisionRO.revision_id)
+            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
             .filter(ContentRevisionRO.parent_id == self.id)
             .order_by(ContentRevisionRO.content_id)
         )
@@ -1243,14 +1253,14 @@ class Content(DeclarativeBase):
         statement = text(
             """
     with RECURSIVE children_id as (
-    select content.id as id from content join content_revisions cr on content.revision_id = cr.revision_id
+    select content.id as id from content join content_revisions cr on content.cached_revision_id = cr.revision_id
     where cr.parent_id = :content_id
     union all
     select content.id as id
-    from content join content_revisions cr on content.revision_id = cr.revision_id
+    from content join content_revisions cr on content.cached_revision_id = cr.revision_id
         join children_id c on c.id = cr.parent_id
     )
-    select content.id from content join content_revisions on content.revision_id = content_revisions.revision_id
+    select content.id from content join content_revisions on content.cached_revision_id = content_revisions.revision_id
         join children_id c on c.id = content.id;
             """
         )
@@ -1262,7 +1272,9 @@ class Content(DeclarativeBase):
             return (
                 object_session(self)
                 .query(Content)
-                .join(ContentRevisionRO, Content.revision_id == ContentRevisionRO.revision_id)
+                .join(
+                    ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
+                )
                 .filter(Content.id.in_(children_ids))
                 .order_by(ContentRevisionRO.content_id)
             )
@@ -1441,7 +1453,7 @@ class Content(DeclarativeBase):
                         'but does exist in content_revision "{content_revision}" of content "{content_id}" allowed_content,'
                         "it will be ignored".format(
                             type_label=type_label,
-                            content_revision=self.revision_id,
+                            content_revision=self.cached_revision_id,
                             content_id=self.content_id,
                         ),
                     )
@@ -1506,7 +1518,7 @@ class Content(DeclarativeBase):
         return revisions_data
 
 
-Index("idx__content__revision_id", Content.revision_id)
+Index("idx__content__cached_revision_id", Content.cached_revision_id)
 
 
 class RevisionReadStatus(DeclarativeBase):

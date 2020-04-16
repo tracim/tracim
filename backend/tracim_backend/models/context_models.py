@@ -1047,7 +1047,7 @@ class ContentInContext(object):
 
     @property
     def current_revision_id(self) -> int:
-        return self.content.revision_id
+        return self.content.cached_revision_id
 
     @property
     def created(self) -> datetime:
@@ -1115,7 +1115,7 @@ class ContentInContext(object):
                 show_temporary=True,
             )
             return content_api.get_preview_page_nb(
-                self.content.revision_id, file_extension=self.content.file_extension
+                self.content.cached_revision_id, file_extension=self.content.file_extension
             )
         else:
             return None
@@ -1169,7 +1169,7 @@ class ContentInContext(object):
             show_temporary=True,
         )
         return content_api.has_pdf_preview(
-            self.content.revision_id, file_extension=self.content.file_extension
+            self.content.cached_revision_id, file_extension=self.content.file_extension
         )
 
     @property
@@ -1192,7 +1192,7 @@ class ContentInContext(object):
             show_temporary=True,
         )
         return content_api.has_jpeg_preview(
-            self.content.revision_id, file_extension=self.content.file_extension
+            self.content.cached_revision_id, file_extension=self.content.file_extension
         )
 
     @property
@@ -1304,7 +1304,7 @@ class RevisionInContext(object):
         content = content_api.get_one(
             content_id=self.revision.content_id, content_type=content_type_list.Any_SLUG
         )
-        if content.revision_id == self.revision_id:
+        if content.cached_revision_id == self.revision_id:
             return content_api.is_editable(content)
         # INFO - G.M - 2018-11-02 - old revision are not editable
         return False

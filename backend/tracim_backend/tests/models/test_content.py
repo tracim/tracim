@@ -261,7 +261,7 @@ class TestContent(object):
         session.flush()
         assert [type(child) == Content for child in parent_folder.children]
         assert [child.revision_id for child in parent_folder.children] == [
-            children_folder.revision_id
+            children_folder.cached_revision_id
         ]
 
         with new_revision(session=session, tm=transaction.manager, content=children_folder):

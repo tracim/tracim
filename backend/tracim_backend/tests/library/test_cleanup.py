@@ -297,7 +297,7 @@ class TestCleanupLib(object):
                 UploadPermission.upload_permission_id == upload_permission_id
             ).one()
 
-    def test_unit__delete_revision__ok__nominal_case(
+    def test_unit__delete_revision__ok__delete_last_revision(
         self,
         admin_user,
         session,
@@ -393,6 +393,105 @@ class TestCleanupLib(object):
             assert (
                 session.query(RevisionReadStatus)
                 .filter(RevisionReadStatus.revision_id == second_revision_id)
+                .one()
+            )
+
+    def test_unit__delete_revision__ok__delete_older_revision(
+        self,
+        admin_user,
+        session,
+        app_config,
+        content_type_list,
+        content_api_factory,
+        workspace_api_factory,
+        share_lib_factory,
+        upload_permission_lib_factory,
+    ) -> None:
+
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True
+        )
+        workspace_api = workspace_api_factory.get()
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        folder = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        file_ = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            parent=folder,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=file_):
+            content_api.update_file_data(
+                file_, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.mark_read(file_)
+        file_id = file_.content_id
+        revisions = file_.revisions
+        session.flush()
+        transaction.commit()
+        assert len(revisions) == 2
+        first_revision_id = revisions[0].revision_id
+        second_revision_id = revisions[1].revision_id
+        content = content_api.get_one(file_id, content_type=content_type_list.Any_SLUG)
+        assert content
+        assert content.revision.revision_id == second_revision_id
+        assert (
+            session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.revision_id == first_revision_id)
+            .one()
+        )
+        assert (
+            session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.revision_id == second_revision_id)
+            .one()
+        )
+        assert (
+            session.query(RevisionReadStatus)
+            .filter(RevisionReadStatus.revision_id == first_revision_id)
+            .one()
+        )
+        assert (
+            session.query(RevisionReadStatus)
+            .filter(RevisionReadStatus.revision_id == second_revision_id)
+            .one()
+        )
+
+        with unprotected_content_revision(session) as unprotected_session:
+            cleanup_lib = CleanupLib(app_config=app_config, session=unprotected_session)
+            cleanup_lib.delete_revision(revision=revisions[0])
+            session.flush()
+        transaction.commit()
+        assert content
+        assert content.revision.revision_id == second_revision_id
+        assert (
+            session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.revision_id == second_revision_id)
+            .one()
+        )
+        with pytest.raises(NoResultFound):
+            assert (
+                session.query(ContentRevisionRO)
+                .filter(ContentRevisionRO.revision_id == first_revision_id)
+                .one()
+            )
+        assert (
+            session.query(RevisionReadStatus)
+            .filter(RevisionReadStatus.revision_id == second_revision_id)
+            .one()
+        )
+        with pytest.raises(NoResultFound):
+            assert (
+                session.query(RevisionReadStatus)
+                .filter(RevisionReadStatus.revision_id == first_revision_id)
                 .one()
             )
 

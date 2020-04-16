@@ -216,7 +216,7 @@ class ContentApi(object):
         """
         return (
             self._session.query(Content)
-            .join(ContentRevisionRO, Content.revision_id == ContentRevisionRO.revision_id)
+            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
             .options(contains_eager(Content.current_revision))
         )
 
@@ -845,7 +845,7 @@ class ContentApi(object):
 
         # Return the content
         try:
-            return content_query.order_by(Content.revision_id.desc()).one()
+            return content_query.order_by(Content.cached_revision_id.desc()).one()
         except NoResultFound as exc:
             raise ContentNotFound(
                 'Content "{}" not found in database'.format(content_label)
@@ -883,7 +883,7 @@ class ContentApi(object):
 
             # Get thirst corresponding folder
             try:
-                folder = folder_query.order_by(Content.revision_id.desc()).one()
+                folder = folder_query.order_by(Content.cached_revision_id.desc()).one()
             except NoResultFound:
                 raise ContentNotFound("Folder not found")
 
@@ -1270,7 +1270,7 @@ class ContentApi(object):
             .outerjoin(
                 RevisionReadStatus,
                 and_(
-                    RevisionReadStatus.revision_id == Content.revision_id,
+                    RevisionReadStatus.revision_id == Content.cached_revision_id,
                     RevisionReadStatus.user_id == self._user_id,
                 ),
             )
@@ -2060,7 +2060,7 @@ class ContentApi(object):
             .outerjoin(
                 RevisionReadStatus,
                 and_(
-                    RevisionReadStatus.revision_id == Content.revision_id,
+                    RevisionReadStatus.revision_id == Content.cached_revision_id,
                     RevisionReadStatus.user_id == self._user_id,
                 ),
             )

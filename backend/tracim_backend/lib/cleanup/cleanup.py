@@ -2,6 +2,7 @@ import shutil
 import typing
 import uuid
 
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from tracim_backend.applications.share.models import ContentShare
@@ -81,12 +82,30 @@ class CleanupLib(object):
         else:
             logger.debug(self, "fake deletion of {} dir".format(dir_path))
 
-    def delete_revision(self, revision: ContentRevisionRO) -> int:
+    def delete_revision(
+        self, revision: ContentRevisionRO, do_update_content_last_revision: bool = True
+    ) -> int:
         """
 
         :param revision: revision to delete
         :return: revision_id of revision to delete
         """
+
+        if do_update_content_last_revision and revision.node.revision_id == revision.revision_id:
+            new_last_revision = (
+                self.session.query(ContentRevisionRO)
+                .filter(
+                    and_(
+                        ContentRevisionRO.content_id == revision.node.id,
+                        ContentRevisionRO.revision_id != revision.revision_id,
+                    )
+                )
+                .order_by(ContentRevisionRO.revision_id.desc())
+                .limit(1)
+                .one()
+            )
+            revision.node.current_revision = new_last_revision
+            self.safe_update(revision.node)
 
         # INFO - G.M - 2019-12-11 - delete revision read status
         read_statuses = self.session.query(RevisionReadStatus).filter(
@@ -136,10 +155,11 @@ class CleanupLib(object):
             for children in content.get_children(recursively=recursively):
                 self.delete_content(children)
 
-        content.revision_id = None
+        content.cached_revision_id = None
         for revision in content.revisions:
-            deleted_contents.append(self.delete_revision(revision))
-
+            deleted_contents.append(
+                self.delete_revision(revision, do_update_content_last_revision=False)
+            )
         logger.info(self, "delete content {}".format(content.content_id))
         deleted_contents.append(content.content_id)
         self.safe_delete(content)
