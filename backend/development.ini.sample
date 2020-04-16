@@ -82,7 +82,7 @@ basic_setup.session_secret = change_this_value_please!
 
 ## Anonymized User
 # You can set default display name for anonymized user.
-default_anonymized_user_display_name = "Lost Meerkat"
+; default_anonymized_user_display_name = "Lost Meerkat"
 
 ## Build Version
 # If you leave build_version empty or unsetted here, Tracim will automatically
@@ -129,7 +129,7 @@ sqlalchemy.url = %(basic_setup.sqlalchemy_url)s
 
 ### File Depot ###
 ## file depot name
-depot_storage_name = tracim
+; depot_storage_name = tracim
 ## This is where none database file will be stored
 depot_storage_dir = %(basic_setup.depot_storage_dir)s
 
@@ -199,12 +199,12 @@ api.key = %(basic_setup.api_key)s
 ## set remote_user_header.
 ## remote user auth is disabled by default,
 ## you should set a not-null value to auth_remote_header to active it:
-remote_user_header =
+; remote_user_header =
 
 ## Auth type list (internal or ldap), can be a list of item separated by ','
 ## and ordered by priority
 ## auth_type 'remote' is not allowed there, set remote_auth_header.
-auth_types = internal
+; auth_types = internal
 # If auth_type is ldap, uncomment following ldap_* parameters
 ## LDAP server address
 ; ldap_url = ldap://localhost:389
@@ -222,9 +222,9 @@ auth_types = internal
 ; ldap_tls = False
 
 ## User auth token validity in seconds (used to interfaces like web calendars)
-user.auth_token.validity = 604800
+; user.auth_token.validity = 604800
 ## user reset_password token lifetime (default to 900s -> 15 minutes)
-user.reset_password.token_lifetime = 900
+; user.reset_password.token_lifetime = 900
 ## Default profile of created user, valid values are users, trusted-users, administrators
 ; user.default_profile = users
 
@@ -248,7 +248,7 @@ website.base_url = %(basic_setup.website_base_url)s
 
 ### Frontend ###
 ## if you want to use Tracim API without frontend, change this parameter to False
-frontend.serve = True
+; frontend.serve = True
 # You can set dist folder of Tracim frontend. by default, system
 # will try to get it automatically according to Tracim repository
 # organisation.
@@ -279,21 +279,21 @@ frontend.serve = True
 # webdav url for client
 # url can be extended like localhost/webdav by setting webdav.root_path parameter
 # in this case, you have to create your own proxy behind this url.
-webdav.base_url = http://localhost:3030
-webdav.ui.enabled = True
+; webdav.base_url = http://localhost:3030
+; webdav.ui.enabled = True
 
 ####
 # EMAIL-COMMON
 ####
 
 ## shortcut for template_dir path
-email.template_dir = %(here)s/tracim_backend/templates/mail
+; email.template_dir = %(here)s/tracim_backend/templates/mail
 
 ### Email sending configuration ###
 # processing_mode may be sync or async,
 # if async is choosen, you need also to run mail_notifier daemon
 # see README for more info.
-email.processing_mode = sync
+; email.processing_mode = sync
 ## with async, please also configure redis below
 ; email.async.redis.host = localhost
 ; email.async.redis.port = 6379
@@ -304,7 +304,7 @@ email.processing_mode = sync
 ####
 
 ## available choice: True or False
-email.notification.activated = False
+; email.notification.activated = False
 ## you can enable or disable if invited user to shared space will be notified
 ## on this shared space by default (default: True).
 ## NB: new users will not being notified until they login to Tracim a first time
@@ -323,7 +323,7 @@ email.notification.activated = False
 ; email.notification.smtp.use_implicit_ssl = false
 
 ### Headers ###
-email.notification.from.default_label = Tracim Notifications
+; email.notification.from.default_label = Tracim Notifications
 
 # Note: items between { and } are variable names. Do not remove / rename them
 # email notifications can be sent with the user_id added as an identifier
@@ -355,22 +355,22 @@ email.notification.from.default_label = Tracim Notifications
 # be a email like string.
 ## valid variable is 'content_id' for 'references' header
 ; email.notification.references.email = thread+{content_id}@trac.im
-email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
-email.notification.created_account.subject = [{website_title}] Someone created an account for you
-email.notification.share_content_to_emitter.subject = [{website_title}] You shared "{content_filename}" with {nb_receivers} people
-email.notification.share_content_to_receiver.subject = [{website_title}] {emitter_name} shared the file "{content_filename}" with you
-email.notification.upload_permission_to_emitter.subject = [{website_title}] You invited {nb_receivers} people to upload files on "{workspace_name}"
-email.notification.upload_permission_to_receiver.subject = {emitter_name} invited you to upload files on "{website_title}"
+; email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
+; email.notification.created_account.subject = [{website_title}] Someone created an account for you
+; email.notification.share_content_to_emitter.subject = [{website_title}] You shared "{content_filename}" with {nb_receivers} people
+; email.notification.share_content_to_receiver.subject = [{website_title}] {emitter_name} shared the file "{content_filename}" with you
+; email.notification.upload_permission_to_emitter.subject = [{website_title}] You invited {nb_receivers} people to upload files on "{workspace_name}"
+; email.notification.upload_permission_to_receiver.subject = {emitter_name} invited you to upload files on "{website_title}"
 
 ### Templates ###
-email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
-email.notification.created_account.template.html = %(email.template_dir)s/created_account_body_html.mak
-email.notification.reset_password_request.template.html = %(email.template_dir)s/reset_password_body_html.mak
-email.notification.share_content_to_emitter.template.html = %(email.template_dir)s/shared_content_to_emitter_body_html.mak
-email.notification.share_content_to_receiver.template.html = %(email.template_dir)s/shared_content_to_receiver_body_html.mak
-email.notification.upload_permission_to_emitter.template.html = %(email.template_dir)s/upload_permission_to_emitter_body_html.mak
-email.notification.upload_permission_to_receiver.template.html = %(email.template_dir)s/upload_permission_to_receiver_body_html.mak
-email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak
+; email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
+; email.notification.created_account.template.html = %(email.template_dir)s/created_account_body_html.mak
+; email.notification.reset_password_request.template.html = %(email.template_dir)s/reset_password_body_html.mak
+; email.notification.share_content_to_emitter.template.html = %(email.template_dir)s/shared_content_to_emitter_body_html.mak
+; email.notification.share_content_to_receiver.template.html = %(email.template_dir)s/shared_content_to_receiver_body_html.mak
+; email.notification.upload_permission_to_emitter.template.html = %(email.template_dir)s/upload_permission_to_emitter_body_html.mak
+; email.notification.upload_permission_to_receiver.template.html = %(email.template_dir)s/upload_permission_to_receiver_body_html.mak
+; email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak
 
 ####
 # EMAIL-REPLY
@@ -383,7 +383,7 @@ email.notification.new_upload_event.template.html = %(email.template_dir)s/new_u
 # This feature need to run mail_fetcher daemons.
 # more info in README (Run daemons according to your config)
 ## available choice: True or False
-email.reply.activated = False
+; email.reply.activated = False
 
 ### IMAP ###
 # Tracim email reply feature will read all mails in following IMAP,
@@ -392,26 +392,26 @@ email.reply.activated = False
 ; email.reply.imap.port = 993
 ; email.reply.imap.user = your_imap_user
 ; email.reply.imap.password = your_imap_password
-email.reply.imap.folder = INBOX
-email.reply.imap.use_ssl = True
+; email.reply.imap.folder = INBOX
+; email.reply.imap.use_ssl = True
 # IMAP IDLE feature is for real-time notifications (its not necessary to use function send & receive)
 # if this option is available in your imap server, change this parameter to True
-email.reply.imap.use_idle = False
+; email.reply.imap.use_idle = False
 
 ### Connection ###
 ## Delay in seconds for re-new connection
-email.reply.connection.max_lifetime = 600
+; email.reply.connection.max_lifetime = 600
 ## Delay in seconds between each check
-email.reply.check.heartbeat = 60
+; email.reply.check.heartbeat = 60
 
 ### Parsing ###
-email.reply.use_html_parsing = True
-email.reply.use_txt_parsing = True
+; email.reply.use_html_parsing = True
+; email.reply.use_txt_parsing = True
 
 ### Lock ###
 # Lockfile path is required for email_reply feature,
 # it's just an empty file use to prevent concurrent access to imap unseen mail
-email.reply.lockfile_path = %(here)s/email_fetcher.lock
+; email.reply.lockfile_path = %(here)s/email_fetcher.lock
 
 ####
 # WEBDAV
@@ -423,7 +423,7 @@ webdav.listen = localhost:3030
 ## default root of webdav service ( default : / )
 ## this params need to be modified in case of using webdav with proxy
 ## if you want for example that path /webdav give access to webdav
-;webdav.root_path = /
+; webdav.root_path = /
 
 ### Technical Webdav configuration ###
 ## wsgidav block size in bytes (default: 8192)
@@ -484,18 +484,18 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # choose search engine to use, available value are: simple, elasticsearch.
 # simple need nothing more than Tracim but features are limited,
 # elasticsearch is more effective but need an elasticsearch server.
-search.engine = simple
+; search.engine = simple
 # elasticsearch configuration
-;search.elasticsearch.host = localhost
-;search.elasticsearch.port = 9200
+; search.elasticsearch.host = localhost
+; search.elasticsearch.port = 9200
 # global elasticsearch timeout in seconds
 ;search.elasticsearch.request_timeout = 60
 # main index alias use to search/index content in elasticsearch
-;search.elasticsearch.index_alias = tracim_contents
+; search.elasticsearch.index_alias = tracim_contents
 # template_name for all index created currently only {index_alias} and {date} variable are usable.
 # be carefull this template is use to find all index to delete with tracimcli search delete command
 # default value is "{index_alias}-{date}"
-;search.elasticsearch.index_pattern_template = {index_alias}-{date}
+; search.elasticsearch.index_pattern_template = {index_alias}-{date}
 # if you use ingest mode in elasticsearch, you can activate file content ingest
 # for search (default as false)
 ; search.elasticsearch.use_ingest = false
@@ -509,7 +509,7 @@ search.engine = simple
 # if file content like a pdf of a content type file is bigger than the limit, it's content will
 # not be indexed using ingest mode.
 # default value to 52428800 = 50Mo
-;search.elasticsearch.ingest.size_limit = 52428800
+; search.elasticsearch.ingest.size_limit = 52428800
 
 
 ####
