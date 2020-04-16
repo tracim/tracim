@@ -170,6 +170,10 @@ class TestContent(object):
         )
         session.add(content)
         session.flush()
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content.description = "TEST_CONTENT_DESCRIPTION_1_UPDATED"
+        session.add(content)
+        session.flush()
         session.delete(content.revisions[0])
         # Raise ContentRevisionDeleteError because revision can't be deleted
         with pytest.raises(ContentRevisionDeleteError):
@@ -193,6 +197,10 @@ class TestContent(object):
                 is_deleted=False,
                 is_archived=False,
             )
+            unsafe_session.add(content)
+            unsafe_session.flush()
+            with new_revision(session=unsafe_session, tm=transaction.manager, content=content):
+                content.description = "TEST_CONTENT_DESCRIPTION_1_UPDATED"
             unsafe_session.add(content)
             unsafe_session.flush()
             unsafe_session.delete(content.revisions[0])
