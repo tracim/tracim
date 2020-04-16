@@ -533,3 +533,7 @@ class ConflictingMoveInItself(TracimException):
 
 class ConflictingMoveInChild(TracimException):
     error_code = ErrorCode.CONFLICTING_MOVE_IN_CHILD
+
+
+class CannotDeleteUniqueRevisionWithoutDeletingContent(Exception):
+    pass
