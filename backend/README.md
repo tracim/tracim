@@ -69,18 +69,18 @@ Install the project in editable mode with its develop requirements:
 
     pip install -e ".[dev]"
 
-If you want to use PostgreSQL, MySQL or other database engines
-than the default one (SQLite), you need to install python driver for those databases
+If you want to use PostgreSQL, MySQL(8.0.1+) or MariaDB(10.3+) database engine instead of
+the default one (SQLite), you need to install python driver for those databases
 that are supported by SQLAlchemy.
 
-For PostgreSQL and MySQL, those are shortcuts to install Tracim with test and
+For PostgreSQL and MariaDB/MySQL, those are shortcuts to install Tracim with test and
 specific driver.
 
 For PostgreSQL:
 
     pip install -e ".[dev,postgresql]"
 
-For mySQL:
+For MySQL/MariaDB:
 
     pip install -e ".[dev,mysql]"
 

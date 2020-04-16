@@ -65,32 +65,18 @@ _install_backend: &_install_backend
         docker run -d -p 5432:5432 --name postgres -e POSTGRES_DB=tracim_test -e POSTGRES_USER=user -e POSTGRES_PASSWORD=secret postgres:9.3
         pip install -e ".[postgresql,testing]"
       fi
-    # mysql 8+ (support for recursive CTE)
+    # mysql 8+
     - |
       if [ "${DB}" == "mysql" ]; then
         docker pull mysql:8.0
         docker run -d -p 3306:3306 --name mysqld -e MYSQL_DATABASE=tracim_test -e MYSQL_USER=user -e MYSQL_PASSWORD=secret -e MYSQL_RANDOM_ROOT_PASSWORD=true mysql:8.0
         pip install -e ".[mysql,testing]"
       fi
-    # mysql 5.6 (no support for recursive CTE)
-    - |
-      if [ "${DB}" == "mysql-old" ]; then
-        docker pull mysql:5.6
-        docker run -d -p 3306:3306 --name mysqld -e MYSQL_DATABASE=tracim_test -e MYSQL_USER=user -e MYSQL_PASSWORD=secret -e MYSQL_RANDOM_ROOT_PASSWORD=true mysql:5.6
-        pip install -e ".[mysql,testing]"
-      fi
-    # mariadb 10.3 (support for recursive CTE)
+    # mariadb 10.3
     - |
       if [ "${DB}" == "mariadb" ]; then
         docker pull mariadb/server:10.3
         docker run -d -p 3306:3306 --name mariadbd -e MARIADB_DATABASE=tracim_test -e MARIADB_USER=user -e MARIADB_PASSWORD=secret -e MARIADB_RANDOM_ROOT_PASSWORD=true mariadb/server:10.3
-        pip install -e ".[mysql,testing]"
-      fi
-    # mariadb 10.1 (no support for recursive CTE)
-    - |
-      if [ "${DB}" == "mariadb-old" ]; then
-        docker pull mariadb/server:10.1
-        docker run -d -p 3306:3306 --name mariadbd -e MARIADB_DATABASE=tracim_test -e MARIADB_USER=user -e MARIADB_PASSWORD=secret -e MARIADB_RANDOM_ROOT_PASSWORD=true mariadb/server:10.1
         pip install -e ".[mysql,testing]"
       fi
     # sqlite
@@ -227,19 +213,7 @@ jobs:
     - stage: backend
       <<: *_backend_test
       env:
-        - DB=mysql-old
-        - TRACIM_SQLALCHEMY__URL=$DEFAULT_MYSQL_SQLALCHEMY__URL
-      if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: backend
-      <<: *_backend_test
-      env:
         - DB=mariadb
-        - TRACIM_SQLALCHEMY__URL=$DEFAULT_MYSQL_SQLALCHEMY__URL
-      if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: backend
-      <<: *_backend_test
-      env:
-        - DB=mariadb-old
         - TRACIM_SQLALCHEMY__URL=$DEFAULT_MYSQL_SQLALCHEMY__URL
       if: commit_message !~ /(\[skip ci pytest\])/
     # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###

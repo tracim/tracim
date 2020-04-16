@@ -19,14 +19,14 @@ def rename_boolean_column(
     """
     Utils to help rename a boolean column supporting:
     - postgresql
-    - mysql 8.0+
+    - mysql 8.0.1+
     - mariadb 10.3+
     - sqlite
     """
     with op.batch_alter_table(table_name) as bop:
         dialect = op.get_context().dialect
         if dialect.name == "mysql":
-            if not dialect._is_mariadb and dialect.server_version_info >= (8, 0, 0):
+            if not dialect._is_mariadb:
                 bop.drop_constraint(constraint_name, type_="check")
             bop.alter_column(
                 old_column_name,

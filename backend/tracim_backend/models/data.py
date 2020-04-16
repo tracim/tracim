@@ -44,7 +44,6 @@ from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import get_locale
-from tracim_backend.lib.utils.utils import can_handle_cte_query
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.roles import WorkspaceRoles
@@ -1232,20 +1231,6 @@ class Content(DeclarativeBase):
 
     @property
     def recursive_children(self) -> ["Content"]:
-        if can_handle_cte_query(object_session(self)):
-            return self.recursive_children_cte
-        else:
-            return self.recursive_children_slow
-
-    @property
-    def recursive_children_slow(self) -> ["Content"]:
-        recursive_children = self.children.all()
-        for child in self.children:
-            recursive_children.extend(child.recursive_children_slow)
-        return recursive_children
-
-    @property
-    def recursive_children_cte(self) -> ["Content"]:
         """
         :return: list of children Content
         :rtype Content

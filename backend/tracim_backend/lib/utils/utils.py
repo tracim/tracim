@@ -20,7 +20,6 @@ from git import InvalidGitRepositoryError
 import pytz
 from redis import Redis
 from rq import Queue
-from sqlalchemy.orm import Session
 
 from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableDirectory
@@ -516,23 +515,3 @@ def get_build_version(path: str) -> str:
     except StopIteration:
         # INFO - G.M - 2020-01-13 - return the 10 first letter of current commit hash
         return repo.head.object.hexsha[:10]
-
-
-def can_handle_cte_query(session: Session):
-    dialect = session.bind.dialect
-    # INFO - G.M - 2020-03-30 - sqlite and postgresql version that do not support cte and cte
-    # recursive are very old (support begin in 3.8.3 for sqlite and 8.4 for postgresql), so we
-    # will not support very old database.
-    if dialect.name in ("postgresql", "sqlite"):
-        return True
-    # INFO - G.M - 2020-03-30 - Support for both modern and older version of mariadb/mysql
-    if dialect.name == "mysql":
-        if "MariaDB" in dialect.server_version_info:
-            if dialect._mariadb_normalized_version_info >= (10, 2, 2):
-                return True
-        else:
-            if dialect.server_version_info >= (8, 0, 1):
-                return True
-        return False
-    else:
-        return False
