@@ -4,6 +4,7 @@ from pyramid.scripting import AppEnvironment
 
 from tracim_backend.command import AppContextCommand
 from tracim_backend.config import CFG
+from tracim_backend.config import ConfigParam
 
 
 class ParametersListCommand(AppContextCommand):
@@ -36,7 +37,7 @@ class ParametersListCommand(AppContextCommand):
                 env_var_name="<env_var_name>",
             )
         )
-        for config in self._app_config.config_naming:
+        for config in self._app_config.config_info:
             print(
                 parsed_args.template.format(
                     config_name=config.config_name,
@@ -57,20 +58,28 @@ class ParametersValueCommand(AppContextCommand):
             "--name",
             help="parameter name: env_var_name,config_file_name and config_name syntax allowed",
             dest="parameter_name",
-            required=True,
+            required=False,
         )
         parser.add_argument(
             "--template",
             help="template used for parameters value print, not compatible with raw mode",
             dest="template",
             required=False,
-            default="|{config_name: <30}| {value: <50}|",
+            default="|{config_name: <}| {config_value: <50}|",
         )
         parser.add_argument(
             "-r",
             "--raw-mode",
             help="return only parameter name",
             dest="raw",
+            default=False,
+            action="store_true",
+        )
+        parser.add_argument(
+            "-f",
+            "--full-information_mode",
+            help="return most information possible, replace default template",
+            dest="full",
             default=False,
             action="store_true",
         )
@@ -81,19 +90,47 @@ class ParametersValueCommand(AppContextCommand):
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]  # type: CFG
-        for config in self._app_config.config_naming:
-            if parsed_args.parameter_name in [
-                config.config_name,
-                config.config_file_name,
-                config.env_var_name,
-            ]:
-                config_value = str(getattr(self._app_config, config.config_name))
-                if parsed_args.raw:
-                    print(config_value, end="")
-                else:
-                    print(parsed_args.template.format(config_name="<config_name>", value="<value>"))
-                    print(
-                        parsed_args.template.format(
-                            config_name=config.config_name, value=config_value
-                        )
-                    )
+        if parsed_args.full:
+            parsed_args.template = "|{config_name}|{config_value}|{default_value}|{secret}|{config_source}|{config_file_name}|{config_file_value}|{config_env_var_name}|{config_env_var_value}|"
+        if not parsed_args.raw:
+            print(
+                parsed_args.template.format(
+                    config_name="<config_name>",
+                    config_value="<config_value>",
+                    default_value="<default_value>",
+                    secret="<secret>",
+                    config_source="<config_source>",
+                    config_file_name="<config_file_name>",
+                    config_file_value="<config_file_value>",
+                    config_env_var_name="<config_env_var_name>",
+                    config_env_var_value="<config_env_var_value>",
+                )
+            )
+        for config_param in self._app_config.config_info:
+            if parsed_args.parameter_name:
+                if parsed_args.parameter_name in [
+                    config_param.config_name,
+                    config_param.config_file_name,
+                    config_param.env_var_name,
+                ]:
+                    self.print_config_parameter(config_param=config_param, parsed_args=parsed_args)
+            else:
+                self.print_config_parameter(config_param=config_param, parsed_args=parsed_args)
+
+    def print_config_parameter(self, parsed_args: argparse.Namespace, config_param: ConfigParam):
+        if parsed_args.raw:
+            print(config_param.config_value, end="")
+        else:
+            print(
+                parsed_args.template.format(
+                    config_name=config_param.config_name,
+                    config_value=str(config_param.config_value),
+                    default_value=str(config_param.default_value),
+                    secret=str(config_param.secret),
+                    config_source=config_param.config_source,
+                    config_file_name=config_param.config_file_name,
+                    config_file_value=str(config_param.config_file_value),
+                    config_env_var_name=config_param.env_var_name,
+                    config_env_var_value=str(config_param.env_var_value),
+                )
+            )

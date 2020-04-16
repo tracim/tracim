@@ -39,10 +39,37 @@ ID_SOURCE_DEFAULT = "SOURCE_DEFAULT"
 
 
 class ConfigParam(object):
-    def __init__(self, config_file_name):
+    def __init__(
+        self,
+        config_file_name: str,
+        secret: bool,
+        default_value: typing.Optional[str],
+        settings: dict,
+    ):
         self.config_file_name = config_file_name
+        self.default_value = default_value
+        self.secret = secret
         self.config_name = self._get_associated_config_name(config_file_name)
         self.env_var_name = self._get_associated_env_var_name(self.config_name)
+        self.config_file_value = settings.get(self.config_file_name)
+        self.env_var_value = os.environ.get(self.env_var_name)
+
+        if self.env_var_value:
+            self._config_value = self.env_var_value
+            self.config_source = ID_SOURCE_ENV_VAR
+            self.config_name_source = self.env_var_name
+        elif self.config_file_value:
+            self._config_value = self.config_file_value
+            self.config_source = ID_SOURCE_CONFIG
+            self.config_name_source = self.config_file_name
+        else:
+            self._config_value = self.default_value
+            self.config_source = ID_SOURCE_DEFAULT
+            self.config_name_source = None
+
+    @property
+    def config_value(self):
+        return self._get_printed_val_value(value=self._config_value, secret=self.secret)
 
     def _get_associated_env_var_name(self, config_name: str) -> str:
         """
@@ -60,6 +87,12 @@ class ConfigParam(object):
         """
         return config_name.replace(".", "__").replace("-", "_").upper()
 
+    def _get_printed_val_value(self, value: str, secret: bool) -> str:
+        if secret:
+            return "<value not shown>"
+        else:
+            return value
+
 
 class CFG(object):
     """Object used for easy access to config file parameters."""
@@ -69,7 +102,7 @@ class CFG(object):
         # to avoid issue when serializing CFG object. settings dict is completed
         # with object in some context
         self.settings = settings.copy()
-        self.config_naming = []  # type: typing.List[ConfigParam]
+        self.config_info = []  # type: typing.List[ConfigParam]
         logger.debug(self, "CONFIG_PROCESS:1: load enabled apps")
         self.load_enabled_apps()
         logger.debug(self, "CONFIG_PROCESS:3: load config from settings")
@@ -89,12 +122,6 @@ class CFG(object):
             )
 
     # INFO - G.M - 2019-04-05 - Utils Methods
-
-    def _get_printed_val_value(self, value: str, secret: bool) -> str:
-        if secret:
-            return "<value not shown>"
-        else:
-            return value
 
     def deprecate_parameter(
         self, parameter_name: str, parameter_value: typing.Any, extended_information: str
@@ -131,33 +158,23 @@ class CFG(object):
         :param secret: is the value of the parameter secret ? (if true, it will not be printed)
         :return:
         """
-        param = ConfigParam(config_file_name)
-        self.config_naming.append(param)
-        val_cfg = self.settings.get(param.config_file_name)
-        val_env = os.environ.get(param.env_var_name)
-        if val_env:
-            config_value = val_env
-            config_source = ID_SOURCE_ENV_VAR
-            config_name_source = param.env_var_name
-        elif val_cfg:
-            config_value = val_cfg
-            config_source = ID_SOURCE_CONFIG
-            config_name_source = param.config_file_name
-        else:
-            config_value = default_value
-            config_source = ID_SOURCE_DEFAULT
-            config_name_source = None
-
+        param = ConfigParam(
+            config_file_name=config_file_name,
+            secret=secret,
+            default_value=default_value,
+            settings=self.settings,
+        )
+        self.config_info.append(param)
         logger.info(
             self,
             CONFIG_LOG_TEMPLATE.format(
-                config_value=self._get_printed_val_value(config_value, secret),
-                config_source=config_source,
+                config_value=param.config_value,
+                config_source=param.config_source,
                 config_name=param.config_name,
-                config_name_source=config_name_source,
+                config_name_source=param.config_name_source,
             ),
         )
-        return config_value
+        return param.config_value
 
     # INFO - G.M - 2019-04-05 - load of enabled app
     def load_enabled_apps(self) -> None:
@@ -932,7 +949,7 @@ class CFG(object):
         Verify all config_name_attribute are correctly associated with
         a true cfg attribute. Will raise AttributeError if not.
         """
-        for config_param in self.config_naming:
+        for config_param in self.config_info:
             try:
                 getattr(self, config_param.config_name)
             except AttributeError:
