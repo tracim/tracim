@@ -19,7 +19,7 @@ export class Avatar extends React.Component {
   }
 
   getTwoLetter = name => {
-    const trimedName = name.trimLeft()
+    const trimedName = name.trim()
     const splitSpace = trimedName.split(' ')
     if (splitSpace.length >= 2) return `${splitSpace[0].substr(0, 1)}${splitSpace[1].substr(0, 1)}`
 
