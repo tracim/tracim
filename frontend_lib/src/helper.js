@@ -6,7 +6,8 @@ import { CUSTOM_EVENT } from './customEvent.js'
 
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
-  en: require('date-fns/locale/en')
+  en: require('date-fns/locale/en'),
+  pt: require('date-fns/locale/pt')
 }
 
 export const generateFetchResponse = async fetchResult => {

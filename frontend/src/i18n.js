@@ -1,6 +1,6 @@
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
-import { frTranslation, enTranslation } from 'tracim_frontend_lib'
+import { frTranslation, enTranslation, ptTranslation } from 'tracim_frontend_lib'
 import en from '../i18next.scanner/en/translation.json'
 import fr from '../i18next.scanner/fr/translation.json'
 import pt from '../i18next.scanner/pt/translation.json'
