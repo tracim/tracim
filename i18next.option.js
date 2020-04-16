@@ -5,7 +5,7 @@ module.exports = {
     list: ['t', 'props.t', 'this.props.t', 'i18n.t'],
     extensions: ['.js', '.jsx']
   },
-  lngs: ['en', 'fr'],
+  lngs: ['en', 'fr', 'pt'],
   defaultLng: 'en',
   keySeparator: false, // false means "keyBasedFallback"
   nsSeparator: false, // false means "keyBasedFallback"

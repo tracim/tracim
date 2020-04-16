@@ -78,7 +78,6 @@
   "Member List": "Member List",
   "Add a member": "Add a member",
   "Implement Tracim in your explorer": "Implement Tracim in your explorer",
-  "Find all your documents deposited online directly on your computer via the workstation, without going through the software.": "Find all your documents deposited online directly on your computer via the workstation, without going through the software.",
   "Shared space calendar": "Shared space calendar",
   "Each shared space has its own calendar.": "Each shared space has its own calendar.",
   "Recent activity": "Recent activity",
@@ -102,7 +101,6 @@
   "Users": "Users",
   "My Account": "My Account",
   "Logout": "Logout",
-  "Archive Topic": "Archive Topic",
   "Deleted File": "Deleted File",
   "Search…": "Search…",
   "Welcome to Tracim": "Welcome to Tracim",
@@ -202,7 +200,6 @@
   "{{userName}} shared with you the file {{fileName}}": "{{userName}} shared with you the file {{fileName}}",
   "The person who sent you this file protected it with a password. If you do not know the password, please contact her.": "The person who sent you this file protected it with a password. If you do not know the password, please contact her.",
   "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.",
-  "You have not yet chosen any files to upload.": "You have not yet chosen any files to upload.",
   "Send": "Send",
   "Your interlocutor has been notified of your upload. You can close this window.": "Your interlocutor has been notified of your upload. You can close this window.",
   "Error in the URL": "Error in the URL",
@@ -238,5 +235,7 @@
   "User administration": "User administration",
   "Forgotten password": "Forgotten password",
   "Public upload": "Public upload",
-  "Password reset": "Password reset"
+  "Password reset": "Password reset",
+  "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Find all your documents put online directly on your computer via the workstation, without going through the software.",
+  "Archived Topic": "Archived Topic"
 }
