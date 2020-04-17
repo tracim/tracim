@@ -489,7 +489,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ; search.elasticsearch.host = localhost
 ; search.elasticsearch.port = 9200
 # global elasticsearch timeout in seconds
-;search.elasticsearch.request_timeout = 60
+; search.elasticsearch.request_timeout = 60
 # main index alias use to search/index content in elasticsearch
 ; search.elasticsearch.index_alias = tracim_contents
 # template_name for all index created currently only {index_alias} and {date} variable are usable.
