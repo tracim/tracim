@@ -71,6 +71,10 @@ class ConfigParam(object):
     def config_value(self):
         return self._get_printed_val_value(value=self._config_value, secret=self.secret)
 
+    @property
+    def real_config_value(self):
+        return self._config_value
+
     def _get_associated_env_var_name(self, config_name: str) -> str:
         """
         Get associated env var name of any config_name.
@@ -174,7 +178,7 @@ class CFG(object):
                 config_name_source=param.config_name_source,
             ),
         )
-        return param.config_value
+        return param.real_config_value
 
     # INFO - G.M - 2019-04-05 - load of enabled app
     def load_enabled_apps(self) -> None:
