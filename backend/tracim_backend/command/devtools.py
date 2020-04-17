@@ -83,6 +83,20 @@ class ParametersValueCommand(AppContextCommand):
             default=False,
             action="store_true",
         )
+        parser.add_argument(
+            "--show-deprecated",
+            help="return also deprecated parameters",
+            dest="show_deprecated",
+            default=False,
+            action="store_true",
+        )
+        parser.add_argument(
+            "--show-secret",
+            help="return secret value",
+            dest="show_secret",
+            default=False,
+            action="store_true",
+        )
         return parser
 
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
@@ -91,7 +105,7 @@ class ParametersValueCommand(AppContextCommand):
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]  # type: CFG
         if parsed_args.full:
-            parsed_args.template = "|{config_name}|{config_value}|{default_value}|{secret}|{config_source}|{config_file_name}|{config_file_value}|{config_env_var_name}|{config_env_var_value}|"
+            parsed_args.template = "|{config_name}|{config_value}|{default_value}|{secret}|{config_source}|{config_file_name}|{config_file_value}|{config_env_var_name}|{config_env_var_value}|{deprecated}|"
         if not parsed_args.raw:
             print(
                 parsed_args.template.format(
@@ -104,9 +118,15 @@ class ParametersValueCommand(AppContextCommand):
                     config_file_value="<config_file_value>",
                     config_env_var_name="<config_env_var_name>",
                     config_env_var_value="<config_env_var_value>",
+                    deprecated="<deprecated>",
                 )
             )
         for config_param in self._app_config.config_info:
+            # INFO - G.M - 2020-04-17 - filter deprecated parameters
+            if config_param.deprecated and not parsed_args.show_deprecated:
+                continue
+            if parsed_args.show_secret:
+                config_param.show_secret = True
             if parsed_args.parameter_name:
                 if parsed_args.parameter_name in [
                     config_param.config_name,
@@ -132,5 +152,6 @@ class ParametersValueCommand(AppContextCommand):
                     config_file_value=str(config_param.config_file_value),
                     config_env_var_name=config_param.env_var_name,
                     config_env_var_value=str(config_param.env_var_value),
+                    deprecated=config_param.deprecated,
                 )
             )

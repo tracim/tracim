@@ -44,22 +44,34 @@ class ConfigParam(object):
         config_file_name: str,
         secret: bool,
         default_value: typing.Optional[str],
-        settings: dict,
+        settings: typing.Dict[str, str],
+        deprecated: bool,
+        deprecated_extended_information: str,
     ):
+        """
+        :param config_file_name: name of the parameter in config file
+        :param secret: is the parameter secret
+        :param default_value: default value in code for parameter
+        :param settings: settings dict of config file
+        :param deprecated: is the parameter deprecated
+        :param deprecated_extended_information: more information about deprecation.
+        """
         self.config_file_name = config_file_name
         self.default_value = default_value
         self.secret = secret
         self.config_name = self._get_associated_config_name(config_file_name)
         self.env_var_name = self._get_associated_env_var_name(self.config_name)
-        self.config_file_value = settings.get(self.config_file_name)
-        self.env_var_value = os.environ.get(self.env_var_name)
-
-        if self.env_var_value:
-            self._config_value = self.env_var_value
+        self._config_file_value = settings.get(self.config_file_name)
+        self._env_var_value = os.environ.get(self.env_var_name)
+        self.deprecated = deprecated
+        self.deprecated_extended_information = deprecated_extended_information
+        self.show_secret = False
+        if self._env_var_value:
+            self._config_value = self._env_var_value
             self.config_source = ID_SOURCE_ENV_VAR
             self.config_name_source = self.env_var_name
-        elif self.config_file_value:
-            self._config_value = self.config_file_value
+        elif self._config_file_value:
+            self._config_value = self._config_file_value
             self.config_source = ID_SOURCE_CONFIG
             self.config_name_source = self.config_file_name
         else:
@@ -68,8 +80,16 @@ class ConfigParam(object):
             self.config_name_source = None
 
     @property
+    def config_file_value(self):
+        return self._get_protected_value(value=self._config_file_value, secret=self.secret)
+
+    @property
+    def env_var_value(self):
+        return self._get_protected_value(value=self._env_var_value, secret=self.secret)
+
+    @property
     def config_value(self):
-        return self._get_printed_val_value(value=self._config_value, secret=self.secret)
+        return self._get_protected_value(value=self._config_value, secret=self.secret)
 
     @property
     def real_config_value(self):
@@ -91,8 +111,8 @@ class ConfigParam(object):
         """
         return config_name.replace(".", "__").replace("-", "_").upper()
 
-    def _get_printed_val_value(self, value: str, secret: bool) -> str:
-        if secret:
+    def _get_protected_value(self, value: str, secret: bool) -> str:
+        if secret and not self.show_secret and value:
             return "<value not shown>"
         else:
             return value
@@ -137,19 +157,14 @@ class CFG(object):
         :param extended_information: add some more information about deprecation
         :return: None
         """
-        if parameter_value:
-            logger.warning(
-                self,
-                "{parameter_name} parameter is deprecated. {extended_information}".format(
-                    parameter_name=parameter_name, extended_information=extended_information
-                ),
-            )
 
     def get_raw_config(
         self,
         config_file_name: str,
         default_value: typing.Optional[str] = None,
         secret: bool = False,
+        deprecated: bool = False,
+        deprecated_extended_information: str = "",
     ) -> str:
         """
         Get config parameter according to a config name.
@@ -160,6 +175,8 @@ class CFG(object):
         :param config_file_name: name of the config parameter name
         :param default_value: default value if not setted value found
         :param secret: is the value of the parameter secret ? (if true, it will not be printed)
+        :param deprecated: is the parameter deprecated ?
+        :param deprecated_extended_information: some more information about deprecated parameter
         :return:
         """
         param = ConfigParam(
@@ -167,6 +184,8 @@ class CFG(object):
             secret=secret,
             default_value=default_value,
             settings=self.settings,
+            deprecated=deprecated,
+            deprecated_extended_information=deprecated_extended_information,
         )
         self.config_info.append(param)
         logger.info(
@@ -178,6 +197,14 @@ class CFG(object):
                 config_name_source=param.config_name_source,
             ),
         )
+        if param.deprecated and param.config_value:
+            logger.warning(
+                self,
+                "{parameter_name} parameter is deprecated. {extended_information}".format(
+                    parameter_name=param.config_name,
+                    extended_information=param.deprecated_extended_information,
+                ),
+            )
         return param.real_config_value
 
     # INFO - G.M - 2019-04-05 - load of enabled app
@@ -202,19 +229,21 @@ class CFG(object):
         # TODO - G.M - 2020-01-09 - remove this retrocompat code, as
         #  CALDAV__ENABLED and COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
         # should be deprecated.
-        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "False"))
-        self.deprecate_parameter(
-            "CALDAV_ENABLED",
-            self.CALDAV__ENABLED,
-            extended_information="It will not be taken into account.",
+        self.CALDAV__ENABLED = asbool(
+            self.get_raw_config(
+                "caldav.enabled",
+                "False",
+                deprecated=True,
+                deprecated_extended_information="It will not be taken into account.",
+            )
         )
         self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
-            self.get_raw_config("collaborative_document_edition.activated", "False")
-        )
-        self.deprecate_parameter(
-            "COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED",
-            self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
-            extended_information="It will not be taken into account.",
+            self.get_raw_config(
+                "collaborative_document_edition.activated",
+                "False",
+                deprecated=True,
+                deprecated_extended_information="It will not be taken into account.",
+            )
         )
         default_enabled_app = default_enabled_app.format(extend_apps=extend_apps)
         self.APP__ENABLED = string_to_unique_item_list(
@@ -368,11 +397,10 @@ class CFG(object):
         # TODO - G.M - 2019-03-14 - retrocompat code,
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         defaut_reset_password_validity = "900"
-        self.USER__RESET_PASSWORD__VALIDITY = self.get_raw_config("user.reset_password.validity")
-        self.deprecate_parameter(
-            "USER__RESET_PASSWORD__VALIDITY",
-            self.USER__RESET_PASSWORD__VALIDITY,
-            extended_information="please use USER__RESET_PASSWORD__TOKEN_LIFETIME instead",
+        self.USER__RESET_PASSWORD__VALIDITY = self.get_raw_config(
+            "user.reset_password.validity",
+            deprecated=True,
+            deprecated_extended_information="please use USER__RESET_PASSWORD__TOKEN_LIFETIME instead",
         )
         if self.USER__RESET_PASSWORD__VALIDITY:
             self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.USER__RESET_PASSWORD__VALIDITY
@@ -473,11 +501,10 @@ class CFG(object):
         ]
 
         self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config("email.notification.from.email")
-        self.EMAIL__NOTIFICATION__FROM = self.get_raw_config("email.notification.from")
-        self.deprecate_parameter(
-            "EMAIL__NOTIFICATION__FROM",
-            self.EMAIL__NOTIFICATION__FROM,
-            extended_information="use instead EMAIL__NOTIFICATION__FROM__EMAIL and EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
+        self.EMAIL__NOTIFICATION__FROM = self.get_raw_config(
+            "email.notification.from",
+            deprecated=True,
+            deprecated_extended_information="use instead EMAIL__NOTIFICATION__FROM__EMAIL and EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
         )
 
         self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL = self.get_raw_config(
