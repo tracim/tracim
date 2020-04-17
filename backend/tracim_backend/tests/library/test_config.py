@@ -7,7 +7,12 @@ from tracim_backend.config import ConfigParam
 class TestConfigParam(object):
     def test_unit__init__config__params(self):
         param = ConfigParam(
-            "user.auth_token.validity", secret=False, default_value=None, settings={}
+            "user.auth_token.validity",
+            secret=False,
+            default_value=None,
+            settings={},
+            deprecated=False,
+            deprecated_extended_information="",
         )
         assert param.config_file_name == "user.auth_token.validity"
         assert param.config_name == "USER__AUTH_TOKEN__VALIDITY"
