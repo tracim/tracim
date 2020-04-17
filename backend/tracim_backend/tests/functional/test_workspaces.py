@@ -7,6 +7,7 @@ import pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -66,7 +67,6 @@ class TestWorkspaceDiskSpaceEndpoint(object):
         self,
         web_testapp,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         role_api_factory,
         application_api_factory,
@@ -79,14 +79,12 @@ class TestWorkspaceDiskSpaceEndpoint(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.USER,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -125,7 +123,6 @@ class TestWorkspaceEndpoint(object):
         self,
         web_testapp,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         role_api_factory,
         application_api_factory,
@@ -136,14 +133,12 @@ class TestWorkspaceEndpoint(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.USER,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -179,7 +174,6 @@ class TestWorkspaceEndpoint(object):
         workspace_api_factory,
         admin_user,
         user_api_factory,
-        group_api_factory,
         application_api_factory,
         web_testapp,
         app_config,
@@ -191,9 +185,8 @@ class TestWorkspaceEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("administrators")]
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        profile = Profile.ADMIN
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
         rapi = role_api_factory.get(current_user=admin2)
         rapi.delete_one(admin_user.user_id, workspace.workspace_id)
         workspace_api = workspace_api_factory.get()
@@ -535,7 +528,7 @@ class TestWorkspaceEndpoint(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__delete_workspace__ok_200__admin(
-        self, web_testapp, user_api_factory, group_api_factory, workspace_api_factory
+        self, web_testapp, user_api_factory, workspace_api_factory
     ) -> None:
         """
         Test delete workspace as admin
@@ -543,14 +536,12 @@ class TestWorkspaceEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.TRUSTED_USER,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -570,12 +561,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is True
 
     def test_api__delete_workspace__ok_200__manager_workspace_manager(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ) -> None:
         """
         Test delete workspace as global manager and workspace manager
@@ -583,14 +569,13 @@ class TestWorkspaceEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -606,12 +591,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is True
 
     def test_api__delete_workspace__err_403__user_workspace_manager(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        role_api_factory,
-        workspace_api_factory,
+        self, web_testapp, user_api_factory, role_api_factory, workspace_api_factory
     ) -> None:
         """
         Test delete workspace as simple user and workspace manager
@@ -619,14 +599,13 @@ class TestWorkspaceEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -696,7 +675,7 @@ class TestWorkspaceEndpoint(object):
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
     def test_api__undelete_workspace__ok_200__admin(
-        self, web_testapp, user_api_factory, group_api_factory, workspace_api_factory
+        self, web_testapp, user_api_factory, workspace_api_factory
     ) -> None:
         """
         Test undelete workspace as admin
@@ -704,14 +683,12 @@ class TestWorkspaceEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.TRUSTED_USER,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -733,12 +710,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is False
 
     def test_api__undelete_workspace__ok_200__manager_workspace_manager(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ) -> None:
         """
         Test undelete workspace as global manager and workspace manager
@@ -746,14 +718,12 @@ class TestWorkspaceEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.TRUSTED_USER,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -770,12 +740,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is False
 
     def test_api__undelete_workspace__err_403__user_workspace_manager(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ) -> None:
         """
         Test undelete workspace as simple user and workspace manager
@@ -783,14 +748,12 @@ class TestWorkspaceEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.USER,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -935,23 +898,19 @@ class TestWorkspacesEndpoints(object):
         assert workspace["label"] == "test3"
         assert workspace["slug"] == "test3"
 
-    def test_api__get_workspaces__err_403__unallowed_user(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__get_workspaces__err_403__unallowed_user(self, user_api_factory, web_testapp):
         """
         Check obtain all workspaces reachables for one user
         with another non-admin user auth.
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.USER,
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -1007,26 +966,18 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["avatar_url"] is None
 
     def test_api__get_workspace_members__ok_200_show_disabled_users(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user,
     ):
         """
             Check obtain workspace members list with also disabled users
         """
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
+            profile=Profile.TRUSTED_USER,
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
@@ -1049,26 +1000,18 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["do_notify"] is False
 
     def test_api__get_workspace_members__ok_200_show_only_enabled_users(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user,
     ):
         """
             Check obtain workspace members list with only enabled users
         """
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.TRUSTED_USER,
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
@@ -1089,13 +1032,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["do_notify"] is True
 
     def test_api__get_workspace_members__ok_200__as_admin(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
         Check obtain workspace members list of a workspace where admin doesn't
@@ -1103,21 +1040,19 @@ class TestWorkspaceMembersEndpoint(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.TRUSTED_USER,
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("administrators")]
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
+        )
         rapi = role_api_factory.get(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         rapi.delete_one(admin_user.user_id, workspace.workspace_id)
@@ -1183,34 +1118,26 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["avatar_url"] is None
 
     def test_api__get_workspace_member__ok_200__as_admin(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
         Check obtain workspace members list with a reachable workspace for user
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.TRUSTED_USER,
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("administrators")]
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
+        )
         rapi = role_api_factory.get(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         rapi.delete_one(admin_user.user_id, workspace.workspace_id)
@@ -1229,27 +1156,19 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["do_notify"] is False
 
     def test_api__get_workspace_member__ok_200__other_user(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        admin_user,
-        web_testapp,
+        self, user_api_factory, workspace_api_factory, role_api_factory, admin_user, web_testapp
     ):
         """
         Check obtain workspace members list with a reachable workspace for user
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.TRUSTED_USER,
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
@@ -1353,13 +1272,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["workspace_id"] == user_role["workspace_id"]
 
     def test_api__create_workspace_members_role_ok_200__user_email_as_admin(
-        self,
-        workspace_api_factory,
-        user_api_factory,
-        group_api_factory,
-        role_api_factory,
-        admin_user,
-        web_testapp,
+        self, workspace_api_factory, user_api_factory, role_api_factory, admin_user, web_testapp
     ):
         """
         Check obtain workspace members list of a workspace where admin doesn't
@@ -1369,9 +1282,9 @@ class TestWorkspaceMembersEndpoint(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("administrators")]
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
+        )
         rapi = role_api_factory.get(current_user=admin2)
         rapi.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
@@ -1405,13 +1318,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["workspace_id"] == user_role["workspace_id"]
 
     def test_api__create_workspace_members_role_ok_200__user_email_as_workspace_manager(
-        self,
-        admin_user,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        web_testapp,
+        self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
         """
         Check obtain workspace members list of a workspace where admin doesn't
@@ -1419,21 +1326,20 @@ class TestWorkspaceMembersEndpoint(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("administrators")]
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
+        )
         rapi = role_api_factory.get(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.delete_one(admin_user.user_id, workspace.workspace_id)
@@ -1674,41 +1580,34 @@ class TestWorkspaceMembersEndpoint(object):
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
 
     def test_api__update_workspace_member_role__ok_200__nominal_case(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
         Update worskpace member role
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("administrators")]
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+
+        profile = Profile.ADMIN
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
         rapi = role_api_factory.get(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
@@ -1749,41 +1648,35 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["workspace_id"] == workspace.workspace_id
 
     def test_api__update_workspace_member_role__err_400__role_not_exist(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
         Update worskpace member role
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("administrators")]
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+
+        profile = Profile.ADMIN
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
         rapi = role_api_factory.get(current_user=admin2)
         rapi.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
@@ -1802,41 +1695,35 @@ class TestWorkspaceMembersEndpoint(object):
         assert res.json_body["code"] == ErrorCode.USER_ROLE_NOT_FOUND
 
     def test_api__update_workspace_member_role__ok_200__as_admin(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
         Update worskpace member role
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("administrators")]
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+
+        profile = Profile.ADMIN
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
         rapi = role_api_factory.get(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
@@ -1877,26 +1764,21 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["workspace_id"] == workspace.workspace_id
 
     def test_api__delete_workspace_member_role__ok_200__as_admin(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ):
         """
         Delete worskpace member role
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -1919,33 +1801,28 @@ class TestWorkspaceMembersEndpoint(object):
             assert role["user_id"] != user.user_id
 
     def test_api__delete_workspace_member_role__ok_200__nominal_case(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ):
         """
         Delete worskpace member role
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -1969,28 +1846,28 @@ class TestWorkspaceMembersEndpoint(object):
             assert role["user_id"] != user2.user_id
 
     def test_api__delete_workspace_member_role__err_400__role_not_exist(
-        self, user_api_factory, group_api_factory, workspace_api_factory, web_testapp
+        self, user_api_factory, workspace_api_factory, web_testapp
     ):
         """
         Delete worskpace member role
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -2008,12 +1885,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert res.json_body["code"] == ErrorCode.USER_ROLE_NOT_FOUND
 
     def test_api__delete_workspace_member_role__err_400__workspace_manager_itself(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ):
         """
         Delete worskpace member role.
@@ -2021,21 +1893,21 @@ class TestWorkspaceMembersEndpoint(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -2059,34 +1931,29 @@ class TestWorkspaceMembersEndpoint(object):
         assert user2.user_id in [role["user_id"] for role in roles]
 
     def test_api__delete_workspace_member_role__err_400__simple_user(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ):
         """
         Delete worskpace member role
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
-        groups = [gapi.get_one_with_name("trusted-users")]
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -2122,13 +1989,7 @@ class TestWorkspaceMembersEndpoint(object):
 )
 class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
     def test_api__create_workspace_member_role__ok_200__new_user(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        web_testapp,
-        mailhog,
+        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp, mailhog
     ):
         """
         Create workspace member role
@@ -2136,14 +1997,14 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -2193,13 +2054,7 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
 )
 class TestUserInvitationWithMailActivatedSync(object):
     def test_api__create_workspace_member_role__ok_200__new_user(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        web_testapp,
-        mailhog,
+        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp, mailhog
     ):
         """
         Create workspace member role
@@ -2207,14 +2062,14 @@ class TestUserInvitationWithMailActivatedSync(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -2257,13 +2112,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         assert headers["Subject"][0] == "[Tracim] Created account"
 
     def test_api__create_workspace_member_role__err_400__user_not_found_as_simple_user(
-        self,
-        user_api_factory,
-        group_api_factory,
-        web_testapp,
-        role_api_factory,
-        workspace_api_factory,
-        mailhog,
+        self, user_api_factory, web_testapp, role_api_factory, workspace_api_factory, mailhog
     ):
         """
         Create workspace member role
@@ -2271,14 +2120,14 @@ class TestUserInvitationWithMailActivatedSync(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -2317,7 +2166,6 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         web_testapp,
         mailhog,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         role_api_factory,
         content_api_factory,
@@ -2328,14 +2176,14 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -2424,7 +2272,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
 )
 class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
     def test_api__create_workspace_member_role__ok_200__new_user_but_internal_auth_disabled(
-        self, web_testapp, user_api_factory, group_api_factory, workspace_api_factory
+        self, web_testapp, user_api_factory, workspace_api_factory
     ):
         """
         Create workspace member role
@@ -2435,10 +2283,7 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
 
         uapi = user_api_factory.get(current_user=None)
         user = uapi.get_one_by_email("hubert@planetexpress.com")
-        gapi = group_api_factory.get(current_user=user)
-        uapi.update(
-            user, auth_type=user.auth_type, groups=[gapi.get_one_with_name("administrators")]
-        )
+        uapi.update(user, auth_type=user.auth_type, profile=Profile.ADMIN)
         uapi.save(user)
         transaction.commit()
         workspace_api = workspace_api_factory.get(current_user=user, show_deleted=True)
@@ -3962,7 +3807,6 @@ class TestWorkspaceContents(object):
     def test_api__post_content_create_generic_content__err_403__try_creating_folder_as_simple_contributor(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         admin_user,
         role_api_factory,
@@ -3975,14 +3819,14 @@ class TestWorkspaceContents(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -4019,7 +3863,6 @@ class TestWorkspaceContents(object):
     def test_api__post_content_create_generic_content__ok_200__try_creating_folder_as_content_manager(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         admin_user,
         content_api_factory,
@@ -4032,14 +3875,14 @@ class TestWorkspaceContents(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -4075,7 +3918,6 @@ class TestWorkspaceContents(object):
         web_testapp,
         content_type_list,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         admin_user,
         role_api_factory,
@@ -4086,14 +3928,14 @@ class TestWorkspaceContents(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -4138,7 +3980,6 @@ class TestWorkspaceContents(object):
         content_type_list,
         session,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         admin_user,
         role_api_factory,
@@ -4149,14 +3990,14 @@ class TestWorkspaceContents(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -4347,7 +4188,6 @@ class TestWorkspaceContents(object):
         web_testapp,
         session,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         role_api_factory,
         admin_user,
@@ -4366,14 +4206,14 @@ class TestWorkspaceContents(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         projectA_workspace = workspace_api.create_workspace("projectA", save_now=True)

@@ -7,18 +7,21 @@ import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 export class MainPreview extends React.Component {
   constructor (props) {
     super(props)
-
+    this.imgContainer = React.createRef()
+    this.img = React.createRef()
     this.state = {
-      height: 0,
-      width: 0,
-      imageLoaded: IMG_LOAD_STATE.LOADING
+      imageLoaded: IMG_LOAD_STATE.LOADING,
+      style: {
+        maxWidth: '100%',
+        maxHeight: '100%',
+        width: '',
+        height: ''
+      }
     }
   }
 
-  onImageLoad = ({ target: img }) => {
+  onImageLoad = () => {
     this.setState({
-      height: img.height,
-      width: img.width,
       imageLoaded: IMG_LOAD_STATE.LOADED
     })
   }
@@ -29,13 +32,66 @@ export class MainPreview extends React.Component {
     })
   }
 
+  computeImageRatioForRotation () {
+    if (this.props.rotationAngle % 180) {
+      // INFO - RJ - 2020/04/15 - if the image is rotated such as the height "becomes" the width,
+      // let us fix its maximum dimensions when the DOM is ready
+
+      window.requestAnimationFrame(() => {
+        const imgContainer = this.imgContainer.current
+        const img = this.img.current
+
+        const imgContainerStyle = window.getComputedStyle(imgContainer)
+
+        const imgContainerHeight = imgContainer.clientHeight - (
+          parseFloat(imgContainerStyle.paddingTop) +
+          parseFloat(imgContainerStyle.paddingBottom)
+        )
+
+        const imgContainerWidth = imgContainer.clientHeight - (
+          parseFloat(imgContainerStyle.paddingLeft) +
+          parseFloat(imgContainerStyle.paddingRight)
+        )
+
+        let width = Math.min(img.naturalWidth, imgContainerHeight)
+        let height = width * img.naturalHeight / img.naturalWidth
+
+        if (height > imgContainer.clientWidth) {
+          height = Math.min(img.naturalHeight, imgContainerWidth)
+          width = height * img.naturalWidth / img.naturalHeight
+        }
+
+        this.setState({
+          style: {
+            maxWidth: '',
+            maxHeight: '',
+            width: height > width ? width : '',
+            height: width > height ? height : ''
+          }
+        })
+      })
+    } else if (this.state.style.maxWidth !== '100%') {
+      this.setState({
+        style: {
+          maxWidth: '100%',
+          maxHeight: '100%',
+          width: '',
+          height: ''
+        }
+      })
+    }
+  }
+
+  componentDidMount () {
+    this.computeImageRatioForRotation()
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.rotationAngle !== this.props.rotationAngle) this.computeImageRatioForRotation()
+  }
+
   render () {
     const { props, state } = this
-
-    let width = state.width
-    if (props.rotationAngle === 90 || props.rotationAngle === 270) {
-      width = state.height
-    }
 
     return (
       <div className='carousel__item__preview'>
@@ -54,14 +110,15 @@ export class MainPreview extends React.Component {
                 </div>
               </div>
             ) : (
-              <div className='carousel__item__preview__content__image'>
+              <div className='carousel__item__preview__content__image' ref={this.imgContainer}>
                 <img
                   src={props.previewSrc}
                   className={classnames(`rotate${props.rotationAngle}`, state.imageLoaded ? 'img-thumbnail' : null)}
                   onClick={props.handleClickShowImageRaw}
                   onLoad={this.onImageLoad}
                   onError={this.onImageError}
-                  width={width && state.width > width ? width : null}
+                  style={this.state.style}
+                  ref={this.img}
                   alt={props.fileName}
                 />
               </div>

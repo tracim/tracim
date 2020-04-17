@@ -4,6 +4,7 @@ import pytest
 import transaction
 
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -14,18 +15,17 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 )
 class TestFunctionWebdavRemoteUser(object):
     def test_functional__webdav_access_to_root_remote_auth__as_http_header(
-        self, session, webdav_testapp, user_api_factory, group_api_factory
+        self, session, webdav_testapp, user_api_factory
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
         uapi.create_user(
             "remoteuser@emoteuser.remoteuser",
             password=None,
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.USER,
             auth_type=AuthType.REMOTE,
         )
         transaction.commit()
@@ -34,18 +34,17 @@ class TestFunctionWebdavRemoteUser(object):
         assert res
 
     def test_functional__webdav_access_to_root__remote_auth(
-        self, session, webdav_testapp, user_api_factory, group_api_factory
+        self, session, webdav_testapp, user_api_factory
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
         user = uapi.create_user(
             "remoteuser@remoteuser.remoteuser",
             password=None,
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.USER,
             auth_type=AuthType.REMOTE,
         )
         uapi.save(user)
@@ -55,17 +54,16 @@ class TestFunctionWebdavRemoteUser(object):
         assert res
 
     def test_functional__webdav_access_to_root__OK__200__insensitive_email_case(
-        self, user_api_factory, group_api_factory, webdav_testapp
+        self, user_api_factory, webdav_testapp
     ) -> None:
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
         user = uapi.create_user(
             "remoteuser@remoteuser.remoteuser",
             password=None,
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.USER,
             auth_type=AuthType.REMOTE,
         )
         uapi.save(user)
@@ -87,18 +85,17 @@ class TestFunctionalWebdavGet(object):
     """
 
     def test_functional__webdav_access_to_root__nominal_case(
-        self, session, user_api_factory, group_api_factory, webdav_testapp
+        self, session, user_api_factory, webdav_testapp
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.USER,
         )
         transaction.commit()
         webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -107,17 +104,17 @@ class TestFunctionalWebdavGet(object):
         assert res
 
     def test_functional__webdav_access_to_root__insensitive_case_email(
-        self, webdav_testapp, user_api_factory, group_api_factory
+        self, webdav_testapp, user_api_factory
     ) -> None:
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         transaction.commit()
         webdav_testapp.authorization = ("Basic", ("TEST@TEST.TEST", "test@test.test"))
@@ -151,7 +148,6 @@ class TestFunctionalWebdavGet(object):
         workspace_label,
         webdav_workspace_label,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         admin_user,
         role_api_factory,
@@ -159,14 +155,14 @@ class TestFunctionalWebdavGet(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
@@ -181,18 +177,18 @@ class TestFunctionalWebdavGet(object):
         webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
 
     def test_functional__webdav_access_to_workspace__no_role_in_workspace(
-        self, user_api_factory, group_api_factory, workspace_api_factory, webdav_testapp
+        self, user_api_factory, workspace_api_factory, webdav_testapp
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace_api.create_workspace("test", save_now=True)
@@ -203,18 +199,18 @@ class TestFunctionalWebdavGet(object):
         webdav_testapp.get("/test", status=404)
 
     def test_functional__webdav_access_to_workspace__workspace_not_exist(
-        self, session, user_api_factory, group_api_factory, webdav_testapp
+        self, session, user_api_factory, webdav_testapp
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         transaction.commit()
 
@@ -460,7 +456,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         new_content_filename,
         webdav_new_content_filename,
         user_api_factory,
-        group_api_factory,
         admin_user,
         workspace_api_factory,
         role_api_factory,
@@ -471,14 +466,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
@@ -655,7 +650,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         new_content_filename,
         webdav_new_content_filename,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         role_api_factory,
         content_api_factory,
@@ -665,14 +659,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
@@ -829,7 +823,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         new_content_filename,
         webdav_new_content_filename,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         admin_user,
         role_api_factory,
@@ -840,14 +833,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
@@ -1000,7 +993,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         new_content_filename,
         webdav_new_content_filename,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         role_api_factory,
         content_api_factory,
@@ -1010,14 +1002,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
@@ -1150,7 +1142,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         new_content_filename,
         webdav_new_content_filename,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         admin_user,
         role_api_factory,
@@ -1161,14 +1152,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
@@ -1317,7 +1308,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         new_content_filename,
         webdav_new_content_filename,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         role_api_factory,
         content_api_factory,
@@ -1327,14 +1317,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
@@ -1465,7 +1455,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         new_content_filename,
         webdav_new_content_filename,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         admin_user,
         role_api_factory,
@@ -1476,14 +1465,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
@@ -1597,7 +1586,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         new_content_filename,
         webdav_new_content_filename,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         role_api_factory,
         content_api_factory,
@@ -1607,14 +1595,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)

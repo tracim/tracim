@@ -2,7 +2,7 @@ import pytest
 import transaction
 
 from tracim_backend.lib.search.simple_search.simple_search_api import SimpleSearchApi
-from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 
@@ -16,21 +16,16 @@ class TestSimpleSearchApi(object):
         app_config,
         user_api_factory,
         content_api_factory,
-        group_api_factory,
         content_type_list,
     ):
         # HACK - D.A. - 2015-03-09
         # This test is based on a bug which does NOT return results found
         # at root of a workspace (eg a folder)
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
@@ -59,20 +54,15 @@ class TestSimpleSearchApi(object):
         user_api_factory,
         workspace_api_factory,
         session,
-        group_api_factory,
         app_config,
         content_api_factory,
         content_type_list,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
