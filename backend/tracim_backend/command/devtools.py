@@ -65,7 +65,7 @@ class ParametersValueCommand(AppContextCommand):
             help="template used for parameters value print, not compatible with raw mode",
             dest="template",
             required=False,
-            default="|{config_name: <}| {config_value: <50}|",
+            default="|{config_name: <30}| {config_value: <50}|",
         )
         parser.add_argument(
             "-r",
@@ -83,6 +83,7 @@ class ParametersValueCommand(AppContextCommand):
             default=False,
             action="store_true",
         )
+
         parser.add_argument(
             "--show-deprecated",
             help="return also deprecated parameters",
