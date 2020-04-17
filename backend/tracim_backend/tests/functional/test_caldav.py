@@ -5,6 +5,7 @@ import requests
 from requests.exceptions import ConnectionError
 import transaction
 
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -46,18 +47,18 @@ class TestCaldavRadicaleProxyEndpoints(object):
         assert result.status_code == 200
 
     def test_proxy_user_agenda__ok__nominal_case(
-        self, radicale_server, user_api_factory, group_api_factory, web_testapp
+        self, radicale_server, user_api_factory, web_testapp
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -78,18 +79,18 @@ class TestCaldavRadicaleProxyEndpoints(object):
         ],
     )
     def test_proxy_user_agenda__ok__on_sub_items(
-        self, radicale_server, sub_item_label, user_api_factory, group_api_factory, web_testapp
+        self, radicale_server, sub_item_label, user_api_factory, web_testapp
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -111,25 +112,25 @@ class TestCaldavRadicaleProxyEndpoints(object):
         web_testapp.delete("/agenda/user/{}/".format(user.user_id, sub_item_label), status=200)
 
     def test_proxy_user_agenda__err__other_user_agenda(
-        self, radicale_server, user_api_factory, group_api_factory, web_testapp
+        self, radicale_server, user_api_factory, web_testapp
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -140,21 +141,20 @@ class TestCaldavRadicaleProxyEndpoints(object):
         self,
         radicale_server,
         user_api_factory,
-        group_api_factory,
         web_testapp,
         workspace_api_factory,
         role_api_factory,
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -175,23 +175,18 @@ class TestCaldavRadicaleProxyEndpoints(object):
         web_testapp.delete("/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
 
     def test_proxy_workspace_agenda__err__other_workspace_agenda(
-        self,
-        radicale_server,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        web_testapp,
+        self, radicale_server, user_api_factory, workspace_api_factory, web_testapp
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -207,23 +202,18 @@ class TestCaldavRadicaleProxyEndpoints(object):
 )
 class TestAgendaApi(object):
     def test_proxy_user_agenda__ok__nominal_case(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        web_testapp,
+        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("wp1", save_now=True)
@@ -258,23 +248,18 @@ class TestAgendaApi(object):
         assert agenda["with_credentials"] is True
 
     def test_proxy_user_agenda__ok__workspace_filter(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        web_testapp,
+        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("wp1", save_now=True)

@@ -13,11 +13,12 @@ from tracim_backend.exceptions import BadCommandError
 from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import ForceArgumentNeeded
-from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
+from tracim_backend.exceptions import ProfileDoesNotExist
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import User
@@ -96,11 +97,11 @@ class TestCommands(object):
         assert new_user.validate_password("new_password")
         assert new_user.profile.slug == "users"
 
-    def test_func__user_create_command__ok__in_admin_group(
+    def test_func__user_create_command__ok__in_admin_profile(
         self, session, user_api_factory, hapic
     ) -> None:
         """
-        Test User creation with admin as group
+        Test User creation with admin as profile
         """
         api = user_api_factory.get()
         with pytest.raises(UserDoesNotExist):
@@ -120,7 +121,7 @@ class TestCommands(object):
                 "command_test@user",
                 "-p",
                 "new_password",
-                "-g",
+                "--profile",
                 "administrators",
                 "--debug",
             ]
@@ -132,16 +133,16 @@ class TestCommands(object):
         assert new_user.validate_password("new_password")
         assert new_user.profile.slug == "administrators"
 
-    def test_func__user_create_command__err__in_unknown_group(self, hapic, session) -> None:
+    def test_func__user_create_command__err__in_unknown_profile(self, hapic, session) -> None:
         """
-        Test User creation with an unknown group
+        Test User creation with an unknown profile
         """
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(GroupDoesNotExist):
+        with pytest.raises(ProfileDoesNotExist):
             app.run(
                 [
                     "user",
@@ -152,7 +153,7 @@ class TestCommands(object):
                     "command_test@user",
                     "-p",
                     "new_password",
-                    "-g",
+                    "--profile",
                     "unknown",
                     "--debug",
                 ]
@@ -306,7 +307,7 @@ class TestCommands(object):
                 ]
             )
 
-    def test_func__user_update_command__ok__remove_group(
+    def test_func__user_update_command__ok__update_profile(
         self, hapic, session, user_api_factory
     ) -> None:
         """
@@ -333,8 +334,8 @@ class TestCommands(object):
                 "admin@admin.admin",
                 "-p",
                 "new_password",
-                "-rmg",
-                "administrators",
+                "--profile",
+                "trusted-users",
                 "--debug",
             ]
         )
@@ -525,7 +526,6 @@ class TestCommands(object):
         self,
         session,
         user_api_factory,
-        group_api_factory,
         hapic,
         content_api_factory,
         workspace_api_factory,
@@ -535,13 +535,11 @@ class TestCommands(object):
         Test User deletion : nominal case, user has change nothing in other user workspace
         """
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=Profile.USER,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -656,7 +654,6 @@ class TestCommands(object):
         self,
         session,
         user_api_factory,
-        group_api_factory,
         hapic,
         content_api_factory,
         workspace_api_factory,
@@ -671,13 +668,12 @@ class TestCommands(object):
         test_workspace = workspace_api.create_workspace("test_workspace")
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=Profile.USER,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -752,7 +748,6 @@ class TestCommands(object):
         self,
         session,
         user_api_factory,
-        group_api_factory,
         hapic,
         content_api_factory,
         workspace_api_factory,
@@ -767,13 +762,12 @@ class TestCommands(object):
         admin_workspace = workspace_api.create_workspace("test_workspace")
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=Profile.TRUSTED_USER,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -867,7 +861,6 @@ class TestCommands(object):
         self,
         session,
         user_api_factory,
-        group_api_factory,
         hapic,
         content_api_factory,
         workspace_api_factory,
@@ -882,13 +875,11 @@ class TestCommands(object):
         admin_workspace = workspace_api.create_workspace("test_workspace")
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=Profile.TRUSTED_USER,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -984,7 +975,6 @@ class TestCommands(object):
         self,
         session,
         user_api_factory,
-        group_api_factory,
         hapic,
         content_api_factory,
         workspace_api_factory,
@@ -999,13 +989,11 @@ class TestCommands(object):
         test_workspace = workspace_api.create_workspace("test_workspace")
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=Profile.USER,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1096,7 +1084,6 @@ class TestCommands(object):
         self,
         session,
         user_api_factory,
-        group_api_factory,
         hapic,
         content_api_factory,
         workspace_api_factory,
@@ -1108,13 +1095,13 @@ class TestCommands(object):
         Test User anonymization
         """
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1148,7 +1135,6 @@ class TestCommands(object):
         self,
         session,
         user_api_factory,
-        group_api_factory,
         hapic,
         content_api_factory,
         workspace_api_factory,
@@ -1160,13 +1146,11 @@ class TestCommands(object):
         Test User anonymization
         """
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=Profile.USER,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
