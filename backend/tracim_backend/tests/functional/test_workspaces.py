@@ -966,26 +966,18 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["avatar_url"] is None
 
     def test_api__get_workspace_members__ok_200_show_disabled_users(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user,
     ):
         """
             Check obtain workspace members list with also disabled users
         """
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
+            profile=Profile.TRUSTED_USER,
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
@@ -1008,26 +1000,18 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["do_notify"] is False
 
     def test_api__get_workspace_members__ok_200_show_only_enabled_users(
-        self,
-        web_testapp,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user,
     ):
         """
             Check obtain workspace members list with only enabled users
         """
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=Profile.TRUSTED_USER,
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
