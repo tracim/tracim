@@ -10,7 +10,7 @@ from alembic import op
 import sqlalchemy as sa
 
 revision = "2bb8ccb44ce0"
-down_revision = "511ce99e1baa"
+down_revision = "4f72874ba193"
 
 filling_current_revision_query = """
 update content
