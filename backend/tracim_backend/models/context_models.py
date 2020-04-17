@@ -3,7 +3,6 @@ import base64
 import cgi
 from datetime import datetime
 from enum import Enum
-import traceback
 import typing
 
 from slugify import slugify
@@ -1136,17 +1135,14 @@ class ContentInContext(object):
             return None
         try:
             return self.content.depot_file.file.content_length
-        except IOError as e:
+        except IOError:
             logger.warning(
-                self, "IO Exception Occured when trying to get content size  : {}".format(str(e))
+                self, "IO Exception Occured when trying to get content size", exc_info=True
             )
-            logger.warning(self, traceback.format_exc())
-        except Exception as e:
+        except Exception:
             logger.warning(
-                self,
-                "Unknown Exception Occured when trying to get content size  : {}".format(str(e)),
+                self, "Unknown Exception Occured when trying to get content size", exc_info=True
             )
-            logger.warning(self, traceback.format_exc())
         return None
 
     @property
@@ -1440,17 +1436,14 @@ class RevisionInContext(object):
             return None
         try:
             return self.revision.depot_file.file.content_length
-        except IOError as e:
+        except IOError:
             logger.warning(
-                self, "IO Exception Occured when trying to get content size  : {}".format(str(e))
+                self, "IO Exception Occured when trying to get content size", exc_info=True
             )
-            logger.warning(self, traceback.format_exc())
-        except Exception as e:
+        except Exception:
             logger.warning(
-                self,
-                "Unknown Exception Occured when trying to get content size  : {}".format(str(e)),
+                self, "Unknown Exception Occured when trying to get content size", exc_info=True
             )
-            logger.warning(self, traceback.format_exc())
         return None
 
     @property

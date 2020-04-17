@@ -21,7 +21,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -63,7 +63,7 @@ class WorkspaceApi(object):
         if not self._user:
             return self._base_query_without_roles()
 
-        if not self._force_role and self._user.profile.id >= Group.TIM_ADMIN:
+        if not self._force_role and self._user.profile.id >= Profile.ADMIN.id:
             return self._base_query_without_roles()
 
         query = self._base_query_without_roles()
@@ -251,9 +251,9 @@ class WorkspaceApi(object):
     def get_all_manageable(self) -> typing.List[Workspace]:
         """Get all workspaces the current user has manager rights on."""
         workspaces = []  # type: typing.List[Workspace]
-        if self._user.profile.id == Group.TIM_ADMIN:
+        if self._user.profile.id == Profile.ADMIN.id:
             workspaces = self._base_query().order_by(Workspace.label).all()
-        elif self._user.profile.id == Group.TIM_MANAGER:
+        elif self._user.profile.id == Profile.TRUSTED_USER.id:
             workspaces = (
                 self._base_query()
                 .filter(UserRoleInWorkspace.role == UserRoleInWorkspace.WORKSPACE_MANAGER)

@@ -851,6 +851,11 @@ class ContentRevisionRO(DeclarativeBase):
 # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
 Index("idx__content_revisions__owner_id", ContentRevisionRO.owner_id)
 Index("idx__content_revisions__parent_id", ContentRevisionRO.parent_id)
+# INFO - G.M - 2020-04-02 - Theses index may have different name in mysql
+# this is due to the fact, we do not remove automatically created index by mysql
+# on foreign key.
+Index("idx__content_revisions__content_id", ContentRevisionRO.content_id)
+Index("idx__content_revisions__workspace_id", ContentRevisionRO.workspace_id)
 
 
 class Content(DeclarativeBase):

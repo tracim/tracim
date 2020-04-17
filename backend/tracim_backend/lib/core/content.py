@@ -2,7 +2,6 @@
 from contextlib import contextmanager
 import datetime
 import os
-import traceback
 import typing
 
 from depot.io.interfaces import StoredFile
@@ -944,17 +943,13 @@ class ContentApi(object):
             ) from exc
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
-                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted", exc_info=True
             )
-            logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
                 "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         except Exception as exc:
-            logger.warning(
-                self, "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
-            )
-            logger.warning(self, traceback.format_exc())
+            logger.warning(self, "Unknown Preview_Generator Exception Occured", exc_info=True)
             raise UnavailablePreview(
                 "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
@@ -980,17 +975,13 @@ class ContentApi(object):
             ) from exc
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
-                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted", exc_info=True
             )
-            logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
                 "No preview available for revision {}".format(revision_id)
             ) from exc
         except Exception as exc:
-            logger.warning(
-                self, "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
-            )
-            logger.warning(self, traceback.format_exc())
+            logger.warning(self, "Unknown Preview_Generator Exception Occured", exc_info=True)
             raise UnavailablePreview(
                 "No preview available for revision {}".format(revision_id)
             ) from exc
@@ -1062,17 +1053,13 @@ class ContentApi(object):
             ) from exc
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
-                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted", exc_info=True
             )
-            logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
                 "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         except Exception as exc:
-            logger.warning(
-                self, "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
-            )
-            logger.warning(self, traceback.format_exc())
+            logger.warning(self, "Unknown Preview_Generator Exception Occured", exc_info=True)
             raise UnavailablePreview(
                 "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
@@ -1986,15 +1973,13 @@ class ContentApi(object):
             nb_pages = self.preview_manager.get_page_nb(file_path, file_ext=file_extension)
         except UnsupportedMimeType:
             return None
-        except RevisionFilePathSearchFailedDepotCorrupted as exc:
+        except RevisionFilePathSearchFailedDepotCorrupted:
             logger.warning(
-                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted", exc_info=True
             )
-            logger.warning(self, traceback.format_exc())
             return None
-        except Exception as e:
-            logger.warning(self, "Unknown Preview_Generator Exception Occured : {}".format(str(e)))
-            logger.warning(self, traceback.format_exc())
+        except Exception:
+            logger.warning(self, "Unknown Preview_Generator Exception Occured", exc_info=True)
             return None
         return nb_pages
 
@@ -2004,15 +1989,13 @@ class ContentApi(object):
             return self.preview_manager.has_pdf_preview(file_path, file_ext=file_extension)
         except UnsupportedMimeType:
             return False
-        except RevisionFilePathSearchFailedDepotCorrupted as exc:
+        except RevisionFilePathSearchFailedDepotCorrupted:
             logger.warning(
-                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted", exc_info=True
             )
-            logger.warning(self, traceback.format_exc())
             return False
-        except Exception as e:
-            logger.warning(self, "Unknown Preview_Generator Exception Occured : {}".format(str(e)))
-            logger.warning(self, traceback.format_exc())
+        except Exception:
+            logger.warning(self, "Unknown Preview_Generator Exception Occured", exc_info=True)
             return False
 
     def has_jpeg_preview(self, revision_id: int, file_extension: str) -> bool:
@@ -2021,15 +2004,13 @@ class ContentApi(object):
             return self.preview_manager.has_jpeg_preview(file_path, file_ext=file_extension)
         except UnsupportedMimeType:
             return False
-        except RevisionFilePathSearchFailedDepotCorrupted as exc:
+        except RevisionFilePathSearchFailedDepotCorrupted:
             logger.warning(
-                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted", exc_info=True
             )
-            logger.warning(self, traceback.format_exc())
             return False
-        except Exception as e:
-            logger.warning(self, "Unknown Preview_Generator Exception Occured : {}".format(str(e)))
-            logger.warning(self, traceback.format_exc())
+        except Exception:
+            logger.warning(self, "Unknown Preview_Generator Exception Occured", exc_info=True)
             return False
 
     def mark_read__all(self, read_datetime: datetime = None, do_flush: bool = True) -> None:

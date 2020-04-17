@@ -1,6 +1,7 @@
 import pytest
 import transaction
 
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -28,7 +29,6 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_label(
         self,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         workspace_api_factory,
         web_testapp,
@@ -40,14 +40,14 @@ class TestSimpleSearch(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -95,7 +95,6 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_filename(
         self,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         workspace_api_factory,
         content_api_factory,
@@ -107,14 +106,14 @@ class TestSimpleSearch(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -176,7 +175,6 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_content(
         self,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         workspace_api_factory,
         content_api_factory,
@@ -190,14 +188,14 @@ class TestSimpleSearch(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -267,7 +265,6 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_comment_content(
         self,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         workspace_api_factory,
         content_api_factory,
@@ -281,14 +278,14 @@ class TestSimpleSearch(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -344,7 +341,6 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__avoid_duplicate_content(
         self,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         workspace_api_factory,
         content_api_factory,
@@ -356,14 +352,14 @@ class TestSimpleSearch(object):
         second_created_comment_content,
     ) -> None:
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -414,7 +410,6 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__no_search_string(
         self,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         workspace_api_factory,
         content_api_factory,
@@ -422,14 +417,14 @@ class TestSimpleSearch(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -452,7 +447,6 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__filter_by_content_type(
         self,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_api_factory,
         workspace_api_factory,
@@ -460,14 +454,14 @@ class TestSimpleSearch(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -546,7 +540,6 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__filter_by_deleted_archived_active(
         self,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         workspace_api_factory,
         content_api_factory,
@@ -555,14 +548,14 @@ class TestSimpleSearch(object):
     ) -> None:
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("trusted-users")]
+
+        profile = Profile.TRUSTED_USER
         user = uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
             do_notify=False,
-            groups=groups,
+            profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)

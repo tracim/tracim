@@ -46,8 +46,6 @@
         border-bottom 1px solid grey
         padding 0 15px
         height 65px
-        &:last-child
-          border-bottom none
         &__avatar
           margin-right 25px
         &__name
@@ -81,12 +79,14 @@
               padding 10px
               &__icon
                 margin-right 15px
+              &__text
+                white-space normal
         &__delete
           width 16px
           font-size 20px
           cursor pointer
     &__adduser
-      border-top 1px solid grey
+      border-bottom 2px solid grey
       padding 15px
       &__button
         display flex

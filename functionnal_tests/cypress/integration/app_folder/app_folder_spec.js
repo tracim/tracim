@@ -20,87 +20,115 @@ describe('App Folder Advanced', function () {
     })
   })
 
-  beforeEach(() => {
-    cy.loginAs('administrators')
-  })
-
   afterEach(() => {
     cy.cancelXHR()
   })
 
-  it('should open when editing a folder', () => {
-    cy.visitPage({pageName: PAGES.CONTENTS, params: {workspaceId: workspaceId}})
+  describe('App folder navigation tests', () => {
+    it('should open when editing a folder', () => {
+      cy.loginAs('administrators')
+      cy.visitPage({pageName: PAGES.CONTENTS, params: {workspaceId: workspaceId}})
 
-    cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
-      .find('[data-cy="extended_action"]')
-      .click()
+      cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
+        .find('[data-cy="extended_action"]')
+        .click()
 
-    cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
-      .find('[data-cy="extended_action_edit"]')
-      .click()
+      cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
+        .find('[data-cy="extended_action_edit"]')
+        .click()
 
-    cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
-      .should('be.visible')
+      cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
+        .should('be.visible')
+    })
+
+    it('should closed itself when clicking on the close button', () => {
+      cy.loginAs('administrators')
+      cy.visitPage({pageName: PAGES.EDIT_FOLDER, params: {workspaceId: workspaceId, folderId: folder1.content_id}})
+
+      cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
+        .find('.folderAdvanced__header__title')
+        .contains(folder1.label)
+
+      cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
+        .find('[data-cy="popinFixed__header__button__close"]')
+        .click()
+
+      cy.get('#appFeatureContainer').children().should('have.length', 0)
+    })
+
+    it('should reopen itself after being closed', () => {
+      cy.loginAs('administrators')
+      cy.visitPage({pageName: PAGES.EDIT_FOLDER, params: {workspaceId: workspaceId, folderId: folder1.content_id}})
+
+      cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
+        .find('[data-cy="popinFixed__header__button__close"]')
+        .click()
+
+      cy.get('#appFeatureContainer').children().should('have.length', 0)
+
+      cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
+        .find('[data-cy="extended_action"]')
+        .click()
+
+      cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
+        .find('[data-cy="extended_action_edit"]')
+        .click()
+
+      cy.get('#appFeatureContainer').children().should('have.length', 1)
+      cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
+        .find('.folderAdvanced__header__title')
+        .contains(folder1.label)
+    })
+
+    it('should reopen and reload data when opening a different folder', () => {
+      cy.loginAs('administrators')
+      cy.visitPage({pageName: PAGES.EDIT_FOLDER, params: {workspaceId: workspaceId, folderId: folder1.content_id}})
+
+      cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
+        .find('.folderAdvanced__header__title')
+        .contains(folder1.label)
+
+      cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
+        .find('[data-cy="popinFixed__header__button__close"]')
+        .click()
+
+      cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder2.content_id}})
+        .find('[data-cy="extended_action"]')
+        .click()
+
+      cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder2.content_id}})
+        .find('[data-cy="extended_action_edit"]')
+        .click()
+
+      cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
+        .find('.folderAdvanced__header__title')
+        .should('contain', folder2.label)
+    })
   })
 
-  it('should closed itself when clicking on the close button', () => {
-    cy.visitPage({pageName: PAGES.EDIT_FOLDER, params: {workspaceId: workspaceId, folderId: folder1.content_id}})
+  describe('Role persmissions test', () => {
+    let userReader
 
-    cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
-      .find('.folderAdvanced__header__title')
-      .contains(folder1.label)
+    before(() => {
+      cy.loginAs('administrators')
+      cy.createRandomUser().as('userReader')
+        .then(user => {
+          userReader = user
+          cy.addUserToWorkspace(user.user_id, workspaceId, 'reader')
+        })
+    })
 
-    cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
-      .find('[data-cy="popinFixed__header__button__close"]')
-      .click()
+    it('should not be able to edit file and folder if the user is only a reader', () => {
+      cy.login(userReader)
+      cy.visitPage({pageName: PAGES.CONTENTS, params: {workspaceId: workspaceId}})
 
-    cy.get('#appFeatureContainer').children().should('have.length', 0)
-  })
+      cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
+        .find('[data-cy="extended_action"]')
+        .click()
 
-  it('should reopen itself after being closed', () => {
-    cy.visitPage({pageName: PAGES.EDIT_FOLDER, params: {workspaceId: workspaceId, folderId: folder1.content_id}})
-
-    cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
-      .find('[data-cy="popinFixed__header__button__close"]')
-      .click()
-
-    cy.get('#appFeatureContainer').children().should('have.length', 0)
-
-    cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
-      .find('[data-cy="extended_action"]')
-      .click()
-
-    cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
-      .find('[data-cy="extended_action_edit"]')
-      .click()
-
-    cy.get('#appFeatureContainer').children().should('have.length', 1)
-    cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
-      .find('.folderAdvanced__header__title')
-      .contains(folder1.label)
-  })
-
-  it('should reopen and reload data when opening a different folder', () => {
-    cy.visitPage({pageName: PAGES.EDIT_FOLDER, params: {workspaceId: workspaceId, folderId: folder1.content_id}})
-
-    cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
-      .find('.folderAdvanced__header__title')
-      .contains(folder1.label)
-
-    cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
-      .find('[data-cy="popinFixed__header__button__close"]')
-      .click()
-
-    cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder2.content_id}})
-      .find('[data-cy="extended_action"]')
-      .click()
-
-    cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder2.content_id}})
-      .find('[data-cy="extended_action_edit"]')
-      .click()
-
-    cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
-      .find('.folderAdvanced__header__title')
-      .should('contain', folder2.label)
+      cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
+        .find('[data-cy="extended_action_edit"]')
+        .should('be.not.visible')
+    })
   })
 })

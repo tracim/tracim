@@ -17,7 +17,7 @@ from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
 from tracim_backend.lib.utils.request import TracimContext
-from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.roles import WorkspaceRoles
 
 try:
@@ -85,11 +85,11 @@ class ProfileChecker(AuthorizationChecker):
     is as high as profile level given
     """
 
-    def __init__(self, profile_level: int):
-        self.profile_level = profile_level
+    def __init__(self, profile: Profile):
+        self.profile = profile
 
     def check(self, tracim_context: TracimContext) -> bool:
-        if tracim_context.current_user.profile.id >= self.profile_level:
+        if tracim_context.current_user.profile.id >= self.profile.id:
             return True
         raise InsufficientUserProfile()
 
@@ -100,11 +100,11 @@ class CandidateUserProfileChecker(AuthorizationChecker):
     is as high as profile level given
     """
 
-    def __init__(self, profile_level: int):
-        self.profile_level = profile_level
+    def __init__(self, profile: Profile):
+        self.profile = profile
 
     def check(self, tracim_context: TracimContext) -> bool:
-        if tracim_context.candidate_user.profile.id >= self.profile_level:
+        if tracim_context.candidate_user.profile.id >= self.profile.id:
             return True
         raise InsufficientUserProfile()
 
@@ -261,9 +261,9 @@ class AndAuthorizationChecker(AuthorizationChecker):
 
 # Useful Authorization Checker
 # profile
-is_administrator = ProfileChecker(Group.TIM_ADMIN)
-is_trusted_user = ProfileChecker(Group.TIM_MANAGER)
-is_user = ProfileChecker(Group.TIM_USER)
+is_administrator = ProfileChecker(Profile.ADMIN)
+is_trusted_user = ProfileChecker(Profile.TRUSTED_USER)
+is_user = ProfileChecker(Profile.USER)
 # role
 is_workspace_manager = RoleChecker(WorkspaceRoles.WORKSPACE_MANAGER.level)
 is_content_manager = RoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)

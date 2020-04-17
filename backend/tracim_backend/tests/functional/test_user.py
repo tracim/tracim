@@ -8,6 +8,7 @@ import transaction
 
 from tracim_backend import AuthType
 from tracim_backend.error import ErrorCode
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -25,7 +26,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -38,13 +38,13 @@ class TestUserRecentlyActiveContentEndpoint(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -160,7 +160,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         content_api_factory,
         content_type_list,
         session,
@@ -172,13 +171,13 @@ class TestUserRecentlyActiveContentEndpoint(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -267,7 +266,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -281,13 +279,13 @@ class TestUserRecentlyActiveContentEndpoint(object):
         workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -403,7 +401,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -418,13 +415,13 @@ class TestUserRecentlyActiveContentEndpoint(object):
         workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -514,7 +511,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -641,7 +637,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -746,7 +741,6 @@ class TestUserReadStatusEndpoint(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         admin_user,
         role_api_factory,
         content_type_list,
@@ -760,13 +754,13 @@ class TestUserReadStatusEndpoint(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -871,7 +865,6 @@ class TestUserReadStatusEndpoint(object):
         workspace_api_factory,
         admin_user,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -884,13 +877,12 @@ class TestUserReadStatusEndpoint(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1004,7 +996,6 @@ class TestUserReadStatusEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         admin_user,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1017,13 +1008,13 @@ class TestUserReadStatusEndpoint(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1134,7 +1125,6 @@ class TestUserSetContentAsRead(object):
         admin_user,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1145,13 +1135,13 @@ class TestUserSetContentAsRead(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             do_save=True,
             do_notify=False,
@@ -1222,7 +1212,6 @@ class TestUserSetContentAsRead(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1233,13 +1222,13 @@ class TestUserSetContentAsRead(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1277,7 +1266,6 @@ class TestUserSetContentAsRead(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1288,13 +1276,13 @@ class TestUserSetContentAsRead(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1332,7 +1320,6 @@ class TestUserSetContentAsRead(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1343,13 +1330,13 @@ class TestUserSetContentAsRead(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1405,7 +1392,6 @@ class TestUserSetContentAsRead(object):
         workspace_api_factory,
         admin_user,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1416,13 +1402,13 @@ class TestUserSetContentAsRead(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1463,7 +1449,6 @@ class TestUserSetContentAsRead(object):
         admin_user,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1474,13 +1459,13 @@ class TestUserSetContentAsRead(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1552,7 +1537,6 @@ class TestUserSetContentAsRead(object):
         workspace_api_factory,
         admin_user,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1563,13 +1547,13 @@ class TestUserSetContentAsRead(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1648,7 +1632,6 @@ class TestUserSetContentAsUnread(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1660,13 +1643,13 @@ class TestUserSetContentAsUnread(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1739,7 +1722,6 @@ class TestUserSetContentAsUnread(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1751,13 +1733,13 @@ class TestUserSetContentAsUnread(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1795,7 +1777,6 @@ class TestUserSetContentAsUnread(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1806,13 +1787,13 @@ class TestUserSetContentAsUnread(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1851,7 +1832,6 @@ class TestUserSetContentAsUnread(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1862,13 +1842,13 @@ class TestUserSetContentAsUnread(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -1924,7 +1904,6 @@ class TestUserSetContentAsUnread(object):
         admin_user,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         content_type_list,
         content_api_factory,
@@ -1935,13 +1914,13 @@ class TestUserSetContentAsUnread(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2085,7 +2064,6 @@ class TestUserSetWorkspaceAsRead(object):
         workspace_api_factory,
         content_type_list,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         session,
         content_api_factory,
@@ -2095,13 +2073,13 @@ class TestUserSetWorkspaceAsRead(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2159,7 +2137,6 @@ class TestUserSetWorkspaceAsRead(object):
         workspace_api_factory,
         content_type_list,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         session,
         content_api_factory,
@@ -2169,13 +2146,13 @@ class TestUserSetWorkspaceAsRead(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2234,7 +2211,6 @@ class TestUserSetWorkspaceAsRead(object):
         content_type_list,
         user_api_factory,
         admin_user,
-        group_api_factory,
         role_api_factory,
         session,
         content_api_factory,
@@ -2244,13 +2220,13 @@ class TestUserSetWorkspaceAsRead(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2299,7 +2275,6 @@ class TestUserEnableWorkspaceNotification(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         session,
         content_api_factory,
@@ -2309,13 +2284,13 @@ class TestUserEnableWorkspaceNotification(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2342,7 +2317,6 @@ class TestUserEnableWorkspaceNotification(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         session,
         content_api_factory,
@@ -2352,13 +2326,13 @@ class TestUserEnableWorkspaceNotification(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2385,7 +2359,6 @@ class TestUserEnableWorkspaceNotification(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         session,
         content_api_factory,
@@ -2395,13 +2368,13 @@ class TestUserEnableWorkspaceNotification(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2411,7 +2384,7 @@ class TestUserEnableWorkspaceNotification(object):
             email="test2@test2.test2",
             password="password",
             name="boby",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2446,7 +2419,6 @@ class TestUserDisableWorkspaceNotification(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         session,
         content_api_factory,
@@ -2456,13 +2428,13 @@ class TestUserDisableWorkspaceNotification(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2489,7 +2461,6 @@ class TestUserDisableWorkspaceNotification(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         session,
         content_api_factory,
@@ -2499,13 +2470,13 @@ class TestUserDisableWorkspaceNotification(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2532,7 +2503,6 @@ class TestUserDisableWorkspaceNotification(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         session,
         content_api_factory,
@@ -2542,13 +2512,13 @@ class TestUserDisableWorkspaceNotification(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2558,7 +2528,7 @@ class TestUserDisableWorkspaceNotification(object):
             email="test2@test2.test2",
             password="password",
             name="boby",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2596,7 +2566,6 @@ class TestUserWorkspaceEndpoint(object):
         admin_user,
         application_api_factory,
         web_testapp,
-        group_api_factory,
         role_api_factory,
     ):
         """
@@ -2608,13 +2577,12 @@ class TestUserWorkspaceEndpoint(object):
         owned_only_workspace = workspace_api.create_workspace("owned_only")
         user_api = user_api_factory.get()
         user_api.create_user("toto@toto.toto", do_notify=False)
-        group_api = group_api_factory.get()
-        groups = [group_api.get_one_with_name("administrators")]
+        profile = Profile.ADMIN
         test_user = user_api.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2767,16 +2735,15 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
     Tests for GET /api/v2/users/{user_id}
     """
 
-    def test_api__get_user__ok_200__admin(self, user_api_factory, group_api_factory, web_testapp):
+    def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2878,17 +2845,16 @@ class TestUserDiskSpace(object):
     """
 
     def test_api__get_user_disk_space__ok_200__admin(
-        self, user_api_factory, group_api_factory, web_testapp, workspace_api_factory
+        self, user_api_factory, web_testapp, workspace_api_factory
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="test@test.test",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2922,16 +2888,15 @@ class TestUserEndpoint(object):
     Tests for GET /api/v2/users/{user_id}
     """
 
-    def test_api__get_user__ok_200__admin(self, user_api_factory, group_api_factory, web_testapp):
+    def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2955,18 +2920,15 @@ class TestUserEndpoint(object):
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 0
 
-    def test_api__get_user__ok_200__user_itself(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__get_user__ok_200__user_itself(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -2989,18 +2951,15 @@ class TestUserEndpoint(object):
         assert res["is_deleted"] is False
         assert res["allowed_space"] == 0
 
-    def test_api__get_user__err_403__other_normal_user(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__get_user__err_403__other_normal_user(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             do_save=True,
             do_notify=False,
@@ -3009,7 +2968,7 @@ class TestUserEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3192,18 +3151,15 @@ class TestUserEndpoint(object):
         assert user.email == "test@test.test"
         assert user.password is None
 
-    def test_api__create_user__err_400__email_already_in_db(
-        self, user_api_factory, web_testapp, group_api_factory
-    ):
+    def test_api__create_user__err_400__email_already_in_db(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3226,18 +3182,15 @@ class TestUserEndpoint(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
 
-    def test_api__create_user__err_403__other_user(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__create_user__err_403__other_user(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3339,18 +3292,15 @@ class TestUserWithNotificationEndpoint(object):
         assert headers["To"][0] == "test <test@test.test>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
-    def test_api_delete_user__ok_200__admin(
-        sel, web_testapp, user_api_factory, group_api_factory, mailhog
-    ):
+    def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, mailhog):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3382,18 +3332,15 @@ class TestUsersEndpoint(object):
     Tests for GET /api/v2/users/{user_id}
     """
 
-    def test_api__get_user__ok_200__admin(
-        self, user_api_factory, group_api_factory, web_testapp, admin_user
-    ):
+    def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp, admin_user):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3414,18 +3361,15 @@ class TestUsersEndpoint(object):
         assert res[1]["public_name"] == admin_user.display_name
         assert res[1]["avatar_url"] is None
 
-    def test_api__get_user__err_403__normal_user(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3449,18 +3393,15 @@ class TestKnownMembersEndpoint(object):
     Tests for GET /api/v2/users/{user_id}
     """
 
-    def test_api__get_user__ok_200__admin__by_name(
-        self, user_api_factory, group_api_factory, admin_user, web_testapp
-    ):
+    def test_api__get_user__ok_200__admin__by_name(self, user_api_factory, admin_user, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3470,7 +3411,7 @@ class TestKnownMembersEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3499,17 +3440,16 @@ class TestKnownMembersEndpoint(object):
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(
-        self, web_testapp, user_api_factory, group_api_factory, admin_user
+        self, web_testapp, user_api_factory, admin_user
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3519,7 +3459,7 @@ class TestKnownMembersEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3545,23 +3485,16 @@ class TestKnownMembersEndpoint(object):
         assert res[0]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        admin_user,
-        role_api_factory,
-        web_testapp,
+        self, user_api_factory, workspace_api_factory, admin_user, role_api_factory, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3571,7 +3504,7 @@ class TestKnownMembersEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3602,23 +3535,16 @@ class TestKnownMembersEndpoint(object):
         assert res[0]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(
-        self,
-        admin_user,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        web_testapp,
+        self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3628,7 +3554,7 @@ class TestKnownMembersEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3638,7 +3564,7 @@ class TestKnownMembersEndpoint(object):
             email="test3@test3.test3",
             password="password",
             name="bob3",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3674,17 +3600,16 @@ class TestKnownMembersEndpoint(object):
         assert res[0]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name__deactivated_members(
-        self, user_api_factory, group_api_factory, web_testapp, admin_user
+        self, user_api_factory, web_testapp, admin_user
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3694,7 +3619,7 @@ class TestKnownMembersEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3720,17 +3645,16 @@ class TestKnownMembersEndpoint(object):
         assert res[0]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_email(
-        self, user_api_factory, group_api_factory, admin_user, web_testapp
+        self, user_api_factory, admin_user, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3740,7 +3664,7 @@ class TestKnownMembersEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3769,17 +3693,16 @@ class TestKnownMembersEndpoint(object):
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__err_403__admin__too_small_acp(
-        self, user_api_factory, group_api_factory, admin_user, web_testapp
+        self, user_api_factory, admin_user, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3789,7 +3712,7 @@ class TestKnownMembersEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3811,22 +3734,16 @@ class TestKnownMembersEndpoint(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__get_user__ok_200__normal_user_by_email(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        web_testapp,
+        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3836,7 +3753,7 @@ class TestKnownMembersEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3846,7 +3763,7 @@ class TestKnownMembersEndpoint(object):
             email="test3@test3.test3",
             password="password",
             name="bob3",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3892,22 +3809,16 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
     """
 
     def test_api__get_user__ok_200__show_all_members(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        role_api_factory,
-        web_testapp,
+        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3917,7 +3828,7 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3927,7 +3838,7 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
             email="test3@test3.test3",
             password="password",
             name="bob3",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -3980,18 +3891,15 @@ class TestSetEmailPasswordLdapEndpoint(object):
     for ldap user
     """
 
-    def test_api__set_user_email__ok_200__ldap_user(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__ok_200__ldap_user(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password=None,
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             auth_type=AuthType.LDAP,
@@ -4021,18 +3929,17 @@ class TestSetEmailPasswordLdapEndpoint(object):
         assert res["auth_type"] == "ldap"
 
     def test_api__set_user_password_ldap__ok_200__admin(
-        self, user_api_factory, group_api_factory, web_testapp, session
+        self, user_api_factory, web_testapp, session
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password=None,
             auth_type=AuthType.LDAP,
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4072,18 +3979,15 @@ class TestSetEmailEndpoint(object):
     Tests for PUT /api/v2/users/{user_id}/email
     """
 
-    def test_api__set_user_email__ok_200__admin(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__ok_200__admin(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4107,18 +4011,15 @@ class TestSetEmailEndpoint(object):
         res = res.json_body
         assert res["email"] == "mysuperemail@email.fr"
 
-    def test_api__set_user_email__err_400__admin_same_email(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__err_400__admin_same_email(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4148,17 +4049,16 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "test@test.test"
 
     def test_api__set_user_email__err_403__admin_wrong_password(
-        self, user_api_factory, group_api_factory, web_testapp
+        self, user_api_factory, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4188,17 +4088,17 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "test@test.test"
 
     def test_api__set_user_email__err_400__admin_string_is_not_email(
-        self, user_api_factory, group_api_factory, web_testapp
+        self, user_api_factory, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4228,18 +4128,16 @@ class TestSetEmailEndpoint(object):
         res = res.json_body
         assert res["email"] == "test@test.test"
 
-    def test_api__set_user_email__ok_200__user_itself(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__ok_200__user_itself(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4264,18 +4162,16 @@ class TestSetEmailEndpoint(object):
         res = res.json_body
         assert res["email"] == "mysuperemail@email.fr"
 
-    def test_api__set_user_email__err_403__other_normal_user(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__err_403__other_normal_user(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4285,7 +4181,7 @@ class TestSetEmailEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4315,18 +4211,16 @@ class TestSetPasswordEndpoint(object):
     Tests for PUT /api/v2/users/{user_id}/password
     """
 
-    def test_api__set_user_password__ok_200__admin(
-        self, user_api_factory, group_api_factory, web_testapp, session
-    ):
+    def test_api__set_user_password__ok_200__admin(self, user_api_factory, web_testapp, session):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4356,17 +4250,17 @@ class TestSetPasswordEndpoint(object):
         assert user.validate_password("mynewpassword")
 
     def test_api__set_user_password__err_403__admin_wrong_password(
-        self, user_api_factory, group_api_factory, web_testapp
+        self, user_api_factory, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4401,17 +4295,17 @@ class TestSetPasswordEndpoint(object):
         assert not user.validate_password("mynewpassword")
 
     def test_api__set_user_password__err_400__admin_passwords_do_not_match(
-        self, user_api_factory, group_api_factory, web_testapp
+        self, user_api_factory, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4448,17 +4342,17 @@ class TestSetPasswordEndpoint(object):
         assert not user.validate_password("mynewpassword2")
 
     def test_api__set_user_password__ok_200__user_itself(
-        self, user_api_factory, group_api_factory, web_testapp, session
+        self, user_api_factory, web_testapp, session
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4487,18 +4381,16 @@ class TestSetPasswordEndpoint(object):
         assert not user.validate_password("password")
         assert user.validate_password("mynewpassword")
 
-    def test_api__set_user_email__err_403__other_normal_user(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__err_403__other_normal_user(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             lang="fr",
             timezone="Europe/Paris",
             do_save=True,
@@ -4508,7 +4400,7 @@ class TestSetPasswordEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4538,18 +4430,16 @@ class TestSetUserInfoEndpoint(object):
     Tests for PUT /api/v2/users/{user_id}
     """
 
-    def test_api__set_user_info__ok_200__admin(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_info__ok_200__admin(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4578,18 +4468,16 @@ class TestSetUserInfoEndpoint(object):
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
 
-    def test_api__set_user_info__ok_200__user_itself(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_info__ok_200__user_itself(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4618,18 +4506,16 @@ class TestSetUserInfoEndpoint(object):
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
 
-    def test_api__set_user_info__err_403__other_normal_user(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_info__err_403__other_normal_user(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4639,7 +4525,7 @@ class TestSetUserInfoEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="test",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4667,18 +4553,16 @@ class TestSetUserProfileEndpoint(object):
     Tests for PUT /api/v2/users/{user_id}/profile
     """
 
-    def test_api__set_user_profile__ok_200__admin(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_profile__ok_200__admin(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4729,22 +4613,20 @@ class TestSetUserProfileEndpoint(object):
         assert res["user_id"] == admin_user.user_id
         assert res["profile"] == "administrators"
 
-    def test_api__set_user_profile__err_403__other_normal_user(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_profile__err_403__other_normal_user(self, user_api_factory, web_testapp):
         """
         Set user profile of user normal user as normal user
         Return 403 error because of no right to do this as simple user
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4754,7 +4636,7 @@ class TestSetUserProfileEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="test",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4784,18 +4666,16 @@ class TestSetUserAllowedSpaceEndpoint(object):
     Tests for PUT /api/v2/users/{user_id}/allowed_space
     """
 
-    def test_api__set_user_allowed_space__ok_200__admin(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api__set_user_allowed_space__ok_200__admin(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4823,7 +4703,7 @@ class TestSetUserAllowedSpaceEndpoint(object):
         assert res["allowed_space"] == 134217728
 
     def test_api__set_user_allowed_space__err_403__other_normal_user(
-        self, user_api_factory, group_api_factory, web_testapp
+        self, user_api_factory, web_testapp
     ):
         """
         Set user allowed_space of user normal user as normal user
@@ -4831,13 +4711,13 @@ class TestSetUserAllowedSpaceEndpoint(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4847,7 +4727,7 @@ class TestSetUserAllowedSpaceEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="test",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4878,16 +4758,16 @@ class TestSetUserEnableDisableEndpoints(object):
     and PUT /api/v2/users/{user_id}/disabled
     """
 
-    def test_api_enable_user__ok_200__admin(self, user_api_factory, group_api_factory, web_testapp):
+    def test_api_enable_user__ok_200__admin(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4911,18 +4791,16 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res["user_id"] == user_id
         assert res["is_active"] is True
 
-    def test_api_disable_user__ok_200__admin(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api_disable_user__ok_200__admin(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4965,18 +4843,16 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res["user_id"] == user_id
         assert res["is_active"] is True
 
-    def test_api_enable_user__err_403__other_account(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api_enable_user__err_403__other_account(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -4986,7 +4862,7 @@ class TestSetUserEnableDisableEndpoints(object):
             email="test2@test2.test2",
             password="password",
             name="test2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -5004,18 +4880,16 @@ class TestSetUserEnableDisableEndpoints(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
 
-    def test_api_disable_user__err_403__other_account(
-        self, user_api_factory, group_api_factory, web_testapp
-    ):
+    def test_api_disable_user__err_403__other_account(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -5025,7 +4899,7 @@ class TestSetUserEnableDisableEndpoints(object):
             email="test2@test2.test2",
             password="password",
             name="test2",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -5044,7 +4918,7 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
 
     def test_api_disable_user__err_403__cant_disable_myself_user(
-        self, user_api_factory, group_api_factory, web_testapp
+        self, user_api_factory, web_testapp
     ):
         """
         Trying to disable himself as simple user, raise 403 because no
@@ -5053,13 +4927,13 @@ class TestSetUserEnableDisableEndpoints(object):
         """
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="fr",
             do_save=True,
@@ -5128,17 +5002,12 @@ class TestUserEnpointsLDAPAuth(object):
         assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
 
     @pytest.mark.ldap
-    def test_api__create_user__ok_200__full_admin(
-        self, web_testapp, user_api_factory, group_api_factory
-    ):
+    def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
         web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
         web_testapp.get("/api/v2/auth/whoami", status=200)
         api = user_api_factory.get(current_user=None)
         user = api.get_one_by_email("hubert@planetexpress.com")
-        gapi = group_api_factory.get(current_user=user)
-        api.update(
-            user, auth_type=user.auth_type, groups=[gapi.get_one_with_name("administrators")]
-        )
+        api.update(user, auth_type=user.auth_type, profile=Profile.ADMIN)
         api.save(user)
         transaction.commit()
         params = {

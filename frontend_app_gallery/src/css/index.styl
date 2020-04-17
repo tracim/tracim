@@ -12,34 +12,47 @@
     & .slick-current
       & .carousel__thumbnail__item__preview__content__image
         background-color #7d4e24
-    &__item__preview__content
-      height 125px
-      margin 16px
-      display flex
-      align-items center
-      cursor pointer
-      &__image
-        margin 0 auto
-        box-shadow 0 0 8px 4px rgba(0,0,0,0.2)
-        border none
-        &:hover
-          box-shadow 0 0 16px 4px rgba(0,0,0,0.3)
+      & .carousel__thumbnail__item__preview__error
+        color #7d4e24
+    &__item__preview
+      &__content
+        height 125px
+        margin 16px
+        display flex
+        align-items center
+        cursor pointer
+        &__image
+          margin 0 auto
+          box-shadow 0 0 8px 4px rgba(0,0,0,0.2)
+          border none
+          &:hover
+            box-shadow 0 0 16px 4px rgba(0,0,0,0.3)
+      &__error
+        margin auto
+        font-size 30px
   &__item__preview
     height 100%
     &__content
       height 100%
       display: block
-      text-align: center
       &__image
         padding 8px
+        justify-content center
+        align-items center
         display flex
         height 100%
         & img
-          max-height 100%
-          margin auto
           object-fit contain
           cursor pointer
           box-shadow 0 0 8px 2px rgba(0,0,0,0.2)
+    &__error
+      height 100%
+      display flex
+      align-items center
+      &__message
+        margin auto
+      &__icon
+        font-size 30px
   &__arrow
     position absolute
     height 100%

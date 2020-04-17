@@ -131,6 +131,7 @@ class UploadPermissionLib(object):
             config.EMAIL__NOTIFICATION__SMTP__PORT,
             config.EMAIL__NOTIFICATION__SMTP__USER,
             config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+            config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
         )
 
         return UploadPermissionEmailManager(config=config, smtp_config=smtp_config, session=session)
@@ -193,8 +194,8 @@ class UploadPermissionLib(object):
                 self.base_query()
                 .filter(UploadPermission.workspace_id == workspace.workspace_id)
                 .filter(UploadPermission.upload_permission_id == upload_permission_id)
-                .one()
-            )  # type: UploadPermission
+                .one()  # type: UploadPermission
+            )  # INFO - GM - 2020-04-02 - do not put typing here, black error : https://github.com/psf/black/issues/1329
         except NoResultFound as exc:
             raise UploadPermissionNotFound(
                 'Upload permission "{}" not found in database'.format(upload_permission_id)

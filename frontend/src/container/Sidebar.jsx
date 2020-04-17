@@ -33,7 +33,7 @@ export class Sidebar extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = async ({ detail: { type, data } }) => {
+  customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
       case CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP:
         this.handleClickNewWorkspace()

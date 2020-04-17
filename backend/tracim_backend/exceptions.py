@@ -227,10 +227,6 @@ class NotificationDisabledCantResetPassword(TracimException):
     error_code = ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
 
-class GroupDoesNotExist(TracimError):
-    pass
-
-
 class ContentStatusNotExist(TracimError):
     pass
 
@@ -331,7 +327,7 @@ class AutoReplyEmailNotAllowed(TracimException):
     pass
 
 
-class NoSpecialKeyFound(EmptyValueNotAllowed):
+class NoKeyFound(EmptyValueNotAllowed):
     pass
 
 

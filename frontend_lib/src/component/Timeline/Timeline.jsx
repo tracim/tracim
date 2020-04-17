@@ -126,7 +126,13 @@ class Timeline extends React.Component {
 
         {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
           <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
-            <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__texteditor__textinput')}>
+            <div
+              className={classnames(
+                `${props.customClass}__texteditor__textinput`,
+                'timeline__texteditor__textinput',
+                props.wysiwyg ? 'timeline__texteditor__textinput__wysiwyg' : null
+              )}
+            >
               <textarea
                 id='wysiwygTimelineComment'
                 placeholder={props.t('Your message...')}
@@ -141,21 +147,13 @@ class Timeline extends React.Component {
                 <button
                   type='button'
                   className={classnames(
-                    `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn btn outlineTextBtn`
+                    `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn`
                   )}
                   onClick={props.onClickWysiwygBtn}
                   disabled={props.disableComment}
-                  style={{
-                    borderColor: props.customColor,
-                    color: '#252525',
-                    ':hover': {
-                      backgroundColor: props.customColor,
-                      color: '#fdfdfd'
-                    }
-                  }}
                   key={'timeline__comment__advancedtext'}
                 >
-                  {props.wysiwyg ? props.t('Simple text') : props.t('Rich text')}
+                  {props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
                 </button>
               </div>
 

@@ -21,7 +21,7 @@ from tracim_backend.lib.utils.authorization import ProfileChecker
 from tracim_backend.lib.utils.authorization import RoleChecker
 from tracim_backend.lib.utils.authorization import SameUserChecker
 from tracim_backend.lib.utils.request import TracimContext
-from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -55,45 +55,41 @@ class TestAuthorizationChecker(object):
     def test__unit__ProfileChecker__ok__nominal_case(self):
         class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_user = User(user_id=2)
-            current_user.groups.append(Group(group_id=2))
+            current_user.profile = Profile.TRUSTED_USER
 
-        assert ProfileChecker(1).check(FakeBaseFakeTracimContext())
-        assert ProfileChecker(2).check(FakeBaseFakeTracimContext())
+        assert ProfileChecker(Profile.USER).check(FakeBaseFakeTracimContext())
+        assert ProfileChecker(Profile.TRUSTED_USER).check(FakeBaseFakeTracimContext())
 
     def test__unit__ProfileChecker__err__profile_insufficient(self):
         class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             current_user = User(user_id=2)
-            current_user.groups.append(Group(group_id=2))
+            current_user.profile = Profile.TRUSTED_USER
 
-        assert ProfileChecker(2).check(FakeBaseFakeTracimContext())
+        assert ProfileChecker(Profile.USER).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserProfile):
-            ProfileChecker(3).check(FakeBaseFakeTracimContext())
-        with pytest.raises(InsufficientUserProfile):
-            ProfileChecker(4).check(FakeBaseFakeTracimContext())
+            ProfileChecker(Profile.ADMIN).check(FakeBaseFakeTracimContext())
 
     def test__unit__CandidateUserProfileChecker__ok__nominal_case(self):
         class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             candidate_user = User(user_id=2)
-            candidate_user.groups.append(Group(group_id=2))
+            candidate_user.profile = Profile.TRUSTED_USER
 
-        assert CandidateUserProfileChecker(1).check(FakeBaseFakeTracimContext())
-        assert CandidateUserProfileChecker(2).check(FakeBaseFakeTracimContext())
+        assert CandidateUserProfileChecker(Profile.USER).check(FakeBaseFakeTracimContext())
+        assert CandidateUserProfileChecker(Profile.TRUSTED_USER).check(FakeBaseFakeTracimContext())
 
     def test__unit__CandidateUserProfileChecker__err__profile_insufficient(self):
         class FakeBaseFakeTracimContext(BaseFakeTracimContext):
             candidate_user = User(user_id=2)
-            candidate_user.groups.append(Group(group_id=2))
+            candidate_user.profile = Profile.TRUSTED_USER
 
-        assert CandidateUserProfileChecker(2).check(FakeBaseFakeTracimContext())
+        assert CandidateUserProfileChecker(Profile.TRUSTED_USER).check(FakeBaseFakeTracimContext())
         with pytest.raises(InsufficientUserProfile):
-            CandidateUserProfileChecker(3).check(FakeBaseFakeTracimContext())
-        with pytest.raises(InsufficientUserProfile):
-            CandidateUserProfileChecker(4).check(FakeBaseFakeTracimContext())
+            CandidateUserProfileChecker(Profile.ADMIN).check(FakeBaseFakeTracimContext())
 
     def test__unit__RoleChecker__ok__nominal_case(self, session):
 
         current_user = User(user_id=2, email="toto@toto.toto")
-        current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
+        current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=5)
         session.add(current_user)
@@ -117,7 +113,7 @@ class TestAuthorizationChecker(object):
     def test__unit__RoleChecker__err_role_insufficient(self, session):
 
         current_user = User(user_id=2, email="toto@toto.toto")
-        current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
+        current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=2)
         session.add(current_user)
@@ -144,7 +140,7 @@ class TestAuthorizationChecker(object):
     def test__unit__RoleChecker__err_no_role_in_workspace(self, session):
 
         current_user = User(user_id=2, email="toto@toto.toto")
-        current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
+        current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
         session.add(current_user)
         session.add(current_workspace)
@@ -173,7 +169,7 @@ class TestAuthorizationChecker(object):
     def test__unit__CandidateWorkspaceRoleChecker__ok__nominal_case(self, session):
 
         current_user = User(user_id=2, email="toto@toto.toto")
-        current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
+        current_user.profile = Profile.TRUSTED_USER
         candidate_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=5)
         session.add(current_user)
@@ -197,7 +193,7 @@ class TestAuthorizationChecker(object):
     def test__unit__CandidateWorkspaceRoleChecker__err_role_insufficient(self, session):
 
         current_user = User(user_id=2, email="toto@toto.toto")
-        current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
+        current_user.profile = Profile.TRUSTED_USER
         candidate_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=2)
         session.add(current_user)
@@ -224,7 +220,7 @@ class TestAuthorizationChecker(object):
     def test__unit__CandidateWorkspaceRoleChecker__err_no_role_in_workspace(self, session):
 
         current_user = User(user_id=2, email="toto@toto.toto")
-        current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
+        current_user.profile = Profile.TRUSTED_USER
         candidate_workspace = Workspace(workspace_id=3, owner=current_user)
         session.add(current_user)
         session.add(candidate_workspace)
@@ -493,7 +489,7 @@ class TestAuthorizationChecker(object):
     def test__unit__ContentTypeCreationChecker__ok__implicit(self, session):
 
         current_user = User(user_id=2, email="toto@toto.toto")
-        current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
+        current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
         candidate_content_type = TracimContentType(
             slug="test",
@@ -534,7 +530,7 @@ class TestAuthorizationChecker(object):
     def test__unit__ContentTypeCreationChecker__ok__explicit(self, session):
 
         current_user = User(user_id=2, email="toto@toto.toto")
-        current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
+        current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
         candidate_content_type = TracimContentType(
             slug="test",
@@ -575,7 +571,7 @@ class TestAuthorizationChecker(object):
     ):
 
         current_user = User(user_id=2, email="toto@toto.toto")
-        current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
+        current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
         candidate_content_type = TracimContentType(
             slug="test",
@@ -619,7 +615,7 @@ class TestAuthorizationChecker(object):
     ):
 
         current_user = User(user_id=2, email="toto@toto.toto")
-        current_user.groups.append(Group(group_id=2, group_name=Group.TIM_MANAGER_GROUPNAME))
+        current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
         role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level)
         candidate_content_type = TracimContentType(
