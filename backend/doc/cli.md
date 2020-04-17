@@ -150,28 +150,33 @@ you can do:
 This will give you an almost complete list of tracim parameters available.
 The list is the same as the list available in [settings documentation](setting.md).
 
-Others parameters are available using internal doc:
+Others parameters are available using internal documentation:
 
     tracimcli dev parameters list -h
 
 ## Parameters values and more
 
-To get a specific parameter value applied you can use :
-
-    tracimcli dev parameters value -n app.enabled
-
 To get all parameters values applied:
 
     tracimcli dev parameters value
 
-You can use this one to get default value of parameters:
+Many others parameters are available using internal documentation:
+
+    tracimcli dev parameters value -h
+
+Example 1: getting a specific parameter value applied:
+
+    # with config file name syntax:
+    tracimcli dev parameters value -n app.enabled
+    # is equivalent to (tracim internal parameter syntax):
+    tracimcli dev parameters value -n APP__ENABLED
+    # is equivalent to (env var syntax):
+    tracimcli dev parameters value -n TRACIM_APP__ENABLED
+
+Example 2: getting default value of parameters:
 
     tracimcli dev parameters value --template "|{config_name: <30}|{default_value: <30}"
 
-of to get the max information know:
+Example 3: getting the maximum information known about a specific parameter:
 
-    tracimcli dev parameters value -f
-
-Others parameters are available using internal doc:
-
-    tracimcli dev parameters value -h
+    tracimcli dev parameters value -f -n DEBUG
