@@ -136,7 +136,7 @@ export class AdminForm extends React.Component {
 
             <button onClick={() => this.setState({editor: !this.state.editor})}>{this.state.editor ? 'Drag and drop' : 'Json editor'}</button>
             <div>
-              <div className='divLeft'>
+              <div className='adminUser__left'>
                 {this.state.editor
                   ? (
                     <JsonFormEditor
@@ -161,7 +161,7 @@ export class AdminForm extends React.Component {
                 }
               </div>
 
-              <div className='divRight'>
+              <div className='adminUser__right'>
                 <div>
                   {this.state.schema && (
                     <ErrorBoundary>
