@@ -231,6 +231,6 @@ Note: to retrieve all frontend apps, run this command:
     ls -d frontend*
 
 <a href='https://www.browserstack.com' target='_blank'>
-    <img src='https://raw.githubusercontent.com/tracim/tracim/master/tracim/tracim/public/assets/img/logo_browserstack.png' width='150'>
+    <img src='https://raw.githubusercontent.com/tracim/tracim/master/logo_browserstack.png' width='150'>
 </a>
 BrowserStack support open source project and graciously helps us testing Tracim on every devices.
