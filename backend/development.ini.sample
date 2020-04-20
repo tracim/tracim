@@ -221,10 +221,16 @@ api.key = %(basic_setup.api_key)s
 ## LDAP server address
 ; ldap_url = ldap://localhost:389
 ## Bind dn to identify the search
+; ldap_bind_dn =
+# example:
 # ldap_bind_dn = cn=admin,dc=directory,dc=fsf,dc=org
 ## The bind password
+; ldap_bind_pass =
+# example:
 # ldap_bind_pass = toor
 ## Base dn to make queries of users
+; ldap_user_base_dn =
+# example:
 # ldap_user_base_dn = ou=Users,dc=directory,dc=fsf,dc=org
 ## Attribute name of user record who contain user login (email)
 ; ldap_login_attribute = mail
@@ -270,6 +276,7 @@ website.base_url = %(basic_setup.website_base_url)s
 # feature. you add your javascript in this folder, all content
 # of this folder will be serve in /custom_toolbox-assets
 # and all javascript ".js" file will be added to index.html file.
+; frontend.custom_toolbox_folder_path =
 # example:
 # frontend.custom_toolbox_folder_path = /tmp/custom_toolbox
 
@@ -288,6 +295,8 @@ website.base_url = %(basic_setup.website_base_url)s
 # check for color.json file in Tracim, check by default in Tracim parent
 # dir of backend.
 ## you can set a specific file path here
+; color.config_file_path =
+# example:
 # color.config_file_path = /home/user/tracim/color.json
 
 ### Webdav ###
@@ -329,6 +338,11 @@ email.template_dir = %(here)s/tracim_backend/templates/mail
 
 ### SMTP ###
 
+
+; email.notification.smtp.server =
+; email.notification.smtp.port =
+; email.notification.smtp.user =
+; email.notification.smtp.password =
 # configuration example:
 # email.notification.smtp.server = your_smtp_server
 # email.notification.smtp.port = 25
@@ -355,24 +369,29 @@ email.template_dir = %(here)s/tracim_backend/templates/mail
 # of pattern with multiple variable will not work correctly :
 # reply+{content_id}{content_id}@trac.im
 
+
+## valid variable is 'user_id' for 'from' header:
+; email.notification.from.email =
+## valid variable is 'content_id' for 'reply_to' header:
+; email.notification.reply_to.email =
+## valid variable is 'content_id' for 'references' header:
+; email.notification.references.email =
+
+# example of recommanded pattern (for 'from' header):
+# email.notification.from.email = noreply+{user_id}@trac.im
+
+# tagging reply_to header of email with content_id is needed for working
+# email_reply feature
 # example of recommanded pattern (for 'reply_to' header):
 # email.notification.reply_to.email = reply+{content_id}@domainname.tld
 # email.notification.reply_to.email = {content_id}@reply.domainname.tld
 # email.notification.reply_to.email = reply+cid{content_id}@domainname.tld
 
-## valid variable is 'user_id' for 'from' header:
-# email.notification.from.email = noreply+{user_id}@trac.im
-
-# tagging reply_to header of email with content_id is needed for working
-# email_reply feature
-## valid variable is 'content_id' for 'reply_to' header:
-# email.notification.reply_to.email = reply+{content_id}@trac.im
-
 # tagging reference header of email with content_id is nice to have
 # all modification to a same content in a same email client thread
 # Note: reference doesn't need to be an existing email account but should
 # be a email like string.
-## valid variable is 'content_id' for 'references' header
+# example of recommanded pattern (for 'references' header):
 # email.notification.references.email = thread+{content_id}@trac.im
 
 # emails subjects:
@@ -412,12 +431,18 @@ email.template_dir = %(here)s/tracim_backend/templates/mail
 # Tracim email reply feature will read all mails in following IMAP,
 # to be able to transform email responses into Tracim app comments.
 
+; email.reply.imap.server =
+; email.reply.imap.port =
+; email.reply.imap.user =
+; email.reply.imap.password =
+; email.reply.imap.folder = INBOX
+; email.reply.imap.use_ssl = True
+
+# example:
 # email.reply.imap.server = your_imap_server
 # email.reply.imap.port = 993
 # email.reply.imap.user = your_imap_user
 # email.reply.imap.password = your_imap_password
-; email.reply.imap.folder = INBOX
-; email.reply.imap.use_ssl = True
 
 # IMAP IDLE feature is for real-time notifications (its not necessary to use function send & receive)
 # if this option is available in your imap server, change this parameter to True
@@ -517,6 +542,8 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ; search.elasticsearch.request_timeout = 60
 
 # main index alias use to search/index content in elasticsearch
+; search.elasticsearch.index_alias =
+# example:
 # search.elasticsearch.index_alias = tracim_contents
 
 # template_name for all index created currently only {index_alias} and {date} variable are usable.
@@ -530,10 +557,14 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 # define mimetypes to be plain-text indexed. List of mimetypes, separated by a coma ",".
 # if set to empty, index documents of any mimetype:
+; search.elasticsearch.ingest.mimetype_whitelist =
+# example:
 # search.elasticsearch.ingest.mimetype_whitelist = text/markdown,text/plain
 
 # exclude mimetypes from plain-text indexation. If a mimetype is both in whitelist and blacklist, it will be blacklisted.
 # if set to empty, do nothing. default value is empty, meaning no blacklist:
+; search.elasticsearch.ingest.mimetype_blacklist =
+# example:
 # search.elasticsearch.ingest.mimetype_blacklist = application/gzip,application/zip
 
 # add size limit (in bytes) for elasticsearch ingest activation
