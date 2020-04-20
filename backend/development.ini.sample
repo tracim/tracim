@@ -367,7 +367,7 @@ email.template_dir = %(here)s/tracim_backend/templates/mail
 # header for from, reply-to and references headers.
 # those allow to set one variable only one time in email pattern, this kind
 # of pattern with multiple variable will not work correctly :
-# reply+{content_id}{content_id}@trac.im
+# reply+{content_id}{content_id}@domainname.tld
 
 
 ## valid variable is 'user_id' for 'from' header:
@@ -378,7 +378,7 @@ email.template_dir = %(here)s/tracim_backend/templates/mail
 ; email.notification.references.email =
 
 # example of recommanded pattern (for 'from' header):
-# email.notification.from.email = noreply+{user_id}@trac.im
+# email.notification.from.email = noreply+{user_id}@domainname.tld
 
 # tagging reply_to header of email with content_id is needed for working
 # email_reply feature
@@ -392,7 +392,7 @@ email.template_dir = %(here)s/tracim_backend/templates/mail
 # Note: reference doesn't need to be an existing email account but should
 # be a email like string.
 # example of recommanded pattern (for 'references' header):
-# email.notification.references.email = thread+{content_id}@trac.im
+# email.notification.references.email = thread+{content_id}@domainname.tld
 
 # emails subjects:
 ; email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
