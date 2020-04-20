@@ -1,7 +1,7 @@
 import { FETCH_CONFIG } from './helper.js'
 
-export const getHtmlDocContent = (apiUrl, idWorkspace, idContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/html-documents/${idContent}`, {
+export const getCustomFormContent = (apiUrl, idWorkspace, idContent) =>
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/custom-form/${idContent}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -9,7 +9,7 @@ export const getHtmlDocContent = (apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const getHtmlDocComment = (apiUrl, idWorkspace, idContent) =>
+export const getCustomFormComment = (apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
     credentials: 'include',
     headers: {
@@ -18,7 +18,7 @@ export const getHtmlDocComment = (apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const getHtmlDocRevision = (apiUrl, idWorkspace, idContent) =>
+export const getCustomFormRevision = (apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/html-documents/${idContent}/revisions`, {
     credentials: 'include',
     headers: {
@@ -27,7 +27,7 @@ export const getHtmlDocRevision = (apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const postHtmlDocNewComment = (apiUrl, idWorkspace, idContent, newComment) =>
+export const postCustomFormNewComment = (apiUrl, idWorkspace, idContent, newComment) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
     credentials: 'include',
     headers: {
@@ -39,7 +39,7 @@ export const postHtmlDocNewComment = (apiUrl, idWorkspace, idContent, newComment
     })
   })
 
-export const putHtmlDocContent = (apiUrl, idWorkspace, idContent, label, newContent) =>
+export const putCustomFormContent = (apiUrl, idWorkspace, idContent, label, newContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/html-documents/${idContent}`, {
     credentials: 'include',
     headers: {
@@ -52,7 +52,7 @@ export const putHtmlDocContent = (apiUrl, idWorkspace, idContent, label, newCont
     })
   })
 
-export const putHtmlDocStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
+export const putCustomFormStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/html-documents/${idContent}/status`, {
     credentials: 'include',
     headers: {
@@ -64,7 +64,7 @@ export const putHtmlDocStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
     })
   })
 
-export const postHtmlDocContent = (apiUrl, idWorkspace, idFolder, contentType, newContentName) =>
+export const postCustomFormContent = (apiUrl, idWorkspace, idFolder, contentType, newContentName) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents`, {
     credentials: 'include',
     headers: {
@@ -78,7 +78,7 @@ export const postHtmlDocContent = (apiUrl, idWorkspace, idFolder, contentType, n
     })
   })
 
-export const putHtmlDocIsArchived = (apiUrl, idWorkspace, idContent) => {
+export const putCustomFormIsArchived = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived`, {
     credentials: 'include',
     headers: {
@@ -88,7 +88,7 @@ export const putHtmlDocIsArchived = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putHtmlDocIsDeleted = (apiUrl, idWorkspace, idContent) => {
+export const putCustomFormIsDeleted = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed`, {
     credentials: 'include',
     headers: {
@@ -98,7 +98,7 @@ export const putHtmlDocIsDeleted = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putHtmlDocRestoreArchived = (apiUrl, idWorkspace, idContent) => {
+export const putCustomFormRestoreArchived = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived/restore`, {
     credentials: 'include',
     headers: {
@@ -108,7 +108,7 @@ export const putHtmlDocRestoreArchived = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putHtmlDocRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
+export const putCustomFormRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed/restore`, {
     credentials: 'include',
     headers: {
@@ -118,7 +118,7 @@ export const putHtmlDocRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putHtmlDocRead = (user, apiUrl, idWorkspace, idContent) => {
+export const putCustomFormRead = (user, apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/${idContent}/read`, {
     credentials: 'include',
     headers: {

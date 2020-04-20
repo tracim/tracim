@@ -37,29 +37,29 @@ export class MarkdownField extends React.Component {
   }
 
   render () {
-    const p = this.props
+    const { props } = this
     return (
       <div>
         <label className='control-label'>
-          {p.schema.title ? p.schema.title : 'title undefined'}
+          {props.schema.title ? props.schema.title : 'title undefined'}
         </label>
-        {!p.disabled && (
+        {!props.disabled && (
           <p>
             <input type={'button'} onClick={() => this.setState({tab: 'write'})} value={'Write'} />
             <input type={'button'} onClick={() => this.setState({tab: 'preview'})} value={'Preview'} />
           </p>
         )}
-        {(p.disabled || this.state.tab === 'preview') && (
+        {(props.disabled || this.state.tab === 'preview') && (
           <div style={{position: 'relative'}}>
             <article id='preview' />
           </div>
         )}
-        {(!p.disabled && this.state.tab === 'write') && (
+        {(!props.disabled && this.state.tab === 'write') && (
           <ReactMde
             onChange={this.handleValueChange}
             onTabChange={this.handleTabChange}
-            value={p.formData}
-            readOnly={p.disabled}
+            value={props.formData}
+            readOnly={props.disabled}
           />
         )}
       </div>

@@ -7,17 +7,19 @@ import field from './CustomFields/index'
 
 export class JsonForm extends React.Component {
   render () {
+    const { props } = this
+
     return (
       <div>
-        {this.props.isDisable && (
+        {props.isDisable && (
           <Form
-            disabled={this.props.isDisable}
-            schema={this.props.schema}
-            formData={this.props.formData}
-            uiSchema={this.props.uiSchema}
-            onChange={this.props.onChange}
+            disabled={props.isDisable}
+            schema={props.schema}
+            formData={props.formData}
+            uiSchema={props.uiSchema}
+            onChange={props.onChange}
             fields={field}
-            formContext={this.props.contextForm}
+            formContext={props.contextForm}
             noValidate
           >
             <p
@@ -26,54 +28,54 @@ export class JsonForm extends React.Component {
             />
           </Form>
         )}
-        {this.props.isDisable === false &&
+        {props.isDisable === false &&
         <Form
-          disabled={this.props.isDisable}
-          schema={this.props.schema}
-          formData={this.props.formData}
+          disabled={props.isDisable}
+          schema={props.schema}
+          formData={props.formData}
           fields={field}
-          uiSchema={this.props.uiSchema}
-          onChange={this.props.onChange}
-          onSubmit={this.props.onClickValidateBtn}
-          formContext={this.props.contextForm}
+          uiSchema={props.uiSchema}
+          onChange={props.onChange}
+          onSubmit={props.onClickValidateBtn}
+          formContext={props.contextForm}
           noValidate
         >
           <div
-            className={`${this.props.customClass}__button editionmode__button`}>
+            className={`${props.customClass}__button editionmode__button`}>
             <button
               type='button'
-              className={`${this.props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn mr-3`}
-              onClick={this.props.onClickCancelBtn}
+              className={`${props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn mr-3`}
+              onClick={props.onClickCancelBtn}
               style={{
                 backgroundColor: '#fdfdfd',
-                color: this.props.customColor,
-                borderColor: this.props.customColor,
+                color: props.customColor,
+                borderColor: props.customColor,
                 ':hover': {
-                  backgroundColor: this.props.customColor,
+                  backgroundColor: props.customColor,
                   color: '#fdfdfd'
                 }
               }}
               key='CustomForm_Validata__cancel'
             >
-              {this.props.t('Cancel')}
+              {props.t('Cancel')}
             </button>
 
             <button
               type='submit'
               data-cy='editionmode__button__submit'
-              className={`${this.props.customClass}__submit editionmode__button__submit btn highlightBtn`}
-              disabled={this.props.disableValidateBtn}
+              className={`${props.customClass}__submit editionmode__button__submit btn highlightBtn`}
+              disabled={props.disableValidateBtn}
               style={{
-                backgroundColor: this.props.customColor,
+                backgroundColor: props.customColor,
                 color: '#fdfdfd',
-                borderColor: this.props.customColor,
+                borderColor: props.customColor,
                 ':hover': {
-                  backgroundColor: color(this.props.customColor).darken(0.15).hexString()
+                  backgroundColor: color(props.customColor).darken(0.15).hexString()
                 }
               }}
               key='CustomForm__Validata'
             >
-              {this.props.t('Validate')}
+              {props.t('Validate')}
             </button>
           </div>
         </Form>}

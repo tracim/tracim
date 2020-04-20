@@ -3,7 +3,6 @@ import CustomFormComponent from '../component/CustomFormComponent.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
   PopinFixedHeader,
@@ -25,17 +24,17 @@ import {
   initWysiwyg
 } from '../helper.js'
 import {
-  getHtmlDocContent,
-  getHtmlDocComment,
-  getHtmlDocRevision,
-  postHtmlDocNewComment,
-  putHtmlDocContent,
-  putHtmlDocStatus,
-  putHtmlDocIsArchived,
-  putHtmlDocIsDeleted,
-  putHtmlDocRestoreArchived,
-  putHtmlDocRestoreDeleted,
-  putHtmlDocRead
+  getCustomFormContent,
+  getCustomFormComment,
+  getCustomFormRevision,
+  postCustomFormNewComment,
+  putCustomFormContent,
+  putCustomFormStatus,
+  putCustomFormIsArchived,
+  putCustomFormIsDeleted,
+  putCustomFormRestoreArchived,
+  putCustomFormRestoreDeleted,
+  putCustomFormRead
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -229,12 +228,12 @@ class CustomForm extends React.Component {
   loadContent = async () => {
     const { loggedUser, content, config, appName } = this.state
 
-    const fetchResultHtmlDocument = getHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultComment = getHtmlDocComment(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultRevision = getHtmlDocRevision(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultCustomForm = getCustomFormContent(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultComment = getCustomFormComment(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRevision = getCustomFormRevision(config.apiUrl, content.workspace_id, content.content_id)
 
-    const [resHtmlDocument, resComment, resRevision] = await Promise.all([
-      handleFetchResult(await fetchResultHtmlDocument),
+    const [resCustomForm, resComment, resRevision] = await Promise.all([
+      handleFetchResult(await fetchResultCustomForm),
       handleFetchResult(await fetchResultComment),
       handleFetchResult(await fetchResultRevision)
     ])
@@ -268,7 +267,7 @@ class CustomForm extends React.Component {
       ], [])
 
     const localStorageComment = localStorage.getItem(
-      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, appName, 'comment')
+      generateLocalStorageContentId(resCustomForm.body.workspace_id, resCustomForm.body.content_id, appName, 'comment')
     )
 
     // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
@@ -286,17 +285,17 @@ class CustomForm extends React.Component {
 
     // can't use this.getLocalStorageItem because it uses state that isn't yet initialized
     const localStorageRawContent = localStorage.getItem(
-      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, appName, 'rawContent')
+      generateLocalStorageContentId(resCustomForm.body.workspace_id, resCustomForm.body.content_id, appName, 'rawContent')
     )
     // HACK
     // const hasLocalStorageRawContent = !!localStorageRawContent
-    const rawContent = JSON.parse(resHtmlDocument.body.raw_content)
+    const rawContent = JSON.parse(resCustomForm.body.raw_content)
     // const hasLocalStorageRawContent = !!localStorageRawContent
     const hasLocalStorageRawContent = false
     this.setState({
       mode: modeToRender,
       content: {
-        ...resHtmlDocument.body,
+        ...resCustomForm.body,
         raw_content: modeToRender === MODE.EDIT && hasLocalStorageRawContent
           ? localStorageRawContent
           : rawContent.formData
@@ -309,7 +308,7 @@ class CustomForm extends React.Component {
       hexcolor: rawContent.hexcolor,
       faIcon: rawContent.faIcon
     })
-    await putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
+    await putCustomFormRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}}) // await above makes sure that we will reload workspace content after the read status update
   }
 
@@ -335,17 +334,17 @@ class CustomForm extends React.Component {
       // formData: data.formData
       formData: state.content.raw_content
     }
-    const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle, JSON.stringify(rawContent))
+    const fetchResultSaveCustomForm = await handleFetchResult(
+      await putCustomFormContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle, JSON.stringify(rawContent))
     )
 
-    switch (fetchResultSaveHtmlDoc.apiResponse.status) {
+    switch (fetchResultSaveCustomForm.apiResponse.status) {
       case 200:
         this.loadContent()
         GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
         break
       case 400:
-        switch (fetchResultSaveHtmlDoc.body.code) {
+        switch (fetchResultSaveCustomForm.body.code) {
           case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
           case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
@@ -392,27 +391,24 @@ class CustomForm extends React.Component {
       // formData: data.formData
       formData: data.formData
     }
-    this.handleSaveHtmlDocument(JSON.stringify(rawContent))
-    // this.handleSaveHtmlDocument(JSON.stringify(data.formData)).then(() => console.log('ok'))
+    this.handleSaveCustomForm(JSON.stringify(rawContent))
   };
 
-  handleSaveHtmlDocument = async (data) => {
+  handleSaveCustomForm = async (data) => {
     const { state, props } = this
     const backupLocalStorage = this.getLocalStorageItem('rawContent')
 
     localStorage.removeItem(
-      // generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
       // HACK
       generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, 'html-document', 'rawContent')
     )
 
-    const fetchResultSaveHtmlDoc = await handleFetchResult(
+    const fetchResultSaveCustomForm = await handleFetchResult(
       // HACK
-      // await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, state.content.raw_content)
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, data)
+      await putCustomFormContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, data)
     )
 
-    switch (fetchResultSaveHtmlDoc.apiResponse.status) {
+    switch (fetchResultSaveCustomForm.apiResponse.status) {
       case 200:
         // this.handleCloseNewVersion() // HACK
         this.loadContent()
@@ -445,7 +441,7 @@ class CustomForm extends React.Component {
       ? state.newComment
       : `<p>${convertBackslashNToBr(state.newComment)}</p>`
 
-    const fetchResultSaveNewComment = await handleFetchResult(await postHtmlDocNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
+    const fetchResultSaveNewComment = await handleFetchResult(await postCustomFormNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
         this.setState({newComment: ''})
@@ -467,7 +463,7 @@ class CustomForm extends React.Component {
     if (newStatus === state.content.status) return
 
     const fetchResultSaveEditStatus = await handleFetchResult(
-      await putHtmlDocStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
+      await putCustomFormStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
     )
 
     switch (fetchResultSaveEditStatus.status) {
@@ -479,7 +475,7 @@ class CustomForm extends React.Component {
   handleClickArchive = async () => {
     const { config, content } = this.state
 
-    const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultArchive = await putCustomFormIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_archived: true}, mode: MODE.VIEW}))
@@ -499,7 +495,7 @@ class CustomForm extends React.Component {
   handleClickDelete = async () => {
     const { config, content } = this.state
 
-    const fetchResultArchive = await putHtmlDocIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultArchive = await putCustomFormIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_deleted: true}, mode: MODE.VIEW}))
@@ -519,7 +515,7 @@ class CustomForm extends React.Component {
   handleClickRestoreArchived = async () => {
     const { config, content } = this.state
 
-    const fetchResultRestore = await putHtmlDocRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRestore = await putCustomFormRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_archived: false}}))
@@ -539,7 +535,7 @@ class CustomForm extends React.Component {
   handleClickRestoreDeleted = async () => {
     const { config, content } = this.state
 
-    const fetchResultRestore = await putHtmlDocRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRestore = await putCustomFormRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_deleted: false}}))

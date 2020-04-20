@@ -12,16 +12,16 @@ export class ImageField extends React.Component {
   }
 
   render () {
-    const p = this.props
+    const { props } = this
     return (
       <div>
         <label
-          className='control-label'>{p.schema.title ? p.schema.title : 'title undefined'}</label>
+          className='control-label'>{props.schema.title ? props.schema.title : 'title undefined'}</label>
         <div>
-          {p.disabled === false && p.formData &&
+          {props.disabled === false && props.formData &&
           <button onClick={this.removeImage}>Changer
             d'image</button>}
-          {p.disabled === false && p.formData === undefined && (
+          {props.disabled === false && props.formData === undefined && (
             <FileBase64
               multiple={false}
               onDone={this.getFile}
@@ -29,8 +29,8 @@ export class ImageField extends React.Component {
           )}
         </div>
         <div>
-          {p.formData && <img src={p.formData} />}
-          {p.formData === undefined && <p>Image non défini</p>}
+          {props.formData && <img src={props.formData} />}
+          {props.formData === undefined && <p>Image non défini</p>}
         </div>
       </div>
     )

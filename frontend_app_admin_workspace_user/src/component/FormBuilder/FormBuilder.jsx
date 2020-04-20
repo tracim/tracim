@@ -4,7 +4,8 @@ import FieldType from './FieldType'
 import PropTypes from 'prop-types'
 import {
   FIELD_TYPE,
-  POSITION } from '../../helper'
+  POSITION
+} from '../../helper.js'
 
 class FormBuilder extends React.Component {
   render () {

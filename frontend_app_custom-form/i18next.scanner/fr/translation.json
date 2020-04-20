@@ -22,8 +22,8 @@
   "This content is deprecated": "Ce contenu est obsolète",
   "New form": "Nouveau formulaire",
   "Title undefined": "Titre non défini",
-  "Form generator": "__NOT_TRANSLATED__",
-  "Generate a Form": "__NOT_TRANSLATED__",
-  "Cancel": "__NOT_TRANSLATED__",
-  "Validate": "__NOT_TRANSLATED__"
+  "Form generator": "Générateur de formulaire",
+  "Generate a Form": "Générater un formulaire",
+  "Cancel": "Annuler",
+  "Validate": "Valider"
 }

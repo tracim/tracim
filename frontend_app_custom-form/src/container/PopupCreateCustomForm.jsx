@@ -6,11 +6,13 @@ import {
   addAllResourceI18n
 } from 'tracim_frontend_lib'
 import i18n from '../i18n.js'
-import { postHtmlDocContent, putHtmlDocContent } from '../action.async'
+import {
+  postCustomFormcContent,
+  putCustomFormContent
+} from '../action.async'
 
 const debug = { // outdated
   config: {
-    // label: 'New Document',
     slug: 'custom-form',
     faIcon: 'file-text-o',
     hexcolor: '#3f52e3',
@@ -42,7 +44,7 @@ class PopupCreateCustomForm extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'custom-form', // must remain 'custom-form' because it is the name of the react built app (which contains HtmlDocument and PopupCreateCustomForm)
+      appName: 'custom-form', // must remain 'custom-form' because it is the name of the react built app (which contains CustomForm and PopupCreateCustomForm)
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       idWorkspace: props.data ? props.data.idWorkspace : debug.idWorkspace,
@@ -87,9 +89,8 @@ class PopupCreateCustomForm extends React.Component {
   handleValidate = async () => {
     const { config, appName, idWorkspace, idFolder, newContentName } = this.state
     // HACK
-    // const fetchSaveNewHtmlDoc = postHtmlDocContent(config.apiUrl, idWorkspace, idFolder, config.slug, newContentName)
-    const fetchSaveNewHtmlDoc = postHtmlDocContent(config.apiUrl, idWorkspace, idFolder, 'html-document', newContentName)
-    const resSave = await handleFetchResult(await fetchSaveNewHtmlDoc)
+    const fetchSaveNewCustomForm = postCustomFormContent(config.apiUrl, idWorkspace, idFolder, 'html-document', newContentName)
+    const resSave = await handleFetchResult(await fetchSaveNewCustomForm)
 
     switch (resSave.apiResponse.status) {
       case 200:
@@ -102,7 +103,7 @@ class PopupCreateCustomForm extends React.Component {
           schema: this.props.data.config.schema,
           uischema: this.props.data.config.uischema
         }
-        const rawContentHtmlPut = putHtmlDocContent(config.apiUrl, resSave.body.workspace_id, resSave.body.content_id, newContentName, JSON.stringify(data))
+        const rawContentHtmlPut = putCustomFormContent(config.apiUrl, resSave.body.workspace_id, resSave.body.content_id, newContentName, JSON.stringify(data))
         const resPut = await handleFetchResult(await rawContentHtmlPut)
         if (resPut.apiResponse.status === 200) {
           GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })

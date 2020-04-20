@@ -13,10 +13,12 @@ const style = {
 
 class FieldType extends React.Component {
   render () {
-    const opacity = this.props.isDragging ? 0.4 : 1
+    const { props } = this
+
+    const opacity = props.isDragging ? 0.4 : 1
     return (
-      <div ref={this.props.connectDragSource} style={{ ...style, opacity }}>
-        {this.props.name}
+      <div ref={props.connectDragSource} style={{ ...style, opacity }}>
+        {props.name}
       </div>
     )
   }

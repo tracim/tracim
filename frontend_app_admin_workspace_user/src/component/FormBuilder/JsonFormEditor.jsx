@@ -5,7 +5,9 @@ import PropTypes from 'prop-types'
 
 class JsonFormEditor extends React.Component {
   render () {
-    const schema = { ...this.props.schema }
+    const { props } = this
+
+    const schema = { ...props.schema }
     delete schema.change
     return (
       <div style={{marginTop: '2%'}}>
@@ -16,8 +18,8 @@ class JsonFormEditor extends React.Component {
             locale={locale}
             height='550px'
             width={'100%'}
-            placeholder={this.props.schema}
-            onChange={(data) => this.props.onSchemaChange(data.jsObject)}
+            placeholder={props.schema}
+            onChange={(data) => props.onSchemaChange(data.jsObject)}
           />
         </div>
 
@@ -29,8 +31,8 @@ class JsonFormEditor extends React.Component {
             locale={locale}
             height='250px'
             width={'100%'}
-            placeholder={this.props.uiSchema}
-            onChange={this.props.onUiSchemaChange}
+            placeholder={props.uiSchema}
+            onChange={props.onUiSchemaChange}
           />
         </div>
       </div>
