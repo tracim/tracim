@@ -1492,7 +1492,6 @@ class Content(DeclarativeBase):
 
     def get_tree_revisions_advanced(self) -> typing.List[ContentRevisionRO]:
         """Get all revision sorted by id of content and all his children recursively"""
-        # revisions = []  # type: typing.List[ContentRevisionRO]
         RevisionsData = namedtuple("revision_data", ["revision", "is_current_rev"])
         revisions_data = []
         for revision in self.revisions:
