@@ -66,6 +66,10 @@ class HtmlDocument extends React.Component {
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+
+    this.loadContent().then(() => {
+      this.buildBreadcrumbs()
+    })
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
@@ -108,13 +112,6 @@ class HtmlDocument extends React.Component {
         this.loadContent()
         break
     }
-  }
-
-  async componentDidMount () {
-    console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
-
-    await this.loadContent()
-    this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {

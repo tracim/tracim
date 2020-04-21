@@ -65,6 +65,8 @@ class WorkspaceAdvanced extends React.Component {
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+
+    this.loadContent()
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
@@ -96,12 +98,6 @@ class WorkspaceAdvanced extends React.Component {
         this.loadContent()
         break
     }
-  }
-
-  componentDidMount () {
-    console.log('%c<WorkspaceAdvanced> did mount', `color: ${this.state.config.hexcolor}`)
-
-    this.loadContent()
   }
 
   componentDidUpdate (prevProps, prevState) {

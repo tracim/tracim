@@ -89,6 +89,17 @@ class File extends React.Component {
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+
+    const previouslyUnsavedComment = localStorage.getItem(
+      generateLocalStorageContentId(this.state.content.workspace_id, this.state.content.content_id, this.state.appName, 'comment')
+    )
+    if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
+
+    this.loadContent().then(() => {
+      this.loadTimeline()
+      this.buildBreadcrumbs()
+      if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
+    })
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
@@ -123,21 +134,6 @@ class File extends React.Component {
         this.loadTimeline()
         break
     }
-  }
-
-  async componentDidMount () {
-    console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
-    const { state } = this
-
-    const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-    )
-    if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
-
-    await this.loadContent()
-    this.loadTimeline()
-    this.buildBreadcrumbs()
-    if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
   async componentDidUpdate (prevProps, prevState) {
