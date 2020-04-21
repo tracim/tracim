@@ -8,7 +8,9 @@ describe('navigate :: workspace > create_new > custom-form', function () {
   })
 
   it('allcontent > button', function () {
-    this.skip() // INFO - GM - 2020/04/20 - Skip custom_form tests for now
+    // TODO Custom_form tests are skipped for now, tests must be enabled when the app will be activated
+    // see: https://github.com/tracim/tracim/issues/2895
+    this.skip()
     cy.loginAs('users')
     cy.visit(WORKSPACE_URL)
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
