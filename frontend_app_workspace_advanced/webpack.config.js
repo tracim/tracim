@@ -50,7 +50,7 @@ module.exports = {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',
-      exclude: [/node_modules/, /frontend_lib/]
+      exclude: [/node_modules/, /frontend_lib/, /debug\.js/]
     }, {
       test: [/\.js$/, /\.jsx$/],
       exclude: [/node_modules/],
