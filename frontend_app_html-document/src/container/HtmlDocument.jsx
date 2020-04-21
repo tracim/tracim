@@ -452,6 +452,7 @@ class HtmlDocument extends React.Component {
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Edit')}
+                  icon='plus-circle'
                 />
               )}
 
