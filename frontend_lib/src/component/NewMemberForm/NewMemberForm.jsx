@@ -32,6 +32,7 @@ export const NewMemberForm = props => {
             value={props.nameOrEmail}
             onChange={e => props.onChangeNameOrEmail(e.target.value)}
             autoComplete='off'
+            autoFocus
           />
 
           {props.autoCompleteActive && props.nameOrEmail.length >= 2 && (

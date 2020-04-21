@@ -416,6 +416,25 @@ class UserWorkspaceFilterQuerySchema(marshmallow.Schema):
         return UserWorkspaceFilterQuery(**data)
 
 
+class WorkspaceMemberFilterQuery(object):
+    def __init__(self, show_disabled_user: int = 0):
+        self.show_disabled_user = bool(show_disabled_user)
+
+
+class WorkspaceMemberFilterQuerySchema(marshmallow.Schema):
+    show_disabled_user = marshmallow.fields.Int(
+        exemple=0,
+        default=0,
+        description="if set to 1, then show also user which is disabled"
+        " Default is 0, else show them",
+        validate=bool_as_int_validator,
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return WorkspaceMemberFilterQuery(**data)
+
+
 class WorkspaceIdPathSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(
         example=4,

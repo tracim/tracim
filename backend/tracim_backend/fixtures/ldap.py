@@ -20,8 +20,8 @@ ldap_test_server_fixtures = {
         },
         {
             "objectclass": ["organizationalUnit"],
-            "dn": "ou=groups,dc=directory,dc=fsf,dc=org",
-            "attributes": {"ou": "groups"},
+            "dn": "ou=profile,dc=directory,dc=fsf,dc=org",
+            "attributes": {"ou": "profile"},
         },
         {
             "objectclass": ["account", "top"],

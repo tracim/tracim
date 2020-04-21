@@ -51,6 +51,7 @@ class EmailNotifier(INotifier):
             self.config.EMAIL__NOTIFICATION__SMTP__PORT,
             self.config.EMAIL__NOTIFICATION__SMTP__USER,
             self.config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+            self.config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
         )
 
     def notify_content_update(self, content: Content):
@@ -121,12 +122,8 @@ class EmailNotifier(INotifier):
                 EmailManager(self._smtp_config, self.config, self.session).notify_content_update(
                     self._user.user_id, content.content_id
                 )
-        except Exception as e:
-            # TODO - G.M - 2018-08-27 - Do Better catching for exception here
-            logger.error(
-                self, "Exception catched during email notification: {}".format(e.__str__())
-            )
-            logger.exception(self, e)
+        except Exception:
+            logger.exception(self, "Exception catched during email notification")
 
 
 class EmailManager(object):
@@ -313,7 +310,10 @@ class EmailManager(object):
                 # contains only message_id from parents post in thread.
                 # To link this email to a content we create a virtual parent
                 # in reference who contain the content_id.
-                references=EmailAddress("", reference_addr),
+                # INFO - G.M - 2020-04-03 - Enforce angle bracket in references header
+                # we need that to ensure best software compatibility
+                # compat from parsing software
+                references=EmailAddress("", reference_addr, force_angle_bracket=True),
                 body_html=body_html,
                 lang=translator.default_lang,
             )
@@ -445,9 +445,9 @@ class EmailManager(object):
                 lang=translator.default_lang,
                 **context
             )
-        except Exception as exc:
-            logger.exception(self, "Failed to render email template: {}".format(exc.__str__()))
-            raise EmailTemplateError("Failed to render email template: {}".format(exc.__str__()))
+        except Exception:
+            logger.exception(self, "Failed to render email template")
+            raise EmailTemplateError("Failed to render email template")
 
     def _build_context_for_content_update(
         self,
@@ -547,6 +547,7 @@ def get_email_manager(config: CFG, session: Session):
         config.EMAIL__NOTIFICATION__SMTP__PORT,
         config.EMAIL__NOTIFICATION__SMTP__USER,
         config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+        config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
     )
 
     return EmailManager(config=config, smtp_config=smtp_config, session=session)

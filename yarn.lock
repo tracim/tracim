@@ -2246,6 +2246,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"autolinker@npm:^3.13.0":
+  version: 3.14.1
+  resolution: "autolinker@npm:3.14.1"
+  dependencies:
+    tslib: ^1.9.3
+  checksum: 2/0ce159e8ff5f68c6936fa042561b4bc9d27e317f4a39583db072d5a6703e1b67ca08700fd2576d2ffb8a20d7c78a1b2838808108574c6cd9d68d2a1501fb6377
+  languageName: node
+  linkType: hard
+
 "aws-sign2@npm:~0.7.0":
   version: 0.7.0
   resolution: "aws-sign2@npm:0.7.0"
@@ -12872,6 +12881,7 @@ fsevents@~2.1.1:
     "@babel/preset-env": ^7.9.5
     "@babel/preset-react": ^7.0.0
     "@babel/register": ^7.9.0
+    autolinker: ^3.13.0
     babel-eslint: ^10.1.0
     babel-loader: ^8.1.0
     chai: ^4.2.0
@@ -12935,7 +12945,7 @@ fsevents@~2.1.1:
   languageName: node
   linkType: hard
 
-"tslib@npm:^1.9.0":
+"tslib@npm:^1.9.0, tslib@npm:^1.9.3":
   version: 1.11.1
   resolution: "tslib@npm:1.11.1"
   checksum: 2/d40eba08de267b2d3c458ddbf51f9010a45b8e752d3bf8c0fed63e266afc9277c6a26e65e51223335b8753f9f106aeb600e704f2a6eae05729160671a97c52e7

@@ -15,7 +15,7 @@
   "Files": "Fichiers",
   "Please wait until the upload ends": "Veuillez attendre la fin de l'envoi",
   "Error while loading file": "Erreur lors du chargement du fichier",
-  "Update": "Mettre à jour",
+  "Upload a new version": "Téléverser une nouvelle version",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
   "No preview available": "Prévisualisation indisponible",
   " of ": " sur ",
@@ -52,5 +52,6 @@
   "Some file(s) couldn't be uploaded": "Certains fichiers n'ont pas pu être téléversés",
   "Files already uploaded:": "Fichiers déjà téléversés",
   "Upload files": "Téléverser des fichiers",
-  "New file": "Nouveau fichier"
+  "New file": "Nouveau fichier",
+  "Preview loading...": "Chargement de l'aperçu ..."
 }

@@ -108,6 +108,8 @@ describe('App Gallery', function () {
         pageName: PAGES.GALLERY,
         params: { workspaceId }
       })
+      cy.get('.sidebar__expand')
+        .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .find('.carousel__arrow.arrowprev')
         .click()
@@ -132,6 +134,8 @@ describe('App Gallery', function () {
         pageName: PAGES.GALLERY,
         params: { workspaceId }
       })
+      cy.get('.sidebar__expand')
+        .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`[data-cy=gallery__action__button__auto__play]`)
         .click()
@@ -162,6 +166,21 @@ describe('App Gallery', function () {
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}'].rotate270`)
         .should('be.visible')
+      cy.getTag({ selectorName: s.GALLERY_FRAME })
+        .get(`.carousel__item__preview__content__image > img`).then(($img) => {
+          cy.window().then(win => {
+            cy.getTag({ selectorName: s.GALLERY_FRAME })
+              .get(`.carousel__item__preview__content__image`).then(($imgContainer) => {
+                cy.wrap($img[0].getBoundingClientRect().height).should('eq',
+                  $imgContainer[0].clientHeight - (
+                    parseFloat(win.getComputedStyle($imgContainer[0]).paddingTop) +
+                    parseFloat(win.getComputedStyle($imgContainer[0]).paddingBottom)
+                  )
+                )
+              })
+          })
+        })
+        // A big image should use the full available height when rotated
     })
 
     it('the image should be rotated to the right when the left rotate button is clicked', () => {

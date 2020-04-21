@@ -6,7 +6,8 @@ import { CUSTOM_EVENT } from './customEvent.js'
 
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
-  en: require('date-fns/locale/en')
+  en: require('date-fns/locale/en'),
+  pt: require('date-fns/locale/pt')
 }
 
 export const generateFetchResponse = async fetchResult => {
@@ -281,3 +282,9 @@ export const FILE_PREVIEW_STATE = {
 }
 
 export const buildHeadTitle = words => words.reduce((acc, curr) => acc !== '' ? `${acc} · ${curr}` : curr, '')
+
+export const IMG_LOAD_STATE = {
+  LOADED: 'loaded',
+  LOADING: 'loading',
+  ERROR: 'error'
+}

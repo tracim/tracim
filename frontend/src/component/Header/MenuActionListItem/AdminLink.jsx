@@ -15,7 +15,7 @@ const AdminLink = props => {
         data-cy='adminlink__dropdown__btn'
       >
         <i className='fa fa-fw fa-cog' />
-        Administration
+        {props.t('Administration')}
       </button>
 
       <div className='adminlink__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>

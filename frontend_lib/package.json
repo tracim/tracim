@@ -26,6 +26,7 @@
     "@babel/preset-env": "^7.9.5",
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.9.0",
+    "autolinker": "^3.13.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "classnames": "^2.2.6",

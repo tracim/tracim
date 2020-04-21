@@ -13,7 +13,8 @@ describe('<NewVersionBtn />', () => {
     label: 'randomLabel',
     dataCy: 'random-data-cy',
     style: { color: 'yellow' },
-    customColor: 'randomCustomColor'
+    customColor: 'randomCustomColor',
+    icon: 'upload'
   }
 
   const wrapper = mount(
@@ -39,6 +40,10 @@ describe('<NewVersionBtn />', () => {
 
     it('should contains the customColor in the button style', () =>
       expect(wrapper.find('button').prop('style').borderColor).to.equal(props.customColor)
+    )
+
+    it(`should display the icon "${props.icon}"`, () =>
+      expect(wrapper.find(`.fa.fa-${props.icon}`)).to.have.lengthOf(1)
     )
   })
 

@@ -15,6 +15,7 @@ import {
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   FILE_PREVIEW_STATE,
+  IMG_LOAD_STATE,
   displayFileSize,
   parserStringToList,
   checkEmailValidity,
@@ -94,6 +95,7 @@ document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, customEventRed
 
 export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
+export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
 export {
   appContentFactory,
@@ -141,6 +143,7 @@ export {
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   FILE_PREVIEW_STATE,
+  IMG_LOAD_STATE,
   displayFileSize,
   parserStringToList,
   checkEmailValidity,

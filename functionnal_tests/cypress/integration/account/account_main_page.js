@@ -1,3 +1,6 @@
+import { PAGES } from '../../support/urls_commands.js'
+import { SELECTORS as s } from '../../support/generic_selector_commands.js'
+
 describe('Account page', function () {
   before(() => {
     cy.resetDB()
@@ -6,11 +9,17 @@ describe('Account page', function () {
 
   beforeEach(function () {
     cy.loginAs('users')
-    cy.visit('/')
+    cy.visitPage({ pageName: PAGES.HOME })
   })
-  it("should be able it access it through header's button", function () {
-    cy.get('[data-cy=menuprofil__dropdown__button]').click()
-    cy.get('[data-cy=menuprofil__dropdown__account__link]').click()
+
+  it("should be able to access the account page through header's buttons", () => {
+    cy.getTag({ selectorName: s.HEADER })
+      .find('[data-cy=menuprofil__dropdown__button]')
+      .click()
+
+    cy.get('[data-cy=menuprofil__dropdown__account__link]')
+      .click()
+
     cy.get('.userinfo')
   })
 })

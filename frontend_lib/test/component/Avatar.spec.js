@@ -75,6 +75,20 @@ describe('<Avatar />', () => {
         twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
         expect(twoLetterPublicName).to.equal(expectedNameResult)
       })
+
+      it('name: "     public     name     " should return "pn"', () => {
+        publicName = '     public name     '
+        expectedNameResult = 'pn'
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
+
+      it('name: "name   " should return "na"', () => {
+        publicName = 'name   '
+        expectedNameResult = 'na'
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
     })
 
     describe('getTwoLetter(name) with a name with dash', () => {

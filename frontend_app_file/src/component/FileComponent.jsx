@@ -65,13 +65,13 @@ export const FileComponent = props => (
 
     {props.mode === APP_FEATURE_MODE.EDIT && (
       <div className='file__contentpage__dropzone'>
-        {props.progressUpload.display &&
+        {props.progressUpload.display && (
           <PopupProgressUpload
             color={props.customColor}
             percent={props.progressUpload.percent}
             filename={props.newFile ? props.newFile.name : ''}
           />
-        }
+        )}
 
         <FileDropzone
           onDrop={props.onChangeFile}

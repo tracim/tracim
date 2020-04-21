@@ -25,7 +25,6 @@ from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import ActionDescription
 
@@ -498,6 +497,9 @@ class CFG(object):
         self.EMAIL__NOTIFICATION__SMTP__PASSWORD = self.get_raw_config(
             "email.notification.smtp.password", secret=True
         )
+        self.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL = asbool(
+            self.get_raw_config("email.notification.smtp.use_implicit_ssl", "false")
+        )
 
         self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config("email.reply.activated", "false"))
 
@@ -536,7 +538,7 @@ class CFG(object):
         )
 
         self.NEW_USER__INVITATION__MINIMAL_PROFILE = self.get_raw_config(
-            "new_user.invitation.minimal_profile", Group.TIM_MANAGER_GROUPNAME
+            "new_user.invitation.minimal_profile", Profile.TRUSTED_USER.slug
         )
 
     def _load_webdav_config(self) -> None:

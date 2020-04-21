@@ -14,11 +14,12 @@ from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
 class SmtpConfiguration(object):
     """Container class for SMTP configuration used in Tracim."""
 
-    def __init__(self, server: str, port: int, login: str, password: str):
+    def __init__(self, server: str, port: int, login: str, password: str, use_implicit_ssl: bool):
         self.server = server
         self.port = port
         self.login = login
         self.password = password
+        self.use_implicit_ssl = use_implicit_ssl
 
 
 class EST(object):
@@ -52,12 +53,11 @@ class EmailAddress(object):
 
     @property
     def address(self):
-        formatted_address = formataddr((self.label, self.email))
-        if not self.force_angle_bracket or self.label:
-            return formatted_address
-        if formatted_address[0] != "<":
-            return "<{}>".format(formatted_address)
-        return formatted_address
+        if self.label:
+            return formataddr((self.label, self.email))
+        if self.force_angle_bracket and self.email and self.email[0] != "<":
+            return "<{}>".format(self.email)
+        return self.email
 
     @property
     def domain(self):

@@ -67,7 +67,10 @@ class ShareFolderAdvanced extends React.Component {
         props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), () => {})
         this.setHeadTitle()
         break
-
+      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
+        console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
+        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
+        break
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
@@ -115,7 +118,7 @@ class ShareFolderAdvanced extends React.Component {
 
     switch (fetchContentTypeList.apiResponse.status) {
       case 200: this.setState({ tracimContentTypeList: fetchContentTypeList.body.filter(ct => ct.slug !== 'comment') }); break
-      default: this.sendGlobalFlashMessage(props.t("Error while loading tracim's content type list"), 'warning')
+      default: this.sendGlobalFlashMessage(props.t("Error while loading Tracim's content type list"), 'warning')
     }
   }
 

@@ -1,0 +1,21 @@
+{
+  "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
+  "Error while creating document": "Erro ao criar o documento",
+  "New Office Document": "Novo Documento Office",
+  "Validate and create": "Validar e criar",
+  "Office Document's title": "Título do Documento Office",
+  "Spreadsheet": "Folha de Cálculo",
+  "Text": "Texto",
+  "Presentation": "Apresentação",
+  "Draw": "Desenhar",
+  "Create an office document": "Criar um documento office",
+  "Content not found": "Conteúdo não encontrado",
+  "Workspace not found": "Espaço de trabalho não encontrado",
+  "You cannot edit this type of file online": "Você não pode editar este tipo de ficheiro online",
+  "Unknown error": "Erro desconhecido",
+  "Unknown url": "Url desconhecido",
+  "Edit online": "Editar online",
+  "View online": "Visualizar online",
+  "New Office document": "Novo documento Office",
+  "Error while loading shared space detail": "Erro ao carregar o detalhe do espaço partilhado"
+}
