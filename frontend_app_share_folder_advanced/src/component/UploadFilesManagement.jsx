@@ -30,7 +30,7 @@ const UploadFilesManagement = props => {
         </button>
       </div>
 
-      {props.uploadLinkList.length > 0
+      {(props.uploadLinkList.length > 0
         ? props.uploadLinkList.map(shareLink =>
           <ShareLink
             hexcolor={customColor}
@@ -45,7 +45,8 @@ const UploadFilesManagement = props => {
           <div className='share_folder_advanced__content__empty'>
             {props.t('No upload link has been created yet')}
           </div>
-        )}
+        )
+      )}
     </div>
   )
 }

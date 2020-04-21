@@ -258,7 +258,7 @@ class ShareFolderAdvanced extends React.Component {
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
-          {state.currentPageStatus === this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
+          {(state.currentPageStatus === this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
             ? (
               <UploadFilesManagement
                 customColor={customColor}
@@ -280,7 +280,8 @@ class ShareFolderAdvanced extends React.Component {
                 onKeyDownEnter={this.handleKeyDownEnter}
                 emailNotifActivated={state.config.system.config.email_notification_activated}
               />
-            )}
+            )
+          )}
         </PopinFixedContent>
       </PopinFixed>
     )

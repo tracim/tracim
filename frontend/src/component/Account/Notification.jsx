@@ -22,7 +22,7 @@ export const Notification = props =>
         </thead>
 
         <tbody>
-          {props.workspaceList.length > 0
+          {(props.workspaceList.length > 0
             ? props.workspaceList.map(ws => {
               const mySelf = ws.memberList.find(u => u.id === props.userLoggedId)
               const myRole = ROLE_LIST.find(r => r.slug === mySelf.role)
@@ -60,7 +60,8 @@ export const Notification = props =>
                 <td />
                 <td />
               </tr>
-            )}
+            )
+          )}
         </tbody>
       </table>
     </div>

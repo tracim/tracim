@@ -16,7 +16,7 @@ export const HomeNoWorkspace = props =>
     <div className='homepagecard__delimiter delimiter primaryColorBg' />
 
     <div className='homepagecard__text'>
-      {props.canCreateWorkspace
+      {(props.canCreateWorkspace
         ? props.t('You will create your first shared space')
         : (
           <div className='homepagecard__text__user'>
@@ -25,7 +25,8 @@ export const HomeNoWorkspace = props =>
             </div>
             <div>{props.t('Please refer to an administrator or a trusted user')}</div>
           </div>
-        )}
+        )
+      )}
     </div>
 
     {props.canCreateWorkspace && (

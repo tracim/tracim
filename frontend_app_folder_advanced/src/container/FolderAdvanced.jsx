@@ -242,13 +242,14 @@ class FolderAdvanced extends React.Component {
                 />
               */}
 
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id &&
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
                   disabled={state.content.is_archived || state.content.is_deleted}
-                />}
+                />
+              )}
             </div>
           </div>
         </PopinFixedOption>

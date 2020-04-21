@@ -557,7 +557,7 @@ export class Gallery extends React.Component {
               )}
             </div>
 
-            {state.imagesPreviewsLoaded
+            {(state.imagesPreviewsLoaded
               ? (
                 <Carousel
                   fileSelected={state.fileSelected}
@@ -572,7 +572,8 @@ export class Gallery extends React.Component {
                 <div className='gallery__loader'>
                   <i className='fa fa-spinner fa-spin gallery__loader__icon' />
                 </div>
-              )}
+              )
+            )}
 
             <Fullscreen
               enabled={state.fullscreen}

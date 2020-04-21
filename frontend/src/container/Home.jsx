@@ -73,14 +73,17 @@ export class Home extends React.Component {
               <CardHeader displayHeader={false} />
 
               <CardBody formClass='homepagecard__body'>
-                {props.workspaceList.length > 0
-                  ? <HomeHasWorkspace user={props.user} />
+                {(props.workspaceList.length > 0
+                  ? (
+                    <HomeHasWorkspace user={props.user} />
+                  )
                   : (
                     <HomeNoWorkspace
                       canCreateWorkspace={props.canCreateWorkspace}
                       onClickCreateWorkspace={this.handleClickCreateWorkspace}
                     />
-                  )}
+                  )
+                )}
               </CardBody>
             </Card>
           </section>

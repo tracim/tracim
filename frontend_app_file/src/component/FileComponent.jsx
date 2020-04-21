@@ -46,7 +46,7 @@ export const FileComponent = props => (
       />
     )}
 
-    {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) &&
+    {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
       <PreviewComponent
         color={props.customColor}
         downloadRawUrl={props.downloadRawUrl}
@@ -60,16 +60,18 @@ export const FileComponent = props => (
         lightboxUrlList={props.lightboxUrlList}
         onClickPreviousPage={props.onClickPreviousPage}
         onClickNextPage={props.onClickNextPage}
-      />}
+      />
+    )}
 
-    {props.mode === APP_FEATURE_MODE.EDIT &&
+    {props.mode === APP_FEATURE_MODE.EDIT && (
       <div className='file__contentpage__dropzone'>
         {props.progressUpload.display &&
           <PopupProgressUpload
             color={props.customColor}
             percent={props.progressUpload.percent}
             filename={props.newFile ? props.newFile.name : ''}
-          />}
+          />
+        }
 
         <FileDropzone
           onDrop={props.onChangeFile}
@@ -102,7 +104,8 @@ export const FileComponent = props => (
             {props.t('Validate')}
           </button>
         </div>
-      </div>}
+      </div>
+    )}
   </div>
 )
 

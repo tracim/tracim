@@ -43,9 +43,10 @@ export class PersonalData extends React.Component {
     return (
       <div className='account__userpreference__setting__personaldata'>
         <div className='personaldata__sectiontitle subTitle ml-2 ml-sm-0'>
-          {props.displayAdminInfo
+          {(props.displayAdminInfo
             ? props.t('Change the profile')
-            : props.t('Change my profile')}
+            : props.t('Change my profile')
+          )}
         </div>
 
         <div className='personaldata__text ml-2 ml-sm-0' />
@@ -83,11 +84,12 @@ export class PersonalData extends React.Component {
                 onChange={this.handleChangeCheckPassword}
                 disabled={state.newEmail === ''}
               />
-              {props.displayAdminInfo &&
+              {props.displayAdminInfo && (
                 <div className='personaldata__form__txtinput__info'>
                   <i className='personaldata__form__txtinput__info__icon fa fa-lightbulb-o' />
                   {props.t('This edition requires your administrator password')}
-                </div>}
+                </div>
+              )}
             </div>
           )}
 

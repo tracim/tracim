@@ -40,9 +40,10 @@ export const UserStatus = props => {
             className='userstatus__notification__text'
             title={props.t('You can change your notification status by clicking here')}
           >
-            {mySelf.doNotify
+            {(mySelf.doNotify
               ? props.t('Click here to unsubscribe')
-              : props.t('Click here to subscribe')}
+              : props.t('Click here to subscribe')
+            )}
           </div>
         </div>
       )}

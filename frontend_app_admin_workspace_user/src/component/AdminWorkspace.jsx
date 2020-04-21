@@ -47,7 +47,7 @@ const AdminWorkspace = props =>
           </thead>
 
           <tbody>
-            {props.workspaceList.length > 0
+            {(props.workspaceList.length > 0
               ? props.workspaceList/* .sort((a, b) => a.workspace_id > b.workspace_id) */.map(ws => (
                 <tr className='adminWorkspace__workspaceTable__tr' key={ws.slug}>
                   <td className='table__id'>{ws.workspace_id}</td>
@@ -88,7 +88,8 @@ const AdminWorkspace = props =>
                   <td />
                   <td />
                 </tr>
-              )}
+              )
+            )}
           </tbody>
         </table>
       </div>

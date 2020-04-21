@@ -45,7 +45,7 @@ class UploadForm extends React.Component {
             invalidMsg={props.t('Full name is required')}
           />
 
-          {props.hasPassword &&
+          {props.hasPassword && (
             <div className='d-flex'>
               <InputGroupText
                 parentClassName='guestupload__card__form__groupepw'
@@ -78,7 +78,8 @@ class UploadForm extends React.Component {
                   {props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}
                 </PopoverBody>
               </Popover>
-            </div>}
+            </div>
+          )}
 
           <InputTextArea
             placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}

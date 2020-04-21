@@ -310,12 +310,12 @@ class PopupCreateFile extends React.Component {
         customStyle={{ top: '50%', transform: 'translateY(-50%)' }}
       >
         <div>
-          {state.uploadStarted &&
+          {state.uploadStarted && (
             <PopupProgressUpload
               color={state.config.hexcolor}
               percent={this.getPercentUpload()}
-            />}
-
+            />
+          )}
           <FileDropzone
             onDrop={this.handleChangeFile}
             hexcolor={state.config.hexcolor}

@@ -84,7 +84,7 @@ class DownloadForm extends React.Component {
             )} ({props.file.fileSize})
           </div>
 
-          {props.file.isProtected &&
+          {props.file.isProtected && (
             <div className='d-flex'>
               <InputGroupText
                 parentClassName='guestdownload__card__form__groupepw'
@@ -119,7 +119,8 @@ class DownloadForm extends React.Component {
                   {props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}
                 </PopoverBody>
               </Popover>
-            </div>}
+            </div>
+          )}
         </form>
         <div className='d-flex'>
           {/* INFO - G.B. - 2019-08-22 - This button should be always outside the form, to not trigger the submit. */}

@@ -54,7 +54,7 @@ const WorkspaceAdvancedConfiguration = props => {
           <div className='workspace_advanced__delete__content__warning' />
         </div>
 
-        {props.displayPopupValidateDeleteWorkspace &&
+        {(props.displayPopupValidateDeleteWorkspace &&
           <CardPopup
             customClass='workspace_advanced__popup'
             customHeaderClass='primaryColorBg'
@@ -81,7 +81,8 @@ const WorkspaceAdvancedConfiguration = props => {
                 </button>
               </div>
             </div>
-          </CardPopup>}
+          </CardPopup>
+        )}
       </div>
 
       <div

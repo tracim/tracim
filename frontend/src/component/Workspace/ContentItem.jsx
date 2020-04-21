@@ -61,7 +61,7 @@ class ContentItem extends React.Component {
                 padding: props.isShared ? '0 15px' : '0 25px'
               }}
             >
-              {props.isShared
+              {(props.isShared
                 ? (
                   <ComposedIcon
                     mainIcon={props.faIcon}
@@ -71,7 +71,10 @@ class ContentItem extends React.Component {
                     smallIconStyle={{ color: '#252525' }}
                   />
                 )
-                : <i className={`fa fa-fw fa-${props.faIcon}`} />}
+                : (
+                  <i className={`fa fa-fw fa-${props.faIcon}`} />
+                )
+              )}
             </div>
 
             <div className='content__name' title={props.label}>

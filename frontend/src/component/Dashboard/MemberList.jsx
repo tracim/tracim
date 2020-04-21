@@ -23,7 +23,7 @@ export class MemberList extends React.Component {
         </div>
 
         <div className='memberlist__wrapper'>
-          {props.displayNewMemberForm
+          {(props.displayNewMemberForm
             ? (
               <NewMemberForm
                 onClickCloseAddMemberBtn={props.onClickCloseAddMemberBtn}
@@ -98,7 +98,8 @@ export class MemberList extends React.Component {
                   )}
                 </ul>
               </div>
-            )}
+            )
+          )}
         </div>
       </div>
     )

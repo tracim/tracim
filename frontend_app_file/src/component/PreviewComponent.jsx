@@ -150,7 +150,7 @@ export class PreviewComponent extends React.Component {
             }
             onClick={state.isJpegPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
           >
-            {state.isJpegPreviewDisplayable && props.isJpegAvailable
+            {(state.isJpegPreviewDisplayable && props.isJpegAvailable
               ? (
                 <img src={props.previewUrl} className='img-thumbnail mx-auto' />
               )
@@ -161,9 +161,10 @@ export class PreviewComponent extends React.Component {
                     {props.t('No preview available')}
                   </div>
                 </div>
-              )}
+              )
+            )}
 
-            {state.isJpegPreviewDisplayable && props.isJpegAvailable && state.displayLightbox
+            {(state.isJpegPreviewDisplayable && props.isJpegAvailable && state.displayLightbox
               ? (
                 <Lightbox
                   prevSrc={props.lightboxUrlList[props.fileCurrentPage - 2]}
@@ -176,7 +177,8 @@ export class PreviewComponent extends React.Component {
                   imagePadding={55}
                 />
               )
-              : null}
+              : null
+            )}
           </div>
 
           {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (

@@ -230,9 +230,10 @@ class SearchResult extends React.Component {
           <PageWrapper customClass='searchResult'>
             <PageTitle
               parentClass='searchResult'
-              title={currentNumberSearchResults === 1
+              title={(currentNumberSearchResults === 1
                 ? props.t('Search result')
-                : props.t('Search results')}
+                : props.t('Search results')
+              )}
               icon='search'
               subtitle={this.getSubtitle()}
               breadcrumbsList={props.breadcrumbs}
@@ -275,7 +276,7 @@ class SearchResult extends React.Component {
                 ))}
               </div>
               <div className='searchResult__btnSeeMore'>
-                {this.hasMoreResults()
+                {(this.hasMoreResults()
                   ? (
                     <IconButton
                       className='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
@@ -285,7 +286,8 @@ class SearchResult extends React.Component {
                     />
                   )
                   : currentNumberSearchResults > props.searchResult.numberResultsByPage &&
-                    props.t('No more results')}
+                    props.t('No more results')
+                )}
               </div>
             </PageContent>
           </PageWrapper>

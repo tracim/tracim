@@ -5,7 +5,7 @@ import { Checkbox } from 'tracim_frontend_lib'
 const FolderAdvanced = props => {
   return (
     <div className='folder_advanced-content'>
-      {props.isArchived &&
+      {props.isArchived && (
         <div className='folder_advanced__content__state'>
           <div className='folder_advanced__content__state__msg'>
             <i className='fa fa-fw fa-archive' />
@@ -16,9 +16,10 @@ const FolderAdvanced = props => {
             <i className='fa fa-fw fa-archive' />
             {props.t('Restore')}
           </button>
-        </div>}
+        </div>
+      )}
 
-      {props.isDeleted &&
+      {props.isDeleted && (
         <div className='folder_advanced__content__state'>
           <div className='folder_advanced__content__state__msg'>
             <i className='fa fa-fw fa-trash' />
@@ -29,7 +30,8 @@ const FolderAdvanced = props => {
             <i className='fa fa-fw fa-trash' />
             {props.t('Restore')}
           </button>
-        </div>}
+        </div>
+      )}
 
       <div className='formBlock folder_advanced__content'>
         <div className='formBlock__title folder_advanced__content__title'>

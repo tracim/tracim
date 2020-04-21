@@ -84,7 +84,7 @@ export const WorkspaceMembersList = props => {
                   </div>
                 </div>
 
-                {m.user_id !== props.loggedUser.user_id
+                {(m.user_id !== props.loggedUser.user_id
                   ? (
                     <div
                       className='workspace_advanced__userlist__list__item__delete'
@@ -93,7 +93,8 @@ export const WorkspaceMembersList = props => {
                       <i className='fa fa-trash-o' />
                     </div>
                   )
-                  : <div className='workspace_advanced__userlist__list__item__delete' />}
+                  : <div className='workspace_advanced__userlist__list__item__delete' />
+                )}
               </li>
             )}
           </ul>

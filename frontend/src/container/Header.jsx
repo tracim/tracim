@@ -135,13 +135,14 @@ class Header extends React.Component {
                 className='header__menu__rightside__specificBtn'
               />
 
-              {props.user.logged &&
+              {props.user.logged && (
                 <li className='search__nav'>
                   <Search
                     className='header__menu__rightside__search'
                     onClickSearch={this.handleClickSearch}
                   />
-                </li>}
+                </li>
+              )}
 
               {props.user.profile === PROFILE.administrator.slug && (
                 <li className='header__menu__rightside__adminlink nav-item'>

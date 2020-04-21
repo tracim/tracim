@@ -395,7 +395,7 @@ class AdminWorkspaceUser extends React.Component {
           />
         )}
 
-        {state.popupDeleteWorkspaceDisplay &&
+        {state.popupDeleteWorkspaceDisplay && (
           <CardPopup
             customClass='adminworkspaceuser__popup'
             customHeaderClass='primaryColorBg'
@@ -426,7 +426,8 @@ class AdminWorkspaceUser extends React.Component {
                 </button>
               </div>
             </div>
-          </CardPopup>}
+          </CardPopup>
+        )}
       </div>
     )
   }

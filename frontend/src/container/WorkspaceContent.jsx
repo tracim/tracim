@@ -276,9 +276,14 @@ class WorkspaceContent extends React.Component {
 
     if (contentIdInUrl && contentIdInUrl !== 'new' && props.match && props.match.params.type === CONTENT_TYPE.FOLDER) folderIdInUrl.push(contentIdInUrl)
 
-    let fetchContentList
-    if (contentIdInUrl && !isNaN(contentIdInUrl)) fetchContentList = await props.dispatch(getContentPathList(workspaceId, contentIdInUrl, folderIdInUrl))
-    else fetchContentList = await props.dispatch(getFolderContentList(workspaceId, folderIdInUrl.filter(id => id !== SHARE_FOLDER_ID)))
+    const fetchContentList = await props.dispatch(
+      (contentIdInUrl && !isNaN(contentIdInUrl))
+        ? getContentPathList(workspaceId, contentIdInUrl, folderIdInUrl)
+        : getFolderContentList(
+          workspaceId,
+          folderIdInUrl.filter(id => id !== SHARE_FOLDER_ID)
+        )
+    )
 
     const wsMember = await props.dispatch(getWorkspaceMemberList(workspaceId))
     const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
@@ -681,25 +686,27 @@ class WorkspaceContent extends React.Component {
           {state.contentLoaded && (
             <Route
               path={PAGE.WORKSPACE.SHARE_FOLDER(':idws')}
-              component={() =>
+              component={() => (
                 <OpenShareFolderApp
                   // automatically open the share folder advanced
                   workspaceId={state.workspaceIdInUrl}
                   appOpenedType={state.appOpenedType}
                   updateAppOpenedType={this.handleUpdateAppOpenedType}
-                />}
+                />
+              )}
             />
           )}
 
           {state.contentLoaded && (
             <Route
               path={PAGE.WORKSPACE.NEW(':idws', ':type')}
-              component={() =>
+              component={() => (
                 <OpenCreateContentApp
                   // automatically open the popup create content of the app in url
                   workspaceId={state.workspaceIdInUrl}
                   appOpenedType={state.appOpenedType}
-                />}
+                />
+              )}
             />
           )}
 
@@ -725,7 +732,7 @@ class WorkspaceContent extends React.Component {
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />
 
-                {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') &&
+                {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
                   <ShareFolder
                     workspaceId={state.workspaceIdInUrl}
                     availableApp={createContentAvailableApp}
@@ -749,9 +756,10 @@ class WorkspaceContent extends React.Component {
                     rootContentList={rootContentList}
                     isLast={isWorkspaceEmpty || isFilteredWorkspaceEmpty}
                     t={t}
-                  />}
+                  />
+                )}
 
-                {state.contentLoaded && (isWorkspaceEmpty || isFilteredWorkspaceEmpty)
+                {((state.contentLoaded && (isWorkspaceEmpty || isFilteredWorkspaceEmpty))
                   ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
                   : rootContentList.map((content, i) => content.type === CONTENT_TYPE.FOLDER
                     ? (
@@ -816,7 +824,8 @@ class WorkspaceContent extends React.Component {
                         key={content.id}
                       />
                     )
-                  )}
+                  )
+                )}
 
                 {userRoleIdInWorkspace >= ROLE.contributor.id && workspaceContentList.length >= 10 && (
                   <DropdownCreateButton

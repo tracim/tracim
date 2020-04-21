@@ -64,7 +64,7 @@ export class FileProperties extends React.Component {
             <div className='fileProperties__content__detail__description'>
               {props.t('Description:')}
             </div>
-            {state.displayFormNewDescription
+            {(state.displayFormNewDescription
               ? (
                 <form className='fileProperties__content__detail__description__editiondesc'>
                   <textarea
@@ -107,9 +107,10 @@ export class FileProperties extends React.Component {
                 <div className='fileProperties__content__detail__description__text'>
                   {props.description}
                 </div>
-              )}
+              )
+            )}
 
-            {props.displayChangeDescriptionBtn && !state.displayFormNewDescription &&
+            {props.displayChangeDescriptionBtn && !state.displayFormNewDescription && (
               <button
                 type='button'
                 className='fileProperties__content__detail__btndesc btn highlightBtn'
@@ -123,7 +124,8 @@ export class FileProperties extends React.Component {
                 disabled={props.disableChangeDescription}
               >
                 {props.t('Change description')}
-              </button>}
+              </button>
+            )}
           </div>
         </div>
       </div>
