@@ -728,6 +728,21 @@ export const getLoggedUserCalendar = () => dispatch => {
   })
 }
 
+export const getUserCalendar = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/agenda`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_AGENDA_URL,
+    dispatch
+  })
+}
+
 export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedKeywords)}&page_nb=${pageNumber}&size=${pageSize}`,
