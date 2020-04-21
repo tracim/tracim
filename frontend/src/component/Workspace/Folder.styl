@@ -36,6 +36,8 @@ folderopen()
   padding-left 30px
   & > .folder__header
     folderopen()
+    &:hover
+      background-color #e0e0e0
   & > .folder__content
     folderclose()
     & > .file, > .folder
@@ -170,4 +172,3 @@ folderopen()
           display inline
         &::after
           display none // hide the dropdown triangle
-
