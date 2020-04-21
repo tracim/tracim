@@ -78,7 +78,7 @@ class WOPIController(Controller):
         except IOError as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
-                    request.current_content.revision_id, request.current_content.content_id
+                    request.current_content.cached_revision_id, request.current_content.content_id
                 )
             ) from exc
         return HapicFile(

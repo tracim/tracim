@@ -66,23 +66,33 @@ In this case, delete the user and database and start over:
 [//]: # (         --command="GRANT ALL PRIVILEGES ON DATABASE tracimdb TO tracimuser;" \)
 [//]: # (         --command="GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tracimuser;")
 
-## MySQL ##
+## Mariadb 10.3+ or Mysql 8.0.1+ ##
 
-Or if you want to use `MySQL` as database engine
+:warning: Newest version of Tracim (3.0+) doesn't support anymore old mariadb and mysql version. You need at least
+mariadb 10.3 or mysql 8.0.1 (We need database that are able to support recursive CTE query).
+
+:warning: newest version of debian doesn't provide up to date mysql version, you should add official apt repository:
+https://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/
+
+if you want to use MariaDB as database engine
+
+    sudo apt install mariadb-server
+
+or for mysql:
 
     sudo apt install mysql-server
 
-### Minimalist introduction to MySQL ###
+### Minimalist introduction to MariaDB ###
 
 #### Driver ####
 
-Tracim uses the `PyMySQL` driver between the `SQLAlchemy` ORM and the `MySQL` RDBMS. Run the following command to install the right version:
+Tracim uses the `PyMySQL` driver between the `SQLAlchemy` ORM and the `MariaDB` RDBMS. Run the following command to install the right version:
 
     pip install -r install/requirements.mysql.txt
 
 #### Create database ####
 
-Connect to `MySQL` with root user (password has been set at "Installation" -> "Dependencies" chapter, when installing package)
+Connect to `MariaDB` with root user (password has been set at "Installation" -> "Dependencies" chapter, when installing package)
 
     mysql -u root -p
 
@@ -102,7 +112,7 @@ Then flush privileges:
 
     FLUSH PRIVILEGES;
 
-You can now quit `MySQL` prompt:
+You can now quit `MariaDB` prompt:
 
     \q
 
@@ -110,7 +120,7 @@ You can now quit `MySQL` prompt:
 
 In file `tracim/development.ini`, search the lines corresponding to the `SQLAlchemy` database url parameter `sqlalchemy.url`. `SQLite` is the default active database and others should be commented.
 
-If you are willing to choose `PostgreSQL` or `MySQL`, comment the `sqlalchemy.url` line corresponding to `SQLite` and uncomment the one of your choice.
+If you are willing to choose `PostgreSQL` or `MariaDB`, comment the `sqlalchemy.url` line corresponding to `SQLite` and uncomment the one of your choice.
 
 For instance, with `PostgreSQL`, this should give you:
 

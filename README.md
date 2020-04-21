@@ -44,7 +44,7 @@ In order to contribute to the Tracim source code, please read [CONTRIBUTING.md](
 
 ## Advanced - Install Tracim from Source
 
-OS compatibility (tested with Python >= 3.5):
+OS compatibility (tested with Python >= 3.5.2):
 
 - Debian:
   - Jessie (8)
