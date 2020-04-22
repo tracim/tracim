@@ -6,7 +6,6 @@ describe("An admin seeing a user's profile", () => {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
-    cy.fixture('baseWorkspace').as('workspace')
     cy.createRandomUser()
     cy.visitPage({pageName: PAGES.HOME})
   })
@@ -15,7 +14,7 @@ describe("An admin seeing a user's profile", () => {
     cy.cancelXHR()
   })
 
-  it('should show the users agenda', () => {
+  it("should show the user's agenda", () => {
     cy.get('.adminlink').click()
     cy.get('[data-cy=adminlink__user__link]').click()
     cy.get('.adminUser__table__tr__td-link').first().click()
