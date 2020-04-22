@@ -23,7 +23,7 @@ const DropdownLang = props => {
         <div className='dropdownlang__dropdown__subdropdown dropdown-menu' aria-labelledby='headerDropdownMenuButton'>
           {props.langList.filter(l => l.id !== props.langActiveId).map(l =>
             <div
-              className='dropdownlang__dropdown__subdropdown__link dropdown-item'
+              className='dropdownlang__dropdown__subdropdown__link primaryColorBgActive dropdown-item'
               onClick={() => props.onChangeLang(l.id)}
               key={l.id}
             >

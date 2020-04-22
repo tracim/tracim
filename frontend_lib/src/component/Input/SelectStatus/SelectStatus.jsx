@@ -35,7 +35,7 @@ export const SelectStatus = props => {
       <div className='selectStatus__submenu dropdown-menu' aria-labelledby='dropdownMenu2'>
         {props.availableStatus.map(s =>
           <button
-            className='selectStatus__submenu__item current dropdown-item'
+            className='selectStatus__submenu__item primaryColorBgActive current dropdown-item'
             type='button'
             onClick={() => props.onChangeStatus(s.slug)}
             key={`status_${s.slug}`}

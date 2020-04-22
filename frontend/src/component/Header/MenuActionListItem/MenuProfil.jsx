@@ -35,7 +35,7 @@ export const MenuProfil = props => {
 
         <div className='menuprofil__dropdown__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
           <Link
-            className='menuprofil__dropdown__setting__link dropdown-item'
+            className='menuprofil__dropdown__setting__link primaryColorBgActive dropdown-item'
             to={PAGE.ACCOUNT}
             data-cy='menuprofil__dropdown__account__link'
           >
@@ -43,7 +43,7 @@ export const MenuProfil = props => {
             {props.t('My Account')}
           </Link>
 
-          <div className='menuprofil__dropdown__setting__link dropdown-item' onClick={props.onClickLogout}>
+          <div className='menuprofil__dropdown__setting__link primaryColorBgActive dropdown-item' onClick={props.onClickLogout}>
             <i className='fa fa-fw fa-sign-out mr-2' />
             {props.t('Logout')}
           </div>
