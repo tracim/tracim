@@ -1,7 +1,7 @@
 import { PAGES } from '../../support/urls_commands'
 
 
-describe('An admin seeing a user profile', () => {
+describe("An admin seeing a user's profile", () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
