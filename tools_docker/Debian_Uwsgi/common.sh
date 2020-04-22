@@ -14,18 +14,17 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|^basic_setup.file_template_dir = .*|basic_setup.file_template_dir = /tracim/backend/tracim_backend/templates/open_documents|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.api_key =.*|basic_setup.api_key = $KEY|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/development.ini
-    sed -i "s|^; email.template_dir = .*|email.template_dir = /tracim/backend/tracim_backend/templates/mail|g" /etc/tracim/development.ini
+    sed -i "s|^email.template_dir = .*|email.template_dir = /tracim/backend/tracim_backend/templates/mail|g" /etc/tracim/development.ini
     sed -i "s|^; email.reply.lockfile_path = .*|email.reply.lockfile_path = /var/tracim/data/email_fetcher.lock|g" /etc/tracim/development.ini
+    sed -i "s|^; webdav.base_url = .*|webdav.base_url = http://localhost:8080|g" /etc/tracim/development.ini
     sed -i "s|^; webdav.ui.enabled = .*|webdav.ui.enabled = True|g" /etc/tracim/development.ini
     sed -i "s|^; webdav.root_path = /|webdav.root_path = /webdav|g" /etc/tracim/development.ini
-    sed -i "s|^; webdav.base_url = .*|webdav.base_url = http://localhost:8080|g" /etc/tracim/development.ini
     sed -i "s|^; email.processing_mode = sync|email.processing_mode = async|g" /etc/tracim/development.ini
     sed -i "s|^; email.async.redis.host = .*|email.async.redis.host = localhost|g" /etc/tracim/development.ini
     sed -i "s|^; email.async.redis.port = .*|email.async.redis.port = 6379|g" /etc/tracim/development.ini
     sed -i "s|^; email.async.redis.db = .*|email.async.redis.db = 0|g" /etc/tracim/development.ini
     sed -i "s|^; plugin.folder_path = .*|plugin.folder_path = /etc/tracim/plugins|g" /etc/tracim/development.ini
     sed -i "s|^; frontend.custom_toolbox_folder_path = .*|frontend.custom_toolbox_folder_path = /etc/tracim/custom_toolbox|g" /etc/tracim/development.ini
-    sed -i "s|^; search.elasticsearch.index_alias = .*|search.elasticsearch.index_alias = tracim_contents|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in
       mysql)
         sed -i "s|^basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = $DATABASE_TYPE+pymysql://$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME$DATABASE_SUFFIX|g" /etc/tracim/development.ini ;;
