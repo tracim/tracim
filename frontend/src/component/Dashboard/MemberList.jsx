@@ -68,7 +68,6 @@ export class MemberList extends React.Component {
                       className={
                         classnames(
                           'memberlist__list__item',
-                          'primaryColorBgLightenHover',
                           { 'memberlist__list__item__last': props.memberList.length === index + 1 }
                         )
                       }

@@ -41,7 +41,7 @@ export const NewMemberForm = props => {
               {props.searchedKnownMemberList.length > 0
                 ? props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
                   <div
-                    className='autocomplete__item primaryColorBgHover'
+                    className='autocomplete__item'
                     onClick={() => props.onClickKnownMember(u)}
                     key={u.user_id}
                   >

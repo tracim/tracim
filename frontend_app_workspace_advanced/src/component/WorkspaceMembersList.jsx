@@ -72,7 +72,7 @@ export const WorkspaceMembersList = props => {
                   <div className='subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                     {props.roleList.map(r =>
                       <div
-                        className='subdropdown__item dropdown-item'
+                        className='subdropdown__item primaryColorBgActive dropdown-item'
                         onClick={() => props.onClickNewRole(m.user_id, r.slug)}
                         key={`role_${r.id}`}
                       >
