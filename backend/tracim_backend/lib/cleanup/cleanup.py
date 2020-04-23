@@ -2,12 +2,15 @@ import shutil
 import typing
 import uuid
 
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaNotFoundError
+from tracim_backend.exceptions import CannotDeleteUniqueRevisionWithoutDeletingContent
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
@@ -81,12 +84,38 @@ class CleanupLib(object):
         else:
             logger.debug(self, "fake deletion of {} dir".format(dir_path))
 
-    def delete_revision(self, revision: ContentRevisionRO) -> int:
+    def delete_revision(
+        self, revision: ContentRevisionRO, do_update_content_last_revision: bool = True,
+    ) -> int:
         """
-
+        :param do_update_content_last_revision: update last revision of content associated to last one if needed. Set only
+        to False when needed to delete all content data and will delete associated content after.
         :param revision: revision to delete
         :return: revision_id of revision to delete
         """
+
+        if do_update_content_last_revision and revision.node.revision_id == revision.revision_id:
+            try:
+                new_last_revision = (
+                    self.session.query(ContentRevisionRO)
+                    .filter(
+                        and_(
+                            ContentRevisionRO.content_id == revision.node.id,
+                            ContentRevisionRO.revision_id != revision.revision_id,
+                        )
+                    )
+                    .order_by(ContentRevisionRO.revision_id.desc())
+                    .limit(1)
+                    .one()
+                )
+                revision.node.current_revision = new_last_revision
+                self.safe_update(revision.node)
+            except NoResultFound:
+                raise CannotDeleteUniqueRevisionWithoutDeletingContent(
+                    'revision "{}" is the only revision for content "{}", it is not possible to delete'.format(
+                        revision.revision_id, revision.content_id
+                    )
+                )
 
         # INFO - G.M - 2019-12-11 - delete revision read status
         read_statuses = self.session.query(RevisionReadStatus).filter(
@@ -136,9 +165,11 @@ class CleanupLib(object):
             for children in content.get_children(recursively=recursively):
                 self.delete_content(children)
 
+        content.cached_revision_id = None
         for revision in content.revisions:
-            deleted_contents.append(self.delete_revision(revision))
-
+            deleted_contents.append(
+                self.delete_revision(revision, do_update_content_last_revision=False)
+            )
         logger.info(self, "delete content {}".format(content.content_id))
         deleted_contents.append(content.content_id)
         self.safe_delete(content)
@@ -243,7 +274,7 @@ class CleanupLib(object):
             )
             self.safe_delete(role)
 
-        logger.info(self, "delete user groups for user {}".format(user.user_id))
+        logger.info(self, "delete user profile for user {}".format(user.user_id))
         user.groups = []
         self.safe_update(user)
 
@@ -298,7 +329,12 @@ class CleanupLib(object):
         )
         for revision in revisions:
             deleted_revision_ids.append(revision.revision_id)
-            self.delete_revision(revision)
+            try:
+                self.delete_revision(revision)
+            except CannotDeleteUniqueRevisionWithoutDeletingContent:
+                # INFO - G.M - 2019-04-01 - if we tried to delete the only revision of a content,
+                # delete content instead.
+                self.delete_content(revision.node)
         return deleted_revision_ids
 
     def delete_full_user(self, user: User) -> int:

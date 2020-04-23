@@ -69,7 +69,7 @@ class Folder extends React.Component {
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
-          className='folder__header align-items-center primaryColorBgLightenHover'
+          className='folder__header align-items-center'
           onClick={(e) => props.onClickFolder(e, props.folderData.id)}
           ref={props.connectDropTarget}
           title={props.folderData.label}

@@ -45,12 +45,12 @@ class ShareFolder extends React.Component {
         id={SHARE_FOLDER_ID}
       >
         <div
-          className='folder__header align-items-center primaryColorBgLightenHover'
+          className='folder__header align-items-center'
           onClick={() => props.onClickShareFolder()}
           title={props.t('Received files')}
         >
           <div className='folder__header__triangleborder'>
-            <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
+            <div className='folder__header__triangleborder__triangle' />
           </div>
 
           <div
@@ -89,7 +89,7 @@ class ShareFolder extends React.Component {
 
                   <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                     <div
-                      className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
+                      className='subdropdown__item dropdown-item d-flex align-items-center'
                       onClick={this.handleClickOpenShareFolderApp}
                     >
                       <div className='subdropdown__item__icon mr-3'>

@@ -9,7 +9,7 @@ export const SubDropdownCreateButton = props => {
     <div>
       {props.availableApp.map(app =>
         <div
-          className='subdropdown__link primaryColorBgLightenHover dropdown-item'
+          className='subdropdown__link primaryColorBgActive dropdown-item'
           onClick={e => {
             e.preventDefault()
             e.stopPropagation()

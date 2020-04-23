@@ -6,6 +6,7 @@ import pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
+from tracim_backend.models.auth import Profile
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -43,17 +44,17 @@ class TestLoginEndpoint(object):
         assert res.json_body["email"] == "admin@admin.admin"
 
     def test_api__try_login_enpoint__err_401__user_not_activated(
-        self, user_api_factory, group_api_factory, web_testapp
+        self, user_api_factory, web_testapp
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             do_save=True,
             do_notify=False,
@@ -376,16 +377,16 @@ class TestWhoamiEndpoint(object):
         assert res.json_body["email"] == "admin@admin.admin"
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(
-        self, web_testapp, user_api_factory, group_api_factory
+        self, web_testapp, user_api_factory
     ):
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             lang="en",
             do_save=True,
@@ -441,17 +442,17 @@ class TestWhoamiEndpointWithApiKey(object):
         assert res.json_body["email"] == "admin@admin.admin"
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(
-        self, web_testapp, user_api_factory, group_api_factory
+        self, web_testapp, user_api_factory
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             do_save=True,
             do_notify=False,
@@ -523,17 +524,17 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert res.json_body["user_id"] == user_id
 
     def test_api__try_whoami_enpoint__err_401__remote_user_is_not_active(
-        self, web_testapp, user_api_factory, group_api_factory
+        self, web_testapp, user_api_factory
     ):
 
         uapi = user_api_factory.get()
-        gapi = group_api_factory.get()
-        groups = [gapi.get_one_with_name("users")]
+
+        profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
             password="password",
             name="bob",
-            groups=groups,
+            profile=profile,
             timezone="Europe/Paris",
             do_save=True,
             do_notify=False,

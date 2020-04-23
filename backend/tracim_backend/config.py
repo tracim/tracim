@@ -25,7 +25,6 @@ from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import ActionDescription
 
@@ -39,10 +38,61 @@ ID_SOURCE_DEFAULT = "SOURCE_DEFAULT"
 
 
 class ConfigParam(object):
-    def __init__(self, config_file_name):
+    def __init__(
+        self,
+        config_file_name: str,
+        secret: bool,
+        default_value: typing.Optional[str],
+        settings: typing.Dict[str, str],
+        deprecated: bool,
+        deprecated_extended_information: str,
+    ):
+        """
+        :param config_file_name: name of the parameter in config file
+        :param secret: is the parameter secret
+        :param default_value: default value in code for parameter
+        :param settings: settings dict of config file
+        :param deprecated: is the parameter deprecated
+        :param deprecated_extended_information: more information about deprecation.
+        """
         self.config_file_name = config_file_name
+        self.default_value = default_value
+        self.secret = secret
         self.config_name = self._get_associated_config_name(config_file_name)
         self.env_var_name = self._get_associated_env_var_name(self.config_name)
+        self._config_file_value = settings.get(self.config_file_name)
+        self._env_var_value = os.environ.get(self.env_var_name)
+        self.deprecated = deprecated
+        self.deprecated_extended_information = deprecated_extended_information
+        self.show_secret = False
+        if self._env_var_value:
+            self._config_value = self._env_var_value
+            self.config_source = ID_SOURCE_ENV_VAR
+            self.config_name_source = self.env_var_name
+        elif self._config_file_value:
+            self._config_value = self._config_file_value
+            self.config_source = ID_SOURCE_CONFIG
+            self.config_name_source = self.config_file_name
+        else:
+            self._config_value = self.default_value
+            self.config_source = ID_SOURCE_DEFAULT
+            self.config_name_source = None
+
+    @property
+    def config_file_value(self):
+        return self._get_protected_value(value=self._config_file_value, secret=self.secret)
+
+    @property
+    def env_var_value(self):
+        return self._get_protected_value(value=self._env_var_value, secret=self.secret)
+
+    @property
+    def config_value(self):
+        return self._get_protected_value(value=self._config_value, secret=self.secret)
+
+    @property
+    def real_config_value(self):
+        return self._config_value
 
     def _get_associated_env_var_name(self, config_name: str) -> str:
         """
@@ -60,6 +110,12 @@ class ConfigParam(object):
         """
         return config_name.replace(".", "__").replace("-", "_").upper()
 
+    def _get_protected_value(self, value: str, secret: bool) -> str:
+        if secret and not self.show_secret and value:
+            return "<value not shown>"
+        else:
+            return value
+
 
 class CFG(object):
     """Object used for easy access to config file parameters."""
@@ -69,7 +125,7 @@ class CFG(object):
         # to avoid issue when serializing CFG object. settings dict is completed
         # with object in some context
         self.settings = settings.copy()
-        self.config_naming = []  # type: typing.List[ConfigParam]
+        self.config_info = []  # type: typing.List[ConfigParam]
         logger.debug(self, "CONFIG_PROCESS:1: load enabled apps")
         self.load_enabled_apps()
         logger.debug(self, "CONFIG_PROCESS:3: load config from settings")
@@ -90,12 +146,6 @@ class CFG(object):
 
     # INFO - G.M - 2019-04-05 - Utils Methods
 
-    def _get_printed_val_value(self, value: str, secret: bool) -> str:
-        if secret:
-            return "<value not shown>"
-        else:
-            return value
-
     def deprecate_parameter(
         self, parameter_name: str, parameter_value: typing.Any, extended_information: str
     ) -> None:
@@ -106,19 +156,14 @@ class CFG(object):
         :param extended_information: add some more information about deprecation
         :return: None
         """
-        if parameter_value:
-            logger.warning(
-                self,
-                "{parameter_name} parameter is deprecated. {extended_information}".format(
-                    parameter_name=parameter_name, extended_information=extended_information
-                ),
-            )
 
     def get_raw_config(
         self,
         config_file_name: str,
         default_value: typing.Optional[str] = None,
         secret: bool = False,
+        deprecated: bool = False,
+        deprecated_extended_information: str = "",
     ) -> str:
         """
         Get config parameter according to a config name.
@@ -129,35 +174,37 @@ class CFG(object):
         :param config_file_name: name of the config parameter name
         :param default_value: default value if not setted value found
         :param secret: is the value of the parameter secret ? (if true, it will not be printed)
+        :param deprecated: is the parameter deprecated ?
+        :param deprecated_extended_information: some more information about deprecated parameter
         :return:
         """
-        param = ConfigParam(config_file_name)
-        self.config_naming.append(param)
-        val_cfg = self.settings.get(param.config_file_name)
-        val_env = os.environ.get(param.env_var_name)
-        if val_env:
-            config_value = val_env
-            config_source = ID_SOURCE_ENV_VAR
-            config_name_source = param.env_var_name
-        elif val_cfg:
-            config_value = val_cfg
-            config_source = ID_SOURCE_CONFIG
-            config_name_source = param.config_file_name
-        else:
-            config_value = default_value
-            config_source = ID_SOURCE_DEFAULT
-            config_name_source = None
-
+        param = ConfigParam(
+            config_file_name=config_file_name,
+            secret=secret,
+            default_value=default_value,
+            settings=self.settings,
+            deprecated=deprecated,
+            deprecated_extended_information=deprecated_extended_information,
+        )
+        self.config_info.append(param)
         logger.info(
             self,
             CONFIG_LOG_TEMPLATE.format(
-                config_value=self._get_printed_val_value(config_value, secret),
-                config_source=config_source,
+                config_value=param.config_value,
+                config_source=param.config_source,
                 config_name=param.config_name,
-                config_name_source=config_name_source,
+                config_name_source=param.config_name_source,
             ),
         )
-        return config_value
+        if param.deprecated and param.config_value:
+            logger.warning(
+                self,
+                "{parameter_name} parameter is deprecated. {extended_information}".format(
+                    parameter_name=param.config_name,
+                    extended_information=param.deprecated_extended_information,
+                ),
+            )
+        return param.real_config_value
 
     # INFO - G.M - 2019-04-05 - load of enabled app
     def load_enabled_apps(self) -> None:
@@ -181,19 +228,21 @@ class CFG(object):
         # TODO - G.M - 2020-01-09 - remove this retrocompat code, as
         #  CALDAV__ENABLED and COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
         # should be deprecated.
-        self.CALDAV__ENABLED = asbool(self.get_raw_config("caldav.enabled", "false"))
-        self.deprecate_parameter(
-            "CALDAV_ENABLED",
-            self.CALDAV__ENABLED,
-            extended_information="It will not be taken into account.",
+        self.CALDAV__ENABLED = asbool(
+            self.get_raw_config(
+                "caldav.enabled",
+                "False",
+                deprecated=True,
+                deprecated_extended_information="It will not be taken into account.",
+            )
         )
         self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
-            self.get_raw_config("collaborative_document_edition.activated", "false")
-        )
-        self.deprecate_parameter(
-            "COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED",
-            self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
-            extended_information="It will not be taken into account.",
+            self.get_raw_config(
+                "collaborative_document_edition.activated",
+                "False",
+                deprecated=True,
+                deprecated_extended_information="It will not be taken into account.",
+            )
         )
         default_enabled_app = default_enabled_app.format(extend_apps=extend_apps)
         self.APP__ENABLED = string_to_unique_item_list(
@@ -276,6 +325,12 @@ class CFG(object):
             self.log_config_header('"{label}" app config parameters:'.format(label=app.label))
             app.load_config(self)
 
+    def here_macro_replace(self, value: str) -> str:
+        """
+        "replace "%(here)s" by localisation of the config file.
+        """
+        return value.replace("%(here)s", self.settings["here"])
+
     def _load_global_config(self) -> None:
         """
         Load generic config
@@ -283,7 +338,8 @@ class CFG(object):
         ###
         # General
         ###
-        self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", "")
+        default_sqlalchemy_url = self.here_macro_replace("sqlite:///%(here)s/tracim.sqlite")
+        self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", default_sqlalchemy_url)
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_v2_folder = os.path.dirname(backend_folder)
@@ -291,9 +347,12 @@ class CFG(object):
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
         )
-        self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir")
-        self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name")
-        self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir")
+        default_depot_storage_dir = self.here_macro_replace("%(here)s/depot")
+        self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir", default_depot_storage_dir)
+        self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name", "tracim")
+        default_preview_cache_dir = self.here_macro_replace("%(here)s/previews")
+        self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir", default_preview_cache_dir)
+
         self.AUTH_TYPES = string_to_unique_item_list(
             self.get_raw_config("auth_types", "internal"),
             separator=",",
@@ -304,12 +363,14 @@ class CFG(object):
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
         self.SESSION__REISSUE_TIME = int(self.get_raw_config("session.reissue_time", "120"))
-        self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir")
-        self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir")
-        self.WEBSITE__TITLE = self.get_raw_config("website.title", "TRACIM")
+        default_session_data_dir = self.here_macro_replace("%(here)s/sessions_data")
+        default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_data")
+        self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
+        self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
+        self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
 
         # base url of the frontend
-        self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "")
+        self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "http://localhost:6543")
 
         self.API__BASE_URL = self.get_raw_config("api.base_url", self.WEBSITE__BASE_URL)
 
@@ -335,11 +396,10 @@ class CFG(object):
         # TODO - G.M - 2019-03-14 - retrocompat code,
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         defaut_reset_password_validity = "900"
-        self.USER__RESET_PASSWORD__VALIDITY = self.get_raw_config("user.reset_password.validity")
-        self.deprecate_parameter(
-            "USER__RESET_PASSWORD__VALIDITY",
-            self.USER__RESET_PASSWORD__VALIDITY,
-            extended_information="please use USER__RESET_PASSWORD__TOKEN_LIFETIME instead",
+        self.USER__RESET_PASSWORD__VALIDITY = self.get_raw_config(
+            "user.reset_password.validity",
+            deprecated=True,
+            deprecated_extended_information="please use USER__RESET_PASSWORD__TOKEN_LIFETIME instead",
         )
         if self.USER__RESET_PASSWORD__VALIDITY:
             self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.USER__RESET_PASSWORD__VALIDITY
@@ -351,13 +411,13 @@ class CFG(object):
             )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
 
-        self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "true"))
-        self.DEBUG = asbool(self.get_raw_config("debug", "false"))
+        self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
+        self.DEBUG = asbool(self.get_raw_config("debug", "False"))
         self.BUILD_VERSION = self.get_raw_config(
             "build_version", get_build_version(os.path.abspath(__file__))
         )
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
-            self.get_raw_config("preview.jpg.restricted_dims", "false")
+            self.get_raw_config("preview.jpg.restricted_dims", "False")
         )
         self.PREVIEW__JPG__ALLOWED_DIMS = string_to_unique_item_list(
             self.get_raw_config("preview.jpg.allowed_dims", "256x256"),
@@ -365,7 +425,7 @@ class CFG(object):
             separator=",",
         )
 
-        self.FRONTEND__SERVE = asbool(self.get_raw_config("frontend.serve", "false"))
+        self.FRONTEND__SERVE = asbool(self.get_raw_config("frontend.serve", "True"))
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
         # is probably in frontend subfolder
         # of tracim_v2 parent of both backend and frontend
@@ -385,7 +445,10 @@ class CFG(object):
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
-        self.PLUGIN__FOLDER_PATH = self.get_raw_config("plugin.folder_path", None)
+        default_plugin_folder_path = self.here_macro_replace("%(here)s/plugins")
+        self.PLUGIN__FOLDER_PATH = self.get_raw_config(
+            "plugin.folder_path", default_plugin_folder_path
+        )
 
         self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
             "frontend.custom_toolbox_folder_path", None
@@ -412,7 +475,7 @@ class CFG(object):
         # EMAIL related stuff (notification, reply)
         ##
         self.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION = asbool(
-            self.get_raw_config("email.notification.enabled_on_invitation", "true")
+            self.get_raw_config("email.notification.enabled_on_invitation", "True")
         )
 
         # TODO - G.M - 2019-04-05 - keep as parameters
@@ -436,14 +499,11 @@ class CFG(object):
             # 'folder' --folder is skipped
         ]
 
-        self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config(
-            "email.notification.from.email", "noreply+{user_id}@trac.im"
-        )
-        self.EMAIL__NOTIFICATION__FROM = self.get_raw_config("email.notification.from")
-        self.deprecate_parameter(
-            "EMAIL__NOTIFICATION__FROM",
-            self.EMAIL__NOTIFICATION__FROM,
-            extended_information="use instead EMAIL__NOTIFICATION__FROM__EMAIL and EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
+        self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config("email.notification.from.email")
+        self.EMAIL__NOTIFICATION__FROM = self.get_raw_config(
+            "email.notification.from",
+            deprecated=True,
+            deprecated_extended_information="use instead EMAIL__NOTIFICATION__FROM__EMAIL and EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
         )
 
         self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL = self.get_raw_config(
@@ -456,9 +516,10 @@ class CFG(object):
             "email.notification.references.email"
         )
         # Content update notification
-
+        template_dir = self.here_macro_replace("%(here)s/tracim_backend/templates/mail")
         self.EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML = self.get_raw_config(
-            "email.notification.content_update.template.html"
+            "email.notification.content_update.template.html",
+            "{}/{}".format(template_dir, "content_update_body_html.mak"),
         )
 
         self.EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT = self.get_raw_config(
@@ -467,7 +528,8 @@ class CFG(object):
         )
         # Created account notification
         self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML = self.get_raw_config(
-            "email.notification.created_account.template.html"
+            "email.notification.created_account.template.html",
+            "{}/{}".format(template_dir, "created_account_body_html.mak"),
         )
         self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT = self.get_raw_config(
             "email.notification.created_account.subject",
@@ -476,7 +538,8 @@ class CFG(object):
 
         # Reset password notification
         self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML = self.get_raw_config(
-            "email.notification.reset_password_request.template.html"
+            "email.notification.reset_password_request.template.html",
+            "{}/{}".format(template_dir, "reset_password_body_html.mak"),
         )
         self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT = self.get_raw_config(
             "email.notification.reset_password_request.subject",
@@ -487,7 +550,7 @@ class CFG(object):
         # asynchronously see issue https://github.com/tracim/tracim/issues/1345
         self.EMAIL__NOTIFICATION__PROCESSING_MODE = "sync"
         self.EMAIL__NOTIFICATION__ACTIVATED = asbool(
-            self.get_raw_config("email.notification.activated")
+            self.get_raw_config("email.notification.activated", "False")
         )
 
         self.EMAIL__NOTIFICATION__SMTP__SERVER = self.get_raw_config(
@@ -502,7 +565,7 @@ class CFG(object):
             self.get_raw_config("email.notification.smtp.use_implicit_ssl", "false")
         )
 
-        self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config("email.reply.activated", "false"))
+        self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config("email.reply.activated", "False"))
 
         self.EMAIL__REPLY__IMAP__SERVER = self.get_raw_config("email.reply.imap.server")
         self.EMAIL__REPLY__IMAP__PORT = self.get_raw_config("email.reply.imap.port")
@@ -510,24 +573,28 @@ class CFG(object):
         self.EMAIL__REPLY__IMAP__PASSWORD = self.get_raw_config(
             "email.reply.imap.password", secret=True
         )
-        self.EMAIL__REPLY__IMAP__FOLDER = self.get_raw_config("email.reply.imap.folder")
+        self.EMAIL__REPLY__IMAP__FOLDER = self.get_raw_config("email.reply.imap.folder", "INBOX")
         self.EMAIL__REPLY__CHECK__HEARTBEAT = int(
             self.get_raw_config("email.reply.check.heartbeat", "60")
         )
-        self.EMAIL__REPLY__IMAP__USE_SSL = asbool(self.get_raw_config("email.reply.imap.use_ssl"))
+        self.EMAIL__REPLY__IMAP__USE_SSL = asbool(
+            self.get_raw_config("email.reply.imap.use_ssl", "True")
+        )
         self.EMAIL__REPLY__IMAP__USE_IDLE = asbool(
-            self.get_raw_config("email.reply.imap.use_idle", "true")
+            self.get_raw_config("email.reply.imap.use_idle", "False")
         )
         self.EMAIL__REPLY__CONNECTION__MAX_LIFETIME = int(
             self.get_raw_config("email.reply.connection.max_lifetime", "600")  # 10 minutes
         )
         self.EMAIL__REPLY__USE_HTML_PARSING = asbool(
-            self.get_raw_config("email.reply.use_html_parsing", "true")
+            self.get_raw_config("email.reply.use_html_parsing", "True")
         )
         self.EMAIL__REPLY__USE_TXT_PARSING = asbool(
-            self.get_raw_config("email.reply.use_txt_parsing", "true")
+            self.get_raw_config("email.reply.use_txt_parsing", "True")
         )
-        self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config("email.reply.lockfile_path", "")
+        self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config(
+            "email.reply.lockfile_path", self.here_macro_replace("%(here)s/email_fetcher.lock")
+        )
 
         self.EMAIL__PROCESSING_MODE = self.get_raw_config("email.processing_mode", "sync").upper()
 
@@ -539,7 +606,7 @@ class CFG(object):
         )
 
         self.NEW_USER__INVITATION__MINIMAL_PROFILE = self.get_raw_config(
-            "new_user.invitation.minimal_profile", Group.TIM_MANAGER_GROUPNAME
+            "new_user.invitation.minimal_profile", Profile.TRUSTED_USER.slug
         )
 
     def _load_webdav_config(self) -> None:
@@ -551,13 +618,13 @@ class CFG(object):
         wsgidav_website = "https://github.com/mar10/wsgidav/"
         wsgidav_name = "WsgiDAV"
 
-        self.WEBDAV__UI__ENABLED = asbool(self.get_raw_config("webdav.ui.enabled", "true"))
-        self.WEBDAV__BASE_URL = self.get_raw_config("webdav.base_url", "")
+        self.WEBDAV__UI__ENABLED = asbool(self.get_raw_config("webdav.ui.enabled", "True"))
+        self.WEBDAV__BASE_URL = self.get_raw_config("webdav.base_url", "http://localhost:3030")
         self.WEBDAV__VERBOSE__LEVEL = int(self.get_raw_config("webdav.verbose.level", "1"))
         self.WEBDAV__ROOT_PATH = self.get_raw_config("webdav.root_path", "/")
         self.WEBDAV__BLOCK_SIZE = int(self.get_raw_config("webdav.block_size", "8192"))
         self.WEBDAV__DIR_BROWSER__ENABLED = asbool(
-            self.get_raw_config("webdav.dir_browser.enabled", "true")
+            self.get_raw_config("webdav.dir_browser.enabled", "True")
         )
         default_webdav_footnote = (
             '<a href="{instance_url}">{instance_name}</a>.'
@@ -589,19 +656,14 @@ class CFG(object):
         """
         Load config for ldap related stuff
         """
-        self.LDAP_URL = self.get_raw_config("ldap_url", "dc=directory,dc=fsf,dc=org")
-        self.LDAP_BASE_URL = self.get_raw_config("ldap_base_url", "dc=directory,dc=fsf,dc=org")
-        self.LDAP_BIND_DN = self.get_raw_config(
-            "ldap_bind_dn", "cn=admin, dc=directory,dc=fsf,dc=org"
-        )
+        self.LDAP_URL = self.get_raw_config("ldap_url", "ldap://localhost:389")
+        self.LDAP_BIND_DN = self.get_raw_config("ldap_bind_dn")
         self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", secret=True)
-        self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "false"))
-        self.LDAP_USER_BASE_DN = self.get_raw_config(
-            "ldap_user_base_dn", "ou=people, dc=directory,dc=fsf,dc=org"
-        )
+        self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
+        self.LDAP_USER_BASE_DN = self.get_raw_config("ldap_user_base_dn")
         self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config("ldap_login_attribute", "mail")
         # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
-        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute")
+        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "givenName")
         # TODO - G.M - 2018-12-05 - [ldap_profile]
         # support for profile attribute disabled
         # Should be reenabled later probably with a better code
@@ -666,6 +728,7 @@ class CFG(object):
         """
         self._check_global_config_validity()
         self._check_email_config_validity()
+        self._check_ldap_config_validity()
         self._check_search_config_validity()
 
         app_lib = ApplicationApi(app_list=app_list)
@@ -764,10 +827,81 @@ class CFG(object):
                 self.EMAIL__REPLY__LOCKFILE_PATH,
                 when_str="when email reply is activated",
             )
-        # INFO - G.M - 2019-02-01 - check if template are available,
-        # do not allow running with email_notification_activated
-        # if templates needed are not available
+
+        if self.EMAIL__REPLY__ACTIVATED:
+            # INFO - G.M - 2019-12-10 - check imap config provided
+            self.check_mandatory_param(
+                "EMAIL__REPLY__IMAP__SERVER",
+                self.EMAIL__REPLY__IMAP__SERVER,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__REPLY__IMAP__PORT",
+                self.EMAIL__REPLY__IMAP__PORT,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__REPLY__IMAP__USER",
+                self.EMAIL__REPLY__IMAP__USER,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__REPLY__IMAP__PASSWORD",
+                self.EMAIL__REPLY__IMAP__PASSWORD,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__REPLY__IMAP__FOLDER",
+                self.EMAIL__REPLY__IMAP__FOLDER,
+                when_str="when email notification is activated",
+            )
+
         if self.EMAIL__NOTIFICATION__ACTIVATED:
+            # INFO - G.M - 2019-12-10 - check smtp config provided
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__SMTP__SERVER",
+                self.EMAIL__NOTIFICATION__SMTP__SERVER,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__SMTP__PORT",
+                self.EMAIL__NOTIFICATION__SMTP__PORT,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__SMTP__USER",
+                self.EMAIL__NOTIFICATION__SMTP__USER,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__SMTP__PASSWORD",
+                self.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+                when_str="when email notification is activated",
+            )
+            # INFO - G.M - 2019-12-10 - check value provided for headers
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__FROM__EMAIL",
+                self.EMAIL__NOTIFICATION__FROM__EMAIL,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
+                self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__REPLY_TO__EMAIL",
+                self.EMAIL__NOTIFICATION__REPLY_TO__EMAIL,
+                when_str="when email notification is activated",
+            )
+            self.check_mandatory_param(
+                "EMAIL__NOTIFICATION__REFERENCES__EMAIL",
+                self.EMAIL__NOTIFICATION__REFERENCES__EMAIL,
+                when_str="when email notification is activated",
+            )
+            # INFO - G.M - 2019-02-01 - check if template are available,
+            # do not allow running with email_notification_activated
+            # if templates needed are not available
             templates = {
                 "content_update notification": self.EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML,
                 "created account": self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML,
@@ -789,6 +923,35 @@ class CFG(object):
                 'be "{}" or "{}", not "{}"'.format(
                     self.CST.ASYNC, self.CST.SYNC, self.EMAIL__PROCESSING_MODE
                 )
+            )
+
+    def _check_ldap_config_validity(self):
+        if AuthType.LDAP in self.AUTH_TYPES:
+            self.check_mandatory_param(
+                "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method"
+            )
+            self.check_mandatory_param(
+                "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method"
+            )
+            self.check_mandatory_param(
+                "LDAP_BIND_PASS",
+                self.LDAP_BIND_PASS,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_USER_BASE_DN",
+                self.LDAP_USER_BASE_DN,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_LOGIN_ATTRIBUTE",
+                self.LDAP_LOGIN_ATTRIBUTE,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_NAME_ATTRIBUTE",
+                self.LDAP_NAME_ATTRIBUTE,
+                when_str="when ldap is in available auth method",
             )
 
     def _check_search_config_validity(self):
@@ -816,7 +979,7 @@ class CFG(object):
         Verify all config_name_attribute are correctly associated with
         a true cfg attribute. Will raise AttributeError if not.
         """
-        for config_param in self.config_naming:
+        for config_param in self.config_info:
             try:
                 getattr(self, config_param.config_name)
             except AttributeError:

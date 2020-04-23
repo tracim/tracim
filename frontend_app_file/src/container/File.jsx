@@ -752,7 +752,8 @@ class File extends React.Component {
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
-                  label={props.t('Update')}
+                  label={props.t('Upload a new version')}
+                  icon='upload'
                 />
               )}
 

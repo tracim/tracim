@@ -12,7 +12,7 @@ from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name
-from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
@@ -97,21 +97,14 @@ class TestContentApi(object):
         self,
         user_api_factory,
         workspace_api_factory,
-        group_api_factory,
         admin_user,
         session,
         app_config,
         content_type_list,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -126,23 +119,11 @@ class TestContentApi(object):
         assert isinstance(item, Content)
 
     def test_unit__create_content__err_empty_label(
-        self,
-        user_api_factory,
-        group_api_factory,
-        session,
-        app_config,
-        workspace_api_factory,
-        content_type_list,
+        self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -157,23 +138,11 @@ class TestContentApi(object):
             )
 
     def test_unit__create_content__err_content_type_not_allowed_in_this_folder(
-        self,
-        user_api_factory,
-        group_api_factory,
-        session,
-        app_config,
-        workspace_api_factory,
-        content_type_list,
+        self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -219,23 +188,11 @@ class TestContentApi(object):
         )
 
     def test_unit__create_content__err_content_type_not_allowed_in_this_workspace(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        content_type_list,
-        session,
-        app_config,
+        self, user_api_factory, workspace_api_factory, content_type_list, session, app_config
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
-
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -250,23 +207,11 @@ class TestContentApi(object):
             )
 
     def test_unit__create_content__err_same_label_as_another_content(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
-
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -288,23 +233,11 @@ class TestContentApi(object):
             )
 
     def test_unit__is_filename_available__ok__nominal_case(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -347,23 +280,11 @@ class TestContentApi(object):
         )
 
     def test_unit__is_filename_available__ok__different_namespace(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -392,23 +313,11 @@ class TestContentApi(object):
         )
 
     def test_unit__is_filename_available__ok__different_workspace(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -439,23 +348,11 @@ class TestContentApi(object):
         )
 
     def test_unit__is_filename_available__ok__different_parent(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -532,23 +429,11 @@ class TestContentApi(object):
         )
 
     def test_unit__set_allowed_content__ok__private_method(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -572,23 +457,11 @@ class TestContentApi(object):
         }
 
     def test_unit__set_allowed_content__ok__nominal_case(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -614,23 +487,11 @@ class TestContentApi(object):
         }
 
     def test_unit__restore_content_default_allowed_content__ok__nominal_case(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -661,23 +522,11 @@ class TestContentApi(object):
         ] == content_type_list.default_allowed_content_properties(folder.type)
 
     def test_unit__get_allowed_content_type__ok__html_document(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -688,23 +537,11 @@ class TestContentApi(object):
         assert allowed_content_types[0] == content_type_list.get_one_by_slug("html-document")
 
     def test_unit__get_allowed_content_type__ok__page_legacy_alias(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -715,23 +552,11 @@ class TestContentApi(object):
         assert allowed_content_types[0] == content_type_list.get_one_by_slug("html-document")
 
     def test_unit___check_valid_content_type_in_dir__ok__nominal(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -752,23 +577,11 @@ class TestContentApi(object):
         )
 
     def test_unit___check_valid_content_type_in_dir__err__not_valid_in_folder(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -790,23 +603,11 @@ class TestContentApi(object):
             )
 
     def test_unit___check_valid_content_type_in_dir__err__not_valid_in_workspace(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -829,23 +630,11 @@ class TestContentApi(object):
             )
 
     def test_delete(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -899,23 +688,11 @@ class TestContentApi(object):
         eq_(2, len(items))
 
     def test_unit__delete__ok__do_not_change_file_extension(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -953,23 +730,11 @@ class TestContentApi(object):
         assert thread.file_extension == ".thread.html"
 
     def test_unit__archive__ok__do_not_change_file_extension(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1007,23 +772,11 @@ class TestContentApi(object):
         assert thread.file_extension == ".thread.html"
 
     def test_archive(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         api = ContentApi(current_user=user, session=session, config=app_config)
@@ -1079,23 +832,11 @@ class TestContentApi(object):
         eq_(2, len(items))
 
     def test_get_all_with_filter(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1137,23 +878,11 @@ class TestContentApi(object):
         eq_("thefolder", items3[0].label)
 
     def test_get_all_with_parent_id(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1181,23 +910,11 @@ class TestContentApi(object):
         eq_(child_id, items2[0].content_id)
 
     def test_set_status_unknown_status(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
 
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
@@ -1211,7 +928,6 @@ class TestContentApi(object):
     def test_unit__set_status__ok__nominal_case(
         self,
         user_api_factory,
-        group_api_factory,
         role_api_factory,
         workspace_api_factory,
         session,
@@ -1219,15 +935,9 @@ class TestContentApi(object):
         content_type_list,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="another@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user2 = uapi.create_minimal_user(email="another@user", profile=Profile.ADMIN, save_now=True)
 
         workspace = workspace_api_factory.get(current_user=user2).create_workspace(
             "test workspace", save_now=True
@@ -1237,7 +947,7 @@ class TestContentApi(object):
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
         c = api2.create(content_type_list.Folder.slug, workspace, None, "parent", "", True)
         assert c.owner_id == user2.user_id
-        assert c.get_current_revision().owner_id == user2.user_id
+        assert c.current_revision.owner_id == user2.user_id
         api = ContentApi(current_user=user, session=session, config=app_config)
         with new_revision(session=session, tm=transaction.manager, content=c):
             for new_status in [
@@ -1251,27 +961,20 @@ class TestContentApi(object):
 
         assert new_status == c.status
         assert ActionDescription.STATUS_UPDATE == c.revision_type
-        assert c.get_current_revision().owner_id == user.user_id
+        assert c.current_revision.owner_id == user.user_id
 
     def test_create_file__ok__another_namespace(
         self,
         content_type_list,
         user_api_factory,
         content_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
 
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
@@ -1290,23 +993,13 @@ class TestContentApi(object):
         assert p.content_namespace == ContentNamespaces.UPLOAD
 
     def test_create_comment_ok(
-        self,
-        user_api_factory,
-        group_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
@@ -1328,7 +1021,6 @@ class TestContentApi(object):
     def test_unit_move_file_with_comments__different_parent_same_workspace(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1339,15 +1031,11 @@ class TestContentApi(object):
         Check if move of content does proper copy of subcontent.
         """
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1381,12 +1069,11 @@ class TestContentApi(object):
         assert text_file == text_file_after_move
         assert comment_before_move_id == comment_after_move.id
         assert text_file_after_move.revision_type == ActionDescription.MOVE
-        assert text_file_after_move.get_current_revision().owner_id == user2.user_id
+        assert text_file_after_move.current_revision.owner_id == user2.user_id
 
     def test_unit_move_file_with_comments__different_parent_different_workspace(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1397,15 +1084,11 @@ class TestContentApi(object):
         Check if copy of content does proper copy of subcontent.
         """
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1452,7 +1135,6 @@ class TestContentApi(object):
     def test_unit_move_file_with_comments__different_namespace(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1463,15 +1145,11 @@ class TestContentApi(object):
         Check if copy of content does proper copy of subcontent.
         """
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1539,7 +1217,6 @@ class TestContentApi(object):
     def test_unit_copy_file_different_label_different_parent_ok(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1547,15 +1224,11 @@ class TestContentApi(object):
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1609,7 +1282,7 @@ class TestContentApi(object):
         assert text_file_copy.type == text_file.type
         assert text_file_copy.parent.content_id == folderb.content_id
         assert text_file_copy.owner.user_id == user2.user_id
-        assert text_file_copy.get_current_revision().owner_id == user2.user_id
+        assert text_file_copy.current_revision.owner_id == user2.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
@@ -1619,7 +1292,6 @@ class TestContentApi(object):
     def test_unit_copy_file_same_label_different_namespace(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1627,15 +1299,11 @@ class TestContentApi(object):
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1675,7 +1343,7 @@ class TestContentApi(object):
         assert text_file_copy.type == text_file.type
         assert text_file_copy.content_namespace == ContentNamespaces.UPLOAD
         assert text_file_copy.owner.user_id == user2.user_id
-        assert text_file_copy.get_current_revision().owner_id == user2.user_id
+        assert text_file_copy.current_revision.owner_id == user2.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
@@ -1685,7 +1353,6 @@ class TestContentApi(object):
     def test_unit_copy_file_with_comments_different_label_different_parent_ok(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1696,15 +1363,11 @@ class TestContentApi(object):
         Check if copy of content does proper copy of subcontent.
         """
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1749,8 +1412,8 @@ class TestContentApi(object):
         transaction.commit()
         text_file_copy = api2.get_one_by_label_and_parent("test_file_copy", folderb)
 
-        assert len(text_file.children) == 2
-        assert len(text_file_copy.children) == 2
+        assert len(text_file.children.all()) == 2
+        assert len(text_file_copy.children.all()) == 2
         assert text_file.children[0].description == "just a comment"
         assert text_file_copy.children[0].description == text_file.children[0].description
         assert text_file_copy.children[0].id != text_file.children[0].id
@@ -1775,7 +1438,6 @@ class TestContentApi(object):
     def test_unit_copy_file_different_label_different_parent__err__allowed_subcontent(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1783,15 +1445,11 @@ class TestContentApi(object):
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1827,7 +1485,6 @@ class TestContentApi(object):
     def test_unit_copy_file__same_label_different_parent_ok(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1835,15 +1492,11 @@ class TestContentApi(object):
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1891,7 +1544,6 @@ class TestContentApi(object):
     def test_unit_copy_file_different_label_same_parent_ok(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1899,15 +1551,11 @@ class TestContentApi(object):
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1952,7 +1600,6 @@ class TestContentApi(object):
     def test_unit_copy_file_different_label_same_parent__err__subcontent_not_allowed(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1964,15 +1611,11 @@ class TestContentApi(object):
         :return:
         """
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -2003,7 +1646,6 @@ class TestContentApi(object):
     def test_unit_copy_file_different_label_same_parent__err__label_already_used(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -2011,15 +1653,11 @@ class TestContentApi(object):
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -2055,7 +1693,6 @@ class TestContentApi(object):
     def test_mark_read__workspace(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -2063,16 +1700,12 @@ class TestContentApi(object):
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user_a = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user_a = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         user_b = uapi.create_minimal_user(
-            email="this.is@another.user", groups=groups, save_now=True
+            email="this.is@another.user", profile=profile, save_now=True
         )
 
         wapi = workspace_api_factory.get(current_user=user_a)
@@ -2139,7 +1772,6 @@ class TestContentApi(object):
     def test_mark_read(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -2147,16 +1779,12 @@ class TestContentApi(object):
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user_a = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user_a = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         user_b = uapi.create_minimal_user(
-            email="this.is@another.user", groups=groups, save_now=True
+            email="this.is@another.user", profile=profile, save_now=True
         )
 
         wapi = workspace_api_factory.get(current_user=user_a)
@@ -2182,7 +1810,6 @@ class TestContentApi(object):
     def test_mark_read__all(
         self,
         user_api_factory,
-        group_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -2190,16 +1817,12 @@ class TestContentApi(object):
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user_a = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user_a = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         user_b = uapi.create_minimal_user(
-            email="this.is@another.user", groups=groups, save_now=True
+            email="this.is@another.user", profile=profile, save_now=True
         )
 
         wapi = workspace_api_factory.get(current_user=user_a)
@@ -2248,17 +1871,12 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        group_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2330,18 +1948,13 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        group_api_factory,
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2402,18 +2015,13 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        group_api_factory,
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2480,18 +2088,13 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        group_api_factory,
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2558,18 +2161,13 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        group_api_factory,
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2641,17 +2239,12 @@ class TestContentApi(object):
         app_config,
         content_type_list,
         user_api_factory,
-        group_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2713,19 +2306,14 @@ class TestContentApi(object):
         workspace_api_factory,
         app_config,
         session,
-        group_api_factory,
         role_api_factory,
         content_type_list,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2788,18 +2376,13 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        group_api_factory,
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2863,17 +2446,12 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        group_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2917,18 +2495,13 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        group_api_factory,
         role_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         u1id = user1.user_id
 
         workspace_api = workspace_api_factory.get(current_user=user1)
@@ -3012,17 +2585,12 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        group_api_factory,
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         u1id = user1.user_id
 
         workspace_api = workspace_api_factory.get(current_user=user1)
@@ -3098,23 +2666,13 @@ class TestContentApi(object):
         eq_(u1id, updated2.owner_id)
 
     def test_unit__get_last_active__ok__nominal_case(
-        self,
-        user_api_factory,
-        workspace_api_factory,
-        session,
-        app_config,
-        content_type_list,
-        group_api_factory,
+        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -3208,23 +2766,13 @@ class TestContentApi(object):
         assert last_actives[8] == main_folder_workspace2
 
     def test_unit__get_last_active__ok__do_no_show_deleted_archived(
-        self,
-        session,
-        workspace_api_factory,
-        app_config,
-        user_api_factory,
-        group_api_factory,
-        content_type_list,
+        self, session, workspace_api_factory, app_config, user_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -3291,23 +2839,13 @@ class TestContentApi(object):
         assert last_actives[3] == main_folder
 
     def test_unit__get_last_active__ok__workspace_filter_workspace_full(
-        self,
-        user_api_factory,
-        session,
-        app_config,
-        workspace_api_factory,
-        group_api_factory,
-        content_type_list,
+        self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -3382,23 +2920,13 @@ class TestContentApi(object):
         assert last_actives[6] == main_folder
 
     def test_unit__get_last_active__ok__workspace_filter_workspace_content_ids(
-        self,
-        session,
-        user_api_factory,
-        workspace_api_factory,
-        app_config,
-        content_type_list,
-        group_api_factory,
+        self, session, user_api_factory, workspace_api_factory, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -3480,23 +3008,13 @@ class TestContentApi(object):
         assert last_actives[3] == main_folder
 
     def test_unit__get_last_active__ok__workspace_filter_workspace_limit_2_multiples_times(
-        self,
-        session,
-        user_api_factory,
-        workspace_api_factory,
-        app_config,
-        content_type_list,
-        group_api_factory,
+        self, session, user_api_factory, workspace_api_factory, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -3586,23 +3104,13 @@ class TestContentApi(object):
         assert last_actives[0] == main_folder
 
     def test_unit__get_last_active__ok__workspace_filter_workspace_empty(
-        self,
-        session,
-        workspace_api_factory,
-        app_config,
-        user_api_factory,
-        group_api_factory,
-        content_type_list,
+        self, session, workspace_api_factory, app_config, user_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
-        group_api = group_api_factory.get()
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        profile = Profile.ADMIN
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )

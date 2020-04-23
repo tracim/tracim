@@ -10,11 +10,11 @@ from depot.manager import DepotManager
 from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
-import sqlalchemy
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
+from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.attributes import QueryableAttribute
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
@@ -68,6 +68,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import NodeTreeItem
+from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
@@ -207,27 +208,16 @@ class ContentApi(object):
         # TODO - G.M - 2018-06-173 - create revision in context object
         return RevisionInContext(revision, self._session, self._config, self._user)
 
-    def _get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
-        """
-        Return the Content/ContentRevision query join condition
-        :return: Content/ContentRevision query join condition
-        """
-        return and_(
-            Content.id == ContentRevisionRO.content_id,
-            ContentRevisionRO.revision_id
-            == self._session.query(ContentRevisionRO.revision_id)
-            .filter(ContentRevisionRO.content_id == Content.id)
-            .order_by(ContentRevisionRO.revision_id.desc())
-            .limit(1)
-            .correlate(Content),
-        )
-
     def get_canonical_query(self) -> Query:
         """
         Return the Content/ContentRevision base query who join these table on the last revision.
         :return: Content/ContentRevision Query
         """
-        return self._session.query(Content).join(ContentRevisionRO, self._get_revision_join())
+        return (
+            self._session.query(Content)
+            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
+            .options(contains_eager(Content.current_revision))
+        )
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     @classmethod
@@ -854,7 +844,7 @@ class ContentApi(object):
 
         # Return the content
         try:
-            return content_query.order_by(Content.revision_id.desc()).one()
+            return content_query.order_by(Content.cached_revision_id.desc()).one()
         except NoResultFound as exc:
             raise ContentNotFound(
                 'Content "{}" not found in database'.format(content_label)
@@ -892,7 +882,7 @@ class ContentApi(object):
 
             # Get thirst corresponding folder
             try:
-                folder = folder_query.order_by(Content.revision_id.desc()).one()
+                folder = folder_query.order_by(Content.cached_revision_id.desc()).one()
             except NoResultFound:
                 raise ContentNotFound("Folder not found")
 
@@ -1243,36 +1233,6 @@ class ContentApi(object):
 
         return resultset.all()
 
-    # def get_last_unread(
-    #     self, parent_id: int, content_type: str, workspace: Workspace = None, limit=10
-    # ) -> typing.List[Content]:
-    #     assert parent_id is None or isinstance(parent_id, int)  # DYN_REMOVE
-    #     assert content_type is not None  # DYN_REMOVE
-    #     assert isinstance(content_type, str)  # DYN_REMOVE
-    #
-    #     read_revision_ids = self._session.query(RevisionReadStatus.revision_id).filter(
-    #         RevisionReadStatus.user_id == self._user_id
-    #     )
-    #
-    #     not_read_revisions = (
-    #         self._revisions_base_query(workspace)
-    #         .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids))
-    #         .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id)
-    #         .filter(Workspace.is_deleted.is_(False))
-    #         .subquery()
-    #     )
-
-    # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
-    # def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> typing.List[Content]:
-    #     assert content_type is not None# DYN_REMOVE
-    #
-    #     resultset = self._base_query(workspace)
-    #
-    #     if content_type != content_type_list.Any_SLUG:
-    #         resultset = resultset.filter(Content.type==content_type)
-    #
-    #     return resultset.all()
-
     def get_last_active(
         self,
         workspace: Workspace = None,
@@ -1292,7 +1252,22 @@ class ContentApi(object):
         :return: list of content
         """
 
-        resultset = self._get_all_query(workspace=workspace)
+        resultset = (
+            self._get_all_query(workspace=workspace)
+            .outerjoin(
+                RevisionReadStatus,
+                and_(
+                    RevisionReadStatus.revision_id == Content.cached_revision_id,
+                    RevisionReadStatus.user_id == self._user_id,
+                ),
+            )
+            .options(
+                contains_eager(Content.current_revision).contains_eager(
+                    ContentRevisionRO.revision_read_statuses
+                )
+            )
+        )
+
         if content_ids:
             resultset = resultset.filter(
                 or_(
@@ -1653,7 +1628,8 @@ class ContentApi(object):
         # revision related to old data. key of dict is original content id.
         original_content_children = {}  # type: typing.Dict[int,Content]
 
-        for rev in content.get_tree_revisions():
+        for rev, is_current_rev in content.get_tree_revisions_advanced():
+
             if rev.content_id == content.content_id:
                 related_content = new_content
                 related_parent = new_parent
@@ -1670,7 +1646,9 @@ class ContentApi(object):
                     related_parent = new_content_children[rev.parent_id]
             # INFO - G.M - 2019-04-30 - copy of revision itself.
             cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
-            related_content.revisions.append(cpy_rev)
+            cpy_rev.node = related_content
+            if is_current_rev:
+                related_content.current_revision = cpy_rev
             self._session.add(related_content)
             self._session.flush()
         return AddCopyRevisionsResult(
@@ -2035,9 +2013,7 @@ class ContentApi(object):
             logger.warning(self, "Unknown Preview_Generator Exception Occured", exc_info=True)
             return False
 
-    def mark_read__all(
-        self, read_datetime: datetime = None, do_flush: bool = True, recursive: bool = True
-    ) -> None:
+    def mark_read__all(self, read_datetime: datetime = None, do_flush: bool = True) -> None:
         """
         Read content of all workspace visible for the user.
         :param read_datetime: date of readigin
@@ -2045,14 +2021,11 @@ class ContentApi(object):
         :param recursive: mark read subcontent too
         :return: nothing
         """
-        return self.mark_read__workspace(None, read_datetime, do_flush, recursive)
+
+        return self.mark_read__workspace(None, read_datetime, do_flush)
 
     def mark_read__workspace(
-        self,
-        workspace: Workspace,
-        read_datetime: datetime = None,
-        do_flush: bool = True,
-        recursive: bool = True,
+        self, workspace: Workspace, read_datetime: datetime = None, do_flush: bool = True,
     ) -> None:
         """
         Read content of a workspace visible for the user.
@@ -2061,10 +2034,28 @@ class ContentApi(object):
         :param recursive: mark read subcontent too
         :return: nothing
         """
-        itemset = self.get_last_active(workspace)
-        for item in itemset:
-            if item.has_new_information_for(self._user):
-                self.mark_read(item, read_datetime, do_flush, recursive)
+
+        # INFO - G.M - 2020-03-27 - Get all content of workspace
+        resultset = (
+            self._get_all_query(workspace=workspace)
+            .outerjoin(
+                RevisionReadStatus,
+                and_(
+                    RevisionReadStatus.revision_id == Content.cached_revision_id,
+                    RevisionReadStatus.user_id == self._user_id,
+                ),
+            )
+            .options(
+                contains_eager(Content.current_revision).contains_eager(
+                    ContentRevisionRO.revision_read_statuses
+                )
+            )
+        )
+
+        # INFO - G.M - 2020-03-27 - Mark all content as read
+        for content in resultset:
+            if content.has_new_information_for(self._user, recursive=False):
+                self.mark_read(content, read_datetime, do_flush, recursive=False)
 
     def mark_read(
         self,
@@ -2102,23 +2093,8 @@ class ContentApi(object):
             revision.read_by[self._user] = read_datetime
 
         if recursive:
-            # mark read :
-            # - all children
-            # - parent stuff (if you mark a comment as read,
-            #                 then you have seen the parent)
-            # - parent comments
-            for child in content.get_valid_children():
-                self.mark_read(child, read_datetime=read_datetime, do_flush=False)
-
-            if content_type_list.Comment.slug == content.type:
-                self.mark_read(
-                    content.parent, read_datetime=read_datetime, do_flush=False, recursive=False
-                )
-                for comment in content.parent.get_comments():
-                    if comment != content:
-                        self.mark_read(
-                            comment, read_datetime=read_datetime, do_flush=False, recursive=False
-                        )
+            for child in content.recursive_children:
+                self.mark_read(child, read_datetime=read_datetime, do_flush=False, recursive=True)
 
         if do_flush:
             self.flush()

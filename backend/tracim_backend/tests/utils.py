@@ -22,7 +22,6 @@ from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -101,20 +100,6 @@ class WorkspaceApiFactory(object):
             session=self.session,
             config=self.app_config,
             show_deleted=show_deleted,
-            current_user=current_user or self.admin_user,
-        )
-
-
-class GroupApiFactory(object):
-    def __init__(self, session: Session, app_config: CFG, admin_user: User):
-        self.session = session
-        self.app_config = app_config
-        self.admin_user = admin_user
-
-    def get(self, current_user: typing.Optional[User] = None) -> GroupApi:
-        return GroupApi(
-            session=self.session,
-            config=self.app_config,
             current_user=current_user or self.admin_user,
         )
 
@@ -231,6 +216,7 @@ class ElasticSearchHelper(object):
 class RadicaleServerHelper(object):
     def __init__(self, config_uri, config_section):
         settings = plaster.get_settings(config_uri, config_section)
+        settings["here"] = os.path.dirname(os.path.abspath(TEST_CONFIG_FILE_PATH))
         app_factory = CaldavAppFactory(**settings)
         app = app_factory.get_wsgi_app()
         self.radicale_server = multiprocessing.Process(

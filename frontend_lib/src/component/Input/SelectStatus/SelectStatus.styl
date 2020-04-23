@@ -18,10 +18,12 @@
       justify-content space-between
       margin 5px 0
       cursor pointer
+      &:hover:not(:active)
+        background-color grey-hover
       &:active
-        background-color transparent
+        color fontColor
 
-@media (min-width: min-xs) and (max-width: max-md)
+@media (min-width: min-xs) and (max-width: max-lg)
   .selectStatus
     &__mobileVersion
       display none

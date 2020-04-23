@@ -119,8 +119,11 @@
     &__content
       padding-left 20px
 
-.btndropdown__text
-  text-align left
+.btndropdown
+  &__text
+    text-align left
+  &:hover:not(:active)
+    background-color: grey-hover
 
 .workspace_advanced__popup
   .cardPopup__container
@@ -181,4 +184,3 @@
       width 100%
     &__contentpage__content
       height auto
-

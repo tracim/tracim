@@ -8,6 +8,7 @@ from tracim_backend.lib.utils.request import TracimContext
 class BaseFakeTracimContext(TracimContext):
     app_config = None
     dbsession = None
+    current_user = None
 
 
 class TestBaseFakeTracimContext(object):

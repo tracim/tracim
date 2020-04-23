@@ -23,8 +23,11 @@ class CollaborativeDocumentEditionApp(TracimApplication):
         app_config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = app_config.get_raw_config(
             "collaborative_document_edition.collabora.base_url"
         )
+        default_file_template_dir = app_config.here_macro_replace(
+            "%(here)s/tracim_backend/templates/open_documents"
+        )
         app_config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = app_config.get_raw_config(
-            "collaborative_document_edition.file_template_dir"
+            "collaborative_document_edition.file_template_dir", default_file_template_dir
         )
 
     def check_config(self, app_config: CFG) -> None:

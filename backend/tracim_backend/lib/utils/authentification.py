@@ -1,3 +1,5 @@
+from abc import ABC
+from abc import abstractmethod
 import datetime
 import typing
 
@@ -24,7 +26,7 @@ TRACIM_API_USER_EMAIL_LOGIN_HEADER = "Tracim-Api-Login"
 AUTH_TOKEN_QUERY_PARAMETER = "access_token"
 
 
-class TracimAuthenticationPolicy(object):
+class TracimAuthenticationPolicy(ABC):
     """
     Abstract class with some helper for Pyramid TracimAuthentificationPolicy
     """
@@ -82,6 +84,23 @@ class TracimAuthenticationPolicy(object):
         except AuthenticationFailed:
             return None
 
+    @abstractmethod
+    def get_current_user(self, request: TracimRequest) -> typing.Optional[User]:
+        pass
+
+    def authenticated_user(self, request: TracimRequest) -> typing.Optional[User]:
+        user = self.get_current_user(request)
+        if user:
+            request.set_user(user)
+        return user
+
+    def authenticated_userid(self, request: TracimRequest) -> typing.Optional[int]:
+        if not request._current_user:
+            user = self.authenticated_user(request)
+            if not user:
+                return None
+        return request._current_user.user_id
+
 
 ###
 # Pyramid HTTP Basic Auth
@@ -90,7 +109,7 @@ class TracimAuthenticationPolicy(object):
 
 @implementer(IAuthenticationPolicy)
 class TracimBasicAuthAuthenticationPolicy(
-    BasicAuthAuthenticationPolicy, TracimAuthenticationPolicy
+    TracimAuthenticationPolicy, BasicAuthAuthenticationPolicy
 ):
     def __init__(self, realm: str) -> None:
         BasicAuthAuthenticationPolicy.__init__(self, check=None, realm=realm)
@@ -100,7 +119,7 @@ class TracimBasicAuthAuthenticationPolicy(
         # authenticated_user_id) and failed.
         self.callback = None
 
-    def authenticated_userid(self, request: TracimRequest) -> typing.Optional[int]:
+    def get_current_user(self, request: TracimRequest) -> typing.Optional[User]:
         # check if user is correct
         credentials = extract_http_basic_credentials(request)
         if not credentials:
@@ -111,7 +130,7 @@ class TracimBasicAuthAuthenticationPolicy(
         )
         if not user:
             return None
-        return user.user_id
+        return user
 
 
 ###
@@ -120,13 +139,13 @@ class TracimBasicAuthAuthenticationPolicy(
 
 
 @implementer(IAuthenticationPolicy)
-class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy, TracimAuthenticationPolicy):
+class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAuthenticationPolicy):
     def __init__(self, reissue_time: int, debug: bool = False):
         SessionAuthenticationPolicy.__init__(self, debug=debug, callback=None)
         self._reissue_time = reissue_time
         self.callback = None
 
-    def authenticated_userid(self, request: TracimRequest) -> typing.Optional[int]:
+    def get_current_user(self, request: TracimRequest) -> typing.Optional[User]:
         # check if user is correct
         # INFO - G.M - 2018-10-23 - skip non-int user_id
         # if we are using basic_auth policy, unauthenticated_userid is string,
@@ -147,7 +166,7 @@ class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy, TracimAut
             reissue_limit = last_access_datetime + datetime.timedelta(seconds=self._reissue_time)
             if now > reissue_limit:
                 request.session.regenerate_id()
-        return user.user_id
+        return user
 
     def forget(self, request: TracimRequest) -> typing.List[typing.Any]:
         """ Remove the stored userid from the session."""
@@ -162,18 +181,18 @@ class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy, TracimAut
 
 
 @implementer(IAuthenticationPolicy)
-class RemoteAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthenticationPolicy):
+class RemoteAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
     def __init__(self, remote_user_email_login_header: str) -> None:
         self.remote_user_email_login_header = remote_user_email_login_header
         self.callback = None
 
-    def authenticated_userid(self, request: TracimRequest) -> typing.Optional[int]:
+    def get_current_user(self, request: TracimRequest) -> typing.Optional[User]:
         user = self._remote_authenticated_user(
             request=request, email=self.unauthenticated_userid(request)
         )
         if not user:
             return None
-        return user.user_id
+        return user
 
     def unauthenticated_userid(self, request: TracimRequest) -> str:
         return request.environ.get(self.remote_user_email_login_header)
@@ -193,13 +212,13 @@ class RemoteAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthentic
 
 
 @implementer(IAuthenticationPolicy)
-class ApiTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthenticationPolicy):
+class ApiTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
     def __init__(self, api_key_header: str, api_user_email_login_header: str) -> None:
         self.api_key_header = api_key_header
         self.api_user_email_login_header = api_user_email_login_header
         self.callback = None
 
-    def authenticated_userid(self, request: TracimRequest) -> typing.Optional[int]:
+    def get_current_user(self, request: TracimRequest) -> typing.Optional[User]:
         app_config = request.registry.settings["CFG"]  # type: CFG
         valid_api_key = app_config.API__KEY
         api_key = request.headers.get(self.api_key_header)
@@ -211,7 +230,7 @@ class ApiTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthent
         user = self._get_auth_unsafe_user(request, email=request.unauthenticated_userid)
         if not user or not user.is_active or user.is_deleted:
             return None
-        return user.user_id
+        return user
 
     def unauthenticated_userid(self, request: TracimRequest) -> str:
         return request.headers.get(self.api_user_email_login_header)
@@ -231,11 +250,11 @@ class ApiTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthent
 
 
 @implementer(IAuthenticationPolicy)
-class QueryTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthenticationPolicy):
+class QueryTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
     def __init__(self) -> None:
         self.callback = None
 
-    def authenticated_userid(self, request: TracimRequest) -> typing.Optional[int]:
+    def get_current_user(self, request: TracimRequest) -> typing.Optional[User]:
         app_config = request.registry.settings["CFG"]  # type: CFG
         # check if user is correct
         token = self.unauthenticated_userid(request)
@@ -248,7 +267,7 @@ class QueryTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthe
             return None
         if not user.is_active or user.is_deleted:
             return None
-        return user.user_id
+        return user
 
     def unauthenticated_userid(self, request: TracimRequest) -> str:
         return request.params.get(AUTH_TOKEN_QUERY_PARAMETER)

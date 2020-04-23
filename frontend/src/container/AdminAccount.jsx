@@ -27,12 +27,14 @@ import {
   putUserName,
   putUserEmail,
   putUserPassword,
-  putUserWorkspaceDoNotify
+  putUserWorkspaceDoNotify,
+  getUserCalendar
 } from '../action-creator.async.js'
 import {
   editableUserAuthTypeList,
   PAGE
 } from '../helper.js'
+import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 class Account extends React.Component {
   constructor (props) {
@@ -41,22 +43,31 @@ class Account extends React.Component {
     const builtSubComponentMenu = [{
       name: 'personalData',
       active: true,
-      label: props.t('Profile')
+      label: props.t('Profile'),
+      display: true
     }, {
       name: 'notification',
       active: false,
-      label: props.t('Shared spaces and notifications')
+      label: props.t('Shared spaces and notifications'),
+      display: props.system.config.email_notification_activated
     }, {
       name: 'password',
       active: false,
-      label: props.t('Password')
-    }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
+      label: props.t('Password'),
+      display: true
+    }, {
+      name: 'agenda',
+      active: false,
+      label: props.t('Agenda'),
+      display: props.appList.some(a => a.slug === 'agenda')
+    }].filter(menu => menu.display)
 
     this.state = {
       userToEditId: props.match.params.userid,
       userToEdit: {
         public_name: '',
-        auth_type: 'internal'
+        auth_type: 'internal',
+        agendaUrl: ''
       },
       userToEditWorkspaceList: [],
       subComponentMenu: builtSubComponentMenu
@@ -78,6 +89,7 @@ class Account extends React.Component {
     await this.getUserDetail()
     this.setHeadTitle()
     this.getUserWorkspaceList()
+    if (this.props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
     this.buildBreadcrumbs()
   }
 
@@ -86,6 +98,26 @@ class Account extends React.Component {
 
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
       this.setHeadTitle()
+    }
+  }
+
+  loadAgendaUrl = async () => {
+    const { props, state } = this
+    const fetchUserAgenda = await props.dispatch(getUserCalendar(state.userToEditId))
+
+    switch (fetchUserAgenda.status) {
+      case 200:
+        const newAgendaUrl = (fetchUserAgenda.json.find(a => a.agenda_type === 'private') || { agenda_url: '' }).agenda_url
+
+        this.setState(prev => ({
+          userToEdit: {
+            ...prev.userToEdit,
+            agendaUrl: newAgendaUrl
+          }
+        }))
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading your agenda'), 'warning'))
     }
   }
 
@@ -313,6 +345,16 @@ class Account extends React.Component {
 
                       case 'password':
                         return <Password onClickSubmit={this.handleSubmitPassword} displayAdminInfo />
+
+                      case 'agenda':
+                        return (
+                          <AgendaInfo
+                            customClass='account__agenda'
+                            introText={props.t('Use this link to integrate this agenda to your')}
+                            caldavText={props.t('CalDAV compatible software')}
+                            agendaUrl={state.userToEdit.agendaUrl}
+                          />
+                        )
                     }
                   })()}
                 </div>
@@ -326,5 +368,7 @@ class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system }) => ({ breadcrumbs, user, workspaceList, timezone, system })
+const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
+  breadcrumbs, user, workspaceList, timezone, system, appList
+})
 export default withRouter(connect(mapStateToProps)(translate()(Account)))

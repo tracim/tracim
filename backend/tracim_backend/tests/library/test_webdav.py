@@ -189,8 +189,8 @@ class TestWebDav(object):
         session.flush()
         content_pie = (
             session.query(ContentRevisionRO)
-            .filter(Content.content_id == content_pie_id)
-            .order_by(Content.revision_id.desc())
+            .filter(ContentRevisionRO.content_id == content_pie_id)
+            .order_by(ContentRevisionRO.revision_id.desc())
             .first()
         )
         eq_(True, content_pie.is_deleted, msg="Content should be deleted!")
@@ -254,8 +254,8 @@ class TestWebDav(object):
         session.flush()
         content_pie = (
             session.query(ContentRevisionRO)
-            .filter(Content.content_id == content_new_file_id)
-            .order_by(Content.revision_id.desc())
+            .filter(ContentRevisionRO.content_id == content_new_file_id)
+            .order_by(ContentRevisionRO.revision_id.desc())
             .first()
         )
         eq_(True, content_pie.is_deleted, msg="Content should be deleted!")
@@ -276,8 +276,8 @@ class TestWebDav(object):
         session.flush()
         content_pie = (
             session.query(ContentRevisionRO)
-            .filter(Content.content_id == content_new_file_id)
-            .order_by(Content.revision_id.desc())
+            .filter(ContentRevisionRO.content_id == content_new_file_id)
+            .order_by(ContentRevisionRO.revision_id.desc())
             .first()
         )
         eq_(True, content_pie.is_deleted, msg="Content should be deleted!")
@@ -285,8 +285,8 @@ class TestWebDav(object):
         # And an other file exist for this name
         content_new_new_file = (
             session.query(ContentRevisionRO)
-            .filter(Content.label == "greek_salad")
-            .order_by(Content.revision_id.desc())
+            .filter(ContentRevisionRO.label == "greek_salad")
+            .order_by(ContentRevisionRO.revision_id.desc())
             .first()
         )
         assert (

@@ -1,3 +1,5 @@
+@import "../../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
 .adminlink
   &__btn
     font-size 14px
@@ -10,5 +12,5 @@
     &__link
       padding 10px
       font-size 14px
-      &:hover
-        color offWhite
+      &:hover:not(:active)
+        background-color grey-hover
