@@ -8,7 +8,7 @@
 
 ### Improvement
 
-- Better Tracim reactivity by improving SQL requests (#697)
+- Better responsiveness by improving SQL requests (#697)
 
 ### Fixed Issues
 
