@@ -20,7 +20,7 @@
 
 ### Other Changes
 
-- Tracim configuration file (development.ini.sample) now contain the default values used by Tracim and explanations on the settings (#2204). We advise you to be careful on existing installations when merging your configuration file with the new one. 
+- The configuration file (development.ini.sample) now contains the default values used by Tracim and explanations on the settings (#2204). We advise you to be careful on existing installations when merging your configuration file with the new one. 
 
 
 ## 2.6.3 / 2020-04-09
