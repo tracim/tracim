@@ -22,6 +22,10 @@
 
 - The configuration file (development.ini.sample) now contains the default values used by Tracim and explanations on the settings (#2204). We advise you to be careful on existing installations when merging your configuration file with the new one. 
 
+### Breaking/Important change
+
+- Databases support: PostgreSQL(9.3+), MySQL(8.0.1+), MariaDB(10.3+) or SQLite(bundle with python). Older versions are no longer supported.
+
 
 ## 2.6.3 / 2020-04-09
 
