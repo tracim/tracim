@@ -4,7 +4,7 @@
 
 ### Fixed Issues
 
-- backend: #
+- backend: #2920
 
 
 ## 2.7.0 / 2020-04-24
