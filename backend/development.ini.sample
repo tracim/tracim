@@ -38,6 +38,10 @@ basic_setup.session_secret = change_this_value_please!
 # CORE
 ####
 
+# hapic debug mode: return python traceback of error
+; debug = False
+
+
 ### Lang ###
 ## default lang used in backend if user doesn't provided any lang.
 # Available parameter: en, fr, pt
@@ -134,17 +138,20 @@ basic_setup.session_secret = change_this_value_please!
 # sqlalchemy.url = postgresql://user:paswword@dbhost:dbport/dbname?client_encoding=utf8
 # see also for more info:
 # https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine ##
+; sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
 sqlalchemy.url = %(basic_setup.sqlalchemy_url)s
 
 ### File Depot ###
 ## file depot name
 ; depot_storage_name = tracim
 ## This is where none database file will be stored
+; depot_storage_dir = %(here)s/depot
 depot_storage_dir = %(basic_setup.depot_storage_dir)s
 
 
 ### Preview ###
 ## preview cache directory
+; preview_cache_dir = %(here)s/previews
 preview_cache_dir = %(basic_setup.preview_cache_dir)s
 
 ## You can parametrized allowed jpg preview dimension list, if not set, default
@@ -168,7 +175,9 @@ advanced_setup.session_lock_dir = %(basic_setup.sessions_data_root_dir)s/session
 ### pyramid_beaker parameters ###
 session.type = file
 session.data_dir = %(advanced_setup.session_data_dir)s
+; session.data_dir = %(here)s/sessions_data
 session.lock_dir = %(advanced_setup.session_lock_dir)s
+; session.lock_dir = %(here)s/sessions_data
 session.key = session_key
 session.secret = %(basic_setup.session_secret)s
 session.save_accessed_time = True
@@ -504,7 +513,8 @@ webdav.listen = localhost:3030
 ; webdav.dir_browser.enabled = True
 ## Raw HTML code, appended as footer, if not set, let Tracim created his own
 ## footer.
-; webdav.dir_browser.footer = Just another footer
+; webav.dir_browser.footer =
+# webdav.dir_browser.footer = Just another footer
 
 ####
 # CALDAV (Radicale)
@@ -619,9 +629,6 @@ pipeline = tracim_web
 [app:tracim_web]
 use = egg:tracim_backend
 
-# hapic debug mode: return python traceback of error
-debug = False
-
 ### pyramid config ###
 pyramid.reload_templates = True
 pyramid.debug_authorization = False
@@ -632,9 +639,9 @@ pyramid.default_locale_name = en
 ## https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/i18n.html#localization-deployment-settings
 
 ### pyramid optionals plugins ###
-#required plugin are imported directly in Tracim source code
-; pyramid.includes =
-;    pyramid_debugtoolbar
+# required plugin are imported directly in Tracim source code:
+# pyramid.includes =
+#    pyramid_debugtoolbar
 
 [pipeline:webdav]
 pipeline = tracim_webdav
@@ -712,7 +719,8 @@ script_location = tracim_backend/migration
 keys = root, tracim, sqlalchemy, alembic, hapic
 # add Tracim_email_notification logfile
 # this need to add tracim_email_notification handler and tracim_email_notification formatter
-; keys = root, tracim, sqlalchemy, alembic, hapic, tracim_email_notification
+# example:
+# keys = root, tracim, sqlalchemy, alembic, hapic, tracim_email_notification
 
 [logger_root]
 level = INFO
@@ -752,21 +760,21 @@ propagate = 0
 [formatters]
 keys = generic
 ## colored log format (need colorlog)
-; keys = color
+# keys = color
 
 [formatter_color]
 ## use utc based date format:
 class=tracim_backend.lib.utils.logger.ColoredUTCFormatter
-## alternative date: use normal current date (localized)
-; class=colorlog.ColoredFormatter
+## alternative date: use normal current date (localized):
+# class=colorlog.ColoredFormatter
 format = %(asctime)s %(log_color)s%(levelname)-5.5s %(reset)s[%(name)s:%(lineno)s][%(threadName)s] %(log_color)s%(message)s
 datefmt = %Y-%m-%d %H:%M:%S
 
 [formatter_generic]
 ## use utc based date format:
 class=tracim_backend.lib.utils.logger.StandardUTCFormatter
-## alternative date: use normal current date (localized)
-; class=logging.Formatter
+## alternative date: use normal current date (localized):
+# class=logging.Formatter
 format = %(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s
 datefmt = %Y-%m-%d %H:%M:%S
 
@@ -774,20 +782,20 @@ datefmt = %Y-%m-%d %H:%M:%S
 ## use utc based date format:
 class=tracim_backend.lib.utils.logger.StandardUTCFormatter
 ## alternative date: use normal current date (localized)
-; class=logging.Formatter
+# class=logging.Formatter
 format = %(asctime)s %(network)s %(action)s %(recipient)s %(subject)s %(message)s
 datefmt = %Y-%m-%d %H:%M:%S
 
 ### HANDLERS ###
 [handlers]
 keys = console
-# use file log instead
-; keys = logfile
+# use file log instead:
+# keys = logfile
 # add tracim_email_notification_handler
 # this logger is useful to log when notification is prepared
 # ( for email: email is build)
-# and when notification is send (for email: email is send)
-; keys = console, tracim_email_notification
+# and when notification is send (for email: email is send):
+# keys = console, tracim_email_notification
 
 ### Console log ###
 [handler_console]
@@ -795,8 +803,8 @@ class = StreamHandler
 args = (sys.stderr,)
 level = NOTSET
 formatter = generic
-# colored console log (need colorlog python package)
-; formatter = color
+# colored console log (need colorlog python package):
+# formatter = color
 
 ### Rotated file log ###
 [handler_logfile]
