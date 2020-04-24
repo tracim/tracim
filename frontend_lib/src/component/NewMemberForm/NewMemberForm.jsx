@@ -57,7 +57,7 @@ export const NewMemberForm = props => {
                 : props.isEmail
                   ? (
                     <div
-                      className='autocomplete__item primaryColorBgHover'
+                      className='autocomplete__item'
                       onClick={props.onClickAutoComplete}
                     >
                       <div className='autocomplete__item__icon'>
@@ -71,7 +71,7 @@ export const NewMemberForm = props => {
                   )
                   : (
                     <div
-                      className='autocomplete__item primaryColorBgHover'
+                      className='autocomplete__item'
                       onClick={props.onClickAutoComplete}
                     >
                       <div className='autocomplete__item__icon'>
