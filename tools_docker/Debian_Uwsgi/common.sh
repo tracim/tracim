@@ -25,6 +25,14 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|^; email.async.redis.db = .*|email.async.redis.db = 0|g" /etc/tracim/development.ini
     sed -i "s|^; plugin.folder_path = .*|plugin.folder_path = /etc/tracim/plugins|g" /etc/tracim/development.ini
     sed -i "s|^; frontend.custom_toolbox_folder_path = .*|frontend.custom_toolbox_folder_path = /etc/tracim/custom_toolbox|g" /etc/tracim/development.ini
+    sed -i "s|^; email.notification.content_update.template.html = .*/content_update_body_html.mak|email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak|g" /etc/tracim/development.ini
+    sed -i "s|^; email.notification.created_account.template.html = .*/created_account_body_html.mak|email.notification.created_account.template.html = %(email.template_dir)s/created_account_body_html.mak|g" /etc/tracim/development.ini
+    sed -i "s|^; email.notification.reset_password_request.template.html = .*/reset_password_body_html.mak|email.notification.reset_password_request.template.html = %(email.template_dir)s/reset_password_body_html.mak|g" /etc/tracim/development.ini
+    sed -i "s|^; email.notification.share_content_to_emitter.template.html = .*/shared_content_to_emitter_body_html.mak|email.notification.share_content_to_emitter.template.html = %(email.template_dir)s/shared_content_to_emitter_body_html.mak|g" /etc/tracim/development.ini
+    sed -i "s|^; email.notification.share_content_to_receiver.template.html = .*/shared_content_to_receiver_body_html.mak|email.notification.share_content_to_receiver.template.html = %(email.template_dir)s/shared_content_to_receiver_body_html.mak|g" /etc/tracim/development.ini
+    sed -i "s|^; email.notification.upload_permission_to_emitter.template.html = .*/upload_permission_to_emitter_body_html.mak|email.notification.upload_permission_to_emitter.template.html = %(email.template_dir)s/upload_permission_to_emitter_body_html.mak|g" /etc/tracim/development.ini
+    sed -i "s|^; email.notification.upload_permission_to_receiver.template.html = .*/upload_permission_to_receiver_body_html.mak|email.notification.upload_permission_to_receiver.template.html = %(email.template_dir)s/upload_permission_to_receiver_body_html.mak|g" /etc/tracim/development.ini
+    sed -i "s|^; email.notification.new_upload_event.template.html = .*/new_upload_event_body_html.mak|email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in
       mysql)
         sed -i "s|^basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = $DATABASE_TYPE+pymysql://$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME$DATABASE_SUFFIX|g" /etc/tracim/development.ini ;;
