@@ -95,11 +95,7 @@ describe('<NewMemberForm />', () => {
 
     it('should call props.onClickAutoComplete when handler onClickAutoComplete is called', () => {
       wrapper.setProps({ searchedKnownMemberList: [] })
-<<<<<<< HEAD
-      wrapper.find('div.autocomplete__item.primaryColorBgHover').first().simulate('click')
-=======
-      wrapper.find(`div.autocomplete__item`).first().simulate('click')
->>>>>>> develop
+      wrapper.find('div.autocomplete__item').first().simulate('click')
       expect(onClickAutoCompleteCallBack.called).to.equal(true)
       wrapper.setProps({ searchedKnownMemberList: props.searchedKnownMemberList })
     })
