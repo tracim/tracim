@@ -444,7 +444,7 @@ class HtmlDocument extends React.Component {
           customClass={`${state.config.slug}`}
           i18n={i18n}
         >
-          <div /* this div in display flex, justify-content space-between */>
+          <div> {/* this div in display flex, justify-content space-between */}
             <div className='d-flex'>
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
@@ -500,7 +500,7 @@ class HtmlDocument extends React.Component {
           <HtmlDocumentComponent
             mode={state.mode}
             customColor={state.config.hexcolor}
-            wysiwygNewVersion={'wysiwygNewVersion'}
+            wysiwygNewVersion='wysiwygNewVersion'
             onClickCloseEditMode={this.handleCloseNewVersion}
             disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
             onClickValidateBtn={this.handleSaveHtmlDocument}
@@ -516,7 +516,7 @@ class HtmlDocument extends React.Component {
             onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
-            key={'html-document'}
+            key='html-document'
           />
 
           <PopinFixedRightPart

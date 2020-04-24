@@ -9,7 +9,7 @@ import {
 
 describe('helper.js', () => {
   describe('generateLocalStorageContentId()', () => {
-    it(`should return the proper string`, () => {
+    it('should return the proper string', () => {
       const fixture = {
         workspaceId: 23,
         contentId: 53,

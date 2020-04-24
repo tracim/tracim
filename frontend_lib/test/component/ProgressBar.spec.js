@@ -18,15 +18,15 @@ describe('<ProgressBar />', () => {
 
   describe('Static design', () => {
     it(`should display its background in color ${props.backgroundColor}`, () =>
-      expect(wrapper.find(`.progress-value`).prop('style').backgroundColor).to.equal(props.backgroundColor)
+      expect(wrapper.find('.progress-value').prop('style').backgroundColor).to.equal(props.backgroundColor)
     )
 
     it(`should display the text ${props.percent}%`, () =>
-      expect(wrapper.find(`.progress-value`)).to.have.text().equal(`${props.percent}%`)
+      expect(wrapper.find('.progress-value')).to.have.text().equal(`${props.percent}%`)
     )
 
     it(`should display its text ${props.percent} in color ${props.color}`, () =>
-      expect(wrapper.find(`.progress-value`).prop('style').color).to.equal(props.color)
+      expect(wrapper.find('.progress-value').prop('style').color).to.equal(props.color)
     )
   })
 })

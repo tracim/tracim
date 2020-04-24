@@ -19,15 +19,15 @@ describe('<WebdavInfo />', () => {
     )
 
     it(`should display the introText: ${props.introText}`, () =>
-      expect(wrapper.find(`div.webdavInfo__content__text > div`)).to.text().contains(props.introText)
+      expect(wrapper.find('div.webdavInfo__content__text > div')).to.text().contains(props.introText)
     )
 
     it(`should display the webdavText: ${props.webdavText}`, () =>
-      expect(wrapper.find(`a.webdavInfo__content__text__help`)).to.text().equal(props.webdavText)
+      expect(wrapper.find('a.webdavInfo__content__text__help')).to.text().equal(props.webdavText)
     )
 
     it(`should display the webdavUrl: ${props.webdavText}`, () =>
-      expect(wrapper.find(`div.webdavInfo__content__link__url`)).to.text().equal(props.webdavUrl)
+      expect(wrapper.find('div.webdavInfo__content__link__url')).to.text().equal(props.webdavUrl)
     )
   })
 })

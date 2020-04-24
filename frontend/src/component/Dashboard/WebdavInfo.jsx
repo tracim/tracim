@@ -16,6 +16,7 @@ export const WebdavInfo = props => (
             className='webdavInfo__content__text__help primaryColorFont primaryColorFontDarkenHover'
             href='https://github.com/tracim/tracim/issues/1674'
             target='_blank'
+            rel='noopener noreferrer'
           >
             {props.webdavText}
           </a>

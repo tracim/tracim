@@ -50,7 +50,7 @@ describe('<UserStatus />', () => {
       expect(wrapper.find(`div.userstatus__role__icon > i.fa.fa-${testRole.faIcon}`).prop('style').color).to.equal(testRole.hexcolor)
     )
 
-    it(`should not display the notification button when displayNotifBtn is false`, () => {
+    it('should not display the notification button when displayNotifBtn is false', () => {
       wrapper.setProps({ displayNotifBtn: false })
       expect(wrapper.find('div.userstatus__notification').length).to.equal(0)
       wrapper.setProps({ displayNotifBtn: props.displayNotifBtn })
@@ -58,14 +58,14 @@ describe('<UserStatus />', () => {
   })
 
   describe('handlers', () => {
-    it(`onClickRemoveNotifyCallBack should be call when the notification button is clicked and doNotify is true`, () => {
+    it('onClickRemoveNotifyCallBack should be call when the notification button is clicked and doNotify is true', () => {
       wrapper.find('div.userstatus__notification').simulate('click')
       expect(onClickRemoveNotifyCallBack.called).to.equal(true)
       expect(onClickAddNotifyCallBack.called).to.equal(false)
       onClickRemoveNotifyCallBack.resetHistory()
     })
 
-    it(`onClickAddNotifyCallBack should be call when the notification button is clicked and doNotify is false`, () => {
+    it('onClickAddNotifyCallBack should be call when the notification button is clicked and doNotify is false', () => {
       wrapper.setProps({
         curWs: {
           memberList: [{

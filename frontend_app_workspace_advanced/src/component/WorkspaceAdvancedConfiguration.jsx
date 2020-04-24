@@ -22,7 +22,7 @@ const WorkspaceAdvancedConfiguration = props => {
             placeholder={props.t("Shared space's description")}
             value={props.description}
             onChange={props.onChangeDescription}
-            rows={'3'}
+            rows='3'
           />
         </div>
 
@@ -54,7 +54,7 @@ const WorkspaceAdvancedConfiguration = props => {
           <div className='workspace_advanced__delete__content__warning' />
         </div>
 
-        {props.displayPopupValidateDeleteWorkspace &&
+        {(props.displayPopupValidateDeleteWorkspace &&
           <CardPopup
             customClass='workspace_advanced__popup'
             customHeaderClass='primaryColorBg'
@@ -82,7 +82,7 @@ const WorkspaceAdvancedConfiguration = props => {
               </div>
             </div>
           </CardPopup>
-        }
+        )}
       </div>
 
       <div

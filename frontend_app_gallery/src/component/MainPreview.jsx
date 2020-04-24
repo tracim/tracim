@@ -101,7 +101,7 @@ export class MainPreview extends React.Component {
               <i className='fa fa-spinner fa-spin gallery__loader__icon' />
             </div>
           )}
-          {state.imageLoaded === IMG_LOAD_STATE.ERROR
+          {(state.imageLoaded === IMG_LOAD_STATE.ERROR
             ? (
               <div className='carousel__item__preview__error'>
                 <div className='carousel__item__preview__error__message'>
@@ -123,7 +123,7 @@ export class MainPreview extends React.Component {
                 />
               </div>
             )
-          }
+          )}
         </span>
       </div>
     )

@@ -23,7 +23,7 @@ export class MemberList extends React.Component {
         </div>
 
         <div className='memberlist__wrapper'>
-          {props.displayNewMemberForm
+          {(props.displayNewMemberForm
             ? (
               <NewMemberForm
                 onClickCloseAddMemberBtn={props.onClickCloseAddMemberBtn}
@@ -62,15 +62,13 @@ export class MemberList extends React.Component {
                   </div>
                 )}
 
-                <ul className={classnames('memberlist__list', { 'withAddBtn': props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
+                <ul className={classnames('memberlist__list', { withAddBtn: props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
                   {props.memberList.map((m, index) =>
                     <li
-                      className={
-                        classnames(
-                          'memberlist__list__item',
-                          { 'memberlist__list__item__last': props.memberList.length === index + 1 }
-                        )
-                      }
+                      className={classnames(
+                        'memberlist__list__item',
+                        { memberlist__list__item__last: props.memberList.length === index + 1 }
+                      )}
                       key={m.id}
                     >
                       <div className='memberlist__list__item__avatar'>
@@ -100,7 +98,7 @@ export class MemberList extends React.Component {
                 </ul>
               </div>
             )
-          }
+          )}
         </div>
       </div>
     )

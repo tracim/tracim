@@ -36,7 +36,7 @@ export default function workspaceContentList (state = [], action) {
         isOpen: action.folderIdToOpenList.includes(c.content_id)
       }))
 
-    case `${ADD}/${WORKSPACE_CONTENT}`:
+    case `${ADD}/${WORKSPACE_CONTENT}`: {
       const parentIdList = [
         ...state.filter(c => c.parentId),
         ...action.workspaceContentList.filter(c => c.parentId)
@@ -48,6 +48,7 @@ export default function workspaceContentList (state = [], action) {
           isOpen: parentIdList.includes(c.content_id)
         }))
       ]
+    }
 
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
       return state.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)

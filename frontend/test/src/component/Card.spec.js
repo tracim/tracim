@@ -13,7 +13,7 @@ describe('<Card />', () => {
   const CardBodyChildren = () => <div>Random Children</div>
 
   const wrapper = shallow(
-    <Card {...props} >
+    <Card {...props}>
       <CardHeader />
       <CardBody>
         <CardBodyChildren />

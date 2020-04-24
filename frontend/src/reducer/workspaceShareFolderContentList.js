@@ -18,7 +18,7 @@ export default function workspaceShareFolderContentList (state = [], action) {
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
       return state.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
 
-    case `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`:
+    case `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`: {
       const parentIdList = [
         ...state.filter(c => c.parentId),
         ...action.workspaceShareFolderContentList.filter(c => c.parentId)
@@ -31,6 +31,7 @@ export default function workspaceShareFolderContentList (state = [], action) {
           isOpen: parentIdList.includes(c.content_id)
         }))
       ]
+    }
 
     case `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER_ARCHIVED}`:
       return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId

@@ -53,22 +53,22 @@ export const HtmlDocument = props => {
             <div className='html-document__contentpage__textnote__version'>
               version n°
               <div dangerouslySetInnerHTML={{ __html: props.mode === APP_FEATURE_MODE.VIEW ? props.lastVersion : props.version }} />
-              {props.mode === APP_FEATURE_MODE.REVISION &&
+              {props.mode === APP_FEATURE_MODE.REVISION && (
                 <div className='html-document__contentpage__textnote__lastversion outlineTextBtn'>
                   ({props.t('latest version :')} {props.lastVersion})
                 </div>
-              }
+              )}
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
             <div className='html-document__contentpage__textnote__text' dangerouslySetInnerHTML={{ __html: props.text }} />
           </div>
         )}
 
-        {props.mode === APP_FEATURE_MODE.EDIT &&
+        {(props.mode === APP_FEATURE_MODE.EDIT &&
           <div className='html-document__editionmode__container'>
             <TextAreaApp
               id={props.wysiwygNewVersion}
-              customClass={'html-document__editionmode'}
+              customClass='html-document__editionmode'
               customColor={props.customColor}
               onClickCancelBtn={props.onClickCloseEditMode}
               disableValidateBtn={props.disableValidateBtn}
@@ -77,7 +77,7 @@ export const HtmlDocument = props => {
               onChangeText={props.onChangeText}
             />
           </div>
-        }
+        )}
       </div>
     </div>
   )

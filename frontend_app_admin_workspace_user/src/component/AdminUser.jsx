@@ -105,7 +105,7 @@ export class AdminUser extends React.Component {
     return (
       <PageWrapper customClass='adminUser'>
         <PageTitle
-          parentClass={'adminUser'}
+          parentClass='adminUser'
           title={props.t('User account management')}
           icon='users'
           breadcrumbsList={props.breadcrumbsList}
@@ -148,7 +148,7 @@ export class AdminUser extends React.Component {
             />
           )}
 
-          <Delimiter customClass={'adminUser__delimiter'} />
+          <Delimiter customClass='adminUser__delimiter' />
 
           <div className='adminUser__table'>
             <table className='table'>

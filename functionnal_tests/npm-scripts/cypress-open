@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+cd ../backend/ && . env/bin/activate && cd - && cypress open

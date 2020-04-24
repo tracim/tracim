@@ -157,7 +157,7 @@ and `Running Tracim Backend WSGI APP`.
 
 #### Installation of Cypress: Automated script for easy setup
 
-This script check if nodejs is installed (npm is necessary to install Cypress), if file package.json and cypress.json exist in 'functionnal_tests' folder. if not the script install necessary file and install Cypress and his dependency's.
+This script installs some system dependencies of Cypress and checks whether files package.json and cypress.json exist in 'functionnal_tests' folder. If not, the script installs the necessary files.
 
     ./setup_functionnal_tests.sh
 
@@ -166,11 +166,11 @@ Alternatively, under root:
 
     ./setup_functionnal_tests.sh root
 
-If you need to run Cypress with external server of Tracim, modify "baseurl" in cypress.json (for more details, see: https://docs.cypress.io/guides/references/configuration.html#Options ).
+If you need to run Cypress with an external server of Tracim, modify "baseurl" in cypress.json (for more details, see: https://docs.cypress.io/guides/references/configuration.html#Options ).
 
-#### Prerequisit for running Cypress tests
+#### Prerequisite for running Cypress tests
 
-⚠ To run Cypress tests, you need a running Tracim with a specific configuration:
+⚠ To run Cypress tests, you need to run Tracim with a specific configuration:
 
     cd backend/
     source env/bin/activate
@@ -185,21 +185,21 @@ You must change the apiUrl property in `frontend/configEnv.json` to:
 Then rebuild the frontend:
 
     cd frontend/
-    npm run build
+    yarn run build
 
 #### Run tests from the command line ##
 
 To runs all the tests in the 'functionnal_tests/cypress/integration' folder:
 
     cd functionnal_tests/
-    npm run cypress-run
+    yarn run cypress-run
 
 #### Run tests with Cypress GUI ##
 
 You can watch the tests running directly from a (graphical) web interface:
 
     cd functionnal_tests/
-    npm run cypress-open
+    yarn run cypress-open
 
 ### Running frontend unit tests
 
@@ -224,7 +224,7 @@ To run all the unit tests:
 To run the unit tests of a specific frontend app or of frontend_lib:
 
     cd frontend_app_file # (or any frontend app)
-    npm run test
+    yarn run test
 
 Note: to retrieve all frontend apps, run this command:
 

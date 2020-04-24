@@ -42,9 +42,9 @@ describe('<MemberList />', () => {
       expect(wrapper.find('li.memberlist__list__item').length).to.equal(props.memberList.length)
     )
 
-    it(`should display the publicName of each member in memberList`, () => {
+    it('should display the publicName of each member in memberList', () => {
       for (let i = 0; i < props.memberList.length; i++) {
-        expect(wrapper.find(`div.memberlist__list__item__info__name`).at(i)).to.text().equal(props.memberList[i].publicName)
+        expect(wrapper.find('div.memberlist__list__item__info__name').at(i)).to.text().equal(props.memberList[i].publicName)
       }
     })
 
@@ -60,7 +60,7 @@ describe('<MemberList />', () => {
       wrapper.setProps({ userRoleIdInWorkspace: props.userRoleIdInWorkspace })
     })
 
-    it(`should not display the memberList when displayNewMemberForm is true`, () => {
+    it('should not display the memberList when displayNewMemberForm is true', () => {
       wrapper.setProps({ displayNewMemberForm: true })
       expect(wrapper.find('.memberlist__list').length).to.equal(0)
       wrapper.setProps({ displayNewMemberForm: props.displayNewMemberForm })
@@ -68,7 +68,7 @@ describe('<MemberList />', () => {
   })
 
   describe('handlers', () => {
-    it(`onClickAddMemberBtnCallBack should be called when add button is clicked`, () => {
+    it('onClickAddMemberBtnCallBack should be called when add button is clicked', () => {
       wrapper.find('div.memberlist__btnadd').simulate('click')
       expect(onClickAddMemberBtnCallBack.called).to.equal(true)
     })

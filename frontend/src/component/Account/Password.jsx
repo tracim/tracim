@@ -84,10 +84,10 @@ export class Password extends React.Component {
     return (
       <div className='account__userpreference__setting__personaldata'>
         <div className='personaldata__sectiontitle subTitle ml-2 ml-sm-0'>
-          {props.displayAdminInfo
+          {(props.displayAdminInfo
             ? props.t('Change the password')
             : props.t('Change my password')
-          }
+          )}
         </div>
 
         <div className='personaldata__text ml-2 ml-sm-0' />

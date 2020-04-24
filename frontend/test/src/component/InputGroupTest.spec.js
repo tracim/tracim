@@ -39,7 +39,7 @@ describe('<InputGroupText />', () => {
       expect(wrapper.find(`input.${props.parentClassName}__input`).length).to.equal(1)
     )
 
-    it(`should include a input with the class: is-invalid`, () =>
+    it('should include a input with the class: is-invalid', () =>
       expect(wrapper.find(`input.${props.parentClassName}__input.is-invalid`).length).to.equal(1)
     )
 
@@ -48,15 +48,15 @@ describe('<InputGroupText />', () => {
     )
 
     it(`the input should have the value: ${props.value}`, () =>
-      expect(wrapper.find(`input`).prop('value')).to.equal(props.value)
+      expect(wrapper.find('input').prop('value')).to.equal(props.value)
     )
 
     it(`the input should have the placeHolder: ${props.placeHolder}`, () =>
-      expect(wrapper.find(`input`).prop('placeholder')).to.equal(props.placeHolder)
+      expect(wrapper.find('input').prop('placeholder')).to.equal(props.placeHolder)
     )
 
     it(`the input should have the type: ${props.type}`, () =>
-      expect(wrapper.find(`input`).prop('type')).to.equal(props.type)
+      expect(wrapper.find('input').prop('type')).to.equal(props.type)
     )
   })
 

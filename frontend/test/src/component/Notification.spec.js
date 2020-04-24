@@ -40,7 +40,7 @@ describe('<Notification />', () => {
       expect(wrapper.find('div.notification__table__role').length).to.equal(props.workspaceList.length)
     })
 
-    it(`should display labels of workspaces`, () => {
+    it('should display labels of workspaces', () => {
       for (let i = 0; i < props.workspaceList.length; i++) {
         expect(wrapper.find('div.notification__table__wksname').at(i)).to.text().equal(props.workspaceList[i].label)
       }

@@ -46,7 +46,7 @@ describe('<Avatar />', () => {
     })
   })
 
-  describe(`Component's function`, () => {
+  describe('Component\'s function', () => {
     describe('getTwoLetter(name) with a name with space', () => {
       it('name: "public name" should return "pn"', () => {
         publicName = 'public name'

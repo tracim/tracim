@@ -37,9 +37,9 @@ class ShareFolder extends React.Component {
     return (
       <div
         className={classnames('folder', {
-          'active': props.isOpen && folderContentList.length > 0,
+          active: props.isOpen && folderContentList.length > 0,
           'item-last': props.isLast,
-          'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
+          read: true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
         data-cy={SHARE_FOLDER_ID}
         id={SHARE_FOLDER_ID}
@@ -53,10 +53,9 @@ class ShareFolder extends React.Component {
             <div className='folder__header__triangleborder__triangle' />
           </div>
 
-          <div
-            className='folder__header__dragPreview'
-          >
-            <div className='folder__header__icon'
+          <div className='folder__header__dragPreview'>
+            <div
+              className='folder__header__icon'
               title={props.t('Folder')}
               style={{ color: (props.contentType.find(c => c.slug === 'folder') || { hexcolor: '' }).hexcolor }}
             >

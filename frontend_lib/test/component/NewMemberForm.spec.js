@@ -66,7 +66,7 @@ describe('<NewMemberForm />', () => {
         .to.equal(!props.autoCompleteClicked)
     })
 
-    it(`should display the 5 first searched known Member of the list`, () => {
+    it('should display the 5 first searched known Member of the list', () => {
       expect(wrapper.find('.autocomplete__item').length).equal(5)
       for (let i = 0; i < 5; i++) {
         expect(wrapper.find('div.autocomplete__item__avatar > Avatar').at(i).prop('publicName'))
@@ -79,34 +79,34 @@ describe('<NewMemberForm />', () => {
 
   describe('Handlers', () => {
     it('should call props.onClickBtnValidate when handler onClickBtnValidate is called at form validation', () => {
-      wrapper.find(`button`).simulate('click')
+      wrapper.find('button').simulate('click')
       expect(onClickBtnValidateCallBack.called).to.equal(true)
     })
 
     it('should call props.onClickCloseAddMemberBtn when handler onClickCloseAddMemberBtn is called at form closing', () => {
-      wrapper.find(`.memberlist__form__close`).simulate('click')
+      wrapper.find('.memberlist__form__close').simulate('click')
       expect(onClickCloseAddMemberBtnCallBack.called).to.equal(true)
     })
 
     it('should call props.onClickKnownMember when handler onClickKnownMember is called', () => {
-      wrapper.find(`div.autocomplete__item`).first().simulate('click')
+      wrapper.find('div.autocomplete__item').first().simulate('click')
       expect(onClickKnownMemberCallBack.called).to.equal(true)
     })
 
     it('should call props.onClickAutoComplete when handler onClickAutoComplete is called', () => {
       wrapper.setProps({ searchedKnownMemberList: [] })
-      wrapper.find(`div.autocomplete__item`).first().simulate('click')
+      wrapper.find('div.autocomplete__item').first().simulate('click')
       expect(onClickAutoCompleteCallBack.called).to.equal(true)
       wrapper.setProps({ searchedKnownMemberList: props.searchedKnownMemberList })
     })
 
     it('should call props.onChangeRole when handler onChangeRole is called', () => {
-      wrapper.find(`.item__radiobtn > input`).first().simulate('change')
+      wrapper.find('.item__radiobtn > input').first().simulate('change')
       expect(onChangeRoleCallBack.called).to.equal(true)
     })
 
     it('should call props.onChangeNameOrEmail when handler onChangeNameOrEmail is called', () => {
-      wrapper.find(`input.name__input`).simulate('change', { target: { value: 'randomValue' } })
+      wrapper.find('input.name__input').simulate('change', { target: { value: 'randomValue' } })
       expect(onChangeNameOrEmailCallBack.called).to.equal(true)
     })
   })

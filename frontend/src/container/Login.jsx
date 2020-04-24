@@ -120,7 +120,7 @@ class Login extends React.Component {
     const fetchPostUserLogin = await props.dispatch(postUserLogin(email.value, password.value, state.inputRememberMe))
 
     switch (fetchPostUserLogin.status) {
-      case 200:
+      case 200: {
         const loggedUser = {
           ...fetchPostUserLogin.json,
           logged: true
@@ -146,6 +146,7 @@ class Login extends React.Component {
 
         props.history.push(PAGE.HOME)
         break
+      }
       case 400:
         switch (fetchPostUserLogin.json.code) {
           case 2001: props.dispatch(newFlashMessage(props.t('Not a valid email'), 'warning')); break

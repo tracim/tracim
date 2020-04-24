@@ -2,7 +2,7 @@ const nock = require('nock')
 
 const mockPutMyselfName200 = (apiUrl, newName, timezone, lang) => {
   return nock(apiUrl)
-    .put(`/users/me`, {
+    .put('/users/me', {
       public_name: newName,
       timezone: timezone,
       lang: lang

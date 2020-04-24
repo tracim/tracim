@@ -40,13 +40,13 @@ describe('<DropdownLang />', () => {
       expect(wrapper.find('div.dropdownlang__dropdown__subdropdown__link').length).to.equal(props.langList.length - 1)
     })
 
-    it(`should display the label of each other language`, () => {
+    it('should display the label of each other language', () => {
       for (let i = 1; i < props.langList.length; i++) {
         expect(wrapper.find('div.dropdownlang__dropdown__subdropdown__link').at(i - 1)).to.text().equal(props.langList[i].label)
       }
     })
 
-    it(`should display the icon of each other language`, () => {
+    it('should display the icon of each other language', () => {
       for (let i = 1; i < props.langList.length; i++) {
         expect(wrapper.find('img.dropdownlang__dropdown__subdropdown__link__flag').at(i - 1).prop('src')).to.equal(props.langList[i].icon)
       }

@@ -28,13 +28,13 @@ class ThumbnailPreview extends React.Component {
     const { props, state } = this
 
     return (
-      <div className={'carousel__thumbnail__item__preview__content'}>
+      <div className='carousel__thumbnail__item__preview__content'>
         {state.imageLoaded === IMG_LOAD_STATE.LOADING && (
           <div className='gallery__loader'>
             <i className='fa fa-spinner fa-spin gallery__loader__icon' />
           </div>
         )}
-        {state.imageLoaded === IMG_LOAD_STATE.ERROR
+        {(state.imageLoaded === IMG_LOAD_STATE.ERROR
           ? (
             <i className='fa fa-fw fa-exclamation-triangle carousel__thumbnail__item__preview__error' />
           ) : (
@@ -46,7 +46,7 @@ class ThumbnailPreview extends React.Component {
               alt={props.fileName}
             />
           )
-        }
+        )}
       </div>
     )
   }

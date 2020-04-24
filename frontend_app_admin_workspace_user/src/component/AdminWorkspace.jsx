@@ -10,9 +10,9 @@ import {
 const AdminWorkspace = props =>
   <PageWrapper customClass='adminWorkspace'>
     <PageTitle
-      parentClass={'adminWorkspace'}
+      parentClass='adminWorkspace'
       title={props.t('Shared space management')}
-      icon={'bank'}
+      icon='bank'
       breadcrumbsList={props.breadcrumbsList}
     />
 
@@ -30,7 +30,7 @@ const AdminWorkspace = props =>
         {props.t('List of every shared spaces')}
       </div>
 
-      <Delimiter customClass={'adminWorkspace__delimiter'} />
+      <Delimiter customClass='adminWorkspace__delimiter' />
 
       <div className='adminWorkspace__workspaceTable'>
 
@@ -47,7 +47,7 @@ const AdminWorkspace = props =>
           </thead>
 
           <tbody>
-            {props.workspaceList.length > 0
+            {(props.workspaceList.length > 0
               ? props.workspaceList/* .sort((a, b) => a.workspace_id > b.workspace_id) */.map(ws => (
                 <tr className='adminWorkspace__workspaceTable__tr' key={ws.slug}>
                   <td className='table__id'>{ws.workspace_id}</td>
@@ -89,7 +89,7 @@ const AdminWorkspace = props =>
                   <td />
                 </tr>
               )
-            }
+            )}
           </tbody>
         </table>
       </div>
