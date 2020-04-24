@@ -44,6 +44,10 @@
       ${html_class.replace('{state}', '')} { ${param}: ${primary}; }
       ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary_color_darken_str}; }
       ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary_color_lighten_str}; }
+      <% html_class = '.primaryColorBg{state}Active:active'%>
+      ${html_class.replace('{state}', '')} { ${param}: ${primary}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary_color_darken_str}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary_color_lighten_str}; }
 
       <%
         param = 'border-color'

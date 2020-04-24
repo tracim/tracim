@@ -21,10 +21,11 @@ class AgendaApp(TracimApplication):
         load config for caldav related stuff
         """
         app_config.CALDAV__RADICALE_PROXY__BASE_URL = app_config.get_raw_config(
-            "caldav.radicale_proxy.base_url", None
+            "caldav.radicale_proxy.base_url", "http://localhost:5232"
         )
+        default_caldav_storage_dir = app_config.here_macro_replace("%(here)s/radicale_storage")
         app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = app_config.get_raw_config(
-            "caldav.radicale.storage.filesystem_folder"
+            "caldav.radicale.storage.filesystem_folder", default_caldav_storage_dir
         )
         app_config.CALDAV__RADICALE__AGENDA_DIR = "agenda"
         app_config.CALDAV__RADICALE__WORKSPACE_SUBDIR = "workspace"

@@ -23,7 +23,7 @@ export const FileDropzone = props => {
                     className='filecontent__form__icon d-flex justify-content-center'
                     style={{ color: props.hexcolor }}
                   >
-                    <i className='fa fa-download' />
+                    <i className='fa fa-upload' />
                   </div>
 
                   <div

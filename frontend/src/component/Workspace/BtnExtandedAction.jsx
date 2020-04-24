@@ -6,6 +6,8 @@ import { connect } from 'react-redux'
 import { PAGE } from '../../helper'
 import { Link } from 'react-router-dom'
 
+require('./BtnExtandedAction.styl')
+
 export const ExtandedAction = props => {
   return (
     <div
@@ -27,7 +29,7 @@ export const ExtandedAction = props => {
       <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
         {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace >= props.onClickExtendedAction.edit.allowedRoleId && (
           <div
-            className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
+            className='subdropdown__item primaryColorBgActive dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.edit.callback}
             data-cy='extended_action_edit'
           >
@@ -71,7 +73,7 @@ export const ExtandedAction = props => {
 
         {props.onClickExtendedAction.delete && props.userRoleIdInWorkspace >= props.onClickExtendedAction.delete.allowedRoleId && (
           <div
-            className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
+            className='subdropdown__item primaryColorBgActive dropdown-item d-flex align-items-center'
             onClick={props.onClickExtendedAction.delete.callback}
             data-cy='extended_action_delete'
           >
@@ -88,7 +90,7 @@ export const ExtandedAction = props => {
         {/* FIXME - GM - 2019-04-16 - Don't use hardcoded slug and find a better way to handle app buttons like this one - https://github.com/tracim/tracim/issues/2654 */}
         {props.folderData && props.appList && props.appList.some((app) => app.slug === 'gallery') && (
           <Link
-            className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
+            className='subdropdown__item primaryColorBgActive dropdown-item d-flex align-items-center'
             onClick={e => e.stopPropagation()}
             data-cy='extended_action_gallery'
             to={`${PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId)}?folder_ids=${props.folderData.id}`}

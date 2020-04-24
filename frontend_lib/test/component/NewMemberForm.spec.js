@@ -89,13 +89,17 @@ describe('<NewMemberForm />', () => {
     })
 
     it('should call props.onClickKnownMember when handler onClickKnownMember is called', () => {
-      wrapper.find('div.autocomplete__item.primaryColorBgHover').first().simulate('click')
+      wrapper.find('div.autocomplete__item').first().simulate('click')
       expect(onClickKnownMemberCallBack.called).to.equal(true)
     })
 
     it('should call props.onClickAutoComplete when handler onClickAutoComplete is called', () => {
       wrapper.setProps({ searchedKnownMemberList: [] })
+<<<<<<< HEAD
       wrapper.find('div.autocomplete__item.primaryColorBgHover').first().simulate('click')
+=======
+      wrapper.find(`div.autocomplete__item`).first().simulate('click')
+>>>>>>> develop
       expect(onClickAutoCompleteCallBack.called).to.equal(true)
       wrapper.setProps({ searchedKnownMemberList: props.searchedKnownMemberList })
     })

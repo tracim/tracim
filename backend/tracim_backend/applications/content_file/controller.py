@@ -207,7 +207,7 @@ class FileController(Controller):
         except IOError as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
-                    content.revision_id, content.content_id
+                    content.cached_revision_id, content.content_id
                 )
             ) from exc
         filename = hapic_data.path.filename
@@ -302,7 +302,7 @@ class FileController(Controller):
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         pdf_preview_path = api.get_pdf_preview_path(
             content.content_id,
-            content.revision_id,
+            content.cached_revision_id,
             page_number=hapic_data.query.page,
             file_extension=content.file_extension,
         )
@@ -343,7 +343,7 @@ class FileController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         pdf_preview_path = api.get_full_pdf_preview_path(
-            content.revision_id, file_extension=content.file_extension
+            content.cached_revision_id, file_extension=content.file_extension
         )
         filename = hapic_data.path.filename
         # INFO - G.M - 2019-08-08 - use given filename in all case but none or
@@ -467,7 +467,7 @@ class FileController(Controller):
         allowed_dim = api.get_jpg_preview_allowed_dim()
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
-            revision_id=content.revision_id,
+            revision_id=content.cached_revision_id,
             page_number=hapic_data.query.page,
             file_extension=content.file_extension,
             width=allowed_dim.dimensions[0].width,
@@ -512,7 +512,7 @@ class FileController(Controller):
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
-            revision_id=content.revision_id,
+            revision_id=content.cached_revision_id,
             file_extension=content.file_extension,
             page_number=hapic_data.query.page,
             height=hapic_data.path.height,

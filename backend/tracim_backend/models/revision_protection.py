@@ -82,7 +82,7 @@ def new_revision(
     """
     with session.no_autoflush:
         try:
-            if force_create_new_revision or inspect(content.revision).has_identity:
+            if force_create_new_revision or inspect(content.current_revision).has_identity:
                 content.new_revision()
             RevisionsIntegrity.add_to_updatable(content.revision)
             yield content

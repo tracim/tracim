@@ -36,6 +36,8 @@ folderopen()
   padding-left 30px
   & > .folder__header
     folderopen()
+    &:hover
+      background-color grey-hover
   & > .folder__content
     folderclose()
     & > .file, > .folder
@@ -66,6 +68,7 @@ folderopen()
           // INFO - CH - 2019-08-07 - In the HTML, the .folder__header__triangleborder__triangle class also has .primaryColorFontLighten
           // So it always has it's font in the primary color but only uses it as border color on mousehover through "currentColor"
           border-top-color currentColor
+          color grey-hover
     &__triangleborder
       display none
       position absolute
@@ -170,4 +173,3 @@ folderopen()
           display inline
         &::after
           display none // hide the dropdown triangle
-

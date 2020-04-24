@@ -67,7 +67,6 @@ export class MemberList extends React.Component {
                     <li
                       className={classnames(
                         'memberlist__list__item',
-                        'primaryColorBgLightenHover',
                         { memberlist__list__item__last: props.memberList.length === index + 1 }
                       )}
                       key={m.id}

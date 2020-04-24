@@ -1597,7 +1597,7 @@ class TestUserSetContentAsRead(object):
         web_testapp.put(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=workspace.workspace_id,
-                content_id=comments.content_id,
+                content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
             )
         )
@@ -3259,7 +3259,7 @@ class TestUserWithNotificationEndpoint(object):
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "test user <test@test.test>"
-        assert headers["Subject"][0] == "[TRACIM] Created account"
+        assert headers["Subject"][0] == "[Tracim] Created account"
 
     def test_api__create_user__ok_200__limited_admin_with_notif(
         self, web_testapp, user_api_factory, mailhog
@@ -3290,7 +3290,7 @@ class TestUserWithNotificationEndpoint(object):
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "test <test@test.test>"
-        assert headers["Subject"][0] == "[TRACIM] Created account"
+        assert headers["Subject"][0] == "[Tracim] Created account"
 
     def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, mailhog):
 

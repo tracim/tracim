@@ -14,6 +14,7 @@ from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import CommentSchema
@@ -55,8 +56,7 @@ class CommentController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        comments = content.get_comments()
-        comments.sort(key=lambda comment: comment.created)
+        comments = content.get_comments().order_by(ContentRevisionRO.created)
         return [api.get_content_in_context(comment) for comment in comments]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])

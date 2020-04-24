@@ -127,7 +127,9 @@ class SimpleSearchApi(SearchApi):
             .filter(or_(*(filter_group_label + filter_group_filename + filter_group_description)))
             .options(joinedload("children_revisions"))
             .options(joinedload("parent"))
-            .order_by(desc(Content.updated), desc(Content.revision_id), desc(Content.content_id))
+            .order_by(
+                desc(Content.updated), desc(Content.cached_revision_id), desc(Content.content_id)
+            )
         )
 
         # INFO - G.M - 2019-06-13 - we add comment to content_types checked

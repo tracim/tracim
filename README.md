@@ -44,7 +44,7 @@ In order to contribute to the Tracim source code, please read [CONTRIBUTING.md](
 
 ## Advanced - Install Tracim from Source
 
-OS compatibility (tested with Python >= 3.5):
+OS compatibility (tested with Python >= 3.5.2):
 
 - Debian:
   - Jessie (8)
@@ -230,8 +230,6 @@ Note: to retrieve all frontend apps, run this command:
 
     ls -d frontend*
 
-<a href='https://www.browserstack.com' target='_blank'>
-    <img src='https://raw.githubusercontent.com/tracim/tracim/master/logo_browserstack.png' width='150'>
-</a>
+[![logo_browserstack](logo_browserstack.png)](https://www.browserstack.com)
 
 BrowserStack supports open source projects and graciously helps us testing Tracim on every devices.

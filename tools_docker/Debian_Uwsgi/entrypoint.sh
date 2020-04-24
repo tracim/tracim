@@ -91,12 +91,12 @@ if [ "$START_WEBDAV" = "1" ]; then
     if [ ! -L /etc/uwsgi/apps-enabled/tracim_webdav.ini ]; then
         ln -s /etc/uwsgi/apps-available/tracim_webdav.ini /etc/uwsgi/apps-enabled/tracim_webdav.ini
     fi
-    sed -i "s|webdav.ui.enabled = .*|webdav.ui.enabled = True|g" /etc/tracim/development.ini
+    sed -i "s|^webdav.ui.enabled = .*|webdav.ui.enabled = True|g" /etc/tracim/development.ini
     sed -i "s|^\s*#ProxyPass /webdav http://127.0.0.1:3030/webdav|    ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
     sed -i "s|^\s*#ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|    ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_webdav.ini
-    sed -i "s|webdav.ui.enabled = .*|webdav.ui.enabled = False|g" /etc/tracim/development.ini
+    sed -i "s|^webdav.ui.enabled = .*|webdav.ui.enabled = False|g" /etc/tracim/development.ini
     sed -i "s|^\s*ProxyPass /webdav http://127.0.0.1:3030/webdav|    #ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
     sed -i "s|^\s*ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|    #ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 fi

@@ -96,7 +96,7 @@ if sys.version_info.major == 3 and sys.version_info.minor >= 6:
     devtools_require.append('black')
 
 mysql_require = [
-    'PyMySQL'
+    'PyMySQL[rsa]'
 ]
 
 postgresql_require = [

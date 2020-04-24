@@ -243,7 +243,7 @@ class ShareController(Controller):
         except IOError as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
-                    content.revision_id, content.content_id
+                    content.cached_revision_id, content.content_id
                 )
             ) from exc
         filename = hapic_data.path.filename
