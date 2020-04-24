@@ -593,10 +593,19 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 # software used for collaborative document_edition. "collabora" software value give support for
 # both CollaboraOnline and LibreofficeOnline.
-; collaborative_document_edition.software = collabora
+; collaborative_document_edition.software =
+# example with collabora:
+# collaborative_document_edition.software = collabora
+
 # base url where collabora server exist
-; collaborative_document_edition.collabora.base_url = http://localhost:9980
-; collaborative_document_edition.file_template_dir =  %(basic_setup.file_template_dir)s
+; collaborative_document_edition.collabora.base_url =
+# example:
+# collaborative_document_edition.collabora.base_url = http://localhost:9980
+
+# template dir for collaborative document edition:
+; collaborative document edition.file_template_dir = %(here)s/tracim_backend/templates/open_documents
+# example using basic_setup.file_template_dir shortcut configured at the beginning of file:
+# collaborative_document_edition.file_template_dir = %(basic_setup.file_template_dir)s
 
 
 ##############################
