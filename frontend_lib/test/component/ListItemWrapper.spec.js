@@ -37,21 +37,13 @@ describe('<ListItemWrapper />', () => {
 
   it('should have the class "item-last" when isLast is set to true', () => {
     wrapper.setProps({ isLast: true })
-<<<<<<< HEAD
-    expect(wrapper.find('.content.primaryColorBgLightenHover.item-last')).to.have.lengthOf(1)
-=======
-    expect(wrapper.find(`.content.item-last`)).to.have.lengthOf(1)
->>>>>>> develop
+    expect(wrapper.find('.content.item-last')).to.have.lengthOf(1)
     wrapper.setProps({ isLast: props.isLast })
   })
 
   it('should have the class "read" when read is set to true', () => {
     wrapper.setProps({ read: true })
-<<<<<<< HEAD
-    expect(wrapper.find('.content.primaryColorBgLightenHover.read')).to.have.lengthOf(1)
-=======
-    expect(wrapper.find(`.content.read`)).to.have.lengthOf(1)
->>>>>>> develop
+    expect(wrapper.find('.content.read')).to.have.lengthOf(1)
     wrapper.setProps({ read: props.read })
   })
 })
