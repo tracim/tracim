@@ -106,7 +106,7 @@ class Account extends React.Component {
     const fetchUserAgenda = await props.dispatch(getUserCalendar(state.userToEditId))
 
     switch (fetchUserAgenda.status) {
-      case 200:
+      case 200: {
         const newAgendaUrl = (fetchUserAgenda.json.find(a => a.agenda_type === 'private') || { agenda_url: '' }).agenda_url
 
         this.setState(prev => ({
@@ -116,6 +116,8 @@ class Account extends React.Component {
           }
         }))
         break
+      }
+
       default:
         props.dispatch(newFlashMessage(props.t('Error while loading your agenda'), 'warning'))
     }

@@ -310,8 +310,6 @@ website.base_url = %(basic_setup.website_base_url)s
 # EMAIL-COMMON
 ####
 
-## shortcut for template_dir path
-email.template_dir = %(here)s/tracim_backend/templates/mail
 
 ### Email sending configuration ###
 # processing_mode may be sync or async,
@@ -405,14 +403,27 @@ email.template_dir = %(here)s/tracim_backend/templates/mail
 ### Templates ###
 
 # emails templates:
-; email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
-; email.notification.created_account.template.html = %(email.template_dir)s/created_account_body_html.mak
-; email.notification.reset_password_request.template.html = %(email.template_dir)s/reset_password_body_html.mak
-; email.notification.share_content_to_emitter.template.html = %(email.template_dir)s/shared_content_to_emitter_body_html.mak
-; email.notification.share_content_to_receiver.template.html = %(email.template_dir)s/shared_content_to_receiver_body_html.mak
-; email.notification.upload_permission_to_emitter.template.html = %(email.template_dir)s/upload_permission_to_emitter_body_html.mak
-; email.notification.upload_permission_to_receiver.template.html = %(email.template_dir)s/upload_permission_to_receiver_body_html.mak
-; email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak
+; email.notification.content_update.template.html = %(here)s/tracim_backend/templates/mail/content_update_body_html.mak
+; email.notification.created_account.template.html = %(here)s/tracim_backend/templates/mail/created_account_body_html.mak
+; email.notification.reset_password_request.template.html = %(here)s/tracim_backend/templates/mail/reset_password_body_html.mak
+; email.notification.share_content_to_emitter.template.html = %(here)s/tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak
+; email.notification.share_content_to_receiver.template.html = %(here)s/tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak
+; email.notification.upload_permission_to_emitter.template.html = %(here)s/tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak
+; email.notification.upload_permission_to_receiver.template.html = %(here)s/tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak
+; email.notification.new_upload_event.template.html =  %(here)s/tracim_backend/templates/mail/new_upload_event_body_html.mak
+
+
+# example with shortcut for template_dir path :
+; email.template_dir =
+# email.template_dir = %(here)s/tracim_backend/templates/mail
+# email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
+# email.notification.created_account.template.html = %(email.template_dir)s/created_account_body_html.mak
+# email.notification.reset_password_request.template.html = %(email.template_dir)s/reset_password_body_html.mak
+# email.notification.share_content_to_emitter.template.html = %(email.template_dir)s/shared_content_to_emitter_body_html.mak
+# email.notification.share_content_to_receiver.template.html = %(email.template_dir)s/shared_content_to_receiver_body_html.mak
+# email.notification.upload_permission_to_emitter.template.html = %(email.template_dir)s/upload_permission_to_emitter_body_html.mak
+# email.notification.upload_permission_to_receiver.template.html = %(email.template_dir)s/upload_permission_to_receiver_body_html.mak
+# email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak
 
 ####
 # EMAIL-REPLY
