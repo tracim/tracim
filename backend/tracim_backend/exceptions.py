@@ -227,10 +227,6 @@ class NotificationDisabledCantResetPassword(TracimException):
     error_code = ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
 
-class GroupDoesNotExist(TracimError):
-    pass
-
-
 class ContentStatusNotExist(TracimError):
     pass
 
@@ -533,3 +529,7 @@ class ConflictingMoveInItself(TracimException):
 
 class ConflictingMoveInChild(TracimException):
     error_code = ErrorCode.CONFLICTING_MOVE_IN_CHILD
+
+
+class CannotDeleteUniqueRevisionWithoutDeletingContent(Exception):
+    pass

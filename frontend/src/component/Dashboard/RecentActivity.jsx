@@ -46,7 +46,7 @@ export const RecentActivity = props =>
           if (content.type === 'folder' && props.roleIdForLoggedUser < ROLE.contentManager.id) {
             return (
               <div
-                className={classnames('recentactivity__list__item nolink primaryColorBgLightenHover')}
+                className={classnames('recentactivity__list__item nolink')}
                 title={content.label}
                 key={content.id}
               >
@@ -57,7 +57,7 @@ export const RecentActivity = props =>
           } else {
             return (
               <Link
-                className={classnames('recentactivity__list__item primaryColorBgLightenHover', { 'read': props.readByUserList.includes(content.id) })}
+                className={classnames('recentactivity__list__item', { 'read': props.readByUserList.includes(content.id) })}
                 to={PAGE.WORKSPACE.CONTENT(props.workspaceId, content.type, content.id)}
                 title={content.label}
                 key={content.id}

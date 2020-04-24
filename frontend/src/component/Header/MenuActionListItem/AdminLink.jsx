@@ -15,12 +15,12 @@ const AdminLink = props => {
         data-cy='adminlink__dropdown__btn'
       >
         <i className='fa fa-fw fa-cog' />
-        Administration
+        {props.t('Administration')}
       </button>
 
       <div className='adminlink__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
         <Link
-          className='adminlink__setting__link primaryColorBgLightenHover dropdown-item'
+          className='adminlink__setting__link primaryColorBgActive dropdown-item'
           to={PAGE.ADMIN.WORKSPACE}
           data-cy='adminlink__workspace__link'
         >
@@ -29,7 +29,7 @@ const AdminLink = props => {
         </Link>
 
         <Link
-          className='adminlink__setting__link primaryColorBgLightenHover dropdown-item'
+          className='adminlink__setting__link primaryColorBgActive dropdown-item'
           to={PAGE.ADMIN.USER}
           data-cy='adminlink__user__link'
         >

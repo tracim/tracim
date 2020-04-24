@@ -37,7 +37,7 @@ class WopiLib(object):
             user_id=self._user.user_id,
             user_friendly_name=self._user.display_name,
             user_can_write=user_can_write,
-            version=content.revision_id,
+            version=content.cached_revision_id,
             user_can_not_write_relative=True,
         )
 

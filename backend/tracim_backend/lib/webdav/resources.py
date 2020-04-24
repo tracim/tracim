@@ -729,7 +729,7 @@ class FileResource(DAVNonCollection):
         # self.setPropertyValue('Win32FileAttributes', '00000021')
 
     def __repr__(self) -> str:
-        return "<DAVNonCollection: FileResource (%d)>" % self.content.revision_id
+        return "<DAVNonCollection: FileResource (%d)>" % self.content.cached_revision_id
 
     @webdav_check_right(is_reader)
     def getContentLength(self) -> int:

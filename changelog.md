@@ -1,5 +1,32 @@
 
 
+## 2.7.0 / 2020-04-24
+
+### New Features
+
+- Support Português language
+
+### Improvement
+
+- Better responsiveness by improving SQL requests (#697)
+
+### Fixed Issues
+
+- General UX: #1409, #1444, #1515, #1855, #2406, #2444, #2454, #2537, #2595, #2661, #2673, #2679, #2681, #2693, #2701, #2764, #2791
+- Frontend: #1613, #2569
+- Backend: #941, #2631, #2737
+- Documentation: #2776
+- Docker: #2753
+
+### Other Changes
+
+- The configuration file (development.ini.sample) now contains the default values used by Tracim and explanations on the settings (#2204). We advise you to be careful on existing installations when merging your configuration file with the new one. 
+
+### Breaking/Important change
+
+- Supported databases: PostgreSQL(9.3+), MySQL(8.0.1+), MariaDB(10.3+) or SQLite(bundle with python). Older versions are no longer supported.
+
+
 ## 2.6.3 / 2020-04-09
 
 ### Improvement

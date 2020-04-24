@@ -170,6 +170,10 @@ class TestContent(object):
         )
         session.add(content)
         session.flush()
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content.description = "TEST_CONTENT_DESCRIPTION_1_UPDATED"
+        session.add(content)
+        session.flush()
         session.delete(content.revisions[0])
         # Raise ContentRevisionDeleteError because revision can't be deleted
         with pytest.raises(ContentRevisionDeleteError):
@@ -193,6 +197,10 @@ class TestContent(object):
                 is_deleted=False,
                 is_archived=False,
             )
+            unsafe_session.add(content)
+            unsafe_session.flush()
+            with new_revision(session=unsafe_session, tm=transaction.manager, content=content):
+                content.description = "TEST_CONTENT_DESCRIPTION_1_UPDATED"
             unsafe_session.add(content)
             unsafe_session.flush()
             unsafe_session.delete(content.revisions[0])
@@ -247,7 +255,7 @@ class TestContent(object):
         )
         session.add(parent_folder)
         session.flush()
-        assert parent_folder.children == []
+        assert parent_folder.children.all() == []
         children_folder = Content(
             owner=admin_user,
             workspace=workspace,
@@ -261,13 +269,13 @@ class TestContent(object):
         session.flush()
         assert [type(child) == Content for child in parent_folder.children]
         assert [child.revision_id for child in parent_folder.children] == [
-            children_folder.revision_id
+            children_folder.cached_revision_id
         ]
 
         with new_revision(session=session, tm=transaction.manager, content=children_folder):
             children_folder.parent = None
         session.flush()
-        assert parent_folder.children == []
+        assert parent_folder.children.all() == []
 
     def test_unit__query_content__ok__nominal_case(self, admin_user, session, content_type_list):
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)

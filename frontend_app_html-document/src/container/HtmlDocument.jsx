@@ -68,7 +68,7 @@ class HtmlDocument extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = async ({ detail: { type, data } }) => {
+  customEventReducer = ({ detail: { type, data } }) => {
     const { props, state } = this
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
@@ -452,6 +452,7 @@ class HtmlDocument extends React.Component {
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Edit')}
+                  icon='plus-circle'
                 />
               )}
 

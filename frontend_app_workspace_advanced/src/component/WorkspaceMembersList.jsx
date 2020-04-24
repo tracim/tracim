@@ -33,7 +33,11 @@ export const WorkspaceMembersList = props => {
 
           <ul className='formBlock__field workspace_advanced__userlist__list'>
             {props.memberList && props.memberList.filter(m => m.user).map(m =>
-              <li className='workspace_advanced__userlist__list__item' key={`member_${m.user_id}`}>
+              <li
+                className='workspace_advanced__userlist__list__item'
+                key={`member_${m.user_id}`}
+                data-cy={`workspace_advanced__member-${m.user_id}`}
+              >
                 <div className='workspace_advanced__userlist__list__item__avatar'>
                   <Avatar width={'50px'} publicName={m.user.public_name} />
                 </div>
@@ -68,7 +72,7 @@ export const WorkspaceMembersList = props => {
                   <div className='subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                     {props.roleList.map(r =>
                       <div
-                        className='subdropdown__item dropdown-item'
+                        className='subdropdown__item primaryColorBgActive dropdown-item'
                         onClick={() => props.onClickNewRole(m.user_id, r.slug)}
                         key={`role_${r.id}`}
                       >

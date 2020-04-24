@@ -2,8 +2,8 @@
 env:
   global:
     - DEFAULT_SQLITE_SQLALCHEMY__URL=sqlite:////tmp/tracim.sqlite
-    - DEFAULT_MYSQL_SQLALCHEMY__URL=mysql+pymysql://root@localhost/tracim_test
-    - DEFAULT_POSTGRES_SQLALCHEMY__URL=postgresql://postgres:dummy@127.0.0.1:5432/tracim_test?client_encoding=utf8
+    - DEFAULT_MYSQL_SQLALCHEMY__URL=mysql+pymysql://user:secret@127.0.0.1:3306/tracim_test
+    - DEFAULT_POSTGRES_SQLALCHEMY__URL=postgresql://user:secret@127.0.0.1:5432/tracim_test?client_encoding=utf8
     - DB=sqlite
     - COVERAGE=0
     - PSERVE_LOG=/tmp/pserve_log.log
@@ -19,15 +19,12 @@ env:
     - TEST_CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tests_configs.ini
     - TEST_MIGRATION_SCRIPT_LOCATION=$TRAVIS_BUILD_DIR/backend/tracim_backend/migration
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
-sudo: false
 language: python
 dist: bionic
-python:
-  - "3.6"
+python: "3.6"
 
 _install_backend: &_install_backend
   addons:
-    postgresql: "9.3"
     apt:
       packages:
         - libreoffice
@@ -45,7 +42,6 @@ _install_backend: &_install_backend
         - libimage-exiftool-perl
   services:
     - redis-server
-    - mysql
   before_install:
     # INFO - G.M - 2019-05-02 - some useful debug information
     - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
@@ -63,13 +59,31 @@ _install_backend: &_install_backend
 
     - pip install -r "requirements.txt"
     # postgresql
-    - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
-    - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
-    # mysql
-    - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
-    - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
+    - |
+      if [ "${DB}" == "postgres" ]; then
+        docker pull postgres:9.3
+        docker run -d -p 5432:5432 --name postgres -e POSTGRES_DB=tracim_test -e POSTGRES_USER=user -e POSTGRES_PASSWORD=secret postgres:9.3
+        pip install -e ".[postgresql,testing]"
+      fi
+    # mysql 8+
+    - |
+      if [ "${DB}" == "mysql" ]; then
+        docker pull mysql:8.0
+        docker run -d -p 3306:3306 --name mysqld -e MYSQL_DATABASE=tracim_test -e MYSQL_USER=user -e MYSQL_PASSWORD=secret -e MYSQL_RANDOM_ROOT_PASSWORD=true mysql:8.0
+        pip install -e ".[mysql,testing]"
+      fi
+    # mariadb 10.3
+    - |
+      if [ "${DB}" == "mariadb" ]; then
+        docker pull mariadb/server:10.3
+        docker run -d -p 3306:3306 --name mariadbd -e MARIADB_DATABASE=tracim_test -e MARIADB_USER=user -e MARIADB_PASSWORD=secret -e MARIADB_RANDOM_ROOT_PASSWORD=true mariadb/server:10.3
+        pip install -e ".[mysql,testing]"
+      fi
     # sqlite
-    - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
+    - |
+      if [ "${DB}" == "sqlite" ]; then
+        pip install -e ".[testing]"
+      fi
     - cd $TRAVIS_BUILD_DIR
   before_script:
     - docker pull mailhog/mailhog
@@ -121,8 +135,7 @@ jobs:
     # TODO BS 2018-10-12: Re-enable this test when setup.py list deps as strict
     #  - stage: quick-tests
     #    name: Check requirement.txt
-    #    python:
-    #    - "3.5"
+    #    python: "3.5"
     #    addons:
     #    services:
     #    before_install:
@@ -159,21 +172,18 @@ jobs:
     - stage: quick-tests
       name: "Python: 3.6"
       <<: *_backend_quick_test
-      python:
-        - "3.6"
+      python: "3.6"
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: quick-tests
       name: "Python: 3.5"
       <<: *_backend_quick_test
-      python:
-        - "3.5"
+      python: "3.5"
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: quick-tests
       name: "Python: 3.7"
       dist: xenial
       <<: *_backend_quick_test
-      python:
-        - "3.7"
+      python: "3.7"
       if: commit_message !~ /(\[skip ci pytest\])/
 
     # INFO - G.M - 2019-04-25 - Stage: Backend ###
@@ -198,6 +208,12 @@ jobs:
       <<: *_backend_test
       env:
         - DB=mysql
+        - TRACIM_SQLALCHEMY__URL=$DEFAULT_MYSQL_SQLALCHEMY__URL
+      if: commit_message !~ /(\[skip ci pytest\])/
+    - stage: backend
+      <<: *_backend_test
+      env:
+        - DB=mariadb
         - TRACIM_SQLALCHEMY__URL=$DEFAULT_MYSQL_SQLALCHEMY__URL
       if: commit_message !~ /(\[skip ci pytest\])/
     # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###

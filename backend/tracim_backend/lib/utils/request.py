@@ -50,13 +50,16 @@ class TracimContext(ABC):
         self._candidate_content_type = None
 
     # INFO - G.M - 2018-12-03 - Useful property of Tracim Context
+    def set_user(self, user: User):
+        self._current_user = user
 
     @property
+    @abstractmethod
     def current_user(self) -> User:
         """
         Current authenticated user if exist
         """
-        return self._generate_if_none(self._current_user, self._get_user, self._get_current_user_id)
+        pass
 
     @property
     def current_workspace(self) -> Workspace:
@@ -216,11 +219,6 @@ class TracimContext(ABC):
         """
         pass
 
-    # IDs fetchers
-
-    def _get_current_user_id(self) -> int:
-        raise NotImplementedError()
-
     def _get_current_workspace_id(self) -> int:
         raise NotImplementedError()
 
@@ -251,6 +249,19 @@ class TracimRequest(TracimContext, Request):
 
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(self._cleanup)
+
+    @property
+    def current_user(self) -> User:
+        # INFO - G.M - 24-03-2020 - load authenticate mecanism by calling authenticated_userid.
+        # this will prefetch self._current_user value.
+        try:
+            if not self.authenticated_userid:
+                raise UserNotFoundInTracimRequest("No current user has been found in the context")
+        except UserNotFoundInTracimRequest as exc:
+            raise NotAuthenticated("User not found") from exc
+
+        current_user = self._current_user
+        return current_user
 
     @property
     def dbsession(self) -> typing.Optional[Session]:
@@ -343,14 +354,6 @@ class TracimRequest(TracimContext, Request):
         return str_value_param
 
     # ID fetchers
-    def _get_current_user_id(self) -> int:
-        try:
-            if not self.authenticated_userid:
-                raise UserNotFoundInTracimRequest("No current user has been found in the context")
-        except UserNotFoundInTracimRequest as exc:
-            raise NotAuthenticated("User not found") from exc
-        return self.authenticated_userid
-
     def _get_current_workspace_id(self) -> int:
         exception_if_none = WorkspaceNotFoundInTracimRequest(
             "No workspace_id property found in request"

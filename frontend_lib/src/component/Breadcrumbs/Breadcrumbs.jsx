@@ -8,7 +8,7 @@ export const Breadcrumbs = props => {
     <ul className='breadcrumbs'>
       {props.breadcrumbsList.map((crumb, i) =>
         <li
-          className={`breadcrumbs__item primaryColorFont ${crumb.notALink ? '' : 'primaryColorFontDarkenHover'}`}
+          className={`breadcrumbs__item ${crumb.notALink ? '' : 'primaryColorFont primaryColorFontDarkenHover'}`}
           key={`breacrumbs_${i}`}
         >
           {crumb.link}

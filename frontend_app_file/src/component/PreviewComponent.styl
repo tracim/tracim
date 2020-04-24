@@ -39,12 +39,20 @@
     flex-direction column
     justify-content center
     width 100%
-    & > img
+    &__img
+      margin auto
       max-height 100%
       max-width 100%
+    &__text
+      text-align center
+      &-icon
+        font-size 30px
+      &-msg
+        margin-top 10px
+        word-break break-word
     &.previewAvailable
       cursor pointer
-  &__icon
+  &__navigationButton
     margin 0 5px
     font-size 20px
     cursor pointer
@@ -59,4 +67,3 @@
   &__filepreview
     display flex
     height calc(100% - 53px) // 53px => height of dloption
-

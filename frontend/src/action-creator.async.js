@@ -455,9 +455,9 @@ export const getWorkspaceDetail = (user, workspaceId) => dispatch => {
   })
 }
 
-export const getWorkspaceMemberList = workspaceId => dispatch => {
+export const getWorkspaceMemberList = (workspaceId, showDisabledUser = false) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`,
     param: {
       credentials: 'include',
       headers: {
@@ -716,6 +716,21 @@ export const putFolderRead = (userId, workspaceId, contentId) => dispatch => {
 export const getLoggedUserCalendar = () => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/agenda`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_AGENDA_URL,
+    dispatch
+  })
+}
+
+export const getUserCalendar = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/agenda`,
     param: {
       credentials: 'include',
       headers: {

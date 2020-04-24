@@ -1,7 +1,9 @@
 ---
 name: Bug report
 about: Report a bug you detected using tracim
-
+title: "Bug:"
+labels: to sort
+assignees: ""
 ---
 ## Bug description & symptom
 
@@ -52,7 +54,7 @@ about: Report a bug you detected using tracim
 
 *Optional - add screenshots to help explain your problem.*
 
-*Please consider sharing a [animated GIF screencast generated with peek](https://github.com/phw/peek)* 
+*Please consider sharing a [animated GIF screencast generated with peek](https://github.com/phw/peek)*
 
 ## Impacted components
 
@@ -71,4 +73,3 @@ about: Report a bug you detected using tracim
 ## Extra information
 
 *Optional - add any extra information which will be usefull for understanding and developing the feature*
-

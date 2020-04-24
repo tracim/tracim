@@ -36,7 +36,7 @@ export class ResetPassword extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  customEventReducer = async ({ detail: { type } }) => {
+  customEventReducer = ({ detail: { type } }) => {
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         this.setHeadTitle()

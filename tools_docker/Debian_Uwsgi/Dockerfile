@@ -3,6 +3,7 @@ MAINTAINER contact@tracim.fr
 
 ARG TAG=""
 ARG BRANCH=""
+ARG REPO="https://github.com/tracim/tracim.git"
 
 ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission,gallery"
 ENV START_WEBDAV=1
@@ -20,10 +21,10 @@ RUN \
 # Create command to clone repo
     get_source_from_github() { \
     if ([ "$TAG" != "" ] && [ "$BRANCH" = "" ]); \
-    then git clone -b $TAG --single-branch https://github.com/tracim/tracim.git tracim; \
+    then git clone -b $TAG --single-branch "$REPO" tracim; \
     elif ([ "$TAG" = "" ] && [ "$BRANCH" != "" ]); \
-    then git clone https://github.com/tracim/tracim.git tracim && cd tracim/ && git checkout $BRANCH && cd -; \
-    else git clone https://github.com/tracim/tracim.git tracim; \
+    then git clone "$REPO" tracim && cd tracim/ && git checkout $BRANCH && cd -; \
+    else git clone "$REPO" tracim; \
     fi \
     } \
 # Install required packages

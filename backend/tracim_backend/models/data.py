@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime as datetime_root
+from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
 import enum
@@ -18,8 +18,8 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Sequence
-from sqlalchemy import func
 from sqlalchemy import inspect
+from sqlalchemy import text
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
@@ -895,6 +895,14 @@ class Content(DeclarativeBase):
     )  # This flag allow to serialize a given revision if required by the user
 
     id = Column(Integer, primary_key=True)
+    cached_revision_id = Column(
+        Integer, ForeignKey("content_revisions.revision_id", ondelete="RESTRICT")
+    )
+
+    current_revision = relationship(
+        "ContentRevisionRO", uselist=False, foreign_keys=[cached_revision_id], post_update=True
+    )
+
     # TODO - A.P - 2017-09-05 - revisions default sorting
     # The only sorting that makes sens is ordering by "updated" field. But:
     # - its content will soon replace the one of "created",
@@ -929,15 +937,22 @@ class Content(DeclarativeBase):
 
     @hybrid_property
     def revision_id(self) -> int:
-        return self.revision.revision_id
+        return self.cached_revision_id
 
     @revision_id.setter
-    def revision_id(self, value: int):
-        self.revision.revision_id = value
+    def revision_id(self, value: int) -> None:
+        self.cached_revision_id = value
 
     @revision_id.expression
     def revision_id(cls) -> InstrumentedAttribute:
-        return ContentRevisionRO.revision_id
+        return Content.cached_revision_id
+
+    @property
+    def revision(self) -> ContentRevisionRO:
+        if not self.revisions:
+            self.current_revision = ContentRevisionRO()
+            self.current_revision.node = self
+        return self.current_revision
 
     # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
     # and should be author of first revision.
@@ -1211,54 +1226,58 @@ class Content(DeclarativeBase):
 
     @property
     def children(self) -> ["Content"]:
+        return (
+            object_session(self)
+            .query(Content)
+            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
+            .filter(ContentRevisionRO.parent_id == self.id)
+            .order_by(ContentRevisionRO.content_id)
+        )
+
+    @property
+    def recursive_children(self) -> ["Content"]:
         """
         :return: list of children Content
         :rtype Content
         """
-        # TODO - G.M - 2019-02-08 - Refactor this code to be more efficient
-        all_childrens_revisions = (
-            object_session(self)
-            .query(ContentRevisionRO)
-            .filter(ContentRevisionRO.parent_id == self.content_id)
-            .order_by(ContentRevisionRO.content_id)
-            .all()
+        statement = text(
+            """
+    with RECURSIVE children_id as (
+    select content.id as id from content join content_revisions cr on content.cached_revision_id = cr.revision_id
+    where cr.parent_id = :content_id
+    union all
+    select content.id as id
+    from content join content_revisions cr on content.cached_revision_id = cr.revision_id
+        join children_id c on c.id = cr.parent_id
+    )
+    select content.id from content join content_revisions on content.cached_revision_id = content_revisions.revision_id
+        join children_id c on c.id = content.id;
+            """
         )
-        children_content_ids = set([cr.content_id for cr in all_childrens_revisions])
-        # INFO - G.M - 2019-05-06 - we get max revision (latest) for each content (defined
-        # by content id). As we use a group_by , what we retrieve here
-        #  is not a list of ContentRevisionRO, but a standard object of sqlalchemy.
-        all_up_to_date_revisions_result = (
-            object_session(self)
-            .query(func.max(ContentRevisionRO.revision_id))
-            .filter(ContentRevisionRO.content_id.in_(children_content_ids))
-            .group_by(ContentRevisionRO.content_id)
-            .order_by(ContentRevisionRO.content_id)
-            .all()
-        )
-
-        all_up_to_date_revisions_ids = [value[0] for value in all_up_to_date_revisions_result]
-        valid_children = []
-        for revision in all_childrens_revisions:
-            if revision.revision_id in all_up_to_date_revisions_ids:
-                valid_children.append(revision.node)
-
-        return valid_children
+        children_ids = [
+            elem[0]
+            for elem in object_session(self).execute(statement, {"content_id": self.id}).fetchall()
+        ]
+        if children_ids:
+            return (
+                object_session(self)
+                .query(Content)
+                .join(
+                    ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
+                )
+                .filter(Content.id.in_(children_ids))
+                .order_by(ContentRevisionRO.content_id)
+            )
+        return []
 
     def get_children(self, recursively: bool = False) -> ["Content"]:
         """
         Get all children of content recursively or not (including children of children...)
         """
-        children = []
-        for child in self.children:
-            children.append(child)
-            if recursively:
-                children.extend(child.get_children(recursively=recursively))
-        children = sorted(children, key=lambda child: child.content_id)
-        return children
-
-    @property
-    def revision(self) -> ContentRevisionRO:
-        return self.get_current_revision()
+        if recursively:
+            return self.recursive_children
+        else:
+            return self.children
 
     @property
     def first_revision(self) -> ContentRevisionRO:
@@ -1284,18 +1303,6 @@ class Content(DeclarativeBase):
     def depot_file(self, value):
         self.revision.depot_file = value
 
-    def get_current_revision(self) -> ContentRevisionRO:
-        if not self.revisions:
-            return self.new_revision()
-
-        # If last revisions revision don't have revision_id, return it we just add it.
-        if self.revisions[-1].revision_id is None:
-            return self.revisions[-1]
-
-        # Revisions should be ordred by revision_id but we ensure that here
-        revisions = sorted(self.revisions, key=lambda revision: revision.revision_id)
-        return revisions[-1]
-
     def new_revision(self) -> ContentRevisionRO:
         """
         Return and assign to this content a new revision.
@@ -1303,19 +1310,22 @@ class Content(DeclarativeBase):
         If this content already own revision, revision is build from last revision.
         :return:
         """
-        if not self.revisions:
-            self.revisions.append(ContentRevisionRO())
-            return self.revisions[0]
-
-        new_rev = ContentRevisionRO.new_from(self.get_current_revision())
-        self.revisions.append(new_rev)
+        if not self.current_revision:
+            new_rev = ContentRevisionRO()
+        else:
+            new_rev = ContentRevisionRO.new_from(self.current_revision)
+        new_rev.node = self
+        self.current_revision = new_rev
         return new_rev
 
     def get_valid_children(self, content_types: list = None) -> ["Content"]:
-        for child in self.children:
-            if not child.is_deleted and not child.is_archived:
-                if not content_types or child.type in content_types:
-                    yield child.node
+        query = self.children.filter(ContentRevisionRO.is_deleted == False).filter(  # noqa: E712
+            ContentRevisionRO.is_archived == False  # noqa: E712
+        )
+
+        if content_types:
+            query = query.filter(ContentRevisionRO.type.in_(content_types))
+        return query
 
     @hybrid_property
     def properties(self) -> dict:
@@ -1349,16 +1359,6 @@ class Content(DeclarativeBase):
             delta_from_datetime = datetime.utcnow()
         return format_timedelta(delta_from_datetime - datetime_object, locale=get_locale())
 
-    def get_child_nb(self, content_type: str, content_status: str = "") -> int:
-        child_nb = 0
-        for child in self.get_valid_children():
-            if child.type == content_type or content_type.slug == content_type_list.Any_SLUG:
-                if not content_status:
-                    child_nb = child_nb + 1
-                elif content_status == child.status:
-                    child_nb = child_nb + 1
-        return child_nb
-
     def get_label(self) -> str:
         return self.label or self.file_name or ""
 
@@ -1368,40 +1368,15 @@ class Content(DeclarativeBase):
     def get_last_action(self) -> ActionDescription:
         return ActionDescription(self.revision_type)
 
-    def get_simple_last_activity_date(self) -> datetime_root.datetime:
-        """
-        Get last activity_date, comments_included. Do not search recursively
-        in revision or children.
-        :return:
-        """
-        last_revision_date = self.updated
-        for comment in self.get_comments():
-            if comment.updated > last_revision_date:
-                last_revision_date = comment.updated
-        return last_revision_date
-
-    def get_last_activity_date(self) -> datetime_root.datetime:
-        """
-        Get last activity date with complete recursive search
-        :return:
-        """
-        last_revision_date = self.updated
-        for revision in self.revisions:
-            if revision.updated > last_revision_date:
-                last_revision_date = revision.updated
-
-        for child in self.children:
-            if child.updated > last_revision_date:
-                last_revision_date = child.updated
-        return last_revision_date
-
-    def has_new_information_for(self, user: User) -> bool:
+    def has_new_information_for(self, user: User, recursive: bool = True) -> bool:
         """
         :param user: the _session current user
         :return: bool, True if there is new information for given user else False
                        False if the user is None
         """
-        revision = self.get_current_revision()
+        revision = self.current_revision
+        if not revision:
+            return False
 
         if not user:
             return False
@@ -1410,22 +1385,16 @@ class Content(DeclarativeBase):
             # The user did not read this item, so yes!
             return True
 
-        for child in self.get_valid_children():
-            if child.has_new_information_for(user):
-                return True
+        if recursive:
+            for child in self.recursive_children:
+                if child.has_new_information_for(user, recursive=False):
+                    # The user did not read this item, so yes!
+                    return True
 
         return False
 
     def get_comments(self) -> typing.List["Content"]:
-        children = []
-        for child in self.children:
-            if (
-                content_type_list.Comment.slug == child.type
-                and not child.is_deleted
-                and not child.is_archived
-            ):
-                children.append(child.node)
-        return children
+        return self.get_valid_children(content_types=[content_type_list.Comment.slug])
 
     def get_last_comment_from(self, user: User) -> "Content":
         # TODO - Make this more efficient
@@ -1474,7 +1443,7 @@ class Content(DeclarativeBase):
                         'but does exist in content_revision "{content_revision}" of content "{content_id}" allowed_content,'
                         "it will be ignored".format(
                             type_label=type_label,
-                            content_revision=self.revision_id,
+                            content_revision=self.cached_revision_id,
                             content_id=self.content_id,
                         ),
                     )
@@ -1520,6 +1489,25 @@ class Content(DeclarativeBase):
             revisions.extend(child.revisions)
         revisions = sorted(revisions, key=lambda revision: revision.revision_id)
         return revisions
+
+    def get_tree_revisions_advanced(self) -> typing.List[ContentRevisionRO]:
+        """Get all revision sorted by id of content and all his children recursively"""
+        RevisionsData = namedtuple("revision_data", ["revision", "is_current_rev"])
+        revisions_data = []
+        for revision in self.revisions:
+            is_current_rev = bool(revision == self.current_revision)
+            revisions_data.append(RevisionsData(revision, is_current_rev))
+        for child in self.get_children(recursively=True):
+            for revision in child.revisions:
+                is_current_rev = bool(revision == child.current_revision)
+                revisions_data.append(RevisionsData(revision, is_current_rev))
+        revisions_data = sorted(
+            revisions_data, key=lambda revision_data: revision_data.revision.revision_id
+        )
+        return revisions_data
+
+
+Index("idx__content__cached_revision_id", Content.cached_revision_id)
 
 
 class RevisionReadStatus(DeclarativeBase):
