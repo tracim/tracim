@@ -27,7 +27,7 @@ describe('<MenuSubComponent />', () => {
       expect(wrapper.find('li').length).to.equal(props.menu.length)
     })
 
-    it(`should display the name each items (li)`, () => {
+    it('should display the name each items (li)', () => {
       for (let i = 0; i < props.menu.length; i++) {
         expect(wrapper.find('div.menusubcomponent__list__item__link').at(i)).to.have.text().equal(props.menu[i].label)
       }

@@ -83,7 +83,7 @@ export class NewUpload extends React.Component {
           </Popover>
         </div>
 
-        {state.isPasswordActive
+        {(state.isPasswordActive
           ? (
             <div className='newUpload__password'>
               <div className='newUpload__password__active'>
@@ -135,7 +135,7 @@ export class NewUpload extends React.Component {
               </span>
             </div>
           )
-        }
+        )}
 
         <div className='d-flex'>
           <button

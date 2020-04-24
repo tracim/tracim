@@ -93,10 +93,11 @@ export class PreviewComponent extends React.Component {
               className='previewcomponent__dloption__icon btn iconBtn'
               href={props.downloadPdfPageUrl}
               target='_blank'
+              rel='noopener noreferrer'
               download
               style={{ ':hover': { color: props.color } }}
               title={props.t('Download current page as PDF')}
-              key={'file_btn_dl_pdfall'}
+              key='file_btn_dl_pdfall'
             >
               <i className='fa fa-file-o' />
             </a>
@@ -107,10 +108,11 @@ export class PreviewComponent extends React.Component {
               className='previewcomponent__dloption__icon btn iconBtn'
               href={props.downloadPdfFullUrl}
               target='_blank'
+              rel='noopener noreferrer'
               download
               style={{ ':hover': { color: props.color } }}
               title={props.t('Download as PDF')}
-              key={'file_btn_dl_pdfpage'}
+              key='file_btn_dl_pdfpage'
             >
               <i className='fa fa-file-pdf-o' />
             </a>
@@ -120,10 +122,11 @@ export class PreviewComponent extends React.Component {
             className='previewcomponent__dloption__icon btn iconBtn'
             href={props.downloadRawUrl}
             target='_blank'
+            rel='noopener noreferrer'
             download
             style={{ ':hover': { color: props.color } }}
             title={props.t('Download file')}
-            key={'file_btn_dl_raw'}
+            key='file_btn_dl_raw'
           >
             <i className='fa fa-download' />
           </a>
@@ -138,22 +141,20 @@ export class PreviewComponent extends React.Component {
               style={{ ':hover': { color: props.color } }}
               title={props.t('Previous page')}
               disabled={props.fileCurrentPage === 1}
-              key={'file_btn_previouspage'}
+              key='file_btn_previouspage'
             >
               <i className='fa fa-chevron-left' />
             </button>
           )}
 
           <div
-            className={
-              classnames(
-                'previewcomponent__fileimg',
-                { 'previewAvailable': state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable }
-              )
-            }
+            className={classnames(
+              'previewcomponent__fileimg',
+              { previewAvailable: state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable }
+            )}
             onClick={state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
           >
-            {props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED
+            {(props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED
               ? (
                 <img src={props.previewUrl} className='img-thumbnail previewcomponent__fileimg__img' />
               )
@@ -175,9 +176,9 @@ export class PreviewComponent extends React.Component {
                     )}
                 </div>
               )
-            }
+            )}
 
-            {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable && state.displayLightbox
+            {(state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable && state.displayLightbox
               ? (
                 <Lightbox
                   prevSrc={props.lightboxUrlList[props.fileCurrentPage - 2]}
@@ -191,7 +192,7 @@ export class PreviewComponent extends React.Component {
                 />
               )
               : null
-            }
+            )}
           </div>
 
           {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
@@ -202,7 +203,7 @@ export class PreviewComponent extends React.Component {
               style={{ ':hover': { color: props.color } }}
               title={props.t('Next page')}
               disabled={props.fileCurrentPage === props.filePageNb}
-              key={'file_btn_nextpage'}
+              key='file_btn_nextpage'
             >
               <i className='fa fa-chevron-right' />
             </button>

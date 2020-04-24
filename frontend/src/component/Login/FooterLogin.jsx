@@ -8,6 +8,7 @@ export const FooterLogin = () =>
         className='loginpage__footer__text__link'
         href='http://www.tracim.fr/'
         target='_blank'
+        rel='noopener noreferrer'
       >
         tracim.fr
       </a>

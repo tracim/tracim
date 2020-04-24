@@ -54,22 +54,22 @@ describe('<NewShareDownload />', () => {
       expect(onChangeEmailsCallBack.called).to.equal(true)
     })
 
-    it(`should call props.onKeyDownEnter when handler onKeyDownEnter is called`, () => {
+    it('should call props.onKeyDownEnter when handler onKeyDownEnter is called', () => {
       wrapper.find('.shareDownload__email__input').simulate('keyDown', { key: 'Enter', preventDefault: () => {} })
       expect(onKeyDownEnterCallBack.called).to.equal(true)
     })
 
-    it(`should call props.onChangePassword when handler onChangePassword is called`, () => {
+    it('should call props.onChangePassword when handler onChangePassword is called', () => {
       wrapper.find('.shareDownload__password__input').simulate('change', { target: { value: 'anotherEmail' } })
       expect(onChangePasswordCallBack.called).to.equal(true)
     })
 
-    it(`should call props.onClickCancelButton when handler onClickCancelButton is called`, () => {
+    it('should call props.onClickCancelButton when handler onClickCancelButton is called', () => {
       wrapper.find('.shareDownload__cancel').simulate('click', { preventDefault: () => {}, stopPropagation: () => {} })
       expect(onClickCancelButtonCallBack.called).to.equal(true)
     })
 
-    it(`should call props.onClickNewShare when handler onClickNewShare is called`, () => {
+    it('should call props.onClickNewShare when handler onClickNewShare is called', () => {
       wrapper.find('.shareDownload__newBtn').simulate('click', { preventDefault: () => {}, stopPropagation: () => {} })
       expect(onClickNewShareCallBack.called).to.equal(true)
     })

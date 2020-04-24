@@ -39,7 +39,7 @@ export const PAGE = {
 
 export const FETCH_CONFIG = {
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json'
   }
 }

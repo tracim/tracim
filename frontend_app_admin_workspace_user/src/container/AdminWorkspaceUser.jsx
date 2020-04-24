@@ -155,7 +155,7 @@ class AdminWorkspaceUser extends React.Component {
     const workspaceList = await handleFetchResult(await fetchWorkspaceList)
 
     switch (workspaceList.apiResponse.status) {
-      case 200:
+      case 200: {
         const fetchWorkspaceListMemberList = await Promise.all(
           workspaceList.body.map(async ws =>
             handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, ws.workspace_id))
@@ -172,7 +172,7 @@ class AdminWorkspaceUser extends React.Component {
           }
         }))
         break
-
+      }
       default: this.sendGlobalFlashMsg(props.t('Error while loading shared spaces list', 'warning'))
     }
   }
@@ -183,7 +183,7 @@ class AdminWorkspaceUser extends React.Component {
     const userList = await handleFetchResult(await getUserList(state.config.apiUrl))
 
     switch (userList.apiResponse.status) {
-      case 200:
+      case 200: {
         const fetchUserDetailList = await Promise.all(
           userList.body.map(async u =>
             handleFetchResult(await getUserDetail(state.config.apiUrl, u.user_id))
@@ -196,6 +196,7 @@ class AdminWorkspaceUser extends React.Component {
           }
         }))
         break
+      }
       default: this.sendGlobalFlashMsg(props.t('Error while loading users list'), 'warning')
     }
   }
@@ -204,7 +205,7 @@ class AdminWorkspaceUser extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
     }, {
       link: <span>{props.t('Administration')}</span>,
@@ -214,12 +215,12 @@ class AdminWorkspaceUser extends React.Component {
 
     if (state.config.type === 'workspace') {
       breadcrumbsList.push({
-        link: <Link to={'/ui/admin/workspace'}>{props.t('Shared space')}</Link>,
+        link: <Link to='/ui/admin/workspace'>{props.t('Shared space')}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     } else if (state.config.type === 'user') {
       breadcrumbsList.push({
-        link: <Link to={'/ui/admin/user'}>{props.t('Users')}</Link>,
+        link: <Link to='/ui/admin/user'>{props.t('Users')}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
@@ -394,7 +395,7 @@ class AdminWorkspaceUser extends React.Component {
           />
         )}
 
-        {state.popupDeleteWorkspaceDisplay &&
+        {state.popupDeleteWorkspaceDisplay && (
           <CardPopup
             customClass='adminworkspaceuser__popup'
             customHeaderClass='primaryColorBg'
@@ -426,7 +427,7 @@ class AdminWorkspaceUser extends React.Component {
               </div>
             </div>
           </CardPopup>
-        }
+        )}
       </div>
     )
   }

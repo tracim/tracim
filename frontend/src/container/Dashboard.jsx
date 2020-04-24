@@ -152,11 +152,12 @@ class Dashboard extends React.Component {
 
     const fetchCalendar = await props.dispatch(getLoggedUserCalendar())
     switch (fetchCalendar.status) {
-      case 200:
+      case 200: {
         const currentWorkspaceId = parseInt(props.match.params.idws)
         const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === currentWorkspaceId) || { agenda_url: '' }).agenda_url
         this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
         break
+      }
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('agenda details')}`, 'warning')); break
     }
   }
@@ -356,7 +357,7 @@ class Dashboard extends React.Component {
           case 2042:
             props.dispatch(newFlashMessage(props.t('This account is deactivated'), 'warning'))
             return false
-          case 1001:
+          case 1001: {
             const ErrorMsg = () => (
               <div>
                 {props.t('Unknown user')}<br />
@@ -365,6 +366,7 @@ class Dashboard extends React.Component {
             )
             props.dispatch(newFlashMessage(<ErrorMsg />))
             return false
+          }
           case 3008:
             props.dispatch(newFlashMessage(props.t('This user already is in the workspace'), 'warning'))
             return false
@@ -503,7 +505,7 @@ class Dashboard extends React.Component {
             <PageTitle
               parentClass='dashboard__header'
               title={props.t('Dashboard')}
-              subtitle={''}
+              subtitle=''
               icon='home'
               breadcrumbsList={props.breadcrumbs}
             >
@@ -516,8 +518,7 @@ class Dashboard extends React.Component {
                   >
                     <i className='fa fa-fw fa-cog' />
                     {props.t('Open advanced Dashboard')}
-                  </button>
-                }
+                  </button>}
               </div>
             </PageTitle>
 

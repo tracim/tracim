@@ -14,7 +14,7 @@ export { getBrowserLang }
 
 export const FETCH_CONFIG = {
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json'
   },
   apiUrl: configEnv.apiUrl

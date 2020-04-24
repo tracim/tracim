@@ -8,7 +8,7 @@ require('./UserInfo.styl')
 export const UserInfo = props =>
   <div className='userinfo mr-5 ml-5 mb-5' data-cy='userinfo'>
     <div className='userinfo__avatar' data-cy='userinfo__avatar'>
-      <Avatar publicName={props.user.public_name} width={'100px'} />
+      <Avatar publicName={props.user.public_name} width='100px' />
     </div>
 
     <div className='userinfo__wrapper'>

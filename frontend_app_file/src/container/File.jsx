@@ -193,7 +193,7 @@ class File extends React.Component {
     const response = await handleFetchResult(await getFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
     switch (response.apiResponse.status) {
-      case 200:
+      case 200: {
         const filenameNoExtension = removeExtensionOfFilename(response.body.filename)
         const pageForPreview = pageToLoad || state.fileCurrentPage
         this.setState({
@@ -211,6 +211,7 @@ class File extends React.Component {
         })
         this.setHeadTitle(filenameNoExtension)
         break
+      }
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading file'))
         return
@@ -457,7 +458,7 @@ class File extends React.Component {
             this.loadContent(1)
             this.loadTimeline()
             break
-          case 400:
+          case 400: {
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
               case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
@@ -467,6 +468,7 @@ class File extends React.Component {
               default: this.sendGlobalFlashMessage(props.t('Error while uploading file')); break
             }
             break
+          }
           default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
         }
       }
@@ -497,7 +499,7 @@ class File extends React.Component {
     const { state, props } = this
 
     let shareEmailList = parserStringToList(state.shareEmails)
-    let invalidEmails = []
+    const invalidEmails = []
 
     shareEmailList.forEach(shareEmail => {
       if (!checkEmailValidity(shareEmail)) invalidEmails.push(shareEmail)
@@ -561,7 +563,7 @@ class File extends React.Component {
   handleKeyDownEnter = e => {
     if (e.key === 'Enter') {
       const emailList = parserStringToList(this.state.shareEmails)
-      let invalidEmails = []
+      const invalidEmails = []
 
       emailList.forEach(email => {
         if (!checkEmailValidity(email)) invalidEmails.push(email)
@@ -657,7 +659,7 @@ class File extends React.Component {
           onClickWysiwygBtn={this.handleToggleWysiwyg}
           onClickRevisionBtn={this.handleClickShowRevision}
           shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
-          key={'Timeline'}
+          key='Timeline'
         />
       )
     }
@@ -680,7 +682,7 @@ class File extends React.Component {
           displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
           disableChangeDescription={!state.content.is_editable}
           onClickValidateNewDescription={this.handleClickValidateNewDescription}
-          key={'FileProperties'}
+          key='FileProperties'
         />
       )
     }
@@ -706,14 +708,14 @@ class File extends React.Component {
               onClickNewShare={this.handleClickNewShare}
               userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
               emailNotifActivated={state.config.system.config.email_notification_activated}
-              key={'ShareDownload'}
+              key='ShareDownload'
             />
           )
         },
         propertiesObject
       ]
     } else {
-      return [ timelineObject, propertiesObject ]
+      return [timelineObject, propertiesObject]
     }
   }
 
@@ -745,7 +747,7 @@ class File extends React.Component {
           customClass={`${state.config.slug}`}
           i18n={i18n}
         >
-          <div /* this div in display flex, justify-content space-between */>
+          <div> {/* this div in display flex, justify-content space-between */}
             <div className='d-flex'>
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
@@ -768,7 +770,7 @@ class File extends React.Component {
                   style={{
                     marginLeft: '5px'
                   }}
-                  faIcon={'edit'}
+                  faIcon='edit'
                 />
               )}
 

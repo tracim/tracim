@@ -39,7 +39,7 @@ export const WorkspaceMembersList = props => {
                 data-cy={`workspace_advanced__member-${m.user_id}`}
               >
                 <div className='workspace_advanced__userlist__list__item__avatar'>
-                  <Avatar width={'50px'} publicName={m.user.public_name} />
+                  <Avatar width='50px' publicName={m.user.public_name} />
                 </div>
 
                 <div className='workspace_advanced__userlist__list__item__name'>
@@ -88,7 +88,7 @@ export const WorkspaceMembersList = props => {
                   </div>
                 </div>
 
-                {m.user_id !== props.loggedUser.user_id
+                {(m.user_id !== props.loggedUser.user_id
                   ? (
                     <div
                       className='workspace_advanced__userlist__list__item__delete'
@@ -98,7 +98,7 @@ export const WorkspaceMembersList = props => {
                     </div>
                   )
                   : <div className='workspace_advanced__userlist__list__item__delete' />
-                }
+                )}
               </li>
             )}
           </ul>

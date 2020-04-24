@@ -48,7 +48,7 @@ const appInterface = {
       return null
     }
 
-    let editorType = collaborativeDocumentEdition.supported_file_types.find(
+    const editorType = collaborativeDocumentEdition.supported_file_types.find(
       (type) => type.extension === content.file_extension.substr(1)
     )
 

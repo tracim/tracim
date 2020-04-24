@@ -14,7 +14,7 @@ describe('<HomeHasWorkspace />', () => {
 
   describe('static design', () => {
     it(`should display the publicName: ${props.user.public_name} in a div`, () =>
-      expect(wrapper.find(`div.homepagecard__user__publicname`)).to.text().equal(props.user.public_name)
+      expect(wrapper.find('div.homepagecard__user__publicname')).to.text().equal(props.user.public_name)
     )
   })
 })

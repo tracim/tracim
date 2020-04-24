@@ -3,6 +3,8 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 console.log('isPoduction: ', isProduction)
 
+const PnpWebpackPlugin = require('pnp-webpack-plugin')
+
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
@@ -45,7 +47,7 @@ module.exports = {
     rules: [{
       test: /\.jsx?$/,
       enforce: 'pre',
-      exclude: [/node_modules/],
+      exclude: [/node_modules/, /frontend_lib/],
       use: 'standard-loader',
     }, {
       test: [/\.js$/, /\.jsx$/],
@@ -67,7 +69,7 @@ module.exports = {
       use: ['style-loader', 'css-loader']
     }, {
       test: /\.styl$/,
-      use: ['style-loader', 'css-loader', 'stylus-loader']
+      use: ['style-loader', 'css-loader', 'stylus-native-loader']
     }, {
       test: /\.(jpg|png|svg)$/,
       loader: 'file-loader',
@@ -79,7 +81,19 @@ module.exports = {
     }]
   },
   resolve: {
+    plugins: [
+      PnpWebpackPlugin,
+    ],
+    alias: {
+      // Make ~tracim_frontend_lib work in stylus files
+      '~tracim_frontend_lib': path.dirname(path.dirname(require.resolve('tracim_frontend_lib')))
+    },
     extensions: ['.js', '.jsx']
+  },
+  resolveLoader: {
+    plugins: [
+      PnpWebpackPlugin.moduleLoader(module),
+    ],
   },
   plugins:[
     ...[], // generic plugins always present

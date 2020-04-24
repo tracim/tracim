@@ -20,7 +20,7 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__button'
         >
           <Avatar
-            width={'40px'}
+            width='40px'
             style={{
               display: 'inline-block',
               marginRight: '10px'

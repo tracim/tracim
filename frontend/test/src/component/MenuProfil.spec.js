@@ -19,7 +19,7 @@ describe('<MenuProfil />', () => {
 
   describe('static design', () => {
     it('should display the public name in a div', () =>
-      expect(wrapper.find(`div.menuprofil__dropdown__name__text`)).to.text().equal(props.user.public_name)
+      expect(wrapper.find('div.menuprofil__dropdown__name__text')).to.text().equal(props.user.public_name)
     )
   })
 

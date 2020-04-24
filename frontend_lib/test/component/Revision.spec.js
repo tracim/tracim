@@ -38,7 +38,7 @@ describe('<Revision />', () => {
   })
 
   describe('Handlers', () => {
-    it(`should call onClickRevision when click and when allowClickOnRevision`, () => {
+    it('should call onClickRevision when click and when allowClickOnRevision', () => {
       wrapper.setProps({ allowClickOnRevision: true })
       wrapper.find(`li.${props.customClass}__messagelist__version`).simulate('click')
       expect(onClickRevisionCallBack.called).to.equal(true)

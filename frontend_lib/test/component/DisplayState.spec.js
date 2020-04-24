@@ -32,17 +32,17 @@ describe('<DisplayState />', function () {
       expect(wrapper.find('.displaystate__btn')).to.have.text().equal(props.btnLabel)
     )
 
-    it(`should display the button"`, () => {
-      expect(wrapper.find(`.displaystate__btn`)).to.have.lengthOf(1)
+    it('should display the button"', () => {
+      expect(wrapper.find('.displaystate__btn')).to.have.lengthOf(1)
     })
 
     it(`should display 2 icon "${props.icon}"`, () => {
       expect(wrapper.find(`i.fa-${props.icon}`)).to.have.lengthOf(2)
     })
 
-    it(`should not display the button when the btnType is set to link"`, () => {
+    it('should not display the button when the btnType is set to link"', () => {
       wrapper.setProps({ btnType: 'link' })
-      expect(wrapper.find(`button.displaystate__btn`)).to.have.lengthOf(0)
+      expect(wrapper.find('button.displaystate__btn')).to.have.lengthOf(0)
     })
 
     it(`should display 1 icon when the btnType is set to link"${props.icon}"`, () => {
@@ -53,7 +53,7 @@ describe('<DisplayState />', function () {
 
   describe('Handlers', () => {
     it('should call props.onClickBtn when handler onClickBtn is called', () => {
-      wrapper.find(`.displaystate__btn`).simulate('click')
+      wrapper.find('.displaystate__btn').simulate('click')
       expect(onClickBtnCallBack.called).to.equal(true)
     })
   })

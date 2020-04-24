@@ -15,11 +15,11 @@ describe('<HomeNoWorkspace />', () => {
   const wrapper = shallow(<HomeNoWorkspaceWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
-    it(`if canCreateWorkspace is true it should contains a div with a message to create a new Workspace`, () =>
-      expect(wrapper.find(`div.homepagecard__text`)).to.text().equal('You will create your first shared space')
+    it('if canCreateWorkspace is true it should contains a div with a message to create a new Workspace', () =>
+      expect(wrapper.find('div.homepagecard__text')).to.text().equal('You will create your first shared space')
     )
 
-    it(`if canCreateWorkspace is true it should display a button to create a new Workspace`, () =>
+    it('if canCreateWorkspace is true it should display a button to create a new Workspace', () =>
       expect(wrapper.find('button.homepagecard__btn').length).to.equal(1)
     )
 

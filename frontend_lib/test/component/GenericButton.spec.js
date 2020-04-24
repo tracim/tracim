@@ -45,7 +45,7 @@ describe('<GenericButton />', () => {
       expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
     )
 
-    it(`the button should be disabled when disabled is set to true`, () => {
+    it('the button should be disabled when disabled is set to true', () => {
       wrapper.setProps({ disabled: true })
       expect(wrapper.find('button').prop('disabled')).to.equal(true)
       wrapper.setProps({ disabled: props.disabled })

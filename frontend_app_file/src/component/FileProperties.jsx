@@ -53,18 +53,18 @@ export class FileProperties extends React.Component {
               {props.t('Number of shares:')} {props.activesShares}
             </div>
 
-            <div className='fileProperties__content__detail__item' title={props.creationDateFormatted} >
+            <div className='fileProperties__content__detail__item' title={props.creationDateFormatted}>
               {props.t('Creation date:')} {props.creationDateFormattedWithTime}
             </div>
 
-            <div className='fileProperties__content__detail__item' title={props.lastModificationFormatted} >
+            <div className='fileProperties__content__detail__item' title={props.lastModificationFormatted}>
               {props.t('Last modification:')} {props.lastModification}
             </div>
 
             <div className='fileProperties__content__detail__description'>
               {props.t('Description:')}
             </div>
-            {state.displayFormNewDescription
+            {(state.displayFormNewDescription
               ? (
                 <form className='fileProperties__content__detail__description__editiondesc'>
                   <textarea
@@ -108,9 +108,9 @@ export class FileProperties extends React.Component {
                   {props.description}
                 </div>
               )
-            }
+            )}
 
-            {props.displayChangeDescriptionBtn && !state.displayFormNewDescription &&
+            {props.displayChangeDescriptionBtn && !state.displayFormNewDescription && (
               <button
                 type='button'
                 className='fileProperties__content__detail__btndesc btn highlightBtn'
@@ -125,7 +125,7 @@ export class FileProperties extends React.Component {
               >
                 {props.t('Change description')}
               </button>
-            }
+            )}
           </div>
         </div>
       </div>

@@ -76,7 +76,7 @@ export class Gallery extends React.Component {
     const { state, props } = this
 
     switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
+      case CUSTOM_EVENT.SHOW_APP(state.config.slug): {
         console.log('%c<Gallery> Custom event', 'color: #28a745', type, data)
         const newFolderId = qs.parse(data.config.history.location.search).folder_ids
         if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || newFolderId !== state.folderId) {
@@ -86,6 +86,7 @@ export class Gallery extends React.Component {
           })
         }
         break
+      }
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<Gallery> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
@@ -151,7 +152,7 @@ export class Gallery extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
     }, {
       link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{workspaceLabel}</Link>,
@@ -165,8 +166,13 @@ export class Gallery extends React.Component {
     }
     if (includeFile && state.imagesPreviews && state.imagesPreviews.length > 0) {
       breadcrumbsList.push({
-        link: <Link
-          to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}>{state.imagesPreviews[state.fileSelected].fileName}</Link>,
+        link: (
+          <Link
+            to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}
+          >
+            {state.imagesPreviews[state.fileSelected].fileName}
+          </Link>
+        ),
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
@@ -181,7 +187,7 @@ export class Gallery extends React.Component {
   loadFolderDetailAndParentsDetails = async (workspaceId, folderId) => {
     const { state, props } = this
 
-    let folderDetail = {
+    const folderDetail = {
       fileName: '',
       folderParentIdList: []
     }
@@ -191,7 +197,7 @@ export class Gallery extends React.Component {
     )
 
     switch (fetchContentDetail.apiResponse.status) {
-      case 200:
+      case 200: {
         folderDetail.fileName = fetchContentDetail.body.filename
         folderDetail.folderParentIdList = fetchContentDetail.body.parent_id ? [fetchContentDetail.body.parent_id] : []
 
@@ -214,6 +220,7 @@ export class Gallery extends React.Component {
           }
         }
         break
+      }
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
     }
@@ -235,7 +242,7 @@ export class Gallery extends React.Component {
     }
 
     switch (fetchContentList.apiResponse.status) {
-      case 200:
+      case 200: {
         const images = fetchContentList.body.filter(c => c.content_type === 'file').map(c => ({ src: '', contentId: c.content_id }))
 
         const imagesPreviews = await this.loadPreview(images)
@@ -243,6 +250,7 @@ export class Gallery extends React.Component {
         this.setState({ imagesPreviews, imagesPreviewsLoaded: true })
 
         break
+      }
       default: this.sendGlobalFlashMessage(props.t('Error while loading content list'))
     }
   }
@@ -255,7 +263,7 @@ export class Gallery extends React.Component {
         await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId)
       )
       switch (fetchFileContent.apiResponse.status) {
-        case 200:
+        case 200: {
           if (!fetchFileContent.body.has_jpeg_preview) return false
 
           const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
@@ -275,6 +283,7 @@ export class Gallery extends React.Component {
             rotationAngle: 0,
             rawFileUrl
           }
+        }
         default:
           this.sendGlobalFlashMessage(props.t('Error while loading file preview'))
           return false
@@ -385,13 +394,14 @@ export class Gallery extends React.Component {
     const putResult = await putFileIsDeleted(state.config.apiUrl, state.config.appConfig.workspaceId, state.imagesPreviews[filePosition].contentId)
 
     switch (putResult.status) {
-      case 204:
+      case 204: {
         const newImagesPreviews = this.state.imagesPreviews.filter((image) => (image.contentId !== contentIdToDelete))
         this.setState({
           imagesPreviews: newImagesPreviews,
           displayPopupDelete: false
         })
         break
+      }
       case 403:
         this.sendGlobalFlashMessage(this.props.t('Insufficient permissions'))
         break
@@ -502,7 +512,7 @@ export class Gallery extends React.Component {
         <PageWrapper customClass='gallery'>
           <PageTitle
             title={state.folderId ? state.folderDetail.fileName : state.workspaceLabel}
-            icon={'picture-o'}
+            icon='picture-o'
             breadcrumbsList={state.breadcrumbsList}
             parentClass='gallery__header'
           />
@@ -525,7 +535,7 @@ export class Gallery extends React.Component {
                 onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
               >
                 <span className='gallery__action__button__text'>{props.t('Rotate 90° left')}</span>
-                <i className={'fa fa-fw fa-undo'} />
+                <i className='fa fa-fw fa-undo' />
               </button>
 
               <button
@@ -533,7 +543,7 @@ export class Gallery extends React.Component {
                 onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
               >
                 <span className='gallery__action__button__text'>{props.t('Rotate 90° right')}</span>
-                <i className={'fa fa-fw fa-undo'} />
+                <i className='fa fa-fw fa-undo' />
               </button>
 
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
@@ -542,12 +552,12 @@ export class Gallery extends React.Component {
                   onClick={this.handleOpenDeleteFilePopup}
                   data-cy='gallery__action__button__delete'
                 >
-                  <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className={'fa fa-fw fa-trash'} />
+                  <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className='fa fa-fw fa-trash' />
                 </button>
               )}
             </div>
 
-            {state.imagesPreviewsLoaded
+            {(state.imagesPreviewsLoaded
               ? (
                 <Carousel
                   fileSelected={state.fileSelected}
@@ -563,7 +573,7 @@ export class Gallery extends React.Component {
                   <i className='fa fa-spinner fa-spin gallery__loader__icon' />
                 </div>
               )
-            }
+            )}
 
             <Fullscreen
               enabled={state.fullscreen}
@@ -609,7 +619,7 @@ export class Gallery extends React.Component {
                           title={props.t('Rotate 90° left')}
                           data-cy='gallery__action__button__lightbox__rotation__left'
                         >
-                          <i className={'fa fa-fw fa-undo'} />
+                          <i className='fa fa-fw fa-undo' />
                         </button>
                       ), (
                         <button
@@ -617,7 +627,7 @@ export class Gallery extends React.Component {
                           onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
                           title={props.t('Rotate 90° right')}
                         >
-                          <i className={'fa fa-fw fa-undo'} />
+                          <i className='fa fa-fw fa-undo' />
                         </button>
                       ), (
                         <a
@@ -625,8 +635,9 @@ export class Gallery extends React.Component {
                           title={props.t('Open raw file')}
                           href={this.getRawFileUrlSelectedFile()}
                           target='_blank'
+                          rel='noopener noreferrer'
                         >
-                          <i className={'fa fa-fw fa-download'} />
+                          <i className='fa fa-fw fa-download' />
                         </a>
                       )
                     ]}
