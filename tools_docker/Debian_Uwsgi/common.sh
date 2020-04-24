@@ -33,6 +33,7 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|^; email.notification.upload_permission_to_emitter.template.html = .*|email.notification.upload_permission_to_emitter.template.html = %(email.template_dir)s/upload_permission_to_emitter_body_html.mak|g" /etc/tracim/development.ini
     sed -i "s|^; email.notification.upload_permission_to_receiver.template.html = .*|email.notification.upload_permission_to_receiver.template.html = %(email.template_dir)s/upload_permission_to_receiver_body_html.mak|g" /etc/tracim/development.ini
     sed -i "s|^; email.notification.new_upload_event.template.html = .*|email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak|g" /etc/tracim/development.ini
+    sed -i "s|^; collaborative document edition.file_template_dir = .*|collaborative_document_edition.file_template_dir = %(basic_setup.file_template_dir)s|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in
       mysql)
         sed -i "s|^basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = $DATABASE_TYPE+pymysql://$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME$DATABASE_SUFFIX|g" /etc/tracim/development.ini ;;
