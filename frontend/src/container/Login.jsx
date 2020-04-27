@@ -110,14 +110,14 @@ class Login extends React.Component {
 
     event.preventDefault()
 
-    const { email, password } = event.target
+    const { login, password } = event.target
 
-    if (email.value === '' || password.value === '') {
+    if (login.value === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
       return
     }
 
-    const fetchPostUserLogin = await props.dispatch(postUserLogin(email.value, password.value, state.inputRememberMe))
+    const fetchPostUserLogin = await props.dispatch(postUserLogin(login.value, password.value, state.inputRememberMe))
 
     switch (fetchPostUserLogin.status) {
       case 200: {
@@ -149,11 +149,11 @@ class Login extends React.Component {
       }
       case 400:
         switch (fetchPostUserLogin.json.code) {
-          case 2001: props.dispatch(newFlashMessage(props.t('Not a valid email'), 'warning')); break
+          case 2001: props.dispatch(newFlashMessage(props.t('Invalid email or username'), 'warning')); break
           default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
         }
         break
-      case 403: props.dispatch(newFlashMessage(props.t('Email or password invalid'), 'warning')); break
+      case 403: props.dispatch(newFlashMessage(props.t('Invalid credentials'), 'warning')); break
       default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
     }
   }
@@ -240,14 +240,14 @@ class Login extends React.Component {
           <CardBody formClass='loginpage__card__form'>
             <form onSubmit={this.handleClickSubmit}>
               <InputGroupText
-                parentClassName='loginpage__card__form__groupemail'
+                parentClassName='loginpage__card__form__groupelogin'
                 customClass='mb-3 mt-4'
-                icon='fa-envelope-open-o'
-                type='email'
-                placeHolder={props.t('Email Address')}
-                invalidMsg={props.t('Invalid email')}
+                icon='fa-at'
+                type='text'
+                placeHolder={props.t('Email address or username')}
+                invalidMsg={props.t('Invalid email or username')}
                 maxLength={512}
-                name='email'
+                name='login'
               />
 
               <InputGroupText

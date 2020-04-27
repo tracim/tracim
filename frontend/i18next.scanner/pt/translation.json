@@ -45,9 +45,7 @@
   "You will create your first shared space": "Você criará seu primeiro espaço partilhado",
   "create a shared space": "criar um espaço partilhado",
   "You have been disconnected, please login again": "Você foi desconectado, inicie sessão novamente",
-  "Email or password invalid": "E-mail ou palavra-passe inválida",
   "Connection": "Conexão",
-  "Email Address": "E-mail",
   "Password": "Palavra-passe",
   "Error while loading read status list": "Erro ao carregar a lista de status de leitura",
   "List of contents": "Lista de conteúdos",
@@ -154,7 +152,6 @@
   "agenda details": "detalhes da agenda",
   "Home": "Início",
   "All contents": "Todos os conteúdos",
-  "Invalid email": "E-mail inválido",
   "Invalid password": "Palavra-passe inválida",
   "Error while saving your language": "Erro ao salvar seu idioma",
   "Use this link to integrate this agenda to your": "Utilize este link para incluir esta agenda ao seu",
@@ -237,5 +234,8 @@
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Encontre todos os seus documentos colocados online directamente no seu computador através da estação de trabalho, sem passar pelo software.",
   "Have a good day!": "Tenha um bom dia!",
   "Archived Topic": "Tópico arquivado",
-  "Search…": "Pesquisar..."
+  "Search…": "Pesquisar...",
+  "Invalid email or username": "E-mail ou nome de utilizador inválida",
+  "Email address or username": "E-mail ou nome de utilizador",
+  "Invalid credentials": "Credenciais inválidas"
 }

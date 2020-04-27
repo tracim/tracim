@@ -45,9 +45,7 @@
   "You will create your first shared space": "You will create your first shared space",
   "create a shared space": "create a shared space",
   "You have been disconnected, please login again": "You have been disconnected, please login again",
-  "Email or password invalid": "Email or password invalid",
   "Connection": "Connection",
-  "Email Address": "Email Address",
   "Password": "Password",
   "Forgotten password?": "Forgotten password?",
   "Error while loading read status list": "Error while loading read status list",
@@ -158,7 +156,6 @@
   "agenda details": "agenda details",
   "Home": "Home",
   "All contents": "All contents",
-  "Invalid email": "Invalid email",
   "Invalid password": "Invalid password",
   "Error while saving your language": "Error while saving your language",
   "Use this link to integrate this agenda to your": "Use this link to integrate this agenda to your",
@@ -237,5 +234,8 @@
   "Public upload": "Public upload",
   "Password reset": "Password reset",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Find all your documents put online directly on your computer via the workstation, without going through the software.",
-  "Archived Topic": "Archived Topic"
+  "Archived Topic": "Archived Topic",
+  "Invalid email or username": "Invalid email or username",
+  "Email address or username": "Email address or username",
+  "Invalid credentials": "Invalid credentials"
 }
