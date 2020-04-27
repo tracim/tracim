@@ -2,7 +2,7 @@ import { timelineDebugData } from './timelineDebugData.js'
 
 export const FETCH_CONFIG = {
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json'
   }
 }

@@ -23,7 +23,6 @@ describe('operation :: workspace > create_new > custom-form', function () {
     cy.get('.custom-form.visible').should('be.visible')
     cy.get('.custom-form.visible .custom-form__contentpage__messagelist__version.revision').should('be.visible')
     cy.get('.custom-form.visible .wsContentGeneric__header__title').contains(titre1)
-    cy.wait(2000)
     var element1 = 'Element 1'
     cy.get('.btn-add').click()
     cy.get('#root_odj_0').type(element1)
@@ -36,16 +35,13 @@ describe('operation :: workspace > create_new > custom-form', function () {
     // We can add more to fill more field
 
     cy.get('button.custom-form__editionmode__submit.editionmode__button__submit').click({ force: true })
-    cy.wait(2000)
     cy.get('#root_odj_0').should('have.value', element1)
     cy.get('#root_duree').should('have.value', duree)
     cy.get('.custom-form.visible .wsContentGeneric__header__close.custom-form__header__close').should('be.visible')
     cy.get('.custom-form.visible .wsContentGeneric__header__close.custom-form__header__close').click()
     cy.get('.custom-form.visible').should('not.be.visible')
-    cy.wait(2000)
     cy.get('.content__name').contains(titre1).should('be.visible')
     cy.get('.content__name').click()
-    cy.wait(2000)
     cy.get('#root_odj_0').should('have.value', element1)
     cy.get('#root_duree').should('have.value', duree)
     //        Problem to write text in iframe

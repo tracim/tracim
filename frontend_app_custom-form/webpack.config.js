@@ -3,11 +3,13 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 console.log('isProduction : ', isProduction)
 
+const PnpWebpackPlugin = require('pnp-webpack-plugin')
+
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: isProduction
     ? './src/index.js' // only one instance of babel-polyfill is allowed
-    : ['@babel/polyfill', './src/index.dev.js'],
+    : ['./src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'custom-form.app.js' : 'custom-form.app.dev.js',
@@ -49,7 +51,7 @@ module.exports = {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',
-      exclude: [/node_modules/, path.resolve(__dirname, 'react-jsonSchema-form')]
+      exclude: [/node_modules/, path.resolve(__dirname, 'react-jsonSchema-form'), /frontend_lib/]
     }, {
       test: [/\.js$/, /\.jsx$/],
       exclude: [/node_modules/, path.resolve(__dirname, 'react-jsonSchema-form')],
@@ -70,7 +72,7 @@ module.exports = {
       use: ['style-loader', 'css-loader']
     }, {
       test: /\.styl$/,
-      use: ['style-loader', 'css-loader', 'stylus-loader']
+      use: ['style-loader', 'css-loader', 'stylus-native-loader']
     }, {
       test: /\.(jpg|png|svg)$/,
       loader: 'url-loader',
@@ -80,7 +82,19 @@ module.exports = {
     }]
   },
   resolve: {
+    plugins: [
+      PnpWebpackPlugin,
+    ],
+    alias: {
+      // Make ~tracim_frontend_lib work in stylus files
+      '~tracim_frontend_lib': path.dirname(path.dirname(require.resolve('tracim_frontend_lib')))
+    },
     extensions: ['.js', '.jsx']
+  },
+  resolveLoader: {
+    plugins: [
+      PnpWebpackPlugin.moduleLoader(module),
+    ],
   },
   plugins: [
     ...[], // generic plugins always present

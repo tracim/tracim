@@ -38,13 +38,11 @@ export class UsersSelectField extends React.Component {
     // const fetchUsersResponse = await handleFetchResult(await getMyselfKnownMember(formContext.apiUrl, formContext.userId))
     switch (fetchUsersResponse.apiResponse.status) {
       case 200 :
-        let usersTmp = fetchUsersResponse.body.map((u) =>
-          ({
+        this.setState({
+          users: fetchUsersResponse.body.map((u) => ({
             value: u.user_id,
             label: u.user.public_name
           }))
-        this.setState({
-          users: usersTmp
         })
         break
       default :
@@ -58,7 +56,11 @@ export class UsersSelectField extends React.Component {
     return (
       <div>
         <label
-          className='control-label'>{props.schema.title ? props.schema.title : props.t('Title undefined')}</label>
+          className='control-label'
+        >
+          {props.schema.title ? props.schema.title : props.t('Title undefined')}
+        </label>
+
         <Select
           isDisabled={props.disabled}
           components={animatedComponents}

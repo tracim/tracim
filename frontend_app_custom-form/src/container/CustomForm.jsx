@@ -83,10 +83,8 @@ class CustomForm extends React.Component {
     switch (type) {
       case 'custom-form_showApp':
         console.log('%c<CustomForm> Custom event', 'color: #28a745', type, data)
-        // const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, 'custom-form') // HACK HARCODING 'CUSTOM-FORM'
-        if (isSameContentId) {
-          this.setState({isVisible: true})
+        if (appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, 'custom-form')) { // HACK HARCODING 'CUSTOM-FORM'
+          this.setState({ isVisible: true })
           this.buildBreadcrumbs()
         }
         break
@@ -108,7 +106,7 @@ class CustomForm extends React.Component {
 
         this.setState(prev => ({
           // content: {...prev.content, ...data}, // GM
-          content: {...data},
+          content: { ...data },
           isVisible: true,
           timelineWysiwyg: false
         }))
@@ -309,7 +307,7 @@ class CustomForm extends React.Component {
       faIcon: rawContent.faIcon
     })
     await putCustomFormRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
-    GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}}) // await above makes sure that we will reload workspace content after the read status update
+    GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
   handleClickBtnCloseApp = () => {
@@ -321,12 +319,12 @@ class CustomForm extends React.Component {
         raw_content: prev.rawContentBeforeEdit
       }
     }))
-    GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
+    GLOBAL_dispatchEvent({ type: 'appClosed', data: {} })
   }
 
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
-    let rawContent = {
+    const rawContent = {
       hexcolor: state.hexcolor,
       faIcon: state.faIcon,
       schema: state.schema,
@@ -382,8 +380,8 @@ class CustomForm extends React.Component {
     )
   }
 
-  onSubmit = (data) => {
-    let rawContent = {
+  handleSubmit = (data) => {
+    const rawContent = {
       hexcolor: this.state.hexcolor,
       faIcon: this.state.faIcon,
       schema: this.state.schema,
@@ -421,13 +419,13 @@ class CustomForm extends React.Component {
 
   handleChangeForm = e => {
     // const newText = JSON.stringify(e.formData) // because SyntheticEvent is pooled (react specificity)
-    this.setState(prev => ({content: {...prev.content, raw_content: e.formData}}))
+    this.setState(prev => ({ content: { ...prev.content, raw_content: e.formData } }))
     // this.setLocalStorageItem('rawContent', e.formData)
   }
 
   handleChangeNewComment = e => {
     const newComment = e.target.value
-    this.setState({newComment})
+    this.setState({ newComment })
 
     this.setLocalStorageItem('comment', newComment)
   }
@@ -444,7 +442,7 @@ class CustomForm extends React.Component {
     const fetchResultSaveNewComment = await handleFetchResult(await postCustomFormNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
-        this.setState({newComment: ''})
+        this.setState({ newComment: '' })
         localStorage.removeItem(
           generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
         )
@@ -455,7 +453,7 @@ class CustomForm extends React.Component {
     }
   }
 
-  handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
+  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleChangeStatus = async newStatus => {
     const { state, props } = this
@@ -478,7 +476,7 @@ class CustomForm extends React.Component {
     const fetchResultArchive = await putCustomFormIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: true}, mode: MODE.VIEW}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: true }, mode: MODE.VIEW }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -498,7 +496,7 @@ class CustomForm extends React.Component {
     const fetchResultArchive = await putCustomFormIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: true}, mode: MODE.VIEW}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: MODE.VIEW }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -518,7 +516,7 @@ class CustomForm extends React.Component {
     const fetchResultRestore = await putCustomFormRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -538,7 +536,7 @@ class CustomForm extends React.Component {
     const fetchResultRestore = await putCustomFormRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -581,7 +579,7 @@ class CustomForm extends React.Component {
 
   handleClickLastVersion = () => {
     this.loadContent()
-    this.setState({mode: MODE.VIEW})
+    this.setState({ mode: MODE.VIEW })
   }
 
   render () {
@@ -615,47 +613,47 @@ class CustomForm extends React.Component {
           customClass={`${config.slug}`}
           i18n={i18n}
         >
-          <div /* this div in display flex, justify-content space-between */>
+          <div/* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {loggedUser.userRoleIdInWorkspace >= 2 &&
+              {loggedUser.userRoleIdInWorkspace >= 2 && (
                 <NewVersionBtn
                   customColor={this.state.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={mode !== MODE.VIEW || !content.is_editable}
                   label={t('Edit')}
                 />
-              }
+              )}
 
-              {mode === MODE.REVISION &&
+              {mode === MODE.REVISION && (
                 <button
                   className='wsContentGeneric__option__menu__lastversion custom-form__lastversionbtn btn highlightBtn'
                   onClick={this.handleClickLastVersion}
-                  style={{backgroundColor: this.state.hexcolor, color: '#fdfdfd'}}
+                  style={{ backgroundColor: this.state.hexcolor, color: '#fdfdfd' }}
                 >
                   <i className='fa fa-history' />
                   {t('Last version')}
                 </button>
-              }
+              )}
             </div>
 
             <div className='d-flex'>
-              {loggedUser.userRoleIdInWorkspace >= 2 &&
+              {loggedUser.userRoleIdInWorkspace >= 2 && (
                 <SelectStatus
                   selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                   availableStatus={config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
                   disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
                 />
-              }
+              )}
 
-              {loggedUser.userRoleIdInWorkspace >= 4 &&
+              {loggedUser.userRoleIdInWorkspace >= 4 && (
                 <ArchiveDeleteContent
                   customColor={this.state.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
                   disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
                 />
-              }
+              )}
             </div>
           </div>
         </PopinFixedOption>
@@ -663,30 +661,32 @@ class CustomForm extends React.Component {
         <PopinFixedContent
           customClass={`${config.slug}__contentpage`}
         >
-          {schema && <CustomFormComponent
-            mode={mode}
-            customColor={this.state.hexcolor}
-            onClickCloseEditMode={this.handleCloseNewVersion}
-            disableValidateBtn={JSON.stringify(rawContentBeforeEdit) === JSON.stringify(content.raw_content)}
-            onClickValidateBtn={this.onSubmit}
-            version={content.number}
-            lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
-            text={content.raw_content}
-            isArchived={content.is_archived}
-            isDeleted={content.is_deleted}
-            isDeprecated={content.status === config.availableStatuses[3].slug}
-            deprecatedStatus={config.availableStatuses[3]}
-            isDraftAvailable={mode === MODE.VIEW && loggedUser.idRoleUserWorkspace >= 2 && this.getLocalStorageItem('rawContent')}
-            onClickRestoreArchived={this.handleClickRestoreArchived}
-            onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            onClickShowDraft={this.handleClickNewVersion}
-            key={this.state.key}
-            schema={schema}
-            uischema={uiSchema}
-            formdata={content.raw_content}
-            onChangeForm={this.handleChangeForm}
-            contextForm={contextForm}
-          />}
+          {schema && (
+            <CustomFormComponent
+              mode={mode}
+              customColor={this.state.hexcolor}
+              onClickCloseEditMode={this.handleCloseNewVersion}
+              disableValidateBtn={JSON.stringify(rawContentBeforeEdit) === JSON.stringify(content.raw_content)}
+              onClickValidateBtn={this.handleSubmit}
+              version={content.number}
+              lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
+              text={content.raw_content}
+              isArchived={content.is_archived}
+              isDeleted={content.is_deleted}
+              isDeprecated={content.status === config.availableStatuses[3].slug}
+              deprecatedStatus={config.availableStatuses[3]}
+              isDraftAvailable={mode === MODE.VIEW && loggedUser.idRoleUserWorkspace >= 2 && this.getLocalStorageItem('rawContent')}
+              onClickRestoreArchived={this.handleClickRestoreArchived}
+              onClickRestoreDeleted={this.handleClickRestoreDeleted}
+              onClickShowDraft={this.handleClickNewVersion}
+              key={this.state.key}
+              schema={schema}
+              uischema={uiSchema}
+              formdata={content.raw_content}
+              onChangeForm={this.handleChangeForm}
+              contextForm={contextForm}
+            />
+          )}
 
           <Timeline
             customClass={`${config.slug}__contentpage`}

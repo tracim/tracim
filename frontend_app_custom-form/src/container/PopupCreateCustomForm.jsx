@@ -7,7 +7,7 @@ import {
 } from 'tracim_frontend_lib'
 import i18n from '../i18n.js'
 import {
-  postCustomFormcContent,
+  postCustomFormContent,
   putCustomFormContent
 } from '../action.async'
 
@@ -20,12 +20,12 @@ const debug = { // outdated
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543/api/v2',
     apiHeader: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json'
     },
     translation: {
-      en: {translation: {}},
-      fr: {translation: {}}
+      en: { translation: {} },
+      fr: { translation: {} }
     }
   },
   loggedUser: {
@@ -77,7 +77,7 @@ class PopupCreateCustomForm extends React.Component {
     }
   }
 
-  handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
+  handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
@@ -92,17 +92,18 @@ class PopupCreateCustomForm extends React.Component {
     const fetchSaveNewCustomForm = postCustomFormContent(config.apiUrl, idWorkspace, idFolder, 'html-document', newContentName)
     const resSave = await handleFetchResult(await fetchSaveNewCustomForm)
 
+    // HACK
+    const data = {
+      hexcolor: this.state.config.hexcolor,
+      faIcon: this.state.config.faIcon,
+      formData: {},
+      schema: this.props.data.config.schema,
+      uischema: this.props.data.config.uischema
+    }
+
     switch (resSave.apiResponse.status) {
-      case 200:
+      case 200: {
         this.handleClose()
-        // HACK
-        const data = {
-          hexcolor: this.state.config.hexcolor,
-          faIcon: this.state.config.faIcon,
-          formData: {},
-          schema: this.props.data.config.schema,
-          uischema: this.props.data.config.uischema
-        }
         const rawContentHtmlPut = putCustomFormContent(config.apiUrl, resSave.body.workspace_id, resSave.body.content_id, newContentName, JSON.stringify(data))
         const resPut = await handleFetchResult(await rawContentHtmlPut)
         if (resPut.apiResponse.status === 200) {
@@ -121,6 +122,7 @@ class PopupCreateCustomForm extends React.Component {
           console.log(resPut)
         }
         break
+      }
       case 400:
         switch (resSave.body.code) {
           case 3002:

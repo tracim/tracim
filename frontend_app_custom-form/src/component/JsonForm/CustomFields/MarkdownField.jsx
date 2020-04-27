@@ -45,12 +45,12 @@ export class MarkdownField extends React.Component {
         </label>
         {!props.disabled && (
           <p>
-            <input type={'button'} onClick={() => this.setState({tab: 'write'})} value={'Write'} />
-            <input type={'button'} onClick={() => this.setState({tab: 'preview'})} value={'Preview'} />
+            <input type='button' onClick={() => this.setState({ tab: 'write' })} value='Write' />
+            <input type='button' onClick={() => this.setState({ tab: 'preview' })} value='Preview' />
           </p>
         )}
         {(props.disabled || this.state.tab === 'preview') && (
-          <div style={{position: 'relative'}}>
+          <div style={{ position: 'relative' }}>
             <article id='preview' />
           </div>
         )}

@@ -37,7 +37,8 @@ const CustomFormComponent = props => {
       )}
 
       <div
-        className='wsContentHtmlDocument__contentpage__textnote custom-form__contentpage__textnote'>
+        className='wsContentHtmlDocument__contentpage__textnote custom-form__contentpage__textnote'
+      >
         {props.mode === MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
             msg={props.t('You have a pending draft')}
@@ -53,18 +54,20 @@ const CustomFormComponent = props => {
             <div className='custom-form__contentpage__textnote__version'>
               version n°
               <div
-                dangerouslySetInnerHTML={{ __html: props.mode === MODE.VIEW ? props.lastVersion : props.version }} />
-              {props.mode === MODE.REVISION &&
-              <div
-                className='custom-form__contentpage__textnote__lastversion outlineTextBtn'>
-                ({props.t('latest version :')} {props.lastVersion})
-              </div>
-              }
+                dangerouslySetInnerHTML={{ __html: props.mode === MODE.VIEW ? props.lastVersion : props.version }}
+              />
+              {props.mode === MODE.REVISION && (
+                <div
+                  className='custom-form__contentpage__textnote__lastversion outlineTextBtn'
+                >
+                  ({props.t('latest version :')} {props.lastVersion})
+                </div>
+              )}
             </div>
           </div>
         )}
         <JsonForm
-          customClass={'custom-form__editionmode'}
+          customClass='custom-form__editionmode'
           customColor={props.customColor}
           onClickCancelBtn={props.onClickCloseEditMode}
           disableValidateBtn={props.disableValidateBtn}

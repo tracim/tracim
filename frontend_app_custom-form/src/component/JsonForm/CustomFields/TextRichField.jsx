@@ -8,19 +8,23 @@ export class TextRichField extends React.Component {
     return (
       <div>
         <label
-          className='control-label'>{props.schema.title ? props.schema.title : 'title undefined'}
+          className='control-label'
+        >
+          {props.schema.title ? props.schema.title : 'title undefined'}
         </label>
-        {props.disabled && <div className='custom-form__contentpage__textnote__text' dangerouslySetInnerHTML={{__html: props.formData}} />}
-        {!props.disabled && <Editor
-          onChange={(v) => props.onChange(v.target.getContent(), props.id)}
-          menubar={false}
-          disabled={props.disabled}
-          value={props.formData ? props.formData : ''}
-          init={{
-            menubar: false
-          }}
-          toolbar=''
-        />}
+        {props.disabled && <div className='custom-form__contentpage__textnote__text' dangerouslySetInnerHTML={{ __html: props.formData }} />}
+        {!props.disabled && (
+          <Editor
+            onChange={(v) => props.onChange(v.target.getContent(), props.id)}
+            menubar={false}
+            disabled={props.disabled}
+            value={props.formData ? props.formData : ''}
+            init={{
+              menubar: false
+            }}
+            toolbar=''
+          />
+        )}
       </div>
     )
   }
