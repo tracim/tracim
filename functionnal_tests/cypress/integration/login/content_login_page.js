@@ -1,4 +1,5 @@
-import { login, logout } from '../helpers/index.js'
+import { SELECTORS as s } from '../../support/generic_selector_commands'
+import { PAGES as p } from '../../support/urls_commands'
 
 describe('Login page', function () {
   before(() => {
@@ -7,20 +8,49 @@ describe('Login page', function () {
   })
 
   beforeEach(function () {
-    cy.visit('/ui/login')
+    cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
   })
   it('should renders every components', function () {
     cy.url().should('include', '/login')
-    cy.get('.card-header.loginpage__card__header').should('be.visible')
-    cy.get('.dropdownlang__dropdown__btnlanguage__imgselected').should('be.visible')
-    cy.get('.loginpage__footer__text').should('be.visible')
-    cy.get('input[type=email]').should('be.visible')
-    cy.get('input[type=email]').should('have.attr', 'placeholder')
-    cy.get('input[type=password]').should('be.visible')
-    cy.get('input[type=password]').should('have.attr', 'placeholder')
-    cy.get('.loginpage__card__form__btnsubmit').should('be.visible')
-    cy.get('.loginpage__card__form__btnsubmit').should('have.attr', 'type', 'submit')
-    cy.get('.loginpage__card__form__pwforgot').should('be.visible')
+
+    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+      .find('.card-header.loginpage__card__header')
+      .should('be.visible')
+
+    cy.getTag({ selectorName: s.HEADER })
+      .find('.dropdownlang__dropdown__btnlanguage__imgselected')
+      .should('be.visible')
+
+    cy.get('.loginpage__footer__text')
+      .should('be.visible')
+
+    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+      .find('input[type=text]')
+      .should('be.visible')
+
+    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+      .find('input[type=text]')
+      .should('have.attr', 'placeholder')
+
+    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+      .find('input[type=password]')
+      .should('be.visible')
+
+    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+      .find('input[type=password]')
+      .should('have.attr', 'placeholder')
+
+    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+      .find('.loginpage__card__form__btnsubmit')
+      .should('be.visible')
+
+    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+      .find('.loginpage__card__form__btnsubmit')
+      .should('have.attr', 'type', 'submit')
+
+    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+      .find('.loginpage__card__form__pwforgot')
+      .should('be.visible')
   })
 })
 // @philippe 08/08/2018 - Not implemented in Tracim_V2.0
