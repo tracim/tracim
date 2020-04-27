@@ -425,7 +425,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ; email.notification.share_content_to_receiver.template.html = %(here)s/tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak
 ; email.notification.upload_permission_to_emitter.template.html = %(here)s/tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak
 ; email.notification.upload_permission_to_receiver.template.html = %(here)s/tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak
-; email.notification.new_upload_event.template.html =  %(here)s/tracim_backend/templates/mail/new_upload_event_body_html.mak
+; email.notification.new_upload_event.template.html = %(here)s/tracim_backend/templates/mail/new_upload_event_body_html.mak
 
 
 # example with shortcut for template_dir path:
