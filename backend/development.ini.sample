@@ -2,6 +2,15 @@
 # Tracim Config File #
 ######################
 
+## How work this file
+#
+# Tracim use all parameters not commented here (environnement variable is used first if define)
+# Lines who start by `;` is used to comment parameters and show default value available in Tracim code
+# Lines who start by `#` is used for comment and to show parameters examples
+# All parameters who start with `basic_setup` are variable available in this file. This kind of variable is used
+# to simplify configuration of Tracim and all of them are necessary to start Tracim.
+
+
 ## GENERAL TRACIM config:
 # These config are common for all app : REST API, Webdav, etc...
 
