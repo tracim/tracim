@@ -20,14 +20,14 @@ export const NewMemberForm = props => {
 
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>
-            {props.t('Enter the name or email of the user')}
+            {props.t('Enter the username, email or full name of the user')}
           </label>
 
           <input
             type='text'
             className='name__input form-control'
             id='addmember'
-            placeholder={props.t('Full name or email')}
+            placeholder={props.t('Search user...')}
             data-cy='addmember'
             value={props.nameOrEmail}
             onChange={e => props.onChangeNameOrEmail(e.target.value)}
