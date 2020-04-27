@@ -12,7 +12,7 @@ import {
 import { getBrowserLang } from '../helper.js'
 import { PROFILE } from 'tracim_frontend_lib'
 
-const defaultUser = {
+export const defaultUser = {
   user_id: -1,
   logged: null, // null avoid to be redirected to /login while whoami ep has not responded yet
   auth_type: '',

@@ -1,33 +1,16 @@
 import { expect } from 'chai'
-import userReducer from '../../../src/reducer/user.js'
+import userReducer, { defaultUser } from '../../../src/reducer/user.js'
 import {
   UPDATE,
   USER_USERNAME,
   USER_PUBLIC_NAME
 } from '../../../src/action-creator.sync'
-import { PROFILE } from 'tracim_frontend_lib'
 import { globalManager } from '../../fixture/user/globalManager.js'
 
 
-const defaultStateUser = {
-  user_id: -1,
-  logged: null,
-  auth_type: '',
-  timezone: '',
-  profile: PROFILE.user,
-  email: '',
-  is_active: true,
-  avatar_url: null,
-  created: '',
-  public_name: '',
-  lang: 'en',
-  agendaUrl: '',
-  username: ''
-}
-
 describe('user reducer', () => {
   it('should return the default state', () => {
-    expect(userReducer(undefined, {})).to.deep.equal(defaultStateUser)
+    expect(userReducer(undefined, {})).to.deep.equal(defaultUser)
   })
 
   it(`should handle ${UPDATE}/${USER_PUBLIC_NAME}`, () => {
