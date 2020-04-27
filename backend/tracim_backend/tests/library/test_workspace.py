@@ -150,7 +150,7 @@ class TestThread(object):
         assert [w1, w2, w3, w4] == wapi.get_all_manageable()
         # Checks a regular user gets none workspace.
 
-        u = uapi.create_minimal_user("u.s@e.r", Profile.USER, True)
+        u = uapi.create_minimal_user("u.s@e.r", profile=Profile.USER, save_now=True)
         wapi = WorkspaceApi(session=session, current_user=u, config=app_config)
         rapi = role_api_factory.get()
         rapi.create_one(u, w4, UserRoleInWorkspace.READER, False)

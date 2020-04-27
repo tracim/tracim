@@ -18,6 +18,7 @@ import uuid
 
 import sqlalchemy
 from sqlalchemy import BigInteger
+from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
 from sqlalchemy import Sequence
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -94,6 +95,8 @@ class User(DeclarativeBase):
     MAX_PUBLIC_NAME_LENGTH = 255
     MIN_EMAIL_LENGTH = 3
     MAX_EMAIL_LENGTH = 255
+    MIN_USERNAME_LENGTH = 3
+    MAX_USERNAME_LENGTH = 255
     MAX_IMPORTED_FROM_LENGTH = 32
     MAX_TIMEZONE_LENGTH = 32
     MIN_LANG_LENGTH = 2
@@ -101,6 +104,7 @@ class User(DeclarativeBase):
     MAX_AUTH_TOKEN_LENGTH = 255
     MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH = 255
     DEFAULT_ALLOWED_SPACE = 0
+    USERNAME_OR_EMAIL_REQUIRED_CONSTRAINT_NAME = "username_or_email_required"
 
     __tablename__ = "users"
     # INFO - G.M - 2018-10-24 - force table to use utf8 instead of
@@ -109,10 +113,17 @@ class User(DeclarativeBase):
     # field and is uniqueness. As far we search, there is to be no way to apply
     # mysql specific (which is ignored by other database)
     #  collation only on email field.
-    __table_args__ = {"mysql_charset": "utf8", "mysql_collate": "utf8_general_ci"}
+    __table_args__ = (
+        CheckConstraint(
+            "NOT (email IS NULL AND username IS NULL)",
+            name=USERNAME_OR_EMAIL_REQUIRED_CONSTRAINT_NAME,
+        ),
+        {"mysql_charset": "utf8", "mysql_collate": "utf8_general_ci"},
+    )
 
     user_id = Column(Integer, Sequence("seq__users__user_id"), autoincrement=True, primary_key=True)
-    email = Column(Unicode(MAX_EMAIL_LENGTH), unique=True, nullable=False)
+    email = Column(Unicode(MAX_EMAIL_LENGTH), unique=True, nullable=True)
+    username = Column(Unicode(MAX_USERNAME_LENGTH), unique=True, nullable=True)
     display_name = Column(Unicode(MAX_PUBLIC_NAME_LENGTH))
     _password = Column("password", Unicode(MAX_HASHED_PASSWORD_LENGTH), nullable=True)
     created = Column(DateTime, default=datetime.utcnow)

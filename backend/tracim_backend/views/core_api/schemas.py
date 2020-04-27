@@ -29,6 +29,7 @@ from tracim_backend.app_models.validator import user_profile_validator_with_nobo
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
+from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ActiveContentFilter
@@ -168,6 +169,7 @@ class UserDigestSchema(marshmallow.Schema):
         "an empty url as default avatar)",
     )
     public_name = StrippedString(example="John Doe")
+    username = StrippedString(example="JohnDoe", required=False, default=None, allow_none=True)
 
 
 class UserDiskSpaceSchema(UserDigestSchema):
@@ -188,7 +190,8 @@ class UserSchema(UserDigestSchema):
     Complete user schema
     """
 
-    email = marshmallow.fields.Email(required=True, example="hello@tracim.fr")
+    email = marshmallow.fields.Email(required=False, example="hello@tracim.fr", allow_none=True)
+    username = marshmallow.fields.String(required=False, example="My-Power_User99", allow_none=True)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Date of creation of the user account"
     )
@@ -269,7 +272,10 @@ class SetUserInfoSchema(marshmallow.Schema):
         description=FIELD_TIMEZONE_DESC, example="Europe/Paris", required=True
     )
     public_name = StrippedString(
-        example="John Doe", required=True, validate=user_public_name_validator
+        example="John Doe", required=False, validate=user_public_name_validator, default=None
+    )
+    username = StrippedString(
+        example="JohnDoe", required=False, validate=user_username_validator, default=None
     )
     lang = StrippedString(
         description=FIELD_LANG_DESC,
@@ -323,8 +329,9 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
 
 class UserCreationSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
-        required=True, example="hello@tracim.fr", validate=user_email_validator
+        required=False, example="hello@tracim.fr", validate=user_email_validator
     )
+    username = String(required=False, example="My-Power_User99", validate=user_username_validator)
     password = String(
         example="8QLa$<w",
         required=False,
@@ -739,6 +746,9 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
     )
     user_public_name = StrippedString(
         example="John", default=None, allow_none=True, validate=user_public_name_validator
+    )
+    user_username = StrippedString(
+        example="John_Doe", default=None, allow_none=True, validate=user_username_validator
     )
 
     @post_load

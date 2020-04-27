@@ -92,6 +92,7 @@ class AccountController(Controller):
         user = uapi.update(
             request.current_user,
             name=hapic_data.body.public_name,
+            username=hapic_data.body.username,
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
             do_save=True,

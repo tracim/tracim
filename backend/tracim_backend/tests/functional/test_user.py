@@ -2743,6 +2743,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -2762,6 +2763,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
         assert res["lang"] == "fr"
@@ -2776,6 +2778,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
             "timezone": "Europe/Paris",
             "lang": "fr",
             "public_name": "test user",
+            "username": "testu",
             "email_notification": False,
         }
         res = web_testapp.post_json("/api/v2/users", status=200, params=params)
@@ -2786,6 +2789,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "test user"
+        assert res["username"] == "testu"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 134217728
@@ -2894,6 +2898,7 @@ class TestUserEndpoint(object):
         profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
+            username="testu",
             password="password",
             name="bob",
             profile=profile,
@@ -2915,6 +2920,7 @@ class TestUserEndpoint(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "bob"
+        assert res["username"] == "testu"
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
         assert res["lang"] == "fr"
@@ -3007,6 +3013,46 @@ class TestUserEndpoint(object):
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 0
+
+    def test_api__create_user__ok_200__with_only_username(self, web_testapp, user_api_factory):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "username": "testu",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["username"] == "testu"
+        assert res["public_name"] == "test user"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["lang"] == "fr"
+        assert res["allowed_space"] == 0
+
+    def test_api__create_user__err_400__with_no_username_and_no_email(
+        self, web_testapp, user_api_factory
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=400, params=params)
+        res = res.json_body
+        assert res["code"] == 2061
+        assert res["message"] == "Email or username is required to create an user"
 
     def test_api__create_user__ok_200__full_admin_with_allowed_space(
         self, web_testapp, user_api_factory
@@ -3338,6 +3384,7 @@ class TestUsersEndpoint(object):
         profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
+            username="TheTestUSer",
             password="password",
             name="bob",
             profile=profile,
@@ -3359,6 +3406,7 @@ class TestUsersEndpoint(object):
 
         assert res[1]["user_id"] == admin_user.user_id
         assert res[1]["public_name"] == admin_user.display_name
+        assert res[1]["username"] == admin_user.username
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
@@ -4439,6 +4487,7 @@ class TestSetUserInfoEndpoint(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -4455,6 +4504,7 @@ class TestSetUserInfoEndpoint(object):
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         # Set params
@@ -4465,8 +4515,17 @@ class TestSetUserInfoEndpoint(object):
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "updated"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
+        # Set username
+        params = {"username": "TheBoby", "timezone": "Europe/London", "lang": "en"}
+        web_testapp.put_json("/api/v2/users/{}".format(user_id), params=params, status=200)
+        # Check After
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["public_name"] == "updated"
+        assert res["username"] == "TheBoby"
 
     def test_api__set_user_info__ok_200__user_itself(self, user_api_factory, web_testapp):
 
@@ -4477,6 +4536,7 @@ class TestSetUserInfoEndpoint(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -4493,6 +4553,7 @@ class TestSetUserInfoEndpoint(object):
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         # Set params
@@ -4503,8 +4564,17 @@ class TestSetUserInfoEndpoint(object):
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "updated"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
+        # Set username
+        params = {"username": "TheBoby", "timezone": "Europe/London", "lang": "en"}
+        web_testapp.put_json("/api/v2/users/{}".format(user_id), params=params, status=200)
+        # Check After
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["public_name"] == "updated"
+        assert res["username"] == "TheBoby"
 
     def test_api__set_user_info__err_403__other_normal_user(self, user_api_factory, web_testapp):
 

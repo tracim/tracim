@@ -19,16 +19,19 @@ from tracim_backend.app_models.validator import user_lang_validator
 from tracim_backend.app_models.validator import user_password_validator
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
+from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import EmailOrUsernameRequired
 from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
@@ -46,6 +49,7 @@ from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UsernameAlreadyExistInDb
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
@@ -123,6 +127,21 @@ class UserApi(object):
             user = self._base_query().filter(User.email == email.lower()).one()
         except NoResultFound as exc:
             raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc
+        return user
+
+    # FIXME BS NOW: test it
+    def get_one_by_username(self, username: str) -> User:
+        """
+        Get one user by username
+        :param username: username of the user
+        :return: one user
+        """
+        try:
+            user = self._base_query().filter(User.username == username).one()
+        except NoResultFound as exc:
+            raise UserDoesNotExist(
+                'User for username "{}" not found in database'.format(username)
+            ) from exc
         return user
 
     def get_one_by_public_name(self, public_name: str) -> User:
@@ -215,11 +234,16 @@ class UserApi(object):
         return query.all()
 
     def find(
-        self, user_id: int = None, email: str = None, public_name: str = None, token: str = None,
+        self,
+        user_id: typing.Optional[int] = None,
+        email: typing.Optional[str] = None,
+        public_name: typing.Optional[str] = None,
+        token: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
     ) -> typing.Tuple[TypeUser, User]:
         """
         Find existing user from all theses params.
-        Check is made in this order: user_id, email, public_name
+        Check is made in this order: user_id, email, public_name, username
         If no user found raise UserDoesNotExist exception
         """
         user = None
@@ -246,6 +270,12 @@ class UserApi(object):
             try:
                 user = self.get_one_by_public_name(public_name)
                 return TypeUser.PUBLIC_NAME, user
+            except UserDoesNotExist:
+                pass
+        if username:
+            try:
+                user = self.get_one_by_username(username)
+                return TypeUser.USER_NAME, user
             except UserDoesNotExist:
                 pass
 
@@ -611,11 +641,29 @@ class UserApi(object):
             )
         return True
 
+    def _check_username(self, username: str) -> None:
+        """Check given username. Raise InvalidUsernameFormat if not match required format and
+        UsernameAlreadyExistInDb if username already used.
+        """
+        if not self._check_username_correctness(username):
+            raise InvalidUsernameFormat("Username given form {} is not correct".format(username))
+
+        if self.check_username_already_in_db(username):
+            raise UsernameAlreadyExistInDb(
+                "Username given '{}' already exist, please choose something else".format(username)
+            )
+
     def check_email_already_in_db(self, email: str) -> bool:
         """
-        Verify if given email does not already exist in db
+        Verify if given email does already exist in db
         """
         return self._session.query(User.email).filter(User.email == email).count() != 0
+
+    def check_username_already_in_db(self, username: str) -> bool:
+        """
+        Verify if given username already used in db
+        """
+        return self._session.query(User.username).filter(User.username == username).count() != 0
 
     def _check_email_correctness(self, email: str) -> bool:
         """
@@ -631,6 +679,14 @@ class UserApi(object):
             return False
         return True
 
+    def _check_username_correctness(self, username: str) -> bool:
+        if len(username) < User.MIN_USERNAME_LENGTH or len(username) > User.MAX_USERNAME_LENGTH:
+            return False
+        for char in username:
+            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_":
+                return False
+        return True
+
     def update(
         self,
         user: User,
@@ -642,12 +698,15 @@ class UserApi(object):
         auth_type: AuthType = None,
         profile: typing.Optional[Profile] = None,
         allowed_space: typing.Optional[int] = None,
+        username: str = None,
         do_save=True,
     ) -> User:
+        """Update given user instance with given parameters"""
         validator = TracimValidator()
         validator.add_validator("name", name, user_public_name_validator)
         validator.add_validator("password", password, user_password_validator)
         validator.add_validator("email", email, user_email_validator)
+        validator.add_validator("username", name, user_username_validator)
         validator.add_validator("timezone", timezone, user_timezone_validator)
         validator.add_validator("lang", lang, user_lang_validator)
         validator.validate_all()
@@ -673,6 +732,11 @@ class UserApi(object):
                 self._check_email_modification_allowed(user)
                 self._check_email(lowercase_email)
                 user.email = lowercase_email
+
+        if username is not None:
+            if username != user.username:
+                self._check_username(username)
+                user.username = username
 
         if password is not None:
             self._check_password_modification_allowed(user)
@@ -723,11 +787,12 @@ class UserApi(object):
 
     def create_user(
         self,
-        email,
-        password: str = None,
-        name: str = None,
+        email: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+        password: typing.Optional[str] = None,
+        name: typing.Optional[str] = None,
         timezone: str = "",
-        lang: str = None,
+        lang: typing.Optional[str] = None,
         auth_type: AuthType = AuthType.UNKNOWN,
         profile: typing.Optional[Profile] = None,
         allowed_space: typing.Optional[int] = None,
@@ -738,7 +803,7 @@ class UserApi(object):
             raise NotificationDisabledCantCreateUserWithInvitation(
                 "Can't create user with invitation mail because " "notification are disabled."
             )
-        new_user = self.create_minimal_user(email, profile, save_now=False)
+        new_user = self.create_minimal_user(email, username, profile, save_now=False)
         if allowed_space is None:
             allowed_space = self._config.LIMITATION__USER_DEFAULT_ALLOWED_SPACE
         self.update(
@@ -778,19 +843,29 @@ class UserApi(object):
         return new_user
 
     def create_minimal_user(
-        self, email, profile: typing.Optional[Profile] = None, save_now=False
+        self,
+        email: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+        profile: typing.Optional[Profile] = None,
+        save_now=False,
     ) -> User:
         """Previous create_user method"""
+        if not email and not username:
+            raise EmailOrUsernameRequired(f"Email or username is required to create an user")
         lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
         validator.add_validator("email", lowercase_email, user_email_validator)
         validator.validate_all()
-        self._check_email(lowercase_email)
+        if lowercase_email is not None:
+            self._check_email(lowercase_email)
+        if username is not None:
+            self._check_username(username)
         user = User()
         user.email = lowercase_email
+        user.username = username
         # TODO - G.M - 2018-11-29 - Check if this default_value can be
         # incorrect according to user_public_name_validator
-        user.display_name = email.split("@")[0]
+        user.display_name = email.split("@")[0] if email else username
         user.created = datetime.datetime.utcnow()
         if not profile:
             profile = Profile.get_profile_from_slug(self._config.USER__DEFAULT_PROFILE)

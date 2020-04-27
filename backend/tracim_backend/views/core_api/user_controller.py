@@ -3,8 +3,10 @@ from pyramid.config import Configurator
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import EmailOrUsernameRequired
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
@@ -228,6 +230,7 @@ class UserController(Controller):
             request.candidate_user,
             auth_type=request.candidate_user.auth_type,
             name=hapic_data.body.public_name,
+            username=hapic_data.body.username,
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
             do_save=True,
@@ -237,6 +240,8 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(EmailOrUsernameRequired, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(InvalidUsernameFormat, HTTPStatus.BAD_REQUEST)
     @check_right(is_administrator)
     @hapic.input_body(UserCreationSchema())
     @hapic.output_body(UserSchema())
@@ -263,6 +268,7 @@ class UserController(Controller):
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
             name=hapic_data.body.public_name,
+            username=hapic_data.body.username,
             do_notify=hapic_data.body.email_notification,
             allowed_space=hapic_data.body.allowed_space,
             profile=profile,

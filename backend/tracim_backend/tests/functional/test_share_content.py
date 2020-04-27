@@ -754,6 +754,7 @@ class TestGuestDownloadShareEndpoints(object):
         assert share["author_id"] == admin_user.user_id
         assert share["author"]
         assert share["author"]["public_name"] == "Global manager"
+        assert share["author"]["username"] == "TheAdmin"
         assert share["content_label"] == "Test_file"
         assert share["content_size"] == 9
         assert share["content_filename"] == "Test_file.txt"

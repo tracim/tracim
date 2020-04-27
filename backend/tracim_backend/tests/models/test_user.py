@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from freezegun import freeze_time
+import pytest
 import transaction
 
 from tracim_backend.models.auth import User
@@ -32,6 +33,73 @@ class TestUserModel(object):
         assert new_user.display_name == name
         assert new_user.email == email
         assert new_user.email_address == email
+
+    def test_unit__create__ok__username_and_email(self, session):
+        session.flush()
+        transaction.commit()
+        username = "damien"
+        email = "damien@accorsi.info"
+
+        user = User()
+        user.email = email
+        user.username = username
+
+        session.add(user)
+        session.flush()
+        transaction.commit()
+
+        new_user = session.query(User).filter(User.email == email).one()
+
+        assert new_user.email == email
+        assert new_user.email_address == email
+        assert new_user.username == username
+
+    def test_unit__create__ok__only_username(self, session):
+        session.flush()
+        transaction.commit()
+        username = "damien"
+
+        user = User()
+        user.username = username
+
+        session.add(user)
+        session.flush()
+        transaction.commit()
+
+        new_user = session.query(User).filter(User.username == username).one()
+        assert new_user.username == username
+
+    def test_unit__create__error__already_used_username(self, session):
+        session.flush()
+        transaction.commit()
+
+        user1 = User()
+        user1.username = "jean"
+
+        user2 = User()
+        user2.username = "jean"
+
+        session.add(user1)
+        session.add(user2)
+        with pytest.raises(Exception) as caught:
+            session.flush()
+
+        # NOTE BS 20200427: caught exception depend as database engine, but we expect
+        # "unique" string in exception message
+        assert "unique" in str(caught.value).lower()
+
+    def test_unit__create__error__no_username_and_no_email(self, session):
+        session.flush()
+        transaction.commit()
+
+        user = User()
+        session.add(user)
+        with pytest.raises(Exception) as caught:
+            session.flush()
+
+        # NOTE BS 20200427: caught exception depend as database engine, but we expect
+        # constraint name in exception message
+        assert User.USERNAME_OR_EMAIL_REQUIRED_CONSTRAINT_NAME in str(caught.value)
 
     def test_unit__password__ok__nominal_case(self, session):
         """

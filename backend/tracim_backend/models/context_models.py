@@ -179,9 +179,16 @@ class UserInfos(object):
     Just some user infos
     """
 
-    def __init__(self, timezone: str, public_name: str, lang: str) -> None:
+    def __init__(
+        self,
+        timezone: str,
+        lang: str,
+        public_name: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+    ) -> None:
         self.timezone = timezone
         self.public_name = public_name
+        self.username = username
         self.lang = lang
 
 
@@ -210,12 +217,13 @@ class UserCreation(object):
 
     def __init__(
         self,
-        email: str,
-        password: str = None,
-        public_name: str = None,
-        timezone: str = None,
-        profile: str = None,
-        lang: str = None,
+        email: typing.Optional[str] = None,
+        password: typing.Optional[str] = None,
+        public_name: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+        timezone: typing.Optional[str] = None,
+        profile: typing.Optional[str] = None,
+        lang: typing.Optional[str] = None,
         email_notification: bool = True,
         allowed_space: typing.Optional[int] = None,
     ) -> None:
@@ -224,6 +232,7 @@ class UserCreation(object):
         # is auto-generated.
         self.password = password or None
         self.public_name = public_name or None
+        self.username = username or None
         self.timezone = timezone or ""
         self.lang = lang or None
         self.profile = profile or None
@@ -469,11 +478,13 @@ class WorkspaceMemberInvitation(object):
         user_id: int = None,
         user_email: str = None,
         user_public_name: str = None,
+        user_username: str = None,
         role: str = None,
     ) -> None:
         self.role = role
         self.user_email = user_email
         self.user_public_name = user_public_name
+        self.user_username = user_username
         self.user_id = user_id
 
 
@@ -575,6 +586,7 @@ class TypeUser(Enum):
     USER_ID = "found_id"
     EMAIL = "found_email"
     PUBLIC_NAME = "found_public_name"
+    USER_NAME = "found_username"
     TOKEN = "found_user_token"
 
 
@@ -619,6 +631,10 @@ class UserInContext(object):
     @property
     def public_name(self) -> str:
         return self.display_name
+
+    @property
+    def username(self) -> str:
+        return self.user.username
 
     @property
     def display_name(self) -> str:

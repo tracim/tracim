@@ -6,11 +6,13 @@ from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UsernameAlreadyExistInDb
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
@@ -32,11 +34,24 @@ class TestUserApiWithCustomDefaultProfileForUser(object):
         assert u.display_name == "bob"
         assert u.profile.slug == "trusted-users"
 
+    def test_unit__create_minimal_user__ok__with_username_and_email(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user("bob@bob", "boby")
+        assert u.email == "bob@bob"
+        assert u.username == "boby"
+
+    def test_unit__create_minimal_user__ok__with_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby")
+        assert u.email is None
+        assert u.username == "boby"
+
     @pytest.mark.internal_auth
     def test__unit__create__user__ok_nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_user(
             email="bob@bob",
+            username="boby",
             password="password",
             name="bob",
             timezone="+2",
@@ -46,6 +61,7 @@ class TestUserApiWithCustomDefaultProfileForUser(object):
         )
         assert u is not None
         assert u.email == "bob@bob"
+        assert u.username == "boby"
         assert u.validate_password("password")
         assert u.display_name == "bob"
         assert u.timezone == "+2"
@@ -139,6 +155,75 @@ class TestUserApi(object):
         email = "b{}b@bob".format(chars)
         u = api.update(user=u, email=email)
         assert u.email == email
+
+    # username
+    def test_unit__create_minimal_user__ok__with_username_and_email(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user("bob@bob", "boby")
+        assert u.email == "bob@bob"
+        assert u.username == "boby"
+
+    def test_unit__create_minimal_user__ok__with_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby")
+        assert u.email is None
+        assert u.username == "boby"
+
+    def test_unit__create_minimal_user__error__invalid_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        with pytest.raises(InvalidUsernameFormat):
+            api.create_minimal_user(username="@boby")
+
+    def test_unit__create_minimal_user__error__already_used_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        api.create_minimal_user(username="boby")
+        with pytest.raises(UsernameAlreadyExistInDb):
+            api.create_minimal_user(username="boby")
+
+    def test_unit__create_minimal_user__err__too_short_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        with pytest.raises(InvalidUsernameFormat):
+            api.create_minimal_user(username="a" * (User.MIN_USERNAME_LENGTH - 1))
+
+    def test_unit__create_minimal_user__err__too_long_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        with pytest.raises(InvalidUsernameFormat):
+            api.create_minimal_user(username="a" * (User.MAX_USERNAME_LENGTH + 1))
+
+    def test_unit__update_user_username__ok__nominal_case(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby")
+        assert u.username == "boby"
+        u = api.update(user=u, username="bibou")
+        assert u.username == "bibou"
+
+    def test_unit__update_user_username__error__wrong_format(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby")
+        assert u.username == "boby"
+        with pytest.raises(InvalidUsernameFormat):
+            api.update(user=u, username="@bibou")
+
+    def test_unit__update_user_username__error__too_short(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby")
+        assert u.username == "boby"
+        with pytest.raises(InvalidUsernameFormat):
+            api.update(user=u, username="b" * (User.MIN_USERNAME_LENGTH - 1))
+
+    def test_unit__update_user_username__error__too_long(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby")
+        assert u.username == "boby"
+        with pytest.raises(InvalidUsernameFormat):
+            api.update(user=u, username="b" * (User.MAX_USERNAME_LENGTH + 1))
+
+    def test_unit__update_user_username__error__already_used(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u1 = api.create_minimal_user(username="boby")
+        api.create_minimal_user(username="jean")
+        with pytest.raises(UsernameAlreadyExistInDb):
+            api.update(user=u1, username="jean")
 
     # password
     def test_unit__update_user_password__ok__nominal_case(self, session, app_config):

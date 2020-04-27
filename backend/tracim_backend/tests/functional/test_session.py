@@ -27,6 +27,7 @@ class TestLoginEndpoint(object):
         assert res.json_body["created"]
         datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
         assert res.json_body["public_name"] == "Global manager"
+        assert res.json_body["username"] == "TheAdmin"
         assert res.json_body["email"] == "admin@admin.admin"
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
@@ -268,6 +269,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
         assert res.json_body["created"]
         datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
         assert res.json_body["public_name"] == "Global manager"
+        assert res.json_body["username"] == "TheAdmin"
         assert res.json_body["email"] == "admin@admin.admin"
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
@@ -332,6 +334,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/v2/auth/whoami", status=200)
         assert res.json_body["public_name"] == "Global manager"
+        assert res.json_body["username"] == "TheAdmin"
         assert res.json_body["email"] == "admin@admin.admin"
         assert res.json_body["created"]
         assert res.json_body["is_active"]
@@ -358,6 +361,7 @@ class TestWhoamiEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/v2/auth/whoami", status=200)
         assert res.json_body["public_name"] == "Global manager"
+        assert res.json_body["username"] == "TheAdmin"
         assert res.json_body["email"] == "admin@admin.admin"
         assert res.json_body["created"]
         assert res.json_body["is_active"]
@@ -422,6 +426,7 @@ class TestWhoamiEndpointWithApiKey(object):
         headers_auth = {"Tracim-Api-Key": "mysuperapikey", "Tracim-Api-Login": "admin@admin.admin"}
         res = web_testapp.get("/api/v2/auth/whoami", status=200, headers=headers_auth)
         assert res.json_body["public_name"] == "Global manager"
+        assert res.json_body["username"] == "TheAdmin"
         assert res.json_body["email"] == "admin@admin.admin"
         assert res.json_body["created"]
         assert res.json_body["is_active"]
@@ -741,6 +746,7 @@ class TestWhoamiEndpointWithUserAuthToken(object):
         query_param = {"access_token": token}
         res = web_testapp.get("/api/v2/auth/whoami", status=200, params=query_param)
         assert res.json_body["public_name"] == "Global manager"
+        assert res.json_body["username"] == "TheAdmin"
         assert res.json_body["email"] == "admin@admin.admin"
         assert res.json_body["created"]
         assert res.json_body["is_active"]
