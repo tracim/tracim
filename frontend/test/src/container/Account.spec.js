@@ -11,7 +11,7 @@ import {
   UPDATE,
   USER_AGENDA_URL,
   USER_EMAIL,
-  USER_NAME,
+  USER_PUBLIC_NAME,
   USER_WORKSPACE_DO_NOTIFY,
   WORKSPACE_LIST_MEMBER,
   ADD,
@@ -34,7 +34,7 @@ import {
 
 describe('<Account />', () => {
   const setWorkspaceListMemberListCallBack = sinon.spy()
-  const updateUserNameCallBack = sinon.spy()
+  const updateUserPublicNameCallBack = sinon.spy()
   const newFlashMessageWarningCallBack = sinon.spy()
   const updateUserEmailCallBack = sinon.spy()
   const updateUserWorkspaceSubscriptionNotifCallBack = sinon.spy()
@@ -47,8 +47,8 @@ describe('<Account />', () => {
       return param(dispatchCallBack)
     }
     switch (param.type) {
-      case `${UPDATE}/${USER_NAME}`:
-        updateUserNameCallBack()
+      case `${UPDATE}/${USER_PUBLIC_NAME}`:
+        updateUserPublicNameCallBack()
         break
       case `${UPDATE}/${USER_EMAIL}`:
         updateUserEmailCallBack()
@@ -104,7 +104,7 @@ describe('<Account />', () => {
     beforeEach(() => {
       restoreHistoryCallBack([
         setWorkspaceListMemberListCallBack,
-        updateUserNameCallBack,
+        updateUserPublicNameCallBack,
         newFlashMessageWarningCallBack,
         updateUserEmailCallBack,
         updateUserWorkspaceSubscriptionNotifCallBack,
@@ -115,12 +115,12 @@ describe('<Account />', () => {
     })
 
     describe('handleSubmitNameOrEmail', () => {
-      it('updateUserNameCallBack should be called when the function handleSubmitNameOrEmail() is called with a new Name', (done) => {
+      it('updateUserPublicNameCallBack should be called when the function handleSubmitNameOrEmail() is called with a new Name', (done) => {
         const newName = 'randomNewName'
 
         mockPutMyselfName200(FETCH_CONFIG.apiUrl, newName, props.user.timezone, props.user.lang)
         wrapper.instance().handleSubmitNameOrEmail(newName, '', '').then(() => {
-          expect(updateUserNameCallBack.called).to.equal(true)
+          expect(updateUserPublicNameCallBack.called).to.equal(true)
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
       })
