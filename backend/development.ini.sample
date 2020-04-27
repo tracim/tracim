@@ -307,7 +307,7 @@ website.base_url = %(basic_setup.website_base_url)s
 # Leave as empty to let Tracim find automatically cache_token value.
 ; frontend.cache_token =
 # example:
-# frontend.cache_token =
+# frontend.cache_token = QmlnIHN1cmljYXRlIGlzIHdhdGNoaW5nIHlvdSAh
 
 ### Color ###
 # check for color.json file in Tracim, check by default in Tracim parent
@@ -499,15 +499,15 @@ website.base_url = %(basic_setup.website_base_url)s
 ### Main Webdav Config ###
 ## webdav server hostname listen
 webdav.listen = localhost:3030
-## default root of webdav service ( default : / )
+## default root of webdav service
 ## this params need to be modified in case of using webdav with proxy
 ## if you want for example that path /webdav give access to webdav
 ; webdav.root_path = /
 
 ### Technical Webdav configuration ###
-## wsgidav block size in bytes (default: 8192)
+## wsgidav block size in bytes
 ; webdav.block_size = 8192
-## wsgidav verbose level (default: 1)
+## wsgidav verbose level
 ## 0 - quiet
 ## 1 - no output (excepting application exceptions)
 ## 2 - warnings and errors only
@@ -585,7 +585,6 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 # template_name for all index created currently only {index_alias} and {date} variable are usable.
 # be carefull this template is use to find all index to delete with tracimcli search delete command
-# default value is "{index_alias}-{date}"
 ; search.elasticsearch.index_pattern_template = {index_alias}-{date}
 
 # if you use ingest mode in elasticsearch, you can activate file content ingest
