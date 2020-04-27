@@ -49,7 +49,7 @@ class WorkspaceAdvanced extends React.Component {
       displayFormNewMember: false,
       newMember: {
         id: '',
-        nameOrEmail: '',
+        userIdentifier: '',
         role: '',
         avatarUrl: '',
         isEmail: false
@@ -306,18 +306,18 @@ class WorkspaceAdvanced extends React.Component {
 
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
 
-  handleChangeNewMemberName = async newNameOrEmail => {
+  handleChangeNewMemberIdentifier = async newUserIdentifier => {
     this.setState(prev => ({
       newMember: {
         ...prev.newMember,
-        nameOrEmail: newNameOrEmail,
-        isEmail: this.isEmail(newNameOrEmail)
+        userIdentifier: newUserIdentifier,
+        isEmail: this.isEmail(newUserIdentifier)
       },
       autoCompleteClicked: false
     }))
 
-    if (newNameOrEmail.length >= 2) {
-      await this.handleSearchUser(newNameOrEmail)
+    if (newUserIdentifier.length >= 2) {
+      await this.handleSearchUser(newUserIdentifier)
       this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
@@ -327,7 +327,7 @@ class WorkspaceAdvanced extends React.Component {
       newMember: {
         ...prev.newMember,
         id: knownMember.user_id,
-        nameOrEmail: knownMember.public_name,
+        userIdentifier: knownMember.public_name,
         avatarUrl: knownMember.avatar_url,
         isEmail: false
       },
@@ -372,7 +372,7 @@ class WorkspaceAdvanced extends React.Component {
   handleClickValidateNewMember = async () => {
     const { props, state } = this
 
-    if (state.newMember.nameOrEmail === '') {
+    if (state.newMember.userIdentifier === '') {
       this.sendGlobalFlashMessage(props.t('Please set a name or email'), 'warning')
       return
     }
@@ -382,7 +382,7 @@ class WorkspaceAdvanced extends React.Component {
       return
     }
 
-    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.nameOrEmail)
+    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.userIdentifier)
 
     if (
       state.config.system && state.config.system.config &&
@@ -399,8 +399,8 @@ class WorkspaceAdvanced extends React.Component {
 
     const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      publicName: state.newMember.isEmail ? '' : state.newMember.nameOrEmail,
-      email: state.newMember.isEmail ? state.newMember.nameOrEmail : '',
+      publicName: state.newMember.isEmail ? '' : state.newMember.userIdentifier,
+      email: state.newMember.isEmail ? state.newMember.userIdentifier : '',
       role: state.newMember.role
     }))
 
@@ -410,7 +410,7 @@ class WorkspaceAdvanced extends React.Component {
         this.setState({
           newMember: {
             id: '',
-            nameOrEmail: '',
+            userIdentifier: '',
             role: '',
             avatarUrl: '',
             isEmail: false
@@ -521,9 +521,9 @@ class WorkspaceAdvanced extends React.Component {
                     loggedUser={state.loggedUser}
                     onClickDeleteMember={this.handleClickDeleteMember}
                     onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-                    newMemberName={state.newMember.nameOrEmail}
+                    newMemberIdentifier={state.newMember.userIdentifier}
                     isEmail={state.newMember.isEmail}
-                    onChangeNewMemberName={this.handleChangeNewMemberName}
+                    onChangeNewMemberIdentifier={this.handleChangeNewMemberIdentifier}
                     searchedKnownMemberList={state.searchedKnownMemberList}
                     onClickKnownMember={this.handleClickKnownMember}
                     newMemberRole={state.newMember.role}

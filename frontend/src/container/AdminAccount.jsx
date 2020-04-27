@@ -211,7 +211,7 @@ class Account extends React.Component {
     subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
   }))
 
-  handleSubmitNameOrEmail = async (newName, newEmail, checkPassword) => {
+  handleSubmitUserIdentifier = async (newName, newEmail, checkPassword) => {
     const { props, state } = this
 
     if (newName !== '') {
@@ -335,7 +335,7 @@ class Account extends React.Component {
                         return (
                           <PersonalData
                             userAuthType={state.userToEdit.auth_type}
-                            onClickSubmit={this.handleSubmitNameOrEmail}
+                            onClickSubmit={this.handleSubmitUserIdentifier}
                             displayAdminInfo
                           />
                         )

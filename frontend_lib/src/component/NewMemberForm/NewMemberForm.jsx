@@ -29,13 +29,13 @@ export const NewMemberForm = props => {
             id='addmember'
             placeholder={props.t('Search user...')}
             data-cy='addmember'
-            value={props.nameOrEmail}
-            onChange={e => props.onChangeNameOrEmail(e.target.value)}
+            value={props.userIdentifier}
+            onChange={e => props.onChangeUserSearch(e.target.value)}
             autoComplete='off'
             autoFocus
           />
 
-          {props.autoCompleteActive && props.nameOrEmail.length >= 2 && (
+          {props.autoCompleteActive && props.userIdentifier.length >= 2 && (
             // Côme - 2018/10/18 - see https://github.com/tracim/tracim/issues/1021 for details about theses tests
             <div className='autocomplete primaryColorBorder'>
               {props.searchedKnownMemberList.length > 0
@@ -80,7 +80,7 @@ export const NewMemberForm = props => {
 
                       <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
                         <div className='autocomplete__item__name__unknownuser'>
-                          {props.nameOrEmail}
+                          {props.userIdentifier}
                           <div className='autocomplete__item__name__unknownuser__msg'>
                             {props.t('I know this user exist')}
                           </div>
@@ -174,7 +174,7 @@ export default translate()(NewMemberForm)
 
 NewMemberForm.propTypes = {
   onClickCloseAddMemberBtn: PropTypes.func,
-  nameOrEmail: PropTypes.string,
+  userIdentifier: PropTypes.string,
   searchedKnownMemberList: PropTypes.arrayOf(PropTypes.object),
   isEmail: PropTypes.bool,
   onClickAutoComplete: PropTypes.func,
@@ -186,13 +186,13 @@ NewMemberForm.propTypes = {
   onClickBtnValidate: PropTypes.func,
   onChangeRole: PropTypes.func,
   onClickKnownMember: PropTypes.func,
-  onChangeNameOrEmail: PropTypes.func,
+  onChangeUserSearch: PropTypes.func,
   autoCompleteActive: PropTypes.bool,
   role: PropTypes.string
 }
 
 NewMemberForm.defaultProps = {
-  nameOrEmail: '',
+  userIdentifier: '',
   searchedKnownMemberList: [],
   isEmail: false,
   userRoleIdInWorkspace: 0,
@@ -205,7 +205,7 @@ NewMemberForm.defaultProps = {
   onClickBtnValidate: () => {},
   onChangeRole: () => {},
   onClickKnownMember: () => {},
-  onChangeNameOrEmail: () => {},
+  onChangeUserSearch: () => {},
   onClickAutoComplete: () => {},
   onClickCloseAddMemberBtn: () => {}
 }

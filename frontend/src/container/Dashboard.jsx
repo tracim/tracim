@@ -59,7 +59,7 @@ class Dashboard extends React.Component {
       newMember: {
         id: '',
         avatarUrl: '',
-        nameOrEmail: '',
+        userIdentifier: '',
         role: '',
         isEmail: false
       },
@@ -111,7 +111,7 @@ class Dashboard extends React.Component {
       newMember: {
         id: '',
         avatarUrl: '',
-        nameOrEmail: '',
+        userIdentifier: '',
         role: '',
         isEmail: false
       }
@@ -268,18 +268,18 @@ class Dashboard extends React.Component {
 
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
 
-  handleChangeNewMemberNameOrEmail = async newNameOrEmail => {
+  handleChangeUserSearch = async newUserSearched => {
     this.setState(prev => ({
       newMember: {
         ...prev.newMember,
-        nameOrEmail: newNameOrEmail,
-        isEmail: this.isEmail(newNameOrEmail)
+        userIdentifier: newUserSearched,
+        isEmail: this.isEmail(newUserSearched)
       },
       autoCompleteClicked: false
     }))
 
-    if (newNameOrEmail.length >= 2) {
-      await this.handleSearchUser(newNameOrEmail)
+    if (newUserSearched.length >= 2) {
+      await this.handleSearchUser(newUserSearched)
       this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
@@ -289,7 +289,7 @@ class Dashboard extends React.Component {
       newMember: {
         ...prev.newMember,
         id: knownMember.user_id,
-        nameOrEmail: knownMember.public_name,
+        userIdentifier: knownMember.public_name,
         avatarUrl: knownMember.avatar_url,
         isEmail: false
       },
@@ -308,7 +308,7 @@ class Dashboard extends React.Component {
   handleClickValidateNewMember = async () => {
     const { props, state } = this
 
-    if (state.newMember.nameOrEmail === '') {
+    if (state.newMember.userIdentifier === '') {
       props.dispatch(newFlashMessage(props.t('Please set a name or email'), 'warning'))
       return false
     }
@@ -318,7 +318,7 @@ class Dashboard extends React.Component {
       return false
     }
 
-    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.nameOrEmail)
+    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.userIdentifier)
 
     if (!props.system.config.email_notification_activated && !newMemberInKnownMemberList) {
       props.dispatch(newFlashMessage(props.t('Unknown user'), 'warning'))
@@ -331,8 +331,8 @@ class Dashboard extends React.Component {
 
     const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      publicName: state.newMember.isEmail ? '' : state.newMember.nameOrEmail,
-      email: state.newMember.isEmail ? state.newMember.nameOrEmail : '',
+      publicName: state.newMember.isEmail ? '' : state.newMember.userIdentifier,
+      email: state.newMember.isEmail ? state.newMember.userIdentifier : '',
       role: state.newMember.role
     }))
 
@@ -343,7 +343,7 @@ class Dashboard extends React.Component {
           newMember: {
             id: '',
             avatarUrl: '',
-            nameOrEmail: '',
+            userIdentifier: '',
             role: '',
             isEmail: false
           },
@@ -589,9 +589,9 @@ class Dashboard extends React.Component {
                   roleList={ROLE_LIST}
                   searchedKnownMemberList={state.searchedKnownMemberList}
                   autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                  nameOrEmail={state.newMember.nameOrEmail}
+                  userIdentifier={state.newMember.userIdentifier}
                   isEmail={state.newMember.isEmail}
-                  onChangeNameOrEmail={this.handleChangeNewMemberNameOrEmail}
+                  onChangeUserSearch={this.handleChangeUserSearch}
                   onClickKnownMember={this.handleClickKnownMember}
                   // createAccount={state.newMember.createAccount}
                   // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
