@@ -631,7 +631,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # collaborative_document_edition.collabora.base_url = http://localhost:9980
 
 # template dir for collaborative document edition:
-; collaborative document edition.file_template_dir = %(here)s/tracim_backend/templates/open_documents
+; collaborative_document_edition.file_template_dir = %(here)s/tracim_backend/templates/open_documents
 
 
 ## all next lines are not directly concerned by syntax explain in beggining of this file.
