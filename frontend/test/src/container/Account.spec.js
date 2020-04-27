@@ -32,7 +32,7 @@ import {
   mockPutMyselfPassword204, mockPutMyselfPassword403
 } from '../../apiMock'
 
-describe('<Account />', () => {
+describe('In <Account />', () => {
   const setWorkspaceListMemberListCallBack = sinon.spy()
   const updateUserPublicNameCallBack = sinon.spy()
   const newFlashMessageWarningCallBack = sinon.spy()
@@ -98,7 +98,7 @@ describe('<Account />', () => {
 
   const wrapper = shallow(<AccountWithoutHOC {...props} />)
 
-  describe('internal functions', () => {
+  describe('its internal function', () => {
     const invalidPassword = '0'
 
     beforeEach(() => {
@@ -115,7 +115,7 @@ describe('<Account />', () => {
     })
 
     describe('handleSubmitNameOrEmail', () => {
-      it('updateUserPublicNameCallBack should be called when the function handleSubmitNameOrEmail() is called with a new Name', (done) => {
+      it('should call updateUserPublicNameCallBack with a new Name', (done) => {
         const newName = 'randomNewName'
 
         mockPutMyselfName200(FETCH_CONFIG.apiUrl, newName, props.user.timezone, props.user.lang)
@@ -125,7 +125,7 @@ describe('<Account />', () => {
         }).then(done, done)
       })
 
-      it('updateUserEmailCallBack should be called when the function handleSubmitNameOrEmail() is called with a new Email', (done) => {
+      it('should call updateUserEmailCallBack with a new Email', (done) => {
         const newMail = 'randomNewEmail'
 
         mockPutMyselfEmail200(FETCH_CONFIG.apiUrl, newMail, password)
@@ -134,7 +134,7 @@ describe('<Account />', () => {
         }).then(done, done)
       })
 
-      it('newFlashMessageWarningCallBack should be called when the function handleSubmitNameOrEmail() is called with invalid new Name', (done) => {
+      it('should call newFlashMessageWarningCallBack with invalid new Name', (done) => {
         wrapper.instance().handleSubmitNameOrEmail('d', '', '').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
         }).then(done, done)
@@ -142,7 +142,7 @@ describe('<Account />', () => {
     })
 
     describe('handleChangeSubscriptionNotif', () => {
-      it('updateUserWorkspaceSubscriptionNotifCallBack should be called when the function handleChangeSubscriptionNotif() is called', (done) => {
+      it('should call updateUserWorkspaceSubscriptionNotifCallBack', (done) => {
         mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
         wrapper.instance().handleChangeSubscriptionNotif(1, 'activate').then(() => {
           expect(updateUserWorkspaceSubscriptionNotifCallBack.called).to.equal(true)
@@ -150,7 +150,7 @@ describe('<Account />', () => {
         }).then(done, done)
       })
 
-      it('newFlashMessageWarningCallBack should be called when the function handleChangeSubscriptionNotif() is called with invalid workspaceId', (done) => {
+      it('should call newFlashMessageWarningCallBack with invalid workspaceId', (done) => {
         mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
 
         wrapper.instance().handleChangeSubscriptionNotif(0, 'activate').then(() => {
@@ -161,14 +161,14 @@ describe('<Account />', () => {
     })
 
     describe('handleSubmitPassword', () => {
-      it('newFlashMessageInfoCallBack should be called when handleSubmitPassword() is called with valid password', (done) => {
+      it('should call newFlashMessageInfoCallBack with valid password', (done) => {
         mockPutMyselfPassword204(FETCH_CONFIG.apiUrl, 'randomOldPassword')
         wrapper.instance().handleSubmitPassword('randomOldPassword', 'randomPassWord', 'randomPassWord').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
       })
 
-      it('newFlashMessageWarningCallBack should be called when handleSubmitPassword() is called with invalid oldPassword', (done) => {
+      it('should call newFlashMessageWarningCallBack with invalid oldPassword', (done) => {
         mockPutMyselfPassword403(FETCH_CONFIG.apiUrl, invalidPassword)
         wrapper.instance().handleSubmitPassword(invalidPassword, 'randomPassWord', 'randomPassWord').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
@@ -178,7 +178,7 @@ describe('<Account />', () => {
     })
 
     describe('loadAgendaUrl', () => {
-      it('updateUserAgendaUrlCallBack should be called when loadAgendaUrl() is called', (done) => {
+      it('should call updateUserAgendaUrlCallBack', (done) => {
         mockGetLoggedUserCalendar200(FETCH_CONFIG.apiUrl)
         wrapper.instance().loadAgendaUrl().then(() => {
           expect(updateUserAgendaUrlCallBack.called).to.equal(true)
@@ -187,7 +187,7 @@ describe('<Account />', () => {
     })
 
     describe('loadWorkspaceListMemberList', () => {
-      it('setWorkspaceListMemberListCallBack should be called when loadWorkspaceListMemberList() is called', (done) => {
+      it('should call setWorkspaceListMemberListCallBack', (done) => {
         wrapper.instance().loadWorkspaceListMemberList().then(() => {
           expect(setWorkspaceListMemberListCallBack.called).to.equal(true)
         }).then(done, done)
@@ -195,7 +195,7 @@ describe('<Account />', () => {
     })
 
     describe('buildBreadcrumbs', () => {
-      it('setBreadcrumbsCallBack should be called when buildBreadcrumbs is called', () => {
+      it('should call setBreadcrumbsCallBack', () => {
         wrapper.instance().buildBreadcrumbs()
         expect(setBreadcrumbsCallBack.called).to.equal(true)
       })
