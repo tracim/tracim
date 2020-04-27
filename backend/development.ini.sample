@@ -539,7 +539,7 @@ webdav.listen = localhost:3030
 # This feature require application "agenda" in "app.enabled"
 
 ### Radicale Proxy config ##
-## path to Tracim radicale server, usually at localhost:por
+## path to Tracim radicale server, usually at localhost:port
 ; caldav.radicale_proxy.base_url = http://localhost:5232
 
 ### Radicale config ###
