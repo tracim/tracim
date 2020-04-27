@@ -16,6 +16,7 @@ previews
 
 #ignore yarn
 .yarn
+.yarnrc
 .yarnrc.yml
 node_modules
 
