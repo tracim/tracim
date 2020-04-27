@@ -463,6 +463,12 @@ website.base_url = %(basic_setup.website_base_url)s
 ; email.reply.imap.port =
 ; email.reply.imap.user =
 ; email.reply.imap.password =
+# imap folder where email are retrieved for email fetcher,
+# valid name for inbox is INBOX. you need to set an existing directory.
+# you can use "INBOX/tracim_reply" for tracim_reply subdir, or directly "tracim_reply" if you don't use subdir.
+# to use this properly with a different value than INBOX,
+# you probably need to add rules to automatically move the new mail
+# to the correct dir.
 ; email.reply.imap.folder = INBOX
 ; email.reply.imap.use_ssl = True
 
