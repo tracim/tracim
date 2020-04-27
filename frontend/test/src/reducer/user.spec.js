@@ -5,10 +5,11 @@ import {
   USER_USERNAME,
   USER_PUBLIC_NAME
 } from '../../../src/action-creator.sync'
-import { getBrowserLang } from '../../../src/helper.js'
 import { PROFILE } from 'tracim_frontend_lib'
+import { globalManager } from '../../fixture/user/globalManager.js'
 
-const defaultUser = {
+
+const defaultStateUser = {
   user_id: -1,
   logged: null,
   auth_type: '',
@@ -19,36 +20,36 @@ const defaultUser = {
   avatar_url: null,
   created: '',
   public_name: '',
-  lang: getBrowserLang(),
+  lang: 'en',
   agendaUrl: '',
   username: ''
 }
 
 describe('user reducer', () => {
   it('should return the default state', () => {
-    expect(userReducer(undefined, {})).to.deep.equal(defaultUser)
+    expect(userReducer(undefined, {})).to.deep.equal(defaultStateUser)
   })
 
   it(`should handle ${UPDATE}/${USER_PUBLIC_NAME}`, () => {
     expect(
-      userReducer(undefined, {
+      userReducer(globalManager, {
         type: `${UPDATE}/${USER_PUBLIC_NAME}`,
         newName: 'new_public_name'
       })
     ).to.deep.equal({
-      ...defaultUser,
+      ...globalManager,
       public_name: 'new_public_name'
     })
   })
 
   it(`should handle ${UPDATE}/${USER_USERNAME}`, () => {
     expect(
-      userReducer(undefined, {
+      userReducer(globalManager, {
         type: `${UPDATE}/${USER_USERNAME}`,
         newUsername: 'new_username'
       })
     ).to.deep.equal({
-      ...defaultUser,
+      ...globalManager,
       username: 'new_username'
     })
   })
