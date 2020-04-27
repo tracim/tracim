@@ -33,7 +33,7 @@ basic_setup.depot_storage_dir = %(here)s/depot
 basic_setup.caldav_storage_dir = %(here)s/radicale_storage
 basic_setup.preview_cache_dir = %(here)s/previews
 basic_setup.sessions_data_root_dir = %(here)s
-basic_setup.file_template_dir = %(here)s/tracim_backend/templates/open_documents
+
 ## secret
 # This is needed for some feature like reply by email
 basic_setup.api_key =
@@ -169,24 +169,19 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ; preview.jpg.allowed_dims = 256x256
 # examples with multiples values:
 # preview.jpg.allowed_dims = 256x256,512x512,1024x1024
-## Preview dimensions can be set as restricted. If set as restricted, access
+## Preview dimensions can be set as restricted. If set as True, access
 ## endpoint to get any other preview dimensions than allowed_dims will
 ## return error
 ; preview.jpg.restricted_dims = False
-# preview.jpg.restricted_dims = True
 
 ### Session ###
-# shortcut for pyramid_beaker specific config
-# see tracim_web app section to see where those shortcut are used
-advanced_setup.session_data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
-advanced_setup.session_lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 
 ### pyramid_beaker parameters ###
 session.type = file
-session.data_dir = %(advanced_setup.session_data_dir)s
 ; session.data_dir = %(here)s/sessions_data
-session.lock_dir = %(advanced_setup.session_lock_dir)s
+session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
 ; session.lock_dir = %(here)s/sessions_data
+session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 session.key = session_key
 session.secret = %(basic_setup.session_secret)s
 session.save_accessed_time = True
@@ -208,9 +203,10 @@ session.cookie_on_exception = True
 
 ## Api key auth is disabled by default,
 ## you should set a not-null value to api.key to active it:
+; api.key =
 api.key = %(basic_setup.api_key)s
 ## base url of the backend API, default to same as website.base_url
-; api.base_url = http://localhost:6543
+; api.base_url =
 
 ### Remote User Auth ###
 # remote user auth give authorized access to user using a simple header with
@@ -261,13 +257,12 @@ api.key = %(basic_setup.api_key)s
 ; user.auth_token.validity = 604800
 ## user reset_password token lifetime (default to 900s -> 15 minutes)
 ; user.reset_password.token_lifetime = 900
-## Default profile of created user, valid values are users, trusted-users, administrators
+## Default profile of created user, valid values are: users, trusted-users, administrators
 ; user.default_profile = users
 
-## active or disable filter on known user, if activate user cannot see at all informations about
-## member with no common workspace. if false, it can access to these informations.
+## enable or disable filter on known user, if True, user cannot see at all informations about
+## member with no common workspace. if False, it can access to these informations.
 ## This is used by search mechanism for invitation of user in workspace.
-## default value to true.
 ; known_members.filter = True
 ####
 # IHM
@@ -275,9 +270,11 @@ api.key = %(basic_setup.api_key)s
 
 ### Website config ###
 ## title of website, used in email
+; website.title = Tracim
 website.title = %(basic_setup.website_title)s
 # The following base_url is used for links and icons
 # integrated in the email notifcations, it's the frontend config.
+; website.base_url = http://localhost:6543
 website.base_url = %(basic_setup.website_base_url)s
 
 
@@ -288,7 +285,9 @@ website.base_url = %(basic_setup.website_base_url)s
 # You can set dist folder of Tracim frontend. by default, system
 # will try to get it automatically according to Tracim repository
 # organisation.
-; frontend.dist_folder_path = /home/user/tracim/frontend/dist
+; frontend.dist_folder_path =
+# example:
+# frontend.dist_folder_path = /home/user/tracim/frontend/dist
 
 # if you need to add custom javascript code into Tracim, you can use custom toolbox
 # feature. you add your javascript in this folder, all content
@@ -307,11 +306,12 @@ website.base_url = %(basic_setup.website_base_url)s
 # You can override predefined cache_token here.
 # Leave as empty to let Tracim find automatically cache_token value.
 ; frontend.cache_token =
-
+# example:
+# frontend.cache_token =
 
 ### Color ###
 # check for color.json file in Tracim, check by default in Tracim parent
-# dir of backend.
+# directory of backend.
 ## you can set a specific file path here
 ; color.config_file_path =
 # example:
@@ -346,7 +346,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ## available choice: True or False
 ; email.notification.activated = False
 ## you can enable or disable if invited user to shared space will be notified
-## on this shared space by default (default: True).
+## on this shared space by default.
 ## NB: new users will not being notified until they login to Tracim a first time
 ; email.notification.enabled_on_invitation = True
 # You can activate notification specific log using 'tracim_email_notification' logger.
@@ -373,7 +373,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ### Headers ###
 ; email.notification.from.default_label = Tracim Notifications
 
-# Note: items between { and } are variable names. Do not remove / rename them
+# Note: items between {} are variable names. Do not remove / rename them
 # email notifications can be sent with the user_id added as an identifier
 # this way email clients like Thunderbird will be able to distinguish
 # notifications generated by a user or another one. 'content_id' for example is
@@ -388,14 +388,11 @@ website.base_url = %(basic_setup.website_base_url)s
 
 ## valid variable is 'user_id' for 'from' header:
 ; email.notification.from.email =
-## valid variable is 'content_id' for 'reply_to' header:
-; email.notification.reply_to.email =
-## valid variable is 'content_id' for 'references' header:
-; email.notification.references.email =
-
 # example of recommanded pattern (for 'from' header):
 # email.notification.from.email = noreply+{user_id}@domainname.tld
 
+## valid variable is 'content_id' for 'reply_to' header:
+; email.notification.reply_to.email =
 # tagging reply_to header of email with content_id is needed for working
 # email_reply feature
 # example of recommanded pattern (for 'reply_to' header):
@@ -403,6 +400,8 @@ website.base_url = %(basic_setup.website_base_url)s
 # email.notification.reply_to.email = {content_id}@reply.domainname.tld
 # email.notification.reply_to.email = reply+cid{content_id}@domainname.tld
 
+## valid variable is 'content_id' for 'references' header:
+; email.notification.references.email =
 # tagging reference header of email with content_id is nice to have
 # all modification to a same content in a same email client thread
 # Note: reference doesn't need to be an existing email account but should
@@ -473,6 +472,7 @@ website.base_url = %(basic_setup.website_base_url)s
 # email.reply.imap.user = your_imap_user
 # email.reply.imap.password = your_imap_password
 
+
 # IMAP IDLE feature is for real-time notifications (its not necessary to use function send & receive)
 # if this option is available in your imap server, change this parameter to True
 ; email.reply.imap.use_idle = False
@@ -518,11 +518,12 @@ webdav.listen = localhost:3030
 ; webdav.verbose.level = 1
 
 ### Webdav HTML dir browser ###
-## Render HTML listing for GET requests on collections (default: True)
+## Render HTML listing for GET requests on collections
 ; webdav.dir_browser.enabled = True
-## Raw HTML code, appended as footer, if not set, let Tracim created his own
-## footer.
+## Raw HTML code, appended as footer,
+## if not set, let Tracim created his own footer.
 ; webav.dir_browser.footer =
+# example:
 # webdav.dir_browser.footer = Just another footer
 
 ####
@@ -532,17 +533,22 @@ webdav.listen = localhost:3030
 # This feature require application "agenda" in "app.enabled"
 
 ### Radicale Proxy config ##
-## path to Tracim radicale server, usually at localhost:port
-caldav.radicale_proxy.base_url = http://localhost:5232
+## path to Tracim radicale server, usually at localhost:por
+; caldav.radicale_proxy.base_url = http://localhost:5232
 
 ### Radicale config ###
-# those params are same as in config file of radicale but syntax
-# is different.
-# use syntax:
-; caldav.radicale.section.param_name = value
-# instead of radicale.ini syntax:
-; [section]
-; param_name = value
+## those params are same as in config file of radicale but syntax
+## is different.
+## use syntax:
+## ```
+##     caldav.radicale.section.param_name = value
+## ```
+## instead of radicale.ini syntax:
+## ```
+##     [section]
+##     param_name = value
+## ```
+
 caldav.radicale.server.host = localhost:5232
 ## To make Tracim work, we need to disable auth and rights.
 caldav.radicale.auth.type = None
@@ -551,6 +557,7 @@ caldav.radicale.rights.type = None
 caldav.radicale.web.type = None
 ## for Tracim we do use file storage.
 caldav.radicale.storage.type = multifilesystem
+; caldav.radicale.storage.filesystem_folder = %(here)s/radicale_storage
 caldav.radicale.storage.filesystem_folder = %(basic_setup.caldav_storage_dir)s
 # CORS config for radicale
 caldav.radicale.headers.Access-Control-Allow-Origin = *
@@ -582,7 +589,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ; search.elasticsearch.index_pattern_template = {index_alias}-{date}
 
 # if you use ingest mode in elasticsearch, you can activate file content ingest
-# for search (default as false)
+# for search
 ; search.elasticsearch.use_ingest = False
 
 # define mimetypes to be plain-text indexed. List of mimetypes, separated by a coma ",".
@@ -610,10 +617,10 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 # This feature require application "collaborative_document_edition" in "app.enabled"
 
-# software used for collaborative document_edition. "collabora" software value give support for
-# both CollaboraOnline and LibreofficeOnline.
+# software used for collaborative document_edition
 ; collaborative_document_edition.software =
-# example with collabora:
+# "collabora" software value give support for
+# both CollaboraOnline and LibreofficeOnline, example:
 # collaborative_document_edition.software = collabora
 
 # base url where collabora server exist
@@ -623,9 +630,6 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 # template dir for collaborative document edition:
 ; collaborative document edition.file_template_dir = %(here)s/tracim_backend/templates/open_documents
-# example using basic_setup.file_template_dir shortcut configured at the beginning of file:
-# collaborative_document_edition.file_template_dir = %(basic_setup.file_template_dir)s
-
 
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
@@ -648,9 +652,13 @@ pyramid.default_locale_name = en
 ## https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/i18n.html#localization-deployment-settings
 
 ### pyramid optionals plugins ###
-# required plugin are imported directly in Tracim source code:
-# pyramid.includes =
-#    pyramid_debugtoolbar
+# required plugin are imported directly in Tracim source code,
+# for example:
+# ```
+#   pyramid.includes =
+#       pyramid_debugtoolbar
+# ```
+
 
 [pipeline:webdav]
 pipeline = tracim_webdav
