@@ -287,6 +287,11 @@ class AdminWorkspaceUser extends React.Component {
       return
     }
 
+    if (username.length < 3) {
+      this.sendGlobalFlashMsg(props.t('Username must be at least 3 characters'), 'warning')
+      return
+    }
+
     if (!state.config.system.config.email_notification_activated) {
       if (password === '') {
         this.sendGlobalFlashMsg(props.t('Please set a password'), 'warning')
