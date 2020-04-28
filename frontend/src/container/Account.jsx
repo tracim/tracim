@@ -155,7 +155,7 @@ export class Account extends React.Component {
     subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
   }))
 
-  handleSubmitUserIdentifier = async (newName, newEmail, checkPassword) => {
+  handleSubmitPersonalData = async (newName, newEmail, checkPassword) => {
     const { props } = this
 
     if (newName !== '') {
@@ -259,7 +259,7 @@ export class Account extends React.Component {
                         return (
                           <PersonalData
                             userAuthType={props.user.auth_type}
-                            onClickSubmit={this.handleSubmitUserIdentifier}
+                            onClickSubmit={this.handleSubmitPersonalData}
                           />
                         )
 

@@ -27,9 +27,9 @@ export class MemberList extends React.Component {
             ? (
               <NewMemberForm
                 onClickCloseAddMemberBtn={props.onClickCloseAddMemberBtn}
-                userIdentifier={props.userIdentifier}
+                personalData={props.personalData}
                 isEmail={props.isEmail}
-                onChangeUserSearch={props.onChangeUserSearch}
+                onChangePersonalData={props.onChangePersonalData}
                 searchedKnownMemberList={props.searchedKnownMemberList}
                 autoCompleteActive={props.autoCompleteFormNewMemberActive}
                 onClickKnownMember={props.onClickKnownMember}

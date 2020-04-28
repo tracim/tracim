@@ -10,9 +10,9 @@ ReactDOM.render(
   <div style={{ width: '1200px' }}>
     <NewMemberForm
       onClickCloseAddMemberBtn={() => {}}
-      userIdentifier={'text'}
+      personalData={'text'}
       isEmail={false}
-      onChangeUserSearch={() => {}}
+      onChangePersonalData={() => {}}
       searchedKnownMemberList={[]}
       autoCompleteActive={false}
       onClickKnownMember={() => {}}

@@ -108,9 +108,9 @@ export const WorkspaceMembersList = props => {
       {props.displayFormNewMember === true && (
         <NewMemberForm
           onClickCloseAddMemberBtn={props.onClickToggleFormNewMember}
-          userIdentifier={props.newMemberIdentifier}
+          personalData={props.newMemberName}
           isEmail={props.isEmail}
-          onChangeUserSearch={props.onChangeNewMemberIdentifier}
+          onChangePersonalData={props.onChangeNewMemberName}
           searchedKnownMemberList={props.searchedKnownMemberList}
           onClickKnownMember={props.onClickKnownMember}
           roleList={props.roleList}

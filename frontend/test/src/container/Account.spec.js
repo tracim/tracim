@@ -114,28 +114,28 @@ describe('<Account />', () => {
       ])
     })
 
-    describe('handleSubmitUserIdentifier', () => {
-      it('updateUserNameCallBack should be called when the function handleSubmitUserIdentifier() is called with a new Name', (done) => {
+    describe('handleSubmitPersonalData', () => {
+      it('updateUserNameCallBack should be called when the function handleSubmitPersonalData() is called with a new Name', (done) => {
         const newName = 'randomNewName'
 
         mockPutMyselfName200(FETCH_CONFIG.apiUrl, newName, props.user.timezone, props.user.lang)
-        wrapper.instance().handleSubmitUserIdentifier(newName, '', '').then(() => {
+        wrapper.instance().handleSubmitPersonalData(newName, '', '').then(() => {
           expect(updateUserNameCallBack.called).to.equal(true)
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
       })
 
-      it('updateUserEmailCallBack should be called when the function handleSubmitUserIdentifier() is called with a new Email', (done) => {
+      it('updateUserEmailCallBack should be called when the function handleSubmitPersonalData() is called with a new Email', (done) => {
         const newMail = 'randomNewEmail'
 
         mockPutMyselfEmail200(FETCH_CONFIG.apiUrl, newMail, password)
-        wrapper.instance().handleSubmitUserIdentifier('', newMail, password).then(() => {
+        wrapper.instance().handleSubmitPersonalData('', newMail, password).then(() => {
           expect(updateUserEmailCallBack.called).to.equal(true)
         }).then(done, done)
       })
 
-      it('newFlashMessageWarningCallBack should be called when the function handleSubmitUserIdentifier() is called with invalid new Name', (done) => {
-        wrapper.instance().handleSubmitUserIdentifier('d', '', '').then(() => {
+      it('newFlashMessageWarningCallBack should be called when the function handleSubmitPersonalData() is called with invalid new Name', (done) => {
+        wrapper.instance().handleSubmitPersonalData('d', '', '').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
         }).then(done, done)
       })

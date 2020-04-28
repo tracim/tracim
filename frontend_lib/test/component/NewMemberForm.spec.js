@@ -12,11 +12,11 @@ describe('<NewMemberForm />', () => {
   const onClickBtnValidateCallBack = sinon.spy()
   const onChangeRoleCallBack = sinon.spy()
   const onClickKnownMemberCallBack = sinon.spy()
-  const onChangeUserSearchCallBack = sinon.spy()
+  const onChangePersonalDataCallBack = sinon.spy()
 
   const props = {
     onClickCloseAddMemberBtn: onClickCloseAddMemberBtnCallBack,
-    userIdentifier: 'randomUserIdentifier',
+    personalData: 'randomPersonalData',
     searchedKnownMemberList: [
       { public_name: 'random', user_id: 1 },
       { public_name: 'Searched', user_id: 2 },
@@ -35,7 +35,7 @@ describe('<NewMemberForm />', () => {
     onClickBtnValidate: onClickBtnValidateCallBack,
     onChangeRole: onChangeRoleCallBack,
     onClickKnownMember: onClickKnownMemberCallBack,
-    onChangeUserSearch: onChangeUserSearchCallBack,
+    onChangePersonalData: onChangePersonalDataCallBack,
     autoCompleteActive: true,
     role: 'randomRole'
   }
@@ -47,8 +47,8 @@ describe('<NewMemberForm />', () => {
   )
 
   describe('Static design', () => {
-    it(`text input should have the value: ${props.userIdentifier}`, () => {
-      expect(wrapper.find('#addmember').prop('value')).to.equal(props.userIdentifier)
+    it(`text input should have the value: ${props.personalData}`, () => {
+      expect(wrapper.find('#addmember').prop('value')).to.equal(props.personalData)
     })
 
     it(`should display ${props.roleList.length} roles`, () => {
@@ -105,9 +105,9 @@ describe('<NewMemberForm />', () => {
       expect(onChangeRoleCallBack.called).to.equal(true)
     })
 
-    it('should call props.onChangeUserSearch when handler onChangeUserSearch is called', () => {
+    it('should call props.onChangePersonalData when handler onChangePersonalData is called', () => {
       wrapper.find('input.name__input').simulate('change', { target: { value: 'randomValue' } })
-      expect(onChangeUserSearchCallBack.called).to.equal(true)
+      expect(onChangePersonalDataCallBack.called).to.equal(true)
     })
   })
 })
