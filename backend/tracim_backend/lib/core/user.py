@@ -50,7 +50,6 @@ from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.application import ApplicationApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import AuthType
@@ -192,7 +191,7 @@ class UserApi(object):
             exclude_user_ids.extend(user_ids_in_workspaces)
         query = self._base_query().order_by(User.display_name)
         query = query.filter(
-            or_(User.display_name.ilike("%{}%".format(acp)), User.email.ilike("%{}%".format(acp)))
+            or_(User.display_name.ilike("%{}%".format(acp)), User.email.ilike("%{}%".format(acp)),)
         )
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
         # should show only user in same workspace as user
@@ -216,7 +215,7 @@ class UserApi(object):
         return query.all()
 
     def find(
-        self, user_id: int = None, email: str = None, public_name: str = None, token: str = None
+        self, user_id: int = None, email: str = None, public_name: str = None, token: str = None,
     ) -> typing.Tuple[TypeUser, User]:
         """
         Find existing user from all theses params.
@@ -262,7 +261,7 @@ class UserApi(object):
             return False
 
     def _ldap_authenticate(
-        self, user: typing.Optional[User], email: str, password: str, ldap_connector: "Connector"
+        self, user: typing.Optional[User], email: str, password: str, ldap_connector: "Connector",
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
@@ -701,7 +700,10 @@ class UserApi(object):
         return user
 
     def _check_password_modification_allowed(self, user: User) -> bool:
-        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
+        if user.auth_type and user.auth_type not in [
+            AuthType.INTERNAL,
+            AuthType.UNKNOWN,
+        ]:
             raise ExternalAuthUserPasswordModificationDisallowed(
                 "user {} is link to external auth {},"
                 "password modification disallowed".format(user.email, user.auth_type)
@@ -709,7 +711,10 @@ class UserApi(object):
         return True
 
     def _check_email_modification_allowed(self, user: User) -> bool:
-        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
+        if user.auth_type and user.auth_type not in [
+            AuthType.INTERNAL,
+            AuthType.UNKNOWN,
+        ]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 "user {} is link to external auth {},"
                 "email modification disallowed".format(user.email, user.auth_type)
@@ -828,7 +833,7 @@ class UserApi(object):
         self._check_user_auth_validity(user)
         self._check_password_modification_allowed(user)
         return user.validate_reset_password_token(
-            token=token, validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME
+            token=token, validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME,
         )
 
     def enable(self, user: User, do_save=False):
@@ -964,16 +969,3 @@ class UserApi(object):
             return False
 
         return True
-
-    def allowed_to_create_new_workspaces(self, user: User) -> bool:
-        # INFO - G.M - 2019-08-21 - 0 mean no limit here
-        if self._config.LIMITATION__SHAREDSPACE_PER_USER == 0:
-            return True
-
-        workspace_api = WorkspaceApi(
-            session=self._session, current_user=self._user, config=self._config
-        )
-        owned_workspace = workspace_api.get_all_for_user(
-            user=user, include_owned=True, include_with_role=False
-        )
-        return not (len(owned_workspace) >= self._config.LIMITATION__SHAREDSPACE_PER_USER)
