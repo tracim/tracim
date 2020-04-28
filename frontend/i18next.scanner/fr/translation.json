@@ -112,7 +112,6 @@
   "Please select a shared space in the left sidebar by clicking on it": "Veuillez sélectionner un espace partagé présent dans la barre latérale en cliquant dessus",
   "Forgot password": "Mot de passe oublié",
   "Did you forget your password?": "Vous avez oublié votre mot de passe ?",
-  "Email": "Email",
   "Reset password": "Réinitialisez votre mot de passe",
   "Confirm password": "Confirmez le mot de passe",
   "We are going to send you an email containing a link to reset your password": "Nous allons vous envoyer un email contenant un lien pour réinitialiser votre mot de passe",
@@ -126,7 +125,6 @@
   "This account is deactivated": "Ce compte est désactivé",
   "Error while adding the member to the shared space": "Erreur lors de l'ajout du membre à l'espace partagé",
   "Unexpected error, please inform an administrator": "Erreur inattendue, veuillez contacter un administrateur",
-  "Unknown email": "Email inconnu",
   "Cannot reset password while email are disabled, please contact an administrator": "Impossible de réinitialiser votre mot de passe si les emails sont désactivés, veuillez contacter un administrateur",
   "Not a valid email": "Email invalide",
   "An error has happened": "Une erreur est survenue",
@@ -237,5 +235,8 @@
   "User administration": "Administration d'utilisateur",
   "Forgotten password": "Mot de passe perdu",
   "Public upload": "Téléversement publique",
-  "Password reset": "Réinitialisation mot de passe"
+  "Password reset": "Réinitialisation mot de passe",
+  "Unknown email or username": "Adresse email ou identifiant inconnu",
+  "Email address or username": "Adresse email ou identifiant",
+  "This username is not linked to any email": "Ce identifiant n'est lié à aucun e-mail"
 }

@@ -20,7 +20,7 @@ export class ForgotPassword extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      backupEmail: {
+      backupLogin: {
         value: '',
         isInvalid: false
       }
@@ -75,22 +75,23 @@ export class ForgotPassword extends React.Component {
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
 
-  handleChangeBackupEmail = e => this.setState({ backupEmail: { value: e.target.value, isInvalid: false } })
+  handleChangeBackupLogin = e => this.setState({ backupLogin: { value: e.target.value, isInvalid: false } })
 
   handleClickCancel = () => this.props.history.push(PAGE.LOGIN)
 
   handleClickSubmit = async () => {
     const { props, state } = this
 
-    const fetchPostResetPassword = await props.dispatch(postForgotPassword(state.backupEmail.value))
+    const fetchPostResetPassword = await props.dispatch(postForgotPassword(state.backupLogin.value))
     switch (fetchPostResetPassword.status) {
       case 204: props.dispatch(newFlashMessage(props.t("Email sent, don't forget to check your spam"), 'info')); break
       case 400:
         switch (fetchPostResetPassword.json.code) {
-          case 1001: props.dispatch(newFlashMessage(props.t('Unknown email'), 'warning')); break
+          case 1001: props.dispatch(newFlashMessage(props.t('Unknown email or username'), 'warning')); break
           case 2001: props.dispatch(newFlashMessage(props.t('Not a valid email'), 'warning')); break
           case 2046: props.dispatch(newFlashMessage(props.t('Cannot reset password while email are disabled, please contact an administrator'), 'warning')); break
           case 2049: props.dispatch(newFlashMessage(props.t("Your account's password cannot be changed, please contact an administrator"), 'warning')); break
+          case 2061: props.dispatch(newFlashMessage(props.t('This username is not linked to any email'))); break // TODO use the correct code which will be given by the backend
           default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again'), 'warning')); break
         }
         break
@@ -115,13 +116,13 @@ export class ForgotPassword extends React.Component {
               </div>
 
               <InputGroupText
-                parentClassName='forgotpassword__card__body__groupemail'
+                parentClassName='forgotpassword__card__body__grouplogin'
                 customClass=''
-                icon='fa-envelope-open-o'
-                type='email'
-                placeHolder={props.t('Email')}
-                value={state.backupEmail.value}
-                onChange={this.handleChangeBackupEmail}
+                icon='fa-at'
+                type='text'
+                placeHolder={props.t('Email address or username')}
+                value={state.backupLogin.value}
+                onChange={this.handleChangeBackupLogin}
                 onKeyDown={this.handleInputKeyDown}
                 maxLength={512}
               />
