@@ -10,6 +10,11 @@ describe('Login page', function () {
   beforeEach(function () {
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
   })
+
+  afterEach(function () {
+    cy.cancelXHR()
+  })
+
   it('should renders every components', function () {
     cy.url().should('include', '/login')
 

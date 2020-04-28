@@ -7,6 +7,10 @@ describe('Login page', function () {
     cy.setupBaseDB()
   })
 
+  afterEach(function () {
+    cy.cancelXHR()
+  })
+
   it('should allow login and logout', function () {
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
 
@@ -34,8 +38,7 @@ describe('Login page', function () {
       .find('.loginpage__card__form__btnsubmit')
       .click()
 
-    cy.getTag({ selectorName: s.HEADER })
-      .find('.menuprofil__dropdown__name.btn')
+    cy.get('.menuprofil__dropdown__name.btn')
       .click()
 
     cy.getTag({ selectorName: s.HEADER })
