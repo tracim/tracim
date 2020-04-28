@@ -11,6 +11,7 @@ export class AddUserForm extends React.Component {
 
     this.state = {
       newUserName: '',
+      newUserUsername: '',
       newUserEmail: '',
       newUserPassword: '',
       newUserProfile: ''
@@ -18,6 +19,8 @@ export class AddUserForm extends React.Component {
   }
 
   handleChangeNewUserName = e => this.setState({ newUserName: e.target.value })
+
+  handleChangeNewUserUsername = e => this.setState({ newUserUsername: e.target.value })
 
   handleChangeNewUserEmail = e => this.setState({ newUserEmail: e.target.value })
 
@@ -28,11 +31,11 @@ export class AddUserForm extends React.Component {
   handleClickAddUser = () => {
     const { props, state } = this
 
-    if (state.newUserName === '' || state.newUserEmail === '' || state.newUserProfile === '') {
+    if (state.newUserName === '' || (state.newUserUsername === '' && state.newUserEmail === '') || state.newUserProfile === '') {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
-          msg: props.t('Please type a name, an email, a password and select a profile'),
+          msg: props.t('Please enter a name, a password, select a profile, and at least one between username or email'),
           type: 'warning',
           delay: undefined
         }
@@ -40,14 +43,14 @@ export class AddUserForm extends React.Component {
       return
     }
 
-    props.onClickAddUser(state.newUserName, state.newUserEmail, state.newUserProfile, state.newUserPassword)
+    props.onClickAddUser(state.newUserName, state.newUserUsername, state.newUserEmail, state.newUserProfile, state.newUserPassword)
   }
 
   isValidateButtonDisabled = () => {
     const { props, state } = this
     return props.emailNotifActivated
-      ? [state.newUserName, state.newUserEmail, state.newUserProfile].some(i => i === '')
-      : [state.newUserName, state.newUserEmail, state.newUserPassword, state.newUserProfile].some(i => i === '')
+      ? (state.newUserName === '' || (state.newUserUsername === '' && state.newUserEmail === '') || state.newUserProfile === '')
+      : (state.newUserName === '' || (state.newUserUsername === '' && state.newUserEmail === '') || state.newUserProfile === '' || state.newUserPassword === '')
   }
 
   render () {
@@ -68,6 +71,20 @@ export class AddUserForm extends React.Component {
             value={state.newUserName}
             onChange={this.handleChangeNewUserName}
             data-cy='adduser_name'
+          />
+
+          <label className='username__text' htmlFor='adduser_username'>
+            {props.t('Username')}
+          </label>
+
+          <input
+            type='text'
+            className='username__input form-control'
+            id='adduser_username'
+            placeholder={props.t('@username')}
+            value={state.newUserUsername}
+            onChange={this.handleChangeNewUserUsername}
+            data-cy='adduser_username'
           />
 
           <label className='username__text' htmlFor='adduser_email'>

@@ -36,7 +36,7 @@
   "Password": "Password",
   "Create the user": "Create the user",
   "Create a user": "Create a user",
-  "Please type a name, an email, a password and select a profile": "Please type a name, an email, a password and select a profile",
+  "Please enter a name, a password, select a profile, and at least one between username or email": "Please enter a name, a password, select a profile, and at least one between username or email",
   "Please set a password": "Please set a password",
   "Full name": "Full name",
   "Full name must be at least 3 characters": "Full name must be at least 3 characters",
@@ -46,5 +46,6 @@
   "Home": "Home",
   "Users": "Users",
   "Administration": "Administration",
-  "Username": "Username"
+  "Username": "Username",
+  "@username": "@username"
 }

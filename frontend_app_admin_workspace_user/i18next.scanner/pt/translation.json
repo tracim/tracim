@@ -36,7 +36,7 @@
   "Password": "Palavra-passe",
   "Create the user": "Criar o utilizador",
   "Create a user": "Criar um utilizador",
-  "Please type a name, an email, a password and select a profile": "Por favor, escreva um nome, um e-mail, uma palavra-passe e selecione um perfil",
+  "Please enter a name, a password, select a profile, and at least one between username or email": "Por favor, digite um nome, uma palavra-passe, seleccione um perfil e pelo menos um entre identificador ou e-mail",
   "Please set a password": "Defina uma palavra-passe",
   "Full name": "Nome completo",
   "Full name must be at least 3 characters": "O nome completo deve ter pelo menos 3 carateres",
@@ -46,5 +46,6 @@
   "Home": "Início",
   "Users": "Utilizadores",
   "Administration": "Administração",
-  "Username": "Identificador"
+  "Username": "Identificador",
+  "@username": "@identificador"
 }
