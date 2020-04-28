@@ -86,7 +86,7 @@ class WorkspaceAdvanced extends React.Component {
         break
 
       case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
-        console.log('%c<File> Custom event', 'color: #28a745', type, data)
+        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, () => {}, () => {})
         break
 
@@ -373,7 +373,7 @@ class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     if (state.newMember.userIdentifier === '') {
-      this.sendGlobalFlashMessage(props.t('Please set a name or email'), 'warning')
+      this.sendGlobalFlashMessage(props.t('Please set a name, an email or an username'), 'warning')
       return
     }
 

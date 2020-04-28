@@ -309,7 +309,7 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     if (state.newMember.userIdentifier === '') {
-      props.dispatch(newFlashMessage(props.t('Please set a name or email'), 'warning'))
+      props.dispatch(newFlashMessage(props.t('Please set a name, an email or an username'), 'warning'))
       return false
     }
 

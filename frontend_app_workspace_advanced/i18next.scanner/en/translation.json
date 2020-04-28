@@ -8,7 +8,7 @@
   "Error while saving new description": "Error while saving new description",
   "Error while saving new role for member": "Error while saving new role for member",
   "Error while fetching known members list": "Error while fetching known members list",
-  "Please set a name or email": "Please set a name or email",
+  "Please set a name, an email or an username": "Please set a name, an email or an username",
   "Please set a role": "Please set a role",
   "Member removed": "Member removed",
   "Member added": "Member added",
