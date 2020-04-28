@@ -333,6 +333,7 @@ class Dashboard extends React.Component {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
       publicName: state.newMember.isEmail ? '' : state.newMember.userIdentifier,
       email: state.newMember.isEmail ? state.newMember.userIdentifier : '',
+      username: newMemberInKnownMemberList.user_username,
       role: state.newMember.role
     }))
 
