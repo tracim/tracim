@@ -37,7 +37,7 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
     @pytest.mark.parametrize(
         "config_section", [{"name": "functional_test_no_workspace_limit_per_user"}], indirect=True
     )
-    def test_api__create_workspace_err_400__no_workspace_limit(
+    def test_api__create_workspace_ok_200__no_workspace_limit(
         self, web_testapp, admin_user
     ) -> None:
         """

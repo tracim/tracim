@@ -2,6 +2,7 @@
 from datetime import datetime
 import typing
 
+from sqlalchemy import func
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
@@ -72,6 +73,18 @@ class WorkspaceApi(object):
         )
         return query
 
+    def _user_allowed_to_create_new_workspaces(self, user: User) -> bool:
+        # INFO - G.M - 2019-08-21 - 0 mean no limit here
+        if self._config.LIMITATION__SHAREDSPACE_PER_USER == 0:
+            return True
+
+        owned_workspace_count = (
+            self._session.query(func.count(Workspace.workspace_id))
+            .filter(Workspace.owner_id == user.user_id)
+            .scalar()
+        )
+        return owned_workspace_count < self._config.LIMITATION__SHAREDSPACE_PER_USER
+
     def get_workspace_with_context(self, workspace: Workspace) -> WorkspaceInContext:
         """
         Return WorkspaceInContext object from Workspace
@@ -90,12 +103,7 @@ class WorkspaceApi(object):
         public_upload_enabled: bool = True,
         save_now: bool = False,
     ) -> Workspace:
-        # TODO - G.M - 2019-04-11 - Fix Circular Import issue between userApi
-        # and workspaceApi
-        from tracim_backend.lib.core.user import UserApi
-
-        uapi = UserApi(session=self._session, current_user=self._user, config=self._config)
-        if not uapi.allowed_to_create_new_workspaces(self._user):
+        if not self._user_allowed_to_create_new_workspaces(self._user):
             raise UserNotAllowedToCreateMoreWorkspace("User not allowed to create more workspace")
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
@@ -114,7 +122,7 @@ class WorkspaceApi(object):
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
 
         role = role_api.create_one(
-            self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=True
+            self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=True,
         )
 
         self._session.add(workspace)

@@ -18,3 +18,7 @@ previews
 .yarn
 .yarnrc.yml
 node_modules
+
+# vscode and mypy
+.vscode/
+.mypy_cache/
