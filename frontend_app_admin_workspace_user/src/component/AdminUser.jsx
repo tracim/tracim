@@ -157,6 +157,7 @@ export class AdminUser extends React.Component {
                   <th scope='col'>{props.t('Active')}</th>
                   <th />
                   <th scope='col'>{props.t('User')}</th>
+                  <th scope='col'>{props.t('Username')}</th>
                   <th scope='col'>{props.t('Email')}</th>
                   <th scope='col'>{props.t('Can create shared space')}</th>
                   <th scope='col'>{props.t('Administrator')}</th>
@@ -195,6 +196,10 @@ export class AdminUser extends React.Component {
                         <Link to={`/ui/admin/user/${u.user_id}`}>
                           {u.public_name}
                         </Link>
+                      </td>
+
+                      <td>
+                        {u.username}
                       </td>
 
                       <td>{u.email}</td>
