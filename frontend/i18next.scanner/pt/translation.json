@@ -237,5 +237,9 @@
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Encontre todos os seus documentos colocados online directamente no seu computador através da estação de trabalho, sem passar pelo software.",
   "Have a good day!": "Tenha um bom dia!",
   "Archived Topic": "Tópico arquivado",
-  "Search…": "Pesquisar..."
+  "Search…": "Pesquisar...",
+  "Username must be at least 3 characters": "O nome de utilizador deve ter pelo menos 3 caracteres",
+  "Username can't contain any whitespace": "O nome de utilizador não pode conter nenhum espaço em branco",
+  "@username": "@identificador",
+  "When changed, the old username and everything linked to it will be lost.": "Ao mudar, o seu antigo nome de utilizador e tudo o que lhe está ligado perder-se-á."
 }

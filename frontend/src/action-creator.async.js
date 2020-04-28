@@ -262,7 +262,7 @@ export const putMyselfName = (user, newName) => dispatch => {
   })
 }
 
-export const putUserName = (user, newName) => dispatch => {
+export const putUserPublicName = (user, newName) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}`,
     param: {

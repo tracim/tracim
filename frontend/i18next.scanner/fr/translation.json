@@ -237,5 +237,9 @@
   "User administration": "Administration d'utilisateur",
   "Forgotten password": "Mot de passe perdu",
   "Public upload": "Téléversement publique",
-  "Password reset": "Réinitialisation mot de passe"
+  "Password reset": "Réinitialisation mot de passe",
+  "Username must be at least 3 characters": "L'identifiant doit faire au moins 3 caractères",
+  "Username can't contain any whitespace": "L'identifiant ne doit pas contenir d'espace",
+  "@username": "@identifiant",
+  "When changed, the old username and everything linked to it will be lost.": "En le changeant, l'ancien nom d'utilisateur et tout ce qui y est lié sera perdu"
 }

@@ -27,12 +27,17 @@ describe('<PersonnalData />', () => {
 
   describe('intern functions', () => {
     const randomText = 'randomText'
-    it('handleChangeOldPassword should change the state', () => {
-      wrapper.instance().handleChangeName({ target: { value: randomText } })
-      expect(wrapper.state('newName')).to.equal(randomText)
+    it('handleChangeUserName should change the state', () => {
+      wrapper.instance().handleChangePublicName({ target: { value: randomText } })
+      expect(wrapper.state('newPublicName')).to.equal(randomText)
     })
 
-    it('handleChangeNewPassword should change the state', () => {
+    it('handleChangeUserName should change the state', () => {
+      wrapper.instance().handleChangeUserName({ target: { value: randomText } })
+      expect(wrapper.state('newUserName')).to.equal(randomText)
+    })
+
+    it('handleChangeEmail should change the state', () => {
       wrapper.instance().handleChangeEmail({ target: { value: randomText } })
       expect(wrapper.state('newEmail')).to.equal(randomText)
     })

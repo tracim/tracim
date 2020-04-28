@@ -24,7 +24,7 @@ import {
   getUser,
   getUserWorkspaceList,
   getWorkspaceMemberList,
-  putUserName,
+  putUserPublicName,
   putUserEmail,
   putUserPassword,
   putUserWorkspaceDoNotify,
@@ -211,7 +211,7 @@ class Account extends React.Component {
     subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
   }))
 
-  handleSubmitNameOrEmail = async (newName, newEmail, checkPassword) => {
+  handleSubmitPersonalData = async (newName, newUserName, newEmail, checkPassword) => {
     const { props, state } = this
 
     if (newName !== '') {
@@ -220,8 +220,8 @@ class Account extends React.Component {
         return false
       }
 
-      const fetchPutUserName = await props.dispatch(putUserName(state.userToEdit, newName))
-      switch (fetchPutUserName.status) {
+      const fetchPutUserPublicName = await props.dispatch(putUserPublicName(state.userToEdit, newName))
+      switch (fetchPutUserPublicName.status) {
         case 200:
           this.setState(prev => ({ userToEdit: { ...prev.userToEdit, public_name: newName } }))
           if (newEmail === '') {
@@ -232,6 +232,20 @@ class Account extends React.Component {
           break
         default: props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning')); break
       }
+    }
+
+    if (newUserName !== '') {
+      if (newUserName.length < 3) {
+        props.dispatch(newFlashMessage(props.t('Username must be at least 3 characters'), 'warning'))
+        return false
+      }
+
+      if (/\s/.test(newUserName)) {
+        props.dispatch(newFlashMessage(props.t("Username can't contain any whitespace"), 'warning'))
+        return false
+      }
+
+      // TODO add the put function for username
     }
 
     if (newEmail !== '') {
@@ -335,7 +349,7 @@ class Account extends React.Component {
                         return (
                           <PersonalData
                             userAuthType={state.userToEdit.auth_type}
-                            onClickSubmit={this.handleSubmitNameOrEmail}
+                            onClickSubmit={this.handleSubmitPersonalData}
                             displayAdminInfo
                           />
                         )

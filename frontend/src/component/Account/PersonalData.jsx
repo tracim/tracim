@@ -11,13 +11,16 @@ export class PersonalData extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      newName: '',
+      newPublicName: '',
+      newUserName: '',
       newEmail: '',
       checkPassword: ''
     }
   }
 
-  handleChangeName = e => this.setState({ newName: e.target.value })
+  handleChangePublicName = e => this.setState({ newPublicName: e.target.value })
+
+  handleChangeUserName = e => this.setState({ newUserName: e.target.value })
 
   handleChangeEmail = e => this.setState({ newEmail: e.target.value })
 
@@ -31,8 +34,9 @@ export class PersonalData extends React.Component {
       return
     }
 
-    await props.onClickSubmit(state.newName, state.newEmail, state.checkPassword) && this.setState({
-      newName: '',
+    await props.onClickSubmit(state.newPublicName, state.newUserName, state.newEmail, state.checkPassword) && this.setState({
+      newPublicName: '',
+      newUserName: '',
       newEmail: '',
       checkPassword: ''
     })
@@ -58,13 +62,31 @@ export class PersonalData extends React.Component {
               type='text'
               data-cy='personaldata__form__txtinput__fullname'
               placeholder={props.t('New full name')}
-              value={state.newName}
-              onChange={this.handleChangeName}
+              value={state.newPublicName}
+              onChange={this.handleChangePublicName}
             />
           </div>
 
+          <div className='d-flex align-items-center flex-wrap'>
+            <input
+              className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-3 mt-sm-0'
+              type='text'
+              data-cy='personaldata__form__txtinput__username'
+              placeholder={props.t('@username')}
+              value={state.newUserName}
+              onChange={this.handleChangeUserName}
+            />
+          </div>
+
+          {state.newUserName !== '' && (
+            <div className='personaldata__form__txtinput__msgerror'>
+              <i className='fa fa-exclamation-triangle personaldata__form__txtinput__msgerror__icon' />
+              {props.t('When changed, the old username and everything linked to it will be lost.')}
+            </div>
+          )}
+
           {editableUserAuthTypeList.includes(props.userAuthType) && (
-            <div className='d-flex align-items-center flex-wrap mb-4'>
+            <div className='d-flex align-items-center flex-wrap mb-4 mt-4'>
               <input
                 className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control mt-3 mt-sm-0'
                 type='email'

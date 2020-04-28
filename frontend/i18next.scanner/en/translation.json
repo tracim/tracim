@@ -237,5 +237,9 @@
   "Public upload": "Public upload",
   "Password reset": "Password reset",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Find all your documents put online directly on your computer via the workstation, without going through the software.",
-  "Archived Topic": "Archived Topic"
+  "Archived Topic": "Archived Topic",
+  "Username must be at least 3 characters": "Username must be at least 3 characters",
+  "Username can't contain any whitespace": "Username can't contain any whitespace",
+  "@username": "@username",
+  "When changed, the old username and everything linked to it will be lost.": "When changed, the old username and everything linked to it will be lost."
 }
