@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from unittest import mock
+
 import pytest
 import transaction
 
@@ -67,6 +69,30 @@ class TestUserApiWithCustomDefaultProfileForUser(object):
         assert u.timezone == "+2"
         assert u.lang == "en"
         assert u.profile.slug == "trusted-users"
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+)
+class TestUserApiWithNotifications:
+    @pytest.mark.parametrize("with_email", (True, False))
+    def test__unit__create_user__ok__with_or_without_email(
+        self, session, app_config, with_email: bool,
+    ):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        with mock.patch(
+            "tracim_backend.lib.mail_notifier.notifier.EmailManager.notify_created_account"
+        ) as mocked_notify_created_account:
+            api.create_user(
+                email="bob@bob.local" if with_email else None,
+                username="boby",
+                password="password",
+                name="bob",
+                do_save=True,
+                do_notify=True,
+            )
+        assert mocked_notify_created_account.called == with_email
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -415,6 +441,14 @@ class TestUserApi(object):
 
         assert uid == api.get_one_by_email("bibi@bibi").user_id
 
+    def test_get_one_by_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby")
+        session.flush()
+        transaction.commit()
+
+        assert u.user_id == api.get_one_by_username("boby").user_id
+
     def test_unit__get_one_by_email__err__user_does_not_exist(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(UserDoesNotExist):
@@ -439,6 +473,14 @@ class TestUserApi(object):
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
 
         users = api.get_known_user("email")
+        assert len(users) == 1
+        assert users[0] == u1
+
+    def test_unit__get_known__user__admin__by_username(self, session, app_config, admin_user):
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
+        u1 = api.create_user(name="name", username="FooBarBaz", do_notify=False, do_save=True)
+
+        users = api.get_known_user("obar")
         assert len(users) == 1
         assert users[0] == u1
 

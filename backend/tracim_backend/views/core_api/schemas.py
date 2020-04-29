@@ -169,7 +169,9 @@ class UserDigestSchema(marshmallow.Schema):
         "an empty url as default avatar)",
     )
     public_name = StrippedString(example="John Doe")
-    username = StrippedString(example="JohnDoe", required=False, default=None, allow_none=True)
+    username = StrippedString(
+        example="My-Power_User99", required=False, default=None, allow_none=True
+    )
 
 
 class UserDiskSpaceSchema(UserDigestSchema):
@@ -191,7 +193,6 @@ class UserSchema(UserDigestSchema):
     """
 
     email = marshmallow.fields.Email(required=False, example="hello@tracim.fr", allow_none=True)
-    username = marshmallow.fields.String(required=False, example="My-Power_User99", allow_none=True)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Date of creation of the user account"
     )

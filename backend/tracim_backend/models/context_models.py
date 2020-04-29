@@ -621,7 +621,7 @@ class UserInContext(object):
         return self
 
     @property
-    def email(self) -> str:
+    def email(self) -> typing.Optional[str]:
         return self.user.email
 
     @property
@@ -629,15 +629,15 @@ class UserInContext(object):
         return self.user.user_id
 
     @property
-    def public_name(self) -> str:
+    def public_name(self) -> typing.Optional[str]:
         return self.display_name
 
     @property
-    def username(self) -> str:
+    def username(self) -> typing.Optional[str]:
         return self.user.username
 
     @property
-    def display_name(self) -> str:
+    def display_name(self) -> typing.Optional[str]:
         return self.user.display_name
 
     @property

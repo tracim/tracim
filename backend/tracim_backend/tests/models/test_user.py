@@ -190,7 +190,15 @@ class TestUserModel(object):
         user.display_name = name
         user.email = email
 
-        assert user.__repr__() == "<User: email='tracim@trac.im', display='Damien'>"
+        assert user.__repr__() == "<User: email='tracim@trac.im', username=None display='Damien'>"
+
+    def test_unit__repr__ok__with_username(self):
+        user = User()
+        user.display_name = "Damien"
+        user.email = "tracim@trac.im"
+        user.username = "Dams"
+
+        assert user.__repr__() == "<User: email='tracim@trac.im', username='Dams' display='Damien'>"
 
     def test_unit__unicode__ok__nominal_case(self):
         name = "Damien"

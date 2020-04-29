@@ -129,7 +129,6 @@ class UserApi(object):
             raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc
         return user
 
-    # FIXME BS NOW: test it
     def get_one_by_username(self, username: str) -> User:
         """
         Get one user by username
@@ -210,7 +209,11 @@ class UserApi(object):
             exclude_user_ids.extend(user_ids_in_workspaces)
         query = self._base_query().order_by(User.display_name)
         query = query.filter(
-            or_(User.display_name.ilike("%{}%".format(acp)), User.email.ilike("%{}%".format(acp)),)
+            or_(
+                User.display_name.ilike("%{}%".format(acp)),
+                User.email.ilike("%{}%".format(acp)),
+                User.username.ilike("%{}%".format(acp)),
+            )
         )
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
         # should show only user in same workspace as user
@@ -721,7 +724,7 @@ class UserApi(object):
             ):
                 raise UserAuthTypeDisabled(
                     'Can\'t update user "{}" auth_type with unavailable value "{}".'.format(
-                        user.email, auth_type
+                        user.email or user.username, auth_type
                     )
                 )
             user.auth_type = auth_type
@@ -770,7 +773,9 @@ class UserApi(object):
         ]:
             raise ExternalAuthUserPasswordModificationDisallowed(
                 "user {} is link to external auth {},"
-                "password modification disallowed".format(user.email, user.auth_type)
+                "password modification disallowed".format(
+                    user.email or user.username, user.auth_type
+                )
             )
         return True
 
@@ -781,7 +786,7 @@ class UserApi(object):
         ]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 "user {} is link to external auth {},"
-                "email modification disallowed".format(user.email, user.auth_type)
+                "email modification disallowed".format(user.email or user.username, user.auth_type)
             )
         return True
 
@@ -809,6 +814,7 @@ class UserApi(object):
         self.update(
             user=new_user,
             name=name,
+            username=username,
             email=email,
             auth_type=auth_type,
             password=password,
@@ -817,7 +823,9 @@ class UserApi(object):
             lang=lang,
             do_save=False,
         )
-        if do_notify:
+
+        # NOTE BS 20200428: #2829: Email no longer required for User
+        if do_notify and new_user.email:
             try:
                 email_manager = get_email_manager(self._config, self._session)
                 email_manager.notify_created_account(
@@ -1013,7 +1021,9 @@ class UserApi(object):
     def _check_user_auth_validity(self, user: User) -> None:
         if not self._user_can_authenticate(user):
             raise UserAuthTypeDisabled(
-                "user {} auth type {} is disabled".format(user.email, user.auth_type.value)
+                "user {} auth type {} is disabled".format(
+                    user.email or user.username, user.auth_type.value
+                )
             )
 
     def _user_can_authenticate(self, user: User) -> bool:

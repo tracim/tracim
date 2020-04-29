@@ -157,10 +157,14 @@ class User(DeclarativeBase):
         return self.email
 
     def __repr__(self):
-        return "<User: email=%s, display=%s>" % (repr(self.email), repr(self.display_name))
+        return "<User: email=%s, username=%s display=%s>" % (
+            repr(self.email),
+            repr(self.username),
+            repr(self.display_name),
+        )
 
     def __unicode__(self):
-        return self.display_name or self.email
+        return self.display_name or self.email or self.username
 
     @classmethod
     def by_email_address(cls, email, dbsession):
@@ -168,9 +172,9 @@ class User(DeclarativeBase):
         return dbsession.query(cls).filter_by(email=email).first()
 
     @classmethod
-    def by_user_name(cls, username, dbsession):
+    def by_username(cls, username, dbsession):
         """Return the user object whose user name is ``username``."""
-        return dbsession.query(cls).filter_by(email=username).first()
+        return dbsession.query(cls).filter_by(username=username).first()
 
     def _set_password(self, cleartext_password: typing.Optional[str]) -> None:
         """
@@ -208,7 +212,7 @@ class User(DeclarativeBase):
 
     def get_display_name(self, remove_email_part: bool = False) -> str:
         """
-        Get a name to display from corresponding member or email.
+        Get a name to display from corresponding display_name, username or email.
 
         :param remove_email_part: If True and display name based on email,
             remove @xxx.xxx part of email in returned value
@@ -216,11 +220,14 @@ class User(DeclarativeBase):
         """
         if self.display_name:
             return self.display_name
-        else:
-            if remove_email_part:
-                at_pos = self.email.index("@")
-                return self.email[0:at_pos]
-            return self.email
+
+        if self.username:
+            return self.username
+
+        if remove_email_part:
+            at_pos = self.email.index("@")
+            return self.email[0:at_pos]
+        return self.email
 
     def get_role(self, workspace: "Workspace") -> int:
         for role in self.roles:
