@@ -48,5 +48,6 @@
   "Users": "Utilizadores",
   "Administration": "Administração",
   "Username": "Identificador",
-  "@username": "@identificador"
+  "@username": "@identificador",
+  "The user will not be able to reset his password by himself without an email linked to his account.": "O utilizador não poderá redefinir a sua palavra-passe sozinho sem um e-mail ligado à sua conta."
 }

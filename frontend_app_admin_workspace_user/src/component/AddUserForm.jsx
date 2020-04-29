@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { Popover, PopoverBody } from 'reactstrap'
 import {
   CUSTOM_EVENT,
   PROFILE_LIST
@@ -14,8 +15,15 @@ export class AddUserForm extends React.Component {
       newUserUsername: '',
       newUserEmail: '',
       newUserPassword: '',
-      newUserProfile: ''
+      newUserProfile: '',
+      popoverEmailInfoOpen: false
     }
+  }
+
+  handleTogglePopoverEmailInfo = () => {
+    this.setState(prevState => ({
+      popoverEmailInfoOpen: !prevState.popoverEmailInfoOpen
+    }))
   }
 
   handleChangeNewUserName = e => this.setState({ newUserName: e.target.value })
@@ -58,14 +66,14 @@ export class AddUserForm extends React.Component {
 
     return (
       <form className='adminUser__adduser__form' data-cy='adminUser__adduser__form'>
-        <div className='adminUser__adduser__form__username'>
-          <label className='username__text' htmlFor='adduser_name'>
+        <div className='adminUser__adduser__form__userData'>
+          <label className='userData__text' htmlFor='adduser_name'>
             {props.t('Full name')}
           </label>
 
           <input
             type='text'
-            className='username__input form-control'
+            className='userData__input form-control'
             id='adduser_name'
             placeholder={props.t('Full name')}
             value={state.newUserName}
@@ -73,13 +81,13 @@ export class AddUserForm extends React.Component {
             data-cy='adduser_name'
           />
 
-          <label className='username__text' htmlFor='adduser_username'>
+          <label className='userData__text' htmlFor='adduser_username'>
             {props.t('Username')}
           </label>
 
           <input
             type='text'
-            className='username__input form-control'
+            className='userData__input form-control'
             id='adduser_username'
             placeholder={props.t('@username')}
             value={state.newUserUsername}
@@ -87,13 +95,35 @@ export class AddUserForm extends React.Component {
             data-cy='adduser_username'
           />
 
-          <label className='username__text' htmlFor='adduser_email'>
-            {props.t('Email')}
-          </label>
+          <div className='userData__email'>
+            <label className='userData__text' htmlFor='adduser_email'>
+              {props.t('Email')}
+            </label>
+
+            <button
+              type='button'
+              className='userData__email__info'
+              id='popoverEmailInfo'
+            >
+              <i className='fa fa-fw fa-question-circle' />
+            </button>
+
+            <Popover
+              placement='bottom'
+              isOpen={state.popoverEmailInfoOpen}
+              target='popoverEmailInfo'
+              toggle={this.handleTogglePopoverEmailInfo}
+              trigger='hover'
+            >
+              <PopoverBody>
+                {props.t('The user will not be able to reset his password by himself without an email linked to his account.')}
+              </PopoverBody>
+            </Popover>
+          </div>
 
           <input
             type='text'
-            className='username__input form-control'
+            className='userData__input form-control'
             id='adduser_email'
             placeholder={props.t('Email')}
             value={state.newUserEmail}
@@ -103,13 +133,13 @@ export class AddUserForm extends React.Component {
 
           {!props.emailNotifActivated && (
             <div>
-              <label className='username__text' htmlFor='adduser_password'>
+              <label className='userData__text' htmlFor='adduser_password'>
                 {props.t('Password')}
               </label>
 
               <input
                 type='text'
-                className='username__input form-control'
+                className='userData__input form-control'
                 id='adduser_password'
                 placeholder={props.t('Password')}
                 value={state.newUserPassword}

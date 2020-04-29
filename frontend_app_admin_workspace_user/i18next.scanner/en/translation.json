@@ -48,5 +48,6 @@
   "Users": "Users",
   "Administration": "Administration",
   "Username": "Username",
-  "@username": "@username"
+  "@username": "@username",
+  "The user will not be able to reset his password by himself without an email linked to his account.": "The user will not be able to reset his password by himself without an email linked to his account."
 }
