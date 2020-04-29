@@ -96,7 +96,7 @@ export const putUserProfile = (apiUrl, userId, newProfile) =>
     method: 'PUT'
   })
 
-export const postAddUser = (apiUrl, username, name, email, profile, emailNotif, password) =>
+export const postAddUser = (apiUrl, name, username, email, profile, emailNotif, password) =>
   fetch(`${apiUrl}/users`, {
     credentials: 'include',
     headers: {
