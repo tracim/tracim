@@ -15,3 +15,6 @@ functionnal_tests/cypress/screenshots
 
 #ignore preview files as it is by default in backend folder
 previews
+
+/tools_docker/test_docker/tracim.env
+/tools_docker/test_docker/test_config.env
