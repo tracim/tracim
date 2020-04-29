@@ -9,7 +9,8 @@ const PAGES = {
   ADMIN_WORKSPACE: 'adminWorkspace',
   SHARE_FOLDER: 'share_folder',
   GALLERY: 'gallery',
-  CONTENT_OPEN: 'contentOpen'
+  CONTENT_OPEN: 'contentOpen',
+  ACCOUNT: 'account'
 }
 
 const URLS = {
@@ -23,7 +24,8 @@ const URLS = {
   [PAGES.SEARCH]: ({searchedKeywords, pageNumber, numberByPage, actived, deleted, archived, contentTypes}) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchedKeywords}&t=${contentTypes}`,
   [PAGES.SHARE_FOLDER]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/share_folder`,
   [PAGES.ADMIN_WORKSPACE]: () => '/ui/admin/workspace',
-  [PAGES.GALLERY]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/gallery` + (folderId ? `?folder_ids=${folderId}` : '/')
+  [PAGES.GALLERY]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/gallery` + (folderId ? `?folder_ids=${folderId}` : '/'),
+  [PAGES.ACCOUNT]: () => '/ui/account'
 }
 
 /**

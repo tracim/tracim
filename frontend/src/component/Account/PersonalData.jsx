@@ -90,6 +90,7 @@ export class PersonalData extends React.Component {
               <input
                 className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control mt-3 mt-sm-0'
                 type='email'
+                data-cy='personaldata__form__txtinput__email'
                 placeholder={props.t('New email')}
                 value={state.newEmail}
                 onChange={this.handleChangeEmail}
