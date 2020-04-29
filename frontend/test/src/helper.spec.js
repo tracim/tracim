@@ -2,7 +2,8 @@ import { expect } from 'chai'
 import {
   sortWorkspaceContents,
   findUserRoleIdInWorkspace,
-  getUserProfile
+  getUserProfile,
+  removeAtInUserName
 } from '../../src/helper.js'
 import {
   ROLE,
@@ -167,6 +168,27 @@ describe('In file helper.js', () => {
 
     it('should return an empty object when the slug is empty', () => {
       expect(getUserProfile()).to.eql({})
+    })
+  })
+
+  describe('the removeAtInUserName() function', () => {
+    it('should return the username without @ when username is "@johndoe"', () => {
+      expect(removeAtInUserName('@johndoe')).to.eq('johndoe')
+    })
+    it('should return the username without @  and whitespace when username is "    @johndoe    "', () => {
+      expect(removeAtInUserName('    @johndoe    ')).to.eq('johndoe')
+    })
+    it('should return the username without channges when username is "johndoe"', () => {
+      expect(removeAtInUserName('johndoe')).to.eq('johndoe')
+    })
+    it('should return the username empty when username is "@"', () => {
+      expect(removeAtInUserName('@')).to.eq('')
+    })
+    it('should return the username without @ when username is "@j"', () => {
+      expect(removeAtInUserName('@j')).to.eq('j')
+    })
+    it('should return the username empty when username is empty', () => {
+      expect(removeAtInUserName('')).to.eq('')
     })
   })
 })

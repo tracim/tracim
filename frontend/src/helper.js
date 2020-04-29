@@ -121,3 +121,11 @@ export const sortWorkspaceContents = (a, b) => {
   if (b.label > a.label) return -1
   return 0
 }
+
+export const removeAtInUserName = (username) => {
+  let trimmedUserName = username.trim()
+  if (trimmedUserName.length > 0 && trimmedUserName.includes('@') && trimmedUserName[0] === '@') {
+    trimmedUserName = trimmedUserName.substring(1)
+  }
+  return trimmedUserName
+}

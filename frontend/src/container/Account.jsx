@@ -35,7 +35,8 @@ import {
 } from '../action-creator.async.js'
 import {
   editableUserAuthTypeList,
-  PAGE
+  PAGE,
+  removeAtInUserName
 } from '../helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
@@ -179,6 +180,22 @@ export class Account extends React.Component {
           if (newEmail === '') return false
           break
       }
+    }
+
+    if (newUserName !== '') {
+      const userName = removeAtInUserName(newUserName)
+
+      if (userName.length < 3) {
+        props.dispatch(newFlashMessage(props.t('Username must be at least 3 characters'), 'warning'))
+        return false
+      }
+
+      if (/\s/.test(userName)) {
+        props.dispatch(newFlashMessage(props.t("Username can't contain any whitespace"), 'warning'))
+        return false
+      }
+
+      // TODO add the put function for username #2943
     }
 
     if (newEmail !== '') {
