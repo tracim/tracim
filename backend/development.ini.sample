@@ -2,17 +2,21 @@
 # Tracim Config File #
 ######################
 
-## How work this file
-#
-# Tracim use all parameters not commented here (environnement variable is used first if define)
-# Lines who start by `;` is used to comment parameters and show default value available in Tracim code
-# Lines who start by `#` is used for comment and to show parameters examples
-# All parameters who start with `basic_setup` are variable available in this file. This kind of variable is used
-# to simplify configuration of Tracim and all of them are necessary to start Tracim.
+## Configuration
+# Parameters can be defined via environment variables or in the config file.
+# Environment parameters are used in priority if a variable is defined in both.
 
+## File Syntax
+# Comments start by `;` or `#`.
+# In the sample config file:
+#  - `;` commented lines are used to indicate the default values used by Tracim;
+#  - `#` commented lines are used for comments/examples.
+# Boolean values can be `True` or `False`
+# All parameters starting with `basic_setup` can be used as variables in other parameters.
+# For simple needs they are all you need to customize.
 
 ## GENERAL TRACIM config:
-# These config are common for all app : REST API, Webdav, etc...
+# These config are common for all app: REST API, Webdav, etc...
 
 [DEFAULT]
 
@@ -63,7 +67,7 @@ basic_setup.session_secret = change_this_value_please!
 # already added to default list.
 # This parameter is a list of app slug separated by ',' char.
 # Not exhaustive list of available apps:
-# - "content/thread" -> thread/topic/discussion : allow to discuss about one
+# - "content/thread" -> thread/topic/discussion: allow to discuss about one
 #   subject.
 # - content/file -> allow to upload all type of file like .pdf, .odt, .jpg, etc
 # - content/html-document -> allow to work on a standard html-based document
@@ -72,9 +76,9 @@ basic_setup.session_secret = change_this_value_please!
 # - agenda -> add caldav agenda feature (specific process need to be runned)
 # - collaborative_document_edition -> add support for collaborative document edition,
 #   add support for collaborative edition server like collabora/libreofficeOnline.
-# - share_content -> allow user to share tracim content with external user
+# - share_content -> allow user to share Tracim content with external user
 # - upload_permission -> allow external with permission to upload some file in a workspace.
-# - gallery -> add gallery app in tracim
+# - gallery -> add gallery app in Tracim
 # default app.enabled config explicit list config:
 ; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,share_content,upload_permission,gallery
 # With all apps (add collaborative document edition):
@@ -215,7 +219,6 @@ api.key = %(basic_setup.api_key)s
 # this a true auth mechanism like internal or ldap,
 # this mean user created this way will be attached to this mechanism.
 
-
 ## Remote user header should be a CGI env var.
 ## most common value is "REMOTE_USER".
 ## You can also directly use HTTP header instead of standard CGI env var
@@ -261,9 +264,10 @@ api.key = %(basic_setup.api_key)s
 ; user.default_profile = users
 
 ## enable or disable filter on known user, if True, user cannot see at all informations about
-## member with no common workspace. if False, it can access to these informations.
+## member with no common workspace. If False, it can access to these informations.
 ## This is used by search mechanism for invitation of user in workspace.
 ; known_members.filter = True
+
 ####
 # IHM
 ####
@@ -277,12 +281,10 @@ website.title = %(basic_setup.website_title)s
 ; website.base_url = http://localhost:6543
 website.base_url = %(basic_setup.website_base_url)s
 
-
-
 ### Frontend ###
-## if you want to use Tracim API without frontend, change this parameter to False
+## if you want to use Tracim API without frontend, change this parameter
 ; frontend.serve = True
-# You can set dist folder of Tracim frontend. by default, system
+# You can set dist folder of Tracim frontend. By default, system
 # will try to get it automatically according to Tracim repository
 # organisation.
 ; frontend.dist_folder_path =
@@ -290,7 +292,7 @@ website.base_url = %(basic_setup.website_base_url)s
 # frontend.dist_folder_path = /home/user/tracim/frontend/dist
 
 # if you need to add custom javascript code into Tracim, you can use custom toolbox
-# feature. you add your javascript in this folder, all content
+# feature. You add your javascript in this folder, all content
 # of this folder will be serve in /custom_toolbox-assets
 # and all javascript ".js" file will be added to index.html file.
 ; frontend.custom_toolbox_folder_path =
@@ -328,7 +330,6 @@ website.base_url = %(basic_setup.website_base_url)s
 # EMAIL-COMMON
 ####
 
-
 ### Email sending configuration ###
 # processing_mode may be sync or async,
 # if async is choosen, you need also to run mail_notifier daemon
@@ -343,7 +344,7 @@ website.base_url = %(basic_setup.website_base_url)s
 # EMAIL-NOTIFICATION
 ####
 
-## available choice: True or False
+## send some notification when user make specific action in Tracim
 ; email.notification.activated = False
 ## you can enable or disable if invited user to shared space will be notified
 ## on this shared space by default.
@@ -366,7 +367,7 @@ website.base_url = %(basic_setup.website_base_url)s
 # email.notification.smtp.password = your_smtp_password
 
 # active implicit ssl if you are using implicit smtp with encryption port like 465
-# by default, tracim will try to use explicit smtp encryption using starttls, and unencrypted
+# by default, Tracim will try to use explicit smtp encryption using starttls, and unencrypted
 # connection as fallback.
 ; email.notification.smtp.use_implicit_ssl = False
 
@@ -382,7 +383,7 @@ website.base_url = %(basic_setup.website_base_url)s
 
 # header for from, reply-to and references headers.
 # those allow to set one variable only one time in email pattern, this kind
-# of pattern with multiple variable will not work correctly :
+# of pattern with multiple variable will not work correctly:
 # reply+{content_id}{content_id}@domainname.tld
 
 
@@ -427,10 +428,10 @@ website.base_url = %(basic_setup.website_base_url)s
 ; email.notification.share_content_to_receiver.template.html = %(here)s/tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak
 ; email.notification.upload_permission_to_emitter.template.html = %(here)s/tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak
 ; email.notification.upload_permission_to_receiver.template.html = %(here)s/tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak
-; email.notification.new_upload_event.template.html =  %(here)s/tracim_backend/templates/mail/new_upload_event_body_html.mak
+; email.notification.new_upload_event.template.html = %(here)s/tracim_backend/templates/mail/new_upload_event_body_html.mak
 
 
-# example with shortcut for template_dir path :
+# example with shortcut for template_dir path:
 ; email.template_dir =
 # email.template_dir = %(here)s/tracim_backend/templates/mail
 # email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
@@ -452,7 +453,6 @@ website.base_url = %(basic_setup.website_base_url)s
 # This need api.key with non-empty value
 # This feature need to run mail_fetcher daemons.
 # more info in README (Run daemons according to your config)
-## available choice: True or False
 ; email.reply.activated = False
 
 ### IMAP ###
@@ -464,7 +464,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ; email.reply.imap.user =
 ; email.reply.imap.password =
 # imap folder where email are retrieved for email fetcher,
-# valid name for inbox is INBOX. you need to set an existing directory.
+# valid name for inbox is INBOX. You need to set an existing directory.
 # you can use "INBOX/tracim_reply" for tracim_reply subdir, or directly "tracim_reply" if you don't use subdir.
 # to use this properly with a different value than INBOX,
 # you probably need to add rules to automatically move the new mail
@@ -539,7 +539,7 @@ webdav.listen = localhost:3030
 # This feature require application "agenda" in "app.enabled"
 
 ### Radicale Proxy config ##
-## path to Tracim radicale server, usually at localhost:por
+## path to Tracim radicale server, usually at localhost:port
 ; caldav.radicale_proxy.base_url = http://localhost:5232
 
 ### Radicale config ###
@@ -604,7 +604,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # search.elasticsearch.ingest.mimetype_whitelist = text/markdown,text/plain
 
 # exclude mimetypes from plain-text indexation. If a mimetype is both in whitelist and blacklist, it will be blacklisted.
-# if set to empty, do nothing. default value is empty, meaning no blacklist:
+# if set to empty, do nothing. Default value is empty, meaning no blacklist:
 ; search.elasticsearch.ingest.mimetype_blacklist =
 # example:
 # search.elasticsearch.ingest.mimetype_blacklist = application/gzip,application/zip
@@ -634,7 +634,10 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # collaborative_document_edition.collabora.base_url = http://localhost:9980
 
 # template dir for collaborative document edition:
-; collaborative document edition.file_template_dir = %(here)s/tracim_backend/templates/open_documents
+; collaborative_document_edition.file_template_dir = %(here)s/tracim_backend/templates/open_documents
+
+
+## all next lines are not directly concerned by syntax explain in beggining of this file.
 
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
@@ -728,13 +731,13 @@ script_location = tracim_backend/migration
 # LOGGERS #
 ###########
 
-## more info here :
+## more info here:
 ## https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/logging.html
 
 ## level possibilities
 # "level = INFO" logs SQL queries.
 # "level = DEBUG" logs SQL queries and results.
-# "level = WARN" logs neither.  (Recommended for production systems.)
+# "level = WARN" logs neither (Recommended for production systems.)
 
 ### LOGGERS ###
 [loggers]
