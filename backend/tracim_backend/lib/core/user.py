@@ -486,12 +486,19 @@ class UserApi(object):
         ) as exc:
             raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc
 
-    def authenticate(self, email: str, password: str, ldap_connector: "Connector" = None) -> User:
+    def authenticate(
+        self,
+        password: str,
+        email: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+        ldap_connector: "Connector" = None,
+    ) -> User:
         """
-        Authenticate user with email and password, raise AuthenticationFailed
-        if uncorrect. try all auth available in order and raise issue of
+        Authenticate user with email/username and password, raise AuthenticationFailed
+        if incorrect. try all auth available in order and raise issue of
         last auth if all auth failed.
         :param email: email of the user
+        :param username: username of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :return: User who was authenticated.
@@ -501,7 +508,13 @@ class UserApi(object):
         )
         for auth_type in self._config.AUTH_TYPES:
             try:
-                return self._authenticate(email, password, ldap_connector, auth_type=auth_type)
+                return self._authenticate(
+                    email=email,
+                    username=username,
+                    password=password,
+                    ldap_connector=ldap_connector,
+                    auth_type=auth_type,
+                )
             except AuthenticationFailed as exc:
                 raise exc
             except WrongAuthTypeForUser:
@@ -511,25 +524,39 @@ class UserApi(object):
 
     def _authenticate(
         self,
-        email: str,
         password: str,
+        email: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
         ldap_connector: "Connector" = None,
         auth_type: AuthType = AuthType.INTERNAL,
     ) -> User:
         """
-        Authenticate user with email and password, raise AuthenticationFailed
-        if uncorrect. check only one auth
+        Authenticate user with email/username and password, raise AuthenticationFailed
+        if incorrect. check only one auth
         :param email: email of the user
+        :param username: username of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :param auth_type: auth type to test.
         :return: User who was authenticated.
         """
-        # get existing user
-        try:
-            user = self.get_one_by_email(email)
-        except UserDoesNotExist:
-            user = None
+        assert username or email
+        user = None
+
+        # try to get existing user with email
+        if email:
+            try:
+                user = self.get_one_by_email(email)
+            except UserDoesNotExist:
+                pass
+
+        # try to get existing user with email
+        if username:
+            try:
+                user = self.get_one_by_username(username)
+            except UserDoesNotExist:
+                pass
+
         # try auth
         try:
             if auth_type == AuthType.LDAP:

@@ -798,14 +798,20 @@ class ResetPasswordModifySchema(marshmallow.Schema):
 class BasicAuthSchema(marshmallow.Schema):
 
     email = marshmallow.fields.Email(
-        example="hello@tracim.fr", required=True, validate=user_email_validator
+        example="hello@tracim.fr", required=False, validate=user_email_validator
     )
+    username = String(example="My-Power_User99", required=False, validate=user_username_validator)
     password = String(
         example="8QLa$<w", required=True, load_only=True, validate=user_password_validator
     )
 
     class Meta:
         description = "Entry for HTTP Basic Auth"
+
+    @marshmallow.validates_schema(pass_original=True)
+    def validate_email_and_username(self, data: dict, original_data: dict, **kwargs) -> None:
+        if not original_data.get("email") and not original_data.get("username"):
+            raise marshmallow.ValidationError("email or username required")
 
     @post_load
     def make_login(self, data: typing.Dict[str, typing.Any]) -> object:

@@ -101,8 +101,14 @@ class LoginCredentials(object):
     Login credentials model for login model
     """
 
-    def __init__(self, email: str, password: str) -> None:
+    def __init__(
+        self,
+        password: str,
+        email: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+    ) -> None:
         self.email = email
+        self.username = username
         self.password = password
 
 
