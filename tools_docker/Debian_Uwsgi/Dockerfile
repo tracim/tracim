@@ -81,7 +81,7 @@ RUN \
     && python3 -m pip install -r requirements.txt \
     && python3 -m pip install -e ".[postgresql]" \
     && python3 -m pip install -e ".[mysql]" \
-    && npm install i18next-conv -g \
+    && npm install "i18next-conv@<8" -g \
     && ./update_i18n_json_file.sh \
     && cd ../../ \
 # Move some file

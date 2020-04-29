@@ -144,7 +144,7 @@ function install_npm_and_nodejs {
 
 function translate_email {
     log "install i18next-conv to translate email"
-    $SUDO npm install i18next-conv -g && loggood "install i18next-conv success" || logerror "failed to install i18next-conv"
+    $SUDO npm install "i18next-conv@<8" -g && loggood "install i18next-conv success" || logerror "failed to install i18next-conv"
     log "translate email"
     ./update_i18n_json_file.sh && loggood "translate email success" || logerror "failed to translate email"
 }
