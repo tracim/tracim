@@ -109,6 +109,7 @@
   "Email": "E-mail",
   "Reset password": "Reiniciar a palavra-passe",
   "Confirm password": "Confirmar a palavra-passe",
+  "Confirm": "Confirmar",
   "We are going to send you an email containing a link to reset your password": "Vamos enviar-lhe um e-mail com um link para reiniciar sua palavra-passe",
   "Cancel": "Anular",
   "Information are missing, please use the link in the email your should have received to reset your password": "Informações estão faltando, utilize o link no e-mail que você deve ter recebido para reiniciar sua palavra-passe",
@@ -140,6 +141,7 @@
   "Change the profile": "Mudar o perfil",
   "New full name": "Novo nome completo",
   "New email": "Novo e-mail",
+  "never ask me again": "nunca mais me pergunte",
   "Change my password": "Mudar minha palavra-passe",
   "Change my profile": "Mudar meu perfil",
   "Full name must be at least 3 characters": "O nome completo deve ter pelo menos 3 carateres",
@@ -167,6 +169,7 @@
   "Hide shared space": "Ocultar espaço partilhado",
   "See sidebar": "Ver barra lateral",
   "Hide sidebar": "Ocultar barra lateral",
+  "Hello, you don't have a username yet!": "Olá, você ainda não tem um identificador!",
   "Search results": "Resultados da pesquisa",
   "best results for": "melhores resultados para",
   "Search result": "Resultado da pesquisa",
@@ -197,6 +200,7 @@
   "The person who sent you this file protected it with a password. If you do not know the password, please contact her.": "A pessoa enviou-lhe um ficheiro protegido por uma palavra-passe. Se não conhece a palavra-passe, entre em contacto com ela.",
   "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Deixe uma mensagem com o(s) seu(s) ficheiro(s) se desejar. Pode deixar os seus contactos se desejar ser novamente contactado.",
   "Send": "Envíar",
+  "Set your username:": "Defina o seu identificador:",
   "Your interlocutor has been notified of your upload. You can close this window.": "O seu interlocutor foi notificado do seu upload. Você pode fechar esta janela.",
   "Error in the URL": "Erro no URL",
   "Content not found": "Conteúdo não encontrado",
@@ -216,6 +220,7 @@
   "Error, this link is invalid or has expired": "Erro, este link é inválido ou expirou",
   "Error while loading upload information": "Erro ao carregar informações subidas",
   "You must select at least 1 file to upload": "Você tem de selecionar pelo menos 1 ficheiro para subir",
+  "you can always set your username in your account preferences": "você pode sempre configurar o identificador nas preferências da sua conta",
   "Create an office document": "Criar um documento office",
   "Full name (required)": "Nome completo (necessário)",
   "Password (required)": "Palavra-passe (necessário)",
@@ -237,5 +242,6 @@
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Encontre todos os seus documentos colocados online directamente no seu computador através da estação de trabalho, sem passar pelo software.",
   "Have a good day!": "Tenha um bom dia!",
   "Archived Topic": "Tópico arquivado",
-  "Search…": "Pesquisar..."
+  "Search…": "Pesquisar...",
+  "@username": "@identificador"
 }

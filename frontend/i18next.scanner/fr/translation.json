@@ -115,6 +115,7 @@
   "Email": "Email",
   "Reset password": "Réinitialisez votre mot de passe",
   "Confirm password": "Confirmez le mot de passe",
+  "Confirm": "Valider",
   "We are going to send you an email containing a link to reset your password": "Nous allons vous envoyer un email contenant un lien pour réinitialiser votre mot de passe",
   "Your password has been changed, you can now login": "Votre mot de passe a été changé, vous pouvez vous connecter",
   "Information are missing, please use the link in the email your should have received to reset your password": "Informations manquantes, veuillez utiliser le lien de l'email que vous devez avoir reçu pour changer votre mot de passe",
@@ -146,6 +147,7 @@
   "Change the profile": "Changer le profil",
   "New full name": "Nouveau nom complet",
   "New email": "Nouvel email",
+  "never ask me again": "ne plus jamais me demander",
   "Change my password": "Changer mon mot de passe",
   "Change my profile": "Changer mon profil",
   "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères",
@@ -173,6 +175,7 @@
   "Hide shared space": "Masquer l'espace partagé",
   "See sidebar": "Voir la barre latérale",
   "Hide sidebar": "Masquer la barre latérale",
+  "Hello, you don't have a username yet!": "Bonjour, vous n'avez pas encore d'identifiant !",
   "Search results": "Résultats de la recherche",
   "best results for": "meilleurs résultats pour",
   "Search result": "Résultat de la recherche",
@@ -203,6 +206,7 @@
   "The person who sent you this file protected it with a password. If you do not know the password, please contact her.": "La personne qui vous a envoyé ce fichier l'a protégé par mot de passe. Si vous ne connaissez pas le mot de passe, veuillez la contacter.",
   "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Laissez un message avec votre ou vos fichier(s) si vous le souhaitez. N'hésitez pas à laisser vos coordonnées si vous souhaitez être recontacté.",
   "Send": "Envoyer",
+  "Set your username:": "Définissez votre identifiant :",
   "Your interlocutor has been notified of your upload. You can close this window.": "Votre interlocuteur a été notifié de votre téléversement. Vous pouvez fermer cette fenêtre.",
   "Error in the URL": "Erreur dans l'URL",
   "Content not found": "Contenu introuvable",
@@ -222,6 +226,7 @@
   "Error, this link is invalid or has expired": "Erreur, ce lien est invalide ou a expiré",
   "Error while loading upload information": "Erreur lors du chargement des informations de téléversement",
   "You must select at least 1 file to upload": "Vous devez selectionner au moins 1 fichier à téléverser",
+  "you can always set your username in your account preferences": "vous pourrez toujours définir votre identifiant dans les préférences de votre compte",
   "Create an office document": "Créer un doc. bureautique",
   "Full name (required)": "Nom complet (requis)",
   "Password (required)": "Mot de passe (requis)",
@@ -237,5 +242,6 @@
   "User administration": "Administration d'utilisateur",
   "Forgotten password": "Mot de passe perdu",
   "Public upload": "Téléversement publique",
-  "Password reset": "Réinitialisation mot de passe"
+  "Password reset": "Réinitialisation mot de passe",
+  "@username": "@identifiant"
 }

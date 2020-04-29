@@ -113,6 +113,7 @@
   "Email": "Email",
   "Reset password": "Reset password",
   "Confirm password": "Confirm password",
+  "Confirm": "Confirm",
   "We are going to send you an email containing a link to reset your password": "We are going to send you an email containing a link to reset your password",
   "Cancel": "Cancel",
   "Information are missing, please use the link in the email your should have received to reset your password": "Information are missing, please use the link in the email your should have received to reset your password",
@@ -144,6 +145,7 @@
   "Change the profile": "Change the profile",
   "New full name": "New full name",
   "New email": "New email",
+  "never ask me again": "never ask me again",
   "Change my password": "Change my password",
   "Change my profile": "Change my profile",
   "Full name must be at least 3 characters": "Full name must be at least 3 characters",
@@ -171,6 +173,7 @@
   "Hide shared space": "Hide shared space",
   "See sidebar": "See sidebar",
   "Hide sidebar": "Hide sidebar",
+  "Hello, you don't have a username yet!": "Hello, you don't have a username yet!",
   "Search results": "Search results",
   "best results for": "best results for",
   "Search result": "Search result",
@@ -201,6 +204,7 @@
   "The person who sent you this file protected it with a password. If you do not know the password, please contact her.": "The person who sent you this file protected it with a password. If you do not know the password, please contact her.",
   "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.",
   "Send": "Send",
+  "Set your username:": "Set your username:",
   "Your interlocutor has been notified of your upload. You can close this window.": "Your interlocutor has been notified of your upload. You can close this window.",
   "Error in the URL": "Error in the URL",
   "Content not found": "Content not found",
@@ -220,6 +224,7 @@
   "Error, this link is invalid or has expired": "Error, this link is invalid or has expired",
   "Error while loading upload information": "Error while loading upload information",
   "You must select at least 1 file to upload": "You must select at least 1 file to upload",
+  "you can always set your username in your account preferences": "you can always set your username in your account preferences",
   "Create an office document": "Create an office document",
   "Full name (required)": "Full name (required)",
   "Password (required)": "Password (required)",
@@ -237,5 +242,6 @@
   "Public upload": "Public upload",
   "Password reset": "Password reset",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Find all your documents put online directly on your computer via the workstation, without going through the software.",
-  "Archived Topic": "Archived Topic"
+  "Archived Topic": "Archived Topic",
+  "@username": "@username"
 }

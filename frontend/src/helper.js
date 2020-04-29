@@ -86,7 +86,8 @@ export const CONTENT_TYPE = {
 export const COOKIE_FRONTEND = {
   LAST_CONNECTION: 'lastConnection',
   DEFAULT_LANGUAGE: 'defaultLanguage',
-  DEFAULT_EXPIRE_TIME: 180
+  DEFAULT_EXPIRE_TIME: 180,
+  USERNAME_ESTABLISHED: 'usernameEstablished'
 }
 
 export const getUserProfile = slug => PROFILE_LIST.find(p => slug === p.slug) || {}
