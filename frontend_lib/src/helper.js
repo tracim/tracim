@@ -288,3 +288,11 @@ export const IMG_LOAD_STATE = {
   LOADING: 'loading',
   ERROR: 'error'
 }
+
+export const removeAtInUsername = (username) => {
+  let trimmedUserName = username.trim()
+  if (trimmedUserName.length > 0 && trimmedUserName.includes('@') && trimmedUserName[0] === '@') {
+    trimmedUserName = trimmedUserName.substring(1)
+  }
+  return trimmedUserName
+}

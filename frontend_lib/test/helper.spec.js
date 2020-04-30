@@ -4,7 +4,8 @@ import {
   convertBackslashNToBr,
   handleFetchResult,
   generateFetchResponse,
-  parserStringToList
+  parserStringToList,
+  removeAtInUsername
 } from '../src/helper.js'
 
 describe('helper.js', () => {
@@ -95,6 +96,27 @@ describe('helper.js', () => {
       const substringList = ['randomEmail@randomEmail.randomEmail', 'randomEmail@randomEmail.randomEmail', 'randomEmail@randomEmail.randomEmail']
 
       expect(substringList).to.deep.equal(parserStringToList(string, separatorList))
+    })
+  })
+
+  describe('the removeAtInUsername() function', () => {
+    it('should return the username without @ when username is "@johndoe"', () => {
+      expect(removeAtInUsername('@johndoe')).to.eq('johndoe')
+    })
+    it('should return the username without @  and whitespace when username is "    @johndoe    "', () => {
+      expect(removeAtInUsername('    @johndoe    ')).to.eq('johndoe')
+    })
+    it('should return the username without channges when username is "johndoe"', () => {
+      expect(removeAtInUsername('johndoe')).to.eq('johndoe')
+    })
+    it('should return the username empty when username is "@"', () => {
+      expect(removeAtInUsername('@')).to.eq('')
+    })
+    it('should return the username without @ when username is "@j"', () => {
+      expect(removeAtInUsername('@j')).to.eq('j')
+    })
+    it('should return the username empty when username is empty', () => {
+      expect(removeAtInUsername('')).to.eq('')
     })
   })
 })

@@ -14,7 +14,8 @@ import {
   PageContent,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -35,8 +36,7 @@ import {
 } from '../action-creator.async.js'
 import {
   editableUserAuthTypeList,
-  PAGE,
-  removeAtInUserName
+  PAGE
 } from '../helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
@@ -183,7 +183,7 @@ export class Account extends React.Component {
     }
 
     if (newUserName !== '') {
-      const userName = removeAtInUserName(newUserName)
+      const userName = removeAtInUsername(newUserName)
 
       if (userName.length < 3) {
         props.dispatch(newFlashMessage(props.t('Username must be at least 3 characters'), 'warning'))
