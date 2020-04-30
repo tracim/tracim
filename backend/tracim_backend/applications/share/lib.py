@@ -95,8 +95,10 @@ class ShareLib(object):
             except SMTPRecipientsRefused:
                 logger.warning(
                     self,
-                    "Share initied by user {username} but "
-                    "SMTP server refuse to send notification".format(username=self._user.username),
+                    "Share initied by user {} but "
+                    "SMTP server refuse to send notification ".format(
+                        self._user.username or self._user.email
+                    ),
                 )
             except SMTPException as exc:
                 raise NotificationSendingFailed(
