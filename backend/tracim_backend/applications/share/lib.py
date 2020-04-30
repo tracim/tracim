@@ -97,7 +97,7 @@ class ShareLib(object):
                     self,
                     "Share initied by user {} but "
                     "SMTP server refuse to send notification ".format(
-                        self._user.username or self._user.email
+                        self._user.email or self._user.username
                     ),
                 )
             except SMTPException as exc:
