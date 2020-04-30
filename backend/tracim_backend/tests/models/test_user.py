@@ -85,8 +85,8 @@ class TestUserModel(object):
             session.flush()
 
         # NOTE BS 20200427: caught exception depend as database engine, but we expect
-        # "unique" string in exception message
-        assert "unique" in str(caught.value).lower()
+        # "unique" or "duplicate" string in exception message
+        assert "unique" in str(caught.value).lower() or "duplicate" in str(caught.value).lower()
 
     def test_unit__create__error__no_username_and_no_email(self, session):
         session.flush()
