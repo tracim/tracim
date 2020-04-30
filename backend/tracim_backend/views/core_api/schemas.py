@@ -1008,6 +1008,15 @@ class TimezoneSchema(marshmallow.Schema):
     name = StrippedString(example="Europe/London")
 
 
+class GetUsernameAvailabilities(marshmallow.Schema):
+    username = marshmallow.fields.List(StrippedString(example="The-powerUser_42"))
+
+
+class UsernameAvailability(marshmallow.Schema):
+    username = StrippedString(example="The-powerUser_42", required=True)
+    available = marshmallow.fields.Boolean(required=True)
+
+
 class AboutSchema(marshmallow.Schema):
     name = StrippedString(example="Tracim", description="Software name")
     version = StrippedString(example="2.6", description="Version of Tracim")

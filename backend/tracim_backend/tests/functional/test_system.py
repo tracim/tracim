@@ -168,6 +168,29 @@ class TestAboutEndpoint(object):
         assert "details" in res.json.keys()
 
 
+@pytest.mark.usefixtures("test_fixture")
+class TestUsernameAvailabilitiesEndpoint(object):
+    """
+    Tests for /api/v2/system/username-availability
+    """
+
+    def test_api__get_username_availabilities__ok_200__nominal_case(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        usernames = ["TheAdmin", "TheBobi", "Cloclo", "anotherOne"]
+        query = "&username=".join(usernames)
+        res = web_testapp.get(
+            "/api/v2/system/username-availability?username={}".format(query), status=200
+        )
+        assert len(res.json) == len(usernames)
+        availabilities = {
+            d["username"]: d["available"] for d in (sorted(res.json, key=lambda d: d["username"]))
+        }
+        assert not availabilities["TheAdmin"]
+        assert not availabilities["TheBobi"]
+        assert availabilities["Cloclo"]
+        assert availabilities["anotherOne"]
+
+
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
 class TestConfigEndpointCollabora(object):

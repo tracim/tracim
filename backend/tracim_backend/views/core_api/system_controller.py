@@ -1,5 +1,7 @@
 # coding=utf-8
+import typing
 
+from hapic.data import HapicData
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import content_type_list
@@ -18,7 +20,9 @@ from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
 from tracim_backend.views.core_api.schemas import ErrorCodeSchema
+from tracim_backend.views.core_api.schemas import GetUsernameAvailabilities
 from tracim_backend.views.core_api.schemas import TimezoneSchema
+from tracim_backend.views.core_api.schemas import UsernameAvailability
 
 SWAGGER_TAG_SYSTEM_ENDPOINTS = "System"
 
@@ -62,6 +66,20 @@ class SystemController(Controller):
         Get List of timezones
         """
         return get_timezones_list()
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.input_query(GetUsernameAvailabilities(), as_list="username")
+    @hapic.output_body(UsernameAvailability(many=True))
+    def username_availabilities(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.List[typing.Dict[str, bool]]:
+        """
+        Return availability for each given username
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        system_api = SystemApi(app_config, request.dbsession)
+        return system_api.get_username_availabilities(hapic_data.query["username"])
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
@@ -125,3 +143,9 @@ class SystemController(Controller):
         # Content_types
         configurator.add_route("timezones_list", "/system/timezones", request_method="GET")
         configurator.add_view(self.timezones_list, route_name="timezones_list")
+
+        # username availability
+        configurator.add_route(
+            "username_availabilities", "/system/username-availability", request_method="GET"
+        )
+        configurator.add_view(self.username_availabilities, route_name="username_availabilities")
