@@ -65,7 +65,7 @@ class TracimDomainController(object):
         api = UserApi(None, session, self.app_config)
         try:
             api.authenticate(
-                email_or_username=username,
+                login=username,
                 password=password,
                 ldap_connector=environ["tracim_registry"].ldap_connector,
             )

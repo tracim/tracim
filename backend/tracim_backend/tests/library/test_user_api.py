@@ -692,7 +692,7 @@ class TestUserApi(object):
     @pytest.mark.internal_auth
     def test_unit__authenticate_user___ok__nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        user = api.authenticate(email_or_username="admin@admin.admin", password="admin@admin.admin")
+        user = api.authenticate(login="admin@admin.admin", password="admin@admin.admin")
         assert isinstance(user, User)
         assert user.email == "admin@admin.admin"
         assert user.auth_type == AuthType.INTERNAL
@@ -700,7 +700,7 @@ class TestUserApi(object):
     @pytest.mark.internal_auth
     def test_unit__authenticate_user__ok__with_username(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        user = api.authenticate(email_or_username="TheAdmin", password="admin@admin.admin")
+        user = api.authenticate(login="TheAdmin", password="admin@admin.admin")
         assert isinstance(user, User)
         assert user.email == "admin@admin.admin"
         assert user.username == "TheAdmin"
@@ -722,19 +722,19 @@ class TestUserApi(object):
         )
         api.disable(user)
         with pytest.raises(AuthenticationFailed):
-            api.authenticate(email_or_username="test@test.test", password="test@test.test")
+            api.authenticate(login="test@test.test", password="test@test.test")
 
     @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__wrong_password(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(AuthenticationFailed):
-            api.authenticate(email_or_username="admin@admin.admin", password="wrong_password")
+            api.authenticate(login="admin@admin.admin", password="wrong_password")
 
     @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__wrong_user(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(AuthenticationFailed):
-            api.authenticate(email_or_username="admin@admin.admin", password="wrong_password")
+            api.authenticate(login="admin@admin.admin", password="wrong_password")
 
     def test_unit__disable_user___ok__nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
@@ -795,7 +795,7 @@ class TestFakeLDAPUserApi(object):
     def test_unit__authenticate_user___err__no_ldap_connector(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(MissingLDAPConnector):
-            api.authenticate(email_or_username="hubert@planetexpress.com", password="professor")
+            api.authenticate(login="hubert@planetexpress.com", password="professor")
 
     @pytest.mark.xfail(reason="create account with specific profile ldap feature disabled")
     @pytest.mark.ldap
@@ -820,7 +820,7 @@ class TestFakeLDAPUserApi(object):
 
         api = UserApi(current_user=None, session=session, config=app_config)
         user = api.authenticate(
-            email_or_username="hubert@planetexpress.com",
+            login="hubert@planetexpress.com",
             password="professor",
             ldap_connector=fake_ldap_connector(),
         )
@@ -840,7 +840,7 @@ class TestFakeLDAPUserApi(object):
 
         api = UserApi(current_user=None, session=session, config=app_config)
         user = api.authenticate(
-            email_or_username="hubert@planetexpress.com",
+            login="hubert@planetexpress.com",
             password="professor",
             ldap_connector=fake_ldap_connector(),
         )

@@ -49,9 +49,7 @@ class SessionController(Controller):
         if login.email:
             try:
                 user = uapi.authenticate(
-                    email_or_username=login.email,
-                    password=login.password,
-                    ldap_connector=ldap_connector,
+                    login=login.email, password=login.password, ldap_connector=ldap_connector,
                 )
             except AuthenticationFailed as exc:
                 if not login.username:
@@ -59,9 +57,7 @@ class SessionController(Controller):
 
         if user is None:
             user = uapi.authenticate(
-                email_or_username=login.username,
-                password=login.password,
-                ldap_connector=ldap_connector,
+                login=login.username, password=login.password, ldap_connector=ldap_connector,
             )
 
         remember(request, user.user_id)
