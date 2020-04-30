@@ -38,7 +38,7 @@ class SessionController(Controller):
         Eg. : `session_key=932d2ad68f3a094c2d4da563ccb921e6479729f5b5f707eba91d4194979df20831be48a0; expires=Mon, 22-Oct-2018 19:37:02 GMT; Path=/; SameSite=Lax`
         """
 
-        login: LoginCredentials = hapic_data.body
+        login = hapic_data.body  # type: LoginCredentials
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         ldap_connector = None
