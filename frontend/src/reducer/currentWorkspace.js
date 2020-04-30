@@ -55,6 +55,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         memberList: action.workspaceMemberList.map(m => ({
           id: m.user_id,
           publicName: m.user.public_name,
+          username: m.user.username,
           role: m.role,
           isActive: m.is_active,
           doNotify: m.do_notify

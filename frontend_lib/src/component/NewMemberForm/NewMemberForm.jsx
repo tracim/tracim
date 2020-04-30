@@ -51,6 +51,10 @@ export const NewMemberForm = props => {
 
                     <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
                       {u.public_name}
+
+                      <div className='autocomplete__item__name__username' data-cy='autocomplete__item__username'>
+                        {u.username}
+                      </div>
                     </div>
                   </div>
                 )

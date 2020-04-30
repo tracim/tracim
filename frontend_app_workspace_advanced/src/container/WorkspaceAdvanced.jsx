@@ -382,7 +382,7 @@ class WorkspaceAdvanced extends React.Component {
       return
     }
 
-    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.nameOrEmail)
+    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.user_id === state.newMember.id)
 
     if (
       state.config.system && state.config.system.config &&

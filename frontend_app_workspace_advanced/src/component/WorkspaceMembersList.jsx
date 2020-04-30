@@ -44,6 +44,10 @@ export const WorkspaceMembersList = props => {
 
                 <div className='workspace_advanced__userlist__list__item__name'>
                   {m.user.public_name}
+
+                  <div className='workspace_advanced__userlist__list__item__name__username'>
+                    {m.user.username}
+                  </div>
                 </div>
 
                 <div className='workspace_advanced__userlist__list__item__role dropdown'>

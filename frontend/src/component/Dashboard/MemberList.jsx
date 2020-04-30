@@ -80,6 +80,10 @@ export class MemberList extends React.Component {
                           {m.publicName}
                         </div>
 
+                        <div className='memberlist__list__item__info__username'>
+                          {m.username}
+                        </div>
+
                         <div className='memberlist__list__item__info__role'>
                           {props.t(props.roleList.find(r => r.slug === m.role).label)}
                         </div>
