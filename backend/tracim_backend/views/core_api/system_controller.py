@@ -89,7 +89,7 @@ class SystemController(Controller):
         This is the equivalent of classical "help > about" menu in classical software.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        system_api = SystemApi(app_config)
+        system_api = SystemApi(app_config, request.dbsession)
         return system_api.get_about()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
@@ -103,14 +103,14 @@ class SystemController(Controller):
         # do not allow unauthenticated user to
         # get all config info
         app_config = request.registry.settings["CFG"]  # type: CFG
-        system_api = SystemApi(app_config)
+        system_api = SystemApi(app_config, request.dbsession)
         return system_api.get_config()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @hapic.output_body(ErrorCodeSchema(many=True))
     def error_codes(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
-        system_api = SystemApi(app_config)
+        system_api = SystemApi(app_config, request.dbsession)
         return system_api.get_error_codes()
 
     def bind(self, configurator: Configurator) -> None:
