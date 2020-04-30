@@ -46,7 +46,6 @@ RUN \
     libpq-dev \
     libreoffice \
     locales \
-    mysql-client \
     poppler-utils \
     postgresql-client \
     python3 \
