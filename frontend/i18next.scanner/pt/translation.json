@@ -238,8 +238,8 @@
   "Have a good day!": "Tenha um bom dia!",
   "Archived Topic": "Tópico arquivado",
   "Search…": "Pesquisar...",
-  "Username must be at least 3 characters": "O nome de utilizador deve ter pelo menos 3 caracteres",
-  "Username can't contain any whitespace": "O nome de utilizador não pode conter nenhum espaço em branco",
+  "Username must be at least 3 characters": "O identificador deve ter pelo menos 3 carateres",
+  "Username can't contain any whitespace": "O identificador não pode conter nenhum espaço em branco",
   "@username": "@identificador",
-  "When changed, the old username and everything linked to it will be lost.": "Ao mudar, o seu antigo nome de utilizador e tudo o que lhe está ligado perder-se-á."
+  "When changed, the old username and everything linked to it will be lost.": "Ao mudar, o seu antigo identificador e tudo o que lhe está ligado perder-se-á."
 }

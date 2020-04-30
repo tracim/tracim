@@ -29,7 +29,7 @@ export class PersonalData extends React.Component {
   handleClickSubmit = async () => {
     const { props, state } = this
 
-    if (state.newEmail !== '' && state.checkPassword === '') {
+    if ((state.newEmail !== '' || state.newUserName !== '') && state.checkPassword === '') {
       props.dispatch(newFlashMessage(props.t('Please type your password in order to change your email. (For security reasons)'), 'warning'))
       return
     }
@@ -98,7 +98,7 @@ export class PersonalData extends React.Component {
             </div>
           )}
 
-          {state.newEmail !== '' && (
+          {(state.newEmail !== '' || state.newUserName !== '') && (
             <div className='d-flex align-items-center flex-wrap mb-4'>
               <input
                 className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
@@ -106,7 +106,7 @@ export class PersonalData extends React.Component {
                 placeholder={props.displayAdminInfo ? props.t("Administrator's password") : props.t('Type your password')}
                 value={state.checkPassword}
                 onChange={this.handleChangeCheckPassword}
-                disabled={state.newEmail === ''}
+                disabled={state.newEmail === '' && state.newUserName === ''}
               />
               {props.displayAdminInfo && (
                 <div className='personaldata__form__txtinput__info'>
