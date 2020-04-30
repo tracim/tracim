@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM debian:buster
 MAINTAINER contact@tracim.fr
 
 ARG TAG=""
@@ -64,7 +64,7 @@ RUN \
     xvfb \
     zlib1g-dev \
 # Install nodejs
-    && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
     && apt update \
     && apt install -qy nodejs \
 # Clone repo
