@@ -1008,8 +1008,8 @@ class TimezoneSchema(marshmallow.Schema):
     name = StrippedString(example="Europe/London")
 
 
-class GetUsernameAvailabilities(marshmallow.Schema):
-    username = marshmallow.fields.List(StrippedString(example="The-powerUser_42"))
+class GetUsernameAvailability(marshmallow.Schema):
+    username = StrippedString(example="The-powerUser_42", required=True)
 
 
 class UsernameAvailability(marshmallow.Schema):

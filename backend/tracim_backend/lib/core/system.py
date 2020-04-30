@@ -14,7 +14,6 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.models.context_models import ErrorCodeModel
-from tracim_backend.views.core_api.schemas import UsernameAvailability
 
 
 class SystemApi(object):
@@ -65,13 +64,6 @@ class SystemApi(object):
             error_codes.append(ErrorCodeModel(error_code))
         return error_codes
 
-    def get_username_availabilities(
-        self, usernames: typing.List[str]
-    ) -> typing.List[typing.Dict[str, bool]]:
-        availabilities: typing.List[UsernameAvailability] = []
+    def get_username_availability(self, username: str) -> bool:
         uapi = UserApi(None, session=self._session, config=self._config)
-        for username in usernames:
-            availabilities.append(
-                dict(username=username, available=not uapi.check_username_already_in_db(username),)
-            )
-        return availabilities
+        return not uapi.check_username_already_in_db(username)

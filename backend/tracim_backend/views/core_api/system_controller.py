@@ -1,6 +1,4 @@
 # coding=utf-8
-import typing
-
 from hapic.data import HapicData
 from pyramid.config import Configurator
 
@@ -20,7 +18,7 @@ from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
 from tracim_backend.views.core_api.schemas import ErrorCodeSchema
-from tracim_backend.views.core_api.schemas import GetUsernameAvailabilities
+from tracim_backend.views.core_api.schemas import GetUsernameAvailability
 from tracim_backend.views.core_api.schemas import TimezoneSchema
 from tracim_backend.views.core_api.schemas import UsernameAvailability
 
@@ -69,17 +67,18 @@ class SystemController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
-    @hapic.input_query(GetUsernameAvailabilities(), as_list="username")
-    @hapic.output_body(UsernameAvailability(many=True))
-    def username_availabilities(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> typing.List[typing.Dict[str, bool]]:
+    @hapic.input_query(GetUsernameAvailability())
+    @hapic.output_body(UsernameAvailability())
+    def username_availability(self, context, request: TracimRequest, hapic_data: HapicData) -> dict:
         """
         Return availability for each given username
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         system_api = SystemApi(app_config, request.dbsession)
-        return system_api.get_username_availabilities(hapic_data.query["username"])
+        return {
+            "username": hapic_data.query["username"],
+            "available": system_api.get_username_availability(hapic_data.query["username"]),
+        }
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
@@ -146,6 +145,6 @@ class SystemController(Controller):
 
         # username availability
         configurator.add_route(
-            "username_availabilities", "/system/username-availability", request_method="GET"
+            "username_availability", "/system/username-availability", request_method="GET"
         )
-        configurator.add_view(self.username_availabilities, route_name="username_availabilities")
+        configurator.add_view(self.username_availability, route_name="username_availability")
