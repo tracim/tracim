@@ -13,7 +13,6 @@
   "Copyright 2013 - 2017": "Copyright 2013 - 2017",
   "Your name has been changed": "Seu nome foi mudado",
   "Error while changing name": "Erro ao mudar o nome",
-  "Your name and email has been changed": "Seu nome e e-mail foram mudados",
   "Your email has been changed": "Seu e-mail foi mudado",
   "Error while changing email": "Erro ao mudar o e-mail",
   "Error while changing subscription": "Erro ao mudar a subscrição",
@@ -23,7 +22,6 @@
   "My account": "Minha conta",
   "Error while loading user": "Erro ao carregar o utilizador",
   "Name has been changed": "Nome foi mudado",
-  "Name and email has been changed": "Nome e e-mail foram mudados",
   "Email has been changed": "O e-mail foi mudado",
   "Password has been changed": "Palavra-passe foi mudada",
   "Wrong administrator's password": "Palavra-passe do administrador incorreta",
@@ -241,5 +239,6 @@
   "Username must be at least 3 characters": "O identificador deve ter pelo menos 3 carateres",
   "Username can't contain any whitespace": "O identificador não pode conter nenhum espaço em branco",
   "@username": "@identificador",
-  "When changed, the old username and everything linked to it will be lost.": "Ao mudar, o seu antigo identificador e tudo o que lhe está ligado perder-se-á."
+  "When changed, the old username and everything linked to it will be lost.": "Ao mudar, o seu antigo identificador e tudo o que lhe está ligado perder-se-á.",
+  "Your personal data has been changed": "Os seus dados pessoais foram alterados"
 }

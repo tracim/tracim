@@ -156,20 +156,20 @@ export class Account extends React.Component {
     subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
   }))
 
-  handleSubmitPersonalData = async (newName, newUserName, newEmail, checkPassword) => {
+  handleSubmitPersonalData = async (newPublicName, newUserName, newEmail, checkPassword) => {
     const { props } = this
 
-    if (newName !== '') {
-      if (newName.length < 3) {
+    if (newPublicName !== '') {
+      if (newPublicName.length < 3) {
         props.dispatch(newFlashMessage(props.t('Full name must be at least 3 characters'), 'warning'))
         return false
       }
 
-      const fetchPutUserName = await props.dispatch(putMyselfName(props.user, newName))
-      switch (fetchPutUserName.status) {
+      const fetchPutPublicName = await props.dispatch(putMyselfName(props.user, newPublicName))
+      switch (fetchPutPublicName.status) {
         case 200:
-          props.dispatch(updateUserName(newName))
-          if (newEmail === '') {
+          props.dispatch(updateUserName(newPublicName))
+          if (newEmail === '' && newUserName === '') {
             props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
             return true
           }
@@ -203,7 +203,7 @@ export class Account extends React.Component {
       switch (fetchPutUserEmail.status) {
         case 200:
           props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
-          if (newName !== '') props.dispatch(newFlashMessage(props.t('Your name and email has been changed'), 'info'))
+          if (newUserName !== '' || newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your personal data has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
           return true
         default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); return false

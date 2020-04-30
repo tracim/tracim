@@ -13,7 +13,6 @@
   "Copyright 2013 - 2017": "Copyright 2013 - 2017",
   "Your name has been changed": "Your name has been changed",
   "Error while changing name": "Error while changing name",
-  "Your name and email has been changed": "Your name and email has been changed",
   "Your email has been changed": "Your email has been changed",
   "Error while changing email": "Error while changing email",
   "Error while changing subscription": "Error while changing subscription",
@@ -23,7 +22,6 @@
   "My account": "My account",
   "Error while loading user": "Error while loading user",
   "Name has been changed": "Name has been changed",
-  "Name and email has been changed": "Name and email has been changed",
   "Email has been changed": "Email has been changed",
   "Password has been changed": "Password has been changed",
   "Wrong administrator's password": "Wrong administrator's password",
@@ -241,5 +239,6 @@
   "Username must be at least 3 characters": "Username must be at least 3 characters",
   "Username can't contain any whitespace": "Username can't contain any whitespace",
   "@username": "@username",
-  "When changed, the old username and everything linked to it will be lost.": "When changed, the old username and everything linked to it will be lost."
+  "When changed, the old username and everything linked to it will be lost.": "When changed, the old username and everything linked to it will be lost.",
+  "Your personal data has been changed": "Your personal data has been changed"
 }
