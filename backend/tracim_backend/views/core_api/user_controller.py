@@ -11,6 +11,7 @@ from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
+from tracim_backend.exceptions import UsernameAlreadyExistInDb
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -35,6 +36,7 @@ from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
+from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
@@ -190,6 +192,30 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(UsernameAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(InvalidUsernameFormat, HTTPStatus.BAD_REQUEST)
+    @check_right(has_personal_access)
+    @hapic.input_body(SetUsernameSchema())
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(UserSchema())
+    def set_user_username(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Set user username
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        user = uapi.set_username(
+            request.candidate_user,
+            hapic_data.body.loggedin_user_password,
+            hapic_data.body.username,
+            do_save=True,
+        )
+        return uapi.get_user_with_context(user)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
@@ -230,7 +256,6 @@ class UserController(Controller):
             request.candidate_user,
             auth_type=request.candidate_user.auth_type,
             name=hapic_data.body.public_name,
-            username=hapic_data.body.username,
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
             do_save=True,
@@ -587,6 +612,12 @@ class UserController(Controller):
             "set_user_email", "/users/{user_id:\d+}/email", request_method="PUT"
         )  # noqa: W605
         configurator.add_view(self.set_user_email, route_name="set_user_email")
+
+        # set user username
+        configurator.add_route(
+            "set_user_username", "/users/{user_id:\d+}/username", request_method="PUT"
+        )  # noqa: W605
+        configurator.add_view(self.set_user_username, route_name="set_user_username")
 
         # set user password
         configurator.add_route(

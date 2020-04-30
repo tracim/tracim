@@ -4,6 +4,7 @@ from pyramid.config import Configurator
 from pyramid.security import remember
 from pyramid_ldap3 import get_ldap_connector
 
+from tracim_backend import AuthenticationFailed
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
@@ -43,12 +44,26 @@ class SessionController(Controller):
         ldap_connector = None
         if AuthType.LDAP in app_config.AUTH_TYPES:
             ldap_connector = get_ldap_connector(request)
-        user = uapi.authenticate(
-            email=login.email,
-            username=login.username,
-            password=login.password,
-            ldap_connector=ldap_connector,
-        )
+
+        user = None
+        if login.email:
+            try:
+                user = uapi.authenticate(
+                    email_or_username=login.email,
+                    password=login.password,
+                    ldap_connector=ldap_connector,
+                )
+            except AuthenticationFailed as exc:
+                if not login.username:
+                    raise exc
+
+        if user is None:
+            user = uapi.authenticate(
+                email_or_username=login.username,
+                password=login.password,
+                ldap_connector=ldap_connector,
+            )
+
         remember(request, user.user_id)
         return uapi.get_user_with_context(user)
 

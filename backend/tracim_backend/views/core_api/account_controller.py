@@ -6,6 +6,7 @@ from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import UsernameAlreadyExistInDb
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -16,6 +17,7 @@ from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
+from tracim_backend.models.context_models import UserInContext
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
@@ -26,6 +28,7 @@ from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
+from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserSchema
@@ -92,7 +95,6 @@ class AccountController(Controller):
         user = uapi.update(
             request.current_user,
             name=hapic_data.body.public_name,
-            username=hapic_data.body.username,
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
             do_save=True,
@@ -143,6 +145,30 @@ class AccountController(Controller):
             request.current_user,
             hapic_data.body.loggedin_user_password,
             hapic_data.body.email,
+            do_save=True,
+        )
+        return uapi.get_user_with_context(user)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
+    @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(UsernameAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @check_right(is_user)
+    @hapic.input_body(SetUsernameSchema())
+    @hapic.output_body(UserSchema())
+    def set_account_username(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> UserInContext:
+        """
+        Set user username
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        user = uapi.set_username(
+            request.current_user,
+            hapic_data.body.loggedin_user_password,
+            hapic_data.body.username,
             do_save=True,
         )
         return uapi.get_user_with_context(user)
@@ -375,6 +401,10 @@ class AccountController(Controller):
         # set account email
         configurator.add_route("set_account_email", "/users/me/email", request_method="PUT")
         configurator.add_view(self.set_account_email, route_name="set_account_email")
+
+        # set account username
+        configurator.add_route("set_account_username", "/users/me/username", request_method="PUT")
+        configurator.add_view(self.set_account_username, route_name="set_account_username")
 
         # set account password
         configurator.add_route("set_account_password", "/users/me/password", request_method="PUT")

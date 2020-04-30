@@ -487,30 +487,21 @@ class UserApi(object):
             raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc
 
     def authenticate(
-        self,
-        password: str,
-        email: typing.Optional[str] = None,
-        username: typing.Optional[str] = None,
-        ldap_connector: "Connector" = None,
+        self, password: str, email_or_username: str, ldap_connector: "Connector" = None,
     ) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. try all auth available in order and raise issue of
         last auth if all auth failed.
-        :param email: email of the user
-        :param username: username of the user
+        :param email_or_username: email or username of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :return: User who was authenticated.
         """
-        user_auth_type_not_available = AuthenticationFailed(
-            "Auth mechanism for this user is not activated"
-        )
         for auth_type in self._config.AUTH_TYPES:
             try:
                 return self._authenticate(
-                    email=email,
-                    username=username,
+                    email_or_username=email_or_username,
                     password=password,
                     ldap_connector=ldap_connector,
                     auth_type=auth_type,
@@ -520,51 +511,48 @@ class UserApi(object):
             except WrongAuthTypeForUser:
                 pass
 
-        raise user_auth_type_not_available
+        raise AuthenticationFailed("Auth mechanism for this user is not activated")
 
     def _authenticate(
         self,
         password: str,
-        email: typing.Optional[str] = None,
-        username: typing.Optional[str] = None,
+        email_or_username: str,
         ldap_connector: "Connector" = None,
         auth_type: AuthType = AuthType.INTERNAL,
     ) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. check only one auth
-        :param email: email of the user
-        :param username: username of the user
+        :param email_or_username: email of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :param auth_type: auth type to test.
         :return: User who was authenticated.
         """
-        assert username or email
         user = None
 
         # try to get existing user with email
-        if email:
-            try:
-                user = self.get_one_by_email(email)
-            except UserDoesNotExist:
-                pass
+        try:
+            user = self.get_one_by_email(email_or_username)
+        except UserDoesNotExist:
+            pass
 
         # try to get existing user with email
-        if username:
-            try:
-                user = self.get_one_by_username(username)
-            except UserDoesNotExist:
-                pass
+        try:
+            user = self.get_one_by_username(email_or_username)
+        except UserDoesNotExist:
+            pass
 
         # try auth
         try:
             if auth_type == AuthType.LDAP:
                 if ldap_connector:
-                    return self._ldap_authenticate(user, email, password, ldap_connector)
+                    return self._ldap_authenticate(
+                        user, email_or_username, password, ldap_connector
+                    )
                 raise MissingLDAPConnector()
             elif auth_type == AuthType.INTERNAL:
-                return self._internal_db_authenticate(user, email, password)
+                return self._internal_db_authenticate(user, email_or_username, password)
             else:
                 raise UnknownAuthType()
         except (
@@ -575,7 +563,9 @@ class UserApi(object):
             UserAuthenticatedIsNotActive,
             TracimValidationFailed,
         ) as exc:
-            raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc
+            raise AuthenticationFailed(
+                'User "{}" authentication failed'.format(email_or_username)
+            ) from exc
 
     # Actions
     def set_password(
@@ -615,7 +605,9 @@ class UserApi(object):
             self.save(user)
         return user
 
-    def set_email(self, user: User, loggedin_user_password: str, email: str, do_save: bool = True):
+    def set_email(
+        self, user: User, loggedin_user_password: str, email: str, do_save: bool = True
+    ) -> User:
         """
         Set email address of user if loggedin user password is correct
         :param user: User who need email changed
@@ -635,6 +627,28 @@ class UserApi(object):
                 "Wrong password for authenticated user {}".format(self._user.user_id)
             )
         self.update(user=user, email=email, do_save=do_save)
+        return user
+
+    def set_username(
+        self, user: User, loggedin_user_password: str, username: str, do_save: bool = True
+    ) -> User:
+        """
+        Set username of user if loggedin user password is correct
+        :param user: User who need email changed
+        :param loggedin_user_password: cleartext password of logged user (not
+        same as user)
+        :param username: new username
+        :param do_save: if True, flush database session
+        :return:
+        """
+        if not self._user:
+            raise NoUserSetted("Current User should be set in UserApi to use this method")
+
+        if not self._user.validate_password(loggedin_user_password):
+            raise WrongUserPassword(
+                "Wrong password for authenticated user {}".format(self._user.user_id)
+            )
+        self.update(user=user, username=username, do_save=do_save)
         return user
 
     def set_password_reset_token(
@@ -676,7 +690,7 @@ class UserApi(object):
         UsernameAlreadyExistInDb if username already used.
         """
         if not self._check_username_correctness(username):
-            raise InvalidUsernameFormat("Username given form {} is not correct".format(username))
+            raise InvalidUsernameFormat("Username '{}' is not correct".format(username))
 
         if self.check_username_already_in_db(username):
             raise UsernameAlreadyExistInDb(

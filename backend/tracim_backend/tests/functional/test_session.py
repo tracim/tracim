@@ -4,6 +4,7 @@ import datetime
 from freezegun import freeze_time
 import pytest
 import transaction
+from webtest import TestApp
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
@@ -40,14 +41,14 @@ class TestLoginEndpoint(object):
         res = web_testapp.post_json("/api/v2/auth/login", params=params, status=200)
         assert res.json_body["created"]
         datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
-        assert res.json_body["public_name"] == "Global manager"
         assert res.json_body["username"] == "TheAdmin"
-        assert res.json_body["email"] == "admin@admin.admin"
-        assert res.json_body["is_active"]
-        assert res.json_body["profile"]
-        assert res.json_body["profile"] == "administrators"
-        assert res.json_body["avatar_url"] is None
-        assert res.json_body["auth_type"] == "internal"
+
+    def test_api__try_login_enpoint__ok_200__with_username_basic_auth(
+        self, web_testapp: TestApp,
+    ) -> None:
+        web_testapp.authorization = ("Basic", ("TheAdmin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/auth/whoami", status=200)
+        assert res.json_body["public_name"] == "Global manager"
 
     def test_api__try_login_enpoint__ok_200__without_username_and_email(self, web_testapp):
         params = {"password": "admin@admin.admin"}

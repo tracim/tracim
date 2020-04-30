@@ -155,6 +155,16 @@ class SetEmail(object):
         self.email = email
 
 
+class SetUsername(object):
+    """
+    Just an username and password
+    """
+
+    def __init__(self, loggedin_user_password: str, username: str) -> None:
+        self.loggedin_user_password = loggedin_user_password
+        self.username = username
+
+
 class SimpleFile(object):
     def __init__(self, files: cgi.FieldStorage = None) -> None:
         self.files = files

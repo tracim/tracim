@@ -58,6 +58,7 @@ from tracim_backend.models.context_models import RoleUpdate
 from tracim_backend.models.context_models import SetContentStatus
 from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
+from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
 from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
@@ -254,6 +255,16 @@ class SetEmailSchema(LoggedInUserPasswordSchema):
         return SetEmail(**data)
 
 
+class SetUsernameSchema(LoggedInUserPasswordSchema):
+    username = StrippedString(
+        required=True, example="The-user_42", validate=user_username_validator
+    )
+
+    @post_load
+    def create_set_username_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return SetUsername(**data)
+
+
 class SetPasswordSchema(LoggedInUserPasswordSchema):
     new_password = String(example="8QLa$<w", required=True, validate=user_password_validator)
     new_password2 = String(example="8QLa$<w", required=True, validate=user_password_validator)
@@ -274,9 +285,6 @@ class SetUserInfoSchema(marshmallow.Schema):
     )
     public_name = StrippedString(
         example="John Doe", required=False, validate=user_public_name_validator, default=None
-    )
-    username = StrippedString(
-        example="JohnDoe", required=False, validate=user_username_validator, default=None
     )
     lang = StrippedString(
         description=FIELD_LANG_DESC,
@@ -749,7 +757,7 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
         example="John", default=None, allow_none=True, validate=user_public_name_validator
     )
     user_username = StrippedString(
-        example="John_Doe", default=None, allow_none=True, validate=user_username_validator
+        example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
     )
 
     @post_load
