@@ -892,7 +892,7 @@ class UserApi(object):
     ) -> User:
         """Previous create_user method"""
         if not email and not username:
-            raise EmailOrUsernameRequired(f"Email or username is required to create an user")
+            raise EmailOrUsernameRequired("Email or username is required to create an user")
         lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
         validator.add_validator("email", lowercase_email, user_email_validator)
