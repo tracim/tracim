@@ -759,7 +759,7 @@ class UserApi(object):
             ):
                 raise UserAuthTypeDisabled(
                     'Can\'t update user "{}" auth_type with unavailable value "{}".'.format(
-                        user.email or user.username, auth_type
+                        user.login, auth_type
                     )
                 )
             user.auth_type = auth_type
@@ -808,9 +808,7 @@ class UserApi(object):
         ]:
             raise ExternalAuthUserPasswordModificationDisallowed(
                 "user {} is link to external auth {},"
-                "password modification disallowed".format(
-                    user.email or user.username, user.auth_type
-                )
+                "password modification disallowed".format(user.login, user.auth_type)
             )
         return True
 
@@ -821,7 +819,7 @@ class UserApi(object):
         ]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 "user {} is link to external auth {},"
-                "email modification disallowed".format(user.email or user.username, user.auth_type)
+                "email modification disallowed".format(user.login, user.auth_type)
             )
         return True
 
@@ -1056,9 +1054,7 @@ class UserApi(object):
     def _check_user_auth_validity(self, user: User) -> None:
         if not self._user_can_authenticate(user):
             raise UserAuthTypeDisabled(
-                "user {} auth type {} is disabled".format(
-                    user.email or user.username, user.auth_type.value
-                )
+                "user {} auth type {} is disabled".format(user.login, user.auth_type.value)
             )
 
     def _user_can_authenticate(self, user: User) -> bool:

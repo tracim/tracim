@@ -176,6 +176,11 @@ class User(DeclarativeBase):
         """Return the user object whose user name is ``username``."""
         return dbsession.query(cls).filter_by(username=username).first()
 
+    @property
+    def login(self) -> str:
+        """Return email or username if no email"""
+        return self.email or self.username
+
     def _set_password(self, cleartext_password: typing.Optional[str]) -> None:
         """
         Set ciphertext password from cleartext password.
