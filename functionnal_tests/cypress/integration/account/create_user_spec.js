@@ -8,7 +8,8 @@ const correctPwd = '123456'
 const errShortPwd = '123'
 const errLongPwd = '123'.repeat(200)
 const errPublicName = 'pn'
-const errUsername = 'un'
+const errShortUsername = 'un'
+const errSpaceUsername = 'new username'
 const errEmail = 'err.email'
 
 describe('When "Create new user" at Administration', () => {
@@ -99,12 +100,23 @@ describe('When "Create new user" at Administration', () => {
   it('should show error message if username is too short', () => {
     cy.get('[data-cy=adminUser__adduser__button]').click()
     cy.get('[data-cy=adduser_name]').type(publicName)
-    cy.get('[data-cy=adduser_username]').type(errUsername)
+    cy.get('[data-cy=adduser_username]').type(errShortUsername)
     cy.get('[data-cy=adduser_email]').type(email)
     cy.get('[data-cy=adduser_password]').type(correctPwd)
     cy.get('[data-cy=profile__list__item__administrators]').click()
     cy.get('[data-cy=adminUser__adduser__form__submit]').click()
     cy.get('.flashmessage').contains('Username must be at least 3 characters')
+  })
+
+  it('should show error message if username has a whitespace', () => {
+    cy.get('[data-cy=adminUser__adduser__button]').click()
+    cy.get('[data-cy=adduser_name]').type(publicName)
+    cy.get('[data-cy=adduser_username]').type(errSpaceUsername)
+    cy.get('[data-cy=adduser_email]').type(email)
+    cy.get('[data-cy=adduser_password]').type(correctPwd)
+    cy.get('[data-cy=profile__list__item__administrators]').click()
+    cy.get('[data-cy=adminUser__adduser__form__submit]').click()
+    cy.get('.flashmessage').contains("Username can't contain any whitespace")
   })
 
   it('should show error message if email is out of standard', () => {

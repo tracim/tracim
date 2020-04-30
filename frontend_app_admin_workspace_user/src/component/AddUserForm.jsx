@@ -3,7 +3,8 @@ import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import {
   CUSTOM_EVENT,
-  PROFILE_LIST
+  PROFILE_LIST,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
 
 export class AddUserForm extends React.Component {
@@ -51,7 +52,13 @@ export class AddUserForm extends React.Component {
       return
     }
 
-    props.onClickAddUser(state.newUserName, state.newUserUsername, state.newUserEmail, state.newUserProfile, state.newUserPassword)
+    props.onClickAddUser(
+      state.newUserName,
+      removeAtInUsername(state.newUserUsername),
+      state.newUserEmail,
+      state.newUserProfile,
+      state.newUserPassword
+    )
   }
 
   isValidateButtonDisabled = () => {

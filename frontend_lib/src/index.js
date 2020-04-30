@@ -22,7 +22,8 @@ import {
   buildFilePreviewUrl,
   removeExtensionOfFilename,
   computeProgressionPercentage,
-  buildHeadTitle
+  buildHeadTitle,
+  removeAtInUsername
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -157,5 +158,6 @@ export {
   ShareLink,
   ShareDownload,
   ProgressBar,
-  RadioBtnGroup
+  RadioBtnGroup,
+  removeAtInUsername
 }

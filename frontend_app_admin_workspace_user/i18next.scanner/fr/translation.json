@@ -41,6 +41,7 @@
   "Full name": "Nom complet",
   "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères",
   "Username must be at least 3 characters": "L'identeifiant doit faire au moins 3 caractères",
+  "Username can't contain any whitespace": "L'identifiant ne doit pas contenir d'espace",
   "Email notification are disabled, please manually notify users of any change": "Les notifications par email sont désactivées, veuillez informer manuellement les utilisateurs des changements",
   "Error, invalid email address": "Erreur, email invalide",
   "Create a shared space": "Créer un espace partagé",
