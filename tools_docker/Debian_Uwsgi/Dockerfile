@@ -46,7 +46,6 @@ RUN \
     libpq-dev \
     libreoffice \
     locales \
-    mysql-client \
     poppler-utils \
     postgresql-client \
     python3 \
@@ -64,7 +63,7 @@ RUN \
     xvfb \
     zlib1g-dev \
 # Install nodejs
-    && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
     && apt update \
     && apt install -qy nodejs \
 # Clone repo

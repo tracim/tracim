@@ -78,8 +78,8 @@ debian_install() {
 
         debian_install_curl
 
-        curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-        echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+        curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | $SUDO apt-key add -
+        echo "deb https://dl.yarnpkg.com/debian/ stable main" | $SUDO tee /etc/apt/sources.list.d/yarn.list
 
         log "We will install yarn."
         apt_install=true
