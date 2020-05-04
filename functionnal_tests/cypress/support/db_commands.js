@@ -49,17 +49,17 @@ Cypress.Commands.add('enableUser', (userId) =>
 )
 
 Cypress.Commands.add('createRandomUser', (profile = 'users') => {
-  const FullName = makeRandomString()
-  const Username = makeRandomString()
+  const fullName = makeRandomString()
+  const username = makeRandomString()
 
   const data = {
-    email: `${FullName}@tracim.fr`,
+    email: `${fullName}@tracim.fr`,
     email_notification: false,
     lang: 'en',
     password: '8QLa$<w',
     profile: profile,
-    public_name: FullName,
-    username: Username,
+    public_name: fullName,
+    username: username,
     timezone: 'Europe/Paris'
   }
   return cy
