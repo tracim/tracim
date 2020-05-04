@@ -6,6 +6,10 @@
 
 - backend: #2962
 
+### Breaking/Important change
+
+- If you have started Tracim 2.7.0 or 2.7.1 on existing database (>= 2.6.3), you need to downgrade your database to this version `ce074202abb2` before starting with 2.7.2. You can find downgrade documentation [here](https://github.com/tracim/tracim/blob/master/backend/doc/migration.md#downgrading-the-schema)
+
 
 ## 2.7.1 / 2020-04-30
 
