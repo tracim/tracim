@@ -373,7 +373,7 @@ class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     if (state.newMember.personalData === '') {
-      this.sendGlobalFlashMessage(props.t('Please set a name, an email or an username'), 'warning')
+      this.sendGlobalFlashMessage(props.t('Please set a name, an email or a username'), 'warning')
       return
     }
 
