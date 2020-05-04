@@ -18,6 +18,7 @@ function loggood {
 
 function logerror {
     echo -e "\n${RED}[$(date +'%H:%M:%S')]${RED} $ $1${NC}"
+    exit 1
 }
 
 function create_dir(){
@@ -36,10 +37,7 @@ function install_backend_system_dep {
     log "install base debian-packaged-dep for backend..."
     $SUDO apt update
     PACKAGE_LIST='python3 python3-venv python3-dev python3-pip redis-server zlib1g-dev libjpeg-dev imagemagick libmagickwand-dev libpq-dev ghostscript libfile-mimeinfo-perl poppler-utils libimage-exiftool-perl qpdf libldap2-dev libsasl2-dev libreoffice inkscape ufraw-batch ffmpeg'
-    for PACKAGE in $PACKAGE_LIST
-    do
-        $SUDO apt install -y $PACKAGE && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
-    done
+    $SUDO apt install -y $PACKAGE_LIST && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
 }
 
 function setup_pyenv {
@@ -118,8 +116,7 @@ function install_npm_and_nodejs {
     if [ $? -eq 0 ]; then
         loggood "npm \"$(npm -v)\" and node \"$(node -v)\" are installed"
     else
-        logerror "npm not installed"
-        log "install npm with nodejs"
+        log "npm not installed. Installing npm with nodejs"
         $SUDO apt install -y curl && loggood "install curl success" || logerror "failed to install curl"
         curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
         $SUDO apt update
@@ -133,11 +130,9 @@ function install_npm_and_nodejs {
                 loggood  "npm \"$(npm -v)\" is correctly installed"
             else
                 logerror "npm is not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
-            exit 1
             fi
         else
             logerror "nodejs 10.x and npm are not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
-            exit 1
         fi
     fi
 }
