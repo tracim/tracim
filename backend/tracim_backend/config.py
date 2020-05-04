@@ -364,7 +364,7 @@ class CFG(object):
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
         self.SESSION__REISSUE_TIME = int(self.get_raw_config("session.reissue_time", "120"))
         default_session_data_dir = self.here_macro_replace("%(here)s/sessions_data")
-        default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_data")
+        default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_lock")
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")

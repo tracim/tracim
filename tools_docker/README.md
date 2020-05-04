@@ -113,6 +113,9 @@ Exemple with SQlite, email notifications and some small customisations:
                -e TRACIM_EMAIL__NOTIFICATION__SMTP__PORT=25 \
                -e TRACIM_EMAIL__NOTIFICATION__SMTP__USER=xxxxxxxxxx \
                -e TRACIM_EMAIL__NOTIFICATION__SMTP__PASSWORD=xxxxxxxxxx \
+               -e EMAIL__NOTIFICATION__FROM__EMAIL=xxx+{user_id}@servermail.xx \
+               -e EMAIL__NOTIFICATION__REPLY_TO__EMAIL=xxxx+{content_id}@servermail.xx \
+               -e TRACIM_EMAIL__NOTIFICATION__REFERENCES__EMAIL=xxxx+{content_id}@servermail.xx \
                -e TRACIM_WEBSITE__TITLE=xxxxxx \
                -e TRACIM_WEBSITE__BASE_URL=http://{ip_or_domain} \
                -p 8080:80 \
