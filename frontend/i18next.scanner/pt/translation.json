@@ -236,7 +236,7 @@
   "Have a good day!": "Tenha um bom dia!",
   "Archived Topic": "Tópico arquivado",
   "Search…": "Pesquisar...",
-  "Unknown email or username": "E-mail ou nome de utilizador desconhecido",
-  "Email address or username": "E-mail ou nome de utilizador",
-  "This username is not linked to any email": "Este nome de utilizador não está ligado a nenhum e-mail"
+  "Unknown email or username": "E-mail ou identificador desconhecido",
+  "Email address or username": "E-mail ou identificador",
+  "This username is not linked to any email": "Este identificador não está ligado a nenhum e-mail"
 }
