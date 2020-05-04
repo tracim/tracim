@@ -247,7 +247,7 @@ class DeleteUserCommand(AppContextCommand):
         anonymize_if_required: bool = False,
         anonymized_user_display_name: typing.Optional[str] = None,
     ):
-        print('trying to delete user {}: "{}"\n'.format(user.user_id, user.email))
+        print('trying to delete user {}: "{}"\n'.format(user.user_id, user.login))
 
         deleted_workspace_ids = []
         deleted_user_id = user.user_id
@@ -285,8 +285,8 @@ class DeleteUserCommand(AppContextCommand):
                 user, anonymized_user_display_name=anonymized_user_display_name
             )
             print(
-                'user {} anonymized to "{} <{}>".'.format(
-                    user.user_id, user.display_name, user.email
+                'user {} anonymized to "{} <{}/{}>".'.format(
+                    user.user_id, user.display_name, user.email, user.username
                 )
             )
         else:
@@ -357,8 +357,8 @@ class AnonymizeUserCommand(AppContextCommand):
                 )
                 self._session.flush()
                 print(
-                    'user {} anonymized to "{} <{}>".'.format(
-                        user.user_id, user.display_name, user.email
+                    'user {} anonymized to "{} <{}/{}>".'.format(
+                        user.user_id, user.display_name, user.email, user.username
                     )
                 )
                 print("~~~~~~~~~~")

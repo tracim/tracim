@@ -10,6 +10,7 @@ class Base(Fixture):
     def insert(self):
         u = User()
         u.display_name = "Global manager"
+        u.username = "TheAdmin"
         u.email = "admin@admin.admin"
         u.password = "admin@admin.admin"
         u.profile = Profile.ADMIN
@@ -30,6 +31,7 @@ class Test(Fixture):
 
         bob = User()
         bob.display_name = "Bob i."
+        bob.username = "TheBobi"
         bob.email = "bob@fsf.local"
         bob.password = "foobarbaz"
         bob.profile = Profile.TRUSTED_USER

@@ -20,7 +20,7 @@ import {
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
-  updateUserName,
+  updateUserPublicName,
   updateUserEmail,
   updateUserWorkspaceSubscriptionNotif,
   updateUserAgendaUrl,
@@ -169,7 +169,7 @@ export class Account extends React.Component {
       const fetchPutPublicName = await props.dispatch(putMyselfName(props.user, newPublicName))
       switch (fetchPutPublicName.status) {
         case 200:
-          props.dispatch(updateUserName(newPublicName))
+          props.dispatch(updateUserPublicName(newPublicName))
           if (newEmail === '' && newUsername === '') {
             props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
             return true

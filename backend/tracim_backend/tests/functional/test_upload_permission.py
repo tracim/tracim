@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from rq import SimpleWorker
 import transaction
@@ -7,8 +9,47 @@ from tracim_backend.applications.upload_permissions.lib import UploadPermissionL
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.utils.utils import get_redis_connection
 from tracim_backend.lib.utils.utils import get_rq_queue
+from tracim_backend.models.auth import User
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+)
+class TestPrivateUploadPermissionEndpointsWithNotifications(object):
+    @pytest.mark.parametrize("with_email", (True, False))
+    def test_api__add_upload_permission__ok_200__emitter_with_or_without_email(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user: User,
+        with_email: bool,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+
+        if not with_email:
+            # remove admin (emitter) email before share content
+            admin_user.email = None
+            session.add(admin_user)
+            session.flush()
+
+        with mock.patch(
+            "tracim_backend.applications.upload_permissions.email_manager"
+            ".UploadPermissionEmailManager._notify_emitter",
+        ) as mocked__notify_emitter:
+            upload_permission_lib.add_permission_to_workspace(
+                workspace, emails=["target@user.local"], do_notify=True
+            )
+        assert mocked__notify_emitter.called == with_email
 
 
 @pytest.mark.usefixtures("base_fixture")
