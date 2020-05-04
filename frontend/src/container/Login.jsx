@@ -11,7 +11,11 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import {
+  buildHeadTitle,
+  CUSTOM_EVENT,
+  checkEmailValidity
+} from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setUserConnected,
@@ -117,7 +121,12 @@ class Login extends React.Component {
       return
     }
 
-    const fetchPostUserLogin = await props.dispatch(postUserLogin(login.value, password.value, state.inputRememberMe))
+    const credentials = {
+      ...(checkEmailValidity(login.value) ? { email: login.value } : { username: login.value }),
+      password: password.value
+    }
+
+    const fetchPostUserLogin = await props.dispatch(postUserLogin(credentials, state.inputRememberMe))
 
     switch (fetchPostUserLogin.status) {
       case 200: {
