@@ -55,4 +55,17 @@ context('Unknown users', function () {
     cy.contains('Validate').click()
     cy.get('[data-cy=flashmessage]').contains('Unknown user')
   })
+
+  it('adds an unknown user to workspace using username', function () {
+    cy.get('[data-cy=memberlist__btnadd]').click()
+    cy.get('[data-cy=addmember]').type(this.userToAdd.username)
+    cy.get('[data-cy=autocomplete__item__name]')
+      .contains('I know this user exist')
+      .click()
+    cy.get('[data-cy=memberlist]')
+      .contains(sharedSpaceManager)
+      .click()
+    cy.contains('Validate').click()
+    cy.get('[data-cy=flashmessage]').contains('Unknown user')
+  })
 })
