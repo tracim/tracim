@@ -240,5 +240,11 @@
   "Username can't contain any whitespace": "Username can't contain any whitespace",
   "@username": "@username",
   "When changed, the old username and everything linked to it will be lost.": "When changed, the old username and everything linked to it will be lost.",
-  "Your personal data has been changed": "Your personal data has been changed"
+  "Your personal data has been changed": "Your personal data has been changed",
+  "Your username and your name has been changed": "Your username and your name has been changed",
+  "Your username has been changed": "Your username has been changed",
+  "Error while changing username": "Error while changing username",
+  "Username and name has been changed": "Username and name has been changed",
+  "Username has been changed": "Username has been changed",
+  "Personal data has been changed": "Personal data has been changed"
 }

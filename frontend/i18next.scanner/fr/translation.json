@@ -240,5 +240,11 @@
   "Username can't contain any whitespace": "L'identifiant ne doit pas contenir d'espace",
   "@username": "@identifiant",
   "When changed, the old username and everything linked to it will be lost.": "En le changeant, l'ancien nom d'utilisateur et tout ce qui y est lié sera perdu",
-  "Your personal data has been changed": "Vos données personnelles sont modifiées"
+  "Your personal data has been changed": "Vos données personnelles ont été modifiées",
+  "Your username and your name has been changed": "Votre identifiant et votre nom a été changé",
+  "Your username has been changed": "Votre identifiant a été changé",
+  "Error while changing username": "Erreur lors du changement d'identifiant",
+  "Username and name has been changed": "L'identifiant et le nom a été changé",
+  "Username has been changed": "L'identifiant a été changé",
+  "Personal data has been changed": "Les données personnelles ont été modifiées"
 }

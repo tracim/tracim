@@ -320,6 +320,25 @@ export const putUserEmail = (user, newEmail, checkPassword) => dispatch => {
   })
 }
 
+export const putUserUsername = (user, newUsername, checkPassword) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/username`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        username: newUsername,
+        loggedin_user_password: checkPassword
+      })
+    },
+    actionName: USER_EMAIL,
+    dispatch
+  })
+}
+
 export const putMyselfPassword = (oldPassword, newPassword, newPassword2) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/password`,

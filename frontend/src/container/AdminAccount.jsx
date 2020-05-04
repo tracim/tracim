@@ -27,6 +27,7 @@ import {
   getWorkspaceMemberList,
   putUserPublicName,
   putUserEmail,
+  putUserUsername,
   putUserPassword,
   putUserWorkspaceDoNotify,
   getUserCalendar
@@ -212,7 +213,7 @@ class Account extends React.Component {
     subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
   }))
 
-  handleSubmitPersonalData = async (newPublicName, newUserName, newEmail, checkPassword) => {
+  handleSubmitPersonalData = async (newPublicName, newUsername, newEmail, checkPassword) => {
     const { props, state } = this
 
     if (newPublicName !== '') {
@@ -235,20 +236,31 @@ class Account extends React.Component {
       }
     }
 
-    if (newUserName !== '') {
-      const userName = removeAtInUsername(newUserName)
+    if (newUsername !== '') {
+      const username = removeAtInUsername(newUsername)
 
-      if (userName.length < 3) {
+      if (username.length < 3) {
         props.dispatch(newFlashMessage(props.t('Username must be at least 3 characters'), 'warning'))
         return false
       }
 
-      if (/\s/.test(userName)) {
+      if (/\s/.test(username)) {
         props.dispatch(newFlashMessage(props.t("Username can't contain any whitespace"), 'warning'))
         return false
       }
 
-      // TODO add the put function for username #2943
+      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, checkPassword))
+      switch (fetchPutUsername.status) {
+        case 200:
+          // TODO add redux update
+          if (newEmail === '') {
+            if (newPublicName !== '') props.dispatch(newFlashMessage(props.t('Username and name has been changed'), 'info'))
+            else props.dispatch(newFlashMessage(props.t('Username has been changed'), 'info'))
+            return true
+          }
+          break
+        default: props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning')); return false
+      }
     }
 
     if (newEmail !== '') {
@@ -256,7 +268,7 @@ class Account extends React.Component {
       switch (fetchPutUserEmail.status) {
         case 200:
           this.setState(prev => ({ userToEdit: { ...prev.userToEdit, email: newEmail } }))
-          if (newUserName !== '' || newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your personal data has been changed'), 'info'))
+          if (newUsername !== '' || newPublicName !== '') props.dispatch(newFlashMessage(props.t('Personal data has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Email has been changed'), 'info'))
           return true
         default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); break
