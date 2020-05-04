@@ -124,9 +124,7 @@ export const postUserLogin = (credentials, rememberMe) => async dispatch => {
       headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
-        email: credentials.email || null,
-        username: credentials.username || null,
-        password: credentials.password
+        ...credentials
         // remember_me: rememberMe
       })
     },

@@ -17,7 +17,7 @@ describe('Login after a disconnection ', function () {
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '?dc=1' } })
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=text]')
+      .find('input[type=email]')
       .type(login)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })

@@ -30,11 +30,11 @@ describe('Login page', function () {
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=text]')
+      .find('input[type=email]')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=text]')
+      .find('input[type=email]')
       .should('have.attr', 'placeholder')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
