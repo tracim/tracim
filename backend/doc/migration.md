@@ -20,7 +20,13 @@ and activate the Tracim virtualenv:
 
 ### Downgrading the Schema ###
 
+To preview version:
+
     alembic -c development.ini downgrade -1
+
+To specific database revision:
+
+    alembic -c development.ini downgrade <database_revision>
 
 ## Migration How-To - Advanced (for Developers) ##
 
