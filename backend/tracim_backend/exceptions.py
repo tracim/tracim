@@ -415,6 +415,14 @@ class EmailValidationFailed(TracimValidationFailed):
     error_code = ErrorCode.INTERNAL_TRACIM_VALIDATION_ERROR
 
 
+class EmailOrUsernameRequired(TracimValidationFailed):
+    error_code = ErrorCode.EMAIL_OR_USERNAME_REQUIRED
+
+
+class InvalidUsernameFormat(TracimValidationFailed):
+    error_code = ErrorCode.INVALID_USERNAME_FORMAT
+
+
 class InconsistentDatabase(TracimException):
     pass
 
@@ -457,6 +465,10 @@ class AppDoesNotExist(TracimException):
 
 class EmailAlreadyExistInDb(TracimException):
     error_code = ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+
+
+class UsernameAlreadyExistInDb(TracimException):
+    error_code = ErrorCode.USERNAME_ALREADY_EXIST_IN_DB
 
 
 class UnavailablePreview(TracimException):
