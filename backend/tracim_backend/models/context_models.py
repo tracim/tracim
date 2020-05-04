@@ -101,8 +101,14 @@ class LoginCredentials(object):
     Login credentials model for login model
     """
 
-    def __init__(self, email: str, password: str) -> None:
+    def __init__(
+        self,
+        password: str,
+        email: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+    ) -> None:
         self.email = email
+        self.username = username
         self.password = password
 
 
@@ -149,6 +155,16 @@ class SetEmail(object):
         self.email = email
 
 
+class SetUsername(object):
+    """
+    Just an username and password
+    """
+
+    def __init__(self, loggedin_user_password: str, username: str) -> None:
+        self.loggedin_user_password = loggedin_user_password
+        self.username = username
+
+
 class SimpleFile(object):
     def __init__(self, files: cgi.FieldStorage = None) -> None:
         self.files = files
@@ -179,9 +195,16 @@ class UserInfos(object):
     Just some user infos
     """
 
-    def __init__(self, timezone: str, public_name: str, lang: str) -> None:
+    def __init__(
+        self,
+        timezone: str,
+        lang: str,
+        public_name: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+    ) -> None:
         self.timezone = timezone
         self.public_name = public_name
+        self.username = username
         self.lang = lang
 
 
@@ -210,12 +233,13 @@ class UserCreation(object):
 
     def __init__(
         self,
-        email: str,
-        password: str = None,
-        public_name: str = None,
-        timezone: str = None,
-        profile: str = None,
-        lang: str = None,
+        email: typing.Optional[str] = None,
+        password: typing.Optional[str] = None,
+        public_name: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+        timezone: typing.Optional[str] = None,
+        profile: typing.Optional[str] = None,
+        lang: typing.Optional[str] = None,
         email_notification: bool = True,
         allowed_space: typing.Optional[int] = None,
     ) -> None:
@@ -224,6 +248,7 @@ class UserCreation(object):
         # is auto-generated.
         self.password = password or None
         self.public_name = public_name or None
+        self.username = username or None
         self.timezone = timezone or ""
         self.lang = lang or None
         self.profile = profile or None
@@ -469,11 +494,13 @@ class WorkspaceMemberInvitation(object):
         user_id: int = None,
         user_email: str = None,
         user_public_name: str = None,
+        user_username: str = None,
         role: str = None,
     ) -> None:
         self.role = role
         self.user_email = user_email
         self.user_public_name = user_public_name
+        self.user_username = user_username
         self.user_id = user_id
 
 
@@ -575,6 +602,7 @@ class TypeUser(Enum):
     USER_ID = "found_id"
     EMAIL = "found_email"
     PUBLIC_NAME = "found_public_name"
+    USER_NAME = "found_username"
     TOKEN = "found_user_token"
 
 
@@ -609,7 +637,7 @@ class UserInContext(object):
         return self
 
     @property
-    def email(self) -> str:
+    def email(self) -> typing.Optional[str]:
         return self.user.email
 
     @property
@@ -617,11 +645,15 @@ class UserInContext(object):
         return self.user.user_id
 
     @property
-    def public_name(self) -> str:
+    def public_name(self) -> typing.Optional[str]:
         return self.display_name
 
     @property
-    def display_name(self) -> str:
+    def username(self) -> typing.Optional[str]:
+        return self.user.username
+
+    @property
+    def display_name(self) -> typing.Optional[str]:
         return self.user.display_name
 
     @property

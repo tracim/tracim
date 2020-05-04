@@ -55,11 +55,11 @@ class TracimAuthenticationPolicy(ABC):
             return None
 
     def _authenticate_user(
-        self, request: Request, email: typing.Optional[str], password: typing.Optional[str]
+        self, request: Request, login: typing.Optional[str], password: typing.Optional[str],
     ) -> typing.Optional[User]:
         """
         Helper to authenticate user in pyramid request
-        from user email and password
+        from user email or username and password
         :param request: pyramid request
         :return: User or None
         """
@@ -69,7 +69,7 @@ class TracimAuthenticationPolicy(ABC):
         if AuthType.LDAP in app_config.AUTH_TYPES:
             ldap_connector = get_ldap_connector(request)
         try:
-            user = uapi.authenticate(email=email, password=password, ldap_connector=ldap_connector)
+            user = uapi.authenticate(login=login, password=password, ldap_connector=ldap_connector,)
             return user
         except AuthenticationFailed:
             return None
@@ -126,7 +126,7 @@ class TracimBasicAuthAuthenticationPolicy(
             return None
 
         user = self._authenticate_user(
-            request=request, email=credentials.username, password=credentials.password
+            request=request, login=credentials.username, password=credentials.password
         )
         if not user:
             return None
