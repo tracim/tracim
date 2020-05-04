@@ -25,6 +25,7 @@ export const debug = {
   loggedUser: {
     user_id: 1,
     public_name: 'Global Manager',
+    username: 'global_manager',
     email: 'osef@algoo.fr',
     lang: 'en',
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'

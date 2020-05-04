@@ -3,20 +3,25 @@ import typing
 from urllib.parse import urljoin
 
 from importlib_metadata import metadata
+from sqlalchemy.orm import Session
 
 from tracim_backend.apps import COLLABORATIVE_DOCUMENT_EDITION__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.models.context_models import ErrorCodeModel
 
 
 class SystemApi(object):
-    def __init__(self, config: CFG):
+    def __init__(
+        self, config: CFG, session: Session,
+    ):
         self._config = config
+        self._session = session
 
     def get_about(self) -> AboutModel:
         # TODO - G.M - 2018-09-26 - Set version correctly
@@ -58,3 +63,7 @@ class SystemApi(object):
         for error_code in ErrorCode:
             error_codes.append(ErrorCodeModel(error_code))
         return error_codes
+
+    def get_username_availability(self, username: str) -> bool:
+        uapi = UserApi(None, session=self._session, config=self._config)
+        return not uapi.check_username_already_in_db(username)

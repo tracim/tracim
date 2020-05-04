@@ -16,7 +16,7 @@ import {
   setRedirectLogin,
   setUserDisconnected,
   USER_KNOWN_MEMBER_LIST,
-  USER_NAME,
+  USER_PUBLIC_NAME,
   USER_EMAIL,
   USER_PASSWORD,
   USER_LANG,
@@ -257,7 +257,7 @@ export const putMyselfName = (user, newName) => dispatch => {
         lang: user.lang
       })
     },
-    actionName: USER_NAME,
+    actionName: USER_PUBLIC_NAME,
     dispatch
   })
 }
@@ -277,7 +277,7 @@ export const putUserName = (user, newName) => dispatch => {
         lang: user.lang
       })
     },
-    actionName: USER_NAME,
+    actionName: USER_PUBLIC_NAME,
     dispatch
   })
 }
