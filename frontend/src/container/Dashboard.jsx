@@ -12,7 +12,8 @@ import {
   ROLE,
   ROLE_LIST,
   PROFILE,
-  buildHeadTitle
+  buildHeadTitle,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -278,8 +279,8 @@ class Dashboard extends React.Component {
       autoCompleteClicked: false
     }))
 
-    if (newPersonalData.length >= 2) {
-      await this.handleSearchUser(newPersonalData)
+    if (removeAtInUsername(newPersonalData).length >= 2) {
+      await this.handleSearchUser(removeAtInUsername(newPersonalData))
       this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
