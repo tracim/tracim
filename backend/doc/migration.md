@@ -38,7 +38,7 @@ To specific database revision:
 
     alembic -c development.ini stamp head
 
-### Creating a New Database Migration (revision) ###
+### Creating a New Database Migration (Revision) ###
 
 This creates a new auto-generated python migration file:
 
