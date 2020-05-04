@@ -113,9 +113,7 @@ class UploadPermissionLib(object):
                 logger.warning(
                     self,
                     "Upload Permission initied by user {} but SMTP "
-                    "server refuse to send notification".format(
-                        self._user.email or self._user.username
-                    ),
+                    "server refuse to send notification".format(self._user.login),
                 )
             except SMTPException as exc:
                 raise NotificationSendingFailed(
