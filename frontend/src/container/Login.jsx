@@ -238,12 +238,12 @@ class Login extends React.Component {
           </CardHeader>
 
           <CardBody formClass='loginpage__card__form'>
-            <form onSubmit={this.handleClickSubmit}>
+            <form onSubmit={this.handleClickSubmit} noValidate>
               <InputGroupText
                 parentClassName='loginpage__card__form__groupelogin'
                 customClass='mb-3 mt-4'
                 icon='fa-at'
-                type='text'
+                type='email'
                 placeHolder={props.t('Email address or username')}
                 invalidMsg={props.t('Invalid email or username')}
                 maxLength={512}
