@@ -588,7 +588,6 @@ export const postWorkspaceMember = (user, workspaceId, newMember) => dispatch =>
       body: JSON.stringify({
         user_id: newMember.id || null,
         user_email: newMember.email || null,
-        user_public_name: newMember.publicName || null,
         role: newMember.role
       })
     },

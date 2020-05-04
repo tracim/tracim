@@ -318,7 +318,7 @@ class Dashboard extends React.Component {
       return false
     }
 
-    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.nameOrEmail)
+    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.user_id === state.newMember.id)
 
     if (!props.system.config.email_notification_activated && !newMemberInKnownMemberList) {
       props.dispatch(newFlashMessage(props.t('Unknown user'), 'warning'))

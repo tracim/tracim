@@ -46,7 +46,7 @@ export const WorkspaceMembersList = props => {
                   {m.user.public_name}
 
                   <div className='workspace_advanced__userlist__list__item__name__username'>
-                    {m.user.username}
+                    @{m.user.username}
                   </div>
                 </div>
 

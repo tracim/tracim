@@ -87,7 +87,7 @@ export class MemberList extends React.Component {
                         </div>
 
                         <div className='memberlist__list__item__info__username'>
-                          {m.username}
+                          @{m.username}
                         </div>
                       </div>
 
