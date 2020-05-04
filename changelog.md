@@ -8,7 +8,7 @@
 
 ### Breaking/Important change
 
-- If you launched Tracim 2.7.0 or 2.7.1 on an existing database (≤ 2.6.3), an incorrect migration was performed. As a consequence, you need to downgrade your database to revision `ce074202abb2` before running Tracim 2.7.2. Please see the [documentation about downgrading](https://github.com/tracim/tracim/blob/master/backend/doc/migration.md#downgrading-the-schema).
+- If you launched Tracim 2.7.0 or 2.7.1 on an existing database (≤ 2.6.3), an incorrect migration was performed. As a consequence, you need to downgrade your database to revision `ce074202abb2` before running Tracim 2.7.2. Please see the [documentation about downgrading](https://github.com/tracim/tracim/blob/master/backend/doc/migration.md#downgrading-the-database).
 
 
 ## 2.7.1 / 2020-04-30
