@@ -55,7 +55,6 @@
   "Error while saving new lang": "Erreur lors de l'enregistrement d'une nouvelle langue",
   "List of contents": "Liste des contenus",
   "Repeat new password": "Répéter le nouveau mot de passe",
-  "Please type your password in order to change your email. (For security reasons)": "Veuillez saisir votre mot de passe afin de changer votre email. (Pour des raisons de sécurité)",
   "An error has happened while getting": "Une erreur s'est produite lors de l'obtention de ",
   "An error has happened while setting \"mark all as read\"": "Une erreur s'est produite lors du réglage de \"Tout marquer comme lu\".",
   "Create in folder": "Créer dans ce dossier ",
@@ -144,7 +143,6 @@
   "New email": "Nouvel email",
   "Change my password": "Changer mon mot de passe",
   "Change my profile": "Changer mon profil",
-  "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères",
   "Your account's password cannot be changed, please contact an administrator": "Le mot de passe de votre compte ne peut pas être changé, veuillez contacter un administrateur",
   "An error has happened, please try again": "Une erreur est survenue, veuillez réessayer",
   "Click here to unsubscribe": "Cliquez ici pour vous désabonner",
@@ -233,7 +231,6 @@
   "Forgotten password": "Mot de passe perdu",
   "Public upload": "Téléversement publique",
   "Password reset": "Réinitialisation mot de passe",
-  "Username must be at least 3 characters": "L'identifiant doit faire au moins 3 caractères",
   "Username can't contain any whitespace": "L'identifiant ne doit pas contenir d'espace",
   "@username": "@identifiant",
   "When changed, the old username and everything linked to it will be lost.": "En le changeant, l'ancien nom d'utilisateur et tout ce qui y est lié sera perdu",
@@ -248,5 +245,8 @@
   "This username is not available": "Cet identifiant n'est pas disponible",
   "Invalid email or username": "Adresse email ou identifiant invalide",
   "Email address or username": "Adresse email ou identifiant",
-  "Invalid credentials": "Identifiants invalide"
+  "Invalid credentials": "Identifiants invalide",
+  "Please type your password in order to change your email and/or username. (For security reasons)": "Veuillez saisir votre mot de passe afin de changer votre email et/ou votre identifiant. (Pour des raisons de sécurité)",
+  "Full name must be at least {{minimumCharactersPublicName}} characters": "Le nom complet doit comporter au moins {{minimumCharactersPublicName}} caractères",
+  "Username must be at least {{minimumCharactersUsername}} characters": "L'identifiant doit faire au moins {{minimumCharactersUsername}} caractères"
 }

@@ -66,7 +66,6 @@
   "Repeat new password": "Repetir nova palavra-passe",
   "Administrator's password": "Palavra-passe do Administrador",
   "This edition requires your administrator password": "Esta edição necessita a palavra-passe do administrador",
-  "Please type your password in order to change your email. (For security reasons)": "Escreva sua palavra-passe para mudar seu e-mail. (Por razões de segurança)",
   "Type your password": "Escreva sua palavra-passe",
   "Validate": "Validar",
   "Change your Timezone": "Mudar seu Fuso Horário",
@@ -138,7 +137,6 @@
   "New email": "Novo e-mail",
   "Change my password": "Mudar minha palavra-passe",
   "Change my profile": "Mudar meu perfil",
-  "Full name must be at least 3 characters": "O nome completo deve ter pelo menos 3 carateres",
   "Your account's password cannot be changed, please contact an administrator": "Não é possível mudar a palavra-passe da sua conta, contacte um administrador",
   "An error has happened, please try again": "Ocorreu um erro, tente novamente",
   "Click here to unsubscribe": "Clique aqui para anular a subscrição",
@@ -201,7 +199,7 @@
   "Error while downloading file": "Erro ao fazer dowload do ficheiro",
   "Manage": "Gerir",
   "Files already uploaded:": "Ficheiros já subidos:",
-  "Full name must be at least 1 character": " O nome completo deve ter pelo menos 1 caráter",
+  "Full name must be at least 1 character": "O nome completo deve ter pelo menos 1 caráter",
   "Full name must be less than 255 characters": "O nome completo deve ter menos de 255 carateres",
   "Password must be at least 6 characters": "A palavra-passe deve ter pelo menos 6 carateres",
   "Password must be less than 255 characters": "A palavra-passe deve ter menos de 255 carateres",
@@ -233,7 +231,6 @@
   "Have a good day!": "Tenha um bom dia!",
   "Archived Topic": "Tópico arquivado",
   "Search…": "Pesquisar...",
-  "Username must be at least 3 characters": "O identificador deve ter pelo menos 3 carateres",
   "Username can't contain any whitespace": "O identificador não pode conter nenhum espaço em branco",
   "@username": "@identificador",
   "When changed, the old username and everything linked to it will be lost.": "Ao mudar, o seu antigo identificador e tudo o que lhe está ligado perder-se-á.",
@@ -248,5 +245,8 @@
   "This username is not available": "Este identificador não está disponível",
   "Invalid email or username": "E-mail ou identificador inválido",
   "Email address or username": "E-mail ou identificador",
-  "Invalid credentials": "Credenciais inválidas"
+  "Invalid credentials": "Credenciais inválidas",
+  "Please type your password in order to change your email and/or username. (For security reasons)": "Escreva sua palavra-passe para mudar seu e-mail e/ou identificador. (Por razões de segurança)",
+  "Full name must be at least {{minimumCharactersPublicName}} characters": "O nome completo deve ter pelo menos {{minimumCharactersPublicName}} caráter",
+  "Username must be at least {{minimumCharactersUsername}} characters": "O identificador deve ter pelo menos {{minimumCharactersUsername}} carateres"
 }

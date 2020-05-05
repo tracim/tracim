@@ -39,7 +39,9 @@ import {
 } from '../action-creator.async.js'
 import {
   editableUserAuthTypeList,
-  PAGE
+  PAGE,
+  MINIMUM_CHARACTERS_PUBLIC_NAME,
+  MINIMUM_CHARACTERS_USERNAME
 } from '../helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
@@ -165,8 +167,11 @@ export class Account extends React.Component {
     const { props } = this
 
     if (newPublicName !== '') {
-      if (newPublicName.length < 3) {
-        props.dispatch(newFlashMessage(props.t('Full name must be at least 3 characters'), 'warning'))
+      if (newPublicName.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
+        props.dispatch(newFlashMessage(
+          props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
+          , 'warning')
+        )
         return false
       }
 
@@ -190,8 +195,11 @@ export class Account extends React.Component {
     if (newUsername !== '') {
       const username = removeAtInUsername(newUsername)
 
-      if (username.length < 3) {
-        props.dispatch(newFlashMessage(props.t('Username must be at least 3 characters'), 'warning'))
+      if (username.length < MINIMUM_CHARACTERS_USERNAME) {
+        props.dispatch(newFlashMessage(
+          props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+          , 'warning')
+        )
         return false
       }
 

@@ -67,7 +67,6 @@
   "Repeat new password": "Repeat new password",
   "Administrator's password": "Administrator's password",
   "This edition requires your administrator password": "This edition requires your administrator password",
-  "Please type your password in order to change your email. (For security reasons)": "Please type your password in order to change your email. (For security reasons)",
   "Type your password": "Type your password",
   "Validate": "Validate",
   "Change your Timezone": "Change your Timezone",
@@ -142,7 +141,6 @@
   "New email": "New email",
   "Change my password": "Change my password",
   "Change my profile": "Change my profile",
-  "Full name must be at least 3 characters": "Full name must be at least 3 characters",
   "Your account's password cannot be changed, please contact an administrator": "Your account's password cannot be changed, please contact an administrator",
   "An error has happened, please try again": "An error has happened, please try again",
   "Click here to unsubscribe": "Click here to unsubscribe",
@@ -233,7 +231,6 @@
   "Password reset": "Password reset",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Find all your documents put online directly on your computer via the workstation, without going through the software.",
   "Archived Topic": "Archived Topic",
-  "Username must be at least 3 characters": "Username must be at least 3 characters",
   "Username can't contain any whitespace": "Username can't contain any whitespace",
   "@username": "@username",
   "When changed, the old username and everything linked to it will be lost.": "When changed, the old username and everything linked to it will be lost.",
@@ -248,5 +245,8 @@
   "This username is not available": "This username is not available",
   "Invalid email or username": "Invalid email or username",
   "Email address or username": "Email address or username",
-  "Invalid credentials": "Invalid credentials"
+  "Invalid credentials": "Invalid credentials",
+  "Please type your password in order to change your email and/or username. (For security reasons)": "Please type your password in order to change your email and/or username. (For security reasons)",
+  "Full name must be at least {{minimumCharactersPublicName}} characters": "Full name must be at least {{minimumCharactersPublicName}} characters",
+  "Username must be at least {{minimumCharactersUsername}} characters": "Username must be at least {{minimumCharactersUsername}} characters"
 }
