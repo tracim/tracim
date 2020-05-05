@@ -289,7 +289,7 @@ class AdminWorkspaceUser extends React.Component {
       this.sendGlobalFlashMsg(props.t('Full name must be at least 3 characters'), 'warning')
       return
     }
-    // TODO add a error for not allowed chars
+
     if (username.length > 0 && username.length < 3) {
       this.sendGlobalFlashMsg(props.t('Username must be at least 3 characters'), 'warning')
       return
