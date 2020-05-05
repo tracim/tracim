@@ -12,9 +12,12 @@ import { DragDropContextProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import { history } from './helper'
 
-// export const history = require('history').createBrowserHistory()
-
 require('./css/index.styl')
+
+require('./util/appInterface.js')
+require('./util/tinymceInit.js')
+
+// export const history = require('history').createBrowserHistory()
 
 ReactDOM.render(
   <Provider store={store}>

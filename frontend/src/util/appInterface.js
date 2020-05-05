@@ -1,38 +1,43 @@
-var previouslySelectedAppFeature = ''
-var previouslySelectedAppFullScreen = ''
-var APP_NOT_LOADED = 'appNotLoaded'
-var TIME_TO_RETRY = 500
-var RETRY_TIMEOUT = 60000
+let previouslySelectedAppFeature = ''
+let previouslySelectedAppFullScreen = ''
+const APP_NOT_LOADED = 'appNotLoaded'
+const TIME_TO_RETRY = 500
+const RETRY_TIMEOUT = 60000
 
-var getSelectedApp = function (appName) {
+const getSelectedApp = function (appName) {
   // FIXME - CH - 2019-06-18 - The try/catch is a temporary solution to solve the frontend, apps and appInterface.js
   // loading and execution order. If getSelectedApp return APP_NOT_LOADED, GLOBAL_renderAppFeature and GLOBAL_renderAppFullscreen
   // will retry every TIME_TO_RETRY ms for RETRY_TIMEOUT ms
   // see https://github.com/tracim/tracim/issues/1954
+
+  /*
+    global appHtmlDocument, appThread, appFile, appFolderAdvanced, appAdminWorkspaceUser, appWorkspaceAdvanced,
+    appAgenda, appShareFolderAdvanced, appCollaborativeDocumentEdition, appGallery, appWorkspace
+  */
   try {
     switch (appName) {
       case 'html-document':
-        return (appHtmlDocument || {default: {}}).default
+        return (appHtmlDocument || { default: {} }).default
       case 'thread':
-        return (appThread || {default: {}}).default
+        return (appThread || { default: {} }).default
       case 'file':
-        return (appFile || {default: {}}).default
+        return (appFile || { default: {} }).default
       case 'workspace':
-        return (appWorkspace || {default: {}}).default
+        return (appWorkspace || { default: {} }).default
       case 'folder':
-        return (appFolderAdvanced || {default: {}}).default
+        return (appFolderAdvanced || { default: {} }).default
       case 'admin_workspace_user':
-        return (appAdminWorkspaceUser || {default: {}}).default
+        return (appAdminWorkspaceUser || { default: {} }).default
       case 'workspace_advanced':
-        return (appWorkspaceAdvanced || {default: {}}).default
+        return (appWorkspaceAdvanced || { default: {} }).default
       case 'agenda':
-        return (appAgenda || {default: {}}).default
+        return (appAgenda || { default: {} }).default
       case 'share_folder':
-        return (appShareFolderAdvanced || {default: {}}).default
+        return (appShareFolderAdvanced || { default: {} }).default
       case 'collaborative_document_edition':
-        return (appCollaborativeDocumentEdition || {default: {}}).default
+        return (appCollaborativeDocumentEdition || { default: {} }).default
       case 'gallery':
-        return (appGallery || {default: {}}).default
+        return (appGallery || { default: {} }).default
       default:
         return APP_NOT_LOADED
     }
@@ -47,19 +52,19 @@ var getSelectedApp = function (appName) {
 // doesn't work, cant resolve a file outside of the build dir
 // see https://github.com/tracim/tracim/issues/1956
 
-function GLOBAL_renderAppFeature (app, retryCount) {
+globalThis.GLOBAL_renderAppFeature = function (app, retryCount) {
   console.log('%cGLOBAL_renderAppFeature', 'color: #5cebeb', app)
 
-  var selectedApp = getSelectedApp(app.config.slug)
+  const selectedApp = getSelectedApp(app.config.slug)
 
   if (selectedApp === APP_NOT_LOADED) {
     retryCount = retryCount || 0 // INFO - CH - 2019-06-18 - old school way for default param
 
     console.log(app.config.slug + ' does not exist. Maybe it hasn\'t finished loading yet? Retrying in ' + TIME_TO_RETRY + 'ms')
-    var retryTime = retryCount + TIME_TO_RETRY
+    const retryTime = retryCount + TIME_TO_RETRY
 
     if (retryTime < RETRY_TIMEOUT) {
-      setTimeout(function () {GLOBAL_renderAppFeature(app, retryTime)}, TIME_TO_RETRY)
+      setTimeout(() => GLOBAL_renderAppFeature(app, retryTime), TIME_TO_RETRY)
       return
     }
 
@@ -68,30 +73,30 @@ function GLOBAL_renderAppFeature (app, retryCount) {
   }
 
   if (selectedApp.isRendered) {
-    GLOBAL_dispatchEvent({type: app.config.slug + '_showApp', data: app})
+    GLOBAL_dispatchEvent({ type: app.config.slug + '_showApp', data: app })
   } else {
-    if (previouslySelectedAppFeature !== selectedApp.name) GLOBAL_dispatchEvent({type: 'unmount_appFeature', data: {}})
+    if (previouslySelectedAppFeature !== selectedApp.name) GLOBAL_dispatchEvent({ type: 'unmount_appFeature', data: {} })
 
     selectedApp.renderAppFeature(app)
     selectedApp.isRendered = true
-    ;(getSelectedApp(previouslySelectedAppFeature) || {isRendered: null}).isRendered = false
+    ;(getSelectedApp(previouslySelectedAppFeature) || { isRendered: null }).isRendered = false
     previouslySelectedAppFeature = selectedApp.name
   }
 }
 
-function GLOBAL_renderAppFullscreen (app, retryCount) {
+globalThis.GLOBAL_renderAppFullscreen = function (app, retryCount) {
   console.log('%cGLOBAL_renderAppFullscreen', 'color: #5cebeb', app)
 
-  var selectedApp = getSelectedApp(app.config.slug)
+  const selectedApp = getSelectedApp(app.config.slug)
 
   if (selectedApp === APP_NOT_LOADED) {
     retryCount = retryCount || 0 // INFO - CH - 2019-06-18 - old school way for default param
 
     console.log(app.config.slug + ' does not exist. Maybe it hasn\'t finished loading yet? Retrying in ' + TIME_TO_RETRY + 'ms')
-    var retryTime = retryCount + TIME_TO_RETRY
+    const retryTime = retryCount + TIME_TO_RETRY
 
     if (retryTime < RETRY_TIMEOUT) {
-      setTimeout(function () {GLOBAL_renderAppFullscreen(app, retryTime)}, TIME_TO_RETRY)
+      setTimeout(() => GLOBAL_renderAppFullscreen(app, retryTime), TIME_TO_RETRY)
       return
     }
 
@@ -100,28 +105,28 @@ function GLOBAL_renderAppFullscreen (app, retryCount) {
   }
 
   if (selectedApp.isRendered) {
-    GLOBAL_dispatchEvent({type: app.config.slug + '_showApp', data: app})
+    GLOBAL_dispatchEvent({ type: app.config.slug + '_showApp', data: app })
   } else {
     selectedApp.renderAppFullscreen(app)
     selectedApp.isRendered = true
-    ;(getSelectedApp(previouslySelectedAppFullScreen) || {isRendered: null}).isRendered = false
+    ;(getSelectedApp(previouslySelectedAppFullScreen) || { isRendered: null }).isRendered = false
     previouslySelectedAppFullScreen = selectedApp.name
   }
 }
 
-function GLOBAL_renderAppPopupCreation (app, retryCount) {
+globalThis.GLOBAL_renderAppPopupCreation = function (app, retryCount) {
   console.log('%cGLOBAL_renderAppPopupCreation', 'color: #5cebeb', app)
 
-  var selectedApp = getSelectedApp(app.config.slug)
+  const selectedApp = getSelectedApp(app.config.slug)
 
   if (selectedApp === APP_NOT_LOADED) {
     retryCount = retryCount || 0 // INFO - CH - 2019-06-18 - old school way for default param
 
     console.log(app.config.slug + ' does not exist. Maybe it hasn\'t finished loading yet? Retrying in ' + TIME_TO_RETRY + 'ms')
-    var retryTime = retryCount + TIME_TO_RETRY
+    const retryTime = retryCount + TIME_TO_RETRY
 
     if (retryTime < RETRY_TIMEOUT) {
-      setTimeout(function () {GLOBAL_renderAppPopupCreation(app, retryTime)}, TIME_TO_RETRY)
+      setTimeout(() => GLOBAL_renderAppPopupCreation(app, retryTime), TIME_TO_RETRY)
       return
     }
 
@@ -132,22 +137,22 @@ function GLOBAL_renderAppPopupCreation (app, retryCount) {
   getSelectedApp(app.config.slug).renderAppPopupCreation(app)
 }
 
-function GLOBAL_dispatchEvent (event) {
-  var type = event.type
-  var data = event.data
+globalThis.GLOBAL_dispatchEvent = function (event) {
+  const type = event.type
+  const data = event.data
   console.log('%cGLOBAL_dispatchEvent', 'color: #fff', type, data)
 
-  var customEvent = new CustomEvent('appCustomEventListener', {detail: {type, data}})
+  const customEvent = new globalThis.CustomEvent('appCustomEventListener', { detail: { type, data } })
   document.dispatchEvent(customEvent)
 }
 
-function GLOBAL_eventReducer (event) {
-  var type = event.detail.type
-  var data = event.detail.data
+globalThis.GLOBAL_eventReducer = function (event) {
+  const type = event.detail.type
+  const data = event.detail.data
 
-  var unMountAppFeature = function () {
+  const unMountAppFeature = function () {
     if (previouslySelectedAppFeature !== '') {
-      selectedApp = getSelectedApp(previouslySelectedAppFeature)
+      const selectedApp = getSelectedApp(previouslySelectedAppFeature)
       selectedApp.unmountApp('appFeatureContainer')
       selectedApp.unmountApp('popupCreateContentContainer')
       selectedApp.isRendered = false
@@ -155,9 +160,9 @@ function GLOBAL_eventReducer (event) {
     }
   }
 
-  var unMountAppFullscreen = function () {
+  const unMountAppFullscreen = function () {
     if (previouslySelectedAppFullScreen !== '') {
-      selectedApp = getSelectedApp(previouslySelectedAppFullScreen)
+      const selectedApp = getSelectedApp(previouslySelectedAppFullScreen)
       selectedApp.unmountApp('appFullscreenContainer')
       selectedApp.isRendered = false
       previouslySelectedAppFullScreen = ''
@@ -182,4 +187,4 @@ function GLOBAL_eventReducer (event) {
   }
 }
 
-document.addEventListener('appCustomEventListener', GLOBAL_eventReducer)
+document.addEventListener('appCustomEventListener', globalThis.GLOBAL_eventReducer)
