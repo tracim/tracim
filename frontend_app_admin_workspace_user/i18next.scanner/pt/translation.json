@@ -44,11 +44,13 @@
   "Username can't contain any whitespace": "O identificador não pode conter nenhum espaço em branco",
   "Email notification are disabled, please manually notify users of any change": "A notificação por e-mail está desativada, notifique os utilizadores manualmente de qualquer alteração",
   "Error, invalid email address": "Erro, endereço de e-mail inválido",
+  "Error while checking username availability": "Erro ao verificar a disponibilidade do identificador",
   "Create a shared space": "Criar um espaço partilhado",
   "Home": "Início",
   "Users": "Utilizadores",
   "Administration": "Administração",
   "Username": "Identificador",
   "@username": "@identificador",
-  "The user will not be able to reset his password by himself without an email linked to his account.": "O utilizador não poderá redefinir a sua palavra-passe sozinho sem um e-mail ligado à sua conta."
+  "The user will not be able to reset his password by himself without an email linked to his account.": "O utilizador não poderá redefinir a sua palavra-passe sozinho sem um e-mail ligado à sua conta.",
+  "This username is not available": "Este identificador não está disponível"
 }

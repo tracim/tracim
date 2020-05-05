@@ -29,7 +29,10 @@ export class AddUserForm extends React.Component {
 
   handleChangeNewUserName = e => this.setState({ newUserName: e.target.value })
 
-  handleChangeNewUserUsername = e => this.setState({ newUserUsername: e.target.value })
+  handleChangeNewUserUsername = e => {
+    this.setState({ newUserUsername: e.target.value })
+    this.props.onChangeUsername(e.target.value)
+  }
 
   handleChangeNewUserEmail = e => this.setState({ newUserEmail: e.target.value })
 
@@ -63,9 +66,19 @@ export class AddUserForm extends React.Component {
 
   isValidateButtonDisabled = () => {
     const { props, state } = this
+
     return props.emailNotifActivated
-      ? (state.newUserName === '' || (state.newUserUsername === '' && state.newUserEmail === '') || state.newUserProfile === '')
-      : (state.newUserName === '' || (state.newUserUsername === '' && state.newUserEmail === '') || state.newUserProfile === '' || state.newUserPassword === '')
+      ? (
+        state.newUserName === '' ||
+        ((state.newUserUsername === '' || !props.newUsernameAvailability) && state.newUserEmail === '') ||
+        state.newUserProfile === ''
+      )
+      : (
+        state.newUserName === '' ||
+        ((state.newUserUsername === '' || !props.newUsernameAvailability) && state.newUserEmail === '') ||
+        state.newUserProfile === '' ||
+        state.newUserPassword === ''
+      )
   }
 
   render () {
@@ -101,6 +114,13 @@ export class AddUserForm extends React.Component {
             onChange={this.handleChangeNewUserUsername}
             data-cy='adduser_username'
           />
+
+          {!props.newUsernameAvailability && (
+            <div className='userData__input__username__errorMsg'>
+              <i className='userData__input__username__errorIcon fa fa-times' />
+              {props.t('This username is not available')}
+            </div>
+          )}
 
           <div className='userData__email'>
             <label className='userData__text' htmlFor='adduser_email'>

@@ -44,11 +44,13 @@
   "Username can't contain any whitespace": "Username can't contain any whitespace",
   "Email notification are disabled, please manually notify users of any change": "Email notification are disabled, please manually notify users of any change",
   "Error, invalid email address": "Error, invalid email address",
+  "Error while checking username availability": "Error while checking username availability",
   "Create a shared space": "Create a shared space",
   "Home": "Home",
   "Users": "Users",
   "Administration": "Administration",
   "Username": "Username",
   "@username": "@username",
-  "The user will not be able to reset his password by himself without an email linked to his account.": "The user will not be able to reset his password by himself without an email linked to his account."
+  "The user will not be able to reset his password by himself without an email linked to his account.": "The user will not be able to reset his password by himself without an email linked to his account.",
+  "This username is not available": "This username is not available"
 }

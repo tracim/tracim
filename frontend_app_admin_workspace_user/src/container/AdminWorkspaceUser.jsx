@@ -10,13 +10,15 @@ import {
   BREADCRUMBS_TYPE,
   ROLE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
   deleteWorkspace,
   getUserDetail,
   getUserList,
+  getUsernameAvailability,
   getWorkspaceList,
   getWorkspaceMemberList,
   postAddUser,
@@ -43,6 +45,7 @@ class AdminWorkspaceUser extends React.Component {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
+      newUsernameAvailability: true,
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
       workspaceIdOpened: null,
@@ -286,7 +289,7 @@ class AdminWorkspaceUser extends React.Component {
       this.sendGlobalFlashMsg(props.t('Full name must be at least 3 characters'), 'warning')
       return
     }
-    // TODO use the endpoint to check availability of a username and add a error for not allowed chars
+    // TODO add a error for not allowed chars
     if (username.length > 0 && username.length < 3) {
       this.sendGlobalFlashMsg(props.t('Username must be at least 3 characters'), 'warning')
       return
@@ -376,6 +379,20 @@ class AdminWorkspaceUser extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {} })
   }
 
+  handleChangeUsername = async (username) => {
+    const { props, state } = this
+
+    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, removeAtInUsername(username)))
+
+    switch (fetchUsernameAvailability.apiResponse.status) {
+      case 200:
+        this.setState({ newUsernameAvailability: fetchUsernameAvailability.body.available })
+        console.log(state.newUsernameAvailability)
+        break
+      default: this.sendGlobalFlashMsg(props.t('Error while checking username availability'))
+    }
+  }
+
   render () {
     const { props, state } = this
 
@@ -401,7 +418,9 @@ class AdminWorkspaceUser extends React.Component {
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}
+            onChangeUsername={this.handleChangeUsername}
             breadcrumbsList={state.breadcrumbsList}
+            newUsernameAvailability={state.newUsernameAvailability}
           />
         )}
 
