@@ -28,6 +28,7 @@
   "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé",
   "You can't remove yourself from Administrator": "Vous ne pouvez pas vous retirer le profil administrateur",
   "You can't deactivate your own account": "Vous ne pouvez pas désactiver votre propre compte",
+  "Your username is incorrect, the allowed characters are azAZ09-_": "Votre identifiant est incorrect, les caractères autorisés sont azAZ09-_",
   "New password is too short (minimum 6 characters)": "Le nouveau mot de passe est trop court (minimum 6 caractères)",
   "New password is too long (maximum 512 characters)": "Le nouveau mot de passe trop long (maximum 512 caractères)",
   "User created and email sent": "Utilisateur créé et email envoyé",

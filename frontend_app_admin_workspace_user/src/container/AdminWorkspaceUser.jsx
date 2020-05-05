@@ -334,6 +334,7 @@ class AdminWorkspaceUser extends React.Component {
       case 400:
         switch (newUserResult.body.code) {
           case 2001: this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning'); break
+          case 2062: this.sendGlobalFlashMsg(props.t('Your username is incorrect, the allowed characters are azAZ09-_'), 'warning'); break
           case 2036: this.sendGlobalFlashMsg(props.t('Email already exists'), 'warning'); break
           default: this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
         }
@@ -387,7 +388,6 @@ class AdminWorkspaceUser extends React.Component {
     switch (fetchUsernameAvailability.apiResponse.status) {
       case 200:
         this.setState({ newUsernameAvailability: fetchUsernameAvailability.body.available })
-        console.log(state.newUsernameAvailability)
         break
       default: this.sendGlobalFlashMsg(props.t('Error while checking username availability'))
     }
