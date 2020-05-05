@@ -114,28 +114,28 @@ describe('In <Account />', () => {
       ])
     })
 
-    describe('handleSubmitNameOrEmail', () => {
-      it('should call updateUserPublicNameCallBack with a new Name', (done) => {
+    describe('handleSubmitPersonalData', () => {
+      it('updateUserPublicNameCallBack should be called when the function handleSubmitPersonalData() is called with a new Name', (done) => {
         const newName = 'randomNewName'
 
         mockPutMyselfName200(FETCH_CONFIG.apiUrl, newName, props.user.timezone, props.user.lang)
-        wrapper.instance().handleSubmitNameOrEmail(newName, '', '').then(() => {
+        wrapper.instance().handleSubmitPersonalData(newName, '', '').then(() => {
           expect(updateUserPublicNameCallBack.called).to.equal(true)
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
       })
 
-      it('should call updateUserEmailCallBack with a new Email', (done) => {
+      it('updateUserEmailCallBack should be called when the function handleSubmitPersonalData() is called with a new Email', (done) => {
         const newMail = 'randomNewEmail'
 
         mockPutMyselfEmail200(FETCH_CONFIG.apiUrl, newMail, password)
-        wrapper.instance().handleSubmitNameOrEmail('', newMail, password).then(() => {
+        wrapper.instance().handleSubmitPersonalData('', newMail, password).then(() => {
           expect(updateUserEmailCallBack.called).to.equal(true)
         }).then(done, done)
       })
 
-      it('should call newFlashMessageWarningCallBack with invalid new Name', (done) => {
-        wrapper.instance().handleSubmitNameOrEmail('d', '', '').then(() => {
+      it('newFlashMessageWarningCallBack should be called when the function handleSubmitPersonalData() is called with invalid new Name', (done) => {
+        wrapper.instance().handleSubmitPersonalData('d', '', '').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
         }).then(done, done)
       })

@@ -110,6 +110,7 @@ export {
   buildFilePreviewUrl,
   buildHeadTitle,
   removeExtensionOfFilename,
+  removeAtInUsername,
   computeProgressionPercentage,
   Breadcrumbs,
   PopinFixed,

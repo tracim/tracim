@@ -7,7 +7,6 @@ import {
 } from '../../../src/action-creator.sync'
 import { globalManager } from '../../fixture/user/globalManager.js'
 
-
 describe('user reducer', () => {
   it('should return the default state', () => {
     expect(userReducer(undefined, {})).to.deep.equal(defaultUser)
