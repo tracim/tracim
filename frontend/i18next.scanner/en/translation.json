@@ -34,7 +34,7 @@
   "read status list": "read status list",
   "An error has happened while setting \"mark all as read\"": "An error has happened while setting \"mark all as read\"",
   "known members list": "known members list",
-  "Please set a name or email": "Please set a name or email",
+  "Please set a name, an email or a username": "Please set a name, an email or a username",
   "Please set a role": "Please set a role",
   "Member added": "Member added",
   "Member removed": "Member removed",

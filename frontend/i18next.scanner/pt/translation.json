@@ -34,7 +34,7 @@
   "read status list": "lista de status de leitura",
   "An error has happened while setting \"mark all as read\"": " Ocorreu um erro ao definir \"marcar tudo como lido\"",
   "known members list": "lista de membros conhecidos",
-  "Please set a name or email": "Defina um nome ou e-mail",
+  "Please set a name, an email or a username": "Defina um nome, um e-mail ou um identificador",
   "Please set a role": "Defina uma função",
   "Member added": "Membro acrescentado",
   "Member removed": "Membro eliminado",
