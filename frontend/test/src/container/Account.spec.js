@@ -116,6 +116,10 @@ describe('In <Account />', () => {
 
     describe('handleSubmitPersonalData', () => {
       it('updateUserPublicNameCallBack should be called when the function handleSubmitPersonalData() is called with a new Name', (done) => {
+        const newName = 'randomNewName'
+
+        mockPutMyselfName200(FETCH_CONFIG.apiUrl, newName, props.user.timezone, props.user.lang)
+        wrapper.instance().handleSubmitPersonalData(newName, '', '').then(() => {
           expect(updateUserPublicNameCallBack.called).to.equal(true)
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
