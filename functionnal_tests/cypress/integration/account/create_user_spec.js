@@ -10,6 +10,7 @@ const errLongPwd = '123'.repeat(200)
 const errPublicName = 'pn'
 const errShortUsername = 'un'
 const errSpaceUsername = 'new username'
+const errNotAllowedCharsUsername = 'usern@me!'
 const errEmail = 'err.email'
 
 describe('When "Create new user" at Administration', () => {
@@ -119,6 +120,17 @@ describe('When "Create new user" at Administration', () => {
     cy.get('.flashmessage').contains("Username can't contain any whitespace")
   })
 
+  it('should show error message if username has not alloew characters', () => {
+    cy.get('[data-cy=adminUser__adduser__button]').click()
+    cy.get('[data-cy=adduser_name]').type(publicName)
+    cy.get('[data-cy=adduser_username]').type(errNotAllowedCharsUsername)
+    cy.get('[data-cy=adduser_email]').type(email)
+    cy.get('[data-cy=adduser_password]').type(correctPwd)
+    cy.get('[data-cy=profile__list__item__administrators]').click()
+    cy.get('[data-cy=adminUser__adduser__form__submit]').click()
+    cy.get('.flashmessage').contains('Your username is incorrect, the allowed characters are azAZ09-_')
+  })
+
   it('should show error message if email is out of standard', () => {
     cy.get('[data-cy=adminUser__adduser__button]').click()
     cy.get('[data-cy=adduser_name]').type(publicName)
@@ -157,7 +169,7 @@ describe('When "Create new user" at Administration', () => {
     cy.get('[data-cy=adminUser__adduser__form__submit]').click()
     cy.get('[data-cy=flashmessage]').contains('Email already exists')
     cy.contains(publicName)
-    // cy.contains(username)
+    cy.contains(username)
     cy.contains(email)
   })
 })
