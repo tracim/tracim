@@ -1,6 +1,7 @@
 import { PAGES } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import baseUser from '../../fixtures/baseUser.json'
+import defaultAdmin from '../../fixtures/defaultAdmin.json'
 
 describe('Account page', () => {
   before(() => {
@@ -186,12 +187,36 @@ describe('Account page', () => {
           .find('.personaldata__form__txtinput.checkPassword')
           .type(baseUser.password)
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.personaldata__form__txtinput__msgerror')
+          .find('.personaldata__form__txtinput__info')
           .should('be.visible')
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('.personaldata__form__button')
           .click()
-        // TODO Add verification on the username in header to test if it works when the full feature is ready
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=userinfo__username]')
+          .contains(newUserName)
+      })
+
+      it('should show a warning when the username is not available', () => {
+        const newUserName = defaultAdmin.username
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+          .click()
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=personaldata__form__txtinput__username]')
+          .type(newUserName)
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__txtinput.checkPassword')
+          .type(defaultAdmin.password)
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.fa-exclamation-triangle.personaldata__form__txtinput__info__icon')
+          .should('be.visible')
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__txtinput__msgerror')
+          .should('be.visible')
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__button')
+          .should('be.disabled')
       })
     })
   })

@@ -246,5 +246,7 @@
   "Error while changing username": "Erro ao alterar o nome de utilizador",
   "Username and name has been changed": "O nome e o nome de utilizador foram alterados",
   "Username has been changed": "O nome de utilizador foi alterado",
-  "Personal data has been changed": "Os dados pessoais foram alterados"
+  "Personal data has been changed": "Os dados pessoais foram alterados",
+  "Error while checking username availability": "Erro ao verificar a disponibilidade do nome de utilizador",
+  "This username is not available": "Este nome de utilizador não está disponível"
 }

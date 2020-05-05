@@ -30,6 +30,7 @@ import {
   putUserUsername,
   putUserPassword,
   putUserWorkspaceDoNotify,
+  getUsernameAvailability,
   getUserCalendar
 } from '../action-creator.async.js'
 import {
@@ -69,7 +70,9 @@ class Account extends React.Component {
       userToEdit: {
         public_name: '',
         auth_type: 'internal',
-        agendaUrl: ''
+        agendaUrl: '',
+        username: '',
+        newUsernameAvailability: true
       },
       userToEditWorkspaceList: [],
       subComponentMenu: builtSubComponentMenu
@@ -210,7 +213,8 @@ class Account extends React.Component {
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
-    subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
+    subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName })),
+    userToEdit: { ...prev.userToEdit, newUsernameAvailability: true }
   }))
 
   handleSubmitPersonalData = async (newPublicName, newUsername, newEmail, checkPassword) => {
@@ -249,10 +253,10 @@ class Account extends React.Component {
         return false
       }
 
-      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, checkPassword))
+      const fetchPutUsername = await props.dispatch(putUserUsername(state.userToEdit, username, checkPassword))
       switch (fetchPutUsername.status) {
         case 200:
-          // TODO add redux update
+          this.setState(prev => ({ userToEdit: { ...prev.userToEdit, username: newUsername } }))
           if (newEmail === '') {
             if (newPublicName !== '') props.dispatch(newFlashMessage(props.t('Username and name has been changed'), 'info'))
             else props.dispatch(newFlashMessage(props.t('Username has been changed'), 'info'))
@@ -276,6 +280,19 @@ class Account extends React.Component {
     }
 
     return false
+  }
+
+  handleChangeUsername = async (username) => {
+    const { props } = this
+
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(removeAtInUsername(username)))
+
+    switch (fetchUsernameAvailability.status) {
+      case 200:
+        this.setState(prev => ({ userToEdit: { ...prev.userToEdit, newUsernameAvailability: fetchUsernameAvailability.json.available } }))
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning')); break
+    }
   }
 
   handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
@@ -365,6 +382,8 @@ class Account extends React.Component {
                           <PersonalData
                             userAuthType={state.userToEdit.auth_type}
                             onClickSubmit={this.handleSubmitPersonalData}
+                            onChangeUsername={this.handleChangeUsername}
+                            newUsernameAvailability={state.userToEdit.newUsernameAvailability}
                             displayAdminInfo
                           />
                         )

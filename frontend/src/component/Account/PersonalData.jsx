@@ -12,7 +12,7 @@ export class PersonalData extends React.Component {
     super(props)
     this.state = {
       newPublicName: '',
-      newUserName: '',
+      newUsername: '',
       newEmail: '',
       checkPassword: ''
     }
@@ -20,7 +20,10 @@ export class PersonalData extends React.Component {
 
   handleChangePublicName = e => this.setState({ newPublicName: e.target.value })
 
-  handleChangeUserName = e => this.setState({ newUserName: e.target.value })
+  handleChangeUserName = e => {
+    this.setState({ newUsername: e.target.value })
+    this.props.onChangeUsername(e.target.value)
+  }
 
   handleChangeEmail = e => this.setState({ newEmail: e.target.value })
 
@@ -29,14 +32,14 @@ export class PersonalData extends React.Component {
   handleClickSubmit = async () => {
     const { props, state } = this
 
-    if ((state.newEmail !== '' || state.newUserName !== '') && state.checkPassword === '') {
+    if ((state.newEmail !== '' || state.newUsername !== '') && state.checkPassword === '') {
       props.dispatch(newFlashMessage(props.t('Please type your password in order to change your email. (For security reasons)'), 'warning'))
       return
     }
 
-    await props.onClickSubmit(state.newPublicName, state.newUserName, state.newEmail, state.checkPassword) && this.setState({
+    await props.onClickSubmit(state.newPublicName, state.newUsername, state.newEmail, state.checkPassword) && this.setState({
       newPublicName: '',
-      newUserName: '',
+      newUsername: '',
       newEmail: '',
       checkPassword: ''
     })
@@ -73,14 +76,20 @@ export class PersonalData extends React.Component {
               type='text'
               data-cy='personaldata__form__txtinput__username'
               placeholder={props.t('@username')}
-              value={state.newUserName}
+              value={state.newUsername}
               onChange={this.handleChangeUserName}
             />
+            {!props.newUsernameAvailability && (
+              <div className='personaldata__form__txtinput__msgerror'>
+                <i className='personaldata__form__txtinput__msgerror__icon fa fa-times' />
+                {props.t('This username is not available')}
+              </div>
+            )}
           </div>
 
-          {state.newUserName !== '' && (
-            <div className='personaldata__form__txtinput__msgerror'>
-              <i className='fa fa-exclamation-triangle personaldata__form__txtinput__msgerror__icon' />
+          {state.newUsername !== '' && (
+            <div className='personaldata__form__txtinput__info'>
+              <i className='fa fa-exclamation-triangle personaldata__form__txtinput__info__icon' />
               {props.t('When changed, the old username and everything linked to it will be lost.')}
             </div>
           )}
@@ -98,7 +107,7 @@ export class PersonalData extends React.Component {
             </div>
           )}
 
-          {(state.newEmail !== '' || state.newUserName !== '') && (
+          {(state.newEmail !== '' || state.newUsername !== '') && (
             <div className='d-flex align-items-center flex-wrap mb-4'>
               <input
                 className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
@@ -106,7 +115,7 @@ export class PersonalData extends React.Component {
                 placeholder={props.displayAdminInfo ? props.t("Administrator's password") : props.t('Type your password')}
                 value={state.checkPassword}
                 onChange={this.handleChangeCheckPassword}
-                disabled={state.newEmail === '' && state.newUserName === ''}
+                disabled={state.newEmail === '' && state.newUsername === ''}
               />
               {props.displayAdminInfo && (
                 <div className='personaldata__form__txtinput__info'>
@@ -121,6 +130,7 @@ export class PersonalData extends React.Component {
             type='button'
             className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={this.handleClickSubmit}
+            disabled={!props.newUsernameAvailability}
           >
             {props.t('Validate')}
           </button>
@@ -132,7 +142,18 @@ export class PersonalData extends React.Component {
 
 PersonalData.propTypes = {
   userAuthType: PropTypes.string,
-  onClickSubmit: PropTypes.func
+  onClickSubmit: PropTypes.func,
+  onChangeUsername: PropTypes.func,
+  newUsernameAvailability: PropTypes.bool,
+  displayAdminInfo: PropTypes.bool
+}
+
+PersonalData.defaultProps = {
+  newUsernameAvailability: true,
+  userAuthType: '',
+  onClickSubmit: () => {},
+  onChangeUsername: () => {},
+  displayAdminInfo: false
 }
 
 const mapStateToProps = () => ({}) // connect for .dispatch()

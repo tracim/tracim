@@ -6,14 +6,25 @@ import { PersonalData as PersonalDataWithoutHOC } from '../../../src/component/A
 
 describe('<PersonnalData />', () => {
   const onClickSubmitCallBack = sinon.spy()
+  const onChangeUsernameCallBack = sinon.spy()
 
   const props = {
     onClickSubmit: onClickSubmitCallBack,
     displayAdminInfo: false,
-    userAuthType: 'randomUserAuthType'
+    userAuthType: 'randomUserAuthType',
+    newUsernameAvailability: true,
+    onChangeUsername: onChangeUsernameCallBack
   }
 
   const wrapper = shallow(<PersonalDataWithoutHOC {...props} t={key => key} />)
+
+  describe('static design', () => {
+    it('should show an error message when the username is not available', () => {
+      wrapper.setProps({ newUsernameAvailability: false })
+      expect(wrapper.find('.personaldata__form__txtinput__msgerror').length).to.equal(1)
+      wrapper.setProps({ newUsernameAvailability: props.newUsernameAvailability })
+    })
+  })
 
   describe('handlers', () => {
     it('onClickSubmitCallBack should be called when the button is clicked and the new password is valid', () => {
@@ -22,6 +33,10 @@ describe('<PersonnalData />', () => {
       }
       wrapper.find('button').simulate('click')
       expect(onClickSubmitCallBack.called).to.equal(true)
+    })
+    it('onChangeUsernameCallBack should be called when the username is changing', () => {
+      wrapper.find('input.personaldata__form__txtinput').at(1).simulate('change', { target: { value: 'newRandomUsername' } })
+      expect(onChangeUsernameCallBack.called).to.equal(true)
     })
   })
 
@@ -34,7 +49,7 @@ describe('<PersonnalData />', () => {
 
     it('handleChangeUserName should change the state', () => {
       wrapper.instance().handleChangeUserName({ target: { value: randomText } })
-      expect(wrapper.state('newUserName')).to.equal(randomText)
+      expect(wrapper.state('newUsername')).to.equal(randomText)
     })
 
     it('handleChangeEmail should change the state', () => {

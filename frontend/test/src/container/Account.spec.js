@@ -125,7 +125,7 @@ describe('In <Account />', () => {
         }).then(done, done)
       })
 
-      //   TODO Enable this test
+      // TODO Enable this test
       // it('updateUserNameCallBack should be called when the function handleSubmitPersonalData() is called with a new username', (done) => {
       //   const newUserName = 'randomNewUserName'
       //   mockPutMyselfName200(FETCH_CONFIG.apiUrl, newUserName, props.user.timezone, props.user.lang)

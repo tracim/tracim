@@ -246,5 +246,7 @@
   "Error while changing username": "Error while changing username",
   "Username and name has been changed": "Username and name has been changed",
   "Username has been changed": "Username has been changed",
-  "Personal data has been changed": "Personal data has been changed"
+  "Personal data has been changed": "Personal data has been changed",
+  "Error while checking username availability": "Error while checking username availability",
+  "This username is not available": "This username is not available"
 }
