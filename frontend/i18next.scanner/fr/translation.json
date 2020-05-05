@@ -2,7 +2,6 @@
   "Copyright 2013 - 2017": "Copyright 2013 - 2017",
   "Disconnection error": "Erreur de déconnexion",
   "Error": "Erreur",
-  "Email or password invalid": "Email ou mot de passe invalide",
   "Type": "Type",
   "Status": "Statut",
   "Search…": "Rechercher…",
@@ -28,7 +27,6 @@
   "Add a member": "Ajouter un membre",
   "Implement Tracim in your explorer": "Implémenter Tracim dans votre explorateur",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Retrouvez tous vos documents déposés en ligne directement sur votre ordinateur via le poste de travail, sans passer par le logiciel.",
-  "Email Address": "Adresse email",
   "Old password": "Ancien mot de passe",
   "New password": "Nouveau mot de passe",
   "Connection": "Connexion",
@@ -37,7 +35,7 @@
   "recent activity list": "Liste des activités récentes",
   "read status list": "Lire la liste des statuts",
   "known members list": "Liste des membres connus",
-  "Please set a name or email": "Entrez un nom, s'il vous plaît",
+  "Please set a name, an email or a username": "Veuillez saisir le nom, l'email ou l'identifiant",
   "Please set a role": "Choisissez un rôle s'il vous plaît",
   "Thank you for trusting us and using our collaborative tool": "Merci de nous faire confiance et d'utiliser notre outil collaboratif.",
   "Feature": "Fonctionnalité",
@@ -158,7 +156,6 @@
   "agenda details": "de l'agenda",
   "Home": "Accueil",
   "All contents": "Tous les contenus",
-  "Invalid email": "Email invalide",
   "Invalid password": "Mot de passe invalide",
   "Error while saving your language": "Erreur lors de la sauvegarde de la langue",
   "Use this link to integrate this agenda to your": "Utiliser ce lien pour intégrer l'agenda à votre",
@@ -248,5 +245,8 @@
   "Username has been changed": "L'identifiant a été changé",
   "Personal data has been changed": "Les données personnelles ont été modifiées",
   "Error while checking username availability": "Erreur lors de la vérification de la disponibilité de l'identifiant",
-  "This username is not available": "Cet identifiant n'est pas disponible"
+  "This username is not available": "Cet identifiant n'est pas disponible",
+  "Invalid email or username": "Adresse email ou identifiant invalide",
+  "Email address or username": "Adresse email ou identifiant",
+  "Invalid credentials": "Identifiants invalide"
 }

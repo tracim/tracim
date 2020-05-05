@@ -49,7 +49,7 @@ class WorkspaceAdvanced extends React.Component {
       displayFormNewMember: false,
       newMember: {
         id: '',
-        nameOrEmail: '',
+        personalData: '',
         role: '',
         avatarUrl: '',
         isEmail: false
@@ -86,7 +86,7 @@ class WorkspaceAdvanced extends React.Component {
         break
 
       case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
-        console.log('%c<File> Custom event', 'color: #28a745', type, data)
+        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, () => {}, () => {})
         break
 
@@ -306,18 +306,18 @@ class WorkspaceAdvanced extends React.Component {
 
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
 
-  handleChangeNewMemberName = async newNameOrEmail => {
+  handleChangeNewMemberName = async newPersonalData => {
     this.setState(prev => ({
       newMember: {
         ...prev.newMember,
-        nameOrEmail: newNameOrEmail,
-        isEmail: this.isEmail(newNameOrEmail)
+        personalData: newPersonalData,
+        isEmail: this.isEmail(newPersonalData)
       },
       autoCompleteClicked: false
     }))
 
-    if (newNameOrEmail.length >= 2) {
-      await this.handleSearchUser(newNameOrEmail)
+    if (newPersonalData.length >= 2) {
+      await this.handleSearchUser(newPersonalData)
       this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
@@ -327,7 +327,7 @@ class WorkspaceAdvanced extends React.Component {
       newMember: {
         ...prev.newMember,
         id: knownMember.user_id,
-        nameOrEmail: knownMember.public_name,
+        personalData: knownMember.public_name,
         avatarUrl: knownMember.avatar_url,
         isEmail: false
       },
@@ -372,8 +372,8 @@ class WorkspaceAdvanced extends React.Component {
   handleClickValidateNewMember = async () => {
     const { props, state } = this
 
-    if (state.newMember.nameOrEmail === '') {
-      this.sendGlobalFlashMessage(props.t('Please set a name or email'), 'warning')
+    if (state.newMember.personalData === '') {
+      this.sendGlobalFlashMessage(props.t('Please set a name, an email or a username'), 'warning')
       return
     }
 
@@ -382,7 +382,7 @@ class WorkspaceAdvanced extends React.Component {
       return
     }
 
-    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.nameOrEmail)
+    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.personalData)
 
     if (
       state.config.system && state.config.system.config &&
@@ -399,8 +399,9 @@ class WorkspaceAdvanced extends React.Component {
 
     const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      publicName: state.newMember.isEmail ? '' : state.newMember.nameOrEmail,
-      email: state.newMember.isEmail ? state.newMember.nameOrEmail : '',
+      publicName: state.newMember.isEmail ? '' : state.newMember.personalData,
+      email: state.newMember.isEmail ? state.newMember.personalData : '',
+      username: newMemberInKnownMemberList.user_username,
       role: state.newMember.role
     }))
 
@@ -410,7 +411,7 @@ class WorkspaceAdvanced extends React.Component {
         this.setState({
           newMember: {
             id: '',
-            nameOrEmail: '',
+            personalData: '',
             role: '',
             avatarUrl: '',
             isEmail: false
@@ -521,7 +522,7 @@ class WorkspaceAdvanced extends React.Component {
                     loggedUser={state.loggedUser}
                     onClickDeleteMember={this.handleClickDeleteMember}
                     onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-                    newMemberName={state.newMember.nameOrEmail}
+                    newMemberName={state.newMember.personalData}
                     isEmail={state.newMember.isEmail}
                     onChangeNewMemberName={this.handleChangeNewMemberName}
                     searchedKnownMemberList={state.searchedKnownMemberList}

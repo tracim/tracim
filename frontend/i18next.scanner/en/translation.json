@@ -32,7 +32,7 @@
   "read status list": "read status list",
   "An error has happened while setting \"mark all as read\"": "An error has happened while setting \"mark all as read\"",
   "known members list": "known members list",
-  "Please set a name or email": "Please set a name or email",
+  "Please set a name, an email or a username": "Please set a name, an email or a username",
   "Please set a role": "Please set a role",
   "Member added": "Member added",
   "Member removed": "Member removed",
@@ -43,9 +43,7 @@
   "You will create your first shared space": "You will create your first shared space",
   "create a shared space": "create a shared space",
   "You have been disconnected, please login again": "You have been disconnected, please login again",
-  "Email or password invalid": "Email or password invalid",
   "Connection": "Connection",
-  "Email Address": "Email Address",
   "Password": "Password",
   "Forgotten password?": "Forgotten password?",
   "Error while loading read status list": "Error while loading read status list",
@@ -156,7 +154,6 @@
   "agenda details": "agenda details",
   "Home": "Home",
   "All contents": "All contents",
-  "Invalid email": "Invalid email",
   "Invalid password": "Invalid password",
   "Error while saving your language": "Error while saving your language",
   "Use this link to integrate this agenda to your": "Use this link to integrate this agenda to your",
@@ -248,5 +245,8 @@
   "Username has been changed": "Username has been changed",
   "Personal data has been changed": "Personal data has been changed",
   "Error while checking username availability": "Error while checking username availability",
-  "This username is not available": "This username is not available"
+  "This username is not available": "This username is not available",
+  "Invalid email or username": "Invalid email or username",
+  "Email address or username": "Email address or username",
+  "Invalid credentials": "Invalid credentials"
 }
