@@ -159,6 +159,5 @@ export {
   ShareLink,
   ShareDownload,
   ProgressBar,
-  RadioBtnGroup,
-  removeAtInUsername
+  RadioBtnGroup
 }
