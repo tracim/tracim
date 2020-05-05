@@ -7,6 +7,7 @@ from tracim_backend.applications.share.models import ContentShareType
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.utils.utils import get_redis_connection
 from tracim_backend.lib.utils.utils import get_rq_queue
+from tracim_backend.models.auth import User
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -707,6 +708,61 @@ class TestPrivateShareEndpointsWithNotification(object):
             valid_dests.remove(headers["To"][0])
         assert valid_dests == []
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+    )
+    def test_api__add_share__ok_200__with_email_notification_and_emitter_without_email(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        share_lib_factory,
+        admin_user: User,
+        mailhog,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        content_api.save(test_file)
+        share_api = share_lib_factory.get()  # type: ShareLib
+
+        # remove admin (emitter) email before share content
+        admin_user.email = None
+        session.add(admin_user)
+        session.flush()
+
+        share_api.share_content(
+            test_file, emails=["test@test.test", "test2@test2.test2"], do_notify=True
+        )
+        transaction.commit()
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 2
+        # admin not in list because have no mail
+        valid_dests = ["test@test.test", "test2@test2.test2"]
+        for email in response:
+            assert (
+                email["Content"]["Headers"]["From"][0]
+                == "Tracim Notifications <test_user_from+0@localhost>"
+                or "Global manager via Tracim <test_user_from+1@localhost>"
+            )
+            headers = email["Content"]["Headers"]
+            assert headers["To"][0] in valid_dests
+            valid_dests.remove(headers["To"][0])
+        assert valid_dests == []
+
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
@@ -754,6 +810,7 @@ class TestGuestDownloadShareEndpoints(object):
         assert share["author_id"] == admin_user.user_id
         assert share["author"]
         assert share["author"]["public_name"] == "Global manager"
+        assert share["author"]["username"] == "TheAdmin"
         assert share["content_label"] == "Test_file"
         assert share["content_size"] == 9
         assert share["content_filename"] == "Test_file.txt"
