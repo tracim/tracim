@@ -241,12 +241,12 @@
   "@username": "@identificador",
   "When changed, the old username and everything linked to it will be lost.": "Ao mudar, o seu antigo identificador e tudo o que lhe está ligado perder-se-á.",
   "Your personal data has been changed": "Os seus dados pessoais foram alterados",
-  "Your username and your name has been changed": "O seu nome de utilizador e o seu nome foi alterado",
-  "Your username has been changed": "O seu nome de utilizador foi alterado",
-  "Error while changing username": "Erro ao alterar o nome de utilizador",
-  "Username and name has been changed": "O nome e o nome de utilizador foram alterados",
-  "Username has been changed": "O nome de utilizador foi alterado",
+  "Your username and your name has been changed": "O seu identificador e o seu nome foi alterado",
+  "Your username has been changed": "O seu identificador foi alterado",
+  "Error while changing username": "Erro ao alterar o identificador",
+  "Username and name has been changed": "O nome e o identificador foram alterados",
+  "Username has been changed": "O identificador foi alterado",
   "Personal data has been changed": "Os dados pessoais foram alterados",
   "Error while checking username availability": "Erro ao verificar a disponibilidade do nome de utilizador",
-  "This username is not available": "Este nome de utilizador não está disponível"
+  "This username is not available": "Este identificador não está disponível"
 }
