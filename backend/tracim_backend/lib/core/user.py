@@ -204,13 +204,12 @@ class UserApi(object):
         query = query.limit(nb_elem)
         return query.all()
 
-    def find(
-        self, user_id: int = None, email: str = None, token: str = None,
+    def get(
+        self, user_id: int = None, token: str = None, email: str = None
     ) -> typing.Tuple[TypeUser, User]:
         """
-        Find existing user from all theses params.
-        Check is made in this order: user_id, email
-        If no user found raise UserDoesNotExist exception
+        Get an existing user by their id, or authentication token, or email, in this order.
+        If no user is found by any of these parameters, exception UserDoesNotExist will be raised
         """
         user = None
 

@@ -563,11 +563,10 @@ class FolderContentUpdate(object):
 
 
 class TypeUser(Enum):
-    """Params used to find user"""
+    """The method that helped to find a user"""
 
     USER_ID = "found_id"
     EMAIL = "found_email"
-    PUBLIC_NAME = "found_public_name"
     TOKEN = "found_user_token"
 
 
