@@ -30,7 +30,7 @@ from tracim_backend.models.data import Workspace
 
 class TracimContext(ABC):
     """
-    Abstract class, Context of Tracim, neede for tracim authorization mechanism.
+    Abstract class, Context of Tracim, needed for tracim authorization mechanism.
     """
 
     def __init__(self) -> None:
@@ -249,6 +249,11 @@ class TracimRequest(TracimContext, Request):
 
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(self._cleanup)
+
+    def set_user(self, user: User):
+        """Overload TracimContext method to add plugin hook call."""
+        super().set_user(user)
+        self.plugin_manager.hook.on_current_user_set(user, self)
 
     @property
     def current_user(self) -> User:

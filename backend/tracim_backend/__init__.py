@@ -35,6 +35,7 @@ from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.plugins import init_plugin_manager
+from tracim_backend.lib.live_message import EventBuilder
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -83,7 +84,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_config.configure_filedepot()
     settings["CFG"] = app_config
     plugin_manager = init_plugin_manager(app_config)
+    plugin_manager.register(EventBuilder(app_config))
     settings["plugin_manager"] = plugin_manager
+
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
     tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")

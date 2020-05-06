@@ -622,7 +622,9 @@ class ContentRevisionRO(DeclarativeBase):
     __tablename__ = "content_revisions"
 
     revision_id = Column(Integer, primary_key=True)
-    content_id = Column(Integer, ForeignKey("content.id"), nullable=False)
+    # NOTE - S.G - 2020-05-06: cannot set nullable=False as post_update is used
+    # for current_revision in Content.
+    content_id = Column(Integer, ForeignKey("content.id", ondelete="CASCADE"))
     # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
 
@@ -900,7 +902,7 @@ class Content(DeclarativeBase):
     )
 
     current_revision = relationship(
-        "ContentRevisionRO", uselist=False, foreign_keys=[cached_revision_id], post_update=True
+        "ContentRevisionRO", uselist=False, foreign_keys=[cached_revision_id], post_update=True,
     )
 
     # TODO - A.P - 2017-09-05 - revisions default sorting

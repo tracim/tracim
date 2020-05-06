@@ -14,6 +14,7 @@ import zope.sqlalchemy
 
 from tracim_backend.applications.share.models import ContentShare  # noqa: F401
 from tracim_backend.applications.upload_permissions.models import UploadPermission  # noqa: F401
+from tracim_backend.lib.crud_hook.caller import DatabaseCrudHookCaller
 from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.models.auth import User  # noqa: F401
 from tracim_backend.models.data import Content  # noqa: F401
@@ -95,6 +96,12 @@ def get_tm_session(session_factory, transaction_manager) -> Session:
     return dbsession
 
 
+def _create_dbsession(session_factory, request) -> Session:
+    dbsession = get_tm_session(session_factory, request.tm)
+    dbsession.info["crud_hook_caller"] = DatabaseCrudHookCaller(dbsession, request.plugin_manager)
+    return dbsession
+
+
 def init_models(configurator: Configurator, app_config: "CFG") -> None:
     """
     Initialize the model for a Pyramid app.
@@ -114,7 +121,7 @@ def init_models(configurator: Configurator, app_config: "CFG") -> None:
     # make request.dbsession available for use in Pyramid
     configurator.add_request_method(
         # r.tm is the transaction manager used by pyramid_tm
-        lambda r: get_tm_session(session_factory, r.tm),
+        lambda r: _create_dbsession(session_factory, r),
         "dbsession",
         reify=True,
     )
