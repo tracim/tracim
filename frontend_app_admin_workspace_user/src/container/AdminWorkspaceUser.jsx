@@ -13,7 +13,12 @@ import {
   buildHeadTitle,
   removeAtInUsername
 } from 'tracim_frontend_lib'
-import { debug } from '../helper.js'
+import {
+  ALLOWED_CHARACTERS_USERNAME,
+  debug,
+  MINIMUM_CHARACTERS_PUBLIC_NAME,
+  MINIMUM_CHARACTERS_USERNAME
+} from '../helper.js'
 import {
   deleteWorkspace,
   getUserDetail,
@@ -285,13 +290,17 @@ class AdminWorkspaceUser extends React.Component {
   handleClickAddUser = async (name, username, email, profile, password) => {
     const { props, state } = this
 
-    if (name.length < 3) {
-      this.sendGlobalFlashMsg(props.t('Full name must be at least 3 characters'), 'warning')
+    if (name.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
+      this.sendGlobalFlashMsg(
+        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
+      )
       return
     }
 
-    if (username.length > 0 && username.length < 3) {
-      this.sendGlobalFlashMsg(props.t('Username must be at least 3 characters'), 'warning')
+    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+      this.sendGlobalFlashMsg(
+        props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+      )
       return
     }
 
@@ -334,7 +343,11 @@ class AdminWorkspaceUser extends React.Component {
       case 400:
         switch (newUserResult.body.code) {
           case 2001: this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning'); break
-          case 2062: this.sendGlobalFlashMsg(props.t('Your username is incorrect, the allowed characters are azAZ09-_'), 'warning'); break
+          case 2062:
+            this.sendGlobalFlashMsg(
+              props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+            )
+            break
           case 2036: this.sendGlobalFlashMsg(props.t('Email already exists'), 'warning'); break
           default: this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
         }

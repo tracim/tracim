@@ -28,7 +28,7 @@
   "Error while deleting shared space": "Error while deleting shared space",
   "You can't remove yourself from Administrator": "You can't remove yourself from Administrator",
   "You can't deactivate your own account": "You can't deactivate your own account",
-  "Your username is incorrect, the allowed characters are azAZ09-_": "Your username is incorrect, the allowed characters are azAZ09-_",
+  "Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}": "Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}",
   "New password is too short (minimum 6 characters)": "New password is too short (minimum 6 characters)",
   "New password is too long (maximum 512 characters)": "New password is too long (maximum 512 characters)",
   "User created and email sent": "User created and email sent",
@@ -40,8 +40,8 @@
   "Please enter a name, a password, select a profile, and at least one between username or email": "Please enter a name, a password, select a profile, and at least one between username or email",
   "Please set a password": "Please set a password",
   "Full name": "Full name",
-  "Full name must be at least 3 characters": "Full name must be at least 3 characters",
-  "Username must be at least 3 characters": "Username must be at least 3 characters",
+  "Full name must be at least {{minimumCharactersPublicName}} characters": "Full name must be at least {{minimumCharactersPublicName}} characters",
+  "Username must be at least {{minimumCharactersUsername}} characters": "Username must be at least {{minimumCharactersUsername}} characters",
   "Username can't contain any whitespace": "Username can't contain any whitespace",
   "Email notification are disabled, please manually notify users of any change": "Email notification are disabled, please manually notify users of any change",
   "Error, invalid email address": "Error, invalid email address",
@@ -52,6 +52,6 @@
   "Administration": "Administration",
   "Username": "Username",
   "@username": "@username",
-  "The user will not be able to reset his password by himself without an email linked to his account.": "The user will not be able to reset his password by himself without an email linked to his account.",
+  "The user will not be able to reset their password by themselves without an email linked to their account.": "The user will not be able to reset their password by themselves without an email linked to their account.",
   "This username is not available": "This username is not available"
 }

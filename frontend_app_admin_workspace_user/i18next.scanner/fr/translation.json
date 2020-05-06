@@ -28,7 +28,7 @@
   "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé",
   "You can't remove yourself from Administrator": "Vous ne pouvez pas vous retirer le profil administrateur",
   "You can't deactivate your own account": "Vous ne pouvez pas désactiver votre propre compte",
-  "Your username is incorrect, the allowed characters are azAZ09-_": "Votre identifiant est incorrect, les caractères autorisés sont azAZ09-_",
+  "Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}": "Votre identifiant est incorrect, les caractères autorisés sont {{allowedCharactersUsername}}",
   "New password is too short (minimum 6 characters)": "Le nouveau mot de passe est trop court (minimum 6 caractères)",
   "New password is too long (maximum 512 characters)": "Le nouveau mot de passe trop long (maximum 512 caractères)",
   "User created and email sent": "Utilisateur créé et email envoyé",
@@ -40,8 +40,8 @@
   "Please enter a name, a password, select a profile, and at least one between username or email": "Veuillez saisir un nom, un mot de passe, sélectionner un profil, et au moins un identifiant ou un email",
   "Please set a password": "Veuillez définir un mot de passe",
   "Full name": "Nom complet",
-  "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères",
-  "Username must be at least 3 characters": "L'identeifiant doit faire au moins 3 caractères",
+  "Full name must be at least {{minimumCharactersPublicName}} characters": "Le nom complet doit comporter au moins {{minimumCharactersPublicName}} caractères",
+  "Username must be at least {{minimumCharactersUsername}} characters": "L'identifiant doit faire au moins {{minimumCharactersUsername}} caractères",
   "Username can't contain any whitespace": "L'identifiant ne doit pas contenir d'espace",
   "Email notification are disabled, please manually notify users of any change": "Les notifications par email sont désactivées, veuillez informer manuellement les utilisateurs des changements",
   "Error, invalid email address": "Erreur, email invalide",
@@ -52,6 +52,6 @@
   "Administration": "Administration",
   "Username": "Identifiant",
   "@username": "@identifiant",
-  "The user will not be able to reset his password by himself without an email linked to his account.": "L'utilisateur ne pourra pas réinitialiser son mot de passe par lui-même sans un e-mail lié à son compte.",
+  "The user will not be able to reset their password by themselves without an email linked to their account.": "L'utilisateur ne pourra pas réinitialiser son mot de passe par lui-même sans un e-mail lié à son compte.",
   "This username is not available": "Cet identifiant n'est pas disponible"
 }
