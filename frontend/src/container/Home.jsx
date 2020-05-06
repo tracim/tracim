@@ -5,7 +5,9 @@ import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../appFactory.js'
 import {
+  ALLOWED_CHARACTERS_USERNAME,
   COOKIE_FRONTEND,
+  MINIMUM_CHARACTERS_USERNAME,
   workspaceConfig
 } from '../helper.js'
 import {
@@ -98,7 +100,9 @@ export class Home extends React.Component {
       const username = removeAtInUsername(state.newUsername)
 
       if (username.length < 3) {
-        props.dispatch(newFlashMessage(props.t('Username must be at least 3 characters'), 'warning'))
+        props.dispatch(newFlashMessage(
+          props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME }),
+        'warning'))
         return false
       }
 
@@ -115,7 +119,9 @@ export class Home extends React.Component {
           break
         case 400:
           case 2062:
-            props.dispatch(newFlashMessage(props.t('Your username is incorrect, the allowed characters are azAZ09-_'), 'warning'))
+            props.dispatch(newFlashMessage(
+              props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME }),
+            'warning'))
             return false
         default:
           props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning'))
