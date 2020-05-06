@@ -3,6 +3,7 @@ import { PAGES as p } from '../../support/urls_commands'
 
 describe('Login after a disconnection ', function () {
     const login = 'admin@admin.admin'
+    const public_name = 'test'
     const username = 'test'
     const email = 'test@test.test'
     const pwd = 'testPwd'
@@ -42,6 +43,10 @@ describe('Login after a disconnection ', function () {
 
         cy.getTag({selectorName: s.ADMIN_USER_PAGE})
             .find('[data-cy=adduser_name]')
+            .type(public_name)
+
+        cy.getTag({selectorName: s.ADMIN_USER_PAGE})
+            .find('[data-cy=adduser_username]')
             .type(username)
 
         cy.getTag({selectorName: s.ADMIN_USER_PAGE})

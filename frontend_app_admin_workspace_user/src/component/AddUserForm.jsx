@@ -143,7 +143,7 @@ export class AddUserForm extends React.Component {
               trigger='hover'
             >
               <PopoverBody>
-                {props.t('The user will not be able to reset their password by themselves without an email linked to their account.')}
+                {props.t('Linking an email address is required for the user to be able to reset the password.')}
               </PopoverBody>
             </Popover>
           </div>

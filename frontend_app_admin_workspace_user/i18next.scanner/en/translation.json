@@ -22,6 +22,7 @@
   "Can create shared space": "Can create shared space",
   "Shared space management": "Shared space management",
   "List of every shared spaces": "List of every shared spaces",
+  "Linking an email address is required for the user to be able to reset the password.": "Linking an email address is required for the user to be able to reset the password.",
   "Shared space": "Shared space",
   "There is no shared space yet": "There is no shared space yet",
   "Error while loading shared spaces list": "Error while loading shared spaces list",
@@ -52,6 +53,5 @@
   "Administration": "Administration",
   "Username": "Username",
   "@username": "@username",
-  "The user will not be able to reset their password by themselves without an email linked to their account.": "The user will not be able to reset their password by themselves without an email linked to their account.",
   "This username is not available": "This username is not available"
 }

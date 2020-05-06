@@ -22,6 +22,7 @@
   "Can create shared space": "Pode criar espaço partilhado",
   "Shared space management": "Gestão de espaço partilhado",
   "List of every shared spaces": "Lista de todos os espaços partilhados",
+  "Linking an email address is required for the user to be able to reset the password.": " A atribuição de um endereço de e-mail é necessária para que o utilizador possa redefinir a palavra-passe.",
   "Shared space": "Espaço partilhado",
   "There is no shared space yet": "Ainda não há espaço partilhado",
   "Error while loading shared spaces list": "Erro ao carregamento da lista dos espaços partilhados",
@@ -52,6 +53,5 @@
   "Administration": "Administração",
   "Username": "Identificador",
   "@username": "@identificador",
-  "The user will not be able to reset their password by themselves without an email linked to their account.": "O utilizador não poderá redefinir a sua palavra-passe sozinho sem um e-mail ligado à sua conta.",
   "This username is not available": "Este identificador não está disponível"
 }
