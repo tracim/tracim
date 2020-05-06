@@ -2,7 +2,6 @@
   "Copyright 2013 - 2017": "Copyright 2013 - 2017",
   "Disconnection error": "Erreur de déconnexion",
   "Error": "Erreur",
-  "Email or password invalid": "Email ou mot de passe invalide",
   "Type": "Type",
   "Status": "Statut",
   "Search…": "Rechercher…",
@@ -28,7 +27,6 @@
   "Add a member": "Ajouter un membre",
   "Implement Tracim in your explorer": "Implémenter Tracim dans votre explorateur",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Retrouvez tous vos documents déposés en ligne directement sur votre ordinateur via le poste de travail, sans passer par le logiciel.",
-  "Email Address": "Adresse email",
   "Old password": "Ancien mot de passe",
   "New password": "Nouveau mot de passe",
   "Connection": "Connexion",
@@ -160,7 +158,6 @@
   "agenda details": "de l'agenda",
   "Home": "Accueil",
   "All contents": "Tous les contenus",
-  "Invalid email": "Email invalide",
   "Invalid password": "Mot de passe invalide",
   "Error while saving your language": "Erreur lors de la sauvegarde de la langue",
   "Use this link to integrate this agenda to your": "Utiliser ce lien pour intégrer l'agenda à votre",
@@ -237,5 +234,8 @@
   "User administration": "Administration d'utilisateur",
   "Forgotten password": "Mot de passe perdu",
   "Public upload": "Téléversement publique",
-  "Password reset": "Réinitialisation mot de passe"
+  "Password reset": "Réinitialisation mot de passe",
+  "Invalid email or username": "Adresse email ou identifiant invalide",
+  "Email address or username": "Adresse email ou identifiant",
+  "Invalid credentials": "Identifiants invalide"
 }

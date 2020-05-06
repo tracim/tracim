@@ -116,7 +116,7 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
   }
 }
 
-export const postUserLogin = (login, password, rememberMe) => async dispatch => {
+export const postUserLogin = (credentials, rememberMe) => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/auth/login`,
     param: {
@@ -124,8 +124,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
       headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
-        email: login,
-        password: password
+        ...credentials
         // remember_me: rememberMe
       })
     },

@@ -71,6 +71,7 @@ describe('Login after a disconnection ', function () {
         cy.get('[data-cy=adminUser__adduser__form]')
             .should('not.exist')
 
+        cy.contains(public_name)
         cy.contains(username)
         cy.contains(email)
     })
