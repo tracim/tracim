@@ -352,8 +352,7 @@ class WorkspaceController(Controller):
         try:
             _, user = uapi.find(
                 user_id=hapic_data.body.user_id,
-                email=hapic_data.body.user_email,
-                public_name=hapic_data.body.user_public_name,
+                email=hapic_data.body.user_email
             )
             if user.is_deleted:
                 raise UserIsDeleted("This user has been deleted. Unable to invite him.")

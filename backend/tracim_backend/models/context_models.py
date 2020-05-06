@@ -468,12 +468,10 @@ class WorkspaceMemberInvitation(object):
         self,
         user_id: int = None,
         user_email: str = None,
-        user_public_name: str = None,
         role: str = None,
     ) -> None:
         self.role = role
         self.user_email = user_email
-        self.user_public_name = user_public_name
         self.user_id = user_id
 
 
