@@ -218,6 +218,7 @@
   "Error while loading upload information": "Erro ao carregar informações subidas",
   "You must select at least 1 file to upload": "Você tem de selecionar pelo menos 1 ficheiro para subir",
   "you can always set your username in your account preferences": "você pode sempre configurar o identificador nas preferências da sua conta",
+  "Your username is incorrect, the allowed characters are azAZ09-_": "O seu identificador está incorreto, os carateres permitidos são azAZ09-_",
   "Create an office document": "Criar um documento office",
   "Full name (required)": "Nome completo (necessário)",
   "Password (required)": "Palavra-passe (necessário)",

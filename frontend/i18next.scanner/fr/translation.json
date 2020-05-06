@@ -224,6 +224,7 @@
   "Error while loading upload information": "Erreur lors du chargement des informations de téléversement",
   "You must select at least 1 file to upload": "Vous devez selectionner au moins 1 fichier à téléverser",
   "you can always set your username in your account preferences": "vous pourrez toujours définir votre identifiant dans les préférences de votre compte",
+  "Your username is incorrect, the allowed characters are azAZ09-_": "Votre identifiant est incorrect, les caractères autorisés sont azAZ09-_",
   "Create an office document": "Créer un doc. bureautique",
   "Full name (required)": "Nom complet (requis)",
   "Password (required)": "Mot de passe (requis)",

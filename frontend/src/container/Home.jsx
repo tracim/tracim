@@ -11,8 +11,16 @@ import {
 import {
   buildHeadTitle,
   CUSTOM_EVENT,
-  CardPopup
+  CardPopup,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
+import {
+  putUserUsername
+} from '../action-creator.async.js'
+import {
+  newFlashMessage,
+  updateUserUsername
+} from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -26,6 +34,7 @@ export class Home extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
     this.state = {
       newUsername: '',
+      password: '',
       checkbox: false,
       usernamePopup: false
     }
@@ -80,11 +89,40 @@ export class Home extends React.Component {
     this.setState(prevState => ({ usernamePopup: !prevState.usernamePopup }))
   }
 
-  handleClickConfirmUsernamePopup = () => {
-    if (this.state.newUsername === '') {
+  handleClickConfirmUsernamePopup = async() => {
+    const { props, state } = this
+
+    if (state.newUsername === '') {
       Cookies.set(COOKIE_FRONTEND.USERNAME_ESTABLISHED, this.state.checkbox, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
     } else {
-      console.log(this.state.newUsername) // TODO set username
+      const username = removeAtInUsername(state.newUsername)
+
+      if (username.length < 3) {
+        props.dispatch(newFlashMessage(props.t('Username must be at least 3 characters'), 'warning'))
+        return false
+      }
+
+      if (/\s/.test(username)) {
+        props.dispatch(newFlashMessage(props.t("Username can't contain any whitespace"), 'warning'))
+        return false
+      }
+
+      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, state.password))
+      switch (fetchPutUsername.status) {
+        case 200:
+          props.dispatch(updateUserUsername(state.newUsername))
+          props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
+          break
+        case 400:
+          case 2062:
+            props.dispatch(newFlashMessage(props.t('Your username is incorrect, the allowed characters are azAZ09-_'), 'warning'))
+            return false
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning'))
+          return false
+      }
+
+      Cookies.set(COOKIE_FRONTEND.USERNAME_ESTABLISHED, true, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
     }
     this.handleClickCloseUsernamePopup()
   }
@@ -94,6 +132,8 @@ export class Home extends React.Component {
   }
 
   handleChangeNewUsername = e => this.setState({ newUsername: e.target.value })
+
+  handleChangePassword = e => this.setState({ password: e.target.value })
 
   render () {
     const { props } = this
@@ -146,6 +186,22 @@ export class Home extends React.Component {
                     value={this.state.newUsername}
                     onChange={this.handleChangeNewUsername}
                   />
+
+                  {this.state.newUsername !== '' &&
+                    <>
+                      <div className='homepage__usernamePopup__body__msg'>
+                        {props.t('Please confirm your password:')}
+                      </div>
+
+                      <input
+                        className='homepage__usernamePopup__body__input form-control'
+                        type='text'
+                        placeholder={props.t('Password')}
+                        value={this.state.password}
+                        onChange={this.handleChangePassword}
+                      />
+                    </>
+                  }
 
                   <div className='homepage__usernamePopup__body__checkbox'>
                     <input
