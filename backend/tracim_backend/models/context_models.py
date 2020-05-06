@@ -464,12 +464,7 @@ class WorkspaceMemberInvitation(object):
     Workspace Member Invitation
     """
 
-    def __init__(
-        self,
-        user_id: int = None,
-        user_email: str = None,
-        role: str = None,
-    ) -> None:
+    def __init__(self, user_id: int = None, user_email: str = None, role: str = None,) -> None:
         self.role = role
         self.user_email = user_email
         self.user_id = user_id
