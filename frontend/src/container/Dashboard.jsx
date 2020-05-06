@@ -36,10 +36,11 @@ import {
   removeWorkspaceMember,
   updateUserWorkspaceSubscriptionNotif,
   setWorkspaceAgendaUrl,
-  setBreadcrumbs
+  setBreadcrumbs,
+  addWorkspaceMember
 } from '../action-creator.sync.js'
-import appFactory from '../appFactory.js'
-import { PAGE, findUserRoleIdInWorkspace } from '../helper.js'
+import appFactory from '../util/appFactory.js'
+import { PAGE, findUserRoleIdInWorkspace } from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
@@ -72,11 +73,15 @@ class Dashboard extends React.Component {
     }
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    document.addEventListener('TracimLiveMessage', this.liveMessageReducer)
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
     switch (type) {
-      case CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST: this.loadMemberList(); break
+      // this customEvent REFRESH_DASHBOARD_MEMBER_LIST will have to be deleted because of new user.role.create TLM
+      case CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST:
+        this.loadMemberList();
+        break
       case CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL:
         await this.loadWorkspaceDetail()
         this.buildBreadcrumbs()
@@ -84,6 +89,14 @@ class Dashboard extends React.Component {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         this.buildBreadcrumbs()
         this.setHeadTitle()
+        break
+    }
+  }
+
+  liveMessageReducer = async ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'sharedspace_user_role.created':
+        this.props.dispatch(addWorkspaceMember(data))
         break
     }
   }

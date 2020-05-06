@@ -14,7 +14,7 @@ import {
   DRAG_AND_DROP,
   sortWorkspaceContents,
   SHARE_FOLDER_ID
-} from '../../helper.js'
+} from '../../util/helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 require('./Folder.styl')

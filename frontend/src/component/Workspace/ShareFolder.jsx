@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import ContentItem from './ContentItem.jsx'
 import Folder from './Folder.jsx'
-import { PAGE, SHARE_FOLDER_ID } from '../../helper.js'
+import { PAGE, SHARE_FOLDER_ID } from '../../util/helper.js'
 import { ROLE } from 'tracim_frontend_lib'
 
 require('./Folder.styl')

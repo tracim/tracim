@@ -7,10 +7,10 @@ import { store } from './store.js'
 import Tracim from './container/Tracim.jsx'
 import { Router } from 'react-router'
 import { I18nextProvider } from 'react-i18next'
-import i18n from './i18n.js'
+import i18n from './util/i18n.js'
 import { DragDropContextProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
-import { history } from './helper'
+import { history } from './util/helper.js'
 
 require('./css/index.styl')
 

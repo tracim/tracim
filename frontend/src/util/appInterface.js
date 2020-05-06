@@ -1,3 +1,5 @@
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+
 let previouslySelectedAppFeature = ''
 let previouslySelectedAppFullScreen = ''
 const APP_NOT_LOADED = 'appNotLoaded'
@@ -79,8 +81,10 @@ globalThis.GLOBAL_renderAppFeature = function (app, retryCount) {
 
     selectedApp.renderAppFeature(app)
     selectedApp.isRendered = true
-    ;(getSelectedApp(previouslySelectedAppFeature) || { isRendered: null }).isRendered = false
     previouslySelectedAppFeature = selectedApp.name
+
+    if (getSelectedApp(previouslySelectedAppFeature) === APP_NOT_LOADED) return
+    getSelectedApp(previouslySelectedAppFeature).isRendered = false
   }
 }
 
@@ -109,8 +113,10 @@ globalThis.GLOBAL_renderAppFullscreen = function (app, retryCount) {
   } else {
     selectedApp.renderAppFullscreen(app)
     selectedApp.isRendered = true
-    ;(getSelectedApp(previouslySelectedAppFullScreen) || { isRendered: null }).isRendered = false
     previouslySelectedAppFullScreen = selectedApp.name
+
+    if (getSelectedApp(previouslySelectedAppFullScreen) === APP_NOT_LOADED) return
+    getSelectedApp(previouslySelectedAppFullScreen).isRendered = false
   }
 }
 
@@ -142,7 +148,7 @@ globalThis.GLOBAL_dispatchEvent = function (event) {
   const data = event.data
   console.log('%cGLOBAL_dispatchEvent', 'color: #fff', type, data)
 
-  const customEvent = new globalThis.CustomEvent('appCustomEventListener', { detail: { type, data } })
+  const customEvent = new globalThis.CustomEvent(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, { detail: { type, data } })
   document.dispatchEvent(customEvent)
 }
 

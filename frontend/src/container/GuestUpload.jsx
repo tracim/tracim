@@ -17,7 +17,7 @@ import UploadForm from '../component/GuestPage/UploadForm.jsx'
 import {
   FETCH_CONFIG,
   PAGE
-} from '../helper.js'
+} from '../util/helper.js'
 import { getGuestUploadInfo } from '../action-creator.async'
 
 class GuestUpload extends React.Component {
