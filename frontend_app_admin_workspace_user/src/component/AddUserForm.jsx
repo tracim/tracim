@@ -115,7 +115,7 @@ export class AddUserForm extends React.Component {
             data-cy='adduser_username'
           />
 
-          {!props.newUsernameAvailability && (
+          {!props.newUsernameAvailability && state.newUserUsername !== '' && (
             <div className='userData__input__username__errorMsg'>
               <i className='userData__input__username__errorIcon fa fa-times' />
               {props.t('This username is not available')}
