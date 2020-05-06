@@ -17,6 +17,7 @@ import {
   removeAtInUsername
 } from 'tracim_frontend_lib'
 import {
+  getUsernameAvailability,
   putUserUsername
 } from '../action-creator.async.js'
 import {
@@ -35,9 +36,10 @@ export class Home extends React.Component {
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
     this.state = {
-      newUsername: '',
-      password: '',
       checkbox: false,
+      newUsername: '',
+      newUsernameAvailability: true,
+      password: '',
       usernamePopup: false
     }
   }
@@ -82,7 +84,7 @@ export class Home extends React.Component {
 
   checkUsername = () => {
     // TODO when back, check if username = null, the cookie and set the username state
-    if(!Cookies.get(COOKIE_FRONTEND.USERNAME_ESTABLISHED)){
+    if (!Cookies.get(COOKIE_FRONTEND.USERNAME_ESTABLISHED)) {
       this.setState({ usernamePopup: true })
     }
   }
@@ -91,7 +93,7 @@ export class Home extends React.Component {
     this.setState(prevState => ({ usernamePopup: !prevState.usernamePopup }))
   }
 
-  handleClickConfirmUsernamePopup = async() => {
+  handleClickConfirmUsernamePopup = async () => {
     const { props, state } = this
 
     if (state.newUsername === '') {
@@ -99,10 +101,10 @@ export class Home extends React.Component {
     } else {
       const username = removeAtInUsername(state.newUsername)
 
-      if (username.length < 3) {
-        props.dispatch(newFlashMessage(
-          props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME }),
-        'warning'))
+      if (username.length < MINIMUM_CHARACTERS_USERNAME) {
+        props.dispatch(
+          newFlashMessage(props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME }), 'warning')
+        )
         return false
       }
 
@@ -118,11 +120,22 @@ export class Home extends React.Component {
           props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
           break
         case 400:
-          case 2062:
-            props.dispatch(newFlashMessage(
-              props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME }),
-            'warning'))
-            return false
+          switch (fetchPutUsername.json.code) {
+            case 2001:
+              props.dispatch(newFlashMessage(props.t('Password must be at least 6 characters'), 'warning'))
+              return false
+            case 2062:
+              props.dispatch(
+                newFlashMessage(props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME }), 'warning')
+              )
+              return false
+            default:
+              props.dispatch(newFlashMessage(props.t('An error has happened, please try again'), 'warning'))
+              return false
+          }
+        case 403:
+          props.dispatch(newFlashMessage(props.t('Invalid password'), 'warning'))
+          return false
         default:
           props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning'))
           return false
@@ -137,7 +150,22 @@ export class Home extends React.Component {
     this.setState(prevState => ({ checkbox: !prevState.checkbox }))
   }
 
-  handleChangeNewUsername = e => this.setState({ newUsername: e.target.value })
+  handleChangeNewUsername = async e => {
+    const { props, state } = this
+
+    this.setState({ newUsername: e.target.value })
+
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(removeAtInUsername(state.newUsername)))
+
+    switch (fetchUsernameAvailability.status) {
+      case 200:
+        this.setState({ newUsernameAvailability: fetchUsernameAvailability.json.available })
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning'))
+        break
+    }
+  }
 
   handleChangePassword = e => this.setState({ password: e.target.value })
 
@@ -193,7 +221,14 @@ export class Home extends React.Component {
                     onChange={this.handleChangeNewUsername}
                   />
 
-                  {this.state.newUsername !== '' &&
+                  {!this.state.newUsernameAvailability && (
+                    <div className='userData__input__username__errorMsg'>
+                      <i className='userData__input__username__errorIcon fa fa-times' />
+                      {props.t('This username is not available')}
+                    </div>
+                  )}
+
+                  {this.state.newUsername !== '' && (
                     <>
                       <div className='homepage__usernamePopup__body__msg'>
                         {props.t('Please confirm your password:')}
@@ -201,13 +236,13 @@ export class Home extends React.Component {
 
                       <input
                         className='homepage__usernamePopup__body__input form-control'
-                        type='text'
+                        type='password'
                         placeholder={props.t('Password')}
                         value={this.state.password}
                         onChange={this.handleChangePassword}
                       />
                     </>
-                  }
+                  )}
 
                   <div className='homepage__usernamePopup__body__checkbox'>
                     <input
