@@ -38,7 +38,7 @@
     }
 
     getTinyMceLang = (lang) => {
-      switch(lang) {
+      switch (lang) {
         case 'fr':
           return 'fr_FR'
         case 'pt':
