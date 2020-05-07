@@ -228,6 +228,7 @@ export class Home extends React.Component {
                     placeholder={props.t('@username')}
                     value={this.state.newUsername}
                     onChange={this.handleChangeNewUsername}
+                    data-cy='usernamePopup_username'
                   />
 
                   {!this.state.newUsernameAvailability && (
@@ -249,6 +250,7 @@ export class Home extends React.Component {
                         placeholder={props.t('Password')}
                         value={this.state.password}
                         onChange={this.handleChangePassword}
+                        data-cy='usernamePopup_password'
                       />
                     </>
                   )}
