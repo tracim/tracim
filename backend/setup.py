@@ -68,7 +68,9 @@ requires = [
     # logging
     'colorlog',
     # plugin
-    'pluggy'
+    'pluggy',
+    # live message
+    'gripcontrol'
 ]
 
 tests_require = [
@@ -141,6 +143,7 @@ setup(
             'search index-drop = tracim_backend.command.search:SearchIndexDeleteCommand',
             'dev parameters list = tracim_backend.command.devtools:ParametersListCommand',
             'dev parameters value = tracim_backend.command.devtools:ParametersValueCommand',
+            'dev test live-messages = tracim_backend.command.devtools:LiveMessageTesterCommand',
             'user delete = tracim_backend.command.cleanup:DeleteUserCommand',
             'user anonymize = tracim_backend.command.cleanup:AnonymizeUserCommand',
         ]

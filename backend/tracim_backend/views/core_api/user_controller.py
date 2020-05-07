@@ -1,4 +1,5 @@
 from pyramid.config import Configurator
+from pyramid.response import Response
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
@@ -542,6 +543,26 @@ class UserController(Controller):
         wapi.save(workspace)
         return
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    def live_messages(self, context, request: TracimRequest, hapic_data=None) -> Response:
+        """
+        Tracim Live Message Events as ServerSide Event Stream
+        """
+        user_channel_name = "user_{}".format(request.candidate_user.user_id)
+        headers = [
+            # Here we ask push pin to keep the connection open
+            ("Grip-Hold", "stream"),
+            # and register this connection on the given channel
+            # multiple channels subscription is possible
+            ("Grip-Channel", user_channel_name),
+            # content type for SSE
+            ("Content-Type", "text/event-stream"),
+            # do not cache the events
+            ("Cache-Control", "no-cache"),
+        ]
+        return Response(headerlist=headers, charset="utf-8", status_code=200)
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -694,3 +715,11 @@ class UserController(Controller):
         configurator.add_view(
             self.disable_workspace_notification, route_name="disable_workspace_notification"
         )
+
+        # TracimLiveMessages notification
+        configurator.add_route(
+            "live_messages",
+            "/users/{user_id:\d+}/live_messages",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.live_messages, route_name="live_messages")
