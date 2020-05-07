@@ -36,7 +36,7 @@ export class Home extends React.Component {
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
     this.state = {
-      checkbox: false,
+      hidePopupCheckbox: false,
       newUsername: '',
       newUsernameAvailability: true,
       password: '',
@@ -83,8 +83,7 @@ export class Home extends React.Component {
   }
 
   checkUsername = () => {
-    // TODO when back, check if username = null, the cookie and set the username state
-    if (!Cookies.get(COOKIE_FRONTEND.USERNAME_ESTABLISHED)) {
+    if (!(Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP) && this.props.user.username)) {
       this.setState({ usernamePopup: true })
     }
   }
@@ -97,7 +96,7 @@ export class Home extends React.Component {
     const { props, state } = this
 
     if (state.newUsername === '') {
-      Cookies.set(COOKIE_FRONTEND.USERNAME_ESTABLISHED, this.state.checkbox, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+      Cookies.set(COOKIE_FRONTEND.HIDE_USERNAME_POPUP, this.state.hidePopupCheckbox, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
     } else {
       const username = removeAtInUsername(state.newUsername)
 
@@ -116,7 +115,7 @@ export class Home extends React.Component {
       const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, state.password))
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(updateUserUsername(state.newUsername))
+          props.dispatch(updateUserUsername(username))
           props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
           break
         case 400:
@@ -141,21 +140,21 @@ export class Home extends React.Component {
           return false
       }
 
-      Cookies.set(COOKIE_FRONTEND.USERNAME_ESTABLISHED, true, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+      Cookies.set(COOKIE_FRONTEND.HIDE_USERNAME_POPUP, true, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
     }
     this.handleClickCloseUsernamePopup()
   }
 
   handleClickCheckbox = () => {
-    this.setState(prevState => ({ checkbox: !prevState.checkbox }))
+    this.setState(prevState => ({ hidePopupCheckbox: !prevState.hidePopupCheckbox }))
   }
 
   handleChangeNewUsername = async e => {
-    const { props, state } = this
+    const { props } = this
 
     this.setState({ newUsername: e.target.value })
 
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(removeAtInUsername(state.newUsername)))
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(removeAtInUsername(e.target.value)))
 
     switch (fetchUsernameAvailability.status) {
       case 200:
@@ -168,6 +167,16 @@ export class Home extends React.Component {
   }
 
   handleChangePassword = e => this.setState({ password: e.target.value })
+
+  disableConfirmButton = () => {
+    const { state } = this
+
+    return (
+      (state.newUsername === '' && !state.hidePopupCheckbox) ||
+      !state.newUsernameAvailability ||
+      (state.newUsername !== '' && state.password === '')
+    )
+  }
 
   render () {
     const { props } = this
@@ -222,8 +231,8 @@ export class Home extends React.Component {
                   />
 
                   {!this.state.newUsernameAvailability && (
-                    <div className='userData__input__username__errorMsg'>
-                      <i className='userData__input__username__errorIcon fa fa-times' />
+                    <div className='homepage__usernamePopup__errorMsg'>
+                      <i className='homepage__usernamePopup__errorIcon fa fa-times' />
                       {props.t('This username is not available')}
                     </div>
                   )}
@@ -260,6 +269,7 @@ export class Home extends React.Component {
                     type='button'
                     className='homepage__usernamePopup__body__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
                     onClick={this.handleClickConfirmUsernamePopup}
+                    disabled={this.disableConfirmButton()}
                   >
                     {props.t('Confirm')}
                   </button>
