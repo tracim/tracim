@@ -78,7 +78,6 @@ class Dashboard extends React.Component {
 
   customEventReducer = async ({ detail: { type, data } }) => {
     switch (type) {
-      // this customEvent REFRESH_DASHBOARD_MEMBER_LIST will have to be deleted because of new user.role.create TLM
       case CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST:
         this.loadMemberList();
         break

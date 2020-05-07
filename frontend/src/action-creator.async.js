@@ -654,7 +654,7 @@ export const getAppList = () => dispatch => {
 }
 
 export const getLiveMessage = () => dispatch => {
-  // get live message with query param send_state=already_sent
+  // FIXME #2842 - CH - 20200507 - This is a mock, it should use the endpoint to get the live messages list
   return new Promise((resolve) => {
     setTimeout(() => {
       console.log('resolving getLiveMessage')
