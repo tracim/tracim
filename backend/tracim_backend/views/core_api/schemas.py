@@ -737,9 +737,6 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
     user_email = marshmallow.fields.Email(
         example="suri@cate.fr", default=None, allow_none=True, validate=user_email_validator
     )
-    user_public_name = StrippedString(
-        example="John", default=None, allow_none=True, validate=user_public_name_validator
-    )
 
     @post_load
     def make_role(self, data: typing.Dict[str, typing.Any]) -> object:

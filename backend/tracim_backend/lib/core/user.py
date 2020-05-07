@@ -125,16 +125,6 @@ class UserApi(object):
             raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc
         return user
 
-    def get_one_by_public_name(self, public_name: str) -> User:
-        """
-        Get one user by public_name
-        """
-        try:
-            user = self._base_query().filter(User.display_name == public_name).one()
-        except NoResultFound as exc:
-            raise UserDoesNotExist('User "{}" not found in database'.format(public_name)) from exc
-        return user
-
     # FIXME - G.M - 24-04-2018 - Duplicate method with get_one.
 
     def get_one_by_id(self, id: int) -> User:
@@ -214,13 +204,12 @@ class UserApi(object):
         query = query.limit(nb_elem)
         return query.all()
 
-    def find(
-        self, user_id: int = None, email: str = None, public_name: str = None, token: str = None,
+    def get(
+        self, user_id: int = None, token: str = None, email: str = None
     ) -> typing.Tuple[TypeUser, User]:
         """
-        Find existing user from all theses params.
-        Check is made in this order: user_id, email, public_name
-        If no user found raise UserDoesNotExist exception
+        Get an existing user by their id, or authentication token, or email, in this order.
+        If no user is found by any of these parameters, exception UserDoesNotExist will be raised
         """
         user = None
 
@@ -240,12 +229,6 @@ class UserApi(object):
             try:
                 user = self.get_one_by_email(email)
                 return TypeUser.EMAIL, user
-            except UserDoesNotExist:
-                pass
-        if public_name:
-            try:
-                user = self.get_one_by_public_name(public_name)
-                return TypeUser.PUBLIC_NAME, user
             except UserDoesNotExist:
                 pass
 
