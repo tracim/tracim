@@ -50,7 +50,7 @@ export class CollaborativeEditionFrame extends React.Component {
 
   async componentDidMount () {
     const { props } = this
-    console.log('%c<CollaboraFrame> did mount', `color: ${props.data.config.hexcolor}`, props)
+    // console.log('%c<CollaboraFrame> did mount', `color: ${props.data.config.hexcolor}`, props)
     //  // INFO - B.L - 2019/09/03 Collabora fire the event from window we need to listen window.
     window.addEventListener('message', this.handleIframeIsClosing)
     try {
@@ -241,7 +241,7 @@ export class CollaborativeEditionFrame extends React.Component {
         <form id={this.state.formId} name={this.state.formId} target={this.state.iframeId} action={this.state.iframeUrl} method='post'>
           <input name='access_token' value={this.state.accessToken} type='hidden' />
         </form>
-        <iframe id={this.state.iframeId} name={this.state.iframeId} allowfullscreen style={this.state.iframeStyle} />
+        <iframe id={this.state.iframeId} name={this.state.iframeId} allowFullScreen style={this.state.iframeStyle} />
       </div>
     )
   }
