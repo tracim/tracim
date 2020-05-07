@@ -37,9 +37,20 @@
       return currentHeightInt
     }
 
+    getTinyMceLang = (lang) => {
+      switch(lang) {
+        case 'fr':
+          return 'fr_FR'
+        case 'pt':
+          return 'pt_PT'
+        default:
+          return lang
+      }
+    }
+
     tinymce.init({
       selector: selector,
-      language: lang === 'fr' ? 'fr_FR' : lang,
+      language: getTinyMceLang(lang),
       menubar: false,
       resize: false,
       skin: 'lightgray',
