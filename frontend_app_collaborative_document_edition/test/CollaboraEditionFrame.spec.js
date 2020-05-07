@@ -25,7 +25,7 @@ describe('<CollaborativeEditionFrame />', function () {
           config: {
             content_length_file_size_limit: 0,
             email_notification_activated: true,
-            instance_name: "Algoo",
+            instance_name: "Tracim",
             new_user_invitation_do_notify: true,
             webdav_enabled: true,
             webdav_url: "https://unit.test:6543/webdav",
