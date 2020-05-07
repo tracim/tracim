@@ -17,7 +17,7 @@
       font-size 20px
   .selectStatus
     margin-right 15px
-  &__contentpage
+  &__contentpage, &__contentpage__edition
     width 100%
     &__left
       &__wrapper
@@ -100,17 +100,25 @@
 @media (min-width: min-sm) and (max-width: max-lg)
   .html-document
     &__contentpage
-      &__left
-        &__wrapper
-          padding 0
-      &__textnote
-        margin 0
+      &, &__contentpage__edition
+        &__left
+          &__wrapper
+            padding 0
+        &__textnote
+          margin 0
+      &__edition__content
+        &__left
+          height 100%
 
 @media (max-width: max-xs)
   .html-document
     &__contentpage
-      &__left
-        &__wrapper
-          padding 0
-      &__textnote
-        margin 0
+      &, &__contentpage__edition
+        &__left
+          &__wrapper
+            padding 0
+        &__textnote
+          margin 0
+      &__edition__content
+        &__left
+          height 100%
