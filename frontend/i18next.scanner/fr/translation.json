@@ -238,5 +238,5 @@
   "Forgotten password": "Mot de passe perdu",
   "Public upload": "Téléversement publique",
   "Password reset": "Réinitialisation mot de passe",
-  "{{filename}} is bigger than 1mo, it can takes some time to upload, do you wish to continue?": "{{filename}} est supérieur à 1mo, cela peut prendre du temps à téléverser. Voulez-vous continuer ?"
+  "{{filename}} is bigger than 1MB, it can takes some time to upload, do you wish to continue?": "{{filename}} est supérieur à 1MO, cela peut prendre du temps à téléverser. Voulez-vous continuer "
 }
