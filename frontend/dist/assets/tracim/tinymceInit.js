@@ -37,9 +37,21 @@
       return currentHeightInt
     }
 
+    // TODO - GM - 2020/05/07 - find a better way to handle language support in order to make it more generic see: https://github.com/tracim/tracim/issues/3011
+    getTinyMceLang = (lang) => {
+      switch (lang) {
+        case 'fr':
+          return 'fr_FR'
+        case 'pt':
+          return 'pt_PT'
+        default:
+          return lang
+      }
+    }
+
     tinymce.init({
       selector: selector,
-      language: lang === 'fr' ? 'fr_FR' : lang,
+      language: getTinyMceLang(lang),
       menubar: false,
       resize: false,
       skin: 'lightgray',
