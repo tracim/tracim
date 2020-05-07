@@ -66,7 +66,7 @@ globalThis.GLOBAL_renderAppFeature = function (app, retryCount) {
     const retryTime = retryCount + TIME_TO_RETRY
 
     if (retryTime < RETRY_TIMEOUT) {
-      setTimeout(() => GLOBAL_renderAppFeature(app, retryTime), TIME_TO_RETRY)
+      setTimeout(() => globalThis.GLOBAL_renderAppFeature(app, retryTime), TIME_TO_RETRY)
       return
     }
 
@@ -75,16 +75,19 @@ globalThis.GLOBAL_renderAppFeature = function (app, retryCount) {
   }
 
   if (selectedApp.isRendered) {
-    GLOBAL_dispatchEvent({ type: app.config.slug + '_showApp', data: app })
+    globalThis.GLOBAL_dispatchEvent({ type: app.config.slug + '_showApp', data: app })
   } else {
-    if (previouslySelectedAppFeature !== selectedApp.name) GLOBAL_dispatchEvent({ type: 'unmount_appFeature', data: {} })
+    if (previouslySelectedAppFeature !== selectedApp.name) {
+      globalThis.GLOBAL_dispatchEvent({ type: 'unmount_appFeature', data: {} })
+    }
 
     selectedApp.renderAppFeature(app)
     selectedApp.isRendered = true
-    previouslySelectedAppFeature = selectedApp.name
 
-    if (getSelectedApp(previouslySelectedAppFeature) === APP_NOT_LOADED) return
-    getSelectedApp(previouslySelectedAppFeature).isRendered = false
+    if (getSelectedApp(previouslySelectedAppFeature) !== APP_NOT_LOADED) {
+      getSelectedApp(previouslySelectedAppFeature).isRendered = false
+    }
+    previouslySelectedAppFeature = selectedApp.name
   }
 }
 
@@ -100,7 +103,7 @@ globalThis.GLOBAL_renderAppFullscreen = function (app, retryCount) {
     const retryTime = retryCount + TIME_TO_RETRY
 
     if (retryTime < RETRY_TIMEOUT) {
-      setTimeout(() => GLOBAL_renderAppFullscreen(app, retryTime), TIME_TO_RETRY)
+      setTimeout(() => globalThis.GLOBAL_renderAppFullscreen(app, retryTime), TIME_TO_RETRY)
       return
     }
 
@@ -109,14 +112,17 @@ globalThis.GLOBAL_renderAppFullscreen = function (app, retryCount) {
   }
 
   if (selectedApp.isRendered) {
-    GLOBAL_dispatchEvent({ type: app.config.slug + '_showApp', data: app })
+    globalThis.GLOBAL_dispatchEvent({ type: app.config.slug + '_showApp', data: app })
   } else {
+    console.log('previouslySelectedAppFullScreen', previouslySelectedAppFullScreen)
+
     selectedApp.renderAppFullscreen(app)
     selectedApp.isRendered = true
-    previouslySelectedAppFullScreen = selectedApp.name
 
-    if (getSelectedApp(previouslySelectedAppFullScreen) === APP_NOT_LOADED) return
-    getSelectedApp(previouslySelectedAppFullScreen).isRendered = false
+    if (getSelectedApp(previouslySelectedAppFullScreen) !== APP_NOT_LOADED) {
+      getSelectedApp(previouslySelectedAppFullScreen).isRendered = false
+    }
+    previouslySelectedAppFullScreen = selectedApp.name
   }
 }
 

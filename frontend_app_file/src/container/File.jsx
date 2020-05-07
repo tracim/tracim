@@ -157,13 +157,13 @@ class File extends React.Component {
       }
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
+    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymce.remove('#wysiwygTimelineComment')
+    globalThis.tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
