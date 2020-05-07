@@ -37,7 +37,7 @@
       return currentHeightInt
     }
 
-    // TODO find a better way to handle language support in order to make it more generic see: https://github.com/tracim/tracim/issues/3011
+    // TODO - GM - 2020/05/07 - find a better way to handle language support in order to make it more generic see: https://github.com/tracim/tracim/issues/3011
     getTinyMceLang = (lang) => {
       switch (lang) {
         case 'fr':
