@@ -214,7 +214,7 @@ class TestWorkspaceEndpoint(object):
             workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
 
     def test_api__update_workspace__ok_200__nominal_case(
-        self, workspace_api_factory, application_api_factory, web_testapp, app_config
+        self, workspace_api_factory, application_api_factory, web_testapp, app_config, event_helper
     ) -> None:
         """
         Test update workspace
@@ -262,6 +262,18 @@ class TestWorkspaceEndpoint(object):
         assert workspace["agenda_enabled"] is False
         assert workspace["public_upload_enabled"] is False
         assert workspace["public_download_enabled"] is False
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace.modified"
+        assert last_event.fields["workspace"] == {
+            "workspace_id": workspace["workspace_id"],
+            "slug": workspace["slug"],
+            "label": workspace["label"],
+            "is_deleted": workspace["is_deleted"],
+            "agenda_enabled": workspace["agenda_enabled"],
+            "public_upload_enabled": workspace["public_upload_enabled"],
+            "public_download_enabled": workspace["public_download_enabled"],
+            "sidebar_entries": workspace["sidebar_entries"],
+        }
 
         # after
         res = web_testapp.get("/api/v2/workspaces/1", status=200)
@@ -478,7 +490,7 @@ class TestWorkspaceEndpoint(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__create_workspace__ok_200__nominal_case(self, web_testapp) -> None:
+    def test_api__create_workspace__ok_200__nominal_case(self, web_testapp, event_helper) -> None:
         """
         Test create workspace
         """
@@ -503,6 +515,20 @@ class TestWorkspaceEndpoint(object):
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]
         workspace_id = res.json_body["workspace_id"]
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace.created"
+        assert last_event.fields["author"] == workspace["owner"]
+        assert last_event.fields["workspace"] == {
+            "workspace_id": workspace_id,
+            "label": workspace["label"],
+            "is_deleted": workspace["is_deleted"],
+            "agenda_enabled": workspace["agenda_enabled"],
+            "public_upload_enabled": workspace["public_upload_enabled"],
+            "public_download_enabled": workspace["public_download_enabled"],
+            "sidebar_entries": workspace["sidebar_entries"],
+            "slug": workspace["slug"],
+        }
+
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
         assert workspace["workspace_id"] == workspace_2["workspace_id"]
@@ -528,7 +554,7 @@ class TestWorkspaceEndpoint(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__delete_workspace__ok_200__admin(
-        self, web_testapp, user_api_factory, workspace_api_factory
+        self, web_testapp, user_api_factory, workspace_api_factory, event_helper
     ) -> None:
         """
         Test delete workspace as admin
@@ -559,6 +585,18 @@ class TestWorkspaceEndpoint(object):
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace = res.json_body
         assert workspace["is_deleted"] is True
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace.deleted"
+        assert last_event.fields["workspace"] == {
+            "workspace_id": workspace["workspace_id"],
+            "slug": workspace["slug"],
+            "label": workspace["label"],
+            "is_deleted": workspace["is_deleted"],
+            "agenda_enabled": workspace["agenda_enabled"],
+            "public_upload_enabled": workspace["public_upload_enabled"],
+            "public_download_enabled": workspace["public_download_enabled"],
+            "sidebar_entries": workspace["sidebar_entries"],
+        }
 
     def test_api__delete_workspace__ok_200__manager_workspace_manager(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory

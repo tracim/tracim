@@ -2,7 +2,6 @@
 This is just a sample of Tracim backend plugin using pluggy hook
 """
 from pluggy import PluginManager
-
 from tracim_backend.lib.core.plugins import hookimpl
 
 

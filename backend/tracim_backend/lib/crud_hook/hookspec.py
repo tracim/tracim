@@ -15,7 +15,7 @@ class DatabaseCrudHookSpec:
     """
 
     @hookspec
-    def on_user_created(self, user, db_session: TracimSession) -> None:
+    def on_user_created(self, user: User, db_session: TracimSession) -> None:
         ...
 
     @hookspec

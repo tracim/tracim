@@ -253,7 +253,7 @@ class TracimRequest(TracimContext, Request):
     def set_user(self, user: User):
         """Overload TracimContext method to add plugin hook call."""
         super().set_user(user)
-        self.plugin_manager.hook.on_current_user_set(user, self)
+        self.plugin_manager.hook.on_current_user_set(user=user, request=self)
 
     @property
     def current_user(self) -> User:
@@ -290,9 +290,11 @@ class TracimRequest(TracimContext, Request):
         :param request: same as self, request
         :return: nothing.
         """
+        self.plugin_manager.hook.on_request_finished(request=self)
         self._current_user = None
         self._current_workspace = None
-        self.dbsession.close()
+        if self.dbsession:
+            self.dbsession.close()
 
     # INFO - G.M - 2018-12-03 - Internal utils function to simplify ID fetching
 

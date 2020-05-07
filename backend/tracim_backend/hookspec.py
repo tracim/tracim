@@ -25,6 +25,13 @@ class TracimRequestHookSpec:
         """
         pass
 
+    @hookspec
+    def on_request_finished(self, request: TracimRequest) -> None:
+        """
+        Called when the request has been handled.
+        """
+        pass
+
 
 @hookspec
 def web_include(configurator: Configurator, app_config: CFG) -> None:

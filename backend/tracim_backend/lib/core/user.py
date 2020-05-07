@@ -721,7 +721,7 @@ class UserApi(object):
             raise NotificationDisabledCantCreateUserWithInvitation(
                 "Can't create user with invitation mail because " "notification are disabled."
             )
-        new_user = self.create_minimal_user(email, profile, save_now=False)
+        new_user = self.create_minimal_user(email, profile)
         if allowed_space is None:
             allowed_space = self._config.LIMITATION__USER_DEFAULT_ALLOWED_SPACE
         self.update(
@@ -735,6 +735,10 @@ class UserApi(object):
             lang=lang,
             do_save=False,
         )
+        # TODO - G.M - 04-04-2018 - [auth]
+        # Check if this is already needed with
+        # new auth system
+        new_user.ensure_auth_token(validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY)
         if do_notify:
             try:
                 email_manager = get_email_manager(self._config, self._session)
@@ -779,9 +783,8 @@ class UserApi(object):
             profile = Profile.get_profile_from_slug(self._config.USER__DEFAULT_PROFILE)
         user.profile = profile
 
-        self._session.add(user)
-
         if save_now:
+            self._session.add(user)
             self._session.flush()
 
         return user
@@ -845,6 +848,7 @@ class UserApi(object):
             self.save(user)
 
     def save(self, user: User):
+        self._session.add(user)
         self._session.flush()
 
     def execute_updated_user_actions(self, user: User) -> None:
@@ -887,11 +891,6 @@ class UserApi(object):
 
         This method do post-create user actions
         """
-
-        # TODO - G.M - 04-04-2018 - [auth]
-        # Check if this is already needed with
-        # new auth system
-        user.ensure_auth_token(validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY)
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
         # event mechanism is ready, see https://github.com/tracim/tracim/issues/1487
