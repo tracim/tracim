@@ -17,7 +17,7 @@ export class LiveMessageManager {
       setTimeout(() => {
         console.log('resolving openLiveMessageConnection')
 
-        this.mockRandomLiveEvents()
+        // this.mockRandomLiveEvents()
 
         this.status = LIVE_MESSAGE_STATUS.OPEN
 
@@ -35,15 +35,15 @@ export class LiveMessageManager {
     const data = event.data
     console.log('%GLOBAL_dispatchLiveMessage', 'color: #ccc', type, data)
 
-    // const customEvent = new globalThis.CustomEvent('TracimLiveMessage', { detail: { type, data } })
+    const customEvent = new globalThis.CustomEvent('TracimLiveMessage', { detail: { type, data } })
 
-    // document.dispatchEvent(customEvent)
+    document.dispatchEvent(customEvent)
   }
 
   mockRandomLiveEvents () {
     const eventFromBackend = {
       event_id: 42,
-      event_type: 'sharedspace_user_role.modified', // hierarchy in the naming: entity_type.core_event_type
+      event_type: 'sharedspace_user_role.created', // hierarchy in the naming: entity_type.core_event_type
       sent_datetime: '2012-05-29T18:25:43.511Z',
       read_datetime: null,
       sender_id: 54,
@@ -60,7 +60,7 @@ export class LiveMessageManager {
           label: 'Un truc sympa',
           is_deleted: false
         },
-        role: ROLE.contributor
+        role: ROLE.contributor.slug
       }
     }
 

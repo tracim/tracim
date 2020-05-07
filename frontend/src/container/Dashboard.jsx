@@ -96,7 +96,7 @@ class Dashboard extends React.Component {
   liveMessageReducer = async ({ detail: { type, data } }) => {
     switch (type) {
       case 'sharedspace_user_role.created':
-        this.props.dispatch(addWorkspaceMember(data))
+        this.props.dispatch(addWorkspaceMember(data.fields))
         break
     }
   }

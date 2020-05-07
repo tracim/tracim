@@ -70,7 +70,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           {
             id: action.member.user_id,
             publicName: action.member.user.public_name,
-            role: action.member.role.slug,
+            role: action.member.role,
             isActive: action.member.is_active,
             doNotify: action.member.do_notify
           }
