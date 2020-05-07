@@ -94,8 +94,8 @@ export class AdminUser extends React.Component {
     else this.props.onChangeProfile(userId, 'trusted-users')
   }
 
-  handleClickAddUser = async (name, username, email, profile, password) => {
-    const resultSuccess = await this.props.onClickAddUser(name, username, email, profile, password)
+  handleClickAddUser = async (publicName, username, email, profile, password) => {
+    const resultSuccess = await this.props.onClickAddUser(publicName, username, email, profile, password)
     if (resultSuccess) this.handleToggleAddUser()
   }
 

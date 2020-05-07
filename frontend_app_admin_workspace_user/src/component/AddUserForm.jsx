@@ -139,7 +139,8 @@ export class AddUserForm extends React.Component {
               placement='bottom'
               isOpen={state.popoverEmailInfoOpen}
               target='popoverEmailInfo'
-              toggle={this.handleTogglePopoverEmailInfo}
+              // INFO - GB - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+              toggle={this.handleTogglePopoverEmailInfo} // eslint-disable-line react/jsx-handler-names
               trigger='hover'
             >
               <PopoverBody>
