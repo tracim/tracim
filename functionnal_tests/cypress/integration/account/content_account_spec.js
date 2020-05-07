@@ -4,9 +4,15 @@ import baseUser from '../../fixtures/baseUser.json'
 import defaultAdmin from '../../fixtures/defaultAdmin.json'
 
 describe('Account page', () => {
+  let existingUsername
+
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
+    cy.loginAs('administrators')
+    cy.createRandomUser().then(user => {
+      existingUsername = user.username
+    })
   })
 
   beforeEach(() => {
@@ -198,13 +204,12 @@ describe('Account page', () => {
       })
 
       it('should show a warning when the username is not available', () => {
-        const newUserName = defaultAdmin.username
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
           .click()
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=personaldata__form__txtinput__username]')
-          .type(newUserName)
+          .type(existingUsername)
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('.personaldata__form__txtinput.checkPassword')
           .type(defaultAdmin.password)
