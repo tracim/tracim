@@ -114,8 +114,6 @@ globalThis.GLOBAL_renderAppFullscreen = function (app, retryCount) {
   if (selectedApp.isRendered) {
     globalThis.GLOBAL_dispatchEvent({ type: app.config.slug + '_showApp', data: app })
   } else {
-    console.log('previouslySelectedAppFullScreen', previouslySelectedAppFullScreen)
-
     selectedApp.renderAppFullscreen(app)
     selectedApp.isRendered = true
 

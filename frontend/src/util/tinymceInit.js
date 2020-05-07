@@ -6,7 +6,7 @@ import i18n from './i18n.js'
       if (files[i].size > 1000000) {
         files[i].allowed = globalThis.confirm(
           i18n.t(
-            '{{filename}} is bigger than 1MB, it can takes some time to upload, do you wish to continue?',
+            '{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?',
             { filename: files[i].name }
           )
         )
