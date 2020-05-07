@@ -350,7 +350,7 @@ class WorkspaceController(Controller):
             show_deleted=True,
         )
         try:
-            _, user = uapi.find(
+            user = uapi.get(
                 user_id=hapic_data.body.user_id,
                 email=hapic_data.body.user_email,
                 public_name=hapic_data.body.user_public_name,

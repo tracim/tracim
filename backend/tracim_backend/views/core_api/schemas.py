@@ -760,9 +760,6 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
     user_email = marshmallow.fields.Email(
         example="suri@cate.fr", default=None, allow_none=True, validate=user_email_validator
     )
-    user_public_name = StrippedString(
-        example="John", default=None, allow_none=True, validate=user_public_name_validator
-    )
     user_username = StrippedString(
         example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
     )

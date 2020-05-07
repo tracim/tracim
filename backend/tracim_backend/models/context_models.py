@@ -2,7 +2,6 @@
 import base64
 import cgi
 from datetime import datetime
-from enum import Enum
 from typing import List
 from typing import Optional
 
@@ -492,13 +491,11 @@ class WorkspaceMemberInvitation(object):
         self,
         user_id: int = None,
         user_email: str = None,
-        user_public_name: str = None,
         user_username: str = None,
         role: str = None,
     ) -> None:
         self.role = role
         self.user_email = user_email
-        self.user_public_name = user_public_name
         self.user_username = user_username
         self.user_id = user_id
 
@@ -591,16 +588,6 @@ class FolderContentUpdate(object):
         self.label = label
         self.raw_content = raw_content
         self.sub_content_types = sub_content_types
-
-
-class TypeUser(Enum):
-    """The method that helped to find a user"""
-
-    USER_ID = "found_id"
-    EMAIL = "found_email"
-    PUBLIC_NAME = "found_public_name"
-    USER_NAME = "found_username"
-    TOKEN = "found_user_token"
 
 
 class Agenda(object):
