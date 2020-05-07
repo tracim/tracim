@@ -37,6 +37,7 @@
       return currentHeightInt
     }
 
+    // TODO find a better way to handle language label in order to render it more generic see: https://github.com/tracim/tracim/issues/3011
     getTinyMceLang = (lang) => {
       switch (lang) {
         case 'fr':
