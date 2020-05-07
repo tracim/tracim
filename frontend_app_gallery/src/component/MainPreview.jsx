@@ -20,13 +20,13 @@ export class MainPreview extends React.Component {
     }
   }
 
-  onImageLoad = () => {
+  handleImageLoad = () => {
     this.setState({
       imageLoaded: IMG_LOAD_STATE.LOADED
     })
   }
 
-  onImageError = () => {
+  handleImageError = () => {
     this.setState({
       imageLoaded: IMG_LOAD_STATE.ERROR
     })
@@ -114,9 +114,9 @@ export class MainPreview extends React.Component {
                 <img
                   src={props.previewSrc}
                   className={classnames(`rotate${props.rotationAngle}`, state.imageLoaded ? 'img-thumbnail' : null)}
-                  onClick={props.handleClickShowImageRaw}
-                  onLoad={this.onImageLoad}
-                  onError={this.onImageError}
+                  onClick={props.onClickShowImageRaw}
+                  onLoad={this.handleImageLoad}
+                  onError={this.handleImageError}
                   style={this.state.style}
                   ref={this.img}
                   alt={props.fileName}
@@ -135,13 +135,13 @@ export default translate()(MainPreview)
 MainPreview.propTypes = {
   previewSrc: PropTypes.string,
   index: PropTypes.number,
-  handleClickShowImageRaw: PropTypes.func,
+  onClickShowImageRaw: PropTypes.func,
   rotationAngle: PropTypes.number
 }
 
 MainPreview.defaultProps = {
   previewSrc: '',
   index: 0,
-  handleClickShowImageRaw: () => {},
+  onClickShowImageRaw: () => {},
   rotationAngle: 0
 }

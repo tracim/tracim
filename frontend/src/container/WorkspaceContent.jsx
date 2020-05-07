@@ -701,7 +701,7 @@ class WorkspaceContent extends React.Component {
               // automatically open the app for the contentId in url
               workspaceId={state.workspaceIdInUrl}
               appOpenedType={state.appOpenedType}
-              updateAppOpenedType={this.handleUpdateAppOpenedType}
+              onUpdateAppOpenedType={this.handleUpdateAppOpenedType}
             />
           )}
 
@@ -713,7 +713,7 @@ class WorkspaceContent extends React.Component {
                   // automatically open the share folder advanced
                   workspaceId={state.workspaceIdInUrl}
                   appOpenedType={state.appOpenedType}
-                  updateAppOpenedType={this.handleUpdateAppOpenedType}
+                  onUpdateAppOpenedType={this.handleUpdateAppOpenedType}
                 />
               )}
             />
@@ -763,7 +763,7 @@ class WorkspaceContent extends React.Component {
                     onDropMoveContentItem={this.handleDropMoveContent}
                     onClickFolder={this.handleClickFolder}
                     onClickCreateContent={this.handleClickCreateContent}
-                    setFolderRead={this.handleSetFolderRead}
+                    onSetFolderRead={this.handleSetFolderRead}
                     userRoleIdInWorkspace={userRoleIdInWorkspace}
                     shareFolderContentList={workspaceShareFolderContentList}
                     onClickExtendedAction={{
@@ -802,7 +802,7 @@ class WorkspaceContent extends React.Component {
                         onClickCreateContent={this.handleClickCreateContent}
                         contentType={contentType}
                         readStatusList={currentWorkspace.contentReadStatusList}
-                        setFolderRead={this.handleSetFolderRead}
+                        onSetFolderRead={this.handleSetFolderRead}
                         isLast={i === rootContentList.length - 1}
                         key={content.id}
                         t={t}

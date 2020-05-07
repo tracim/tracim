@@ -79,7 +79,7 @@ class Dashboard extends React.Component {
   customEventReducer = async ({ detail: { type, data } }) => {
     switch (type) {
       case CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST:
-        this.loadMemberList();
+        this.loadMemberList()
         break
       case CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL:
         await this.loadWorkspaceDetail()

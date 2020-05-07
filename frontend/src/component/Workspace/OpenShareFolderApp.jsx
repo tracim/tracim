@@ -46,7 +46,7 @@ export class OpenShareFolderApp extends React.Component {
         findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE_LIST),
         contentToOpen
       )
-      this.props.updateAppOpenedType(contentToOpen.type)
+      this.props.onUpdateAppOpenedType(contentToOpen.type)
     }
   }
 
@@ -61,7 +61,7 @@ export class OpenShareFolderApp extends React.Component {
     console.log('%c<OpenShareFolderApp> did Update', 'color: #dcae84', this.props)
 
     if (props.match && prevProps.match && props.match.params.idws !== prevProps.match.params.idws) {
-      props.updateAppOpenedType(false)
+      props.onUpdateAppOpenedType(false)
       props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
     }
 

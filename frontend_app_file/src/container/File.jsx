@@ -764,7 +764,7 @@ class File extends React.Component {
                   customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
                   dataCy='wsContentGeneric__option__menu__addversion'
                   customColor={state.config.hexcolor}
-                  onClick={onlineEditionAction.callback}
+                  onClick={onlineEditionAction.handleClick}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t(onlineEditionAction.label)}
                   style={{

@@ -125,7 +125,17 @@ class GuestUpload extends React.Component {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
-          msg: <div>{props.t('Files already uploaded:')}<br /><ul>{alreadyUploadedList.map(file => <li>{file.name}</li>)}</ul></div>,
+          msg: (
+            <div>
+              {props.t('Files already uploaded:')}
+              <br />
+              <ul>
+                {alreadyUploadedList.map(file =>
+                  <li key={file.name}>{file.name}</li>
+                )}
+              </ul>
+            </div>
+          ),
           type: 'warning',
           delay: undefined
         }

@@ -125,7 +125,7 @@ class ShareFolder extends React.Component {
                 onClickCreateContent={props.onClickCreateContent}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
-                setFolderRead={props.setFolderRead}
+                onSetFolderRead={props.onSetFolderRead}
                 isLast={index === props.shareFolderContentList.length - 1}
                 key={content.id}
                 t={props.t}

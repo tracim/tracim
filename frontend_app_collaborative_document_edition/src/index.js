@@ -56,7 +56,7 @@ const appInterface = {
 
     return {
       label: editorType.associated_action === ACTION_EDIT && userRoleId >= ROLE.contributor.id ? i18n.t('Edit online') : i18n.t('View online'),
-      callback: () => {
+      handleClick: () => {
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.REDIRECT,
           data: { url: `/ui/online_edition/workspaces/${content.workspace_id}/contents/${content.content_id}` }

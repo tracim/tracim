@@ -249,7 +249,11 @@ export class Tracim extends React.Component {
     return (
       <div className='tracim fullWidthFullHeight'>
         <Header />
-        <FlashMessage flashMessage={props.flashMessage} removeFlashMessage={this.handleRemoveFlashMessage} t={props.t} />
+        <FlashMessage
+          flashMessage={props.flashMessage}
+          onRemoveFlashMessage={this.handleRemoveFlashMessage}
+          t={props.t}
+        />
 
         <div className='sidebarpagecontainer'>
           <Route render={() => <Sidebar />} />
