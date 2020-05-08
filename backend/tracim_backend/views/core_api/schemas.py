@@ -1309,3 +1309,13 @@ class ConfigSchema(marshmallow.Schema):
     workspace_size_limit = marshmallow.fields.Integer()
     workspaces_number_per_user_limit = marshmallow.fields.Integer()
     instance_name = marshmallow.fields.String()
+
+
+class LiveMessageSchema(marshmallow.Schema):
+    """Message for the user."""
+
+    fields = marshmallow.fields.Dict()
+    event_id = marshmallow.fields.Int(example=42, validate=strictly_positive_int_validator)
+    event_type = marshmallow.fields.String(example="content.modified")
+    created = marshmallow.fields.DateTime(format=DATETIME_FORMAT, description="created date")
+    read = marshmallow.fields.DateTime(format=DATETIME_FORMAT, description="read date")

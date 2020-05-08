@@ -7,6 +7,7 @@ though.
 """
 from datetime import datetime
 import enum
+import typing
 
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -81,3 +82,15 @@ class Message(DeclarativeBase):
 
     event = relationship(Event)
     receiver = relationship(User)
+
+    @property
+    def fields(self) -> typing.Dict[str, typing.Any]:
+        return self.event.fields
+
+    @property
+    def event_type(self) -> str:
+        return self.event.event_type
+
+    @property
+    def created(self) -> datetime:
+        return self.event.created
