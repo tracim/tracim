@@ -1098,6 +1098,7 @@ class ContentCreationSchema(marshmallow.Schema):
 class ContentDigestSchema(marshmallow.Schema):
     content_namespace = marshmallow.fields.String(example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    current_revision_id = marshmallow.fields.Int(example=12)
     slug = StrippedString(example="intervention-report-12")
     parent_id = marshmallow.fields.Int(
         example=34, allow_none=True, default=None, validate=positive_int_validator
@@ -1153,7 +1154,6 @@ class ReadStatusSchema(marshmallow.Schema):
 
 
 class ContentSchema(ContentDigestSchema):
-    current_revision_id = marshmallow.fields.Int(example=12)
     author = marshmallow.fields.Nested(UserDigestSchema)
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 

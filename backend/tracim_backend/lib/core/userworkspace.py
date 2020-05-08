@@ -166,7 +166,6 @@ class RoleApi(object):
         with_notif: bool,
         flush: bool = True,
     ) -> UserRoleInWorkspace:
-
         # INFO - G.M - 2018-10-29 - Check if role already exist
         query = self._get_one_rsc(user.user_id, workspace.workspace_id)
         if query.count() > 0:
@@ -189,14 +188,8 @@ class RoleApi(object):
             raise UserCantRemoveHisOwnRoleInWorkspace(
                 "user {} can't remove is own role in workspace".format(user_id)
             )
-        if self._get_one_rsc(user_id, workspace_id).count() == 0:
-            raise UserRoleNotFound(
-                "Role for user {user_id} "
-                "in workspace {workspace_id} was not found.".format(
-                    user_id=user_id, workspace_id=workspace_id
-                )
-            )
-        self._get_one_rsc(user_id, workspace_id).delete()
+        role = self.get_one(user_id, workspace_id)
+        self._session.delete(role)
         if flush:
             self._session.flush()
 

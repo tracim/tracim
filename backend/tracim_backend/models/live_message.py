@@ -10,6 +10,7 @@ import enum
 
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy.ext.indexable import index_property
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import JSON
 from sqlalchemy.types import DateTime
@@ -33,19 +34,6 @@ class EntityType(enum.Enum):
     AGENDA = "agenda"
 
 
-ALLOWED_ENTITY_OPERATION_COMBINATIONS = (
-    (EntityType.USER, OperationType.CREATED),
-    (EntityType.USER, OperationType.MODIFIED),
-    (EntityType.USER, OperationType.DELETED),
-    (EntityType.WORKSPACE, OperationType.CREATED),
-    (EntityType.WORKSPACE, OperationType.MODIFIED),
-    (EntityType.WORKSPACE, OperationType.DELETED),
-    (EntityType.WORKSPACE_USER_ROLE, OperationType.CREATED),
-    (EntityType.WORKSPACE_USER_ROLE, OperationType.MODIFIED),
-    (EntityType.WORKSPACE_USER_ROLE, OperationType.DELETED),
-)
-
-
 class Event(DeclarativeBase):
     """
     Event definition.
@@ -58,6 +46,13 @@ class Event(DeclarativeBase):
     entity_type = Column(Enum(EntityType), nullable=False)
     created = Column(DateTime, nullable=False, default=datetime.utcnow)
     fields = Column(JSON, nullable=False)
+
+    # easier access to values stored in fields
+    author = index_property("fields", "author")
+    workspace = index_property("fields", "workspace")
+    user = index_property("fields", "user")
+    content = index_property("fields", "content")
+    role = index_property("fields", "role")
 
     @property
     def event_type(self) -> str:

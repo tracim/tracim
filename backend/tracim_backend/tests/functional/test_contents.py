@@ -12,6 +12,7 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import set_html_document_slug_to_legacy
+from tracim_backend.views.core_api.schemas import WorkspaceMenuEntrySchema
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -2229,7 +2230,13 @@ class TestFiles(object):
         assert res.last_modified.year == test_file.updated.year
 
     def test_api__create_file__ok__200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, admin_user
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        admin_user,
+        event_helper,
     ) -> None:
         """
         create one file of a content at workspace root
@@ -2237,6 +2244,7 @@ class TestFiles(object):
 
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
+        workspace_in_context = workspace_api.get_workspace_with_context(business_workspace)
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         image = create_1000px_png_test_image()
@@ -2258,6 +2266,31 @@ class TestFiles(object):
         assert res["status"] == "open"
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
+        last_events = event_helper.last_events(2)
+
+        # A creation is in fact two events: created + modified to add the revision
+        created_event = last_events[0]
+        assert created_event.event_type == "content.created"
+        assert created_event.author == {
+            "public_name": "Global manager",
+            "avatar_url": None,
+            "user_id": 1,
+        }
+        sidebar_entries = (
+            WorkspaceMenuEntrySchema().dump(workspace_in_context.sidebar_entries, many=True).data
+        )
+        assert created_event.workspace == {
+            "workspace_id": workspace_in_context.workspace_id,
+            "slug": workspace_in_context.slug,
+            "label": workspace_in_context.label,
+            "is_deleted": workspace_in_context.is_deleted,
+            "agenda_enabled": workspace_in_context.agenda_enabled,
+            "public_upload_enabled": workspace_in_context.public_upload_enabled,
+            "public_download_enabled": workspace_in_context.public_download_enabled,
+            "sidebar_entries": sidebar_entries,
+        }
+        assert created_event.content == res
+        assert last_events[-1].event_type == "content.modified"
 
         res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/files/{content_id}".format(
@@ -2465,7 +2498,13 @@ class TestFiles(object):
         assert res.json_body["code"] == ErrorCode.PARENT_NOT_FOUND
 
     def test_api__set_file_raw__ok_200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        event_helper,
     ) -> None:
         """
         Set one file of a content
@@ -2474,6 +2513,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
+        workspace_in_context = workspace_api.get_workspace_with_context(business_workspace)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
@@ -2493,6 +2533,49 @@ class TestFiles(object):
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
+        res = web_testapp.get(
+            "/api/v2/workspaces/1/files/{}".format(content_id), status=200
+        ).json_body
+        last_event = event_helper.last_event
+        assert last_event.event_type == "content.modified"
+        assert last_event.content["actives_shares"] == res["actives_shares"]
+        assert last_event.content["content_id"] == content_id
+        assert last_event.content["content_namespace"] == res["content_namespace"]
+        assert last_event.content["content_type"] == res["content_type"]
+        assert last_event.content["current_revision_id"] == res["current_revision_id"]
+        assert last_event.content["created"] == res["created"]
+        assert last_event.content["modified"] == res["modified"]
+        assert last_event.content["file_extension"] == res["file_extension"]
+        assert last_event.content["filename"] == res["filename"]
+        assert last_event.content["is_archived"] == res["is_archived"]
+        assert last_event.content["is_editable"] == res["is_editable"]
+        assert last_event.content["is_deleted"] == res["is_deleted"]
+        assert last_event.content["label"] == res["label"]
+        assert last_event.content["parent_id"] == res["parent_id"]
+        assert last_event.content["show_in_ui"] == res["show_in_ui"]
+        assert last_event.content["slug"] == res["slug"]
+        assert last_event.content["status"] == res["status"]
+        assert last_event.content["sub_content_types"] == res["sub_content_types"]
+        assert last_event.content["workspace_id"] == res["workspace_id"]
+        assert last_event.author == {
+            "public_name": "Global manager",
+            "avatar_url": None,
+            "user_id": 1,
+        }
+        sidebar_entries = (
+            WorkspaceMenuEntrySchema().dump(workspace_in_context.sidebar_entries, many=True).data
+        )
+        assert last_event.workspace == {
+            "workspace_id": workspace_in_context.workspace_id,
+            "slug": workspace_in_context.slug,
+            "label": workspace_in_context.label,
+            "is_deleted": workspace_in_context.is_deleted,
+            "agenda_enabled": workspace_in_context.agenda_enabled,
+            "public_upload_enabled": workspace_in_context.public_upload_enabled,
+            "public_download_enabled": workspace_in_context.public_download_enabled,
+            "sidebar_entries": sidebar_entries,
+        }
+
         res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name), status=200
         )

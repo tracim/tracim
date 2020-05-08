@@ -237,7 +237,8 @@ class EventHelper(object):
         self._session = db_session
 
     def last_events(self, count: int) -> typing.List[Event]:
-        return self._session.query(Event).order_by(Event.event_id.desc()).limit(count).all()
+        events = self._session.query(Event).order_by(Event.event_id.desc()).limit(count).all()
+        return sorted(events, key=lambda e: e.event_id)
 
     @property
     def last_event(self) -> typing.Optional[Event]:

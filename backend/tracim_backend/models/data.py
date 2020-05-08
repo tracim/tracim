@@ -162,7 +162,7 @@ class UserRoleInWorkspace(DeclarativeBase):
     do_notify = Column(Boolean, unique=False, nullable=False, default=False)
 
     workspace = relationship(
-        "Workspace", remote_side=[Workspace.workspace_id], backref="roles", lazy="joined"
+        "Workspace", remote_side=[Workspace.workspace_id], backref="roles", lazy="joined",
     )
     user = relationship("User", remote_side=[User.user_id], backref="roles")
 
@@ -1538,14 +1538,7 @@ class RevisionReadStatus(DeclarativeBase):
         ),
     )
 
-    user = relationship(
-        "User",
-        backref=backref(
-            "revision_readers",
-            collection_class=attribute_mapped_collection("view_datetime"),
-            cascade="all, delete-orphan",
-        ),
-    )
+    user = relationship("User")
 
 
 class NodeTreeItem(object):

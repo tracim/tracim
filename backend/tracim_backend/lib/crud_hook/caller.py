@@ -12,9 +12,9 @@ class DatabaseCrudHookCaller:
     """Listen for sqlalchemy session events and call the pluggy hooks
     as defined in hookspec.py."""
 
-    def __init__(self, plugin_manager: PluginManager) -> None:
+    def __init__(self, session: TracimSession, plugin_manager: PluginManager) -> None:
         self._plugin_manager = plugin_manager
-        event.listen(TracimSession, "after_flush", self._call_hooks)
+        event.listen(session, "after_flush", self._call_hooks)
 
     def _call_hooks(self, session: TracimSession, flush_context) -> None:
         for obj in session.new:
@@ -30,6 +30,11 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_content_created(content=obj, db_session=session)
 
         for obj in session.dirty:
+            # NOTE S.G 2020-05-08: session.dirty contains objects that do not have to be
+            # updated, don't consider them
+            # see https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.dirty
+            if not session.is_modified(obj):
+                continue
             if isinstance(obj, User):
                 self._plugin_manager.hook.on_user_modified(user=obj, db_session=session)
             elif isinstance(obj, Workspace):
