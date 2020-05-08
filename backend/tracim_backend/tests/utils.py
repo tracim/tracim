@@ -31,7 +31,7 @@ from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.live_message import Event
+from tracim_backend.models.event import Event
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.tracim_session import TracimSession
 

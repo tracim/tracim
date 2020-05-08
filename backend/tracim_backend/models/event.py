@@ -17,6 +17,7 @@ from sqlalchemy.types import DateTime
 from sqlalchemy.types import Enum
 from sqlalchemy.types import Integer
 
+from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 
 
@@ -73,9 +74,10 @@ class Message(DeclarativeBase):
 
     __tablename__ = "messages"
 
-    event_id = Column(Integer, ForeignKey("events.event_id"), primary_key=True)
     receiver_id = Column(Integer, ForeignKey("users.user_id"), primary_key=True)
+    event_id = Column(Integer, ForeignKey("events.event_id"), primary_key=True)
     sent = Column(DateTime)
     read = Column(DateTime)
 
     event = relationship(Event)
+    receiver = relationship(User)

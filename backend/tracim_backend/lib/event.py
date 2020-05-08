@@ -1,5 +1,7 @@
 import typing
 
+from sqlalchemy.orm import joinedload
+
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
@@ -11,13 +13,37 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceRoles
-from tracim_backend.models.live_message import EntityType
-from tracim_backend.models.live_message import Event
-from tracim_backend.models.live_message import OperationType
+from tracim_backend.models.event import EntityType
+from tracim_backend.models.event import Event
+from tracim_backend.models.event import Message
+from tracim_backend.models.event import OperationType
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
+
+_USER_FIELD = "user"
+_AUTHOR_FIELD = "author"
+_WORKSPACE_FIELD = "workspace"
+_CONTENT_FIELD = "content"
+_ROLE_FIELD = "role"
+
+
+class EventApi:
+    """Api to query event & messages"""
+
+    def __init__(self, current_user: User, session: TracimSession, config: CFG) -> None:
+        self._current_user = current_user
+        self._session = session
+        self._config = config
+
+    def get_messages_for_user(self, user_id: int) -> typing.List[Message]:
+        return (
+            self._session.query(Message)
+            .filter(Message.receiver_id == user_id)
+            .options(joinedload(Message.event))
+            .all()
+        )
 
 
 class EventBuilder:
@@ -55,8 +81,8 @@ class EventBuilder:
         self, operation: OperationType, user: User, db_session: TracimSession
     ) -> None:
         fields = {
-            "user": self._user_schema.dump(user).data,
-            "author": self._user_schema.dump(self._current_user).data,
+            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
+            _USER_FIELD: self._user_schema.dump(user).data,
         }
         event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
         db_session.add(event)
@@ -80,8 +106,8 @@ class EventBuilder:
         api = WorkspaceApi(db_session, self._current_user, self._config)
         workspace_in_context = api.get_workspace_with_context(workspace)
         fields = {
-            "author": self._user_schema.dump(self._current_user).data,
-            "workspace": self._workspace_schema.dump(workspace_in_context).data,
+            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
+            _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
         db_session.add(event)
@@ -110,9 +136,9 @@ class EventBuilder:
             workspace_api.get_one(content_in_context.workspace_id)
         )
         fields = {
-            "author": self._user_schema.dump(self._current_user).data,
-            "content": self._content_schema.dump(content_in_context).data,
-            "workspace": self._workspace_schema.dump(workspace_in_context).data,
+            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
+            _CONTENT_FIELD: self._content_schema.dump(content_in_context).data,
+            _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.CONTENT, operation=operation, fields=fields)
         db_session.add(event)
@@ -144,10 +170,10 @@ class EventBuilder:
         workspace_in_context = workspace_api.get_workspace_with_context(role.workspace)
         user_api = UserApi(self._current_user, db_session, self._config)
         fields = {
-            "author": self._user_schema.dump(self._current_user).data,
-            "user": self._user_schema.dump(user_api.get_one(role.user_id)).data,
-            "workspace": self._workspace_schema.dump(workspace_in_context).data,
-            "role": WorkspaceRoles.get_role_from_level(role.role).label,
+            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
+            _USER_FIELD: self._user_schema.dump(user_api.get_one(role.user_id)).data,
+            _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
+            _ROLE_FIELD: WorkspaceRoles.get_role_from_level(role.role).label,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_USER_ROLE, operation=operation, fields=fields
