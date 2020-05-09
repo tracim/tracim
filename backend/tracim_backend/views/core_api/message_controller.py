@@ -10,11 +10,6 @@ from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import LiveMessageSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus  # noqa: F401
-
 SWAGGER_TAG_EVENT_ENDPOINTS = "Event & Messages"
 
 
@@ -59,8 +54,6 @@ class MessageController(Controller):
         Create all routes and views using pyramid configurator
         for this controller
         """
-
-        # account workspace
         configurator.add_route(
             "live_messages", "/users/{user_id}/live_messages", request_method="GET"
         )

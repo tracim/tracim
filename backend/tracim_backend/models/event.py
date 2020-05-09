@@ -33,7 +33,6 @@ class EntityType(enum.Enum):
     WORKSPACE = "workspace"
     WORKSPACE_USER_ROLE = "workspace_user_role"
     CONTENT = "content"
-    AGENDA = "agenda"
 
 
 class Event(DeclarativeBase):
