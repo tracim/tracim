@@ -1,11 +1,10 @@
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
-console.log('isPoduction: ', isProduction)
-
 const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {
+  stats: process.env.QUIET_BUILD === "true" ? 'errors-warnings' : undefined,
   mode: isProduction ? 'production' : 'development',
   entry: {
     app: ['./src/index.js']
@@ -48,7 +47,7 @@ module.exports = {
     hints: false
   },
   module: {
-    rules: [{
+    rules: [ process.env.DISABLE_LINTING === "true" ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       exclude: [/node_modules/, /frontend_lib/],
