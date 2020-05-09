@@ -16,9 +16,8 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'tracim_frontend_lib.[name].js' : 'tracim_frontend_lib.[name].dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'tracim_frontend_lib' : undefined,
-    libraryTarget: isProduction ? 'umd' : undefined,
-    umdNamedDefine: isProduction ? true : undefined
+    library: 'tracim_frontend_[name]',
+    libraryTarget: 'var'
   },
   optimization: {
     namedModules: true
@@ -35,16 +34,7 @@ module.exports = {
     //   }
     // }
   },
-  externals: isProduction
-    ? {
-      // react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
-      // 'react-dom': {commonjs: 'react-dom', commonjs2: 'react-dom', amd: 'react-dom', root: '_'},
-      'react-i18next': {commonjs: 'react-i18next', commonjs2: 'react-i18next', amd: 'react-i18next', root: '_'},
-      classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
-      'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'},
-      radium: {commonjs: 'radium', commonjs2: 'radium', amd: 'radium', root: '_'}
-    }
-    : {},
+  externals: require(path.join(path.dirname(require.resolve("tracim_frontend_vendors")), 'externals.json')),
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     port: 8070,

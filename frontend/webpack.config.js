@@ -16,6 +16,10 @@ module.exports = {
     pathinfo: !isProduction,
     publicPath: '/assets/'
   },
+  externals: Object.assign(
+    {tracim_frontend_lib: 'tracim_frontend_lib'},
+    require(path.join(path.dirname(require.resolve("tracim_frontend_vendors")), 'externals.json'))
+  ),
   optimization: {
     splitChunks: {
       chunks: 'all'

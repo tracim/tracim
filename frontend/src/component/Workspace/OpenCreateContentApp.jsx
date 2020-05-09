@@ -4,7 +4,7 @@ import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
-const qs = require('query-string')
+import qs from 'query-string'
 
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ? (or AppCreateContentManager)
 export class OpenCreateContentApp extends React.Component {

@@ -37,7 +37,7 @@ import {
   COOKIE_FRONTEND
 } from '../helper.js'
 
-const qs = require('query-string')
+import qs from 'query-string'
 
 class Login extends React.Component {
   constructor (props) {

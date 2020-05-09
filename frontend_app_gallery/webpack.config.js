@@ -17,7 +17,10 @@ module.exports = {
     library: isProduction ? 'appGallery' : undefined,
     libraryTarget: isProduction ? 'var' : undefined
   },
-  externals: {},
+  externals: Object.assign(
+    {tracim_frontend_lib: 'tracim_frontend_lib'},
+    require(path.join(path.dirname(require.resolve("tracim_frontend_vendors")), 'externals.json'))
+  ),
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     host: '0.0.0.0',

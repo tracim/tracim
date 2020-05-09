@@ -39,6 +39,11 @@ export DEFAULTDIR
 # create folder $DEFAULTDIR/frontend/dist/app/ if no exists
 mkdir -p $DEFAULTDIR/frontend/dist/app/ || logerror "Failed to make directory $DEFAULTDIR/frontend/dist/app/"
 
+# Tracim vendors
+log "Building tracim_frontend_vendors"
+cd "$DEFAULTDIR/frontend_vendors"
+./build_vendors.sh && loggood "success" || logerror "Could not build tracim_frontend_vendors"
+
 # Tracim Lib
 log "Building tracim_frontend_lib"
 yarn workspace tracim_frontend_lib run buildtracimlib$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib"

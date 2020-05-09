@@ -17,15 +17,10 @@ module.exports = {
     library: isProduction ? 'appCollaborativeDocumentEdition' : undefined,
     libraryTarget: isProduction ? 'var' : undefined
   },
-  externals: {},
-  // isProduction ? { // Côme - since plugins are imported through <script>, cannot externalize libraries
-  //   react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
-  //   'react-dom': {commonjs: 'react-dom', commonjs2: 'react-dom', amd: 'react-dom', root: '_'},
-  //   classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
-  //   'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'},
-  //   tracim_frontend_lib: {commonjs: 'tracim_frontend_lib', commonjs2: 'tracim_frontend_lib', amd: 'tracim_frontend_lib', root: '_'}
-  // }
-  // : {},
+  externals: Object.assign(
+    {tracim_frontend_lib: 'tracim_frontend_lib'},
+    require(path.join(path.dirname(require.resolve("tracim_frontend_vendors")), 'externals.json'))
+  ),
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     host: '0.0.0.0',

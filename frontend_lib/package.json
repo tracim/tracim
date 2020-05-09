@@ -9,10 +9,10 @@
     "buildwindoz": "echo 'Only use npm run buildtracimlibwindoz'",
     "build": "echo 'Only use npm run buildtracimlib'",
     "build-translation": "node i18next.scanner.js",
-    "buildtracimlib": "NODE_ENV=production webpack-cli -p && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/ && echo Script ended at $(date +'%H:%M:%S')",
-    "buildtracimlib-dev": "NODE_ENV=production webpack-cli && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/ && echo Script ended at $(date +'%H:%M:%S')",
-    "buildtracimlibwindoz": "set NODE_ENV=production&& webpack-cli -p && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
-    "buildtracimlib-devwindoz": "set NODE_ENV=production&& webpack-cli && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
+    "buildtracimlib": "NODE_ENV=production webpack-cli -p && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh && echo Script ended at $(date +'%H:%M:%S')",
+    "buildtracimlib-dev": "webpack-cli && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh.sh && echo Script ended at $(date +'%H:%M:%S')",
+    "buildtracimlibwindoz": "set NODE_ENV=production&& webpack-cli -p && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh.sh",
+    "buildtracimlib-devwindoz": "set NODE_ENV=production&& webpack-cli && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh.sh",
     "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
@@ -76,8 +76,7 @@
     "url-loader": "^2.0.1",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3",
-    "whatwg-fetch": "^3.0.0"
+    "webpack-dev-server": "^3.10.3"
   },
   "standard": {
     "globals": [],

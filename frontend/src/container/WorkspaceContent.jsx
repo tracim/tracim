@@ -59,7 +59,7 @@ import {
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
-const qs = require('query-string')
+import qs from 'query-string'
 
 // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
 export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
