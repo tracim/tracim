@@ -27,12 +27,18 @@ class OperationType(enum.Enum):
     MODIFIED = "modified"
     DELETED = "deleted"
 
+    def __str__(self) -> str:
+        return self.value
+
 
 class EntityType(enum.Enum):
     USER = "user"
     WORKSPACE = "workspace"
     WORKSPACE_USER_ROLE = "workspace_user_role"
     CONTENT = "content"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class Event(DeclarativeBase):
@@ -60,7 +66,7 @@ class Event(DeclarativeBase):
         return "{}.{}".format(self.entity_type.value, self.operation.value)
 
     def __repr__(self):
-        return "<Event: type=%s, created_date=%s, fields=%s>" % (
+        return "<Event(type=%s, created_date=%s, fields=%s)>" % (
             repr(self.event_type),
             repr(self.created),
             repr(self.fields),

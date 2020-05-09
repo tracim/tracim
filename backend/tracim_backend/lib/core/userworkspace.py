@@ -73,11 +73,13 @@ class RoleApi(object):
 
     # TODO - Gui.M - 26-03-2020 - For now it only filters enabled/disabled user, it does not filters deleted
     #  workspaces/users
-    def _base_query(self):
-        query = self._session.query(UserRoleInWorkspace)
+    def _apply_base_filters(self, query):
         if not self._show_disabled_user:
             query = query.join(User).filter(User.is_active)
         return query
+
+    def _base_query(self):
+        return self._apply_base_filters(self._session.query(UserRoleInWorkspace))
 
     def get_user_workspaces_ids(self, user_id: int, min_role: int) -> typing.List[int]:
         assert self._user.profile == Profile.ADMIN or self._user.user_id == user_id
@@ -198,6 +200,14 @@ class RoleApi(object):
             self._base_query()
             .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id)
             .order_by(UserRoleInWorkspace.user_id)
+        )
+        return query.all()
+
+    def get_workspace_member_ids(self, workspace_id: int) -> typing.List[int]:
+        query = self._apply_base_filters(
+            self._session.query(UserRoleInWorkspace.user_id).filter(
+                UserRoleInWorkspace.workspace_id == workspace_id
+            )
         )
         return query.all()
 

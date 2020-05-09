@@ -77,13 +77,15 @@ class UserApi(object):
         self._show_deleted = show_deleted
         self._show_deactivated = show_deactivated
 
-    def _base_query(self):
-        query = self._session.query(User)
+    def _apply_base_filters(self, query):
         if not self._show_deleted:
             query = query.filter(User.is_deleted == False)  # noqa: E711
         if not self._show_deactivated:
             query = query.filter(User.is_active == True)  # noqa: E711
         return query
+
+    def _base_query(self):
+        return self._apply_base_filters(self._session.query(User))
 
     def get_user_with_context(self, user: User) -> UserInContext:
         """
@@ -143,6 +145,10 @@ class UserApi(object):
 
     def get_all(self) -> typing.Iterable[User]:
         return self._get_all_query().all()
+
+    def get_user_ids_from_profile(self, profile: Profile) -> typing.Iterable[int]:
+        query = self._apply_base_filters(self._session.query(User.user_id))
+        return query.filter(User.profile == profile).all()
 
     def get_known_user(
         self,

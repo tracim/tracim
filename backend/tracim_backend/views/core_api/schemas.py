@@ -72,6 +72,8 @@ from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.event import EntityType
+from tracim_backend.models.event import OperationType
 
 FIELD_LANG_DESC = "User langage in ISO 639 format. " "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
@@ -1309,6 +1311,22 @@ class ConfigSchema(marshmallow.Schema):
     workspace_size_limit = marshmallow.fields.Integer()
     workspaces_number_per_user_limit = marshmallow.fields.Integer()
     instance_name = marshmallow.fields.String()
+
+
+class EventSchema(marshmallow.Schema):
+    """Event structure transmitted to workers."""
+
+    fields = marshmallow.fields.Dict()
+    event_id = marshmallow.fields.Int(example=42, validate=strictly_positive_int_validator)
+    operation = marshmallow.fields.String()
+    entity_type = marshmallow.fields.String()
+    created = marshmallow.fields.DateTime()
+
+    @marshmallow.post_load
+    def strings_to_enums(self, item):
+        item["operation"] = OperationType(item["operation"])
+        item["entity_type"] = EntityType(item["entity_type"])
+        return item
 
 
 class LiveMessageSchema(marshmallow.Schema):

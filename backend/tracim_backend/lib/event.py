@@ -1,3 +1,4 @@
+from datetime import datetime
 import typing
 
 from sqlalchemy.orm import joinedload
@@ -6,8 +7,12 @@ from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -19,6 +24,7 @@ from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
+from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 
@@ -27,6 +33,9 @@ _AUTHOR_FIELD = "author"
 _WORKSPACE_FIELD = "workspace"
 _CONTENT_FIELD = "content"
 _ROLE_FIELD = "role"
+
+
+RQ_QUEUE_NAME = "event"
 
 
 class EventApi:
@@ -52,6 +61,7 @@ class EventBuilder:
     _user_schema = UserDigestSchema()
     _workspace_schema = WorkspaceDigestSchema()
     _content_schema = ContentDigestSchema()
+    _event_schema = EventSchema()
 
     def __init__(self, config: CFG) -> None:
         self._config = config
@@ -85,8 +95,7 @@ class EventBuilder:
             _USER_FIELD: self._user_schema.dump(user).data,
         }
         event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
-        db_session.add(event)
-        self._publish_event(event)
+        self._publish_event(event, db_session)
 
     # Workspace events
     @hookimpl
@@ -110,8 +119,7 @@ class EventBuilder:
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
-        db_session.add(event)
-        self._publish_event(event)
+        self._publish_event(event, db_session)
 
     # Content events
     @hookimpl
@@ -141,8 +149,7 @@ class EventBuilder:
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.CONTENT, operation=operation, fields=fields)
-        db_session.add(event)
-        self._publish_event(event)
+        self._publish_event(event, db_session)
 
     # UserRoleInWorkspace events
     @hookimpl
@@ -178,9 +185,74 @@ class EventBuilder:
         event = Event(
             entity_type=EntityType.WORKSPACE_USER_ROLE, operation=operation, fields=fields
         )
-        db_session.add(event)
-        self._publish_event(event)
+        self._publish_event(event, db_session)
 
-    def _publish_event(self, event: Event) -> None:
-        # TODO S.G 20200507: add the RQ job(s) creation here
-        logger.debug(self, "publish event {}".format(event))
+    def _publish_event(self, event: Event, db_session: TracimSession) -> None:
+        db_session.add(event)
+        redis_connection = get_redis_connection(self._config)
+        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+        logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
+        queue.enqueue(
+            LiveMessageBuilder.publish_messages_for_event, self._event_schema.dump(event).data
+        )
+
+
+class LiveMessageBuilder:
+
+    _event_schema = EventSchema()
+
+    @classmethod
+    def _session(cls) -> TracimSession:
+        # TODO SG 20200807: acquire this from the RQ worker's context
+        raise NotImplementedError()
+
+    @classmethod
+    def _config(cls) -> CFG:
+        # TODO SG 20200807: acquire this from the RQ worker's context
+        raise NotImplementedError()
+
+    @classmethod
+    def publish_messages_for_event(cls, event_dict: typing.Dict[str, typing.Any]) -> None:
+        load_result = cls._event_schema.load(event_dict)
+        if load_result.errors:
+            logger.error(
+                cls, "Error while loading event from dict: {}".format(load_result.errors),
+            )
+            return
+        event = Event(**load_result.data)
+        if event.entity_type == EntityType.USER:
+            receiver_ids = cls._get_user_event_receiver_ids(event)
+        elif event.entity_type == EntityType.WORKSPACE:
+            receiver_ids = cls._get_workspace_event_receiver_ids(event)
+        elif event.entity_type == EntityType.CONTENT:
+            receiver_ids = cls._get_workspace_event_receiver_ids(event)
+        elif event.entity_type == EntityType.WORKSPACE_USER_ROLE:
+            receiver_ids = cls._get_user_event_receiver_ids(event)
+
+        # The author is not notified of the change (?)
+        try:
+            receiver_ids -= set([event.author.user_id])
+        except AttributeError:
+            # No author
+            pass
+
+        messages = [
+            Message(receiver_id=receiver_id, event_id=event.event_id, sent=datetime.utcnow())
+            for receiver_id in receiver_ids
+        ]
+        cls._session().add_all(messages)
+
+    @classmethod
+    def _get_user_event_receiver_ids(cls, event: Event) -> typing.Set[int]:
+        user_api = UserApi(None, session=cls._session(), config=cls._config())
+        receiver_ids = set(user_api.get_user_ids_from_profile(Profile.ADMIN))
+        receiver_ids.add(event.user.user_id)
+        return receiver_ids
+
+    @classmethod
+    def _get_workspace_event_receiver_ids(cls, event: Event) -> typing.Set[int]:
+        user_api = UserApi(None, session=cls._session(), config=cls._config())
+        administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
+        role_api = RoleApi(None, session=cls._session(), config=cls._config())
+        workspace_members = role_api.get_workspace_member_ids(event.workspace.workspace_id)
+        return set(administrators).union(set(workspace_members))
