@@ -1873,6 +1873,7 @@ class ContentApi(object):
         item.file_mimetype = new_mimetype
         item.depot_file = FileIntent(new_content, new_filename, new_mimetype)
         item.revision_type = ActionDescription.REVISION
+        # self._session.flush()
         return item
 
     def check_upload_size(self, content_length: int, workspace: Workspace) -> None:

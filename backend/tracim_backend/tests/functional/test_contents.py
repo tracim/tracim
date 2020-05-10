@@ -2266,10 +2266,8 @@ class TestFiles(object):
         assert res["status"] == "open"
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
-        last_events = event_helper.last_events(2)
-
         # A creation is in fact two events: created + modified to add the revision
-        created_event = last_events[0]
+        (created_event, modified_event) = event_helper.last_events(2)
         assert created_event.event_type == "content.created"
         assert created_event.author == {
             "public_name": "Global manager",
@@ -2279,7 +2277,7 @@ class TestFiles(object):
         sidebar_entries = (
             WorkspaceMenuEntrySchema().dump(workspace_in_context.sidebar_entries, many=True).data
         )
-        assert created_event.workspace == {
+        workspace_dict = {
             "workspace_id": workspace_in_context.workspace_id,
             "slug": workspace_in_context.slug,
             "label": workspace_in_context.label,
@@ -2289,8 +2287,17 @@ class TestFiles(object):
             "public_download_enabled": workspace_in_context.public_download_enabled,
             "sidebar_entries": sidebar_entries,
         }
-        assert created_event.content == res
-        assert last_events[-1].event_type == "content.modified"
+        assert created_event.workspace == workspace_dict
+
+        assert modified_event.event_type == "content.modified"
+        content = modified_event.content
+        # A bit complicated but the value returned by the POST is not reliable
+        # as it sometimes is the created revision id and other times the updated…
+        assert content["current_revision_id"] == created_event.content["current_revision_id"] + 1
+        del content["current_revision_id"]
+        del res["current_revision_id"]
+        assert modified_event.content == res
+        assert modified_event.workspace == workspace_dict
 
         res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/files/{content_id}".format(

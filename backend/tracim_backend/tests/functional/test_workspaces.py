@@ -515,10 +515,10 @@ class TestWorkspaceEndpoint(object):
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]
         workspace_id = res.json_body["workspace_id"]
-        last_event = event_helper.last_event
-        assert last_event.event_type == "workspace.created"
-        assert last_event.author == workspace["owner"]
-        assert last_event.workspace == {
+        (workspace_created, user_role_created) = event_helper.last_events(2)
+        assert workspace_created.event_type == "workspace.created"
+        assert workspace_created.author == workspace["owner"]
+        assert workspace_created.workspace == {
             "workspace_id": workspace_id,
             "label": workspace["label"],
             "is_deleted": workspace["is_deleted"],
@@ -528,6 +528,7 @@ class TestWorkspaceEndpoint(object):
             "sidebar_entries": workspace["sidebar_entries"],
             "slug": workspace["slug"],
         }
+        assert user_role_created.event_type == "workspace_user_role.created"
 
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body

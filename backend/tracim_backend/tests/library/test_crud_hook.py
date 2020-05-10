@@ -99,7 +99,7 @@ class TestDatabaseCrudHookCaller:
         plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
         hook = UserHookImpl()
         plugin_manager.register(hook)
-        DatabaseCrudHookCaller(plugin_manager)
+        DatabaseCrudHookCaller(session, plugin_manager)
 
         user = User(email="foo@bar")
         session.add(user)
@@ -119,7 +119,7 @@ class TestDatabaseCrudHookCaller:
         plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
         hook = WorkspaceHookImpl()
         plugin_manager.register(hook)
-        DatabaseCrudHookCaller(plugin_manager)
+        DatabaseCrudHookCaller(session, plugin_manager)
 
         owner = User(email="john")
         session.add(owner)
@@ -143,7 +143,7 @@ class TestDatabaseCrudHookCaller:
         plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
         hook = UserRoleInWorkspaceHookImpl()
         plugin_manager.register(hook)
-        DatabaseCrudHookCaller(plugin_manager)
+        DatabaseCrudHookCaller(session, plugin_manager)
 
         owner = User(email="john")
         workspace = Workspace(label="Hello", owner=owner)
@@ -169,7 +169,7 @@ class TestDatabaseCrudHookCaller:
         plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
         hook = ContentHookImpl()
         plugin_manager.register(hook)
-        DatabaseCrudHookCaller(plugin_manager)
+        DatabaseCrudHookCaller(session, plugin_manager)
 
         owner = User(email="john")
         session.add(owner)

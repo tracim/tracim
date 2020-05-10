@@ -4,6 +4,7 @@ import typing
 from sqlalchemy.orm import joinedload
 
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
@@ -138,7 +139,6 @@ class EventBuilder:
     ) -> None:
         content_api = ContentApi(db_session, self._current_user, self._config)
         content_in_context = content_api.get_content_in_context(content)
-
         workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace_id)
@@ -175,10 +175,17 @@ class EventBuilder:
     ) -> None:
         workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(role.workspace)
-        user_api = UserApi(self._current_user, db_session, self._config)
+        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
+
+        try:
+            user_field = self._user_schema.dump(user_api.get_one(role.user_id)).data
+        except UserDoesNotExist:
+            # It is possible to have an already deleted user when deleting his roles.
+            user_field = None
+
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
-            _USER_FIELD: self._user_schema.dump(user_api.get_one(role.user_id)).data,
+            _USER_FIELD: user_field,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
             _ROLE_FIELD: WorkspaceRoles.get_role_from_level(role.role).label,
         }

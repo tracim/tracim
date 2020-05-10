@@ -55,6 +55,7 @@ from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.core_api.account_controller import AccountController
+from tracim_backend.views.core_api.message_controller import MessageController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
@@ -193,6 +194,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     reset_password_controller = ResetPasswordController()
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
+    message_controller = MessageController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -200,6 +202,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(reset_password_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(workspace_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(message_controller.bind, route_prefix=BASE_API_V2)
 
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
