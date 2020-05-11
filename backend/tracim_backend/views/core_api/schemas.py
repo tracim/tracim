@@ -338,9 +338,11 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
 
 class UserCreationSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
-        required=False, example="hello@tracim.fr", validate=user_email_validator
+        required=False, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
     )
-    username = String(required=False, example="My-Power_User99", validate=user_username_validator)
+    username = String(
+        required=False, example="My-Power_User99", validate=user_username_validator, allow_none=True
+    )
     password = String(
         example="8QLa$<w",
         required=False,
@@ -385,6 +387,11 @@ class UserCreationSchema(marshmallow.Schema):
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
         "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
+
+    @marshmallow.validates_schema(pass_original=True)
+    def validate_email_and_username(self, data: dict, original_data: dict, **kwargs) -> None:
+        if not original_data.get("email") and not original_data.get("username"):
+            raise marshmallow.ValidationError("email or username required")
 
     @post_load
     def create_user(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -806,9 +813,11 @@ class ResetPasswordModifySchema(marshmallow.Schema):
 class BasicAuthSchema(marshmallow.Schema):
 
     email = marshmallow.fields.Email(
-        example="hello@tracim.fr", required=False, validate=user_email_validator
+        example="hello@tracim.fr", required=False, validate=user_email_validator, allow_none=True
     )
-    username = String(example="My-Power_User99", required=False, validate=user_username_validator)
+    username = String(
+        example="My-Power_User99", required=False, validate=user_username_validator, allow_none=True
+    )
     password = String(
         example="8QLa$<w", required=True, load_only=True, validate=user_password_validator
     )
