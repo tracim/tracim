@@ -49,6 +49,7 @@
   "Error while checking username availability": "Erreur lors de la vérification de la disponibilité de l'identifiant",
   "Create a shared space": "Créer un espace partagé",
   "Home": "Accueil",
+  "If you do not link an email to this new user, please notify manually the username and password.": "Si vous ne liez pas un e-mail à ce nouvel utilisateur, veuillez notifier manuellement l'identifiant et le mot de passe.",
   "Users": "Utilisateurs",
   "Administration": "Administration",
   "Username": "Identifiant",

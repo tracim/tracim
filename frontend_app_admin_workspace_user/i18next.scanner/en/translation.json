@@ -49,6 +49,7 @@
   "Error while checking username availability": "Error while checking username availability",
   "Create a shared space": "Create a shared space",
   "Home": "Home",
+  "If you do not link an email to this new user, please notify manually the username and password.": "If you do not link an email to this new user, please notify manually the username and password.",
   "Users": "Users",
   "Administration": "Administration",
   "Username": "Username",

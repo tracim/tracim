@@ -180,6 +180,12 @@ export class AddUserForm extends React.Component {
               />
             </div>
           )}
+          {(props.emailNotifActivated && state.newUserEmail === '') && (
+            <div className='userData__info'>
+              <i className='fa fa-exclamation-triangle userData__info__icon' />
+              {props.t('If you do not link an email to this new user, please notify manually the username and password.')}
+            </div>
+          )}
         </div>
 
         <div className='adminUser__adduser__form__profile'>
