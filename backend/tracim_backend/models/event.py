@@ -30,6 +30,10 @@ class OperationType(enum.Enum):
     def __str__(self) -> str:
         return self.value
 
+    @classmethod
+    def values(cls) -> typing.List[str]:
+        return [e.value for e in cls]
+
 
 class EntityType(enum.Enum):
     USER = "user"
@@ -39,6 +43,23 @@ class EntityType(enum.Enum):
 
     def __str__(self) -> str:
         return self.value
+
+    @classmethod
+    def values(cls) -> typing.List[str]:
+        return [e.value for e in cls]
+
+
+class ReadStatus(enum.Enum):
+    ALL = "all"
+    READ = "read"
+    UNREAD = "unread"
+
+    def __str__(self) -> str:
+        return self.value
+
+    @classmethod
+    def values(cls) -> typing.List[str]:
+        return [e.value for e in cls]
 
 
 class Event(DeclarativeBase):

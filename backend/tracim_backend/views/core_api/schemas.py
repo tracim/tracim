@@ -74,6 +74,7 @@ from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import OperationType
+from tracim_backend.models.event import ReadStatus
 
 FIELD_LANG_DESC = "User langage in ISO 639 format. " "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
@@ -1318,8 +1319,8 @@ class EventSchema(marshmallow.Schema):
 
     fields = marshmallow.fields.Dict()
     event_id = marshmallow.fields.Int(example=42, validate=strictly_positive_int_validator)
-    operation = marshmallow.fields.String()
-    entity_type = marshmallow.fields.String()
+    operation = marshmallow.fields.String(validator=OneOf(OperationType.values()))
+    entity_type = marshmallow.fields.String(validator=OneOf(EntityType.values()))
     created = marshmallow.fields.DateTime()
 
     @marshmallow.post_load
@@ -1336,4 +1337,14 @@ class LiveMessageSchema(marshmallow.Schema):
     event_id = marshmallow.fields.Int(example=42, validate=strictly_positive_int_validator)
     event_type = marshmallow.fields.String(example="content.modified")
     created = marshmallow.fields.DateTime(format=DATETIME_FORMAT, description="created date")
-    read = marshmallow.fields.DateTime(format=DATETIME_FORMAT, description="read date")
+    read = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="read date", allow_none=True
+    )
+
+
+class GetLiveMessageQuerySchema(marshmallow.Schema):
+    """Possible query parameters for the GET messages endpoint."""
+
+    read_status = marshmallow.fields.String(
+        missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values())
+    )

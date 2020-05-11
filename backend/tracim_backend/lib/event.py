@@ -1,6 +1,7 @@
 from datetime import datetime
 import typing
 
+from sqlalchemy import null
 from sqlalchemy.orm import joinedload
 
 from tracim_backend.config import CFG
@@ -23,6 +24,7 @@ from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
+from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import EventSchema
@@ -47,13 +49,17 @@ class EventApi:
         self._session = session
         self._config = config
 
-    def get_messages_for_user(self, user_id: int) -> typing.List[Message]:
-        return (
+    def get_messages_for_user(self, user_id: int, read_status: ReadStatus) -> typing.List[Message]:
+        query = (
             self._session.query(Message)
             .filter(Message.receiver_id == user_id)
             .options(joinedload(Message.event))
-            .all()
         )
+        if read_status == ReadStatus.READ:
+            query = query.filter(Message.read)
+        elif read_status == ReadStatus.UNREAD:
+            query = query.filter(Message.read == null())
+        return query.all()
 
 
 class EventBuilder:

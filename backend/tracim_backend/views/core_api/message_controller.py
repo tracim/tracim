@@ -1,12 +1,19 @@
+import typing
+
+from hapic import HapicData
 from pyramid.config import Configurator
 from pyramid.response import Response
 
+from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.event import EventApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.models.event import Message
+from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
 from tracim_backend.views.core_api.schemas import LiveMessageSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 
@@ -15,9 +22,11 @@ SWAGGER_TAG_EVENT_ENDPOINTS = "Event & Messages"
 
 class MessageController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG_EVENT_ENDPOINTS])
-    @hapic.input_path(UserIdPathSchema)
     @check_right(has_personal_access)
-    def open_message_stream(self, context, request: TracimRequest, hapic_data) -> Response:
+    @hapic.input_path(UserIdPathSchema())
+    def open_message_stream(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> Response:
         """
         Open the message stream for the currently connected user.
         Stream is done through server-side events.
@@ -38,16 +47,20 @@ class MessageController(Controller):
         return Response(headerlist=headers)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_EVENT_ENDPOINTS])
-    @hapic.input_path(UserIdPathSchema)
-    @hapic.output_body(LiveMessageSchema(many=True))
     @check_right(has_personal_access)
-    def get_user_messages(self, context, request: TracimRequest, hapic_data) -> Response:
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(GetLiveMessageQuerySchema())
+    @hapic.output_body(LiveMessageSchema(many=True))
+    def get_user_messages(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.List[Message]:
         """
         Returns user messages matching the given query
         """
-        user_id = hapic_data.path.user_id
-        event_api = EventApi(request.current_user, request.dbsession, request.config)
-        return event_api.get_messages_for_user(user_id)
+        user_id = hapic_data.path["user_id"]
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        return event_api.get_messages_for_user(user_id, ReadStatus(hapic_data.query["read_status"]))
 
     def bind(self, configurator: Configurator) -> None:
         """
