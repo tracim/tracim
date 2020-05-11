@@ -127,26 +127,30 @@ export class AddUserForm extends React.Component {
               {props.t('Email')}
             </label>
 
-            <button
-              type='button'
-              className='userData__email__info'
-              id='popoverEmailInfo'
-            >
-              <i className='fa fa-fw fa-question-circle' />
-            </button>
+            {!props.emailNotifActivated && (
+              <>
+                <button
+                  type='button'
+                  className='userData__email__info'
+                  id='popoverEmailInfo'
+                >
+                  <i className='fa fa-fw fa-question-circle' />
+                </button>
 
-            <Popover
-              placement='bottom'
-              isOpen={state.popoverEmailInfoOpen}
-              target='popoverEmailInfo'
-              // INFO - GB - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-              toggle={this.handleTogglePopoverEmailInfo} // eslint-disable-line react/jsx-handler-names
-              trigger='hover'
-            >
-              <PopoverBody>
-                {props.t('Linking an email address is required for the user to be able to reset the password.')}
-              </PopoverBody>
-            </Popover>
+                <Popover
+                  placement='bottom'
+                  isOpen={state.popoverEmailInfoOpen}
+                  target='popoverEmailInfo'
+                  // INFO - GB - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+                  toggle={this.handleTogglePopoverEmailInfo} // eslint-disable-line react/jsx-handler-names
+                  trigger='hover'
+                >
+                  <PopoverBody>
+                    {props.t('Linking an email address is required for the user to be able to reset the password.')}
+                  </PopoverBody>
+                </Popover>
+              </>
+            )}
           </div>
 
           <input
@@ -159,7 +163,7 @@ export class AddUserForm extends React.Component {
             data-cy='adduser_email'
           />
 
-          {!props.emailNotifActivated && (
+          {(!props.emailNotifActivated || state.newUserEmail === '') && (
             <div>
               <label className='userData__text' htmlFor='adduser_password'>
                 {props.t('Password')}
