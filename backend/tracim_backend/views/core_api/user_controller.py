@@ -272,7 +272,7 @@ class UserController(Controller):
     @hapic.output_body(UserSchema())
     def create_user(self, context, request: TracimRequest, hapic_data=None):
         """
-        Create new user
+        Create new user. Note: One of username or email required.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
