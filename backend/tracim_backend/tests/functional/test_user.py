@@ -3053,8 +3053,8 @@ class TestUserEndpoint(object):
         }
         res = web_testapp.post_json("/api/v2/users", status=400, params=params)
         res = res.json_body
-        assert res["code"] == 2061
-        assert res["message"] == "Email or username is required to create an user"
+        assert res["code"] == 2001
+        assert res["message"] == "Validation error of input data"
 
     def test_api__create_user__ok_200__full_admin_with_allowed_space(
         self, web_testapp, user_api_factory
