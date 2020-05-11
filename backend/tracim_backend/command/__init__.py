@@ -63,9 +63,6 @@ class AppContextCommand(Command):
                         self.take_app_action(parsed_args, app_context)
         except Exception as exc:
             logger.exception(self, exc)
-            import traceback
-
-            traceback.print_exc()
             print("Something goes wrong during command")
             raise exc
 

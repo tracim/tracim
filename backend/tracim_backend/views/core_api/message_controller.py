@@ -38,7 +38,7 @@ class MessageController(Controller):
             ("Grip-Hold", "stream"),
             # and register this connection on the user's channel
             # multiple channels subscription is possible
-            ("Grip-Channel", f"user_{user_id}"),
+            ("Grip-Channel", "user_{}".format(user_id)),
             # content type for SSE
             ("Content-Type", "text/event-stream"),
             # do not cache the events
