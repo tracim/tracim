@@ -126,7 +126,7 @@ class FileController(Controller):
         )
         api.save(content, ActionDescription.CREATION)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
-            content = api.update_file_data(
+            api.update_file_data(
                 content,
                 new_filename=_file.filename,
                 new_mimetype=_file.type,

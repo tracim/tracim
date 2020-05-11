@@ -75,7 +75,7 @@ class RoleApi(object):
     #  workspaces/users
     def _apply_base_filters(self, query):
         if not self._show_disabled_user:
-            query = query.join(User).filter(User.is_active)
+            query = query.join(User).filter(User.is_active == True)  # noqa:E712
         return query
 
     def _base_query(self):

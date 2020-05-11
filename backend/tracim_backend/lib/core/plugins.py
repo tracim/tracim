@@ -2,6 +2,7 @@ import collections
 import importlib
 import pkgutil
 import sys
+import types
 import typing
 
 import pluggy
@@ -16,7 +17,7 @@ hookimpl = pluggy.HookimplMarker(PLUGIN_NAMESPACE)
 
 HOOKSPEC_FILES_SUFFIX = "hookspec"
 HOOKSPEC_CLASS_SUFFIX = "HookSpec"
-PLUGIN_DIR_PREFIX = "tracim_plugin_"
+PLUGIN_DIR_PREFIX = "tracim_backend_"
 PLUGIN_ENTRY_POINT_NAME = "register_tracim_plugin"
 
 TracimPluginEntryPoint = typing.Callable[[pluggy.PluginManager], None]
@@ -62,39 +63,39 @@ def _load_spec(plugin_manager: pluggy.PluginManager) -> None:
             plugin_manager.add_hookspecs(class_)
 
 
-def _load_plugins(plugin_manager: pluggy.PluginManager) -> typing.Dict[str, TracimPluginEntryPoint]:
+def _load_plugins(plugin_manager: pluggy.PluginManager,) -> typing.Dict[str, types.ModuleType]:
     """
     Loads all tracim_backend_plugin
     :param force: plugin will not be reloaded if already loaded if force is not true.
     :return: None
     """
-    entry_points = {}
+    plugins = {}
     prefix_len = len(PLUGIN_DIR_PREFIX)
     for finder, name, ispkg in pkgutil.iter_modules():
         if not name.startswith(PLUGIN_DIR_PREFIX):
             continue
         plugin_name = name[prefix_len:]
-        module = importlib.import_module(name)
+        plugins[plugin_name] = importlib.import_module(name)
+    return plugins
+
+
+def _register_all(
+    plugin_manager: pluggy.PluginManager, plugins: typing.Dict[str, types.ModuleType],
+):
+    # INFO - G.M - 2019-12-02 - sort plugins by name here to have predictable
+    # order for plugin registration according to plugin_name.
+    plugins = collections.OrderedDict(sorted(plugins.items()))
+    for plugin_name, module in plugins.items():
+        plugin_manager.register(module)
         try:
-            entry_point = getattr(module, PLUGIN_ENTRY_POINT_NAME, None)
-            entry_points[plugin_name] = entry_point
+            entry_point = getattr(module, PLUGIN_ENTRY_POINT_NAME)
+            entry_point(plugin_manager)
         except AttributeError:
             logger.warning(
                 "Cannot find plugin entry point '{}' in '{}' plugin".format(
                     PLUGIN_ENTRY_POINT_NAME, plugin_name
                 )
             )
-    return entry_points
-
-
-def _register_all(
-    plugin_manager: pluggy.PluginManager, entry_points: typing.Dict[str, TracimPluginEntryPoint]
-):
-    # INFO - G.M - 2019-12-02 - sort plugins by name here to have predictable
-    # order for plugin registration according to plugin_name.
-    entry_points = collections.OrderedDict(sorted(entry_points.items()))
-    for entry_point in entry_points.values():
-        entry_point(plugin_manager)
 
 
 def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
