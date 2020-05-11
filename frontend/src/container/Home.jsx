@@ -83,7 +83,7 @@ export class Home extends React.Component {
   }
 
   checkUsername = () => {
-    if (!(Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP) && this.props.user.username)) {
+    if (!(Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP) || this.props.user.username)) {
       this.setState({ usernamePopup: true })
     }
   }
@@ -261,7 +261,7 @@ export class Home extends React.Component {
                       type='checkbox'
                       onChange={this.handleClickCheckbox}
                     />
-                    {props.t('never ask me again')}
+                    {props.t('Never ask me again')}
                   </div>
                   <div className='homepage__usernamePopup__body__smallmsg'>
                     ({props.t('you can always set your username in your account preferences')})

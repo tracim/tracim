@@ -4,8 +4,16 @@ import { PAGES as p } from '../../support/urls_commands'
 const newUsername = 'newUsername'
 const shortUsername = 'nU'
 
-let userWithoutUsernameEmail
-let userWithoutUsernamePassword
+const userWithoutUsername = {
+  email: 'userWithoutUsername@tracim.fr',
+  email_notification: false,
+  lang: 'en',
+  password: 'userWithoutUsername',
+  profile: 'users',
+  public_name: 'userWithoutUsername',
+  username: null,
+  timezone: 'Europe/Paris'
+}
 
 let userWithUsernameEmail
 let userWithUsernameUsername
@@ -22,10 +30,11 @@ describe('Login', function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
-    cy.createRandomUser().then(user => {
-      user.username = null
-      userWithoutUsernameEmail = user.email
-      userWithoutUsernamePassword = user.password
+
+    cy.request('POST', '/api/v2/users', userWithoutUsername)
+      .then(response => {
+        response.body.password = '8QLa$<w'
+        return response.body
     })
 
     cy.createRandomUser().then(user => {
@@ -45,11 +54,11 @@ describe('Login', function () {
     beforeEach(() => {
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
       .find('input[type=email]')
-      .type(userWithoutUsernameEmail)
+      .type(userWithoutUsername.email)
 
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
         .find('input[type=password]')
-        .type(userWithoutUsernamePassword)
+        .type(userWithoutUsername.password)
 
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
         .find('.loginpage__card__form__btnsubmit')
@@ -61,7 +70,7 @@ describe('Login', function () {
       cy.get(confirmButton).should('not.be.enabled')
     })
 
-    it('should enable the confirm button when check "never ask me again"', function () {
+    it('should enable the confirm button when check "Never ask me again"', function () {
       cy.get(checkbox).click()
       cy.get(confirmButton).should('be.enabled')
     })
@@ -79,7 +88,7 @@ describe('Login', function () {
 
     it('should show error if username is too short', function () {
       cy.get(usernameInput).type(shortUsername)
-      cy.get(passwordInput).type(userWithoutUsernamePassword)
+      cy.get(passwordInput).type(userWithoutUsername.password)
       cy.get(confirmButton).click()
       cy.get('.flashmessage').contains('Username must be at least 3 characters')
     })
@@ -94,12 +103,12 @@ describe('Login', function () {
 
     it('should be able to set username', function () {
       cy.get(usernameInput).type(newUsername)
-      cy.get(passwordInput).type(userWithoutUsernamePassword)
+      cy.get(passwordInput).type(userWithoutUsername.password)
       cy.get(confirmButton).click()
       cy.get('.flashmessage').contains('Your username has been changed')
     })
 
-    describe('if user choose "never ask me again"', function () {
+    describe('if user choose "Never ask me again"', function () {
       it('should not open the set username popup if they login again', function () {
         cy.get(checkbox).click()
         cy.get(confirmButton).click()
@@ -109,11 +118,11 @@ describe('Login', function () {
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
         .find('input[type=email]')
-        .type(userWithoutUsernameEmail)
+        .type(userWithoutUsername.email)
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
           .find('input[type=password]')
-          .type(userWithoutUsernamePassword)
+          .type(userWithoutUsername.password)
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
           .find('.loginpage__card__form__btnsubmit')
