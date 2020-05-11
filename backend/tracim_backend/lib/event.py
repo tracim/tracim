@@ -72,7 +72,7 @@ class EventBuilder:
 
     def __init__(self, config: CFG) -> None:
         self._config = config
-        self._current_user: typing.Optional[User] = None
+        self._current_user = None  # type: typing.Optional[User]
 
     @hookimpl
     def on_current_user_set(self, user: User) -> None:

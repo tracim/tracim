@@ -37,7 +37,7 @@ def create_events_and_messages(session) -> tracim_event.Event:
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
-class TestFolder(object):
+class TestMessages(object):
     """
     Tests for /api/v2/users/{user_id}/messages
     endpoint
