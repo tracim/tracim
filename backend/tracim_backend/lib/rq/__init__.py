@@ -17,10 +17,12 @@ def get_redis_connection(config: CFG) -> redis.Redis:
     )
 
 
-def get_rq_queue(redis_connection: redis.Redis, queue_name: str = "default") -> rq.Queue:
+def get_rq_queue(
+    redis_connection: redis.Redis, queue_name: str = "default", is_async: bool = True
+) -> rq.Queue:
     """
     :param queue_name: name of queue
     :return: wanted queue
     """
 
-    return rq.Queue(name=queue_name, connection=redis_connection)
+    return rq.Queue(name=queue_name, connection=redis_connection, is_async=is_async)

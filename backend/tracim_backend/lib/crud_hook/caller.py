@@ -1,5 +1,6 @@
 from pluggy import PluginManager
 from sqlalchemy import event
+from sqlalchemy.orm.session import UOWTransaction
 
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
@@ -16,7 +17,7 @@ class DatabaseCrudHookCaller:
         self._plugin_manager = plugin_manager
         event.listen(session, "after_flush", self._call_hooks)
 
-    def _call_hooks(self, session: TracimSession, flush_context) -> None:
+    def _call_hooks(self, session: TracimSession, flush_context: UOWTransaction,) -> None:
         for obj in session.new:
             if isinstance(obj, User):
                 self._plugin_manager.hook.on_user_created(user=obj, db_session=session)

@@ -87,7 +87,8 @@ class Event(DeclarativeBase):
         return "{}.{}".format(self.entity_type.value, self.operation.value)
 
     def __repr__(self):
-        return "<Event(type=%s, created_date=%s, fields=%s)>" % (
+        return "<Event(event_id=%s, type=%s, created_date=%s, fields=%s)>" % (
+            repr(self.event_id),
             repr(self.event_type),
             repr(self.created),
             repr(self.fields),

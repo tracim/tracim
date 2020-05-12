@@ -148,7 +148,7 @@ class UserApi(object):
 
     def get_user_ids_from_profile(self, profile: Profile) -> typing.Iterable[int]:
         query = self._apply_base_filters(self._session.query(User.user_id))
-        return query.filter(User.profile == profile).all()
+        return [res[0] for res in query.filter(User.profile == profile)]
 
     def get_known_user(
         self,

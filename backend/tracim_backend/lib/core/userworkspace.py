@@ -209,7 +209,7 @@ class RoleApi(object):
                 UserRoleInWorkspace.workspace_id == workspace_id
             )
         )
-        return query.all()
+        return [res[0] for res in query]
 
     def save(self, role: UserRoleInWorkspace) -> None:
         self._session.flush()

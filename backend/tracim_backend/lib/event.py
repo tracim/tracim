@@ -1,6 +1,7 @@
 from datetime import datetime
 import typing
 
+from sqlalchemy import event
 from sqlalchemy import null
 from sqlalchemy.orm import joinedload
 
@@ -73,6 +74,7 @@ class EventBuilder:
     def __init__(self, config: CFG) -> None:
         self._config = config
         self._current_user = None  # type: typing.Optional[User]
+        event.listen(TracimSession, "pending_to_persistent", self._publish_event)
 
     @hookimpl
     def on_current_user_set(self, user: User) -> None:
@@ -102,7 +104,7 @@ class EventBuilder:
             _USER_FIELD: self._user_schema.dump(user).data,
         }
         event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
-        self._publish_event(event, db_session)
+        db_session.add(event)
 
     # Workspace events
     @hookimpl
@@ -126,7 +128,7 @@ class EventBuilder:
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
-        self._publish_event(event, db_session)
+        db_session.add(event)
 
     # Content events
     @hookimpl
@@ -155,7 +157,7 @@ class EventBuilder:
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.CONTENT, operation=operation, fields=fields)
-        self._publish_event(event, db_session)
+        db_session.add(event)
 
     # UserRoleInWorkspace events
     @hookimpl
@@ -198,31 +200,39 @@ class EventBuilder:
         event = Event(
             entity_type=EntityType.WORKSPACE_USER_ROLE, operation=operation, fields=fields
         )
-        self._publish_event(event, db_session)
-
-    def _publish_event(self, event: Event, db_session: TracimSession) -> None:
         db_session.add(event)
+
+    def _publish_event(self, db_session: TracimSession, instance: object) -> None:
+        if not isinstance(instance, Event):
+            return
+        event = typing.cast(Event, instance)
         redis_connection = get_redis_connection(self._config)
-        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME, is_async=False)
         logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
+        LiveMessageBuilder.session = db_session
+        LiveMessageBuilder.config = self._config
         queue.enqueue(
-            LiveMessageBuilder.publish_messages_for_event, self._event_schema.dump(event).data
+            LiveMessageBuilder.publish_messages_for_event, self._event_schema.dump(event).data,
         )
 
 
 class LiveMessageBuilder:
 
     _event_schema = EventSchema()
+    session = None
+    config = None
 
     @classmethod
     def _session(cls) -> TracimSession:
         # TODO SG 20200807: acquire this from the RQ worker's context
-        raise NotImplementedError()
+        assert cls.session
+        return cls.session
 
     @classmethod
     def _config(cls) -> CFG:
         # TODO SG 20200807: acquire this from the RQ worker's context
-        raise NotImplementedError()
+        assert cls.config
+        return cls.config
 
     @classmethod
     def publish_messages_for_event(cls, event_dict: typing.Dict[str, typing.Any]) -> None:
@@ -244,7 +254,7 @@ class LiveMessageBuilder:
 
         # The author is not notified of the change (?)
         try:
-            receiver_ids -= set([event.author.user_id])
+            receiver_ids -= set([event.author["user_id"]])
         except AttributeError:
             # No author
             pass
@@ -259,7 +269,7 @@ class LiveMessageBuilder:
     def _get_user_event_receiver_ids(cls, event: Event) -> typing.Set[int]:
         user_api = UserApi(None, session=cls._session(), config=cls._config())
         receiver_ids = set(user_api.get_user_ids_from_profile(Profile.ADMIN))
-        receiver_ids.add(event.user.user_id)
+        receiver_ids.add(event.user["user_id"])
         return receiver_ids
 
     @classmethod
@@ -267,5 +277,5 @@ class LiveMessageBuilder:
         user_api = UserApi(None, session=cls._session(), config=cls._config())
         administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
         role_api = RoleApi(None, session=cls._session(), config=cls._config())
-        workspace_members = role_api.get_workspace_member_ids(event.workspace.workspace_id)
+        workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
         return set(administrators).union(set(workspace_members))
