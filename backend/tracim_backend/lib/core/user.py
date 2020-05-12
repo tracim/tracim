@@ -32,6 +32,7 @@ from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidUsernameFormat
+from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
@@ -170,7 +171,7 @@ class UserApi(object):
         filter_results: bool = True,
     ) -> typing.Iterable[User]:
         """
-        Return list of know user by current UserApi user.
+        Return list of known user by current UserApi user.
         :param acp: autocomplete filter by name/email
         :param exclude_user_ids: user id to exclude from result
         :param exclude_workspace_ids: workspace user to exclude from result
@@ -909,10 +910,15 @@ class UserApi(object):
         """
         self._check_user_auth_validity(user)
         self._check_password_modification_allowed(user)
+
+        if not user.email:
+            raise MissingEmailCantResetPassword("Can't reset password without an email address")
+
         if not self._config.EMAIL__NOTIFICATION__ACTIVATED:
             raise NotificationDisabledCantResetPassword(
-                "cant reset password with notification disabled"
+                "Can't reset password with notification disabled"
             )
+
         token = user.generate_reset_password_token()
         try:
             email_manager = get_email_manager(self._config, self._session)
