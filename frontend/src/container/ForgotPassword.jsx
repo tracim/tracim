@@ -99,7 +99,7 @@ export class ForgotPassword extends React.Component {
           case 2001: props.dispatch(newFlashMessage(props.t('Not a valid email'), 'warning')); break
           case 2046: props.dispatch(newFlashMessage(props.t('Cannot reset password while email are disabled, please contact an administrator'), 'warning')); break
           case 2049: props.dispatch(newFlashMessage(props.t("Your account's password cannot be changed, please contact an administrator"), 'warning')); break
-          case 2064: props.dispatch(newFlashMessage(props.t('This username is not linked to any email, contact an administrator to reset your password'), 'warning')); break
+          case 2064: props.dispatch(newFlashMessage(props.t('This username is not linked to any email, please contact an administrator to reset your password'), 'warning')); break
           default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again'), 'warning')); break
         }
         break
