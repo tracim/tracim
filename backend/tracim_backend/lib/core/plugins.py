@@ -92,9 +92,10 @@ def _register_all(
             entry_point(plugin_manager)
         except AttributeError:
             logger.warning(
+                plugin_manager,
                 "Cannot find plugin entry point '{}' in '{}' plugin".format(
                     PLUGIN_ENTRY_POINT_NAME, plugin_name
-                )
+                ),
             )
 
 
