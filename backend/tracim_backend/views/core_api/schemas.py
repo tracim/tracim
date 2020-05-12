@@ -774,12 +774,22 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
 
 class ResetPasswordRequestSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
-        required=True, example="hello@tracim.fr", validate=user_email_validator
+        example="hello@tracim.fr", default=None, allow_none=True, validate=user_email_validator
+    )
+
+    username = StrippedString(
+        example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
     )
 
     @post_load
     def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return ResetPasswordRequest(**data)
+
+    # TODO 2020-06-11 - RJ: duplicated code across this file
+    @marshmallow.validates_schema(pass_original=True)
+    def validate_email_and_username(self, data: dict, original_data: dict, **kwargs) -> None:
+        if not original_data.get("email") and not original_data.get("username"):
+            raise marshmallow.ValidationError("email or username required")
 
 
 class ResetPasswordCheckTokenSchema(marshmallow.Schema):
