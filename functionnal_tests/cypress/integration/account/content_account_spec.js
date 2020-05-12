@@ -200,7 +200,7 @@ describe('Account page', () => {
           .click()
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=personaldata__form__txtinput__username]')
-          .type(defaultAdmin.username)
+          .type(baseUser.username)
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('.personaldata__form__txtinput.checkPassword')
           .type(defaultAdmin.password)
