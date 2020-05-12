@@ -318,6 +318,10 @@ Run your project's tests:
 
 ### Lints and Others Checks ###
 
+Install required versions:
+
+    pip install -r requirements-static-tests.txt
+
 Run mypy checks:
 
     mypy --ignore-missing-imports --disallow-untyped-defs tracim_backend
