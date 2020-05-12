@@ -52,9 +52,6 @@ class TestResetPasswordRequestEndpointMailSync(object):
         assert headers["To"][0] == "bob <test@test.test>"
         assert headers["Subject"][0] == "[Tracim] A password reset has been requested"
 
-        uapi.delete(test_user)
-        transaction.commit()
-
     def test_api__reset_password_request__err_400__username_missing_email(
         self, user_api_factory, web_testapp, mailhog
     ):
@@ -82,9 +79,6 @@ class TestResetPasswordRequestEndpointMailSync(object):
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.MISSING_EMAIL_CANT_RESET_PASSWORD
-
-        uapi.delete(test_user)
-        transaction.commit()
 
     @pytest.mark.email_notification
     @pytest.mark.unknown_auth
