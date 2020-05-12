@@ -235,7 +235,7 @@
   "Search…": "Pesquisar...",
   "Unknown email or username": "E-mail ou identificador desconhecido",
   "Email address or username": "E-mail ou identificador",
-  "This username is not linked to any email, contact an administrator to reset your password": "Este identificador não está ligado a nenhum e-mail, contacte um administrador para redefinir a sua palavra-passe",
+  "This username is not linked to any email, please contact an administrator to reset your password": "Este identificador não está ligado a nenhum e-mail, por favor contacte um administrador para redefinir a sua palavra-passe",
   "Invalid email or username": "E-mail ou identificador inválido",
   "Invalid credentials": "Credenciais inválidas"
 }
