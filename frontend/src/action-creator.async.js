@@ -17,6 +17,8 @@ import {
   setUserDisconnected,
   USER_KNOWN_MEMBER_LIST,
   USER_PUBLIC_NAME,
+  USER_USERNAME,
+  USERNAME_AVAILABILITY,
   USER_EMAIL,
   USER_PASSWORD,
   USER_LANG,
@@ -277,6 +279,40 @@ export const putUserName = (user, newName) => dispatch => {
       })
     },
     actionName: USER_PUBLIC_NAME,
+    dispatch
+  })
+}
+
+export const putUserUsername = (user, newUsername, checkPassword) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/username`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        username: newUsername,
+        loggedin_user_password: checkPassword
+      })
+    },
+    actionName: USER_USERNAME,
+    dispatch
+  })
+}
+
+export const getUsernameAvailability = (username) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/username-availability?username=${username}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USERNAME_AVAILABILITY,
     dispatch
   })
 }
