@@ -49,7 +49,7 @@ class TracimAuthenticationPolicy(ABC):
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         try:
-            _, user = uapi.get(user_id=user_id, token=token, email=email)
+            user = uapi.get(user_id=user_id, token=token, email=email)
             return user
         except UserDoesNotExist:
             return None
