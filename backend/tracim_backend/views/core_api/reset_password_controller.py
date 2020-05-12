@@ -47,7 +47,7 @@ class ResetPasswordController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
-        _, user = uapi.find(username=hapic_data.body.username, email=hapic_data.body.email)
+        user = uapi.get(username=hapic_data.body.username, email=hapic_data.body.email)
         uapi.reset_password_notification(user, do_save=True)
         return
 
