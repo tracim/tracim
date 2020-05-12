@@ -56,7 +56,7 @@ class EventApi:
             .options(joinedload(Message.event))
         )
         if read_status == ReadStatus.READ:
-            query = query.filter(Message.read)
+            query = query.filter(Message.read != null())
         elif read_status == ReadStatus.UNREAD:
             query = query.filter(Message.read == null())
         return query.all()
