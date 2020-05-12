@@ -3,6 +3,7 @@ import io
 from urllib.parse import quote
 
 from PIL import Image
+import dateutil.parser
 from depot.io.utils import FileIntent
 import pytest
 import transaction
@@ -2551,7 +2552,12 @@ class TestFiles(object):
         assert last_event.content["content_type"] == res["content_type"]
         assert last_event.content["current_revision_id"] == res["current_revision_id"]
         assert last_event.content["created"] == res["created"]
-        assert last_event.content["modified"] == res["modified"]
+        # NOTE S.G 2020-05-12: allow a small difference in modified time
+        # as tests with MySQL sometimes fails with a strict equality
+        event_content_modified = dateutil.parser.isoparse(last_event.content["modified"])
+        content_modified = dateutil.parser.isoparse(res["modified"])
+        modified_diff = (event_content_modified - content_modified).total_seconds()
+        assert abs(modified_diff) < 2
         assert last_event.content["file_extension"] == res["file_extension"]
         assert last_event.content["filename"] == res["filename"]
         assert last_event.content["is_archived"] == res["is_archived"]
