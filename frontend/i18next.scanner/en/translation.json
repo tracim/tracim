@@ -235,7 +235,7 @@
   "Archived Topic": "Archived Topic",
   "Unknown email or username": "Unknown email or username",
   "Email address or username": "Email address or username",
-  "This username is not linked to any email, contact an administrator to reset your password": "This username is not linked to any email, contact an administrator to reset your password",
+  "This username is not linked to any email, please contact an administrator to reset your password": "This username is not linked to any email, please contact an administrator to reset your password",
   "Invalid email or username": "Invalid email or username",
   "Invalid credentials": "Invalid credentials"
 }
