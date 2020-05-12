@@ -3,6 +3,7 @@ import pytest as pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
+from tracim_backend.models.auth import Profile
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -13,7 +14,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 class TestResetPasswordRequestEndpointMailSync(object):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
-    def test_api__reset_password_request__ok__nominal_case(self, web_testapp, mailhog):
+    def test_api__reset_password_request__ok__nominal_case_email(self, web_testapp, mailhog):
         params = {"email": "admin@admin.admin"}
         web_testapp.post_json("/api/v2/auth/password/reset/request", status=204, params=params)
         response = mailhog.get_mailhog_mails()
@@ -22,6 +23,37 @@ class TestResetPasswordRequestEndpointMailSync(object):
         assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[Tracim] A password reset has been requested"
+
+    def test_api__reset_password_request__ok__nominal_case_username(
+        self, user_api_factory, web_testapp, mailhog
+    ):
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            username="boby",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="en",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+
+        params = {"username": "boby"}
+        web_testapp.post_json("/api/v2/auth/password/reset/request", status=204, params=params)
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 1
+        headers = response[0]["Content"]["Headers"]
+        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
+        assert headers["To"][0] == "bob <test@test.test>"
+        assert headers["Subject"][0] == "[Tracim] A password reset has been requested"
+
+        uapi.delete(test_user)
+        transaction.commit()
 
     @pytest.mark.email_notification
     @pytest.mark.unknown_auth
@@ -33,7 +65,7 @@ class TestResetPasswordRequestEndpointMailSync(object):
             "password": "mysuperpassword",
             "profile": "users",
             "timezone": "Europe/Paris",
-            "lang": "fr",
+            "lang": "en",
             "public_name": "test user",
             "email_notification": False,
         }
