@@ -25,7 +25,7 @@ DEFAULTDIR=$(pwd)
 export DEFAULTDIR
 echo "This is DEFAULTDIR \"$DEFAULTDIR\""
 
-for project in "$DEFAULTDIR/frontend_lib" "$DEFAULTDIR/frontend" "$DEFAULTDIR/frontend_app"; do
+for project in "$DEFAULTDIR/frontend_lib" "$DEFAULTDIR/frontend" "$DEFAULTDIR"/frontend_app*; do
     cd "$project" || exit 1
     yarn run test && loggood "success" || (logerror "some error" && STATUS=1)
 done

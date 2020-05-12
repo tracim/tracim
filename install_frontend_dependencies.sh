@@ -78,8 +78,8 @@ debian_install() {
 
         debian_install_curl
 
-        curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-        echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+        curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | $SUDO apt-key add -
+        echo "deb https://dl.yarnpkg.com/debian/ stable main" | $SUDO tee /etc/apt/sources.list.d/yarn.list
 
         log "We will install yarn."
         apt_install=true
@@ -121,9 +121,9 @@ debian_install() {
 }
 
 setup_yarn() {
-    if [ ! -f ".yarnrc.yml" ]; then
-        log "Setting up yarn (yarn set version berry)"
-        yarn set version berry && \
+    if ! yarn -v | grep '^2\.' > /dev/null; then
+        log "Setting up yarn (yarn policies set-version berry)"
+        yarn policies set-version berry && \
             loggood "Yarn is correctly set up." || \
             logerror "Failed to set up yarn."
     fi
@@ -132,7 +132,7 @@ setup_yarn() {
         logerror "We expected Yarn 2, we got $(yarn --version)."
     fi
 
-    if ! grep -F 'nodeLinker: node-modules' .yarnrc.yml; then
+    if ! grep -F 'nodeLinker: node-modules' .yarnrc.yml > /dev/null; then
         log "Setting yarn nodeLinker to node-modules mode."
         echo 'nodeLinker: node-modules' >> .yarnrc.yml
     fi

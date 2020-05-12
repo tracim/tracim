@@ -1251,7 +1251,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": 2,
             "user_email": None,
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
@@ -1297,7 +1296,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json(
@@ -1354,7 +1352,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json(
@@ -1391,7 +1388,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
@@ -1433,7 +1429,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1460,7 +1455,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1562,7 +1556,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": None,
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1582,7 +1575,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": 47,
             "user_email": None,
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1602,7 +1594,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "nothing@nothing.nothing",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -2046,7 +2037,6 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2111,7 +2101,6 @@ class TestUserInvitationWithMailActivatedSync(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2170,7 +2159,6 @@ class TestUserInvitationWithMailActivatedSync(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2227,7 +2215,6 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2324,7 +2311,6 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2365,7 +2351,6 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2403,7 +2388,6 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2444,7 +2428,6 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2476,7 +2459,6 @@ class TestUserInvitationWithMailActivatedASync(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
