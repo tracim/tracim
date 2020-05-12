@@ -13,11 +13,16 @@ export class LiveMessageManager {
   }
 
   openLiveMessageConnection () {
+    if (this.status !== LIVE_MESSAGE_STATUS.OPEN) {
+      console.error('LiveMessage already connected.')
+      return false
+    }
+
     return new Promise((resolve) => {
       setTimeout(() => {
         console.log('resolving openLiveMessageConnection')
 
-        // this.mockRandomLiveEvents()
+        this.mockRandomLiveEvents()
 
         this.status = LIVE_MESSAGE_STATUS.OPEN
 
@@ -27,13 +32,14 @@ export class LiveMessageManager {
   }
 
   closeLiveMessageConnection () {
+    this.status = LIVE_MESSAGE_STATUS.CLOSE
     return true
   }
 
   dispatchLiveMessage = function (event) {
     const type = event.type
     const data = event.data
-    console.log('%GLOBAL_dispatchLiveMessage', 'color: #ccc', type, data)
+    console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', type, data)
 
     const customEvent = new globalThis.CustomEvent('TracimLiveMessage', { detail: { type, data } })
 

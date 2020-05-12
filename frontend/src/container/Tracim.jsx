@@ -59,7 +59,7 @@ export class Tracim extends React.Component {
     super(props)
 
     this.liveMessageManager = new LiveMessageManager()
-    this.liveMessageManager.openLiveMessageConnection()
+
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
@@ -122,8 +122,9 @@ export class Tracim extends React.Component {
 
         this.loadAppConfig()
         this.loadLiveMessage()
-
         this.loadWorkspaceList()
+        this.liveMessageManager.openLiveMessageConnection()
+
         break
       case 401: props.dispatch(setUserConnected({ logged: false })); break
       default: props.dispatch(setUserConnected({ logged: false })); break
