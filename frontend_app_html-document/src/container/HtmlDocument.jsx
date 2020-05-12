@@ -491,7 +491,7 @@ class HtmlDocument extends React.Component {
         </PopinFixedOption>
 
         <PopinFixedContent
-          customClass={`${state.config.slug}__contentpage`}
+          customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
