@@ -19,7 +19,7 @@ import {
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
-  updateUserName,
+  updateUserPublicName,
   updateUserEmail,
   updateUserWorkspaceSubscriptionNotif,
   updateUserAgendaUrl,
@@ -155,7 +155,7 @@ export class Account extends React.Component {
     subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
   }))
 
-  handleSubmitNameOrEmail = async (newName, newEmail, checkPassword) => {
+  handleSubmitPersonalData = async (newName, newEmail, checkPassword) => {
     const { props } = this
 
     if (newName !== '') {
@@ -167,7 +167,7 @@ export class Account extends React.Component {
       const fetchPutUserName = await props.dispatch(putMyselfName(props.user, newName))
       switch (fetchPutUserName.status) {
         case 200:
-          props.dispatch(updateUserName(newName))
+          props.dispatch(updateUserPublicName(newName))
           if (newEmail === '') {
             props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
             return true
@@ -259,7 +259,7 @@ export class Account extends React.Component {
                         return (
                           <PersonalData
                             userAuthType={props.user.auth_type}
-                            onClickSubmit={this.handleSubmitNameOrEmail}
+                            onClickSubmit={this.handleSubmitPersonalData}
                           />
                         )
 

@@ -95,6 +95,7 @@ user_profile_validator_with_nobody = OneOf(Profile.get_all_valid_slugs(include_n
 agenda_type_validator = OneOf([agenda_type.value for agenda_type in AgendaType])
 user_timezone_validator = Length(max=User.MAX_TIMEZONE_LENGTH)
 user_email_validator = Length(min=User.MIN_EMAIL_LENGTH, max=User.MAX_EMAIL_LENGTH)
+user_username_validator = Length(min=User.MIN_USERNAME_LENGTH, max=User.MAX_USERNAME_LENGTH)
 user_password_validator = Length(min=User.MIN_PASSWORD_LENGTH, max=User.MAX_PASSWORD_LENGTH)
 user_public_name_validator = Length(
     min=User.MIN_PUBLIC_NAME_LENGTH, max=User.MAX_PUBLIC_NAME_LENGTH
