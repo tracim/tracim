@@ -98,10 +98,16 @@ def _register_all(
             )
 
 
-def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
+def create_plugin_manager() -> pluggy.PluginManager:
+    """Create an instance of tracim plugin manager and loads the tracim
+    hookspecs from tracim modules."""
     plugin_manager = pluggy.PluginManager(PLUGIN_NAMESPACE)
-
     _load_spec(plugin_manager)
+    return plugin_manager
+
+
+def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
+    plugin_manager = create_plugin_manager()
 
     # INFO - G.M - 2019-11-27 - if a plugin path is provided, load plugins from this path
     plugin_path = app_config.PLUGIN__FOLDER_PATH
