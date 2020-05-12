@@ -267,3 +267,4 @@ def create_1000px_png_test_image() -> None:
 
 
 TEST_CONFIG_FILE_PATH = os.environ.get("TEST_CONFIG_FILE_PATH")
+TEST_PUSHPIN_FILE_PATH = os.environ.get("TEST_PUSHPIN_FILE_PATH")

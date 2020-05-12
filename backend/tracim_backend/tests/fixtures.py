@@ -1,11 +1,14 @@
 import logging
 import os
+from os.path import basename
+from os.path import dirname
 import typing
 
 from depot.manager import DepotManager
 import plaster
 from pyramid import testing
 import pytest
+from pytest_pyramid_server import PyramidTestServer
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -28,6 +31,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
+from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import ElasticSearchHelper
@@ -39,6 +43,41 @@ from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
+
+
+@pytest.fixture
+def pushpin_config_file():
+    return TEST_PUSHPIN_FILE_PATH
+
+
+@pytest.fixture
+def pushpin(request, tracim_webserver, pushpin_config_file, watcher_getter):
+    assert tracim_webserver.uri.startswith("http")
+    return watcher_getter(
+        name="pushpin",
+        arguments=[
+            "--config",
+            pushpin_config_file,
+            "--route",
+            "* {}:{}".format(tracim_webserver.hostname, tracim_webserver.port),
+        ],
+        checker=lambda: os.path.exists("/tmp/testpushpin/rundir/pushpin-handler.pid"),
+        request=request,
+    )
+
+
+@pytest.fixture
+def tracim_webserver(settings, config_uri) -> PyramidTestServer:
+    config_filename = basename(config_uri)
+    config_dir = dirname(config_uri)
+
+    with PyramidTestServer(
+        config_filename=config_filename,
+        config_dir=config_dir,
+        extra_config_vars={"app:main": settings},
+    ) as server:
+        server.start()
+        yield server
 
 
 @pytest.fixture

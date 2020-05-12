@@ -77,12 +77,14 @@ tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
     'pytest',
     'pytest-dotenv',
+    'pytest-services',
     'responses',
     'mock',
     'Pillow',
     # INFO - G.M - 2020-01-14 - static version of freezeguh due to regression
     # with webtest, see https://github.com/spulec/freezegun/issues/326
     'freezegun==0.3.12',
+    'sseclient-py',
 ]
 
 devtools_require=[
