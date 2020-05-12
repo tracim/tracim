@@ -14,7 +14,11 @@ import {
   setConfig
 } from '../action-creator.sync.js'
 import { PAGE } from '../helper.js'
-import { CUSTOM_EVENT, buildHeadTitle } from 'tracim_frontend_lib'
+import {
+  CUSTOM_EVENT,
+  checkEmailValidity,
+  buildHeadTitle
+} from 'tracim_frontend_lib'
 
 export class ForgotPassword extends React.Component {
   constructor (props) {
@@ -82,7 +86,11 @@ export class ForgotPassword extends React.Component {
   handleClickSubmit = async () => {
     const { props, state } = this
 
-    const fetchPostResetPassword = await props.dispatch(postForgotPassword(state.backupLogin.value))
+    const fetchPostResetPassword = await props.dispatch(
+      postForgotPassword(
+        checkEmailValidity(state.backupLogin.value) ? { email: state.backupLogin.value } : { username: state.backupLogin.value }
+      )
+    )
     switch (fetchPostResetPassword.status) {
       case 204: props.dispatch(newFlashMessage(props.t("Email sent, don't forget to check your spam"), 'info')); break
       case 400:
