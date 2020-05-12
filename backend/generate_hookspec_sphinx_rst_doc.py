@@ -7,25 +7,25 @@ HEADER = """
 Tracim Plugin using Event Hooks
 ===============================
 
-To plug external code in tracim backend, you need to add your code in a ``tracim_plugin_myplugin`` module.
+To plug external code in tracim backend, you need to add your code in a ``tracim_backend_myplugin`` module.
 
-it can be either a python module file (``tracim_plugin_myplugin.py``) or a python package (``tracim_plugin_myplugin`` dir with ``__init__.py`` file into).
+it can be either a python module file (``tracim_backend_myplugin.py``) or a python package (``tracim_backend_myplugin`` dir with ``__init__.py`` file into).
 
 .. warning::
-   Only module beginning with ``tracim_plugin_`` will be considered by tracim as plugin.
+   Only module beginning with ``tracim_backend_`` will be considered by tracim as plugin.
 
    if your module doesn't begin like this, it will not be processed as plugin by tracim.
 
 You can add it by:
 
-1. add your ``tracim_plugin_myplugin`` module to ``PLUGIN__FOLDER_PATH`` tracim backend config parameter dir. it will be automatically loaded by tracim.
-2. creating python package named ``tracim_plugin_myplugin`` and install it with ``pip``.
-3. add your ``tracim_plugin_myplugin`` module to your local python path, for example by using environnement var ``PYTHONPATH``.
+1. add your ``tracim_backend_myplugin`` module to ``PLUGIN__FOLDER_PATH`` tracim backend config parameter dir. it will be automatically loaded by tracim.
+2. creating python package named ``tracim_backend_myplugin`` and install it with ``pip``.
+3. add your ``tracim_backend_myplugin`` module to your local python path, for example by using environnement var ``PYTHONPATH``.
 
 To make a plugin, you just need to use available event hook methods and import ``tracim_backend.lib.core.plugins.hookimpl``.
 
-Order of plugin running is LIFO (Last In, First Out) by default as in ``pluggy``. In Tracim, we load all plugin sorted by name one by one, that's means that ``tracim_plugin_test_2`` hooks
-will be runned before ``tracim_plugin_test_1`` hooks unless to explictly use ``tryfirst`` or ``trylast`` parameters of pluggy hookspec.
+Order of plugin running is LIFO (Last In, First Out) by default as in ``pluggy``. In Tracim, we load all plugin sorted by name one by one, that's means that ``tracim_backend_test_2`` hooks
+will be runned before ``tracim_backend_test_1`` hooks unless to explictly use ``tryfirst`` or ``trylast`` parameters of pluggy hookspec.
 
 Plugin hook mechanism in tracim is based on ``pluggy``, if you need more information about how plugin
 mechanism do work in Tracim, you can check `pluggy documentation <https://pluggy.readthedocs.io/en/latest/>`_ .

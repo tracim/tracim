@@ -207,6 +207,7 @@ class EventBuilder:
             return
         event = typing.cast(Event, instance)
         redis_connection = get_redis_connection(self._config)
+        # TODO S.G 2020-05-12: change is_async to use workers
         queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME, is_async=False)
         logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
         LiveMessageBuilder.session = db_session
@@ -224,13 +225,13 @@ class LiveMessageBuilder:
 
     @classmethod
     def _session(cls) -> TracimSession:
-        # TODO SG 20200807: acquire this from the RQ worker's context
+        # TODO S.G 2020-05-07: acquire this from the RQ worker's context
         assert cls.session
         return cls.session
 
     @classmethod
     def _config(cls) -> CFG:
-        # TODO SG 20200807: acquire this from the RQ worker's context
+        # TODO SG 2020-05-07: acquire this from the RQ worker's context
         assert cls.config
         return cls.config
 
