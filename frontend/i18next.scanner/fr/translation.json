@@ -235,7 +235,7 @@
   "Password reset": "Réinitialisation mot de passe",
   "Unknown email or username": "Adresse email ou identifiant inconnu",
   "Email address or username": "Adresse email ou identifiant",
-  "This username is not linked to any email, contact an administrator to reset your password": "Ce identifiant n'est lié à aucun e-mail, veuillez contacter un administrateur pour réinitialiser votre mot de passe",
+  "This username is not linked to any email, please contact an administrator to reset your password": "Ce identifiant n'est lié à aucun e-mail, veuillez contacter un administrateur pour réinitialiser votre mot de passe",
   "Invalid email or username": "Adresse email ou identifiant invalide",
   "Invalid credentials": "Identifiants invalide"
 }
