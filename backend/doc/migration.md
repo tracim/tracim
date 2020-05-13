@@ -20,11 +20,11 @@ and activate the Tracim virtualenv:
 
 ### Downgrading the Database ###
 
-To preview version:
+To the previous version:
 
     alembic -c development.ini downgrade -1
 
-To specific database revision:
+To a specific database revision:
 
     alembic -c development.ini downgrade <database_revision>
 

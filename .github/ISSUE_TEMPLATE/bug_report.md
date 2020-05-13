@@ -11,7 +11,7 @@ assignees: ""
 
 ## Diagnostic
 
-*Optional - explain what has been found and what is not yet clear. If unknown, write "unknown".*
+*Optional - explain what has been found and what is not clear yet. If unknown, write "unknown".*
 
 ## Expected
 
@@ -54,7 +54,7 @@ assignees: ""
 
 *Optional - add screenshots to help explain your problem.*
 
-*Please consider sharing a [animated GIF screencast generated with peek](https://github.com/phw/peek)*
+*Please consider sharing an [animated GIF screencast generated with peek](https://github.com/phw/peek)*
 
 ## Impacted components
 
@@ -72,4 +72,4 @@ assignees: ""
 
 ## Extra information
 
-*Optional - add any extra information which will be usefull for understanding and developing the feature*
+*Optional - add any useful information to understand and develop the feature*

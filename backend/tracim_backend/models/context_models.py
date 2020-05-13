@@ -464,16 +464,9 @@ class WorkspaceMemberInvitation(object):
     Workspace Member Invitation
     """
 
-    def __init__(
-        self,
-        user_id: int = None,
-        user_email: str = None,
-        user_public_name: str = None,
-        role: str = None,
-    ) -> None:
+    def __init__(self, user_id: int = None, user_email: str = None, role: str = None,) -> None:
         self.role = role
         self.user_email = user_email
-        self.user_public_name = user_public_name
         self.user_id = user_id
 
 
@@ -570,11 +563,10 @@ class FolderContentUpdate(object):
 
 
 class TypeUser(Enum):
-    """Params used to find user"""
+    """The method that helped to find a user"""
 
     USER_ID = "found_id"
     EMAIL = "found_email"
-    PUBLIC_NAME = "found_public_name"
     TOKEN = "found_user_token"
 
 
