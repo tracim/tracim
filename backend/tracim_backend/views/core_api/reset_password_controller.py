@@ -4,6 +4,7 @@ from pyramid.config import Configurator
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import UnvalidResetPasswordToken
@@ -33,6 +34,7 @@ SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS = generate_documentation_sw
 
 class ResetPasswordController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])
+    @hapic.handle_exception(MissingEmailCantResetPassword, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(NotificationDisabledCantResetPassword, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(
         ExternalAuthUserPasswordModificationDisallowed, http_code=HTTPStatus.BAD_REQUEST
