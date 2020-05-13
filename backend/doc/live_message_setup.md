@@ -49,5 +49,5 @@ And you can test message with this command:
 (in this example, we use use also the default admin user)
 
 ~~~bash
-tracim dev test live-messages -u 1 -d
+tracimcli dev test live-messages -u 1 -d
 ~~~
