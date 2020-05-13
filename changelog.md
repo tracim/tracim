@@ -6,6 +6,10 @@
 
 - UX: #3026
 
+### Other change
+
+- Adds a log when an HTTP request is made by an authenticated user
+
 
 ## 2.7.3 / 2020-05-07
 
