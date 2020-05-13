@@ -101,6 +101,7 @@ user_public_name_validator = Length(
 )
 user_lang_validator = Length(min=User.MIN_LANG_LENGTH, max=User.MAX_LANG_LENGTH)
 user_role_validator = OneOf(UserRoleInWorkspace.get_all_role_slug())
+sse_mimetype_validator = OneOf(["text/event-stream"])
 
 # Dynamic validator #
 all_content_types_validator = OneOf(choices=[])

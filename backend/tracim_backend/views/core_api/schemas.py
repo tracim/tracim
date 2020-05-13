@@ -20,6 +20,7 @@ from tracim_backend.app_models.validator import not_empty_string_validator
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
+from tracim_backend.app_models.validator import sse_mimetype_validator
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -1309,3 +1310,9 @@ class ConfigSchema(marshmallow.Schema):
     workspace_size_limit = marshmallow.fields.Integer()
     workspaces_number_per_user_limit = marshmallow.fields.Integer()
     instance_name = marshmallow.fields.String()
+
+
+class TracimLiveEventHeaderSchema(marshmallow.Schema):
+    accept = marshmallow.fields.String(
+        required=True, load_from="Accept", dump_to="Accept", validate=sse_mimetype_validator
+    )
