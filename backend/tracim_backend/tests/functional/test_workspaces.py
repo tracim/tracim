@@ -1251,7 +1251,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": 2,
             "user_email": None,
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
@@ -1297,7 +1296,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json(
@@ -1354,7 +1352,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json(
@@ -1391,7 +1388,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
@@ -1433,7 +1429,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1460,46 +1455,12 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_DELETED
-
-    def test_api__create_workspace_member_role__ok_200__user_public_name(self, web_testapp):
-        """
-        Create workspace member role
-        :return:
-        """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        # create workspace role
-        params = {
-            "user_id": None,
-            "user_email": None,
-            "user_public_name": "Lawrence L.",
-            "role": "content-manager",
-        }
-        res = web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
-        user_role_found = res.json_body
-        assert user_role_found["role"] == "content-manager"
-        assert user_role_found["user_id"] == 2
-        assert user_role_found["workspace_id"] == 1
-        assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
-
-        res = web_testapp.get("/api/v2/workspaces/1/members", status=200).json_body
-        assert len(res) == 2
-        user_role = res[0]
-        assert user_role["role"] == "workspace-manager"
-        assert user_role["user_id"] == 1
-        assert user_role["workspace_id"] == 1
-        user_role = res[1]
-        assert user_role_found["role"] == user_role["role"]
-        assert user_role_found["user_id"] == user_role["user_id"]
-        assert user_role_found["workspace_id"] == user_role["workspace_id"]
 
     def test_api__create_workspace_member_role__ok_200__user_username(self, web_testapp):
         """
@@ -1529,27 +1490,6 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == user_role["user_id"]
         assert user_role_found["workspace_id"] == user_role["workspace_id"]
 
-    def test_api__create_workspace_member_role__ok_400__user_public_name_user_already_in_workspace(
-        self, web_testapp
-    ):
-        """
-        Create workspace member role
-        :return:
-        """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        # create workspace role
-        params = {
-            "user_id": None,
-            "user_email": None,
-            "user_public_name": "Lawrence L.",
-            "role": "content-manager",
-        }
-        web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
-        res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.USER_ROLE_ALREADY_EXIST
-
     def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(
         self, web_testapp
     ):
@@ -1562,7 +1502,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": None,
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1582,7 +1521,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": 47,
             "user_email": None,
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1602,7 +1540,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "nothing@nothing.nothing",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -2046,7 +1983,6 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2111,7 +2047,6 @@ class TestUserInvitationWithMailActivatedSync(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2170,7 +2105,6 @@ class TestUserInvitationWithMailActivatedSync(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2227,7 +2161,6 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2324,7 +2257,6 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2365,7 +2297,6 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2403,7 +2334,6 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2444,7 +2374,6 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2476,7 +2405,6 @@ class TestUserInvitationWithMailActivatedASync(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }

@@ -46,7 +46,6 @@ RUN \
     libpq-dev \
     libreoffice \
     locales \
-    mysql-client \
     poppler-utils \
     postgresql-client \
     python3 \
@@ -64,7 +63,7 @@ RUN \
     xvfb \
     zlib1g-dev \
 # Install nodejs
-    && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
     && apt update \
     && apt install -qy nodejs \
 # Clone repo
@@ -81,7 +80,7 @@ RUN \
     && python3 -m pip install -r requirements.txt \
     && python3 -m pip install -e ".[postgresql]" \
     && python3 -m pip install -e ".[mysql]" \
-    && npm install i18next-conv -g \
+    && npm install "i18next-conv@<8" -g \
     && ./update_i18n_json_file.sh \
     && cd ../../ \
 # Move some file

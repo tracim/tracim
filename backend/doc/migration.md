@@ -14,17 +14,23 @@ and activate the Tracim virtualenv:
 
 ## Migration How-To - Overview ##
 
-### Upgrading the Schema to the Last Revision ###
+### Upgrading the Database to the Last Revision ###
 
     alembic -c development.ini upgrade head
 
-### Downgrading the Schema ###
+### Downgrading the Database ###
+
+To the previous version:
 
     alembic -c development.ini downgrade -1
 
+To a specific database revision:
+
+    alembic -c development.ini downgrade <database_revision>
+
 ## Migration How-To - Advanced (for Developers) ##
 
-### Retrieving the Current Version of the Schema ###
+### Retrieving the Current Version of the Database ###
 
     alembic -c development.ini current
 
@@ -32,7 +38,7 @@ and activate the Tracim virtualenv:
 
     alembic -c development.ini stamp head
 
-### Creating a New Schema Migration ###
+### Creating a New Database Migration (Revision) ###
 
 This creates a new auto-generated python migration file:
 

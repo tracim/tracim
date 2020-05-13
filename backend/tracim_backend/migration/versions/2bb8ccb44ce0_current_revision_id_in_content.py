@@ -33,9 +33,6 @@ def upgrade():
     connection = op.get_bind()
 
     connection.execute(filling_current_revision_query)
-    with op.batch_alter_table("content") as batch_op:
-        batch_op.alter_column("cached_revision_id", existing_type=sa.Integer(), nullable=False)
-
     # ### end Alembic commands ###
 
 

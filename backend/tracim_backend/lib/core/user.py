@@ -32,6 +32,7 @@ from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidUsernameFormat
+from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
@@ -59,7 +60,6 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
-from tracim_backend.models.context_models import TypeUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 
@@ -143,16 +143,6 @@ class UserApi(object):
             ) from exc
         return user
 
-    def get_one_by_public_name(self, public_name: str) -> User:
-        """
-        Get one user by public_name
-        """
-        try:
-            user = self._base_query().filter(User.display_name == public_name).one()
-        except NoResultFound as exc:
-            raise UserDoesNotExist('User "{}" not found in database'.format(public_name)) from exc
-        return user
-
     # FIXME - G.M - 24-04-2018 - Duplicate method with get_one.
 
     def get_one_by_id(self, id: int) -> User:
@@ -181,7 +171,7 @@ class UserApi(object):
         filter_results: bool = True,
     ) -> typing.Iterable[User]:
         """
-        Return list of know user by current UserApi user.
+        Return list of known user by current UserApi user.
         :param acp: autocomplete filter by name/email
         :param exclude_user_ids: user id to exclude from result
         :param exclude_workspace_ids: workspace user to exclude from result
@@ -236,49 +226,41 @@ class UserApi(object):
         query = query.limit(nb_elem)
         return query.all()
 
-    def find(
+    def get(
         self,
-        user_id: typing.Optional[int] = None,
-        email: typing.Optional[str] = None,
-        public_name: typing.Optional[str] = None,
-        token: typing.Optional[str] = None,
+        user_id: int = None,
+        token: str = None,
+        email: str = None,
         username: typing.Optional[str] = None,
-    ) -> typing.Tuple[TypeUser, User]:
+    ) -> User:
         """
-        Find existing user from all theses params.
-        Check is made in this order: user_id, email, public_name, username
-        If no user found raise UserDoesNotExist exception
+        Get an existing user by:
+         - their id, or
+         - authentication token, or
+         - email, or
+         - sername
+        in this order.
+        If no user is found by any of these parameters, exception UserDoesNotExist will be raised
         """
-        user = None
 
         if user_id:
             try:
-                user = self.get_one(user_id)
-                return TypeUser.USER_ID, user
+                return self.get_one(user_id)
             except UserDoesNotExist:
                 pass
         if token:
             try:
-                user = self.get_one_by_token(token)
-                return TypeUser.TOKEN, user
+                return self.get_one_by_token(token)
             except UserDoesNotExist:
                 pass
         if email:
             try:
-                user = self.get_one_by_email(email)
-                return TypeUser.EMAIL, user
-            except UserDoesNotExist:
-                pass
-        if public_name:
-            try:
-                user = self.get_one_by_public_name(public_name)
-                return TypeUser.PUBLIC_NAME, user
+                return self.get_one_by_email(email)
             except UserDoesNotExist:
                 pass
         if username:
             try:
-                user = self.get_one_by_username(username)
-                return TypeUser.USER_NAME, user
+                return self.get_one_by_username(username)
             except UserDoesNotExist:
                 pass
 
@@ -928,10 +910,15 @@ class UserApi(object):
         """
         self._check_user_auth_validity(user)
         self._check_password_modification_allowed(user)
+
+        if not user.email:
+            raise MissingEmailCantResetPassword("Can't reset password without an email address")
+
         if not self._config.EMAIL__NOTIFICATION__ACTIVATED:
             raise NotificationDisabledCantResetPassword(
-                "cant reset password with notification disabled"
+                "Can't reset password with notification disabled"
             )
+
         token = user.generate_reset_password_token()
         try:
             email_manager = get_email_manager(self._config, self._session)
