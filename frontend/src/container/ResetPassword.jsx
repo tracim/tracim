@@ -17,7 +17,7 @@ import {
   resetBreadcrumbs,
   setConfig
 } from '../action-creator.sync.js'
-import { PAGE } from '../helper.js'
+import { PAGE } from '../util/helper.js'
 import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 const qs = require('query-string')

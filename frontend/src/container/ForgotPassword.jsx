@@ -13,7 +13,7 @@ import {
   resetBreadcrumbs,
   setConfig
 } from '../action-creator.sync.js'
-import { PAGE } from '../helper.js'
+import { PAGE } from '../util/helper.js'
 import { CUSTOM_EVENT, buildHeadTitle } from 'tracim_frontend_lib'
 
 export class ForgotPassword extends React.Component {

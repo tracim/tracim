@@ -5,14 +5,14 @@ import { FlashMessage as FlashMessageWithoutHOC } from '../../../src/component/F
 import sinon from 'sinon'
 
 describe('<FlashMessage />', () => {
-  const removeFlashMessageCallBack = sinon.spy()
+  const onRemoveFlashMessageCallBack = sinon.spy()
 
   const props = {
     flashMessage: [{
       message: 'randomMessage',
       type: 'info'
     }],
-    removeFlashMessage: removeFlashMessageCallBack
+    onRemoveFlashMessage: onRemoveFlashMessageCallBack
   }
 
   const wrapper = shallow(<FlashMessageWithoutHOC {...props} t={key => key} />)
@@ -30,9 +30,9 @@ describe('<FlashMessage />', () => {
   })
 
   describe('handler', () => {
-    it('removeFlashMessageCallBack should be called when the close button is clicked', () => {
+    it('onRemoveFlashMessageCallBack should be called when the close button is clicked', () => {
       wrapper.find('div.flashmessage__container__close__icon').simulate('click')
-      expect(removeFlashMessageCallBack.called).to.equal(true)
+      expect(onRemoveFlashMessageCallBack.called).to.equal(true)
     })
   })
 })
