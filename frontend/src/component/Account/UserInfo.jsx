@@ -1,6 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { getUserProfile } from '../../helper.js'
+import { getUserProfile } from '../../util/helper.js'
 import { Avatar } from 'tracim_frontend_lib'
 
 require('./UserInfo.styl')

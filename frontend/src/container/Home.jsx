@@ -2,10 +2,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
-import appFactory from '../appFactory.js'
+import appFactory from '../util/appFactory.js'
 import {
   workspaceConfig
-} from '../helper.js'
+} from '../util/helper.js'
 import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'

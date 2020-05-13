@@ -92,6 +92,7 @@
   },
   "standard": {
     "globals": [
+      "$",
       "fetch",
       "btoa",
       "history",
@@ -103,7 +104,8 @@
       "GLOBAL_primaryColor",
       "FormData",
       "XMLHttpRequest",
-      "Image"
+      "Image",
+      "globalThis"
     ],
     "parser": "babel-eslint",
     "ignore": []

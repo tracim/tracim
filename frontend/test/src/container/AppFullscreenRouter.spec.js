@@ -5,7 +5,7 @@ import { AppFullscreenRouter as AppFullscreenRouterWithoutHOC } from '../../../s
 import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user'
 import { MemoryRouter } from 'react-router'
-import { PAGE } from '../../../src/helper'
+import { PAGE } from '../../../src/util/helper.js'
 import { ROLE } from 'tracim_frontend_lib'
 
 describe('<AppFullscreenRouter />', () => {
@@ -40,9 +40,9 @@ describe('<AppFullscreenRouter />', () => {
     it('should not render any app', () => {
       // INFO - GM - 2020/03/30 - In order to set props to children when mounting a element, we need to set props too root
       // See: https://github.com/enzymejs/enzyme/issues/1925#issuecomment-445490387
-      wrapper.setProps({ children: (<ComponentWithHOC {...props} user={{...user, logged: false}} /> )})
+      wrapper.setProps({ children: <ComponentWithHOC {...props} user={{ ...user, logged: false }} /> })
       expect(wrapper.find('.AppFullScreenManager').length).equal(0)
-      wrapper.setProps({ children: (<ComponentWithHOC {...props} /> )})
+      wrapper.setProps({ children: <ComponentWithHOC {...props} /> })
     })
   })
 

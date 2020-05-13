@@ -36,7 +36,7 @@ import {
 import {
   editableUserAuthTypeList,
   PAGE
-} from '../helper.js'
+} from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 export class Account extends React.Component {

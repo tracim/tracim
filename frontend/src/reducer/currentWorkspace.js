@@ -1,5 +1,6 @@
 import {
   SET,
+  ADD,
   APPEND,
   REMOVE,
   WORKSPACE_DETAIL,
@@ -59,6 +60,21 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           isActive: m.is_active,
           doNotify: m.do_notify
         }))
+      }
+
+    case `${ADD}/${WORKSPACE_MEMBER}`:
+      return {
+        ...state,
+        memberList: [
+          ...state.memberList,
+          {
+            id: action.member.user.user_id,
+            publicName: action.member.user.public_name,
+            role: action.member.role,
+            isActive: action.member.user.is_active,
+            doNotify: action.member.user.do_notify
+          }
+        ]
       }
 
     case `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
