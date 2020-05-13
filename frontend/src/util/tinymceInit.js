@@ -44,8 +44,9 @@ import i18n from './i18n.js'
       return parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
     }
 
-    // TODO - GM - 2020/05/07 - find a better way to handle language support in order to make it more generic see: https://github.com/tracim/tracim/issues/3011
-    getTinyMceLang = (lang) => {
+    // TODO - GM - 2020/05/07 - find a better way to handle language support in order to make it more generic
+    // see: https://github.com/tracim/tracim/issues/3011
+    const getTinyMceLang = (lang) => {
       switch (lang) {
         case 'fr':
           return 'fr_FR'

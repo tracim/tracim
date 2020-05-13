@@ -8,12 +8,12 @@ export const LIVE_MESSAGE_STATUS = {
 }
 
 export class LiveMessageManager {
-  constructor() {
+  constructor () {
     this.status = LIVE_MESSAGE_STATUS.CLOSE
   }
 
   openLiveMessageConnection () {
-    if (this.status !== LIVE_MESSAGE_STATUS.OPEN) {
+    if (this.status !== LIVE_MESSAGE_STATUS.CLOSE) {
       console.error('LiveMessage already connected.')
       return false
     }
@@ -22,7 +22,8 @@ export class LiveMessageManager {
       setTimeout(() => {
         console.log('resolving openLiveMessageConnection')
 
-        this.mockRandomLiveEvents()
+        // INFO - CH - 2020-05-13 - commenting this line used for debug and test POC
+        // this.mockRandomLiveEvents()
 
         this.status = LIVE_MESSAGE_STATUS.OPEN
 
@@ -59,10 +60,10 @@ export class LiveMessageManager {
           username: 'jdoe',
           public_name: 'John Doe',
           is_active: true,
-          is_deleted: false,
+          is_deleted: false
         },
         workspace: {
-          workspace_id:  42,
+          workspace_id: 42,
           label: 'Un truc sympa',
           is_deleted: false
         },
@@ -77,6 +78,7 @@ export class LiveMessageManager {
       })
     }, 5000)
 
+    // INFO - CH - 2020-05-13 - commenting this line used for debug and test POC
     // globalThis.setInterval(() => {
     //   const rdm = Math.floor(Math.random() * 100)
     //   if (rdm % 2 === 0) {
