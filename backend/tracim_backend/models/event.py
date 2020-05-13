@@ -102,7 +102,7 @@ class Message(DeclarativeBase):
 
     __tablename__ = "messages"
 
-    receiver_id = Column(Integer, ForeignKey("users.user_id"), primary_key=True)
+    receiver_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True)
     event_id = Column(Integer, ForeignKey("events.event_id"), primary_key=True)
     sent = Column(DateTime)
     read = Column(DateTime)
