@@ -15,6 +15,7 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
@@ -74,11 +75,14 @@ class EventBuilder:
     def __init__(self, config: CFG) -> None:
         self._config = config
         self._current_user = None  # type: typing.Optional[User]
-        event.listen(TracimSession, "pending_to_persistent", self._publish_event)
 
     @hookimpl
     def on_current_user_set(self, user: User) -> None:
         self._current_user = user
+
+    @hookimpl
+    def on_request_session_created(self, request: TracimRequest, session: TracimSession) -> None:
+        event.listen(session, "pending_to_persistent", self._publish_event)
 
     @hookimpl
     def on_request_finished(self) -> None:
@@ -256,7 +260,7 @@ class LiveMessageBuilder:
         # The author is not notified of the change (?)
         try:
             receiver_ids -= set([event.author["user_id"]])
-        except AttributeError:
+        except (AttributeError, KeyError):
             # No author
             pass
 
@@ -268,15 +272,16 @@ class LiveMessageBuilder:
 
     @classmethod
     def _get_user_event_receiver_ids(cls, event: Event) -> typing.Set[int]:
-        user_api = UserApi(None, session=cls._session(), config=cls._config())
+        user_api = UserApi(current_user=None, session=cls._session(), config=cls._config())
         receiver_ids = set(user_api.get_user_ids_from_profile(Profile.ADMIN))
-        receiver_ids.add(event.user["user_id"])
+        if event.user:
+            receiver_ids.add(event.user["user_id"])
         return receiver_ids
 
     @classmethod
     def _get_workspace_event_receiver_ids(cls, event: Event) -> typing.Set[int]:
-        user_api = UserApi(None, session=cls._session(), config=cls._config())
+        user_api = UserApi(current_user=None, session=cls._session(), config=cls._config())
         administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
-        role_api = RoleApi(None, session=cls._session(), config=cls._config())
+        role_api = RoleApi(current_user=None, session=cls._session(), config=cls._config())
         workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
         return set(administrators).union(set(workspace_members))

@@ -84,6 +84,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_config = CFG(settings)
     app_config.configure_filedepot()
     settings["CFG"] = app_config
+
+    # Init plugin manager
     plugin_manager = init_plugin_manager(app_config)
     plugin_manager.register(EventBuilder(app_config))
     settings["plugin_manager"] = plugin_manager

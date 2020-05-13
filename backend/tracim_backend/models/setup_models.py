@@ -99,6 +99,7 @@ def get_tm_session(session_factory, transaction_manager) -> Session:
 def _create_dbsession(session_factory, request) -> Session:
     dbsession = get_tm_session(session_factory, request.tm)
     dbsession.info["crud_hook_caller"] = DatabaseCrudHookCaller(dbsession, request.plugin_manager)
+    request.plugin_manager.hook.on_request_session_created(request=request, session=dbsession)
     return dbsession
 
 

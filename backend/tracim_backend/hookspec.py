@@ -10,6 +10,7 @@ from tracim_backend.config import CFG
 from tracim_backend.lib.core.plugins import hookspec
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import User
+from tracim_backend.models.tracim_session import TracimSession
 
 
 class TracimRequestHookSpec:
@@ -22,6 +23,13 @@ class TracimRequestHookSpec:
 
         :param user: current user
         :param request: current request
+        """
+        pass
+
+    @hookspec
+    def on_request_session_created(self, request: TracimRequest, session: TracimSession) -> None:
+        """
+        Called when the request has been initialized.
         """
         pass
 
