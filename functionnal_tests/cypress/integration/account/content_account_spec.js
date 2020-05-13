@@ -1,7 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import baseUser from '../../fixtures/baseUser.json'
-import defaultAdmin from '../../fixtures/defaultAdmin.json'
 
 describe('Account page', () => {
   beforeEach(() => {
@@ -13,7 +12,7 @@ describe('Account page', () => {
   })
 
   describe('Account header', () => {
-    it('Title and userpreference should be visible', () => {
+    it('should have the title and user preferences visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('.account__title')
         .should('be.visible')
@@ -21,7 +20,7 @@ describe('Account page', () => {
         .find('.account__userpreference')
         .should('be.visible')
     })
-    it('User info should be visible', () => {
+    it('should have User info visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=userinfo]')
         .should('be.visible')
@@ -40,7 +39,7 @@ describe('Account page', () => {
   })
 
   describe('Account Preferences', () => {
-    it('Menu should be visible', () => {
+    it('should have Menu visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('.menusubcomponent__list')
         .should('be.visible')
@@ -54,7 +53,7 @@ describe('Account page', () => {
         .find('[data-cy=menusubcomponent__list__agenda]')
         .should('be.visible')
     })
-    it('Profile fields should be visible', () => {
+    it('should have profile field visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
         .click()
@@ -89,7 +88,7 @@ describe('Account page', () => {
         .find('.personaldata__form .personaldata__form__button')
         .should('have.attr', 'type', 'button')
     })
-    it('Password fields should be visible', () => {
+    it('should have password field visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=menusubcomponent__list__password] > .menusubcomponent__list__item__link')
         .click()
@@ -121,7 +120,7 @@ describe('Account page', () => {
         .find('.mr-5 .personaldata__form__button')
         .should('have.attr', 'type', 'button')
     })
-    it('Agenda field should be visible', () => {
+    it('should have agenda field visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=menusubcomponent__list__agenda]')
         .click()
@@ -201,9 +200,6 @@ describe('Account page', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=personaldata__form__txtinput__username]')
           .type(baseUser.username)
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.personaldata__form__txtinput.checkPassword')
-          .type(defaultAdmin.password)
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('.fa-exclamation-triangle.personaldata__form__txtinput__info__icon')
           .should('be.visible')
