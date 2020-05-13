@@ -5,10 +5,7 @@
 ### Fixed Issues
 
 - UX: #3026
-
-### Other change
-
-- Adds a log when an HTTP request is made by an authenticated user
+- Backend: #3043
 
 
 ## 2.7.3 / 2020-05-07
@@ -22,7 +19,7 @@
 
 ### Fixed Issues
 
-- backend: #2962
+- Backend: #2962
 
 ### Breaking/Important change
 
@@ -33,7 +30,7 @@
 
 ### Fixed Issues
 
-- backend: #2920
+- Backend: #2920
 
 
 ## 2.7.0 / 2020-04-24
