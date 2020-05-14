@@ -269,13 +269,6 @@ class LiveMessageBuilder:
         elif event.entity_type == EntityType.WORKSPACE_USER_ROLE:
             receiver_ids = cls._get_user_event_receiver_ids(event)
 
-        # The author is not notified of the change (?)
-        try:
-            receiver_ids -= set([event.author["user_id"]])
-        except (AttributeError, KeyError):
-            # No author
-            pass
-
         messages = [
             Message(receiver_id=receiver_id, event_id=event.event_id, sent=datetime.utcnow())
             for receiver_id in receiver_ids
