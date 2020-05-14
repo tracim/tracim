@@ -104,7 +104,6 @@
   "Please refer to an administrator or a trusted user": "Consulte um administrador ou um utilizador confiável",
   "Please select a shared space in the left sidebar by clicking on it": "Escolha um espaço partilhado na barra lateral esquerda clicando nele",
   "Forgot password": "Palavra-passe esquecida",
-  "Email": "E-mail",
   "Reset password": "Reiniciar a palavra-passe",
   "Confirm password": "Confirmar a palavra-passe",
   "Confirm": "Confirmar",
@@ -119,7 +118,6 @@
   "This account is deactivated": "Esta conta foi desativada",
   "Error while adding the member to the shared space": "Erro ao acrescentar um membro ao espaço partilhado",
   "Unexpected error, please inform an administrator": "Erro inesperado, informe um administrador",
-  "Unknown email": "E-mail desconhecido",
   "Cannot reset password while email are disabled, please contact an administrator": "Não é possível reiniciar palavra-passe enquanto o e-mail está desativado, contacte um administrador",
   "Not a valid email": "E-mail inválido",
   "An error has happened": "Ocorreu um erro",
@@ -245,8 +243,10 @@
   "Have a good day!": "Tenha um bom dia!",
   "Archived Topic": "Tópico arquivado",
   "Search…": "Pesquisar...",
+  "Unknown email or username": "E-mail ou identificador desconhecido",
   "@username": "@identificador",
   "Invalid email or username": "E-mail ou identificador inválido",
   "Email address or username": "E-mail ou identificador",
+  "This username is not linked to any email, please contact an administrator to reset your password": "Este identificador não está ligado a nenhum e-mail, por favor contacte um administrador para redefinir a sua palavra-passe",
   "Invalid credentials": "Credenciais inválidas"
 }
