@@ -4,18 +4,9 @@ import defaultAdmin from '../../fixtures/defaultAdmin.json'
 import baseUser from '../../fixtures/baseUser.json'
 
 describe("An admin seeing a user's profile", () => {
-  let existingUsername
-
-  before(function () {
+  beforeEach(() => {
     cy.resetDB()
     cy.setupBaseDB()
-    cy.loginAs('administrators')
-    cy.createRandomUser().then(user => {
-      existingUsername = user.username
-    })
-  })
-
-  beforeEach(() => {
     cy.loginAs('administrators')
     cy.visitPage({ pageName: PAGES.ADMIN_USER, params: { userId: baseUser.user_id } })
   })
@@ -33,6 +24,7 @@ describe("An admin seeing a user's profile", () => {
         .find('.account__userpreference')
         .should('be.visible')
     })
+
     it('User info should be visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=userinfo]')
@@ -50,6 +42,7 @@ describe("An admin seeing a user's profile", () => {
         .should('be.visible')
     })
   })
+
   describe('Changing his account preferences', () => {
     describe('Change full name', () => {
       it('should update the header with the new full name', () => {
@@ -68,6 +61,7 @@ describe("An admin seeing a user's profile", () => {
           .contains(newFullName)
       })
     })
+
     describe('Change email', () => {
       it('should update the header with the new email', () => {
         const newRandomEmail = 'newrandomemail@random.fr'
@@ -91,24 +85,8 @@ describe("An admin seeing a user's profile", () => {
           .contains(newRandomEmail)
       })
     })
+
     describe('Change username', () => {
-      it('should show a warning when the username is not available', () => {
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
-          .click()
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('[data-cy=personaldata__form__txtinput__username]')
-          .type(existingUsername)
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.fa-exclamation-triangle.personaldata__form__txtinput__info__icon')
-          .should('be.visible')
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.personaldata__form__txtinput__msgerror')
-          .should('be.visible')
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.personaldata__form__button')
-          .should('be.disabled')
-      })
       it('should update the header with the new username', () => {
         const newUserName = 'newRandomUserName'
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
@@ -129,6 +107,19 @@ describe("An admin seeing a user's profile", () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=userinfo__username]')
           .contains(newUserName)
+      })
+
+      it('should show a warning when the username is not available', () => {
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+          .click()
+        cy.get('[data-cy=personaldata__form__txtinput__username]')
+          .type(baseUser.username)
+        cy.get('.personaldata__form__txtinput__msgerror')
+          .should('be.visible')
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__button')
+          .should('be.disabled')
       })
     })
   })
