@@ -2,6 +2,7 @@ from datetime import datetime
 import typing
 
 from sqlalchemy import event
+from sqlalchemy import inspect
 from sqlalchemy import null
 from sqlalchemy.orm import joinedload
 
@@ -95,7 +96,7 @@ class EventBuilder:
 
     @hookimpl
     def on_user_modified(self, user: User, db_session: TracimSession) -> None:
-        if user.is_deleted:
+        if self._has_just_been_deleted(user):
             self._create_user_event(OperationType.DELETED, user, db_session)
         else:
             self._create_user_event(OperationType.MODIFIED, user, db_session)
@@ -117,7 +118,7 @@ class EventBuilder:
 
     @hookimpl
     def on_workspace_modified(self, workspace: Workspace, db_session: TracimSession) -> None:
-        if workspace.is_deleted:
+        if self._has_just_been_deleted(workspace):
             self._create_workspace_event(OperationType.DELETED, workspace, db_session)
         else:
             self._create_workspace_event(OperationType.MODIFIED, workspace, db_session)
@@ -141,7 +142,7 @@ class EventBuilder:
 
     @hookimpl
     def on_content_modified(self, content: Content, db_session: TracimSession) -> None:
-        if content.is_deleted:
+        if self._has_just_been_deleted(content):
             self._create_content_event(OperationType.DELETED, content, db_session)
         else:
             self._create_content_event(OperationType.MODIFIED, content, db_session)
@@ -220,6 +221,13 @@ class EventBuilder:
             LiveMessageBuilder.publish_messages_for_event, self._event_schema.dump(event).data,
         )
 
+    def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, Content]) -> bool:
+        """Check that an object has been deleted since it has been queried from database."""
+        if obj.is_deleted:
+            history = inspect(obj).attrs.is_deleted.history
+            return history.has_changes()
+        return False
+
 
 class LiveMessageBuilder:
 
@@ -284,4 +292,4 @@ class LiveMessageBuilder:
         administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
         role_api = RoleApi(current_user=None, session=cls._session(), config=cls._config())
         workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
-        return set(administrators).union(set(workspace_members))
+        return set(administrators + workspace_members)
