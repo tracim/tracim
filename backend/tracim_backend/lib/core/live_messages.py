@@ -5,6 +5,10 @@ from gripcontrol import GripPubControl
 
 from tracim_backend import CFG
 
+# TODO - G.M - 2020-05-14 - Use default event "message" for TLM to be usable with
+# "onmessage" EventSource Object in javascript.
+TLM_EVENT_NAME = "message"
+
 
 class ServerSideEvent(object):
     """Create a ServerSideEvent String Like"""
@@ -38,5 +42,5 @@ class LiveMessagesLib(object):
         # todo - G.M - 07-05-2020 - Message should be a specific type, not dict
         message = json.dumps(message)
         self.grip_pub_control.publish_http_stream(
-            channel_name, str(ServerSideEvent(data=[message], event="TLM"))
+            channel_name, str(ServerSideEvent(data=[message], event=TLM_EVENT_NAME))
         )

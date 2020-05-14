@@ -58,4 +58,4 @@ class TestLivesMessages(object):
             break
         response.close()
         assert json.loads(event1.data) == {"test_message": "example"}
-        assert event1.event == "TLM"
+        assert event1.event == "message"
