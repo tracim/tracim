@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Live messages/events related model.
+"""Live messages/events related models."""
 
-It's perfectly fine to re-use this definition in the tracim application,
-though.
-"""
 from datetime import datetime
 import enum
 import typing
