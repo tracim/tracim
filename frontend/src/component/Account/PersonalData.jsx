@@ -3,7 +3,10 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { editableUserAuthTypeList } from '../../helper.js'
+import {
+  ALLOWED_CHARACTERS_USERNAME,
+  editableUserAuthTypeList
+} from '../../helper.js'
 
 require('./PersonalData.styl')
 
@@ -75,7 +78,7 @@ export class PersonalData extends React.Component {
               className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-3 mt-sm-0'
               type='text'
               data-cy='personaldata__form__txtinput__username'
-              placeholder={props.t('@username')}
+              placeholder={props.t('New @username')}
               value={state.newUsername}
               onChange={this.handleChangeUserName}
             />
@@ -85,6 +88,11 @@ export class PersonalData extends React.Component {
                 {props.t('This username is not available')}
               </div>
             )}
+            {state.newUsername !== '' && props.newUsernameAvailability && (
+            <div className='personaldata__form__txtinput__msginfo'>
+              {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
+            </div>
+          )}
           </div>
 
           {state.newUsername !== '' && (
@@ -108,7 +116,7 @@ export class PersonalData extends React.Component {
           )}
 
           {(state.newEmail !== '' || state.newUsername !== '') && (
-            <div className='d-flex align-items-center flex-wrap mb-4'>
+            <div className='align-items-center flex-wrap mb-4'>
               <input
                 className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
                 type='password'

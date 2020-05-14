@@ -1,3 +1,5 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
 .personaldata
   &__text
     margin 15px 0
@@ -19,14 +21,17 @@
       &.withAdminMsg
         margin-right 20px
       &__info
-        margin-left 15px
+        margin 5px
         &__icon
-          margin-right 8px
+          margin-right 5px
       &__msgerror
         margin-left 15px
-        color #dc3545
+        color errorRed
         &__icon
-          margin-right 6px
+          margin-right 5px
+      &__msginfo
+        margin-left 15px
+        color grey
     &__button
       vertical-align top
       border-width 1px

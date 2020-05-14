@@ -38,6 +38,7 @@ import {
   getUsernameAvailability
 } from '../action-creator.async.js'
 import {
+  ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList,
   PAGE,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
@@ -211,13 +212,26 @@ export class Account extends React.Component {
       const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, checkPassword))
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(updateUserUsername(newUsername))
+          props.dispatch(updateUserUsername(username))
           if (newEmail === '') {
             if (newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your username and your name has been changed'), 'info'))
             else props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
             return true
           }
           break
+        case 400:
+          switch (fetchPutUsername.json.code) {
+            case 2062:
+              props.dispatch(newFlashMessage(
+                props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+              , 'warning'))
+              break
+            default: props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning'))
+          }
+          return false
+        case 403:
+          props.dispatch(newFlashMessage(props.t('Invalid password'), 'warning'))
+          return false
         default: props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning')); return false
       }
     }
