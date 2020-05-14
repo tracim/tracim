@@ -135,7 +135,7 @@ export const postUserLogin = (credentials, rememberMe) => async dispatch => {
   })
 }
 
-export const postForgotPassword = email => async dispatch => {
+export const postForgotPassword = login => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/request`,
     param: {
@@ -143,7 +143,7 @@ export const postForgotPassword = email => async dispatch => {
       headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
-        email: email
+        ...login
       })
     },
     actionName: USER_REQUEST_PASSWORD,

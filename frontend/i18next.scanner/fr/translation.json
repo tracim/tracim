@@ -107,7 +107,6 @@
   "Please select a shared space in the left sidebar by clicking on it": "Veuillez sélectionner un espace partagé présent dans la barre latérale en cliquant dessus",
   "Forgot password": "Mot de passe oublié",
   "Did you forget your password?": "Vous avez oublié votre mot de passe ?",
-  "Email": "Email",
   "Reset password": "Réinitialisez votre mot de passe",
   "Confirm password": "Confirmez le mot de passe",
   "Confirm": "Valider",
@@ -122,7 +121,6 @@
   "This account is deactivated": "Ce compte est désactivé",
   "Error while adding the member to the shared space": "Erreur lors de l'ajout du membre à l'espace partagé",
   "Unexpected error, please inform an administrator": "Erreur inattendue, veuillez contacter un administrateur",
-  "Unknown email": "Email inconnu",
   "Cannot reset password while email are disabled, please contact an administrator": "Impossible de réinitialiser votre mot de passe si les emails sont désactivés, veuillez contacter un administrateur",
   "Not a valid email": "Email invalide",
   "An error has happened": "Une erreur est survenue",
@@ -254,5 +252,7 @@
   "Invalid email or username": "Adresse email ou identifiant invalide",
   "Email address or username": "Adresse email ou identifiant",
   "Invalid credentials": "Identifiants invalide",
-  "Please type your password in order to change your email and/or username. (For security reasons)": "Veuillez saisir votre mot de passe afin de changer votre email et/ou votre identifiant. (Pour des raisons de sécurité)"
+  "Please type your password in order to change your email and/or username. (For security reasons)": "Veuillez saisir votre mot de passe afin de changer votre email et/ou votre identifiant. (Pour des raisons de sécurité)",
+  "Unknown email or username": "Adresse email ou identifiant inconnu",
+  "This username is not linked to any email, please contact an administrator to reset your password": "Ce identifiant n'est lié à aucun e-mail, veuillez contacter un administrateur pour réinitialiser votre mot de passe"
 }

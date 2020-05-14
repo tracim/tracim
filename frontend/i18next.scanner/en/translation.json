@@ -105,7 +105,6 @@
   "Please select a shared space in the left sidebar by clicking on it": "Please select a shared space in the left sidebar by clicking on it",
   "Forgot password": "Forgot password",
   "Did you forget your password?": "Did you forget your password?",
-  "Email": "Email",
   "Reset password": "Reset password",
   "Confirm password": "Confirm password",
   "Confirm": "Confirm",
@@ -120,7 +119,6 @@
   "This account is deactivated": "This account is deactivated",
   "Error while adding the member to the shared space": "Error while adding the member to the shared space",
   "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator",
-  "Unknown email": "Unknown email",
   "Cannot reset password while email are disabled, please contact an administrator": "Cannot reset password while email are disabled, please contact an administrator",
   "Not a valid email": "Not a valid email",
   "An error has happened": "An error has happened",
@@ -254,5 +252,7 @@
   "Invalid email or username": "Invalid email or username",
   "Email address or username": "Email address or username",
   "Invalid credentials": "Invalid credentials",
-  "Please type your password in order to change your email and/or username. (For security reasons)": "Please type your password in order to change your email and/or username. (For security reasons)"
+  "Please type your password in order to change your email and/or username. (For security reasons)": "Please type your password in order to change your email and/or username. (For security reasons)",
+  "Unknown email or username": "Unknown email or username",
+  "This username is not linked to any email, please contact an administrator to reset your password": "This username is not linked to any email, please contact an administrator to reset your password"
 }
