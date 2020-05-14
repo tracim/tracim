@@ -3,13 +3,10 @@ import { PAGES as p } from '../../support/urls_commands'
 
 describe('Login after a disconnection ', function () {
   const login = 'admin@admin.admin'
+  const public_name = 'test'
   const username = 'test'
   const email = 'test@test.test'
   const pwd = 'testPwd'
-
-  afterEach(function () {
-    cy.cancelXHR()
-  })
 
   before(() => {
     cy.resetDB()
@@ -39,12 +36,17 @@ describe('Login after a disconnection ', function () {
       .find('[data-cy=adminlink__user__link]')
       .click()
 
+
     cy.getTag({ selectorName: s.ADMIN_USER_PAGE })
       .find('.adminUser__adduser__button')
       .click()
 
     cy.getTag({ selectorName: s.ADMIN_USER_PAGE })
       .find('[data-cy=adduser_name]')
+      .type(public_name)
+
+    cy.getTag({ selectorName: s.ADMIN_USER_PAGE })
+      .find('[data-cy=adduser_username]')
       .type(username)
 
     cy.getTag({ selectorName: s.ADMIN_USER_PAGE })
@@ -69,6 +71,7 @@ describe('Login after a disconnection ', function () {
     cy.get('[data-cy=adminUser__adduser__form]')
       .should('not.exist')
 
+    cy.contains(public_name)
     cy.contains(username)
     cy.contains(email)
   })

@@ -48,12 +48,32 @@
       border 1px solid grey
       border-radius 5px
       padding 20px
-      &__username
-        .username
+      &__userData
+        .userData
           &__text
             font-weight bold
           &__input
             margin-bottom 10px
+            &__username
+              &__errorMsg
+                margin-bottom 10px
+                color #dc3545
+              &__errorIcon
+                margin-right 5px
+          &__info
+            color grey
+            &__icon
+              margin 0 5px
+          &__email
+            &__info
+              background-color transparent
+              border none
+              color grey
+              cursor pointer
+              &:focus
+                box-shadow 0 0 0 0
+                border 0 none
+                outline 0
       &__profile
         .profile
           &__text
