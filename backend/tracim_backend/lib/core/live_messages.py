@@ -38,7 +38,7 @@ class LiveMessagesLib(object):
         self.control_uri = config.LIVE_MESSAGES__CONTROL_URI
         self.grip_pub_control = GripPubControl({"control_uri": self.control_uri})
 
-    def publish_live_message(self, channel_name: str, message: typing.Dict[str, typing.Any]):
+    def publish_dict(self, channel_name: str, message: typing.Dict[str, typing.Any]):
         # todo - G.M - 07-05-2020 - Message should be a specific type, not dict
         message = json.dumps(message)
         self.grip_pub_control.publish_http_stream(

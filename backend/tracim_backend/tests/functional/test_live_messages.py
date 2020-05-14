@@ -49,9 +49,7 @@ class TestLivesMessages(object):
             headers=headers,
         )
         client = sseclient.SSEClient(response)
-        LiveMessagesLib(config=app_config).publish_live_message(
-            "user_1", {"test_message": "example"}
-        )
+        LiveMessagesLib(config=app_config).publish_dict("user_1", {"test_message": "example"})
         for event in client.events():
             event1 = event
             # INFO - GM - 2020-05-12  we skip the live message stream after receiving the first message

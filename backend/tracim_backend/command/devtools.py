@@ -181,7 +181,5 @@ class LiveMessageTesterCommand(AppContextCommand):
             "event_id": -1,
             "event_type": "test",
         }
-        live_messages_lib.publish_live_message(
-            "user_{}".format(parsed_args.user_id), message=test_message
-        )
+        live_messages_lib.publish_dict("user_{}".format(parsed_args.user_id), message=test_message)
         print("test message (id=-1) send to user {}".format(parsed_args.user_id))
