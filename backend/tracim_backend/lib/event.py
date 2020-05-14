@@ -62,6 +62,8 @@ class EventApi:
             query = query.filter(Message.read != null())
         elif read_status == ReadStatus.UNREAD:
             query = query.filter(Message.read == null())
+        # ALL doesn't need any filtering an is the only other handled case
+        assert read_status == ReadStatus.ALL
         return query.all()
 
 
