@@ -17,6 +17,8 @@ basic_setup.website_base_url = http://localhost:7998
 live_messages.control_uri = http://localhost:5571
 ~~~
 
+:warning:  Temporary, you also need to ensure "email.processing_mode" parameter is unset or set to "sync".
+
 ## Run tracim with Pushpin (dev)
 
 First Run tracim :
