@@ -242,7 +242,7 @@
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Le nom complet doit comporter au moins {{minimumCharactersPublicName}} caractères",
   "Public upload": "Téléversement publique",
   "Password reset": "Réinitialisation mot de passe",
-  "When changed, the old username and everything linked to it will be lost.": "En le changeant, l'ancien nom d'utilisateur et tout ce qui y est lié sera perdu",
+  "Changing your username will not update the mentions using your current username.": "Le changement de votre identifiant ne mettra pas à jour les mentions en utilisant votre identifiant actuel.",
   "Your personal data has been changed": "Vos données personnelles ont été modifiées",
   "Your username and your name has been changed": "Votre identifiant et votre nom a été changé",
   "Your username has been changed": "Votre identifiant a été changé",

@@ -241,7 +241,7 @@
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Find all your documents put online directly on your computer via the workstation, without going through the software.",
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Full name must be at least {{minimumCharactersPublicName}} characters",
   "Archived Topic": "Archived Topic",
-  "When changed, the old username and everything linked to it will be lost.": "When changed, the old username and everything linked to it will be lost.",
+  "Changing your username will not update the mentions using your current username.": "Changing your username will not update the mentions using your current username.",
   "Your personal data has been changed": "Your personal data has been changed",
   "Your username and your name has been changed": "Your username and your name has been changed",
   "Your username has been changed": "Your username has been changed",

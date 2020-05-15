@@ -92,13 +92,13 @@ export class PersonalData extends React.Component {
             <div className='personaldata__form__txtinput__msginfo'>
               {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
             </div>
-          )}
+            )}
           </div>
 
           {state.newUsername !== '' && (
             <div className='personaldata__form__txtinput__info'>
               <i className='fa fa-exclamation-triangle personaldata__form__txtinput__info__icon' />
-              {props.t('When changed, the old username and everything linked to it will be lost.')}
+              {props.t('Changing your username will not update the mentions using your current username.')}
             </div>
           )}
 

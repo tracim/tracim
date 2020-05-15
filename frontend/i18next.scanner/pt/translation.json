@@ -242,7 +242,7 @@
   "Have a good day!": "Tenha um bom dia!",
   "Archived Topic": "Tópico arquivado",
   "Search…": "Pesquisar...",
-  "When changed, the old username and everything linked to it will be lost.": "Ao mudar, o seu antigo identificador e tudo o que lhe está ligado perder-se-á.",
+  "Changing your username will not update the mentions using your current username.": "A alteração do seu identificador não actualizará as menções utilizando o seu identificador actual.",
   "Your personal data has been changed": "Os seus dados pessoais foram alterados",
   "Your username and your name has been changed": "O seu identificador e o seu nome foi alterado",
   "Your username has been changed": "O seu identificador foi alterado",
