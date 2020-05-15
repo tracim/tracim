@@ -6,6 +6,7 @@ import {
   PROFILE_LIST,
   removeAtInUsername
 } from 'tracim_frontend_lib'
+import { ALLOWED_CHARACTERS_USERNAME } from '../helper.js'
 
 export class AddUserForm extends React.Component {
   constructor (props) {
@@ -119,6 +120,11 @@ export class AddUserForm extends React.Component {
             <div className='userData__input__username__errorMsg'>
               <i className='userData__input__username__errorIcon fa fa-times' />
               {props.t('This username is not available')}
+            </div>
+          )}
+          {props.newUsernameAvailability && state.newUserUsername !== '' && (
+            <div className='userData__input__username__errorInfo'>
+              {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
             </div>
           )}
 
