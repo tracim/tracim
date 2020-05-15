@@ -18,8 +18,8 @@ from wsgidav.middleware import BaseMiddleware
 import yaml
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.core.event import EventBuilder
 from tracim_backend.lib.core.plugins import create_plugin_manager
-from tracim_backend.lib.event import EventBuilder
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import get_engine

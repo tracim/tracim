@@ -16,9 +16,9 @@ from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.lib.event import EventApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_administrator
