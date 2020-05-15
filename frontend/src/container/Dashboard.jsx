@@ -3,6 +3,9 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { Link, withRouter } from 'react-router-dom'
 import {
+  TracimComponent,
+  TLM_EVENT_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   PageWrapper,
   PageTitle,
   PageContent,
@@ -55,7 +58,9 @@ class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
+      workspaceIdInUrl: props.match.params.idws
+        ? parseInt(props.match.params.idws)
+        : null, // this is used to avoid handling the parseInt every time
       advancedDashboardOpenedId: null,
       newMember: {
         id: '',
@@ -72,32 +77,33 @@ class Dashboard extends React.Component {
       displayWebdavBtn: false
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
-    document.addEventListener('TracimLiveMessage', this.liveMessageReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, handler: this.handleRefreshDashboardMemberList },
+      { name: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, handler: this.handleRefreshWorkspaceDetail },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.CREATED, handler: this.handleAddWorkspaceMember }
+    ])
   }
 
-  customEventReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST:
-        this.loadMemberList()
-        break
-      case CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL:
-        await this.loadWorkspaceDetail()
-        this.buildBreadcrumbs()
-        break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        this.setHeadTitle()
-        break
-    }
+  // CustomEvent handlers
+  handleRefreshDashboardMemberList = () => this.loadMemberList()
+
+  handleRefreshWorkspaceDetail = async () => {
+    await this.loadWorkspaceDetail()
+    this.buildBreadcrumbs()
   }
 
-  liveMessageReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      case 'sharedspace_user_role.created':
-        this.props.dispatch(addWorkspaceMember(data.fields))
-        break
-    }
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
+  }
+
+  // LiveMessage handlers
+  handleAddWorkspaceMember = data => {
+    this.props.dispatch(addWorkspaceMember(data))
   }
 
   async componentDidMount () {
@@ -348,20 +354,20 @@ class Dashboard extends React.Component {
       role: state.newMember.role
     }))
 
+    this.setState({
+      newMember: {
+        id: '',
+        avatarUrl: '',
+        nameOrEmail: '',
+        role: '',
+        isEmail: false
+      },
+      autoCompleteFormNewMemberActive: false,
+      displayNewMemberForm: false
+    })
+
     switch (fetchWorkspaceNewMember.status) {
       case 200:
-        this.loadMemberList()
-        this.setState({
-          newMember: {
-            id: '',
-            avatarUrl: '',
-            nameOrEmail: '',
-            role: '',
-            isEmail: false
-          },
-          autoCompleteFormNewMemberActive: false,
-          displayNewMemberForm: false
-        })
         props.dispatch(newFlashMessage(props.t('Member added'), 'info'))
         return true
       case 400:
@@ -651,4 +657,4 @@ class Dashboard extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
   breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system
 })
-export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Dashboard)))))

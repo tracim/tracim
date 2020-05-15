@@ -24,7 +24,12 @@ import {
   computeProgressionPercentage,
   buildHeadTitle
 } from './helper.js'
+import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
+import {
+  TLM_EVENT_TYPE,
+  TLM_CORE_EVENT_TYPE
+} from './tracimLiveMessage.js'
 
 import { appContentFactory } from './appContentFactory.js'
 
@@ -87,7 +92,6 @@ const customEventReducer = ({ detail: { type, data } }) => {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
       i18n.changeLanguage(data)
       break
-    default: break
   }
 }
 
@@ -99,6 +103,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
 export {
   appContentFactory,
+  TracimComponent,
   addAllResourceI18n,
   handleFetchResult,
   displayDistanceDate,
@@ -135,6 +140,8 @@ export {
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
   CUSTOM_EVENT,
+  TLM_EVENT_TYPE,
+  TLM_CORE_EVENT_TYPE,
   BREADCRUMBS_TYPE,
   ROLE,
   ROLE_LIST,
