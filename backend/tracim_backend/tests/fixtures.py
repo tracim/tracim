@@ -35,6 +35,7 @@ from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import ElasticSearchHelper
+from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
@@ -355,3 +356,8 @@ def webdav_testapp(config_uri, config_section) -> TestApp:
     app_factory = WebdavAppFactory(**settings)
     app = app_factory.get_wsgi_app()
     return TestApp(app)
+
+
+@pytest.fixture
+def event_helper(session) -> EventHelper:
+    return EventHelper(session)
