@@ -29,12 +29,22 @@ describe('Account page', () => {
         .should('be.visible')
         .contains(baseUser.public_name)
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('[data-cy=userinfo__username]')
+        .should('be.visible')
+        .contains(baseUser.username)
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=userinfo__email]')
         .should('be.visible')
         .contains(baseUser.email)
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=avatar]')
         .should('be.visible')
+    })
+    it("should have username with an @ at user's info", () => {
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=userinfo__username]')
+          .contains(`@${baseUser.username}`)
+          .should('be.visible')
     })
   })
 
@@ -171,8 +181,9 @@ describe('Account page', () => {
       })
     })
     describe('Change username', () => {
+      const newUserName = 'newRandomUserName'
+
       it('should update the header with the new username', () => {
-        const newUserName = 'newRandomUserName'
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
           .click()
@@ -193,7 +204,18 @@ describe('Account page', () => {
           .contains(newUserName)
       })
 
-      it('should show a warning when the username is not available', () => {
+      it('should show the allowed characters list', () => {
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+          .click()
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=personaldata__form__txtinput__username]')
+          .type(newUserName)
+        cy.get('.personaldata__form__txtinput__msginfo')
+          .should('be.visible')
+      })
+
+      it('should show not be able to change for a unavailable username', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
           .click()
@@ -201,14 +223,15 @@ describe('Account page', () => {
           .find('[data-cy=personaldata__form__txtinput__username]')
           .type(baseUser.username)
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.fa-exclamation-triangle.personaldata__form__txtinput__info__icon')
-          .should('be.visible')
+          .find('.personaldata__form__txtinput.checkPassword')
+          .type(baseUser.password)
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.personaldata__form__txtinput__msgerror')
+          .find('.personaldata__form__txtinput__info')
           .should('be.visible')
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('.personaldata__form__button')
           .should('be.disabled')
+          .click()
       })
     })
   })

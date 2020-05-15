@@ -87,8 +87,9 @@ describe("An admin seeing a user's profile", () => {
     })
 
     describe('Change username', () => {
+      const newUserName = 'newRandomUserName'
+
       it('should update the header with the new username', () => {
-        const newUserName = 'newRandomUserName'
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
           .click()
@@ -109,17 +110,34 @@ describe("An admin seeing a user's profile", () => {
           .contains(newUserName)
       })
 
-      it('should show a warning when the username is not available', () => {
+      it('should show the allowed characters list', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
           .click()
-        cy.get('[data-cy=personaldata__form__txtinput__username]')
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=personaldata__form__txtinput__username]')
+          .type(newUserName)
+        cy.get('.personaldata__form__txtinput__msginfo')
+          .should('be.visible')
+      })
+
+      it('should show not be able to change for a unavailable username', () => {
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+          .click()
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=personaldata__form__txtinput__username]')
           .type(baseUser.username)
-        cy.get('.personaldata__form__txtinput__msgerror')
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__txtinput.checkPassword')
+          .type(baseUser.password)
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__txtinput__info')
           .should('be.visible')
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('.personaldata__form__button')
           .should('be.disabled')
+          .click()
       })
     })
   })
