@@ -1,7 +1,7 @@
 """
 Generate special rst file for
 """
-from tracim_backend.lib.core.plugins import TracimPluginManager
+from tracim_backend.lib.core.plugins import get_all_hookspec_module_path
 
 HEADER = """
 Tracim Plugin using Event Hooks
@@ -54,15 +54,16 @@ AUTODOC_HOOKSPEC_FILE = """
 
 def generate_hookspec_sphinx_rst_doc() -> str:
     doc = HEADER
-    for module_path in TracimPluginManager.get_all_hookspec_module_path():
+    for module_path in get_all_hookspec_module_path():
         doc += AUTODOC_HOOKSPEC_FILE.format(module_path=module_path)
     doc += FOOTER
     return doc
 
+
 def write_hookspec_sphinx_rst_file(rst_file_path: str = "hookspecs.rst") -> None:
-    with open(rst_file_path, mode='w') as _file:
+    with open(rst_file_path, mode="w") as _file:
         _file.write(generate_hookspec_sphinx_rst_doc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     write_hookspec_sphinx_rst_file()

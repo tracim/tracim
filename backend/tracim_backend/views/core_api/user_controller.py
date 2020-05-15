@@ -1,3 +1,6 @@
+import typing
+
+from hapic import HapicData
 from pyramid.config import Configurator
 from pyramid.response import Response
 
@@ -13,6 +16,7 @@ from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
@@ -23,11 +27,15 @@ from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.event import Message
+from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
+from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMemberQuerySchema
+from tracim_backend.views.core_api.schemas import LiveMessageSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
@@ -49,6 +57,7 @@ from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_EN
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -69,6 +78,10 @@ SWAGGER_TAG__USER_CONTENT_ENDPOINTS = generate_documentation_swagger_tag(
 )
 SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG__NOTIFICATION_SECTION
+)
+
+SWAGGER_TAG__USER_EVENT_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_EVENT_ENDPOINTS
 )
 
 
@@ -544,11 +557,30 @@ class UserController(Controller):
         wapi.save(workspace)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
-    @hapic.input_headers(TracimLiveEventHeaderSchema())
-    def live_messages(self, context, request: TracimRequest, hapic_data=None) -> Response:
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(GetLiveMessageQuerySchema())
+    @hapic.output_body(LiveMessageSchema(many=True))
+    def get_user_messages(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.List[Message]:
         """
+        Returns user messages matching the given query
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        return event_api.get_messages_for_user(
+            request.candidate_user.user_id, ReadStatus(hapic_data.query["read_status"])
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_headers(TracimLiveEventHeaderSchema())
+    def open_message_stream(self, context, request: TracimRequest, hapic_data=None) -> Response:
+        """
+        Open the message stream for the given user.
         Tracim Live Message Events as ServerSide Event Stream
         """
         user_channel_name = "user_{}".format(request.candidate_user.user_id)
@@ -717,11 +749,16 @@ class UserController(Controller):
         configurator.add_view(
             self.disable_workspace_notification, route_name="disable_workspace_notification"
         )
-
         # TracimLiveMessages notification
         configurator.add_route(
             "live_messages",
-            "/users/{user_id:\d+}/live_messages",
-            request_method="GET",  # noqa: W605
+            "/users/{user_id:\d+}/live_messages",  # noqa: W605
+            request_method="GET",
         )
-        configurator.add_view(self.live_messages, route_name="live_messages")
+        configurator.add_view(self.open_message_stream, route_name="live_messages")
+
+        # Tracim user messages
+        configurator.add_route(
+            "messages", "/users/{user_id:\d+}/messages", request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_user_messages, route_name="messages")

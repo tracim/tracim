@@ -49,13 +49,47 @@ class TestLivesMessages(object):
             headers=headers,
         )
         client = sseclient.SSEClient(response)
-        LiveMessagesLib(config=app_config).publish_live_message(
-            "user_1", {"test_message": "example"}
-        )
+        LiveMessagesLib(config=app_config).publish_dict("user_1", {"test_message": "example"})
         for event in client.events():
             event1 = event
             # INFO - GM - 2020-05-12  we skip the live message stream after receiving the first message
             break
         response.close()
         assert json.loads(event1.data) == {"test_message": "example"}
-        assert event1.event == "TLM"
+        assert event1.event == "message"
+
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update(
+        self, pushpin, app_config
+    ):
+
+        headers = {"Accept": "text/event-stream"}
+        response = requests.get(
+            "http://localhost:7997/api/v2/users/1/live_messages",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            stream=True,
+            headers=headers,
+        )
+        client = sseclient.SSEClient(response)
+        params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
+        update_user_request = requests.put(
+            "http://localhost:7997/api/v2/users/1",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            json=params,
+        )
+        assert update_user_request.status_code == 200
+        for event in client.events():
+            event1 = event
+            # INFO - GM - 2020-05-12  we skip the live message stream after receiving the first message
+            break
+        response.close()
+        result = json.loads(event1.data)
+        assert result["read"] is None
+        assert result["fields"]
+        assert result["created"]
+        assert result["event_id"]
+        assert result["fields"]["user"]
+        assert result["fields"]["user"]["user_id"] == 1
+        assert result["fields"]["author"]["user_id"] == 1
+        assert result["fields"]["author"]
+        assert result["event_type"] == "user.modified"
+        assert event1.event == "message"

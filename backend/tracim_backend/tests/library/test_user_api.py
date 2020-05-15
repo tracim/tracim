@@ -337,7 +337,7 @@ class TestUserApi(object):
 
     def test_unit__get_all__ok__nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        api.create_minimal_user("bibi@bibi")
+        api.create_minimal_user("bibi@bibi", save_now=True)
 
         users = api.get_all()
         # u1 + Admin user from BaseFixture

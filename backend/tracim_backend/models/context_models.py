@@ -644,8 +644,7 @@ class UserInContext(object):
 
     @property
     def avatar_url(self) -> typing.Optional[str]:
-        # TODO - G-M - 20-04-2018 - [Avatar] Add user avatar feature
-        return None
+        return self.user.avatar_url
 
     @property
     def auth_type(self) -> str:

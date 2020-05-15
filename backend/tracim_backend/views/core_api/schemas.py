@@ -72,6 +72,9 @@ from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.event import EntityType
+from tracim_backend.models.event import OperationType
+from tracim_backend.models.event import ReadStatus
 
 FIELD_LANG_DESC = "User langage in ISO 639 format. " "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
@@ -1098,6 +1101,7 @@ class ContentCreationSchema(marshmallow.Schema):
 class ContentDigestSchema(marshmallow.Schema):
     content_namespace = marshmallow.fields.String(example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    current_revision_id = marshmallow.fields.Int(example=12)
     slug = StrippedString(example="intervention-report-12")
     parent_id = marshmallow.fields.Int(
         example=34, allow_none=True, default=None, validate=positive_int_validator
@@ -1153,7 +1157,6 @@ class ReadStatusSchema(marshmallow.Schema):
 
 
 class ContentSchema(ContentDigestSchema):
-    current_revision_id = marshmallow.fields.Int(example=12)
     author = marshmallow.fields.Nested(UserDigestSchema)
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 
@@ -1311,5 +1314,43 @@ class ConfigSchema(marshmallow.Schema):
     instance_name = marshmallow.fields.String()
 
 
+class EventSchema(marshmallow.Schema):
+    """Event structure transmitted to workers."""
+
+    fields = marshmallow.fields.Dict()
+    event_id = marshmallow.fields.Int(example=42, validate=strictly_positive_int_validator)
+    operation = marshmallow.fields.String(validator=OneOf(OperationType.values()))
+    entity_type = marshmallow.fields.String(validator=OneOf(EntityType.values()))
+    created = marshmallow.fields.DateTime()
+
+    @marshmallow.post_load
+    def strings_to_enums(self, item):
+        item["operation"] = OperationType(item["operation"])
+        item["entity_type"] = EntityType(item["entity_type"])
+        return item
+
+
+class LiveMessageSchema(marshmallow.Schema):
+    """Message for the user."""
+
+    fields = marshmallow.fields.Dict()
+    event_id = marshmallow.fields.Int(example=42, validate=strictly_positive_int_validator)
+    event_type = marshmallow.fields.String(example="content.modified")
+    created = marshmallow.fields.DateTime(format=DATETIME_FORMAT, description="created date")
+    read = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="read date", allow_none=True
+    )
+
+
+class GetLiveMessageQuerySchema(marshmallow.Schema):
+    """Possible query parameters for the GET messages endpoint."""
+
+    read_status = marshmallow.fields.String(
+        missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values())
+    )
+
+
 class TracimLiveEventHeaderSchema(marshmallow.Schema):
+    # TODO - G.M - 2020-05-14 - Add Filtering for text/event-stream mimetype with accept header,
+    #  see: https://github.com/tracim/tracim/issues/3042
     accept = marshmallow.fields.String(required=True, load_from="Accept", dump_to="Accept")
