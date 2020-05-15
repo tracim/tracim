@@ -20,19 +20,15 @@ class ServerSideEvent(object):
     ):
         self.data = data
         self.event = event
-        self._buffer = ""
-        self._convert_to_sse_string()
-
-    def _convert_to_sse_string(self):
-        if self.event:
-            self._buffer += "event: {}\n".format(self.event)
-        for row in self.data:
-            self._buffer += "data: {}\n".format(row)
-
-        self._buffer += "\n"
 
     def __str__(self):
-        return self._buffer
+        buffer = ""
+        if self.event:
+            buffer += "event: {}\n".format(self.event)
+        for row in self.data:
+            buffer += "data: {}\n".format(row)
+        buffer += "\n"
+        return buffer
 
 
 class LiveMessagesLib(object):
