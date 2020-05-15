@@ -3,11 +3,10 @@ from pyramid.config import Configurator
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmailAlreadyExistInDb
-from tracim_backend.exceptions import EmailOrUsernameRequired
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
-from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
@@ -193,7 +192,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(UsernameAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(InvalidUsernameFormat, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetUsernameSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -265,8 +264,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(EmailOrUsernameRequired, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(InvalidUsernameFormat, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
     @check_right(is_administrator)
     @hapic.input_body(UserCreationSchema())
     @hapic.output_body(UserSchema())

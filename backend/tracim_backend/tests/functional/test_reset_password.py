@@ -55,6 +55,7 @@ class TestResetPasswordRequestEndpointMailSync(object):
     def test_api__reset_password_request__err_400__username_missing_email(
         self, user_api_factory, web_testapp, mailhog
     ):
+        user_api_factory.app_config.EMAIL__REQUIRED = False
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(

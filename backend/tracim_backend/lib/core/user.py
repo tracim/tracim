@@ -27,6 +27,7 @@ from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailOrUsernameRequired
+from tracim_backend.exceptions import EmailRequired
 from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
@@ -873,8 +874,12 @@ class UserApi(object):
         save_now=False,
     ) -> User:
         """Previous create_user method"""
-        if not email and not username:
-            raise EmailOrUsernameRequired("Email or username is required to create an user")
+        if not email:
+            if not username:
+                raise EmailOrUsernameRequired("Email or username is required to create an user")
+            if self._config.EMAIL__REQUIRED:
+                raise EmailRequired("Email is required to create an user")
+
         lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
         validator.add_validator("email", lowercase_email, user_email_validator)

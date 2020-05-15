@@ -423,6 +423,10 @@ class EmailOrUsernameRequired(TracimValidationFailed):
     error_code = ErrorCode.EMAIL_OR_USERNAME_REQUIRED
 
 
+class EmailRequired(TracimValidationFailed):
+    error_code = ErrorCode.EMAIL_REQUIRED
+
+
 class InvalidUsernameFormat(TracimValidationFailed):
     error_code = ErrorCode.INVALID_USERNAME_FORMAT
 
