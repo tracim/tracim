@@ -17,8 +17,8 @@ module.exports = {
     publicPath: '/assets/'
   },
   externals: Object.assign(
-    {tracim_frontend_lib: 'tracim_frontend_lib'},
-    require(path.join(path.dirname(require.resolve("tracim_frontend_vendors")), 'externals.json'))
+    { tracim_frontend_lib: 'tracim_frontend_lib' },
+    require(path.join(path.dirname(require.resolve('tracim_frontend_vendors')), 'externals.json'))
   ),
   optimization: {
     splitChunks: {
@@ -42,7 +42,7 @@ module.exports = {
   },
   devtool: isProduction ? false : 'eval-source-map ',
   node: { // https://github.com/josephsavona/valuable/issues/9#issuecomment-65000999
-    fs: "empty"
+    fs: 'empty'
   },
   performance: {
     hints: false
@@ -52,7 +52,7 @@ module.exports = {
       test: /\.jsx?$/,
       enforce: 'pre',
       exclude: [/node_modules/, /frontend_lib/],
-      use: 'standard-loader',
+      use: 'standard-loader'
     }, {
       test: [/\.js$/, /\.jsx$/],
       exclude: [/node_modules/],
@@ -86,7 +86,7 @@ module.exports = {
   },
   resolve: {
     plugins: [
-      PnpWebpackPlugin,
+      PnpWebpackPlugin
     ],
     alias: {
       // Make ~tracim_frontend_lib work in stylus files
@@ -96,10 +96,10 @@ module.exports = {
   },
   resolveLoader: {
     plugins: [
-      PnpWebpackPlugin.moduleLoader(module),
-    ],
+      PnpWebpackPlugin.moduleLoader(module)
+    ]
   },
-  plugins:[
+  plugins: [
     ...[], // generic plugins always present
     ...(isProduction
       ? [] // production specific plugins

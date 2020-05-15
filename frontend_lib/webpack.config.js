@@ -34,7 +34,7 @@ module.exports = {
     //   }
     // }
   },
-  externals: require(path.join(path.dirname(require.resolve("tracim_frontend_vendors")), 'externals.json')),
+  externals: require(path.join(path.dirname(require.resolve('tracim_frontend_vendors')), 'externals.json')),
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     port: 8070,
@@ -55,49 +55,49 @@ module.exports = {
       isProduction
         ? {}
         : {
-      test: /\.jsx?$/,
-      enforce: 'pre',
-      use: 'standard-loader',
-      exclude: [/node_modules/]
-    }, {
-      test: [/\.js$/, /\.jsx$/],
-      loader: 'babel-loader',
-      options: {
-        presets: [
-          '@babel/preset-env',
-          '@babel/preset-react'
-        ],
-        plugins: [
-          '@babel/plugin-proposal-object-rest-spread',
-          '@babel/plugin-proposal-class-properties',
-          '@babel/plugin-transform-object-assign'
-        ]
-      },
-      exclude: [/node_modules/]
-    }, {
-      test: /\.css$/,
-      use: ['style-loader', 'css-loader']
-    }, {
-      test: /\.styl$/,
-      use: ['style-loader', 'css-loader', 'stylus-native-loader']
-    // }, {
-    //   test: /\.(jpg|png|svg)$/,
-    //   loader: 'url-loader',
-    //   options: {
-    //     limit: 25000
-    //   }
-    }]
+          test: /\.jsx?$/,
+          enforce: 'pre',
+          use: 'standard-loader',
+          exclude: [/node_modules/]
+        }, {
+        test: [/\.js$/, /\.jsx$/],
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            '@babel/preset-env',
+            '@babel/preset-react'
+          ],
+          plugins: [
+            '@babel/plugin-proposal-object-rest-spread',
+            '@babel/plugin-proposal-class-properties',
+            '@babel/plugin-transform-object-assign'
+          ]
+        },
+        exclude: [/node_modules/]
+      }, {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      }, {
+        test: /\.styl$/,
+        use: ['style-loader', 'css-loader', 'stylus-native-loader']
+        // }, {
+        //   test: /\.(jpg|png|svg)$/,
+        //   loader: 'url-loader',
+        //   options: {
+        //     limit: 25000
+        //   }
+      }]
   },
   resolve: {
     plugins: [
-      PnpWebpackPlugin,
+      PnpWebpackPlugin
     ],
     extensions: ['.js', '.jsx']
   },
   resolveLoader: {
     plugins: [
-      PnpWebpackPlugin.moduleLoader(module),
-    ],
+      PnpWebpackPlugin.moduleLoader(module)
+    ]
   },
   plugins: [
     ...[], // generic plugins always present

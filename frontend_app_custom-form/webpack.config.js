@@ -18,8 +18,8 @@ module.exports = {
     libraryTarget: isProduction ? 'var' : undefined
   },
   externals: Object.assign(
-    {tracim_frontend_lib: 'tracim_frontend_lib'},
-    require(path.join(path.dirname(require.resolve("tracim_frontend_vendors")), 'externals.json'))
+    { tracim_frontend_lib: 'tracim_frontend_lib' },
+    require(path.join(path.dirname(require.resolve('tracim_frontend_vendors')), 'externals.json'))
   ),
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
@@ -78,7 +78,7 @@ module.exports = {
   },
   resolve: {
     plugins: [
-      PnpWebpackPlugin,
+      PnpWebpackPlugin
     ],
     alias: {
       // Make ~tracim_frontend_lib work in stylus files
@@ -88,8 +88,8 @@ module.exports = {
   },
   resolveLoader: {
     plugins: [
-      PnpWebpackPlugin.moduleLoader(module),
-    ],
+      PnpWebpackPlugin.moduleLoader(module)
+    ]
   },
   plugins: [
     ...[], // generic plugins always present
