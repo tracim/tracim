@@ -4,7 +4,7 @@ import typing
 
 from pyramid.paster import get_appsettings
 from pyramid.paster import setup_logging
-from rq import Worker
+from rq import SimpleWorker
 from rq.local import LocalStack
 
 from tracim_backend.config import CFG
@@ -46,7 +46,7 @@ def worker_app_config() -> CFG:
     return config
 
 
-class DatabaseWorker(Worker):
+class DatabaseWorker(SimpleWorker):
     """Custom RQ worker that provides access to Tracim:
       - SQL database through the worker_session() context manage.
       - Configuration object (CFG) through the worker_app_config() function.
@@ -61,4 +61,8 @@ class DatabaseWorker(Worker):
         app_config.configure_filedepot()
         _engines.push(get_engine(app_config))
         _configs.push(app_config)
-        super().work(*args, **kwargs)
+        try:
+            super().work(*args, **kwargs)
+        finally:
+            _engines.pop()
+            _configs.pop()
