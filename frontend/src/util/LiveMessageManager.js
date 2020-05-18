@@ -30,7 +30,7 @@ export class LiveMessageManager {
     }
 
     this.eventSource.onmessage = (e) => {
-      console.log('%c.:. TLM received: ', 'color: #ccc0e2', e)
+      console.log('%c.:. TLM received: ', 'color: #ccc0e2', { ...e, data: JSON.parse(e.data) })
       this.dispatchLiveMessage(e)
     }
 

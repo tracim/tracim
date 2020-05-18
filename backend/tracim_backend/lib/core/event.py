@@ -34,7 +34,7 @@ from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
-from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSchema
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
@@ -74,7 +74,7 @@ class EventBuilder:
     """Create Event objects from the database crud hooks."""
 
     _user_schema = UserDigestSchema()
-    _workspace_schema = WorkspaceDigestSchema()
+    _workspace_schema = WorkspaceSchema()
     _content_schema = ContentDigestSchema()
     _event_schema = EventSchema()
 

@@ -36,6 +36,7 @@ import {
   setWorkspaceRecentActivityList,
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
+  updateWorkspaceMember,
   removeWorkspaceMember,
   updateUserWorkspaceSubscriptionNotif,
   setWorkspaceAgendaUrl,
@@ -79,22 +80,19 @@ class Dashboard extends React.Component {
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, handler: this.handleRefreshDashboardMemberList },
-      { name: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, handler: this.handleRefreshWorkspaceDetail },
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.CREATED, handler: this.handleAddWorkspaceMember }
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
+      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
+      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted }
     ])
   }
 
   // CustomEvent handlers
   handleRefreshDashboardMemberList = () => this.loadMemberList()
-
-  handleRefreshWorkspaceDetail = async () => {
-    await this.loadWorkspaceDetail()
-    this.buildBreadcrumbs()
-  }
 
   handleAllAppChangeLanguage = () => {
     this.buildBreadcrumbs()
@@ -102,8 +100,25 @@ class Dashboard extends React.Component {
   }
 
   // LiveMessage handlers
-  handleAddWorkspaceMember = data => {
-    this.props.dispatch(addWorkspaceMember(data))
+  handleWorkspaceModified = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(setWorkspaceDetail(data.workspace))
+    this.setHeadTitle()
+  }
+
+  handleMemberCreated = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(addWorkspaceMember(data.user, data.workspace, data.role))
+  }
+
+  handleMemberModified = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(updateWorkspaceMember(data.user, data.workspace, data.role))
+  }
+
+  handleMemberDeleted = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(removeWorkspaceMember(data.user.user_id, data.workspace))
   }
 
   async componentDidMount () {

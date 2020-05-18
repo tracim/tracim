@@ -3,6 +3,9 @@ import WorkspaceAdvancedConfiguration from '../component/WorkspaceAdvancedConfig
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
+  TracimComponent,
+  TLM_EVENT_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
@@ -65,6 +68,18 @@ class WorkspaceAdvanced extends React.Component {
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+
+    // props.registerCustomEventHandlerList([
+    //   { name: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, handler: this.handleRefreshDashboardMemberList },
+    //   { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    // ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
+      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
+      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted }
+    ])
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
@@ -98,6 +113,66 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
+  handleWorkspaceModified = (data) => {
+    if (data.workspace.workspace_id !== this.state.content.workspace_id) return
+
+    this.setState(prev => ({
+      content: { ...prev.content, ...data.workspace }
+    }))
+  }
+
+  handleMemberCreated = data => {
+    if (data.workspace.workspace_id !== this.state.content.workspace_id) return
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        memberList: [...prev.content.memberList, {
+          user_id: data.user.user_id,
+          user: data.user,
+          workspace_id: data.workspace.workspace_id,
+          workspace: data.workspace,
+          do_notify: data.user.do_notify,
+          is_active: data.user.is_active,
+          role: data.role
+        }]
+      }
+    }))
+  }
+
+  handleMemberModified = data => {
+    if (data.workspace.workspace_id !== this.state.content.workspace_id) return
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        memberList: prev.content.memberList.map(m => m.user_id === data.user.user_id
+          ? {
+            user_id: data.user.user_id,
+            user: data.user,
+            workspace_id: data.workspace.workspace_id,
+            workspace: data.workspace,
+            do_notify: data.user.do_notify,
+            is_active: data.user.is_active,
+            role: data.role
+          }
+          : m
+        )
+      }
+    }))
+  }
+
+  handleMemberDeleted = data => {
+    console.log('handleMemberDeleted', data)
+    console.log('handleMemberDeleted', this.state.content.memberList)
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        memberList: prev.content.memberList.filter(m => m.user_id !== data.user.user_id)
+      }
+    }))
+  }
+
   componentDidMount () {
     console.log('%c<WorkspaceAdvanced> did mount', `color: ${this.state.config.hexcolor}`)
 
@@ -106,7 +181,7 @@ class WorkspaceAdvanced extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
-    console.log('%c<WorkspaceAdvanced> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    // console.log('%c<WorkspaceAdvanced> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.content && state.content && prevState.content.workspace_id !== state.content.workspace_id) {
       this.loadContent()
@@ -170,11 +245,7 @@ class WorkspaceAdvanced extends React.Component {
     const fetchPutWorkspaceLabel = await handleFetchResult(await putLabel(state.config.apiUrl, state.content, newLabel))
 
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
-      case 200:
-        this.setState(prev => ({ content: { ...prev.content, label: newLabel } }))
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
-        break
+      case 200: this.sendGlobalFlashMessage(props.t('Save successful', 'info')); break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space label', 'warning'))
     }
   }
@@ -191,11 +262,7 @@ class WorkspaceAdvanced extends React.Component {
     const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content, state.content.description))
 
     switch (fetchPutDescription.apiResponse.status) {
-      case 200:
-        this.sendGlobalFlashMessage(props.t('Save successful', 'info'))
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
-        break
+      case 200: this.sendGlobalFlashMessage(props.t('Save successful', 'info')); break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new description', 'warning'))
     }
   }
@@ -205,25 +272,15 @@ class WorkspaceAdvanced extends React.Component {
     const fetchPutUserRole = await handleFetchResult(await putMemberRole(state.config.apiUrl, state.content.workspace_id, memberId, slugNewRole))
 
     switch (fetchPutUserRole.apiResponse.status) {
-      case 200:
-        this.setState(prev => ({
-          content: {
-            ...prev.content,
-            memberList: prev.content.memberList.map(m => m.user_id === memberId ? { ...m, role: slugNewRole } : m)
-          }
-        }))
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, data: {} })
-        break
+      case 200: this.sendGlobalFlashMessage(props.t('Save successful', 'info')); break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new role for member', 'warning'))
     }
   }
 
   handleToggleAgendaEnabled = async () => {
     const { props, state } = this
-    const oldAgendaEnabledValue = state.content.agenda_enabled
     const newAgendaEnabledValue = !state.content.agenda_enabled
 
-    this.setState(prev => ({ content: { ...prev.content, agenda_enabled: newAgendaEnabledValue } }))
     const fetchToggleAgendaEnabled = await handleFetchResult(await putAgendaEnabled(state.config.apiUrl, state.content, newAgendaEnabledValue))
 
     switch (fetchToggleAgendaEnabled.apiResponse.status) {
@@ -232,11 +289,8 @@ class WorkspaceAdvanced extends React.Component {
           newAgendaEnabledValue ? props.t('Agenda activated') : props.t('Agenda deactivated'),
           'info'
         )
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       default:
-        this.setState(prev => ({ content: { ...prev.content, agenda_enabled: oldAgendaEnabledValue } }))
         this.sendGlobalFlashMessage(
           newAgendaEnabledValue
             ? props.t('Error while activating agenda')
@@ -248,10 +302,8 @@ class WorkspaceAdvanced extends React.Component {
 
   handleToggleUploadEnabled = async () => {
     const { props, state } = this
-    const oldUploadEnabledValue = state.content.public_upload_enabled
     const newUploadEnabledValue = !state.content.public_upload_enabled
 
-    this.setState(prev => ({ content: { ...prev.content, public_upload_enabled: newUploadEnabledValue } }))
     const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))
 
     switch (fetchToggleUploadEnabled.apiResponse.status) {
@@ -260,11 +312,8 @@ class WorkspaceAdvanced extends React.Component {
           newUploadEnabledValue ? props.t('Upload activated') : props.t('Upload deactivated'),
           'info'
         )
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       default:
-        this.setState(prev => ({ content: { ...prev.content, public_upload_enabled: oldUploadEnabledValue } }))
         this.sendGlobalFlashMessage(
           newUploadEnabledValue
             ? props.t('Error while activating upload')
@@ -276,10 +325,8 @@ class WorkspaceAdvanced extends React.Component {
 
   handleToggleDownloadEnabled = async () => {
     const { props, state } = this
-    const oldDownloadEnabledValue = state.content.public_download_enabled
     const newDownloadEnabledValue = !state.content.public_download_enabled
 
-    this.setState(prev => ({ content: { ...prev.content, public_download_enabled: newDownloadEnabledValue } }))
     const fetchToggleDownloadEnabled = await handleFetchResult(await putDownloadEnabled(state.config.apiUrl, state.content, newDownloadEnabledValue))
 
     switch (fetchToggleDownloadEnabled.apiResponse.status) {
@@ -288,11 +335,8 @@ class WorkspaceAdvanced extends React.Component {
           newDownloadEnabledValue ? props.t('Download activated') : props.t('Download deactivated'),
           'info'
         )
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       default:
-        this.setState(prev => ({ content: { ...prev.content, public_download_enabled: oldDownloadEnabledValue } }))
         this.sendGlobalFlashMessage(
           newDownloadEnabledValue
             ? props.t('Error while activating download')
@@ -355,17 +399,9 @@ class WorkspaceAdvanced extends React.Component {
     const fetchDeleteMember = await deleteMember(state.config.apiUrl, state.content.workspace_id, userId)
     switch (fetchDeleteMember.status) {
       case 204:
-        this.setState(prev => ({
-          content: {
-            ...prev.content,
-            memberList: prev.content.memberList.filter(m => m.user_id !== userId)
-          }
-        }))
         this.sendGlobalFlashMessage(props.t('Member removed', 'info'))
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while removing member', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while removing member'), 'warning')
     }
   }
 
@@ -404,23 +440,21 @@ class WorkspaceAdvanced extends React.Component {
       role: state.newMember.role
     }))
 
+    this.setState({
+      newMember: {
+        id: '',
+        nameOrEmail: '',
+        role: '',
+        avatarUrl: '',
+        isEmail: false
+      },
+      autoCompleteFormNewMemberActive: false,
+      displayFormNewMember: false
+    })
+
     switch (fetchWorkspaceNewMember.apiResponse.status) {
       case 200:
-        this.loadContent()
-        this.setState({
-          newMember: {
-            id: '',
-            nameOrEmail: '',
-            role: '',
-            avatarUrl: '',
-            isEmail: false
-          },
-          autoCompleteFormNewMemberActive: false,
-          displayFormNewMember: false
-        })
         this.sendGlobalFlashMessage(props.t('Member added', 'info'))
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       case 400:
         switch (fetchWorkspaceNewMember.body.code) {
@@ -566,4 +600,4 @@ class WorkspaceAdvanced extends React.Component {
   }
 }
 
-export default translate()(Radium(appContentFactory(WorkspaceAdvanced)))
+export default translate()(Radium(appContentFactory(TracimComponent(WorkspaceAdvanced))))
