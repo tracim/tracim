@@ -49,8 +49,12 @@ log "Building tracim_frontend_lib"
 yarn workspace tracim_frontend_lib run buildtracimlib$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
 for app in "$DEFAULTDIR"/frontend_app_*; do
-	cd "$app" || exit 1
-	./build_*.sh $dev || logerror "Failed building $app."
+	if [ -f "$app/.disabled-app" ]; then
+		log "Skipping $app because of the existence of the .disabled-app file"
+	else
+		cd "$app" || exit 1
+		./build_*.sh $dev || logerror "Failed building $app."
+	fi
 done
 
 # build Tracim
