@@ -164,3 +164,12 @@ Cypress.Commands.add('cleanSessionCookies', () => {
 Cypress.Commands.add('cancelXHR', () => {
   cy.visit('/api/v2/doc/')
 })
+
+Cypress.Commands.add('changeLanguage', (langCode) => {
+    cy.get("#headerDropdownMenuButton")
+      .click()
+
+    cy.get('.dropdownlang__dropdown__subdropdown')
+      .find('[data-cy="' + langCode + '"]')
+      .click()
+})
