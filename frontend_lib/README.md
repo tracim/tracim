@@ -1,32 +1,65 @@
 # Tracim lib
 
-This project is used to centralize generic components that are used either in Tracim and in Tracim's apps.
+This library groups the components shared across the Tracim frontend and the Tracim frontend apps.
 
-### For development
-While working on Tracim and on tracim_lib, if you change tracim_lib, for the changes to be effective in Tracim you must:
-- run `$ npm run build` on tracim_lib
-- add the generated dist/tracim_lib.js to git stage
-- commit and push changes to tracim_lib
-- increase version number of tracim_lib (package.json)
-- commit push the new version
-- run `$ npm update tracim_lib` in Tracim to get the new version
+It can be built in two different ways:
 
-The debug.js file is used for all app debug files and it's based at debug.js.sample file. To adapt the template to your system you must change the variables:
- - loggedUser: object in which all parameters must be changed in relation to the current user logged on in Tracim
+- as a standalone module, that could be published on NPM and used by external apps
+- as a library to be inserted in an HTML page using the a `<script>` tag. This is what is used for Tracim.
 
-#### Alternatively you can (faster for development)
-- create a link of tracim_lib using npm: in tracim_lib `$ npm link`
-- get that link in tracim: in tracim (repo) `$ npm link tracim_lib`
-- in tracim_lib: run `$ npm run build`
+# Building as a standalone bundle
 
-now, you only have to rebuild tracim_lib and tracim will update it's tracim_lib dependency automatically
+The standalone bundle can be used in external Tracim apps as an UMD module.
+It includes all its dependencies, is self-contained, and can be imported using
+`require('tracim_frontend_lib')` or `import ... from 'tracim_frontend_lib'`.
 
-Problem: eslint will parse tracim_lib.js since it will come from another repository.
+Run:
 
-Solution: you must add `/* eslint-disable */` at the beginning and  `/* eslint-enable */` at the end of tracim_lib.js
+    yarn run build
 
-To automatize this: build tracim_lib with that command:
+This will produce two UMD modules:
+- `dist/tracim_frontend_lib.lib.js`: the library part
+- `dist/tracim_frontend_lib.style.js`: the styling part
 
-`npm run build && echo '/* eslint-disable */' | cat - dist/tracim_lib.js > temp && mv temp dist/tracim_lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_lib.js`
+The Webpack configuration used to build the standalone bundle is `webpack.config.js`.
 
-You can also create an alias for this in your .bashrc
+# Building as a browser library
+
+The browser library can be included using a `<script>` tag.
+It does not come with all its dependencies.
+Some of them are in the `tracim_frontend_vendors` bundle.
+The point of the browser library is to share the `tracim_fontend_lib` and common `dependencies` across the frontend, the apps and the lib in Tracim.
+
+The browser library can be used from a package (a Tracim frontend app) by accessing the global variable `tracim_frontend_lib` or in a package built with Webpack as long as:
+
+- `tracim_frontend_lib` is listed in the `externals` property of the Webpack configuration
+- all the libraries in `tracim_frontend_vendors` are also listed in `externals`
+- `tracim_frontend_vendors` and `tracim_frontend_libs` are included using the `<script>` tag before the app is loaded. In this configuration, `tracim_frontend_lib` expects the global object `tracim_frontend_vendors` to be available.
+
+This can be done by using the `externals.json` file built when bundling `tracim_frontend_vendors`.
+
+Run:
+
+    yarn run tracimbuild
+
+This will produce two browser libraries:
+- `dist/tracim_frontend_lib.tracim.lib.js`: the library part, declaring the `tracim_fontend_lib` global variable
+- `dist/tracim_frontend_lib.tracim.style.js`: the styling part
+
+The Webpack configuration used to build the browser library is `webpack.tracim.config.js`.
+
+# Frontend unit tests
+
+Frontend unit tests use the standalone bundle, hence the need to build it when building the full frontend.
+Using the browser libary does not work: `tracim_frontend_lib` needs to be compatible with CommonJS, and needs to access its dependencies. It is, however, impossible to make a `tracim_frontend_vendors` global object available for `tracim_frontend_lib` when using CommonJS modules, since their is no global namespace shared between the modules (in Node.js at least).
+
+# Building a Tracim app using `tracim_fontend_lib`
+
+In the code of your app, use `require('tracim_fontend_lib')` or `import ... from tracim_fontend_lib` to import the library.
+
+In its webpack configuration, either use the bundle, which is the default entry point of `tracim_fontend_lib`, or use the browser library:
+ - declare `tracim_fontend_lib` in the `externals` field of the Webpack configuration of the app.
+ - also import `externals.json` from `tracim_frontend_vendors` into this field
+ - add include `tracim_fontend_lib` and `tracim_fontend_vendors` in the HTML pages where the app is used.
+
+Apps in the Tracim project need to support both methods, using separate Webpack configurations.
