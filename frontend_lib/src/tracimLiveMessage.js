@@ -9,7 +9,7 @@ const CREATED = 'created'
 const MODIFIED = 'modified'
 const DELETED = 'deleted'
 
-export const TLM_EVENT_TYPE = {
+export const TLM_ENTITY_TYPE = {
   USER,
   CONTENT,
   SHAREDSPACE,

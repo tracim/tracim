@@ -27,7 +27,7 @@ import {
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
-  TLM_EVENT_TYPE,
+  TLM_ENTITY_TYPE,
   TLM_CORE_EVENT_TYPE
 } from './tracimLiveMessage.js'
 
@@ -140,7 +140,7 @@ export {
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
   CUSTOM_EVENT,
-  TLM_EVENT_TYPE,
+  TLM_ENTITY_TYPE,
   TLM_CORE_EVENT_TYPE,
   BREADCRUMBS_TYPE,
   ROLE,

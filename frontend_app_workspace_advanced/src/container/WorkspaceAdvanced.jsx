@@ -4,7 +4,7 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   TracimComponent,
-  TLM_EVENT_TYPE as TLM_ET,
+  TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   appContentFactory,
   addAllResourceI18n,

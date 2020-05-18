@@ -4,7 +4,7 @@ import { translate } from 'react-i18next'
 import { Link, withRouter } from 'react-router-dom'
 import {
   TracimComponent,
-  TLM_EVENT_TYPE as TLM_ET,
+  TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   PageWrapper,
   PageTitle,
