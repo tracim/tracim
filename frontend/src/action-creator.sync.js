@@ -52,7 +52,11 @@ export const PATH = 'Path'
 export const WORKSPACE_CONTENT_PATH = `${WORKSPACE_CONTENT}/${PATH}`
 export const setWorkspaceContentList = (workspaceContentList, folderIdToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, folderIdToOpenList })
 export const setWorkspaceShareFolderContentList = (workspaceShareFolderContentList, folderIdToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, folderIdToOpenList })
+
 export const addWorkspaceContentList = workspaceContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT}`, workspaceContentList })
+export const updateWorkspaceContentList = workspaceContentList => ({ type: `${UPDATE}/${WORKSPACE_CONTENT}`, workspaceContentList })
+export const deleteWorkspaceContentList = workspaceContentList => ({ type: `${REMOVE}/${WORKSPACE_CONTENT}`, workspaceContentList })
+
 export const addWorkspaceShareFolderContentList = workspaceShareFolderContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
@@ -90,8 +94,16 @@ export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
 export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
 export const WORKSPACE_MEMBER_REMOVE = `${WORKSPACE_MEMBER}/${REMOVE}`
-export const addWorkspaceMember = (newMember, workspace, role) => ({ type: `${ADD}/${WORKSPACE_MEMBER}`, newMember, workspace, role })
-export const updateWorkspaceMember = (member, workspace, role) => ({ type: `${UPDATE}/${WORKSPACE_MEMBER}`, member, workspace, role })
+export const addWorkspaceMember = (newMember, workspace, role) => ({
+  type: `${ADD}/${WORKSPACE_MEMBER}`,
+  newMember: { user: { ...newMember }, role },
+  workspace
+})
+export const updateWorkspaceMember = (member, workspace, role) => ({
+  type: `${UPDATE}/${WORKSPACE_MEMBER}`,
+  member: { user: { ...member }, role },
+  workspace,
+})
 export const removeWorkspaceMember = (memberId, workspace) => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId, workspace })
 
 export const WORKSPACE_RECENT_ACTIVITY = `${WORKSPACE}/RecentActivity/List`

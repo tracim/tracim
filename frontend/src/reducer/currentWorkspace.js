@@ -1,3 +1,4 @@
+import { uniqBy } from 'lodash'
 import {
   SET,
   ADD,
@@ -10,8 +11,9 @@ import {
   WORKSPACE_MEMBER, UPDATE,
   USER_WORKSPACE_DO_NOTIFY,
   FOLDER_READ,
-  WORKSPACE_AGENDA_URL
+  WORKSPACE_AGENDA_URL, WORKSPACE_CONTENT
 } from '../action-creator.sync.js'
+import { serializeContent } from './workspaceContentList.js'
 
 const defaultWorkspace = {
   id: 0,
@@ -24,9 +26,40 @@ const defaultWorkspace = {
   sidebarEntryList: [],
   memberList: [],
   recentActivityList: [],
-  recentActivityForUserList: [],
   contentReadStatusList: [],
   agendaUrl: ''
+}
+
+export const serializeWorkspace = ws => {
+  return {
+    id: ws.workspace_id,
+    slug: ws.slug,
+    label: ws.label,
+    description: ws.description,
+    agendaEnabled: ws.agenda_enabled,
+    downloadEnabled: ws.public_download_enabled,
+    uploadEnabled: ws.public_upload_enabled
+  }
+}
+
+export const serializeSidebarEntry = sbe => {
+  return {
+    slug: sbe.slug,
+    route: sbe.route,
+    faIcon: sbe.fa_icon,
+    hexcolor: sbe.hexcolor,
+    label: sbe.label
+  }
+}
+
+export const serializeMember = m => {
+  return {
+    id: m.user.user_id,
+    publicName: m.user.public_name,
+    role: m.role,
+    isActive: m.is_active || true,
+    doNotify: m.do_notify
+  }
 }
 
 export default function currentWorkspace (state = defaultWorkspace, action) {
@@ -34,32 +67,14 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
     case `${SET}/${WORKSPACE_DETAIL}`:
       return {
         ...state,
-        id: action.workspaceDetail.workspace_id,
-        slug: action.workspaceDetail.slug,
-        label: action.workspaceDetail.label,
-        description: action.workspaceDetail.description,
-        agendaEnabled: action.workspaceDetail.agenda_enabled,
-        downloadEnabled: action.workspaceDetail.public_download_enabled,
-        uploadEnabled: action.workspaceDetail.public_upload_enabled,
-        sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => ({
-          slug: sbe.slug,
-          route: sbe.route,
-          faIcon: sbe.fa_icon,
-          hexcolor: sbe.hexcolor,
-          label: sbe.label
-        }))
+        ...serializeWorkspace(action.workspaceDetail),
+        sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serializeSidebarEntry(sbe))
       }
 
     case `${SET}/${WORKSPACE_MEMBER_LIST}`:
       return {
         ...state,
-        memberList: action.workspaceMemberList.map(m => ({
-          id: m.user_id,
-          publicName: m.user.public_name,
-          role: m.role,
-          isActive: m.is_active,
-          doNotify: m.do_notify
-        }))
+        memberList: action.workspaceMemberList.map(m => serializeMember(m))
       }
 
     case `${ADD}/${WORKSPACE_MEMBER}`:
@@ -67,41 +82,29 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         memberList: [
           ...state.memberList,
-          {
-            id: action.newMember.user_id,
-            publicName: action.newMember.public_name,
-            role: action.role,
-            isActive: action.newMember.is_active,
-            doNotify: action.newMember.do_notify
-          }
+          { ...serializeMember(action.newMember) }
         ]
       }
 
     case `${UPDATE}/${WORKSPACE_MEMBER}`:
       return {
         ...state,
-        memberList: state.memberList.map(m => m.id === action.member.user_id
-          ? { ...m, id: action.member.user_id, ...action.member, role: action.role }
+        memberList: state.memberList.map(m => m.id === action.member.user.user_id
+          ? { ...m, ...serializeMember(action.member) }
           : m
         )
+      }
+
+    case `${REMOVE}/${WORKSPACE_MEMBER}`:
+      return {
+        ...state,
+        memberList: state.memberList.filter(m => m.id !== action.memberId)
       }
 
     case `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
       return {
         ...state,
-        recentActivityList: action.workspaceRecentActivityList.map(ra => ({
-          id: ra.content_id,
-          slug: ra.slug,
-          label: ra.label,
-          type: ra.content_type,
-          fileExtension: ra.file_extension,
-          parentId: ra.parent_id,
-          showInUi: ra.show_in_ui,
-          isArchived: ra.is_archived,
-          isDeleted: ra.is_deleted,
-          statusSlug: ra.status,
-          subContentTypeSlug: ra.sub_content_types
-        }))
+        recentActivityList: action.workspaceRecentActivityList.map(ra => serializeContent(ra))
       }
 
     case `${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
@@ -109,20 +112,35 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         recentActivityList: [
           ...state.recentActivityList,
-          ...action.workspaceRecentActivityList.map(ra => ({
-            id: ra.content_id,
-            slug: ra.slug,
-            label: ra.label,
-            type: ra.content_type,
-            fileExtension: ra.file_extension,
-            parentId: ra.parent_id,
-            showInUi: ra.show_in_ui,
-            isArchived: ra.is_archived,
-            isDeleted: ra.is_deleted,
-            statusSlug: ra.status,
-            subContentTypeSlug: ra.sub_content_types
-          }))
+          ...action.workspaceRecentActivityList.map(ra => serializeContent(ra))
         ]
+      }
+
+    case `${ADD}/${WORKSPACE_CONTENT}`:
+      return {
+        ...state,
+        recentActivityList: [
+          ...action.workspaceContentList.map(c => serializeContent(c)),
+          ...state.recentActivityList
+        ]
+      }
+
+    case `${UPDATE}/${WORKSPACE_CONTENT}`:
+      return {
+        ...state,
+        recentActivityList: uniqBy(
+          [ // INFO - CH - 2020-05-18 - always put the updated element at the beginning. Then remove duplicates
+            ...action.workspaceContentList.map(c => serializeContent(c)),
+            ...state.recentActivityList
+          ],
+          'id'
+        )
+      }
+
+    case `${REMOVE}/${WORKSPACE_CONTENT}`:
+      return {
+        ...state,
+        recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.includes(c))
       }
 
     case `${SET}/${WORKSPACE_READ_STATUS_LIST}`:
@@ -131,12 +149,6 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         contentReadStatusList: action.workspaceReadStatusList
           .filter(content => content.read_by_user)
           .map(content => content.content_id)
-      }
-
-    case `${REMOVE}/${WORKSPACE_MEMBER}`:
-      return {
-        ...state,
-        memberList: state.memberList.filter(m => m.id !== action.memberId)
       }
 
     case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`:
