@@ -45,8 +45,8 @@ cd "$DEFAULTDIR/frontend_vendors"
 ./build_vendors.sh && loggood "success" || logerror "Could not build tracim_frontend_vendors"
 
 # Tracim Lib
-log "Building tracim_frontend_lib"
-yarn workspace tracim_frontend_lib run tracimbuild$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib"
+log "Building tracim_frontend_lib for Tracim"
+yarn workspace tracim_frontend_lib run tracimbuild$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
 
 for app in "$DEFAULTDIR"/frontend_app_*; do
 	if [ -f "$app/.disabled-app" ]; then
@@ -61,8 +61,8 @@ done
 log "building the Tracim frontend"
 yarn workspace tracim run tracimbuild && loggood "success" || logerror "Could not build the Tracim frontend."
 
-# Tracim Lib, for functional tests
-log "Building tracim_frontend_lib for functional tests"
+# Tracim Lib, for unit tests
+log "Building tracim_frontend_lib for unit tests"
 yarn workspace tracim_frontend_lib run build$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
 loggood "-- frontend build successful."
