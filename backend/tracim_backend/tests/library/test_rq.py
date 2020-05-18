@@ -43,7 +43,7 @@ class TestRQDatabaseWorker(object):
         redis = get_redis_connection(app_config)
         queue = get_rq_queue(redis)
         job = queue.enqueue(
-            # need to enqueue by name as enqueuing weth worker_job fails in pytest
+            # need to enqueue by name as enqueuing with worker_job fails in pytest
             "tracim_backend.tests.library.test_rq.worker_job",
             1,
             timeout=self.JOB_EXECUTION_TIMEOUT,
