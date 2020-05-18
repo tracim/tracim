@@ -15,7 +15,6 @@ module.exports = {
     pathinfo: !isProduction,
     publicPath: '/assets/'
   },
-  externals: { tracim_frontend_lib: 'tracim_frontend_lib', ...require('tracim_frontend_vendors/dist/externals.json') },
   optimization: {
     splitChunks: {
       chunks: 'all'

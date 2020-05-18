@@ -14,26 +14,26 @@ if [ -z "${LINTING+x}" ]; then
     export LINTING=false
 fi
 
-function log {
-    echo -e "${BROWN}[$(date +'%H:%M:%S')]${BROWN} $ $1${NC}"
+log() {
+    echo -e "${YELLOW}[$(date +'%H:%M:%S')]${BROWN} $ $1${NC}"
 }
 
-function loggood {
+loggood() {
     echo -e "${YELLOW}[$(date +'%H:%M:%S')]${GREEN} $ $1${NC}"
 }
 
-function logerror {
+logerror() {
     echo -e "${RED}[$(date +'%H:%M:%S')]${RED} $ $1${NC}"
     exit 1
 }
 
-function build_app {
+build_app() {
     app=$(basename "$1")
 	cd "$1" || exit 1
     ./build_*.sh $dev || logerror "Failed building $app."
 }
 
-function build_app_with_success {
+build_app_with_success() {
     build_app "$1" && loggood "Built $1 successfully"
 }
 
@@ -60,7 +60,7 @@ function parallel_build_failure {
 }
 
 # run the given command asynchronously and pop/push tokens
-function run_with_lock {
+run_with_lock() {
     local x
     # this read waits until there is something to read
     read -u 3 -n 3 x && ((0==x)) || parallel_build_failure
@@ -72,15 +72,17 @@ function run_with_lock {
     )&
 }
 
+wait_build() {
+    if ! wait -n 1; then
+        kill $(jobs -p)
+        exit 1
+    fi
+}
+
 ##### #####
 
 function build_apps {
     log "Building apps..."
-
-    # Initialize parallel build
-    if ! [ "$PARALLEL_BUILD" = 1 ]; then
-        open_sem "$PARALLEL_BUILD"
-    fi
 
     # Loop over the apps
     for app in "$DEFAULTDIR"/frontend_app_*; do
@@ -98,18 +100,19 @@ function build_apps {
     if [ "$PARALLEL_BUILD" != 1 ]; then
         for app in "$DEFAULTDIR"/frontend_app_*; do
             if ! [ -f "$app/.disabled-app" ]; then
-                if ! wait -n 1; then
-                    kill $(jobs -p)
-                    exit 1
-                fi
+                wait_build
             fi
         done
     fi
 }
 
-dev=""
-if [[ $1 = "-d" || $2 = "-d" ]]; then
-    dev="-d"
+build_tracim_lib() {
+    yarn workspace tracim_frontend_lib run build$windoz && loggood "Built tracim_frontend_lib for unit tests" || logerror "Could not build tracim_frontend_lib"
+}
+
+windoz=""
+if [ "$1" = "-w" ] || [ "$2" = "-w" ]; then
+    windoz="windoz"
 fi
 
 echo -e "\n${BROWN}/!\ ${NC}this script does not run 'yarn install'\n${BROWN}/!\ ${NC}"
@@ -128,19 +131,37 @@ export DEFAULTDIR
 # create folder $DEFAULTDIR/frontend/dist/app/ if no exists
 mkdir -p $DEFAULTDIR/frontend/dist/app/ || logerror "Failed to make directory $DEFAULTDIR/frontend/dist/app/"
 
+log "Building tracim_frontend_lib for unit tests"
+
+# Tracim Lib, for unit tests
+if [ "$PARALLEL_BUILD" = 1 ]; then
+    loggood "Building tracim_frontend_lib for unit tests"
+    build_tracim_lib
+else
+    # initialize the parallel build
+    open_sem "$PARALLEL_BUILD"
+    run_with_lock build_tracim_lib
+fi
+
+
 # Tracim vendors
 log "Building tracim_frontend_vendors"
 cd "$DEFAULTDIR/frontend_vendors"
 ./build_vendors.sh && loggood "Built tracim_frontend_vendors successfully" || logerror "Could not build tracim_frontend_vendors"
 
 # Tracim Lib
-log "Building tracim_frontend_lib"
-yarn workspace tracim_frontend_lib run buildtracimlibwindoz && loggood "Built tracim_frontend_vendors successfully" || logerror "Failed to build tracim_frontend_lib"
+log "Building tracim_frontend_lib for Tracim"
+yarn workspace tracim_frontend_lib run tracimbuildwindoz && loggood "Built tracim_frontend_vendors successfully" || logerror "Failed to build tracim_frontend_lib for Tracim"
 
 build_apps
 
 # build the Frontend
 log "Building the Tracim frontend"
-yarn workspace tracim run build || logerror "Failed to build the Tracim frontend."
+yarn workspace tracim run tracimbuild || logerror "Failed to build the Tracim frontend."
+
+if [ "$PARALLEL_BUILD" != 1 ]; then
+    # We need to wait for the build of tracim_frontend_lib for unit tests to finish
+    wait_build
+fi
 
 loggood "-- frontend build successful."

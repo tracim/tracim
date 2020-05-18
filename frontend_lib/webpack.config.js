@@ -17,8 +17,9 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'tracim_frontend_lib.[name].js' : 'tracim_frontend_lib.[name].dev.js',
     pathinfo: !isProduction,
-    library: 'tracim_frontend_[name]',
-    libraryTarget: 'var'
+    library: isProduction ? 'tracim_frontend_lib' : undefined,
+    libraryTarget: isProduction ? 'umd' : undefined,
+    umdNamedDefine: isProduction ? true : undefined
   },
   optimization: {
     namedModules: true
@@ -35,7 +36,6 @@ module.exports = {
     //   }
     // }
   },
-  externals: require('tracim_frontend_vendors/dist/externals.json'),
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     port: 8070,
@@ -99,6 +99,9 @@ module.exports = {
     plugins: [
       PnpWebpackPlugin.moduleLoader(module)
     ]
+  },
+  performance: {
+    hints: false
   },
   plugins: [
     ...[], // generic plugins always present

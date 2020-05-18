@@ -1,3 +1,8 @@
+# Tracim vendors
+
+This bundles includes the common dependencies used in the Tracim frontend, the Tracim frontend apps and `tracim_frontend_lib` in a global variable, `tracim_frontend_vendors`, so they are included once in Tracim.
+This helps making Tracim faster to build, download and run.
+
 # How to add a shared dependencies in this vendor bundle
 
 1. Check that all the apps using this dependency use the same version
