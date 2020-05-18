@@ -875,10 +875,10 @@ class UserApi(object):
     ) -> User:
         """Previous create_user method"""
         if not email:
-            if not username:
-                raise EmailOrUsernameRequired("Email or username is required to create an user")
             if self._config.EMAIL__REQUIRED:
                 raise EmailRequired("Email is required to create an user")
+            if not username:
+                raise EmailOrUsernameRequired("Email or username is required to create an user")
 
         lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
