@@ -2060,7 +2060,7 @@ class ContentApi(object):
     def mark_read(
         self,
         content: Content,
-        read_datetime: datetime = None,
+        read_datetime: typing.Optional[datetime.datetime] = None,
         do_flush: bool = True,
         recursive: bool = True,
     ) -> Content:

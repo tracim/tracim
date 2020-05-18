@@ -5,46 +5,46 @@ import {
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   history
-} from './helper.js'
-import i18n from './i18n.js'
+} from './util/helper.js'
+import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
 import {
-  USER_LOGIN,
-  USER_LOGOUT,
-  USER_REQUEST_PASSWORD,
-  USER_CONNECTED,
-  setRedirectLogin,
-  setUserDisconnected,
-  USER_KNOWN_MEMBER_LIST,
-  USER_NAME,
-  USER_EMAIL,
-  USER_PASSWORD,
-  USER_LANG,
-  WORKSPACE,
-  WORKSPACE_LIST,
-  WORKSPACE_DETAIL,
-  WORKSPACE_MEMBER_LIST,
-  WORKSPACE_MEMBER_ADD,
-  WORKSPACE_MEMBER_REMOVE,
+  APP_LIST,
+  CONFIG,
+  CONTENT,
+  CONTENT_TYPE_LIST,
   FOLDER,
   FOLDER_READ,
-  CONFIG,
-  APP_LIST,
-  CONTENT_TYPE_LIST,
+  newFlashMessage,
+  SEARCHED_KEYWORDS,
+  setRedirectLogin,
+  setUserDisconnected,
+  USER,
+  USER_CONNECTED,
+  USER_EMAIL,
+  USER_KNOWN_MEMBER_LIST,
+  USER_LANG,
+  USER_LOGIN,
+  USER_LOGOUT,
+  USER_NAME,
+  USER_PASSWORD,
+  USER_REQUEST_PASSWORD,
+  USER_WORKSPACE_DO_NOTIFY,
+  USER_WORKSPACE_LIST,
+  WORKSPACE,
+  WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT_ARCHIVED,
   WORKSPACE_CONTENT_DELETED,
-  WORKSPACE_RECENT_ACTIVITY,
-  WORKSPACE_READ_STATUS,
-  WORKSPACE_CONTENT_SHARE_FOLDER,
-  USER_WORKSPACE_DO_NOTIFY,
-  USER,
-  USER_WORKSPACE_LIST,
-  CONTENT,
-  WORKSPACE_CONTENT_PATH,
-  newFlashMessage,
-  WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT_MOVE,
-  SEARCHED_KEYWORDS
+  WORKSPACE_CONTENT_PATH,
+  WORKSPACE_CONTENT_SHARE_FOLDER,
+  WORKSPACE_DETAIL,
+  WORKSPACE_LIST,
+  WORKSPACE_MEMBER_ADD,
+  WORKSPACE_MEMBER_LIST,
+  WORKSPACE_MEMBER_REMOVE,
+  WORKSPACE_READ_STATUS,
+  WORKSPACE_RECENT_ACTIVITY
 } from './action-creator.sync.js'
 import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
 
@@ -650,6 +650,19 @@ export const getAppList = () => dispatch => {
     },
     actionName: APP_LIST,
     dispatch
+  })
+}
+
+export const getLiveMessage = () => dispatch => {
+  // FIXME #2842 - CH - 20200507 - This is a mock, it should use the endpoint to get the live messages list
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log('resolving getLiveMessage')
+      resolve({
+        status: 200,
+        json: []
+      })
+    }, 200)
   })
 }
 

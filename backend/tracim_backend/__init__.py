@@ -35,6 +35,7 @@ from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.plugins import init_plugin_manager
+from tracim_backend.lib.event import EventBuilder
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -54,6 +55,7 @@ from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.core_api.account_controller import AccountController
+from tracim_backend.views.core_api.message_controller import MessageController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
@@ -82,8 +84,12 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_config = CFG(settings)
     app_config.configure_filedepot()
     settings["CFG"] = app_config
+
+    # Init plugin manager
     plugin_manager = init_plugin_manager(app_config)
-    settings["event_dispatcher"] = plugin_manager.event_dispatcher
+    plugin_manager.register(EventBuilder(app_config))
+    settings["plugin_manager"] = plugin_manager
+
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
     tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
@@ -190,6 +196,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     reset_password_controller = ResetPasswordController()
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
+    message_controller = MessageController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -197,6 +204,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(reset_password_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(workspace_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(message_controller.bind, route_prefix=BASE_API_V2)
 
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
@@ -228,9 +236,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         configurator.include(frontend_controller.bind)
 
     # INFO - G.M - 2019-11-27 - Include plugin custom web code
-    plugin_manager.event_dispatcher.hook.web_include(
-        configurator=configurator, app_config=app_config
-    )
+    plugin_manager.hook.web_include(configurator=configurator, app_config=app_config)
 
     hapic.add_documentation_view("/api/v2/doc", "Tracim v2 API", "API of Tracim v2")
     return configurator.make_wsgi_app()

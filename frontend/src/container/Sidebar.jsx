@@ -4,7 +4,7 @@ import { withRouter } from 'react-router'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
-import appFactory from '../appFactory.js'
+import appFactory from '../util/appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
   setWorkspaceListIsOpenInSidebar
@@ -16,7 +16,7 @@ import {
   unLoggedAllowedPageList,
   findUserRoleIdInWorkspace,
   TRACIM_APP_VERSION
-} from '../helper.js'
+} from '../util/helper.js'
 import {
   CUSTOM_EVENT,
   ROLE_LIST,

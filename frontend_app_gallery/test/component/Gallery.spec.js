@@ -181,15 +181,15 @@ describe('<Gallery />', () => {
       })
     })
 
-    describe('onCarouselPositionChange()', () => {
+    describe('handleCarouselPositionChange()', () => {
       it('should set fileSelected to 2 when the param is 2', () => {
         wrapper.setState({ fileSelected: 0 })
-        wrapper.instance().onCarouselPositionChange(2)
+        wrapper.instance().handleCarouselPositionChange(2)
         expect(wrapper.state().fileSelected).to.equal(2)
       })
       it('should not change fileSelected when the param < 0', () => {
         wrapper.setState({ fileSelected: 0 })
-        wrapper.instance().onCarouselPositionChange(-1)
+        wrapper.instance().handleCarouselPositionChange(-1)
         expect(wrapper.state().fileSelected).to.equal(0)
       })
     })

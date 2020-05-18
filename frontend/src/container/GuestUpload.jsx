@@ -17,7 +17,7 @@ import UploadForm from '../component/GuestPage/UploadForm.jsx'
 import {
   FETCH_CONFIG,
   PAGE
-} from '../helper.js'
+} from '../util/helper.js'
 import { getGuestUploadInfo } from '../action-creator.async'
 
 class GuestUpload extends React.Component {
@@ -125,7 +125,17 @@ class GuestUpload extends React.Component {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
-          msg: <div>{props.t('Files already uploaded:')}<br /><ul>{alreadyUploadedList.map(file => <li>{file.name}</li>)}</ul></div>,
+          msg: (
+            <div>
+              {props.t('Files already uploaded:')}
+              <br />
+              <ul>
+                {alreadyUploadedList.map(file =>
+                  <li key={file.name}>{file.name}</li>
+                )}
+              </ul>
+            </div>
+          ),
           type: 'warning',
           delay: undefined
         }

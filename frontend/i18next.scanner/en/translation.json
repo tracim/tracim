@@ -237,5 +237,6 @@
   "Public upload": "Public upload",
   "Password reset": "Password reset",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Find all your documents put online directly on your computer via the workstation, without going through the software.",
-  "Archived Topic": "Archived Topic"
+  "Archived Topic": "Archived Topic",
+  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?"
 }

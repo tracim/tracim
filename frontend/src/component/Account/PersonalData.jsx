@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { editableUserAuthTypeList } from '../../helper.js'
+import { editableUserAuthTypeList } from '../../util/helper.js'
 
 require('./PersonalData.styl')
 
