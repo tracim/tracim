@@ -12,11 +12,11 @@ from tracim_backend.views.core_api.schemas import LiveMessageSchema
 TLM_EVENT_NAME = "message"
 
 
-class ServerSideEvent(object):
-    """Create a ServerSideEvent String Like"""
+class JsonServerSideEvent(object):
+    """Create a ServerSideEvent with single-line json as data"""
 
     def __init__(
-        self, data: typing.List[str], event: typing.Optional[str] = None,
+        self, data: typing.Dict[str, typing.Any], event: typing.Optional[str] = None,
     ):
         self.data = data
         self.event = event
@@ -25,8 +25,7 @@ class ServerSideEvent(object):
         buffer = ""
         if self.event:
             buffer += "event: {}\n".format(self.event)
-        for row in self.data:
-            buffer += "data: {}\n".format(row)
+        buffer += "data: {}\n".format(json.dumps(self.data))
         buffer += "\n"
         return buffer
 
@@ -43,8 +42,6 @@ class LiveMessagesLib(object):
         self.publish_dict(channel_name, message_as_dict=message_as_dict)
 
     def publish_dict(self, channel_name: str, message_as_dict: typing.Dict[str, typing.Any]):
-        # todo - G.M - 07-05-2020 - Message should be a specific type, not dict
-        message_as_dict = json.dumps(message_as_dict)
         self.grip_pub_control.publish_http_stream(
-            channel_name, str(ServerSideEvent(data=[message_as_dict], event=TLM_EVENT_NAME))
+            channel_name, str(JsonServerSideEvent(data=message_as_dict, event=TLM_EVENT_NAME))
         )

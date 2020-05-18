@@ -216,13 +216,17 @@ class EventBuilder:
         if not isinstance(instance, Event):
             return
         event = typing.cast(Event, instance)
-        redis_connection = get_redis_connection(self._config)
-        # TODO S.G 2020-05-12: change is_async to use workers
-        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME, is_async=False)
-        logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
         LiveMessageBuilder.session = db_session
         LiveMessageBuilder.config = self._config
-        queue.enqueue(LiveMessageBuilder.publish_messages_for_event, event.event_id)
+        # TODO - G.M - 2020-05-15 - this parameter should be renamed, it's not email-related anymore
+        if self._config.EMAIL__PROCESSING_MODE == self._config.CST.ASYNC:
+            redis_connection = get_redis_connection(self._config)
+            queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+            logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
+            queue.enqueue(LiveMessageBuilder.publish_messages_for_event, event.event_id)
+        else:
+            logger.debug(self, "publish event {} synchronously".format(event))
+            LiveMessageBuilder.publish_messages_for_event(event.event_id)
 
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
