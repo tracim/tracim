@@ -9,6 +9,7 @@ from sqlalchemy.orm import joinedload
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -33,7 +34,7 @@ from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
-from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSchema
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
@@ -73,7 +74,7 @@ class EventBuilder:
     """Create Event objects from the database crud hooks."""
 
     _user_schema = UserDigestSchema()
-    _workspace_schema = WorkspaceDigestSchema()
+    _workspace_schema = WorkspaceSchema()
     _content_schema = ContentDigestSchema()
     _event_schema = EventSchema()
 
@@ -215,15 +216,17 @@ class EventBuilder:
         if not isinstance(instance, Event):
             return
         event = typing.cast(Event, instance)
-        redis_connection = get_redis_connection(self._config)
-        # TODO S.G 2020-05-12: change is_async to use workers
-        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME, is_async=False)
-        logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
         LiveMessageBuilder.session = db_session
         LiveMessageBuilder.config = self._config
-        queue.enqueue(
-            LiveMessageBuilder.publish_messages_for_event, self._event_schema.dump(event).data,
-        )
+        # TODO - G.M - 2020-05-15 - this parameter should be renamed, it's not email-related anymore
+        if self._config.EMAIL__PROCESSING_MODE == self._config.CST.ASYNC:
+            redis_connection = get_redis_connection(self._config)
+            queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+            logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
+            queue.enqueue(LiveMessageBuilder.publish_messages_for_event, event.event_id)
+        else:
+            logger.debug(self, "publish event {} synchronously".format(event))
+            LiveMessageBuilder.publish_messages_for_event(event.event_id)
 
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
@@ -252,14 +255,8 @@ class LiveMessageBuilder:
         return cls.config
 
     @classmethod
-    def publish_messages_for_event(cls, event_dict: typing.Dict[str, typing.Any]) -> None:
-        load_result = cls._event_schema.load(event_dict)
-        if load_result.errors:
-            logger.error(
-                cls, "Error while loading event from dict: {}".format(load_result.errors),
-            )
-            return
-        event = Event(**load_result.data)
+    def publish_messages_for_event(cls, event_id: int) -> None:
+        event = cls._session().query(Event).filter(Event.event_id == event_id).one()
         if event.entity_type == EntityType.USER:
             receiver_ids = cls._get_user_event_receiver_ids(event)
         elif event.entity_type == EntityType.WORKSPACE:
@@ -270,10 +267,18 @@ class LiveMessageBuilder:
             receiver_ids = cls._get_user_event_receiver_ids(event)
 
         messages = [
-            Message(receiver_id=receiver_id, event_id=event.event_id, sent=datetime.utcnow())
+            Message(
+                receiver_id=receiver_id,
+                event=event,
+                event_id=event.event_id,
+                sent=datetime.utcnow(),
+            )
             for receiver_id in receiver_ids
         ]
         cls._session().add_all(messages)
+        live_message_lib = LiveMessagesLib(cls.config)
+        for message in messages:
+            live_message_lib.publish_message_to_user(message)
 
     @classmethod
     def _get_user_event_receiver_ids(cls, event: Event) -> typing.Set[int]:
