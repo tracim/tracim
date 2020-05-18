@@ -4,11 +4,11 @@ const isProduction = process.env.NODE_ENV === 'production'
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
-    main: './dist/index.js'
+    main: './dist/require-file.js'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'vendors.js' : 'vendors.dev.js',
+    filename: isProduction ? 'tracim_frontend_vendors.js' : 'tracim_frontend_vendors.dev.js',
     pathinfo: !isProduction,
     library: 'tracim_frontend_vendors',
     libraryTarget: 'var'

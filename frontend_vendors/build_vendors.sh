@@ -33,4 +33,4 @@ fi
 log "building frontend_vendors"
 yarn run build$dev$windoz  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
-cp dist/vendors.js ../frontend/dist/app/tracim_frontend_vendors.js && loggood "success" || logerror "some error"
+cp dist/tracim_frontend_vendors.js ../frontend/dist/app/tracim_frontend_vendors.js && loggood "success" || logerror "some error"

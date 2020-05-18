@@ -34,7 +34,7 @@ module.exports = {
     //   }
     // }
   },
-  externals: require(path.join(path.dirname(require.resolve('tracim_frontend_vendors')), 'externals.json')),
+  externals: require('tracim_frontend_vendors/dist/externals.json'),
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     port: 8070,

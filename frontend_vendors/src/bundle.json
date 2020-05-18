@@ -1,0 +1,13 @@
+[
+  "classnames",
+  "core-js/stable",
+  "css-loader",
+  "date-fns",
+  "prop-types",
+  "radium",
+  "react",
+  "react-dom",
+  "react-image-lightbox",
+  "react-router",
+  "regenerator-runtime/runtime"
+]
