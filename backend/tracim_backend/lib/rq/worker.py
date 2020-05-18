@@ -1,13 +1,11 @@
 import contextlib
-import os
 import typing
 
-from pyramid.paster import get_appsettings
-from pyramid.paster import setup_logging
 from rq import SimpleWorker
 from rq.local import LocalStack
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.utils.daemon import initialize_config_from_environment
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.tracim_session import TracimSession
@@ -31,6 +29,9 @@ def worker_session() -> typing.Generator[TracimSession, None, None]:
     session = session_factory()
     try:
         yield session
+        session.commit()
+    except Exception:
+        session.rollback()
     finally:
         session.close()
 
@@ -48,17 +49,15 @@ def worker_app_config() -> CFG:
 
 class DatabaseWorker(SimpleWorker):
     """Custom RQ worker that provides access to Tracim:
-      - SQL database through the worker_session() context manage.
+      - SQL database through the worker_session() context manager.
       - Configuration object (CFG) through the worker_app_config() function.
+
+    Work is performed in the main worker thread to avoid connection problems
+    with SQLAlchemy.
     """
 
     def work(self, *args, **kwargs):
-        config_uri = os.environ["TRACIM_CONF_PATH"]
-        setup_logging(config_uri)
-        settings = get_appsettings(config_uri)
-        settings.update(settings.global_conf)
-        app_config = CFG(settings)
-        app_config.configure_filedepot()
+        app_config = initialize_config_from_environment()
         _engines.push(get_engine(app_config))
         _configs.push(app_config)
         try:
