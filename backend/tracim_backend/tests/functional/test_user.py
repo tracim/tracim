@@ -2985,7 +2985,9 @@ class TestUserEndpoint(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
 
-    def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
+    def test_api__create_user__ok_200__full_admin(
+        self, web_testapp, user_api_factory, event_helper
+    ):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "email": "test@test.test",
@@ -3007,6 +3009,19 @@ class TestUserEndpoint(object):
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 0
+
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.created"
+        assert last_event.fields["user"] == {
+            "user_id": res["user_id"],
+            "public_name": res["public_name"],
+            "avatar_url": None,
+        }
+        assert last_event.fields["author"] == {
+            "user_id": 1,
+            "public_name": "Global manager",
+            "avatar_url": None,
+        }
 
     def test_api__create_user__ok_200__full_admin_with_allowed_space(
         self, web_testapp, user_api_factory
@@ -3151,6 +3166,32 @@ class TestUserEndpoint(object):
         assert user.email == "test@test.test"
         assert user.password is None
 
+    def test_api__update_user__ok_200__infos(self, web_testapp, user_api_factory, event_helper):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params).json_body
+        user_id = res["user_id"]
+
+        res = web_testapp.put_json(
+            "/api/v2/users/{}".format(user_id),
+            status=200,
+            params={"timezone": "Europe/London", "lang": "en", "public_name": "John Doe"},
+        ).json_body
+        assert res["timezone"] == "Europe/London"
+        assert res["lang"] == "en"
+        assert res["public_name"] == "John Doe"
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.modified"
+        assert last_event.fields["user"]["public_name"] == "John Doe"
+
     def test_api__create_user__err_400__email_already_in_db(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
@@ -3292,7 +3333,7 @@ class TestUserWithNotificationEndpoint(object):
         assert headers["To"][0] == "test <test@test.test>"
         assert headers["Subject"][0] == "[Tracim] Created account"
 
-    def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, mailhog):
+    def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, event_helper):
 
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -3314,6 +3355,8 @@ class TestUserWithNotificationEndpoint(object):
         web_testapp.put("/api/v2/users/{}/trashed".format(user_id), status=204)
         res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200).json_body
         assert res["is_deleted"] is True
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.deleted"
 
     def test_api_delete_user__err_400__admin_itself(self, web_testapp, admin_user):
 

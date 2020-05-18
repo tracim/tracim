@@ -12,8 +12,8 @@ from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.utils import EmailAddress
 from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
-from tracim_backend.lib.utils.utils import get_redis_connection
-from tracim_backend.lib.utils.utils import get_rq_queue
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 

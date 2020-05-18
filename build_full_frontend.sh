@@ -84,7 +84,9 @@ function build_apps {
 
     # Loop over the apps
     for app in "$DEFAULTDIR"/frontend_app_*; do
-        if [ "$PARALLEL_BUILD" = 1 ]; then
+        if [ -f "$app/.disabled-app" ]; then
+            log "Skipping $app because of the existence of the .disabled-app file"
+        elif [ "$PARALLEL_BUILD" = 1 ]; then
             log "Building $app"
             build_app $app
         else
@@ -93,20 +95,17 @@ function build_apps {
     done
 
     # Loop over the apps
-    if ! [ "$PARALLEL_BUILD" = 1 ]; then
+    if [ "$PARALLEL_BUILD" != 1 ]; then
         for app in "$DEFAULTDIR"/frontend_app_*; do
-            if ! wait -n 1; then
-                kill $(jobs -p)
-                exit 1
+            if ! [ -f "$app/.disabled-app" ]; then
+                if ! wait -n 1; then
+                    kill $(jobs -p)
+                    exit 1
+                fi
             fi
         done
     fi
 }
-
-windoz=""
-if [[ $1 = "-w" || $2 = "-w" ]]; then
-    windoz="windoz"
-fi
 
 dev=""
 if [[ $1 = "-d" || $2 = "-d" ]]; then
@@ -136,7 +135,7 @@ cd "$DEFAULTDIR/frontend_vendors"
 
 # Tracim Lib
 log "Building tracim_frontend_lib"
-yarn workspace tracim_frontend_lib run buildtracimlib$windoz && loggood "Built tracim_frontend_vendors successfully" || logerror "Failed to build tracim_frontend_lib"
+yarn workspace tracim_frontend_lib run buildtracimlibwindoz && loggood "Built tracim_frontend_vendors successfully" || logerror "Failed to build tracim_frontend_lib"
 
 build_apps
 

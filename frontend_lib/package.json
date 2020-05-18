@@ -10,9 +10,9 @@
     "build": "echo 'Only use npm run buildtracimlib'",
     "build-translation": "node i18next.scanner.js",
     "buildtracimlib": "NODE_ENV=production webpack-cli -p && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh && echo Script ended at $(date +'%H:%M:%S')",
-    "buildtracimlib-dev": "webpack-cli && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh.sh && echo Script ended at $(date +'%H:%M:%S')",
-    "buildtracimlibwindoz": "set NODE_ENV=production&& webpack-cli -p && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh.sh",
-    "buildtracimlib-devwindoz": "set NODE_ENV=production&& webpack-cli && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh.sh",
+    "buildtracimlib-dev": "webpack-cli && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh && echo Script ended at $(date +'%H:%M:%S')",
+    "buildtracimlibwindoz": "NODE_ENV=production webpack-cli -p && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh",
+    "buildtracimlib-devwindoz": "set NODE_ENV=production&& webpack-cli && cp ./dist/tracim_frontend_lib.style.js ./dist/tracim_frontend_lib.lib.js ../frontend/dist/app/ && ./wraplib.sh",
     "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },

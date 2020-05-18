@@ -16,10 +16,7 @@ module.exports = {
     library: isProduction ? 'appShareFolderAdvanced' : undefined,
     libraryTarget: isProduction ? 'var' : undefined
   },
-  externals: Object.assign(
-    {tracim_frontend_lib: 'tracim_frontend_lib'},
-    require(path.join(path.dirname(require.resolve("tracim_frontend_vendors")), 'externals.json'))
-  ),
+  externals: { tracim_frontend_lib: 'tracim_frontend_lib', ...require('tracim_frontend_vendors/dist/externals.json') },
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     host: '0.0.0.0',
@@ -73,7 +70,7 @@ module.exports = {
   },
   resolve: {
     plugins: [
-      PnpWebpackPlugin,
+      PnpWebpackPlugin
     ],
     alias: {
       // Make ~tracim_frontend_lib work in stylus files
@@ -83,14 +80,14 @@ module.exports = {
   },
   resolveLoader: {
     plugins: [
-      PnpWebpackPlugin.moduleLoader(module),
-    ],
+      PnpWebpackPlugin.moduleLoader(module)
+    ]
   },
   plugins: [
     ...[], // generic plugins always present
     ...(isProduction
-        ? [] // production specific plugins
-        : [] // development specific plugins
+      ? [] // production specific plugins
+      : [] // development specific plugins
     )
   ]
 }

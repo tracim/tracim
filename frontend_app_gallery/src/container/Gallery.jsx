@@ -371,7 +371,7 @@ export class Gallery extends React.Component {
     return state.imagesPreviews[state.fileSelected + 1].lightBoxUrlList[0]
   }
 
-  onCarouselPositionChange = (fileSelected) => {
+  handleCarouselPositionChange = (fileSelected) => {
     if (fileSelected < 0) return
     this.setState({ fileSelected })
   }
@@ -562,8 +562,8 @@ export class Gallery extends React.Component {
                 <Carousel
                   fileSelected={state.fileSelected}
                   slides={state.imagesPreviews}
-                  onCarouselPositionChange={this.onCarouselPositionChange}
-                  handleClickShowImageRaw={this.handleClickShowImageRaw}
+                  onCarouselPositionChange={this.handleCarouselPositionChange}
+                  onClickShowImageRaw={this.handleClickShowImageRaw}
                   disableAnimation={state.displayLightbox}
                   isWorkspaceRoot={state.folderId === 0}
                   autoPlay={state.autoPlay}
@@ -593,54 +593,57 @@ export class Gallery extends React.Component {
                     imagePadding={0}
                     onAfterOpen={this.handleAfterOpenReactImageLightBox}
                     reactModalProps={{ parentSelector: () => this.reactImageLightBoxModalRoot }}
-                    toolbarButtons={[
-                      (
-                        <button
-                          className='btn iconBtn'
-                          onClick={() => this.onClickSlickPlay(!state.autoPlay)}
-                          title={state.autoPlay ? props.t('Pause') : props.t('Play')}
-                          data-cy='gallery__action__button__lightbox__auto__play'
-                        >
-                          <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
-                        </button>
-                      ), (
-                        <button
-                          className='btn iconBtn'
-                          onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))}
-                          title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}
-                          data-cy='gallery__action__button__lightbox__fullscreen'
-                        >
-                          <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
-                        </button>
-                      ), (
-                        <button
-                          className='btn iconBtn'
-                          onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
-                          title={props.t('Rotate 90° left')}
-                          data-cy='gallery__action__button__lightbox__rotation__left'
-                        >
-                          <i className='fa fa-fw fa-undo' />
-                        </button>
-                      ), (
-                        <button
-                          className='btn iconBtn gallery__action__button__lightbox__rotation__right'
-                          onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
-                          title={props.t('Rotate 90° right')}
-                        >
-                          <i className='fa fa-fw fa-undo' />
-                        </button>
-                      ), (
-                        <a
-                          className='btn iconBtn gallery__action__button__lightbox__openRawContent'
-                          title={props.t('Open raw file')}
-                          href={this.getRawFileUrlSelectedFile()}
-                          target='_blank'
-                          rel='noopener noreferrer'
-                        >
-                          <i className='fa fa-fw fa-download' />
-                        </a>
-                      )
-                    ]}
+                    toolbarButtons={[(
+                      <button
+                        className='btn iconBtn'
+                        onClick={() => this.onClickSlickPlay(!state.autoPlay)}
+                        title={state.autoPlay ? props.t('Pause') : props.t('Play')}
+                        data-cy='gallery__action__button__lightbox__auto__play'
+                        key='btn_autoplay'
+                      >
+                        <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                      </button>
+                    ), (
+                      <button
+                        className='btn iconBtn'
+                        onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))}
+                        title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}
+                        data-cy='gallery__action__button__lightbox__fullscreen'
+                        key='btn_fullscreen'
+                      >
+                        <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
+                      </button>
+                    ), (
+                      <button
+                        className='btn iconBtn'
+                        onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
+                        title={props.t('Rotate 90° left')}
+                        data-cy='gallery__action__button__lightbox__rotation__left'
+                        key='btn_rotate_left'
+                      >
+                        <i className='fa fa-fw fa-undo' />
+                      </button>
+                    ), (
+                      <button
+                        className='btn iconBtn gallery__action__button__lightbox__rotation__right'
+                        onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
+                        title={props.t('Rotate 90° right')}
+                        key='btn_rotate_right'
+                      >
+                        <i className='fa fa-fw fa-undo' />
+                      </button>
+                    ), (
+                      <a
+                        className='btn iconBtn gallery__action__button__lightbox__openRawContent'
+                        title={props.t('Open raw file')}
+                        href={this.getRawFileUrlSelectedFile()}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        key='btn_open_raw'
+                      >
+                        <i className='fa fa-fw fa-download' />
+                      </a>
+                    )]}
                   />
                 </div>
               )}

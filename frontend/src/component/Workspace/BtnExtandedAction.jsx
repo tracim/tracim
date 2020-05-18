@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { ROLE } from 'tracim_frontend_lib'
 import { connect } from 'react-redux'
-import { PAGE } from '../../helper'
+import { PAGE } from '../../util/helper.js'
 import { Link } from 'react-router-dom'
 
 require('./BtnExtandedAction.styl')

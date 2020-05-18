@@ -5,11 +5,11 @@ module.exports = {
   stats: process.env.QUIET_BUILD === "true" ? 'errors-warnings' : undefined,
   mode: isProduction ? 'production' : 'development',
   entry: {
-    main: "./dist/index.js"
+    main: './dist/require-file.js'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'vendors.js' : 'vendors.dev.js',
+    filename: isProduction ? 'tracim_frontend_vendors.js' : 'tracim_frontend_vendors.dev.js',
     pathinfo: !isProduction,
     library: 'tracim_frontend_vendors',
     libraryTarget: 'var'

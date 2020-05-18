@@ -25,4 +25,4 @@ if [[ $1 = "-d" || $2 = "-d" ]]; then
 fi
 
 yarn run build$dev$windoz || logerror "Failed to build the vendor bundle"
-cp dist/vendors.js ../frontend/dist/app/tracim_frontend_vendors.js  || logerror "Failed to copy the vendor bundle"
+cp dist/tracim_frontend_vendors.js ../frontend/dist/app/tracim_frontend_vendors.js  || logerror "Failed to copy the vendor bundle"

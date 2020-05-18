@@ -5,8 +5,8 @@ import { Route, Redirect } from 'react-router-dom'
 import {
   PAGE,
   findUserRoleIdInWorkspace
-} from '../helper.js'
-import appFactory from '../appFactory.js'
+} from '../util/helper.js'
+import appFactory from '../util/appFactory.js'
 import {
   CUSTOM_EVENT,
   PROFILE,

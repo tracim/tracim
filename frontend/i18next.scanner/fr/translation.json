@@ -237,5 +237,6 @@
   "User administration": "Administration d'utilisateur",
   "Forgotten password": "Mot de passe perdu",
   "Public upload": "Téléversement publique",
-  "Password reset": "Réinitialisation mot de passe"
+  "Password reset": "Réinitialisation mot de passe",
+  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} est supérieur à 1MO, cela peut prendre du temps à téléverser. Voulez-vous continuer ?"
 }

@@ -13505,7 +13505,6 @@ fsevents@~2.1.1:
   resolution: "tracim_frontend_vendors@workspace:frontend_vendors"
   dependencies:
     classnames: ^2.2.6
-    color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
     date-fns: ^1.30.1

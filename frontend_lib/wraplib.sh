@@ -8,7 +8,7 @@
 # node as a regular module.
 
 mv dist/tracim_frontend_lib.lib.js dist/tracim_frontend_lib.lib.js.orig
-cat ../frontend_vendors/dist/vendors.js > dist/tracim_frontend_lib.lib.js
+cat ../frontend_vendors/dist/tracim_frontend_vendors.js > dist/tracim_frontend_lib.lib.js
 echo >> dist/tracim_frontend_lib.lib.js
 cat dist/tracim_frontend_lib.lib.js.orig >> dist/tracim_frontend_lib.lib.js
 echo "module.exports = tracim_frontend_lib" >> dist/tracim_frontend_lib.lib.js
