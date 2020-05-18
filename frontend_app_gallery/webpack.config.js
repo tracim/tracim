@@ -4,7 +4,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {
-  stats: process.env.QUIET_BUILD === "true" ? 'errors-warnings' : undefined,
+  stats: process.env.VERBOSE === 'false' ? 'errors-warnings' : undefined,
   mode: isProduction ? 'production' : 'development',
   entry: isProduction
     ? './src/index.js' // only one instance of babel-polyfill is allowed
@@ -34,7 +34,7 @@ module.exports = {
     hints: false
   },
   module: {
-    rules: [ process.env.DISABLE_LINTING === "true" ? {} : {
+    rules: [ process.env.LINTING !== "false" ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',

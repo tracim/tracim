@@ -6,12 +6,12 @@ GREEN='\033[1;32m'
 RED='\033[1;31m'
 NC='\033[0m' # No Color
 
-if [ -z "${QUIET_BUILD+x}" ]; then
-    export QUIET_BUILD=true
+if [ -z "${VERBOSE+x}" ]; then
+    export VERBOSE=false
 fi
 
-if [ -z "${DISABLE_LINTING+x}" ]; then
-    export DISABLE_LINTING=true
+if [ -z "${LINTING+x}" ]; then
+    export LINTING=false
 fi
 
 function log {

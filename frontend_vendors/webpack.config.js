@@ -2,7 +2,7 @@ const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
-  stats: process.env.QUIET_BUILD === "true" ? 'errors-warnings' : undefined,
+  stats: process.env.VERBOSE === 'false' ? 'errors-warnings' : undefined,
   mode: isProduction ? 'production' : 'development',
   entry: {
     main: './dist/require-file.js'
@@ -15,7 +15,7 @@ module.exports = {
     libraryTarget: 'var'
   },
   module: {
-    rules: [ process.env.DISABLE_LINTING === "true" ? {} : {
+    rules: [ process.env.LINTING !== "false" ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',

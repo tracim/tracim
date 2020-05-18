@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {
-  stats: process.env.QUIET_BUILD === "true" ? 'errors-warnings' : undefined,
+  stats: process.env.VERBOSE === 'false' ? 'errors-warnings' : undefined,
   mode: isProduction ? 'production' : 'development',
   entry: {
     lib: isProduction ? './src/index.js' : './src/index.dev.js',
@@ -53,7 +53,7 @@ module.exports = {
   devtool: isProduction ? false : 'cheap-module-source-map',
   module: {
     rules: [
-      isProduction || process.env.DISABLE_LINTING === "true"
+      isProduction || process.env.LINTING !== "false"
         ? {}
         : {
           test: /\.jsx?$/,
