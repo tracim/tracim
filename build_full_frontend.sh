@@ -149,19 +149,19 @@ log "Building tracim_frontend_vendors"
 cd "$DEFAULTDIR/frontend_vendors"
 ./build_vendors.sh && loggood "Built tracim_frontend_vendors successfully" || logerror "Could not build tracim_frontend_vendors"
 
-# Tracim Lib
+# Tracim Lib Bundle
+log "Building tracim_frontend_lib"
+yarn workspace tracim_frontend_lib run build$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib"
+
+# Tracim Lib for the browsers
 log "Building tracim_frontend_lib for Tracim"
 yarn workspace tracim_frontend_lib run tracimbuildwindoz && loggood "Built tracim_frontend_lib for Tracim successfully" || logerror "Failed to build tracim_frontend_lib for Tracim"
-
-build_apps
 
 if [ "$PARALLEL_BUILD" != 1 ]; then
     # We need to wait for the build of tracim_frontend_lib for unit tests to finish
     wait_build
 fi
 
-# build the Frontend
-log "Building the Tracim frontend"
-yarn workspace tracim run tracimbuild || logerror "Failed to build the Tracim frontend."
+build_apps
 
 loggood "-- frontend build successful."
