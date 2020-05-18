@@ -44,7 +44,12 @@ log "Building tracim_frontend_vendors"
 cd "$DEFAULTDIR/frontend_vendors"
 ./build_vendors.sh && loggood "success" || logerror "Could not build tracim_frontend_vendors"
 
-# Tracim Lib
+
+# Tracim Lib Bundle
+log "Building tracim_frontend_lib"
+yarn workspace tracim_frontend_lib run build$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib"
+
+# Tracim Lib for the browsers
 log "Building tracim_frontend_lib for Tracim"
 yarn workspace tracim_frontend_lib run tracimbuild$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
 
@@ -60,9 +65,5 @@ done
 # build Tracim
 log "building the Tracim frontend"
 yarn workspace tracim run tracimbuild && loggood "success" || logerror "Could not build the Tracim frontend."
-
-# Tracim Lib, for unit tests
-log "Building tracim_frontend_lib for unit tests"
-yarn workspace tracim_frontend_lib run build$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
 loggood "-- frontend build successful."
