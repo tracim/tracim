@@ -109,6 +109,15 @@ class UserApi(object):
             raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
         return user
 
+    def get_one_by_login(self, login: str) -> User:
+        """Return the user identified by the given login.
+        User's email is searched if the login is an email
+        User's username is searched in other cases
+        """
+        if "@" in login:
+            return self.get_one_by_email(login)
+        return self.get_one_by_username(login)
+
     def get_one_by_token(self, token: str) -> User:
         try:
             user = self._base_query().filter(User.auth_token == token).one()
@@ -226,46 +235,6 @@ class UserApi(object):
             query = query.filter(~User.user_id.in_(exclude_user_ids))
         query = query.limit(nb_elem)
         return query.all()
-
-    def get(
-        self,
-        user_id: int = None,
-        token: str = None,
-        email: str = None,
-        username: typing.Optional[str] = None,
-    ) -> User:
-        """
-        Get an existing user by:
-         - their id, or
-         - authentication token, or
-         - email, or
-         - sername
-        in this order.
-        If no user is found by any of these parameters, exception UserDoesNotExist will be raised
-        """
-
-        if user_id:
-            try:
-                return self.get_one(user_id)
-            except UserDoesNotExist:
-                pass
-        if token:
-            try:
-                return self.get_one_by_token(token)
-            except UserDoesNotExist:
-                pass
-        if email:
-            try:
-                return self.get_one_by_email(email)
-            except UserDoesNotExist:
-                pass
-        if username:
-            try:
-                return self.get_one_by_username(username)
-            except UserDoesNotExist:
-                pass
-
-        raise UserDoesNotExist("User not found with any of given params.")
 
     # Check methods
 

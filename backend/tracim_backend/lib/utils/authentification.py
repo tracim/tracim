@@ -31,28 +31,9 @@ class TracimAuthenticationPolicy(ABC):
     Abstract class with some helper for Pyramid TracimAuthentificationPolicy
     """
 
-    def _get_auth_unsafe_user(
-        self,
-        request: Request,
-        email: typing.Optional[str] = None,
-        user_id: typing.Optional[int] = None,
-        token: typing.Optional[str] = None,
-    ) -> typing.Optional[User]:
-        """
-        Helper to get user from email or user_id in pyramid request
-        (process check user_id first)
-        :param request: pyramid request
-        :param email: email of the user, optional
-        :param user_id: user_id of the user, optional
-        :return: User or None
-        """
+    def _get_user_api(self, request: Request) -> UserApi:
         app_config = request.registry.settings["CFG"]  # type: CFG
-        uapi = UserApi(None, session=request.dbsession, config=app_config)
-        try:
-            user = uapi.get(user_id=user_id, token=token, email=email)
-            return user
-        except UserDoesNotExist:
-            return None
+        return UserApi(None, session=request.dbsession, config=app_config)
 
     def _authenticate_user(
         self, request: Request, login: typing.Optional[str], password: typing.Optional[str],
@@ -154,7 +135,10 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
         if not isinstance(request.unauthenticated_userid, int):
             request.session.delete()
             return None
-        user = self._get_auth_unsafe_user(request, user_id=request.unauthenticated_userid)
+        try:
+            user = self._get_user_api(request).get_one(user_id=request.unauthenticated_userid)
+        except UserDoesNotExist:
+            user = None
         # do not allow invalid_user + ask for cleanup of session cookie
         if not user or not user.is_active or user.is_deleted:
             request.session.delete()
@@ -227,7 +211,12 @@ class ApiTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthent
         if valid_api_key != api_key:
             return None
         # check if user is correct
-        user = self._get_auth_unsafe_user(request, email=request.unauthenticated_userid)
+        try:
+            user = self._get_user_api(request).get_one_by_email(
+                email=request.unauthenticated_userid
+            )
+        except UserDoesNotExist:
+            user = None
         if not user or not user.is_active or user.is_deleted:
             return None
         return user
@@ -260,7 +249,10 @@ class QueryTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthe
         token = self.unauthenticated_userid(request)
         if not token:
             return None
-        user = self._get_auth_unsafe_user(request=request, token=token)
+        try:
+            user = self._get_user_api(request).get_one_by_token(token=token)
+        except UserDoesNotExist:
+            user = None
         if not user:
             return None
         if not user.validate_auth_token(token, app_config.USER__AUTH_TOKEN__VALIDITY):

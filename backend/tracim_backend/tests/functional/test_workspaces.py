@@ -1507,7 +1507,7 @@ class TestWorkspaceMembersEndpoint(object):
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(
         self, web_testapp
