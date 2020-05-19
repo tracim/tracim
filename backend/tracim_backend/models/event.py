@@ -22,6 +22,7 @@ class OperationType(enum.Enum):
     CREATED = "created"
     MODIFIED = "modified"
     DELETED = "deleted"
+    UNDELETED = "undeleted"
 
     def __str__(self) -> str:
         return self.value

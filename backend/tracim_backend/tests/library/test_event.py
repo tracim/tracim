@@ -27,7 +27,7 @@ class TestEventBuilder:
         assert update_while_deleted_event.event_type == "user.modified"
 
         uapi.undelete(user, do_save=True)
-        undelete_as_modified_event = event_helper.last_event
-        assert undelete_as_modified_event.event_type == "user.modified"
+        undelete_event = event_helper.last_event
+        assert undelete_event.event_type == "user.undeleted"
 
-        assert undelete_as_modified_event.event_id == update_while_deleted_event.event_id + 1
+        assert undelete_event.event_id == update_while_deleted_event.event_id + 1
