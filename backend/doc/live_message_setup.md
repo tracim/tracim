@@ -1,20 +1,37 @@
 
-## Install Pushpin
+# Install Live Message mecanism for development purpose
+
+## Install Pushpin in docker
 
 On ubuntu/debian:
 
 ~~~bash
-apt install pushpin
+apt install docker.io
+docker pull fanout/pushpin
 ~~~
 
 ## Some configuration needed
 
-if you use pushpin with dev config (pushpin_dev.conf) for development purpose,
-you need to set tracim config like this:
+First you need to verify that both zurl and pushpin service are not running locally,
+on debian/ubuntu(you can also verify if pushpin or zurl package are installed on your OS).
+
+with systemd:
+
+~~~bash
+systemctl status pushpin
+sudo systemctl disable pushpin
+sudo systemctl stop pushpin
+
+systemctl status zurl
+sudo systemctl disable zurl
+sudo systemctl stop zurl
+~~~
+
+you need to set tracim config like this to use default pushpin port:
 
 ~~~ini
-basic_setup.website_base_url = http://localhost:7998
-live_messages.control_uri = http://localhost:5571
+basic_setup.website_base_url = http://localhost:7999
+live_messages.control_uri = http://localhost:5561
 ~~~
 
 :warning:  Temporary, you also need to ensure "email.processing_mode" parameter is unset or set to "sync".
@@ -27,15 +44,38 @@ cd backend
 pserve development.ini
 ~~~
 
+create pushpin docker (from tracim root dir):
 ~~~bash
-pushpin --config pushpin_dev.conf --route '* localhost:6543' &
+ls pushpin_config # just a verification
+docker create --net host -v ${PWD}/pushpin_config:/etc/pushpin --name pushpin fanout/pushpin
 ~~~
+
+then you can start it:
+~~bash
+docker start pushpin
+~~
 
 then you can check if pushpin reverse-proxy work correctly:
 
 ~~~bash
-firefox localhost:7998
+firefox localhost:7999
 ~~~
+### More info about docker
+
+to recreate the pushpin container, you may need to drop the named container "pushpin":
+~~bash
+docker rm pushpin
+~~
+
+to stop "pushpin" containers:
+~~bash
+docker stop pushpin
+~~
+
+to see running container list:
+~~bash
+docker ps
+~~
 
 ## Manually testing live messages
 
@@ -43,7 +83,7 @@ To manually test live messages, you can first open a connexion on live message s
 (this use the default admin user, of course you can do this with other users too)
 
 ~~~bash
-http -S -a admin@admin.admin:admin@admin.admin localhost:7998/api/v2/users/1/live_messages
+http -S -a admin@admin.admin:admin@admin.admin localhost:7999/api/v2/users/1/live_messages
 ~~~
 
 
