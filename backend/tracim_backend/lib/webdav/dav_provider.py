@@ -58,15 +58,15 @@ class WebdavTracimContext(TracimContext):
         Current authenticated user if exist
         """
         return self._generate_if_none(
-            self._current_user, self._get_user, self._get_current_user_email
+            self._current_user, self._get_user, self._get_current_username
         )
 
-    def _get_user(self, user_email: typing.Callable):
-        user_email = user_email()
+    def _get_user(self, get_username: typing.Callable):
+        username = get_username()
         uapi = UserApi(None, show_deleted=True, session=self.dbsession, config=self.app_config)
-        return uapi.get_one_by_email(user_email)
+        return uapi.get(email=username, username=username)
 
-    def _get_current_user_email(self) -> str:
+    def _get_current_username(self) -> str:
         try:
             if not self.environ["http_authenticator.username"]:
                 raise UserNotFoundInTracimRequest("No current user has been found in the context")
