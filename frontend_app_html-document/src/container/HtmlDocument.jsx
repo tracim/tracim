@@ -70,6 +70,14 @@ class HtmlDocument extends React.Component {
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
 
+    // props.registerCustomEventHandlerList([
+    //   { name: CUSTOM_EVENT.SHOW_APP, handler: this.handleShowApp },
+    //   { name: CUSTOM_EVENT.HIDE_APP, handler: this.handleHideApp },
+    //   { name: CUSTOM_EVENT.RELOAD_CONTENT, handler: this.handleReloadContent },
+    //   { name: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA, handler: this.handleReloadAppFeatureData },
+    //   { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    // ])
+
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleHtmlDocumentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleHtmlDocumentCreated }
@@ -118,6 +126,54 @@ class HtmlDocument extends React.Component {
       }))
     }
   }
+
+  // Custom Event Handlers
+  // handleShowApp = data => {
+  //   const { props, state } = this
+  //   console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP, data)
+
+  //   props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+  //   if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
+  // }
+
+  // handleHideApp = data => {
+  //   const { props } = this
+  //   console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP, data)
+
+  //   props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
+  //   globalThis.tinymce.remove('#wysiwygNewVersion')
+  // }
+
+  // handleReloadContent = data => {
+  //   const { props, state } = this
+  //   console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT, data)
+
+  //   props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+  //   globalThis.tinymce.remove('#wysiwygNewVersion')
+  // }
+
+  // handleReloadAppFeatureData = data => {
+  //   const { props } = this
+  //   console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA, data)
+
+  //   props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
+  // }
+
+  // handleAllAppChangeLanguage = data => {
+  //   const { state } = this
+  //   console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+
+  //   initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
+
+  //   this.setState(prev => ({
+  //     loggedUser: {
+  //       ...prev.loggedUser,
+  //       lang: data
+  //     }
+  //   }))
+  //   i18n.changeLanguage(data)
+  //   this.loadContent()
+  // }
 
   customEventReducer = ({ detail: { type, data } }) => {
     const { props, state } = this
