@@ -178,7 +178,7 @@ class File extends React.Component {
       }
     } else if (prevState.content.current_revision_id !== state.content.current_revision_id) {
       const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
-      // INFO - GM - if The file has a new version, fetch its content
+      // INFO - GM - 2020/05/19 - if The file has a new version, fetch its content
       if (state.content.current_revision_id > revisionArray[revisionArray.length - 1].revision_id) {
         this.setState({ fileCurrentPage: 1 })
         this.loadContent()
