@@ -159,8 +159,6 @@ export function appContentFactory (WrappedComponent) {
           localStorage.removeItem(
             generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment')
           )
-
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
           break
         case 400:
           switch (response.body.code) {
@@ -189,7 +187,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (response.status) {
         case 204:
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
+          this.sendGlobalFlashMessage(i18n.t('Status has been changed'), 'info')
           break
         default:
           this.sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')

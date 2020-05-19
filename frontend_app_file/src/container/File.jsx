@@ -3,6 +3,9 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
+  TracimComponent,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
@@ -89,6 +92,11 @@ class File extends React.Component {
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated }
+    ])
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
@@ -125,6 +133,19 @@ class File extends React.Component {
     }
   }
 
+  handleContentModified = (data) => {
+    const { state } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    this.setState(prev => ({ content: { ...prev.content, ...data.content } }))
+  }
+
+  handleContentCreated = (data) => {
+    if (data.content.content_type === 'comment' && data.content.parent_id === this.state.content.content_id) {
+      this.loadTimeline()
+    }
+  }
+
   async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
     const { state } = this
@@ -155,7 +176,7 @@ class File extends React.Component {
         this.setState({})
         this.loadShareLinkList()
       }
-    }
+    } else if (prevState.content.status !== state.content.status) this.loadTimeline()
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
@@ -167,11 +188,11 @@ class File extends React.Component {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+  sendGlobalFlashMessage = (msg, type) => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
-      type: 'warning',
+      type: type || 'warning',
       delay: undefined
     }
   })
@@ -300,7 +321,7 @@ class File extends React.Component {
       await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
-      case 200: this.setState(prev => ({ content: { ...prev.content, raw_content: newDescription } })); break
+      case 200: this.sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
@@ -455,8 +476,7 @@ class File extends React.Component {
               fileCurrentPage: 1,
               mode: APP_FEATURE_MODE.VIEW
             })
-            this.loadContent(1)
-            this.loadTimeline()
+            this.sendGlobalFlashMessage(props.t('Save successful'), 'info')
             break
           case 400: {
             const jsonResult400 = JSON.parse(xhr.responseText)
@@ -858,4 +878,4 @@ class File extends React.Component {
   }
 }
 
-export default translate()(appContentFactory(File))
+export default translate()(appContentFactory(TracimComponent(File)))
