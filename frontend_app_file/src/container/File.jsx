@@ -142,7 +142,7 @@ class File extends React.Component {
 
   handleContentCreated = (data) => {
     if (data.content.content_type === 'comment' && data.content.parent_id === this.state.content.content_id) {
-      this.loadTimeline()
+      this.setState(prev => ({ timeline: [...prev.timeline, data.content] }))
     }
   }
 
@@ -176,7 +176,16 @@ class File extends React.Component {
         this.setState({})
         this.loadShareLinkList()
       }
-    } else if (prevState.content.status !== state.content.status) this.loadTimeline()
+    } else if (prevState.content.current_revision_id !== state.content.current_revision_id) {
+      const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
+      // INFO - GM - if The file has a new version, fetch its content
+      if (state.content.current_revision_id > revisionArray[revisionArray.length - 1].revision_id) {
+        this.setState({ fileCurrentPage: 1 })
+        this.loadContent()
+      }
+    }
+
+    if (state.timeline.length > prevState.timeline.length) this.loadTimeline()
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
