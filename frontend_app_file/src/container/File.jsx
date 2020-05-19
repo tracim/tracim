@@ -182,6 +182,7 @@ class File extends React.Component {
       if (state.content.current_revision_id > revisionArray[revisionArray.length - 1].revision_id) {
         this.setState({ fileCurrentPage: 1 })
         this.loadContent()
+        this.loadTimeline()
       }
     }
 
