@@ -1354,3 +1354,9 @@ class TracimLiveEventHeaderSchema(marshmallow.Schema):
     # TODO - G.M - 2020-05-14 - Add Filtering for text/event-stream mimetype with accept header,
     #  see: https://github.com/tracim/tracim/issues/3042
     accept = marshmallow.fields.String(required=True, load_from="Accept", dump_to="Accept")
+
+
+# FIXME - G.M - 2020-05-19 - This is only used for documentation as
+# usage with hapicData is broken (path_suffix stay empty)
+class PathSuffixSchema(marshmallow.Schema):
+    path_suffix = marshmallow.fields.Str(required=False)
