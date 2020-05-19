@@ -609,6 +609,8 @@ class CFG(object):
             "new_user.invitation.minimal_profile", Profile.TRUSTED_USER.slug
         )
 
+        self.EMAIL__REQUIRED = asbool(self.get_raw_config("email.required", "True"))
+
     def _load_webdav_config(self) -> None:
         """
         load config for webdav related stuff

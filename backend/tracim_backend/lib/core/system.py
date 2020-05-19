@@ -56,6 +56,7 @@ class SystemApi(object):
             workspace_size_limit=self._config.LIMITATION__WORKSPACE_SIZE,
             workspaces_number_per_user_limit=self._config.LIMITATION__SHAREDSPACE_PER_USER,
             instance_name=self._config.WEBSITE__TITLE,
+            email_required=self._config.EMAIL__REQUIRED,
         )
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:

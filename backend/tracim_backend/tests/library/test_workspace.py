@@ -106,10 +106,12 @@ class TestThread(object):
         assert role_1 not in wapi.get_notifiable_roles(workspace=workspace)
         assert role_2 in wapi.get_notifiable_roles(workspace=workspace)
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "base_test_optional_email"}], indirect=True
+    )
     def test__unit__get_notifiable_roles__ok__do_not_show_without_email(
         self, admin_user, session, app_config, user_api_factory, role_api_factory
     ):
-
         wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
         workspace = wapi.create_workspace(label="workspace w", save_now=True)
         uapi = user_api_factory.get()

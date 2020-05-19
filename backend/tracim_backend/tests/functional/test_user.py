@@ -3016,7 +3016,11 @@ class TestUserEndpoint(object):
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 0
 
-    def test_api__create_user__ok_200__with_only_username(self, web_testapp, user_api_factory):
+    @pytest.mark.parametrize("email_required,status", ((True, 400), (False, 200)))
+    def test_api__create_user__with_only_username(
+        self, web_testapp, user_api_factory, email_required, status
+    ):
+        web_testapp.app.registry.settings["CFG"].EMAIL__REQUIRED = email_required
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "password": "mysuperpassword",
@@ -3027,21 +3031,12 @@ class TestUserEndpoint(object):
             "username": "testu",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
-        res = res.json_body
-        assert res["user_id"]
-        assert res["created"]
-        assert res["is_active"] is True
-        assert res["profile"] == "users"
-        assert res["username"] == "testu"
-        assert res["public_name"] == "test user"
-        assert res["timezone"] == "Europe/Paris"
-        assert res["lang"] == "fr"
-        assert res["allowed_space"] == 0
+        web_testapp.post_json("/api/v2/users", status=status, params=params)
 
     def test_api__create_user__err_400__with_no_username_and_no_email(
-        self, web_testapp, user_api_factory
+        self, web_testapp, user_api_factory, app_config
     ):
+
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "password": "mysuperpassword",
@@ -4302,6 +4297,7 @@ class TestSetUsernameEndpoint(object):
         test_user = uapi.create_user(
             username="TheHero",
             password="password",
+            email="boby@boba.fet",
             name="bob",
             profile=profile,
             timezone="Europe/Paris",
