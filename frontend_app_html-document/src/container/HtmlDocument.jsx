@@ -12,6 +12,9 @@ import {
   PopinFixedContent,
   PopinFixedRightPart,
   Timeline,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TracimComponent,
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus,
@@ -66,6 +69,54 @@ class HtmlDocument extends React.Component {
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleHtmlDocumentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleHtmlDocumentCreated }
+      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleHtmlDocumentDeleted }
+    ])
+  }
+
+  // TLM Handlers
+  handleHtmlDocumentModified = data => {
+    const { state } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    globalThis.tinymce.remove('#wysiwygNewVersion')
+
+    localStorage.removeItem(
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
+    )
+
+    const localStorageComment = localStorage.getItem(
+      generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
+    )
+
+    this.setState(prev => ({
+      ...prev,
+      mode: APP_FEATURE_MODE.VIEW,
+      content: {
+        ...prev.content,
+        ...data.content,
+        raw_content: prev.content.raw_content
+        // raw_content: data.raw_content // TODO
+      },
+      newComment: localStorageComment || '',
+      rawContentBeforeEdit: prev.content.raw_content
+    }))
+
+    this.loadTimeline()
+  }
+
+  handleHtmlDocumentCreated = data => {
+    const { state } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    if (data.content.content_type === 'comment') {
+      this.setState(prev => ({
+        timeline: [...prev.timeline, data.content]
+      }))
+    }
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
@@ -269,12 +320,23 @@ class HtmlDocument extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
-  loadTimeline = () => {
-    // INFO - CH - 2019-01-03 - this function must exists to match app content interface. Although it isn't used here because
-    // we need some timeline data to initialize the app in loadContent(). So the timeline generation is handled by loadContent()
-    // The data required to initialize is the number of revisions and whether the first revision has raw_content === '' or not
-    // this is used to know whether we should open the app in EDIT or VIEW mode. See modeToRender in function loadContent()
-    return true
+  loadTimeline = async () => {
+    const { props, state } = this
+
+    const fetchResultComment = getHtmlDocComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+
+    const [resComment, resRevision] = await Promise.all([
+      handleFetchResult(await fetchResultComment),
+      handleFetchResult(await fetchResultRevision)
+    ])
+    if (resComment.apiResponse.status !== 200 && resRevision.apiResponse.status !== 200) {
+      this.sendGlobalFlashMessage(props.t('Error while loading timeline'))
+      console.log('Error loading timeline', 'comments', resComment, 'revisions', resRevision)
+      return
+    }
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
+    this.setState({ timeline: revisionWithComment })
   }
 
   handleClickBtnCloseApp = () => {
@@ -325,14 +387,9 @@ class HtmlDocument extends React.Component {
       await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, state.content.raw_content)
     )
 
-    switch (fetchResultSaveHtmlDoc.apiResponse.status) {
-      case 200:
-        this.handleCloseNewVersion()
-        this.loadContent()
-        break
-      default:
-        this.setLocalStorageItem('rawContent', backupLocalStorage)
-        this.sendGlobalFlashMessage(props.t('Error while saving new version')); break
+    if (fetchResultSaveHtmlDoc.apiResponse.status !== 200) {
+      this.setLocalStorageItem('rawContent', backupLocalStorage)
+      this.sendGlobalFlashMessage(props.t('Error while saving new version'))
     }
   }
 
@@ -551,4 +608,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default translate()(Radium(appContentFactory(HtmlDocument)))
+export default translate()(Radium(appContentFactory(TracimComponent(HtmlDocument))))
