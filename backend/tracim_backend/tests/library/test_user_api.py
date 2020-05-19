@@ -69,7 +69,6 @@ class TestUserApiWithNotifications:
     def test__unit__create_user__ok__with_or_without_email(
         self, session, app_config, email: typing.Optional[str],
     ):
-        app_config.EMAIL__REQUIRED = False
         api = UserApi(current_user=None, session=session, config=app_config)
         with mock.patch(
             "tracim_backend.lib.mail_notifier.notifier.EmailManager.notify_created_account"
@@ -184,8 +183,10 @@ class TestUserApi(object):
         assert u.email == "bob@bob"
         assert u.username == "boby"
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "base_test_optional_email"}], indirect=True
+    )
     def test_unit__create_minimal_user__ok__with_username(self, session, app_config):
-        app_config.EMAIL__REQUIRED = False
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user(username="boby")
         assert u.email is None
