@@ -244,7 +244,7 @@ class EventBuilder:
     def _has_just_been_undeleted(
         self, obj: typing.Union[User, Workspace, ContentRevisionRO]
     ) -> bool:
-        """Check that an object has been undeleted since it has been queried from database."""
+        """Check whether an object has been undeleted since queried from database."""
         if not obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
             return history.has_changes()
