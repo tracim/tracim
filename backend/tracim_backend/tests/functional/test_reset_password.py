@@ -15,7 +15,7 @@ class TestResetPasswordRequestEndpointMailSync(object):
     @pytest.mark.internal_auth
     def test_api__reset_password_request__ok__nominal_case(self, web_testapp, mailhog):
         params = {"email": "admin@admin.admin"}
-        web_testapp.post_json("/api/v2/auth/password/reset/request", status=204, params=params)
+        web_testapp.post_json("/api/auth/password/reset/request", status=204, params=params)
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
@@ -37,14 +37,14 @@ class TestResetPasswordRequestEndpointMailSync(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
 
         # make a request of password
         web_testapp.authorization = None
         params = {"email": "test@test.test"}
-        web_testapp.post_json("/api/v2/auth/password/reset/request", status=204, params=params)
+        web_testapp.post_json("/api/auth/password/reset/request", status=204, params=params)
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
@@ -56,9 +56,7 @@ class TestResetPasswordRequestEndpointMailSync(object):
     @pytest.mark.internal_auth
     def test_api__reset_password_request__err_400__user_not_exist(self, web_testapp, mailhog):
         params = {"email": "this@does.notexist"}
-        res = web_testapp.post_json(
-            "/api/v2/auth/password/reset/request", status=400, params=params
-        )
+        res = web_testapp.post_json("/api/auth/password/reset/request", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
@@ -72,9 +70,7 @@ class TestResetPasswordRequestEndpointMailDisabled(object):
     @pytest.mark.internal_auth
     def test_api__reset_password_request__ok__nominal_case(self, web_testapp):
         params = {"email": "admin@admin.admin"}
-        res = web_testapp.post_json(
-            "/api/v2/auth/password/reset/request", status=400, params=params
-        )
+        res = web_testapp.post_json("/api/auth/password/reset/request", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
@@ -92,16 +88,14 @@ class TestResetPasswordRequestEndpointMailDisabled(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
 
         # make a request of password
         web_testapp.authorization = None
         params = {"email": "test@test.test"}
-        res = web_testapp.post_json(
-            "/api/v2/auth/password/reset/request", status=400, params=params
-        )
+        res = web_testapp.post_json("/api/auth/password/reset/request", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
@@ -122,7 +116,7 @@ class TestResetPasswordCheckTokenEndpoint(object):
         reset_password_token = uapi.reset_password_notification(admin_user, do_save=True)
         transaction.commit()
         params = {"email": "admin@admin.admin", "reset_password_token": reset_password_token}
-        web_testapp.post_json("/api/v2/auth/password/reset/token/check", status=204, params=params)
+        web_testapp.post_json("/api/auth/password/reset/token/check", status=204, params=params)
 
     @pytest.mark.email_notification
     @pytest.mark.unknown_auth
@@ -140,7 +134,7 @@ class TestResetPasswordCheckTokenEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
 
@@ -152,7 +146,7 @@ class TestResetPasswordCheckTokenEndpoint(object):
         reset_password_token = uapi.reset_password_notification(user, do_save=True)
         transaction.commit()
         params = {"email": "test@test.test", "reset_password_token": reset_password_token}
-        web_testapp.post_json("/api/v2/auth/password/reset/token/check", status=204, params=params)
+        web_testapp.post_json("/api/auth/password/reset/token/check", status=204, params=params)
 
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -161,7 +155,7 @@ class TestResetPasswordCheckTokenEndpoint(object):
         transaction.commit()
         params = {"email": "admin@admin.admin", "reset_password_token": reset_password_token}
         res = web_testapp.post_json(
-            "/api/v2/auth/password/reset/token/check", status=400, params=params
+            "/api/auth/password/reset/token/check", status=400, params=params
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -188,10 +182,10 @@ class TestResetPasswordModifyEndpoint(object):
             "new_password": "mynewpassword",
             "new_password2": "mynewpassword",
         }
-        web_testapp.post_json("/api/v2/auth/password/reset/modify", status=204, params=params)
+        web_testapp.post_json("/api/auth/password/reset/modify", status=204, params=params)
         # check if password is correctly setted
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "mynewpassword"))
-        web_testapp.get("/api/v2/auth/whoami", status=200)
+        web_testapp.get("/api/auth/whoami", status=200)
 
     @pytest.mark.email_notification
     @pytest.mark.unknown_auth
@@ -207,7 +201,7 @@ class TestResetPasswordModifyEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
 
@@ -224,10 +218,10 @@ class TestResetPasswordModifyEndpoint(object):
             "new_password": "mynewpassword",
             "new_password2": "mynewpassword",
         }
-        web_testapp.post_json("/api/v2/auth/password/reset/modify", status=204, params=params)
+        web_testapp.post_json("/api/auth/password/reset/modify", status=204, params=params)
         # check if password is correctly setted
         web_testapp.authorization = ("Basic", ("test@test.test", "mynewpassword"))
-        web_testapp.get("/api/v2/auth/whoami", status=200)
+        web_testapp.get("/api/auth/whoami", status=200)
 
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -239,7 +233,7 @@ class TestResetPasswordModifyEndpoint(object):
             "new_password": "mynewpassword",
             "new_password2": "mynewpassword",
         }
-        res = web_testapp.post_json("/api/v2/auth/password/reset/modify", status=400, params=params)
+        res = web_testapp.post_json("/api/auth/password/reset/modify", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INVALID_RESET_PASSWORD_TOKEN
@@ -262,7 +256,7 @@ class TestResetPasswordModifyEndpoint(object):
             transaction.commit()
         with freeze_time("2000-01-01 00:00:05"):
             res = web_testapp.post_json(
-                "/api/v2/auth/password/reset/modify", status=400, params=params
+                "/api/auth/password/reset/modify", status=400, params=params
             )
             assert isinstance(res.json, dict)
             assert "code" in res.json.keys()
@@ -283,7 +277,7 @@ class TestResetPasswordModifyEndpoint(object):
             "new_password": "mynewpassword",
             "new_password2": "anotherpassword",
         }
-        res = web_testapp.post_json("/api/v2/auth/password/reset/modify", status=400, params=params)
+        res = web_testapp.post_json("/api/auth/password/reset/modify", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.PASSWORD_DO_NOT_MATCH
@@ -299,9 +293,7 @@ class TestResetPasswordInternalAuthDisabled(object):
     def test_api__reset_password_request__err__internal_auth_not_activated(self, web_testapp):
 
         params = {"email": "admin@admin.admin"}
-        res = web_testapp.post_json(
-            "/api/v2/auth/password/reset/request", status=400, params=params
-        )
+        res = web_testapp.post_json("/api/auth/password/reset/request", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_AUTH_TYPE_DISABLED
@@ -311,7 +303,7 @@ class TestResetPasswordInternalAuthDisabled(object):
     def test_api__reset_password_check_token__err__internal_auth_not_activated(self, web_testapp):
         params = {"email": "admin@admin.admin", "reset_password_token": "unknown"}
         res = web_testapp.post_json(
-            "/api/v2/auth/password/reset/token/check", status=400, params=params
+            "/api/auth/password/reset/token/check", status=400, params=params
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -328,7 +320,7 @@ class TestResetPasswordInternalAuthDisabled(object):
             "new_password": "mynewpassword",
             "new_password2": "mynewpassword",
         }
-        res = web_testapp.post_json("/api/v2/auth/password/reset/modify", status=400, params=params)
+        res = web_testapp.post_json("/api/auth/password/reset/modify", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_AUTH_TYPE_DISABLED
@@ -346,12 +338,10 @@ class TestResetPasswordExternalAuthUser(object):
     ):
         # precreate user
         web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        web_testapp.get("/api/v2/auth/whoami", status=200)
+        web_testapp.get("/api/auth/whoami", status=200)
 
         params = {"email": "hubert@planetexpress.com"}
-        res = web_testapp.post_json(
-            "/api/v2/auth/password/reset/request", status=400, params=params
-        )
+        res = web_testapp.post_json("/api/auth/password/reset/request", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
@@ -363,11 +353,11 @@ class TestResetPasswordExternalAuthUser(object):
     ):
         # precreate user
         web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        web_testapp.get("/api/v2/auth/whoami", status=200)
+        web_testapp.get("/api/auth/whoami", status=200)
 
         params = {"email": "hubert@planetexpress.com", "reset_password_token": "unknown"}
         res = web_testapp.post_json(
-            "/api/v2/auth/password/reset/token/check", status=400, params=params
+            "/api/auth/password/reset/token/check", status=400, params=params
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -380,7 +370,7 @@ class TestResetPasswordExternalAuthUser(object):
     ):
         # precreate user
         web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        web_testapp.get("/api/v2/auth/whoami", status=200)
+        web_testapp.get("/api/auth/whoami", status=200)
 
         params = {
             "email": "hubert@planetexpress.com",
@@ -388,7 +378,7 @@ class TestResetPasswordExternalAuthUser(object):
             "new_password": "mynewpassword",
             "new_password2": "mynewpassword",
         }
-        res = web_testapp.post_json("/api/v2/auth/password/reset/modify", status=400, params=params)
+        res = web_testapp.post_json("/api/auth/password/reset/modify", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED

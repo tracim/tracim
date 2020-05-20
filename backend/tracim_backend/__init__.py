@@ -52,7 +52,7 @@ from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
-from tracim_backend.views import BASE_API_V2
+from tracim_backend.views import BASE_API
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
@@ -195,20 +195,20 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     reset_password_controller = ResetPasswordController()
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
-    configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(account_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(reset_password_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(workspace_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(session_controller.bind, route_prefix=BASE_API)
+    configurator.include(system_controller.bind, route_prefix=BASE_API)
+    configurator.include(user_controller.bind, route_prefix=BASE_API)
+    configurator.include(account_controller.bind, route_prefix=BASE_API)
+    configurator.include(reset_password_controller.bind, route_prefix=BASE_API)
+    configurator.include(workspace_controller.bind, route_prefix=BASE_API)
+    configurator.include(comment_controller.bind, route_prefix=BASE_API)
 
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
         app.load_controllers(
             app_config=app_config,
             configurator=configurator,
-            route_prefix=BASE_API_V2,
+            route_prefix=BASE_API,
             context=context,
         )
 
@@ -222,7 +222,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
 
     search_controller = SearchFactory.get_search_controller(app_config)
 
-    configurator.include(search_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(search_controller.bind, route_prefix=BASE_API)
     if app_config.FRONTEND__SERVE:
         configurator.include("pyramid_mako")
         frontend_controller = FrontendController(
@@ -235,7 +235,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     # INFO - G.M - 2019-11-27 - Include plugin custom web code
     plugin_manager.hook.web_include(configurator=configurator, app_config=app_config)
 
-    hapic.add_documentation_view("/api/v2/doc", "Tracim v2 API", "API of Tracim v2")
+    hapic.add_documentation_view("/api/doc", "Tracim API", "API of Tracim")
     return configurator.make_wsgi_app()
 
 

@@ -48,7 +48,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
-from tracim_backend.views import BASE_API_V2
+from tracim_backend.views import BASE_API
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentCreationSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
@@ -132,7 +132,7 @@ class WorkspaceController(Controller):
     def workspaces(self, context, request: TracimRequest, hapic_data=None):
         """
         Returns the list of all workspaces. This route is for admin only.
-        Standard users must use their own route: /api/v2/users/me/workspaces
+        Standard users must use their own route: /api/users/me/workspaces
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
@@ -487,7 +487,7 @@ class WorkspaceController(Controller):
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
         raise HTTPFound(
             "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(
-                base_url=BASE_API_V2,
+                base_url=BASE_API,
                 workspace_id=content.workspace_id,
                 content_type=content_type,
                 content_id=content.content_id,
@@ -513,7 +513,7 @@ class WorkspaceController(Controller):
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
         raise HTTPFound(
             "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(
-                base_url=BASE_API_V2,
+                base_url=BASE_API,
                 workspace_id=content.workspace_id,
                 content_type=content_type,
                 content_id=content.content_id,

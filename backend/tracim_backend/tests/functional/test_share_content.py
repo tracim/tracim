@@ -39,7 +39,7 @@ class TestPrivateShareEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=200,
@@ -77,7 +77,7 @@ class TestPrivateShareEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=200,
@@ -93,7 +93,7 @@ class TestPrivateShareEndpoints(object):
         assert content[0]["email"] == "test@test.test"
         assert content[0]["url"].startswith("http://localhost:6543/ui/guest-download/")
         assert content[0]["direct_url"].startswith(
-            "http://localhost:6543/api/v2/public/guest-download/"
+            "http://localhost:6543/api/public/guest-download/"
         )
         assert content[0]["created"]
         assert content[0]["author"]
@@ -133,7 +133,7 @@ class TestPrivateShareEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=200,
@@ -149,7 +149,7 @@ class TestPrivateShareEndpoints(object):
         assert content[0]["email"] == "test@test.test"
         assert content[0]["url"].startswith("http://localhost:6543/ui/guest-download/")
         assert content[0]["direct_url"].startswith(
-            "http://localhost:6543/api/v2/public/guest-download/"
+            "http://localhost:6543/api/public/guest-download/"
         )
         assert content[0]["created"]
         assert content[0]["author"]
@@ -190,7 +190,7 @@ class TestPrivateShareEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=400,
@@ -227,7 +227,7 @@ class TestPrivateShareEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=200,
@@ -236,7 +236,7 @@ class TestPrivateShareEndpoints(object):
         assert len(content) == 1
         params = {"emails": ["test <test@test.test>", "test2@test2.test2"], "password": "123456"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=200,
@@ -253,7 +253,7 @@ class TestPrivateShareEndpoints(object):
         assert content[0]["email"] == "test <test@test.test>"
         assert content[0]["url"].startswith("http://localhost:6543/ui/guest-download/")
         assert content[0]["direct_url"].startswith(
-            "http://localhost:6543/api/v2/public/guest-download/"
+            "http://localhost:6543/api/public/guest-download/"
         )
         assert content[0]["created"]
         assert content[0]["author"]
@@ -264,7 +264,7 @@ class TestPrivateShareEndpoints(object):
         assert content[1]["email"] == "test2@test2.test2"
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=200,
@@ -303,7 +303,7 @@ class TestPrivateShareEndpoints(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"emails": [], "password": "123456"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=400,
@@ -338,7 +338,7 @@ class TestPrivateShareEndpoints(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=400,
@@ -379,7 +379,7 @@ class TestPrivateShareEndpoints(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=400,
@@ -417,7 +417,7 @@ class TestPrivateShareEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=200,
@@ -429,14 +429,14 @@ class TestPrivateShareEndpoints(object):
         share_token = content[0]["share_token"]
 
         web_testapp.delete(
-            "/api/v2/workspaces/{}/contents/{}/shares/{}".format(
+            "/api/workspaces/{}/contents/{}/shares/{}".format(
                 workspace.workspace_id, test_file.content_id, share_id
             ),
             status=204,
         )
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=200,
@@ -445,7 +445,7 @@ class TestPrivateShareEndpoints(object):
         assert len(content) == 0
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/contents/{}/shares".format(
+            "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
             ),
             status=200,
@@ -455,15 +455,14 @@ class TestPrivateShareEndpoints(object):
         assert len(content) == 1
 
         res = web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}/Test_file.txt".format(
+            "/api/public/guest-download/{share_token}/Test_file.txt".format(
                 share_token=share_token
             ),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
         res = web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}".format(share_token=share_token),
-            status=400,
+            "/api/public/guest-download/{share_token}".format(share_token=share_token), status=400,
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
 
@@ -502,7 +501,7 @@ class TestPrivateShareEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.delete(
-            "/api/v2/workspaces/{}/contents/{}/shares/{}".format(
+            "/api/workspaces/{}/contents/{}/shares/{}".format(
                 workspace.workspace_id, test_file.content_id, share_id
             ),
             status=400,
@@ -537,7 +536,7 @@ class TestPrivateShareEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.delete(
-            "/api/v2/workspaces/{}/contents/{}/shares/{}".format(
+            "/api/workspaces/{}/contents/{}/shares/{}".format(
                 workspace.workspace_id, test_file.content_id, 1
             ),
             status=400,
@@ -743,7 +742,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}".format(
+            "/api/public/guest-download/{share_token}".format(
                 share_token=content_share.share_token
             ),
             status=200,
@@ -794,7 +793,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}".format(
+            "/api/public/guest-download/{share_token}".format(
                 share_token=content_share.share_token
             ),
             status=400,
@@ -829,7 +828,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}".format(
+            "/api/public/guest-download/{share_token}".format(
                 share_token=content_share.share_token
             ),
             status=400,
@@ -847,7 +846,7 @@ class TestGuestDownloadShareEndpoints(object):
         admin_user,
     ) -> None:
         res = web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}".format(share_token="invalid-token"),
+            "/api/public/guest-download/{share_token}".format(share_token="invalid-token"),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
@@ -884,7 +883,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
             status=200,
@@ -896,7 +895,7 @@ class TestGuestDownloadShareEndpoints(object):
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format("toto.txt", "toto.txt")
 
         res2 = web_testapp.post(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
             status=200,
@@ -937,7 +936,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
             status=400,
@@ -945,7 +944,7 @@ class TestGuestDownloadShareEndpoints(object):
         assert res.json_body["code"] == ErrorCode.WORKSPACE_PUBLIC_DOWNLOAD_DISABLED
 
         res2 = web_testapp.post(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
             status=400,
@@ -963,9 +962,7 @@ class TestGuestDownloadShareEndpoints(object):
         admin_user,
     ) -> None:
         res = web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
-                share_token="invalid-token"
-            ),
+            "/api/public/guest-download/{share_token}/toto.txt".format(share_token="invalid-token"),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
@@ -998,7 +995,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
             status=400,
@@ -1039,7 +1036,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.post(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
             params={"password": "123456"},
@@ -1085,13 +1082,13 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         web_testapp.get(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
             status=403,
         )
         web_testapp.post(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
             status=403,
@@ -1131,7 +1128,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         web_testapp.post(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
             params={"password": "987654321"},
@@ -1170,7 +1167,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         web_testapp.post_json(
-            "/api/v2/public/guest-download/{share_token}/check".format(
+            "/api/public/guest-download/{share_token}/check".format(
                 share_token=content_share.share_token
             ),
             status=204,
@@ -1210,7 +1207,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.post_json(
-            "/api/v2/public/guest-download/{share_token}/check".format(
+            "/api/public/guest-download/{share_token}/check".format(
                 share_token=content_share.share_token
             ),
             status=400,
@@ -1228,7 +1225,7 @@ class TestGuestDownloadShareEndpoints(object):
         admin_user,
     ) -> None:
         res = web_testapp.post_json(
-            "/api/v2/public/guest-download/{share_token}/check".format(share_token="invalid-token"),
+            "/api/public/guest-download/{share_token}/check".format(share_token="invalid-token"),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
@@ -1267,7 +1264,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.post_json(
-            "/api/v2/public/guest-download/{share_token}/check".format(
+            "/api/public/guest-download/{share_token}/check".format(
                 share_token=content_share.share_token
             ),
             status=400,
@@ -1308,7 +1305,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.post_json(
-            "/api/v2/public/guest-download/{share_token}/check".format(
+            "/api/public/guest-download/{share_token}/check".format(
                 share_token=content_share.share_token
             ),
             status=400,
@@ -1343,7 +1340,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         res = web_testapp.post_json(
-            "/api/v2/public/guest-download/{share_token}/check".format(
+            "/api/public/guest-download/{share_token}/check".format(
                 share_token=content_share.share_token
             ),
             status=400,
@@ -1384,7 +1381,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         web_testapp.post_json(
-            "/api/v2/public/guest-download/{share_token}/check".format(
+            "/api/public/guest-download/{share_token}/check".format(
                 share_token=content_share.share_token
             ),
             params={"password": "123456"},
@@ -1425,7 +1422,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         web_testapp.post_json(
-            "/api/v2/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/toto.txt".format(
                 share_token=content_share.share_token
             ),
             status=403,
@@ -1465,7 +1462,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         web_testapp.post_json(
-            "/api/v2/public/guest-download/{share_token}/check".format(
+            "/api/public/guest-download/{share_token}/check".format(
                 share_token=content_share.share_token
             ),
             params={"password": "987654321"},

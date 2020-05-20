@@ -14,7 +14,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 @pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
 class TestWOPI(object):
     """
-    Tests for /api/v2/collaborative-document-edition/wopi
+    Tests for /api/collaborative-document-edition/wopi
     endpoints
     """
 
@@ -56,7 +56,7 @@ class TestWOPI(object):
         access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         transaction.commit()
         query_param = {"access_token": access_token}
-        url = "/api/v2/collaborative-document-edition/wopi/files/{}/contents".format(
+        url = "/api/collaborative-document-edition/wopi/files/{}/contents".format(
             test_file.content_id
         )
         res = web_testapp.get(url, status=200, params=query_param)
@@ -100,7 +100,7 @@ class TestWOPI(object):
         access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         transaction.commit()
         query_param = {"access_token": access_token}
-        url = "/api/v2/collaborative-document-edition/wopi/files/{}".format(test_file.content_id)
+        url = "/api/collaborative-document-edition/wopi/files/{}".format(test_file.content_id)
         res = web_testapp.get(url, status=200, params=query_param)
         response = res.json_body
         assert response["BaseFileName"] == "Test_file.txt"
@@ -155,7 +155,7 @@ class TestWOPI(object):
         with freeze_time("2000-01-01 00:00:05"):
             access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
             transaction.commit()
-            url = "/api/v2/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
+            url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
                 test_file.content_id, quote(access_token)
             )
             updated_at = test_file.updated
@@ -214,7 +214,7 @@ class TestWOPI(object):
         with freeze_time("2000-01-01 00:00:05"):
             access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
             transaction.commit()
-            url = "/api/v2/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
+            url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
                 test_file.content_id, quote(access_token)
             )
             updated_at = test_file.updated
@@ -275,7 +275,7 @@ class TestWOPI(object):
             )
         access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         transaction.commit()
-        url = "/api/v2/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
+        url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
             test_file.content_id, quote(access_token)
         )
         new_content = b"content has been modified"

@@ -17,7 +17,7 @@ class TestLivesMessages(object):
     ):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/users/{}/live_messages".format(admin_user.user_id),
+            "/api/users/{}/live_messages".format(admin_user.user_id),
             status=200,
             headers={"Accept": "text/event-stream"},
         )
@@ -31,9 +31,7 @@ class TestLivesMessages(object):
         self, user_api_factory, web_testapp, admin_user
     ):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get(
-            "/api/v2/users/{}/live_messages".format(admin_user.user_id), status=400,
-        )
+        res = web_testapp.get("/api/users/{}/live_messages".format(admin_user.user_id), status=400,)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
@@ -43,7 +41,7 @@ class TestLivesMessages(object):
     ):
         headers = {"Accept": "text/event-stream"}
         response = requests.get(
-            "http://localhost:7997/api/v2/users/1/live_messages",
+            "http://localhost:7997/api/users/1/live_messages",
             auth=("admin@admin.admin", "admin@admin.admin"),
             stream=True,
             headers=headers,
@@ -64,7 +62,7 @@ class TestLivesMessages(object):
 
         headers = {"Accept": "text/event-stream"}
         response = requests.get(
-            "http://localhost:7997/api/v2/users/1/live_messages",
+            "http://localhost:7997/api/users/1/live_messages",
             auth=("admin@admin.admin", "admin@admin.admin"),
             stream=True,
             headers=headers,
@@ -72,7 +70,7 @@ class TestLivesMessages(object):
         client = sseclient.SSEClient(response)
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
         update_user_request = requests.put(
-            "http://localhost:7997/api/v2/users/1",
+            "http://localhost:7997/api/users/1",
             auth=("admin@admin.admin", "admin@admin.admin"),
             json=params,
         )
