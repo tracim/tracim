@@ -13,7 +13,6 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import set_html_document_slug_to_legacy
-from tracim_backend.views.core_api.schemas import WorkspaceMenuEntrySchema
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -2514,7 +2513,6 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        workspace_in_context = workspace_api.get_workspace_with_context(business_workspace)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
