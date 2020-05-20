@@ -1,9 +1,7 @@
 from hapic import HapicData
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPTemporaryRedirect
-from webob.multidict import GetDict
 
-from tracim_backend import BASE_API_V2
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
@@ -21,26 +19,6 @@ SWAGGER_TAG__ACCOUNT_NOTIFICATION_ENDPOINTS = generate_documentation_swagger_tag
 )
 
 
-def redirect_account_route(
-    user_id: int, path_suffix: str, get_params: GetDict
-) -> HTTPTemporaryRedirect:
-    param_string_list = []
-    for name, value in get_params.items():
-        param_string_list.append("{}={}".format(name, value))
-    get_params_string = ""
-    if param_string_list:
-        get_params_string += "?"
-        get_params_string += "&".join(param_string_list)
-    raise HTTPTemporaryRedirect(
-        "{base_url}users/{user_id}{path_suffix}{get_params_string}".format(
-            base_url=BASE_API_V2,
-            user_id=user_id,
-            path_suffix=path_suffix,
-            get_params_string=get_params_string,
-        )
-    )
-
-
 class AccountController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
     @hapic.input_path(PathSuffixSchema())
@@ -50,10 +28,8 @@ class AccountController(Controller):
         without giving directly user id.
         This route generate a HTTP 307 with the right url
         """
-        return redirect_account_route(
-            user_id=request.current_user.user_id,
-            path_suffix=request.matchdict.get("path_suffix"),
-            get_params=request.GET,
+        return HTTPTemporaryRedirect(
+            request.url.replace("/me", "/{user_id}".format(user_id=request.current_user.user_id), 1)
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
@@ -64,10 +40,8 @@ class AccountController(Controller):
         without giving directly user id.
         This route generate a HTTP 307 with the right url
         """
-        return redirect_account_route(
-            user_id=request.current_user.user_id,
-            path_suffix=request.matchdict.get("path_suffix"),
-            get_params=request.GET,
+        return HTTPTemporaryRedirect(
+            request.url.replace("/me", "/{user_id}".format(user_id=request.current_user.user_id), 1)
         )
 
     def bind(self, configurator: Configurator) -> None:

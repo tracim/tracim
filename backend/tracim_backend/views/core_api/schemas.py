@@ -1356,7 +1356,11 @@ class TracimLiveEventHeaderSchema(marshmallow.Schema):
     accept = marshmallow.fields.String(required=True, load_from="Accept", dump_to="Accept")
 
 
-# FIXME - G.M - 2020-05-19 - This is only used for documentation as
-# usage with hapicData is broken (path_suffix stay empty)
+# INFO - G.M - 2020-05-19 - This is only used for documentation
 class PathSuffixSchema(marshmallow.Schema):
-    path_suffix = marshmallow.fields.Str(required=False)
+    path_suffix = marshmallow.fields.Str(
+        required=False,
+        description='any path, could include "/"',
+        default="",
+        example="/workspaces/1/notifications/activate",
+    )
