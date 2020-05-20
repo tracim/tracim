@@ -50,7 +50,7 @@ import {
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 
-class File extends React.Component {
+export class File extends React.Component {
   constructor (props) {
     super(props)
 
@@ -93,11 +93,59 @@ class File extends React.Component {
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
 
+    // props.registerCustomEventHandlerList([
+    //   { name: CUSTOM_EVENT.SHOW_APP, handler: this.handleShowApp },
+    //   { name: CUSTOM_EVENT.HIDE_APP, handler: this.handleHideApp },
+    //   { name: CUSTOM_EVENT.RELOAD_CONTENT, handler: this.handleReloadContent },
+    //   { name: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA, handler: this.handleReloadAppFeatureData },
+    //   { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    // ])
+
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated }
     ])
   }
+
+  // Custom Event Handlers
+  // handleShowApp = data => {
+  //   const { props, state } = this
+  //   console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP, data)
+  //
+  //   props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+  //   if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
+  // }
+
+  // handleHideApp = data => {
+  //   const { props } = this
+  //   console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP, data)
+  //
+  //   props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
+  // }
+
+  // handleReloadContent = data => {
+  //   const { props, state } = this
+  //   console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT, data)
+  //
+  //   props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+  // }
+
+  // handleReloadAppFeatureData = data => {
+  //   const { props } = this
+  //   console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA, data)
+  //
+  //   props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
+  // }
+  //
+  // handleAllAppChangeLanguage = data => {
+  //   const { state } = this
+  //   console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+
+  //   props.appContentCustomEventHandlerAllAppChangeLanguage(
+  //     data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
+  //   )
+  //   this.loadTimeline()
+  // }
 
   customEventReducer = ({ detail: { type, data } }) => {
     const { props, state } = this
@@ -134,9 +182,11 @@ class File extends React.Component {
   }
 
   handleContentModified = (data) => {
-    const { state } = this
+    console.err('hello there')
+    const { state, props } = this
     if (data.content.content_id !== state.content.content_id) return
 
+    this.sendGlobalFlashMessage(props.t('File has been updated'), 'info')
     this.setState(prev => ({ content: { ...prev.content, ...data.content } }))
   }
 
@@ -180,7 +230,7 @@ class File extends React.Component {
     } else if (prevState.content.current_revision_id !== state.content.current_revision_id) {
       const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
       // INFO - GM - 2020/05/19 - if The file has a new version, fetch its content
-      if (state.content.current_revision_id > revisionArray[revisionArray.length - 1].revision_id) {
+      if (revisionArray[revisionArray.length - 1] && state.content.current_revision_id > revisionArray[revisionArray.length - 1].revision_id) {
         this.setState({ fileCurrentPage: 1 })
         this.loadContent()
         this.loadTimeline()
@@ -487,7 +537,6 @@ class File extends React.Component {
               fileCurrentPage: 1,
               mode: APP_FEATURE_MODE.VIEW
             })
-            this.sendGlobalFlashMessage(props.t('Save successful'), 'info')
             break
           case 400: {
             const jsonResult400 = JSON.parse(xhr.responseText)
