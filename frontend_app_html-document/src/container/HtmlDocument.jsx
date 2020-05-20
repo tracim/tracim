@@ -79,14 +79,14 @@ class HtmlDocument extends React.Component {
     // ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleHtmlDocumentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleHtmlDocumentCreated }
-      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleHtmlDocumentDeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated }
+      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleContentDeleted }
     ])
   }
 
   // TLM Handlers
-  handleHtmlDocumentModified = data => {
+  handleContentModified = data => {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
@@ -105,8 +105,7 @@ class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.VIEW,
       content: {
         ...prev.content,
-        ...data.content,
-        raw_content: prev.content.raw_content
+        ...data.content
         // raw_content: data.raw_content // TODO
       },
       newComment: localStorageComment || '',
@@ -116,7 +115,7 @@ class HtmlDocument extends React.Component {
     this.loadTimeline()
   }
 
-  handleHtmlDocumentCreated = data => {
+  handleContentCreated = data => {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
