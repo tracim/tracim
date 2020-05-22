@@ -4,7 +4,7 @@ RED='\033[1;31m'
 
 APP_NAME=$1
 
-function logerror {
+logerror() {
     >&2 echo -e "\n${RED}[$(date +'%H:%M:%S')] $ App $APP_NAME - $1${NC}"
     exit 1
 }

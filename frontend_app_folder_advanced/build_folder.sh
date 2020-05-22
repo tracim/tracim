@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-exec ../frontend/build_app.sh folder "$@"
+cd "$(dirname "$0")"; exec ../frontend/build_app.sh folder "$@"

@@ -62,8 +62,7 @@ wait_for_lib_build_to_end() {
 build_vendors() {
     # Tracim vendors
     log "Building tracim_frontend_vendors"
-    cd "$DEFAULTDIR/frontend_vendors"
-    ./build_vendors.sh && loggood "Built tracim_frontend_vendors successfully" || logerror "Could not build tracim_frontend_vendors"
+    frontend_vendors//build_vendors.sh && loggood "Built tracim_frontend_vendors successfully" || logerror "Could not build tracim_frontend_vendors"
 }
 
 build_lib_using_externals() {
@@ -73,9 +72,7 @@ build_lib_using_externals() {
 }
 
 build_app() {
-    app=$(basename "$1")
-	cd "$1" || exit 1
-    ./build_*.sh $dev || logerror "Failed building $app."
+    "$1"/build_*.sh $dev || logerror "Failed building $1."
 }
 
 build_app_with_success() {
@@ -88,7 +85,6 @@ init_parallel() {
     if [ -z "${PARALLEL_BUILD+x}" ]; then
         # See https://stackoverflow.com/questions/6481005/how-to-obtain-the-number-of-cpus-cores-in-linux-from-the-command-line
         PARALLEL_BUILD="$(which nproc > /dev/null && nproc --all || echo 1)"
-        log  "Building tracim_frontend_lib for unit tests"
         open_sem "$PARALLEL_BUILD"
     elif [ "${PARALLEL_BUILD}" = "false" ] || [ "${PARALLEL_BUILD}" = "0" ] ; then
         PARALLEL_BUILD=1
@@ -129,10 +125,14 @@ run_with_lock() {
     )&
 }
 
+stop() {
+    kill $(jobs -p)
+    exit 1
+}
+
 wait_build() {
     if ! wait -n 1; then
-        kill $(jobs -p)
-        exit 1
+        stop
     fi
 }
 
@@ -142,12 +142,12 @@ build_apps() {
     log "Building apps..."
 
     # Loop over the apps
-    for app in "$DEFAULTDIR"/frontend_app_*; do
+    for app in frontend_app_*; do
         if [ -f "$app/.disabled-app" ]; then
             log "Skipping $app because of the existence of the .disabled-app file"
         elif [ "$PARALLEL_BUILD" = 1 ]; then
             log "Building $app"
-            build_app $app
+            build_app "$app"
         else
             run_with_lock build_app_with_success "$app"
         fi
@@ -155,7 +155,7 @@ build_apps() {
 
     # Loop over the apps
     if [ "$PARALLEL_BUILD" != 1 ]; then
-        for app in "$DEFAULTDIR"/frontend_app_*; do
+        for app in frontend_app_*; do
             if ! [ -f "$app/.disabled-app" ]; then
                 wait_build
             fi
@@ -163,11 +163,11 @@ build_apps() {
     fi
 }
 
-DEFAULTDIR=$(pwd)
-export DEFAULTDIR
+cd "$(dirname "$0")"
 
-# create folder $DEFAULTDIR/frontend/dist/app/ if it does not exist
-mkdir -p $DEFAULTDIR/frontend/dist/app/ || logerror "Failed to make directory $DEFAULTDIR/frontend/dist/app/"
+mkdir -p "frontend/dist/app" || logerror "Failed to make directory frontend/dist/app/"
+
+trap stop SIGINT SIGTERM
 
 init_parallel
 parallel_build_lib
