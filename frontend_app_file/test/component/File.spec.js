@@ -49,7 +49,7 @@ describe('<File />', () => {
           content: {
             ...commentTlm,
             parent_id: content.file.content_id,
-            content_id: 39
+            content_id: 9
           }
         }
 
@@ -80,6 +80,46 @@ describe('<File />', () => {
 
         expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData2.content.content_id)
         expect(wrapper.state('timeline')[wrapper.state('timeline').length - 2].content_id).to.equal(tlmData1.content.content_id)
+      })
+
+      it('Timeline should not be updated when the TracimLiveMessage is not related to the current file', () => {
+        const tlmData = {
+          content: {
+            ...commentTlm,
+            parent_id: content.file.content_id + 1,
+            content_id: 12
+          }
+        }
+        const oldTimelineLength = wrapper.state('timeline').length
+
+        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.CREATED](tlmData)
+        expect(wrapper.state('timeline').length).to.equal(oldTimelineLength)
+      })
+    })
+    describe('content modified', () => {
+      it('The state should be updated with the content modified (filename modified)', () => {
+        const tlmData = {
+          content: {
+            ...content.file,
+            filename: 'newName.jpeg'
+          }
+        }
+
+        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.MODIFIED](tlmData)
+        expect(wrapper.state('content').filename).to.equal(tlmData.content.filename)
+      })
+
+      it('The state should not be updated when the modification do not concern the current file', () => {
+        const tlmData = {
+          content: {
+            ...content.file,
+            filename: 'WrongName.jpeg',
+            content_id: content.file.content_id + 1
+          }
+        }
+
+        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.MODIFIED](tlmData)
+        expect(wrapper.state('content').filename).to.not.equal(tlmData.content.filename)
       })
     })
   })
