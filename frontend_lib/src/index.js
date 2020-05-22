@@ -87,6 +87,9 @@ import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
+import { commentList as fixtureCommentList } from '../test/fixture/contentCommentList.js'
+import { revisionList as fixtureRevisionList } from '../test/fixture/contentRevisionList.js'
+
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -164,5 +167,7 @@ export {
   ShareLink,
   ShareDownload,
   ProgressBar,
-  RadioBtnGroup
+  RadioBtnGroup,
+  fixtureCommentList,
+  fixtureRevisionList
 }

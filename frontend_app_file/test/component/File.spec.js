@@ -1,6 +1,7 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import { File } from '../../src/container/File.jsx'
+import { File as ComponentWithoutHOC } from '../../src/container/File.jsx'
+import { expect } from 'chai'
 import {
   mockGetFileContent200,
   mockPutMyselfFileRead200,
@@ -10,31 +11,76 @@ import {
 } from '../apiMock.js'
 import content from '../fixture/content/content.js'
 import { debug } from '../../src/debug.js'
-import { registerLiveMessageHandlerListMock } from '../tlmMock.js'
 import { TLM_CORE_EVENT_TYPE as TLM_CET, TLM_ENTITY_TYPE as TLM_ET } from 'tracim_frontend_lib'
+import { commentTlm } from '../fixture/tracimLiveMessageData/commentTlm.js'
+import { tracimLiveMessageMock } from '../tracimLiveMessageMock.js'
 
 describe('<File />', () => {
   let tlmHandlerList = {}
 
   const props = {
     setApiUrl: () => {},
-    registerLiveMessageHandlerList: registerLiveMessageHandlerListMock(t => { tlmHandlerList = t }),
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
     i18n: {},
-    content
+    content,
+    t: key => key
   }
 
   mockGetFileContent200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.file)
   mockPutMyselfFileRead200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id)
-  mockGetFileComment200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.commentList)
   mockGetShareLinksList200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.shareList)
-  mockGetFileRevision200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.revisionList)
+  mockGetFileComment200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.commentList).persist()
+  mockGetFileRevision200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.revisionList).persist()
 
-  const wrapper = shallow(<File {...props} t={tradKey => tradKey} />)
+  const ComponentWithHoc = tracimLiveMessageMock(t => { tlmHandlerList = t })(ComponentWithoutHOC)
+
+  // INFO - GM - 2020/05/22 - dive in order to render the HOC component AND the target component File, in order to not use useless mount
+  const wrapper = shallow(<ComponentWithHoc {...props} />).dive()
 
   describe('internal function', () => {
-    it('content modified', () => {
-      tlmHandlerList[TLM_ET.CONTENT][TLM_CET.MODIFIED]({})
+    describe('content created', () => {
+      it('Timeline should contains the new comment created', () => {
+        const tlmData = {
+          author: {
+            avatar_url: null,
+            public_name: 'Global manager',
+            user_id: 1
+          },
+          content: {
+            ...commentTlm,
+            parent_id: content.file.content_id,
+            content_id: 39
+          }
+        }
+
+        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.CREATED](tlmData)
+        expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData.content.content_id)
+      })
+
+      it('Timeline should be sorted even when 2 tlm arrive in the wrong order', () => {
+        const tlmData1 = {
+          content: {
+            ...commentTlm,
+            parent_id: content.file.content_id,
+            content_id: 10,
+            created: '2020-05-22T14:02:02Z'
+          }
+        }
+
+        const tlmData2 = {
+          content: {
+            ...commentTlm,
+            parent_id: content.file.content_id,
+            content_id: 11,
+            created: '2020-05-22T14:02:05Z'
+          }
+        }
+        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.CREATED](tlmData2)
+        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.CREATED](tlmData1)
+
+        expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData2.content.content_id)
+        expect(wrapper.state('timeline')[wrapper.state('timeline').length - 2].content_id).to.equal(tlmData1.content.content_id)
+      })
     })
   })
 })
