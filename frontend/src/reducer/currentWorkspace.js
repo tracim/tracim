@@ -82,7 +82,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         memberList: [
           ...state.memberList,
-          { ...serializeMember(action.newMember) }
+          serializeMember(action.newMember)
         ]
       }
 
