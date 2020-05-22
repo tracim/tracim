@@ -32,11 +32,9 @@ class PopupCreateHtmlDocument extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
-
-    // props.registerCustomEventHandlerList([
-    //   { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
-    // ])
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated }
@@ -46,7 +44,7 @@ class PopupCreateHtmlDocument extends React.Component {
   // TLM Handlers
   handleContentCreated = data => {
     const { state } = this
-    if (data.content.parent_id !== this.state.content.content_id) return
+    if (data.content.workspace_id !== state.workspaceId) return
 
     this.handleClose()
 
@@ -60,21 +58,18 @@ class PopupCreateHtmlDocument extends React.Component {
     })
   }
 
-  // handleAllAppChangeLanguage = data => {
-  //   console.log('%c<PopupCreateHtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, data)
+  // Custom Event Handlers
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<PopupCreateHtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, data)
 
-  //   this.setState(prev => ({
-  //     loggedUser: {
-  //       ...prev.loggedUser,
-  //       lang: data
-  //     }
-  //   }))
-  //   i18n.changeLanguage(data)
-  //   this.setHeadTitle()
-  // }
-
-  componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    this.setState(prev => ({
+      loggedUser: {
+        ...prev.loggedUser,
+        lang: data
+      }
+    }))
+    i18n.changeLanguage(data)
+    this.setHeadTitle()
   }
 
   componentDidMount () {
@@ -89,22 +84,6 @@ class PopupCreateHtmlDocument extends React.Component {
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
         data: { title: buildHeadTitle([props.t('New text document'), state.config.workspace.label, state.config.system.config.instance_name]) }
       })
-    }
-  }
-
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<PopupCreateHtmlDocument> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        this.setHeadTitle()
-        break
     }
   }
 

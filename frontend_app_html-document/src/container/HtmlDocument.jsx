@@ -342,23 +342,12 @@ class HtmlDocument extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
-  loadTimeline = async () => {
-    const { props, state } = this
-
-    const fetchResultComment = getHtmlDocComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-
-    const [resComment, resRevision] = await Promise.all([
-      handleFetchResult(await fetchResultComment),
-      handleFetchResult(await fetchResultRevision)
-    ])
-    if (resComment.apiResponse.status !== 200 && resRevision.apiResponse.status !== 200) {
-      this.sendGlobalFlashMessage(props.t('Error while loading timeline'))
-      console.log('Error loading timeline', 'comments', resComment, 'revisions', resRevision)
-      return
-    }
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
-    this.setState({ timeline: revisionWithComment })
+  loadTimeline = () => {
+    // INFO - CH - 2019-01-03 - this function must exists to match app content interface. Although it isn't used here because
+    // we need some timeline data to initialize the app in loadContent(). So the timeline generation is handled by loadContent()
+    // The data required to initialize is the number of revisions and whether the first revision has raw_content === '' or not
+    // this is used to know whether we should open the app in EDIT or VIEW mode. See modeToRender in function loadContent()
+    return true
   }
 
   handleClickBtnCloseApp = () => {
@@ -422,6 +411,7 @@ class HtmlDocument extends React.Component {
       default:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
         this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+        break
     }
   }
 
