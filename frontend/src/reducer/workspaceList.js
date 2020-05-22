@@ -56,7 +56,7 @@ export function workspaceList (state = [], action) {
         : ws
       )
 
-    case `${ADD}/${WORKSPACE_MEMBER}`:
+    case `${ADD}/${WORKSPACE_MEMBER}`: {
       const memberToAdd = {
         id: action.newMember.user_id,
         publicName: action.newMember.public_name,
@@ -64,6 +64,7 @@ export function workspaceList (state = [], action) {
         isActive: action.newMember.is_active,
         doNotify: action.newMember.do_notify
       }
+
       return state.map(ws => ws.id === action.workspace.workspace_id
         ? {
           ...ws,
@@ -71,6 +72,7 @@ export function workspaceList (state = [], action) {
         }
         : ws
       )
+    }
 
     case `${UPDATE}/${WORKSPACE_MEMBER}`:
       return state.map(ws => ws.id === action.workspace.workspace_id

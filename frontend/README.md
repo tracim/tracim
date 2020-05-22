@@ -40,7 +40,7 @@ In Tracim, they act as plugins.
 You need to separately get the built version of each apps and add them to `dist/app` folder.
 App file names should be of the form of '__appName__.app.js'.
 
-1. install and build the app using `yarn install && yarn run tracimbuild`
+1. install and build the app using `yarn install && yarn run buildUsingExternalVendors`
 2. copy the bundle generated at `dist/__appName__.app.js` to tracim_frontend/dist/app folder
 
 By default, for development, the Tracim frontend expects every apps but won't crash if one is missing.

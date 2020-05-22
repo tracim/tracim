@@ -21,13 +21,8 @@ logerror() {
     exit 1
 }
 
-windoz=""
-if [ "$1" = "-w" ] || [ "$2" = "-w" ]; then
-    windoz="windoz"
-fi
-
 dev=""
-if [ "$1" = "-d" ] || [ "$2" = "-d" ]; then
+if [ "$1" = "-d" ]; then
     dev="-d"
 fi
 
@@ -47,11 +42,11 @@ cd "$DEFAULTDIR/frontend_vendors"
 
 # Tracim Lib Bundle
 log "Building tracim_frontend_lib"
-yarn workspace tracim_frontend_lib run build$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib"
+yarn workspace tracim_frontend_lib run build && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
 # Tracim Lib for the browsers
 log "Building tracim_frontend_lib for Tracim"
-yarn workspace tracim_frontend_lib run tracimbuild$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
+yarn workspace tracim_frontend_lib run buildUsingExternalVendors && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
 
 for app in "$DEFAULTDIR"/frontend_app_*; do
 	if [ -f "$app/.disabled-app" ]; then
@@ -64,6 +59,6 @@ done
 
 # build Tracim
 log "building the Tracim frontend"
-yarn workspace tracim run tracimbuild && loggood "success" || logerror "Could not build the Tracim frontend."
+yarn workspace tracim run buildUsingExternalVendors && loggood "success" || logerror "Could not build the Tracim frontend."
 
 loggood "-- frontend build successful."

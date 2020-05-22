@@ -20,18 +20,14 @@ function logerror {
     echo -e "\n${RED}[$(date +'%H:%M:%S')]${RED} $ $1${NC}"
 }
 
-windoz=""
-if [[ $1 = "-w" || $2 = "-w" ]]; then
-    windoz="windoz"
-fi
 
 dev=""
-if [[ $1 = "-d" || $2 = "-d" ]]; then
+if [ "$1" = "-d" ]; then
     dev="-dev"
 fi
 
 log "build frontend_app_custom-form"
-yarn run tracimbuild$dev$windoz && loggood "success" || logerror "some error"
+yarn run buildUsingExternalVendors$dev && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/custom-form.app.js ../frontend/dist/app && loggood "success" || logerror "some error"
 log "copying en translation.json"

@@ -17,13 +17,8 @@ while [ "$1" != "" ]; do
             build "$PRODFLAG" "$CONFIG" && print_time
         ;;
 
-        tracimbuild-dev)
+        buildUsingExternalVendors-dev)
             build "" webpack.tracim.config.js && print_time
-        ;;
-
-        windoz)
-            export NODE_ENV="production"
-            PRINT_TIME=false
         ;;
 
         *)
