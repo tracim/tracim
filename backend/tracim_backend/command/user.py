@@ -1,41 +1,118 @@
 # -*- coding: utf-8 -*-
+from abc import ABC
 import argparse
+import typing
 
+from marshmallow import ValidationError
+from marshmallow.validate import Validator
 from pyramid.scripting import AppEnvironment
-from sqlalchemy.exc import IntegrityError
-import transaction
 
+from tracim_backend.app_models.validator import user_email_validator
+from tracim_backend.app_models.validator import user_lang_validator
+from tracim_backend.app_models.validator import user_password_validator
+from tracim_backend.app_models.validator import user_profile_validator
+from tracim_backend.app_models.validator import user_public_name_validator
+from tracim_backend.app_models.validator import user_timezone_validator
+from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.command import AppContextCommand
-from tracim_backend.exceptions import BadCommandError
-from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
-from tracim_backend.exceptions import NotificationSendingFailed
-from tracim_backend.exceptions import UserAlreadyExistError
+from tracim_backend.exceptions import TracimException
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.auth import User
 
 
-class UserCommand(AppContextCommand):
+class ValidatorType:
+    def __init__(self, validator: Validator):
+        self.validator = validator
 
-    ACTION_CREATE = "create"
-    ACTION_UPDATE = "update"
+    def __call__(self, arg: typing.Any):
+        try:
+            self.validator(arg)
+        except ValidationError as exc:
+            raise argparse.ArgumentTypeError(
+                "{error_messages}".format(error_messages=" - ".join(exc.messages))
+            )
+        return arg
 
-    action = NotImplemented
 
+class UserCommand(AppContextCommand, ABC):
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "-e",
+            "--email",
+            help="Email of the user",
+            dest="email",
+            required=False,
+            default=None,
+            type=ValidatorType(user_email_validator),
+        )
+        parser.add_argument(
+            "-u",
+            "--username",
+            help="Username of the user",
+            dest="username",
+            required=False,
+            default=None,
+            type=ValidatorType(user_username_validator),
+        )
+        parser.add_argument(
+            "--public-name",
+            help="Public name of the user",
+            dest="public_name",
+            required=False,
+            default=None,
+            type=ValidatorType(user_public_name_validator),
+        )
+        parser.add_argument(
+            "--allowed_space",
+            help="Allowed space of user in bytes",
+            dest="allowed_space",
+            required=False,
+            default=None,
+            type=int,
+        )
+        parser.add_argument(
+            "--lang",
+            help="Lang of user",
+            dest="lang",
+            required=False,
+            default=None,
+            type=ValidatorType(user_lang_validator),
+        )
+        parser.add_argument(
+            "-p",
+            "--password",
+            help="User password",
+            dest="password",
+            required=False,
+            default=None,
+            type=ValidatorType(user_password_validator),
+        )
+        parser.add_argument(
+            "--profile",
+            help="set user profile",
+            dest="profile",
+            default=None,
+            type=ValidatorType(user_profile_validator),
+        )
+        parser.add_argument(
+            "--timezone",
+            help="set user timezone",
+            dest="timezone",
+            default=None,
+            type=ValidatorType(user_timezone_validator),
+        )
+        return parser
+
+
+class CreateUserCommand(UserCommand):
     def get_description(self) -> str:
-        return """Create or update user."""
+        return """Create user"""
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
-
-        parser.add_argument("-l", "--login", help="User login (email)", dest="login", required=True)
-
-        parser.add_argument(
-            "-p", "--password", help="User password", dest="password", required=False, default=None
-        )
-
-        parser.add_argument("--profile", help="set user profile", dest="profile", default=None)
-
         parser.add_argument(
             "--send-email",
             help="Send mail to user",
@@ -44,46 +121,57 @@ class UserCommand(AppContextCommand):
             action="store_true",
             default=False,
         )
-
         return parser
 
-    def _user_exist(self, login: str) -> User:
-        return self._user_api.user_with_email_exists(login)
-
-    def _create_user(self, login: str, password: str, do_notify: bool, **kwargs) -> User:
-        if not password:
-            if self._password_required():
-                print("You must provide -p/--password parameter")
-                raise BadCommandError("You must provide -p/--password parameter")
-            password = ""
-        if self._user_api.check_email_already_in_db(login):
-            raise UserAlreadyExistError()
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+        # TODO - G.M - 05-04-2018 -Refactor this in order
+        # to not setup object var outside of __init__ .
+        if parsed_args.send_email and not parsed_args.email:
+            print("Warning: No email provided, can not send email to user.")
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]
+        self._user_api = UserApi(current_user=None, session=self._session, config=self._app_config)
+        profile = None
+        if parsed_args.profile:
+            profile = Profile.get_profile_from_slug(parsed_args.profile)
+        if not parsed_args.password and parsed_args.send_email:
+            parsed_args.password = password_generator()
         try:
             user = self._user_api.create_user(
-                email=login, password=password, do_save=True, do_notify=do_notify
+                email=parsed_args.email,
+                name=parsed_args.public_name,
+                password=parsed_args.password,
+                username=parsed_args.username,
+                timezone=parsed_args.timezone,
+                lang=parsed_args.lang,
+                allowed_space=parsed_args.allowed_space,
+                profile=profile,
+                do_save=True,
+                do_notify=parsed_args.send_email,
             )
-            # TODO - G.M - 04-04-2018 - [Caldav] Check this code
-            # # We need to enable radicale if it not already done
-            # daemons = DaemonsManager()
-            # daemons.run('radicale', RadicaleDaemon)
             self._user_api.execute_created_user_actions(user)
-        except IntegrityError as exception:
+        except TracimException as exc:
             self._session.rollback()
-            raise UserAlreadyExistError() from exception
-        except (
-            NotificationSendingFailed,
-            NotificationDisabledCantCreateUserWithInvitation,
-        ) as exception:
-            self._session.rollback()
-            raise exception from exception
-        return user
+            print("Error: " + str(exc))
+            print("User not created.")
+            raise exc
+        print("User created")
 
-    def _update_password_for_login(self, login: str, password: str) -> None:
-        user = self._user_api.get_one_by_email(login)
-        self._user_api._check_password_modification_allowed(user)
-        user.password = password
-        self._session.flush()
-        transaction.commit()
+
+class UpdateUserCommand(UserCommand):
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "-l",
+            "--login",
+            help="user login, can be either password or username",
+            dest="login",
+            required=True,
+        )
+        return parser
+
+    def get_description(self) -> str:
+        return """Update user"""
 
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
@@ -91,66 +179,29 @@ class UserCommand(AppContextCommand):
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
         self._user_api = UserApi(current_user=None, session=self._session, config=self._app_config)
-        user = self._proceed_user(parsed_args)
-        if parsed_args.profile:
-            user.profile = Profile.get_profile_from_slug(parsed_args.profile)
-
-        print("User created/updated")
-
-    def _proceed_user(self, parsed_args: argparse.Namespace) -> User:
-        self._check_context(parsed_args)
-
-        if self.action == self.ACTION_CREATE:
-            try:
-                user = self._create_user(
-                    login=parsed_args.login,
-                    password=parsed_args.password,
-                    do_notify=parsed_args.send_email,
-                )
-            except UserAlreadyExistError as exc:
-                print("Error: User already exist (use `user update` command instead)")
-                raise UserAlreadyExistError() from exc
-            except NotificationSendingFailed as exc:
-                print("Error: Cannot send email notification due to error, user not created.")
-                raise NotificationSendingFailed() from exc
-            except NotificationDisabledCantCreateUserWithInvitation as exc:
-                print(
-                    "Error: Email notification disabled but notification required, user not created."
-                )
-                raise NotificationDisabledCantCreateUserWithInvitation() from exc
+        if "@" in parsed_args.login:
+            user = self._user_api.get_one_by_email(email=parsed_args.login)
         else:
-            if parsed_args.password:
-                self._update_password_for_login(
-                    login=parsed_args.login, password=parsed_args.password
-                )
-            user = self._user_api.get_one_by_email(parsed_args.login)
-
-        return user
-
-    def _password_required(self) -> bool:
-        # TODO - G.M - 04-04-2018 - [LDAP] Check this code
-        # if config.get('auth_type') == LDAPAuth.name:
-        #     return False
-        return True
-
-    def _check_context(self, parsed_args: argparse.Namespace) -> None:
-        # TODO - G.M - 04-04-2018 - [LDAP] Check this code
-        # if config.get('auth_type') == LDAPAuth.name:
-        #     auth_instance = config.get('auth_instance')
-        #     if not auth_instance.ldap_auth.user_exist(parsed_args.login):
-        #         raise LDAPUserUnknown(
-        #             "LDAP is enabled and user with login/email \"%s\" not found in LDAP" % parsed_args.login
-        #         )
-        pass
-
-
-class CreateUserCommand(UserCommand):
-    action = UserCommand.ACTION_CREATE
-
-
-class UpdateUserCommand(UserCommand):
-    action = UserCommand.ACTION_UPDATE
-
-
-class LDAPUserUnknown(BadCommandError):
-    pass
+            user = self._user_api.get_one_by_username(username=parsed_args.login)
+        profile = None
+        if parsed_args.profile:
+            profile = Profile.get_profile_from_slug(parsed_args.profile)
+        try:
+            user = self._user_api.update(
+                user=user,
+                email=parsed_args.email,
+                name=parsed_args.public_name,
+                password=parsed_args.password,
+                timezone=parsed_args.timezone,
+                username=parsed_args.username,
+                allowed_space=parsed_args.allowed_space,
+                profile=profile,
+                do_save=True,
+            )
+            self._user_api.execute_created_user_actions(user)
+        except TracimException as exc:
+            self._session.rollback()
+            print("Error: " + str(exc))
+            print("User not updated.")
+            raise exc
+        print("User updated")

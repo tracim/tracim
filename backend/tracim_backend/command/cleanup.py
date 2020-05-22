@@ -91,7 +91,7 @@ class DeleteUserCommand(AppContextCommand):
             "-l",
             "--login",
             nargs="+",
-            help="user logins (email) to delete one or more user",
+            help="user logins (email or username) to delete one or more user",
             dest="logins",
             required=True,
         )
@@ -139,10 +139,13 @@ class DeleteUserCommand(AppContextCommand):
             user_list = []  # type: typing.List[User]
             for login in parsed_args.logins:
                 try:
-                    user = uapi.get_one_by_email(login)
+                    if "@" in login:
+                        user = uapi.get_one_by_email(login)
+                    else:
+                        user = uapi.get_one_by_username(login)
                     user_list.append(user)
                 except UserDoesNotExist as exc:
-                    print('ERROR: user with email "{}" does not exist'.format(login))
+                    print('ERROR: user with email/username "{}" does not exist'.format(login))
                     raise exc
             print("~~~~")
             print("Deletion of user from Database")
