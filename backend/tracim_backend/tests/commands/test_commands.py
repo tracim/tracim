@@ -14,7 +14,6 @@ from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
-from tracim_backend.exceptions import ProfileDoesNotExist
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
@@ -141,7 +140,7 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(ProfileDoesNotExist):
+        with pytest.raises(SystemExit):
             app.run(
                 [
                     "user",
