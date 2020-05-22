@@ -54,7 +54,7 @@ Apps are independent React applications. They can be tested and run outside Trac
 To test them inside Tracim, you need to build them and copy the generated bundle to `tracim_frontend/dist/app`.
 This is automatically done by the build script of the apps of this repository.
 
-You also need to allow the mock api to tell the Tracim Frontend that it handles you app:
+You also need to allow the mock api to tell the Tracim Frontend that it handles your app:
 - add an entry for the app in tracim_frontend/jsonserver/static_db.json in the `app_config` property
 - reload the mock api server
 - add the source of your app in tracim_frontend/dist/index.html and an entry to the switch case of the function `GLOBAL_renderAppFeature`. All of this will be handled by backend later on. This is in a work in progress state.
