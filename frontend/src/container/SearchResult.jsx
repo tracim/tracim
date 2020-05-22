@@ -29,7 +29,7 @@ import {
 } from '../action-creator.sync.js'
 import { getSearchedKeywords } from '../action-creator.async.js'
 
-import qs from 'query-string'
+const qs = require('query-string')
 
 class SearchResult extends React.Component {
   constructor (props) {

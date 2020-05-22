@@ -1,8 +1,8 @@
 import pytest
 
+from tracim_backend.lib.core.event import EventBuilder
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.crud_hook.caller import DatabaseCrudHookCaller
-from tracim_backend.lib.event import EventBuilder
 from tracim_backend.models.auth import Profile
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 
@@ -27,7 +27,7 @@ class TestEventBuilder:
         assert update_while_deleted_event.event_type == "user.modified"
 
         uapi.undelete(user, do_save=True)
-        undelete_as_modified_event = event_helper.last_event
-        assert undelete_as_modified_event.event_type == "user.modified"
+        undelete_event = event_helper.last_event
+        assert undelete_event.event_type == "user.undeleted"
 
-        assert undelete_as_modified_event.event_id == update_while_deleted_event.event_id + 1
+        assert undelete_event.event_id == update_while_deleted_event.event_id + 1

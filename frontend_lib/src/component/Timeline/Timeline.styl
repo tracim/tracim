@@ -46,8 +46,6 @@
         padding 5px
         height 80px
         width 100%
-      &__wysiwyg
-        height 200px
     &__wrapper
       display flex
       align-items flex-start
@@ -80,6 +78,10 @@
 
 .mce-btn-group:not(:first-child)
   border-left none!important //remove the left borders of the wysiwyg for a better aesthetic result
+
+// INFO - CH - 2020-05-12 - this overrides the "height: auto" of tinymce to fix responsive issue https://github.com/tracim/tracim/issues/3026
+.mce-container:not(.mce-fullscreen) .mce-edit-area
+  height 100px
 
 // MEDIAQUERIES
 

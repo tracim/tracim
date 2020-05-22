@@ -16,13 +16,8 @@ fi
 
 shift
 
-windoz=""
-if [[ $1 = "-w" || $2 = "-w" ]]; then
-    windoz="windoz"
-fi
-
 dev=""
-if [[ $1 = "-d" || $2 = "-d" ]]; then
+if [ "$1" = "-d" ]; then
     dev="-dev"
 fi
 
@@ -34,7 +29,7 @@ if [ -f src/debug.js.sample ]; then
     cp src/debug.js.sample src/debug.js || logerror "Could not copy the debug file"
 fi
 
-yarn run tracimbuild$dev$windoz || logerror "Build failed"
+yarn run buildUsingExternalVendors$dev || logerror "Build failed"
 
 cp dist/$APP_NAME.app.js ../frontend/dist/app || logerror "Failed copying the app"
 

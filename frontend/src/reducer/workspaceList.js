@@ -1,9 +1,10 @@
 import {
+  ADD, REMOVE,
   SET,
   UPDATE,
   USER_WORKSPACE_DO_NOTIFY,
   WORKSPACE_LIST,
-  WORKSPACE_LIST_MEMBER
+  WORKSPACE_LIST_MEMBER, WORKSPACE_MEMBER
 } from '../action-creator.sync.js'
 
 export function workspaceList (state = [], action) {
@@ -51,6 +52,45 @@ export function workspaceList (state = [], action) {
             ? { ...u, doNotify: action.doNotify }
             : u
           )
+        }
+        : ws
+      )
+
+    case `${ADD}/${WORKSPACE_MEMBER}`: {
+      const memberToAdd = {
+        id: action.newMember.user_id,
+        publicName: action.newMember.public_name,
+        role: action.role,
+        isActive: action.newMember.is_active,
+        doNotify: action.newMember.do_notify
+      }
+
+      return state.map(ws => ws.id === action.workspace.workspace_id
+        ? {
+          ...ws,
+          memberList: [...ws.memberList, memberToAdd]
+        }
+        : ws
+      )
+    }
+
+    case `${UPDATE}/${WORKSPACE_MEMBER}`:
+      return state.map(ws => ws.id === action.workspace.workspace_id
+        ? {
+          ...ws,
+          memberList: ws.memberList.map(m => m.id === action.member.user_id
+            ? { ...m, id: action.member.user_id, ...action.member, role: action.role }
+            : m
+          )
+        }
+        : ws
+      )
+
+    case `${REMOVE}/${WORKSPACE_MEMBER}`:
+      return state.map(ws => ws.id === action.workspace.workspace_id
+        ? {
+          ...ws,
+          memberList: ws.memberList.filter(m => m.id !== action.memberId)
         }
         : ws
       )

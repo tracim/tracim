@@ -123,7 +123,7 @@ export class Tracim extends React.Component {
         this.loadAppConfig()
         this.loadLiveMessage()
         this.loadWorkspaceList()
-        this.liveMessageManager.openLiveMessageConnection()
+        this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id)
 
         break
       case 401: props.dispatch(setUserConnected({ logged: false })); break

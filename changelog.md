@@ -1,5 +1,13 @@
 
 
+## 2.7.4 / 2020-05-13
+
+### Fixed Issues
+
+- UX: #3026
+- Backend: #3025, #3043
+
+
 ## 2.7.3 / 2020-05-07
 
 ### Fixed Issues
@@ -11,7 +19,7 @@
 
 ### Fixed Issues
 
-- backend: #2962
+- Backend: #2962
 
 ### Breaking/Important change
 
@@ -22,7 +30,7 @@
 
 ### Fixed Issues
 
-- backend: #2920
+- Backend: #2920
 
 
 ## 2.7.0 / 2020-04-24

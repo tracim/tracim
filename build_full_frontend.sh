@@ -14,6 +14,11 @@ if [ -z "${LINTING+x}" ]; then
     export LINTING=false
 fi
 
+dev=""
+if [ "$1" = "-d" ]; then
+    dev="-d"
+fi
+
 log() {
     echo -e "${YELLOW}[$(date +'%H:%M:%S')]${BROWN} $ $1${NC}"
 }
@@ -107,13 +112,8 @@ function build_apps {
 }
 
 build_tracim_lib() {
-    yarn workspace tracim_frontend_lib run build$windoz && loggood "Built tracim_frontend_lib for unit tests" || logerror "Could not build tracim_frontend_lib"
+    yarn workspace tracim_frontend_lib run build && loggood "Built tracim_frontend_lib for unit tests" || logerror "Could not build tracim_frontend_lib"
 }
-
-windoz=""
-if [ "$1" = "-w" ] || [ "$2" = "-w" ]; then
-    windoz="windoz"
-fi
 
 echo -e "\n${BROWN}/!\ ${NC}this script does not run 'yarn install'\n${BROWN}/!\ ${NC}"
 
@@ -128,7 +128,7 @@ log "Number of parallel jobs for building apps: $PARALLEL_BUILD"
 DEFAULTDIR=$(pwd)
 export DEFAULTDIR
 
-# create folder $DEFAULTDIR/frontend/dist/app/ if no exists
+# create folder $DEFAULTDIR/frontend/dist/app/ if it does not exist
 mkdir -p $DEFAULTDIR/frontend/dist/app/ || logerror "Failed to make directory $DEFAULTDIR/frontend/dist/app/"
 
 log "Building tracim_frontend_lib for unit tests"
@@ -149,13 +149,10 @@ log "Building tracim_frontend_vendors"
 cd "$DEFAULTDIR/frontend_vendors"
 ./build_vendors.sh && loggood "Built tracim_frontend_vendors successfully" || logerror "Could not build tracim_frontend_vendors"
 
-# Tracim Lib Bundle
-log "Building tracim_frontend_lib"
-yarn workspace tracim_frontend_lib run build$windoz && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
 # Tracim Lib for the browsers
 log "Building tracim_frontend_lib for Tracim"
-yarn workspace tracim_frontend_lib run tracimbuildwindoz && loggood "Built tracim_frontend_lib for Tracim successfully" || logerror "Failed to build tracim_frontend_lib for Tracim"
+yarn workspace tracim_frontend_lib run buildUsingExternalVendors && loggood "Built tracim_frontend_lib for Tracim successfully" || logerror "Failed to build tracim_frontend_lib for Tracim"
 
 if [ "$PARALLEL_BUILD" != 1 ]; then
     # We need to wait for the build of tracim_frontend_lib for unit tests to finish

@@ -5,14 +5,10 @@
   "main": "index.js",
   "scripts": {
     "servdev": "NODE_ENV=development webpack-dev-server --config webpack.tracim.config.js --watch --colors --inline --hot --progress",
-    "servdevwindoz": "NODE_ENV=development webpack-dev-server --config webpack.tracim.config.js --watch --colors --inline --hot --progress",
     "build": "NODE_ENV=production webpack-cli -p",
-    "tracimbuild": "NODE_ENV=production webpack-cli -p --config webpack.tracim.config.js",
+    "buildUsingExternalVendors": "NODE_ENV=production webpack-cli -p --config webpack.tracim.config.js",
     "build-dev": "NODE_ENV=production webpack-cli",
-    "tracimbuild-dev": "NODE_ENV=production webpack-cli --config webpack.tracim.config.js",
-    "buildwindoz": "build",
-    "tracimbuildwindoz": "tracimbuild",
-    "build-devwindoz": "build-dev",
+    "buildUsingExternalVendors-dev": "NODE_ENV=production webpack-cli --config webpack.tracim.config.js",
     "build-translation": "node i18next.scanner.js",
     "test": "NODE_ENV=test mocha --config test/.mocharc.js"
   },

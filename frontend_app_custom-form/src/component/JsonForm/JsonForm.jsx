@@ -2,7 +2,7 @@ import React from 'react'
 import Form from 'react-jsonschema-form/lib'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
-import color from 'color'
+const color = require('color')
 import field from './CustomFields/index'
 
 export class JsonForm extends React.Component {

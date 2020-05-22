@@ -10,7 +10,11 @@ import {
 require('./MemberList.styl')
 
 export class MemberList extends React.Component {
-  handleClickBtnValidate = async () => await this.props.onClickValidateNewMember() && this.setState({ displayNewMemberList: true })
+  handleClickBtnValidate = async () => {
+    if (await this.props.onClickValidateNewMember()) {
+      this.setState({ displayNewMemberList: true })
+    }
+  }
 
   render () {
     const { props } = this

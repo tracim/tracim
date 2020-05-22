@@ -8,8 +8,8 @@ import { DropTarget } from 'react-dnd'
 import { DRAG_AND_DROP } from '../../util/helper.js'
 import { ROLE } from 'tracim_frontend_lib'
 
-import qs from 'query-string'
-import color from 'color'
+const qs = require('query-string')
+const color = require('color')
 
 class WorkspaceListItem extends React.Component {
   shouldDisplayAsActive = (location, workspaceId, activeWorkspaceId, app) => {

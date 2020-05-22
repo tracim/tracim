@@ -4,9 +4,7 @@
   "description": "",
   "main": "dist/tracim_frontend_vendors.js",
   "scripts": {
-    "build": "node ./src/build-externals-and-require-file.js && NODE_ENV=production webpack-cli -p",
-    "buildwindoz": "build",
-    "build-devwindoz": "node ./src/build-externals-and-require-file.js && NODE_ENV=production webpack-cli"
+    "build": "node ./src/build-externals-and-require-file.js && NODE_ENV=production webpack-cli -p"
   },
   "author": "",
   "license": "ISC",

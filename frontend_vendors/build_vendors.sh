@@ -14,15 +14,11 @@ function logerror {
     exit 1
 }
 
-windoz=""
-if [[ $1 = "-w" || $2 = "-w" ]]; then
-    windoz="windoz"
-fi
 
 dev=""
-if [[ $1 = "-d" || $2 = "-d" ]]; then
+if [ "$1" = "-d" ]; then
     dev="-dev"
 fi
 
-yarn run build$dev$windoz || logerror "Failed to build the vendor bundle"
+yarn run build$dev || logerror "Failed to build the vendor bundle"
 cp dist/tracim_frontend_vendors.js ../frontend/dist/app/tracim_frontend_vendors.js  || logerror "Failed to copy the vendor bundle"
