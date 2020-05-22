@@ -1,92 +1,62 @@
-import {
-  ROLE
-} from 'tracim_frontend_lib'
+import { FETCH_CONFIG } from './helper.js'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 export const LIVE_MESSAGE_STATUS = {
   OPEN: 'open',
+  PENDING: 'pending', // INFO - CH - 2020-05-14 - "pending" means connecting started but not yet got the opened confirmation from backend
   CLOSE: 'close'
 }
 
 export class LiveMessageManager {
   constructor () {
     this.status = LIVE_MESSAGE_STATUS.CLOSE
+    this.eventSource = null
   }
 
-  openLiveMessageConnection () {
+  openLiveMessageConnection (userId) {
     if (this.status !== LIVE_MESSAGE_STATUS.CLOSE) {
       console.error('LiveMessage already connected.')
       return false
     }
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log('resolving openLiveMessageConnection')
+    this.eventSource = new globalThis.EventSource(
+      `${FETCH_CONFIG.apiUrl}/users/${userId}/live_messages`,
+      { withCredentials: true }
+    )
 
-        // INFO - CH - 2020-05-13 - commenting this line used for debug and test POC
-        // this.mockRandomLiveEvents()
+    this.eventSource.onopen = () => {
+      console.log('%c.:. TLM Connected: ', 'color: #ccc0e2')
+      this.status = LIVE_MESSAGE_STATUS.OPEN
+    }
 
-        this.status = LIVE_MESSAGE_STATUS.OPEN
+    this.eventSource.onmessage = (e) => {
+      console.log('%c.:. TLM received: ', 'color: #ccc0e2', { ...e, data: JSON.parse(e.data) })
+      this.dispatchLiveMessage(e)
+    }
 
-        resolve(true)
-      }, 200)
-    })
+    this.eventSource.onerror = (e) => {
+      console.log('%c.:. TLM Error: ', 'color: #ccc0e2', e)
+    }
   }
 
   closeLiveMessageConnection () {
+    this.eventSource.close()
+    console.log('%c.:. TLM Closed')
     this.status = LIVE_MESSAGE_STATUS.CLOSE
     return true
   }
 
   dispatchLiveMessage = function (event) {
-    const type = event.type
-    const data = event.data
-    console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', type, data)
+    const data = JSON.parse(event.data)
+    console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', data)
 
-    const customEvent = new globalThis.CustomEvent('TracimLiveMessage', { detail: { type, data } })
+    const customEvent = new globalThis.CustomEvent(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, {
+      detail: {
+        type: data.event_type,
+        data: data.fields
+      }
+    })
 
     document.dispatchEvent(customEvent)
-  }
-
-  mockRandomLiveEvents () {
-    const eventFromBackend = {
-      event_id: 42,
-      event_type: 'sharedspace_user_role.created', // hierarchy in the naming: entity_type.core_event_type
-      sent_datetime: '2012-05-29T18:25:43.511Z',
-      read_datetime: null,
-      sender_id: 54,
-      fields: {
-        user: {
-          user_id: 23,
-          username: 'jdoe',
-          public_name: 'John Doe',
-          is_active: true,
-          is_deleted: false
-        },
-        workspace: {
-          workspace_id: 42,
-          label: 'Un truc sympa',
-          is_deleted: false
-        },
-        role: ROLE.contributor.slug
-      }
-    }
-
-    globalThis.setTimeout(() => {
-      this.dispatchLiveMessage({
-        type: eventFromBackend.event_type,
-        data: eventFromBackend
-      })
-    }, 5000)
-
-    // INFO - CH - 2020-05-13 - commenting this line used for debug and test POC
-    // globalThis.setInterval(() => {
-    //   const rdm = Math.floor(Math.random() * 100)
-    //   if (rdm % 2 === 0) {
-    //     this.dispatchLiveMessage({
-    //       type: eventFromBackend.event_type,
-    //       data: eventFromBackend.fields
-    //     })
-    //   }
-    // }, 3000)
   }
 }

@@ -1,8 +1,8 @@
 import pytest
 
+from tracim_backend.lib.core.event import EventBuilder
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.crud_hook.caller import DatabaseCrudHookCaller
-from tracim_backend.lib.event import EventBuilder
 from tracim_backend.models.auth import Profile
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 

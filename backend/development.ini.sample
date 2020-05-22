@@ -84,6 +84,10 @@ basic_setup.session_secret = change_this_value_please!
 # With all apps (add collaborative document edition):
 # app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,collaborative_document_edition,share_content,upload_permission,gallery
 
+### Live Messages ###
+# control_uri for GRIP protocol reverse-proxy (PushPin)
+# this is the base url used for publishing new events to reverse-proxy.
+; live_messages.control_uri = http://localhost:5561
 
 ### Plugins ###
 # if provided, this allow Tracim to load package from this dir and if package follow

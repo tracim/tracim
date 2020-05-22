@@ -309,6 +309,8 @@ class CFG(object):
         """Parse configuration file and env variables"""
         self.log_config_header("Global config parameters:")
         self._load_global_config()
+        self.log_config_header("Live Messages Config parameters:")
+        self._load_live_messages_config()
         self.log_config_header("Limitation config parameters:")
         self._load_limitation_config()
         self.log_config_header("Email config parameters:")
@@ -452,6 +454,11 @@ class CFG(object):
 
         self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
             "frontend.custom_toolbox_folder_path", None
+        )
+
+    def _load_live_messages_config(self) -> None:
+        self.LIVE_MESSAGES__CONTROL_URI = self.get_raw_config(
+            "live_messages.control_uri", "http://localhost:5561"
         )
 
     def _load_limitation_config(self) -> None:
@@ -727,6 +734,7 @@ class CFG(object):
         Check if config setted is correct
         """
         self._check_global_config_validity()
+        self._check_live_messages_config_validity()
         self._check_email_config_validity()
         self._check_ldap_config_validity()
         self._check_search_config_validity()
@@ -809,6 +817,9 @@ class CFG(object):
                 'ERROR user.default_profile given "{}" is invalid,'
                 "valids values are {}.".format(self.USER__DEFAULT_PROFILE, profile_str_list)
             )
+
+    def _check_live_messages_config_validity(self) -> None:
+        self.check_mandatory_param("LIVE_MESSAGES__CONTROL_URI", self.LIVE_MESSAGES__CONTROL_URI)
 
     def _check_email_config_validity(self) -> None:
         """
