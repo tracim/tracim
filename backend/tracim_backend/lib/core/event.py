@@ -103,6 +103,8 @@ class EventBuilder:
     def on_user_modified(self, user: User, db_session: TracimSession) -> None:
         if self._has_just_been_deleted(user):
             self._create_user_event(OperationType.DELETED, user, db_session)
+        elif self._has_just_been_undeleted(user):
+            self._create_user_event(OperationType.UNDELETED, user, db_session)
         else:
             self._create_user_event(OperationType.MODIFIED, user, db_session)
 
@@ -128,6 +130,8 @@ class EventBuilder:
     def on_workspace_modified(self, workspace: Workspace, db_session: TracimSession) -> None:
         if self._has_just_been_deleted(workspace):
             self._create_workspace_event(OperationType.DELETED, workspace, db_session)
+        elif self._has_just_been_undeleted(workspace):
+            self._create_workspace_event(OperationType.UNDELETED, workspace, db_session)
         else:
             self._create_workspace_event(OperationType.MODIFIED, workspace, db_session)
 
@@ -155,6 +159,8 @@ class EventBuilder:
     def on_content_modified(self, content: Content, db_session: TracimSession) -> None:
         if self._has_just_been_deleted(content.current_revision):
             self._create_content_event(OperationType.DELETED, content, db_session)
+        elif self._has_just_been_undeleted(content.current_revision):
+            self._create_content_event(OperationType.UNDELETED, content, db_session)
         else:
             self._create_content_event(OperationType.MODIFIED, content, db_session)
 
@@ -244,6 +250,15 @@ class EventBuilder:
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
         if obj.is_deleted:
+            history = inspect(obj).attrs.is_deleted.history
+            return history.has_changes()
+        return False
+
+    def _has_just_been_undeleted(
+        self, obj: typing.Union[User, Workspace, ContentRevisionRO]
+    ) -> bool:
+        """Check whether an object has been undeleted since queried from database."""
+        if not obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
             return history.has_changes()
         return False
