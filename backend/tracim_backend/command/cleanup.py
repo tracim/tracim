@@ -344,7 +344,10 @@ class AnonymizeUserCommand(AppContextCommand):
             user_list = []  # type: typing.List[User]
             for login in parsed_args.logins:
                 try:
-                    user = uapi.get_one_by_email(login)
+                    if "@" in login:
+                        user = uapi.get_one_by_email(login)
+                    else:
+                        user = uapi.get_one_by_username(login)
                     user_list.append(user)
                 except UserDoesNotExist as exc:
                     print('ERROR: user with email "{}" does not exist'.format(login))
