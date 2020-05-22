@@ -55,7 +55,7 @@ Using the browser libary does not work: `tracim_frontend_lib` needs to be compat
 
 # Building a Tracim app using `tracim_fontend_lib`
 
-In the code of your app, use `require('tracim_fontend_lib')` or `import ... from tracim_fontend_lib` to import the library.
+In the code of your app, use `import ... from tracim_fontend_lib` to import the library (or `require('tracim_fontend_lib')`).
 
 In its webpack configuration, either use the bundle, which is the default entry point of `tracim_fontend_lib`, or use the browser library:
  - declare `tracim_fontend_lib` in the `externals` field of the Webpack configuration of the app.
