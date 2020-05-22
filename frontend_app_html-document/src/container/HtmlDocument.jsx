@@ -5,6 +5,7 @@ import i18n from '../i18n.js'
 import {
   appContentFactory,
   addAllResourceI18n,
+  displayDistanceDate,
   handleFetchResult,
   PopinFixed,
   PopinFixedHeader,
@@ -89,28 +90,18 @@ class HtmlDocument extends React.Component {
 
   // TLM Handlers
   handleContentModified = data => {
-    const { state } = this // TODO review and test localstorage
+    const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
     const localStorageComment = localStorage.getItem(
-      generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
+      generateLocalStorageContentId(data.content.workspace_id, data.content.content_id, state.appName, 'comment')
     )
 
-    if (state.mode === APP_FEATURE_MODE.EDIT) {
-      if (state.loggedUser.user_id === data.author.user_id) {
-        globalThis.tinymce.remove('#wysiwygNewVersion')
-
-        localStorage.removeItem(
-          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
-        )
-
-        this.setState({ mode: APP_FEATURE_MODE.VIEW })
-      } else {
-        this.setState({
-          editionAuthor: data.author.public_name,
-          keepEditingWarning: true
-        })
-      }
+    if (state.mode === APP_FEATURE_MODE.EDIT && state.loggedUser.user_id !== data.author.user_id) {
+      this.setState({
+        editionAuthor: data.author.public_name,
+        keepEditingWarning: true
+      })
     }
 
     this.setState(prev => ({
@@ -129,22 +120,24 @@ class HtmlDocument extends React.Component {
 
   handleContentCreated = data => {
     const { state } = this
-    if (data.content.parent_id !== state.content.content_id) return
+    if (data.content.parent_id !== state.content.content_id || data.content.content_type !== 'comment') return
 
-    if (data.content.content_type === 'comment') { // TODO review and test localstorage (and appContentSaveNewComment at appContentFactory)
-      if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+    this.setState(prev => ({
+      timeline: [
+        ...prev.timeline,
+        {
+          author: data.author,
+          content_id: data.content.content_id,
+          created: displayDistanceDate(data.content.created),
+          created_raw: data.content.created,
+          parent_id: data.content.parent_id,
+          raw_content: state.newComment, // TODO blocked by back
+          timelineType: data.content.content_type
+        }
+      ]
+    }))
 
-      localStorage.removeItem(
-        generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.config.slug, 'comment')
-      )
-
-      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug), data: {} })
-
-      this.setState(prev => ({
-        newComment: '',
-        timeline: [...prev.timeline, data.content]
-      }))
-    }
+    // GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug), data: {} })
   }
 
   // Custom Event Handlers
@@ -210,11 +203,11 @@ class HtmlDocument extends React.Component {
         globalThis.tinymce.remove('#wysiwygNewVersion')
         break
 
-      // case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
-      //   console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-      //   props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
-      //   globalThis.tinymce.remove('#wysiwygNewVersion')
-      //   break
+      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
+        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
+        props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+        globalThis.tinymce.remove('#wysiwygNewVersion')
+        break
 
       case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
         props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
@@ -463,9 +456,19 @@ class HtmlDocument extends React.Component {
       await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, state.content.raw_content)
     )
 
-    if (fetchResultSaveHtmlDoc.apiResponse.status !== 200) {
-      this.setLocalStorageItem('rawContent', backupLocalStorage)
-      this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+    switch (fetchResultSaveHtmlDoc.apiResponse.status) {
+      case 200:
+        globalThis.tinymce.remove('#wysiwygNewVersion')
+
+        localStorage.removeItem(
+          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
+        )
+
+        this.setState({ mode: APP_FEATURE_MODE.VIEW })
+        break
+      default:
+        this.setLocalStorageItem('rawContent', backupLocalStorage)
+        this.sendGlobalFlashMessage(props.t('Error while saving new version'))
     }
   }
 

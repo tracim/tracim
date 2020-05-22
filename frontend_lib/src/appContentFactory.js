@@ -149,15 +149,13 @@ export function appContentFactory (WrappedComponent) {
       )
 
       switch (response.apiResponse.status) {
-        case 200: // TODO review and test before delete
-          // setState({ newComment: '' })
-          // if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+        case 200:
+          setState({ newComment: '' })
+          if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
 
-          // localStorage.removeItem(
-          //   generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment')
-          // )
-
-          // GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
+          localStorage.removeItem(
+            generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment')
+          )
           break
         case 400:
           switch (response.body.code) {
