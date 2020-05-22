@@ -29,7 +29,9 @@ class AccountController(Controller):
         This route generate a HTTP 307 with the right url
         """
         return HTTPTemporaryRedirect(
-            request.url.replace("/me", "/{user_id}".format(user_id=request.current_user.user_id), 1)
+            request.url.replace(
+                "/users/me", "/users/{user_id}".format(user_id=request.current_user.user_id), 1
+            )
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
@@ -41,7 +43,9 @@ class AccountController(Controller):
         This route generate a HTTP 307 with the right url
         """
         return HTTPTemporaryRedirect(
-            request.url.replace("/me", "/{user_id}".format(user_id=request.current_user.user_id), 1)
+            request.url.replace(
+                "/users/me", "/users/{user_id}".format(user_id=request.current_user.user_id), 1
+            )
         )
 
     def bind(self, configurator: Configurator) -> None:
