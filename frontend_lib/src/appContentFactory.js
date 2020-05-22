@@ -112,21 +112,18 @@ export function appContentFactory (WrappedComponent) {
         await putEditContent(this.apiUrl, content.workspace_id, content.content_id, appSlug, newTitle, content.raw_content, propertiesToAddToBody)
       )
 
-      switch (response.apiResponse.status) {
-        case 200:
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-          break
-        case 400:
-          switch (response.body.code) {
-            case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-            case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
-            default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
-          }
-          break
-        default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+      if (response.apiResponse.status !== 200) {
+        switch (response.apiResponse.status) {
+          case 400:
+            switch (response.body.code) {
+              case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
+              case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
+              default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+            }
+            break
+          default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+        }
       }
-
       return response
     }
 
@@ -152,15 +149,15 @@ export function appContentFactory (WrappedComponent) {
       )
 
       switch (response.apiResponse.status) {
-        case 200:
-          setState({ newComment: '' })
-          if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+        case 200: // TODO review and test before delete
+          // setState({ newComment: '' })
+          // if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
 
-          localStorage.removeItem(
-            generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment')
-          )
+          // localStorage.removeItem(
+          //   generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment')
+          // )
 
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
+          // GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
           break
         case 400:
           switch (response.body.code) {
@@ -187,13 +184,8 @@ export function appContentFactory (WrappedComponent) {
         await putEditStatus(this.apiUrl, content.workspace_id, content.content_id, appSlug, newStatus)
       )
 
-      switch (response.status) {
-        case 204:
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
-          break
-        default:
-          this.sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
-          break
+      if (response.status !== 204) {
+        this.sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
       }
 
       return response

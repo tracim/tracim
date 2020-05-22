@@ -11,15 +11,18 @@
   "Error while creating document": "Erro ao criar o documento",
   "This content is archived": "Este conteúdo está arquivado",
   "Restore": "Restaurar",
+  "Refresh": "Atualizar",
   "This content is deleted": "Este conteúdo está eliminado",
   "You have a pending draft": "Você tem um rascunho pendente",
   "resume writing": "continuar a escrever",
   "Error while saving new version": "Erro ao salvar a nova versão",
+  "If you refresh, you will lose the current changes": "Se você atualizar, você perderá as mudanças atuais",
   "Text Document": "Documento de Texto",
   "Text document": "Documento de texto",
   "text document": "documento de texto",
   "text documents": "documentos de texto",
   "This content is deprecated": "Este conteúdo está obsoleto",
+  "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
   "Timeline": "Linha cronológica",
   "New text document": "Novo documento de texto"
 }

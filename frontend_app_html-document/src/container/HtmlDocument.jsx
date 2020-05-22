@@ -61,7 +61,9 @@ class HtmlDocument extends React.Component {
       timeline: [],
       newComment: '',
       timelineWysiwyg: false,
-      mode: APP_FEATURE_MODE.VIEW
+      mode: APP_FEATURE_MODE.VIEW,
+      keepEditingWarning: false,
+      editionAuthor: ''
     }
 
     // i18n has been init, add resources from frontend
@@ -87,40 +89,59 @@ class HtmlDocument extends React.Component {
 
   // TLM Handlers
   handleContentModified = data => {
-    const { state } = this
+    const { state } = this // TODO review and test localstorage
     if (data.content.content_id !== state.content.content_id) return
-
-    globalThis.tinymce.remove('#wysiwygNewVersion')
-
-    localStorage.removeItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
-    )
 
     const localStorageComment = localStorage.getItem(
       generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
     )
 
+    if (state.mode === APP_FEATURE_MODE.EDIT) {
+      if (state.loggedUser.user_id === data.author.user_id) {
+        globalThis.tinymce.remove('#wysiwygNewVersion')
+
+        localStorage.removeItem(
+          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
+        )
+
+        this.setState({ mode: APP_FEATURE_MODE.VIEW })
+      } else {
+        this.setState({
+          editionAuthor: data.author.public_name,
+          keepEditingWarning: true
+        })
+      }
+    }
+
     this.setState(prev => ({
       ...prev,
-      mode: APP_FEATURE_MODE.VIEW,
       content: {
         ...prev.content,
         ...data.content
-        // raw_content: data.raw_content // TODO
+        // raw_content: data.raw_content // TODO blocked by back
       },
       newComment: localStorageComment || '',
       rawContentBeforeEdit: prev.content.raw_content
     }))
 
-    this.loadTimeline()
+    this.loadTimeline() // TODO blocked by back
   }
 
   handleContentCreated = data => {
     const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
+    if (data.content.parent_id !== state.content.content_id) return
 
-    if (data.content.content_type === 'comment') {
+    if (data.content.content_type === 'comment') { // TODO review and test localstorage (and appContentSaveNewComment at appContentFactory)
+      if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+
+      localStorage.removeItem(
+        generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.config.slug, 'comment')
+      )
+
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug), data: {} })
+
       this.setState(prev => ({
+        newComment: '',
         timeline: [...prev.timeline, data.content]
       }))
     }
@@ -189,11 +210,11 @@ class HtmlDocument extends React.Component {
         globalThis.tinymce.remove('#wysiwygNewVersion')
         break
 
-      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
-        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
-        globalThis.tinymce.remove('#wysiwygNewVersion')
-        break
+      // case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
+      //   console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
+      //   props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+      //   globalThis.tinymce.remove('#wysiwygNewVersion')
+      //   break
 
       case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
         props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
@@ -477,25 +498,27 @@ class HtmlDocument extends React.Component {
     props.appContentChangeStatus(state.content, newStatus, state.config.slug)
   }
 
-  handleClickArchive = async () => {
-    const { props, state } = this
-    props.appContentArchive(state.content, this.setState.bind(this), state.config.slug)
-  }
-
   handleClickDelete = async () => {
     const { props, state } = this
     props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
-  }
-
-  handleClickRestoreArchive = async () => {
-    const { props, state } = this
-    props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
+    // TODO blocked by back
   }
 
   handleClickRestoreDelete = async () => {
     const { props, state } = this
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
+    // TODO blocked by back
   }
+
+  // INFO - G.B. - 2020-05-20 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
+  // handleClickArchive = async () => {
+  //   const { props, state } = this
+  //   props.appContentArchive(state.content, this.setState.bind(this), state.config.slug)
+  // }
+  // handleClickRestoreArchive = async () => {
+  //   const { props, state } = this
+  //   props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
+  // }
 
   handleClickShowRevision = revision => {
     const { state } = this
@@ -527,6 +550,13 @@ class HtmlDocument extends React.Component {
   handleClickLastVersion = () => {
     this.loadContent()
     this.setState({ mode: APP_FEATURE_MODE.VIEW })
+  }
+
+  handleClickRefresh = () => {
+    this.setState({
+      mode: APP_FEATURE_MODE.VIEW,
+      keepEditingWarning: false
+    })
   }
 
   render () {
@@ -629,6 +659,9 @@ class HtmlDocument extends React.Component {
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
+            keepEditingWarning={state.keepEditingWarning}
+            onClickRefresh={this.handleClickRefresh}
+            editionAuthor={state.editionAuthor}
           />
 
           <PopinFixedRightPart

@@ -8,7 +8,7 @@ import {
   handleFetchResult,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  TracimComponent,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { postHtmlDocContent } from '../action.async.js'
 import i18n from '../i18n.js'
@@ -17,7 +17,7 @@ import i18n from '../i18n.js'
 import { debug } from '../debug.js'
 
 class PopupCreateHtmlDocument extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       appName: 'html-document', // must remain 'html-document' because it is the name of the react built app (which contains HtmlDocument and PopupCreateHtmlDocument)
@@ -46,6 +46,8 @@ class PopupCreateHtmlDocument extends React.Component {
   // TLM Handlers
   handleContentCreated = data => {
     const { state } = this
+    if (data.content.parent_id !== this.state.content.content_id) return
+
     this.handleClose()
 
     GLOBAL_dispatchEvent({
@@ -71,11 +73,11 @@ class PopupCreateHtmlDocument extends React.Component {
   //   this.setHeadTitle()
   // }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.setHeadTitle()
   }
 
@@ -116,7 +118,7 @@ class PopupCreateHtmlDocument extends React.Component {
   })
 
   handleValidate = async () => {
-    const { config, appName, workspaceId, folderId, newContentName } = this.state
+    const { config, workspaceId, folderId, newContentName } = this.state
 
     const fetchSaveNewHtmlDoc = postHtmlDocContent(config.apiUrl, workspaceId, folderId, config.slug, newContentName)
 
@@ -150,7 +152,7 @@ class PopupCreateHtmlDocument extends React.Component {
     }
   }
 
-  render() {
+  render () {
     return (
       <CardPopupCreateContent
         onClose={this.handleClose}
