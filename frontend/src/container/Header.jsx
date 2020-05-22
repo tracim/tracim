@@ -36,7 +36,7 @@ import {
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 
-import qs from 'query-string'
+const qs = require('query-string')
 
 class Header extends React.Component {
   componentDidMount () {
