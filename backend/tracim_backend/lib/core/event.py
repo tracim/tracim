@@ -31,9 +31,9 @@ from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
-from tracim_backend.views.core_api.schemas import ContentDigestSchema
+from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
-from tracim_backend.views.core_api.schemas import UserDigestSchema
+from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 
 _USER_FIELD = "user"
@@ -73,9 +73,9 @@ class EventApi:
 class EventBuilder:
     """Create Event objects from the database crud hooks."""
 
-    _user_schema = UserDigestSchema()
+    _user_schema = UserSchema()
     _workspace_schema = WorkspaceSchema()
-    _content_schema = ContentDigestSchema()
+    _content_schema = ContentSchema()
     _event_schema = EventSchema()
 
     def __init__(self, config: CFG) -> None:
@@ -109,9 +109,12 @@ class EventBuilder:
     def _create_user_event(
         self, operation: OperationType, user: User, db_session: TracimSession
     ) -> None:
+        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
-            _USER_FIELD: self._user_schema.dump(user).data,
+            _AUTHOR_FIELD: self._user_schema.dump(
+                user_api.get_user_with_context(self._current_user)
+            ).data,
+            _USER_FIELD: self._user_schema.dump(user_api.get_user_with_context(user)).data,
         }
         event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
         db_session.add(event)
@@ -132,9 +135,12 @@ class EventBuilder:
         self, operation: OperationType, workspace: Workspace, db_session: TracimSession
     ) -> None:
         api = WorkspaceApi(db_session, self._current_user, self._config)
+        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
         workspace_in_context = api.get_workspace_with_context(workspace)
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
+            _AUTHOR_FIELD: self._user_schema.dump(
+                user_api.get_user_with_context(self._current_user)
+            ).data,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
@@ -161,8 +167,11 @@ class EventBuilder:
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace_id)
         )
+        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
+            _AUTHOR_FIELD: self._user_schema.dump(
+                user_api.get_user_with_context(self._current_user)
+            ).data,
             _CONTENT_FIELD: self._content_schema.dump(content_in_context).data,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
@@ -196,13 +205,17 @@ class EventBuilder:
         user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
 
         try:
-            user_field = self._user_schema.dump(user_api.get_one(role.user_id)).data
+            user_field = self._user_schema.dump(
+                user_api.get_user_with_context(user_api.get_one(role.user_id))
+            ).data
         except UserDoesNotExist:
             # It is possible to have an already deleted user when deleting his roles.
             user_field = None
 
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
+            _AUTHOR_FIELD: self._user_schema.dump(
+                user_api.get_user_with_context(self._current_user)
+            ).data,
             _USER_FIELD: user_field,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
             _ROLE_FIELD: WorkspaceRoles.get_role_from_level(role.role).label,
