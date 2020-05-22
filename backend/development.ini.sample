@@ -101,7 +101,7 @@ basic_setup.session_secret = change_this_value_please!
 
 ## Anonymized User
 # You can set default display name for anonymized user.
-; default_anonymized_user_display_name = "Lost Meerkat"
+; default_anonymized_user_display_name = "Deleted user"
 
 ## Build Version
 # If you leave build_version empty or unsetted here, Tracim will automatically
