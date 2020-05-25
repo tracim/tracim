@@ -74,15 +74,6 @@ export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
   return (roleList.find(r => user.role === r.slug) || { id: 1 }).id
 }
 
-// INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/v2/system/content_types
-export const CONTENT_TYPE = {
-  HTML_DOCUMENT: 'html-document',
-  FILE: 'file',
-  THREAD: 'thread',
-  FOLDER: 'folder',
-  COMMENT: 'comment'
-}
-
 export const COOKIE_FRONTEND = {
   LAST_CONNECTION: 'lastConnection',
   DEFAULT_LANGUAGE: 'defaultLanguage',

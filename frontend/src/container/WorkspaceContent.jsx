@@ -7,7 +7,6 @@ import { translate } from 'react-i18next'
 import {
   PAGE,
   findUserRoleIdInWorkspace,
-  CONTENT_TYPE,
   sortWorkspaceContents,
   SHARE_FOLDER_ID
 } from '../util/helper.js'
@@ -58,6 +57,7 @@ import {
   setWorkspaceDetail
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
+import { CONTENT_TYPE } from 'tracim_frontend_lib/src/helper.js'
 
 const qs = require('query-string')
 
