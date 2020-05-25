@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import {
   addAllResourceI18n,
+  appContentFactory,
   buildHeadTitle,
   CardPopupCreateContent,
   CUSTOM_EVENT,
@@ -44,7 +45,7 @@ class PopupCreateHtmlDocument extends React.Component {
   // TLM Handlers
   handleContentCreated = data => {
     const { state } = this
-    if (data.content.workspace_id !== state.workspaceId) return
+    if (data.content.workspace_id !== state.workspaceId || state.loggedUser.user_id !== data.author.user_id) return
 
     this.handleClose()
 
@@ -62,13 +63,7 @@ class PopupCreateHtmlDocument extends React.Component {
   handleAllAppChangeLanguage = data => {
     console.log('%c<PopupCreateHtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, data)
 
-    this.setState(prev => ({
-      loggedUser: {
-        ...prev.loggedUser,
-        lang: data
-      }
-    }))
-    i18n.changeLanguage(data)
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
     this.setHeadTitle()
   }
 
@@ -148,4 +143,4 @@ class PopupCreateHtmlDocument extends React.Component {
   }
 }
 
-export default translate()(TracimComponent(PopupCreateHtmlDocument))
+export default translate()(appContentFactory(TracimComponent(PopupCreateHtmlDocument)))
