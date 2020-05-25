@@ -49,9 +49,11 @@ class ResetPasswordController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
-        user = uapi.get(username=hapic_data.body.username, email=hapic_data.body.email)
+        if hapic_data.body.username:
+            user = uapi.get_one_by_username(username=hapic_data.body.username)
+        else:
+            user = uapi.get_one_by_email(email=hapic_data.body.email)
         uapi.reset_password_notification(user, do_save=True)
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])
     @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)
