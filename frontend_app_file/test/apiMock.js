@@ -35,5 +35,5 @@ export {
   mockGetFileComment200,
   mockGetShareLinksList200,
   mockGetFileRevision200,
-  mockPutMyselfFileRead200,
+  mockPutMyselfFileRead200
 }

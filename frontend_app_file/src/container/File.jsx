@@ -191,7 +191,7 @@ export class File extends React.Component {
 
   handleContentCreated = (data) => {
     if (data.content.content_type === 'comment' && data.content.parent_id === this.state.content.content_id) {
-      const sortedNewTimeLine = [...this.state.timeline, {...data.content, created_raw: data.content.created}].sort((a, b) => a.created_raw > b.created_raw ? 1 : -1)
+      const sortedNewTimeLine = [...this.state.timeline, { ...data.content, created_raw: data.content.created }].sort((a, b) => a.created_raw > b.created_raw ? 1 : -1)
       this.setState({ timeline: sortedNewTimeLine })
     }
   }
