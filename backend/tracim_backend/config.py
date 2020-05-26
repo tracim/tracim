@@ -386,7 +386,7 @@ class CFG(object):
             do_strip=True,
         )
         self.DEFAULT_ANONYMIZED_USER_DISPLAY_NAME = self.get_raw_config(
-            "default_anonymized_user_display_name", "Lost Meerkat"
+            "default_anonymized_user_display_name", "Deleted user"
         )
 
         self.USER__AUTH_TOKEN__VALIDITY = int(
