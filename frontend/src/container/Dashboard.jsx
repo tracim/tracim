@@ -92,7 +92,7 @@ export class Dashboard extends React.Component {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified }
       // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
       // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleContentDeleted }
     ])

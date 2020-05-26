@@ -102,7 +102,7 @@ export const addWorkspaceMember = (user, workspace, member) => ({
 export const updateWorkspaceMember = (user, workspace, member) => ({
   type: `${UPDATE}/${WORKSPACE_MEMBER}`,
   member: { user: user, ...member },
-  workspace,
+  workspace
 })
 export const removeWorkspaceMember = (memberId, workspace) => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId, workspace })
 
