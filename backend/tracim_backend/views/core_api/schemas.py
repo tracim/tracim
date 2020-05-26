@@ -951,16 +951,19 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     )
 
 
-class WorkspaceMemberSchema(marshmallow.Schema):
+class WorkspaceMemberDigestSchema(marshmallow.Schema):
     role = StrippedString(example="contributor", validate=user_role_validator)
-    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
-    user = marshmallow.fields.Nested(UserDigestSchema())
-    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(exclude=("sidebar_entries",)))
-    is_active = marshmallow.fields.Bool()
     do_notify = marshmallow.fields.Bool(
         description="has user enabled notification for this workspace", example=True
     )
+
+
+class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    is_active = marshmallow.fields.Bool()
+    user = marshmallow.fields.Nested(UserDigestSchema())
+    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(exclude=("sidebar_entries",)))
 
     class Meta:
         description = "Workspace Member information"

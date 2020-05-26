@@ -24,7 +24,6 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import WorkspaceRoles
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import Message
@@ -34,13 +33,14 @@ from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
 _WORKSPACE_FIELD = "workspace"
 _CONTENT_FIELD = "content"
-_ROLE_FIELD = "role"
+_MEMBER_FIELD = "member"
 
 
 RQ_QUEUE_NAME = "event"
@@ -77,6 +77,7 @@ class EventBuilder:
     _workspace_schema = WorkspaceSchema()
     _content_schema = ContentDigestSchema()
     _event_schema = EventSchema()
+    _workspace_user_role_schema = WorkspaceMemberDigestSchema()
 
     def __init__(self, config: CFG) -> None:
         self._config = config
@@ -194,22 +195,21 @@ class EventBuilder:
         workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(role.workspace)
         user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
-
+        role_api = RoleApi(current_user=self._current_user, session=db_session, config=self._config)
         try:
             user_field = self._user_schema.dump(user_api.get_one(role.user_id)).data
         except UserDoesNotExist:
             # It is possible to have an already deleted user when deleting his roles.
             user_field = None
 
+        role_in_context = role_api.get_user_role_workspace_with_context(role)
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
             _USER_FIELD: user_field,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
-            _ROLE_FIELD: WorkspaceRoles.get_role_from_level(role.role).label,
+            _MEMBER_FIELD: self._workspace_user_role_schema.dump(role_in_context).data,
         }
-        event = Event(
-            entity_type=EntityType.WORKSPACE_USER_ROLE, operation=operation, fields=fields
-        )
+        event = Event(entity_type=EntityType.WORKSPACE_MEMBER, operation=operation, fields=fields)
         db_session.add(event)
 
     def _publish_event(self, db_session: TracimSession, instance: object) -> None:
@@ -263,8 +263,8 @@ class LiveMessageBuilder:
             receiver_ids = cls._get_workspace_event_receiver_ids(event)
         elif event.entity_type == EntityType.CONTENT:
             receiver_ids = cls._get_workspace_event_receiver_ids(event)
-        elif event.entity_type == EntityType.WORKSPACE_USER_ROLE:
-            receiver_ids = cls._get_user_event_receiver_ids(event)
+        elif event.entity_type == EntityType.WORKSPACE_MEMBER:
+            receiver_ids = cls._get_workspace_event_receiver_ids(event)
 
         messages = [
             Message(
