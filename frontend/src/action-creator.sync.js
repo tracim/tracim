@@ -94,14 +94,14 @@ export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
 export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
 export const WORKSPACE_MEMBER_REMOVE = `${WORKSPACE_MEMBER}/${REMOVE}`
-export const addWorkspaceMember = (newMember, workspace, role) => ({
+export const addWorkspaceMember = (user, workspace, member) => ({
   type: `${ADD}/${WORKSPACE_MEMBER}`,
-  newMember: { user: { ...newMember }, role },
+  newMember: { user: user, ...member },
   workspace
 })
-export const updateWorkspaceMember = (member, workspace, role) => ({
+export const updateWorkspaceMember = (user, workspace, member) => ({
   type: `${UPDATE}/${WORKSPACE_MEMBER}`,
-  member: { user: { ...member }, role },
+  member: { user: user, ...member },
   workspace,
 })
 export const removeWorkspaceMember = (memberId, workspace) => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId, workspace })

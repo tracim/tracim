@@ -13,6 +13,7 @@ import {
   deleteWorkspaceContentList,
   FOLDER_READ,
   REMOVE,
+  removeWorkspaceMember,
   SET,
   setWorkspaceAgendaUrl,
   setWorkspaceContentRead,
@@ -21,7 +22,9 @@ import {
   setWorkspaceReadStatusList,
   setWorkspaceRecentActivityList,
   UPDATE,
+  updateUserWorkspaceSubscriptionNotif,
   updateWorkspaceContentList,
+  updateWorkspaceMember,
   USER_WORKSPACE_DO_NOTIFY,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
@@ -33,7 +36,7 @@ import {
 } from '../../../src/action-creator.sync.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import { appListAsSidebarEntry } from '../../hocMock/redux/appList/appListAsSidebarEntry.js'
-import { globalManagerAsMemberFromApi } from '../../fixture/user/globalManagerAsMember.js'
+import { globalManagerAsMember, globalManagerAsMemberFromApi } from '../../fixture/user/globalManagerAsMember.js'
 import { ROLE } from 'tracim_frontend_lib'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { contentFromApi } from '../../fixture/content/content.js'
@@ -76,7 +79,6 @@ describe('reducer currentWorkspace.js', () => {
           id: globalManagerAsMemberFromApi.user.user_id,
           publicName: globalManagerAsMemberFromApi.user.public_name,
           role: globalManagerAsMemberFromApi.role,
-          isActive: globalManagerAsMemberFromApi.is_active,
           doNotify: globalManagerAsMemberFromApi.do_notify
         })
       })
@@ -114,39 +116,77 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    // @TODO - need le fix des TLM workspace_member_role de seb
-    // describe(`${ADD}/${WORKSPACE_MEMBER}`, () => {
-    //   const randomMember = {
-    //     id: 15,
-    //     publicName: 'random user',
-    //     role: ROLE.reader.slug,
-    //     isActive: true,
-    //     doNotify: true
-    //   }
-    //   const initialStateWithMember = { ...initialState, memberList: [randomMember] }
-    //   const rez = currentWorkspace(
-    //     initialStateWithMember,
-    //     addWorkspaceMember(globalManagerFromApi, {}, ROLE.workspaceManager.slug)
-    //   )
-    //
-    //   it('should return a workspace object with the new member', () => {
-    //     expect(rez).to.deep.equal({
-    //       ...initialState,
-    //       memberList: [
-    //         randomMember,
-    //         serializeMember(globalManagerAsMemberFromApi)
-    //       ]
-    //     })
-    //   })
-    // })
+    describe(`${ADD}/${WORKSPACE_MEMBER}`, () => {
+      const randomMember = {
+        id: 15,
+        publicName: 'random user',
+        role: ROLE.reader.slug,
+        doNotify: true
+      }
+      const initialStateWithMember = { ...initialState, memberList: [randomMember] }
+      const rez = currentWorkspace(
+        initialStateWithMember,
+        addWorkspaceMember(globalManagerFromApi, {}, { role: ROLE.workspaceManager.slug, do_notify: true })
+      )
 
-    // describe(`${UPDATE}/${WORKSPACE_MEMBER}`, () => { })
-    //
-    // describe(`${REMOVE}/${WORKSPACE_MEMBER}`, () => { })
+      it('should return a workspace object with the new member', () => {
+        expect(rez).to.deep.equal({
+          ...initialState,
+          memberList: [
+            randomMember,
+            serializeMember(globalManagerAsMemberFromApi)
+          ]
+        })
+      })
+    })
 
-    // describe(`${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, () => {
-    //   updateUserWorkspaceSubscriptionNotif
-    // })
+    describe(`${UPDATE}/${WORKSPACE_MEMBER}`, () => {
+      const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
+      const rez = currentWorkspace(
+        initialStateWithMember,
+        updateWorkspaceMember(globalManagerFromApi, {}, { role: ROLE.contributor.slug, do_notify: true })
+      )
+      it('should return a workspace object with the member global manager as contributor', () => {
+        expect(rez).to.deep.equal({
+          ...initialStateWithMember,
+          memberList: [{
+            ...globalManagerAsMember,
+            role: ROLE.contributor.slug
+          }]
+        })
+      })
+    })
+
+    describe(`${REMOVE}/${WORKSPACE_MEMBER}`, () => {
+      const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
+      const rez = currentWorkspace(
+        initialStateWithMember,
+        removeWorkspaceMember(globalManagerAsMember.id, {})
+      )
+      it('should return a workspace object with an empty member list', () => {
+        expect(rez).to.deep.equal({
+          ...initialStateWithMember,
+          memberList: []
+        })
+      })
+    })
+
+    describe(`${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, () => {
+      const initialStateWithMember = { ...initialState, memberList: [{ ...globalManagerAsMember, doNotify: true }] }
+      const rez = currentWorkspace(
+        initialStateWithMember,
+        updateUserWorkspaceSubscriptionNotif(globalManagerAsMember.id, initialState.id, false)
+      )
+      it('should return a workspace object with the member as notification disabled', () => {
+        expect(rez).to.deep.equal({
+          ...initialStateWithMember,
+          memberList: [{
+            ...globalManagerAsMember,
+            doNotify: false
+          }]
+        })
+      })
+    })
 
     describe(`${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, () => {
       const initialStateWithRecentActivity = {

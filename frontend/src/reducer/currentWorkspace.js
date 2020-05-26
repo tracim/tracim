@@ -57,7 +57,6 @@ export const serializeMember = m => {
     id: m.user.user_id,
     publicName: m.user.public_name,
     role: m.role,
-    isActive: m.is_active || true,
     doNotify: m.do_notify || false
   }
 }
