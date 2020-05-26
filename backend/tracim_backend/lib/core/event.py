@@ -251,7 +251,8 @@ class EventBuilder:
         """Check that an object has been deleted since it has been queried from database."""
         if obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
-            return history.has_changes()
+            was_changed = not history.unchanged and history.deleted
+            return was_changed
         return False
 
     def _has_just_been_undeleted(
@@ -260,7 +261,8 @@ class EventBuilder:
         """Check whether an object has been undeleted since queried from database."""
         if not obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
-            return history.has_changes()
+            was_changed = not history.unchanged and history.deleted
+            return was_changed
         return False
 
 
