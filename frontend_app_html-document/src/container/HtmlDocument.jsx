@@ -3,28 +3,28 @@ import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  appContentFactory,
   addAllResourceI18n,
+  APP_FEATURE_MODE,
+  appContentFactory,
+  ArchiveDeleteContent,
+  BREADCRUMBS_TYPE,
+  buildHeadTitle,
+  CUSTOM_EVENT,
   displayDistanceDate,
+  generateLocalStorageContentId,
   handleFetchResult,
+  NewVersionBtn,
   PopinFixed,
+  PopinFixedContent,
   PopinFixedHeader,
   PopinFixedOption,
-  PopinFixedContent,
   PopinFixedRightPart,
+  ROLE,
+  SelectStatus,
   Timeline,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  TracimComponent,
-  NewVersionBtn,
-  ArchiveDeleteContent,
-  SelectStatus,
-  generateLocalStorageContentId,
-  BREADCRUMBS_TYPE,
-  ROLE,
-  CUSTOM_EVENT,
-  APP_FEATURE_MODE,
-  buildHeadTitle
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -83,6 +83,7 @@ class HtmlDocument extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated }
       // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleContentDeleted }
+      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, handler: this.handleContentUndeleted }
     ])
   }
 
@@ -101,6 +102,17 @@ class HtmlDocument extends React.Component {
         keepEditingWarning: true
       })
     }
+    // TODO test and review
+    let commentList = state.timeline.filter(item => item.timelineType === 'comment')
+    let {
+      actives_shares,
+      author,
+      created,
+      current_revision_id,
+      current_revision_type,
+      last_modifier,
+      ...revisionObject
+    } = data.content
 
     this.setState(prev => ({
       ...prev,
@@ -109,10 +121,27 @@ class HtmlDocument extends React.Component {
         ...data.content
       },
       newComment: localStorageComment || '',
-      rawContentBeforeEdit: prev.content.raw_content
+      rawContentBeforeEdit: prev.content.raw_content,
+      timeline: [
+        ...prev.timeline,
+        {
+          ...revisionObject,
+          author: {
+            public_name: data.author.public_name,
+            avatar_url: data.author.avatar_url,
+            user_id: data.author.user_id
+          },
+          commentList: commentList,
+          comment_ids: commentList.map(comment => comment.content_id),
+          created: displayDistanceDate(data.content.modified, state.loggedUser.lang),
+          created_raw: data.content.modified,
+          number: prev.timeline.length + 1,
+          revision_id: data.content.current_revision_id,
+          revision_type: data.content.current_revision_type,
+          timelineType: 'revision'
+        }
+      ]
     }))
-
-    this.loadTimeline() // TODO blocked by back
   }
 
   handleContentCreated = data => {
@@ -124,11 +153,44 @@ class HtmlDocument extends React.Component {
         ...prev.timeline,
         {
           ...data.content,
-          created: displayDistanceDate(data.content.created),
+          created: displayDistanceDate(data.content.created, state.loggedUser.lang),
           created_raw: data.content.created,
           timelineType: 'comment'
         }
       ]
+    }))
+  }
+
+  handleContentDeleted = data => {
+    const { state } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    if (state.mode === APP_FEATURE_MODE.EDIT && state.loggedUser.user_id !== data.author.user_id) {
+      this.setState({
+        editionAuthor: data.author.public_name,
+        keepEditingWarning: true
+      })
+    }
+
+    this.setState(prev => ({
+      ...prev,
+      content: {
+        ...prev.content,
+        is_deleted: true
+      }
+    }))
+  }
+
+  handleContentUndeleted = data => {
+    const { state } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    this.setState(prev => ({
+      ...prev,
+      content: {
+        ...prev.content,
+        is_deleted: false
+      }
     }))
   }
 
@@ -397,6 +459,17 @@ class HtmlDocument extends React.Component {
 
         this.setState({ mode: APP_FEATURE_MODE.VIEW })
         break
+      case 400:
+        this.setLocalStorageItem('rawContent', backupLocalStorage)
+        switch (fetchResultSaveHtmlDoc.body.code) {
+          case 2044:
+            this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
+          break
+          default:
+            this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+          break
+        }
+        break
       default:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
         this.sendGlobalFlashMessage(props.t('Error while saving new version'))
@@ -436,13 +509,11 @@ class HtmlDocument extends React.Component {
   handleClickDelete = async () => {
     const { props, state } = this
     props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
-    // TODO blocked by back
   }
 
   handleClickRestoreDelete = async () => {
     const { props, state } = this
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
-    // TODO blocked by back
   }
 
   // INFO - G.B. - 2020-05-20 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347

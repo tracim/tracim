@@ -224,9 +224,9 @@ export function appContentFactory (WrappedComponent) {
       )
 
       switch (response.status) {
-        case 204:
-          setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: APP_FEATURE_MODE.VIEW }))
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
+        case 204: // TODO review before delete
+          // setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: APP_FEATURE_MODE.VIEW }))
+          // GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
           break
         default: GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
@@ -274,9 +274,9 @@ export function appContentFactory (WrappedComponent) {
       )
 
       switch (response.status) {
-        case 204:
-          setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
+        case 204: // TODO review before delete
+          // setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
+          // GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
           break
         default: GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,

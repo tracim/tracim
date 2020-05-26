@@ -24,5 +24,6 @@
   "This content is deprecated": "Este conteúdo está obsoleto",
   "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
   "Timeline": "Linha cronológica",
-  "New text document": "Novo documento de texto"
+  "New text document": "Novo documento de texto",
+  "You must change the status or restore this document before any change": "É necessário alterar o status ou restaurar este documento antes de qualquer alteração"
 }
