@@ -17,7 +17,6 @@ export function withRouterMock (WrappedComponent) {
     render () {
       return (
         <WrappedComponent
-          {...this.props}
           history={{
             action: 'POP',
             block: () => {},
@@ -42,6 +41,10 @@ export function withRouterMock (WrappedComponent) {
             pathname: '/ui/workspaces/1/contents',
             search: '?folder_open='
           }}
+          match={{
+            params: {}
+          }}
+          {...this.props}
         />
       )
     }

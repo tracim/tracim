@@ -23,6 +23,10 @@ export class OpenContentApp extends React.Component {
 
     if (isNaN(workspaceId) || workspaceId === -1) return
 
+    console.log('==============================================')
+    console.log(appList)
+    console.log('==============================================')
+
     if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents') {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
 

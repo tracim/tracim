@@ -58,7 +58,7 @@ import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
 
 const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
 
-class Dashboard extends React.Component {
+export class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
