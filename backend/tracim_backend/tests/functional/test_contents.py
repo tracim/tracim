@@ -2289,7 +2289,26 @@ class TestFiles(object):
             "size",
         ):
             del content[attr]
-        assert modified_event.content == content
+
+        # NOTE S.G 2020-05-12: allow a small difference in modified time
+        # as tests with MySQL sometimes fails with a strict equality
+        event_content_modified = dateutil.parser.isoparse(modified_event.content["modified"])
+        content_modified = dateutil.parser.isoparse(res["modified"])
+        modified_diff = (event_content_modified - content_modified).total_seconds()
+        assert abs(modified_diff) < 2
+        assert modified_event.content["file_extension"] == res["file_extension"]
+        assert modified_event.content["filename"] == res["filename"]
+        assert modified_event.content["is_archived"] == res["is_archived"]
+        assert modified_event.content["is_editable"] == res["is_editable"]
+        assert modified_event.content["is_deleted"] == res["is_deleted"]
+        assert modified_event.content["label"] == res["label"]
+        assert modified_event.content["parent_id"] == res["parent_id"]
+        assert modified_event.content["show_in_ui"] == res["show_in_ui"]
+        assert modified_event.content["slug"] == res["slug"]
+        assert modified_event.content["status"] == res["status"]
+        assert modified_event.content["sub_content_types"] == res["sub_content_types"]
+        assert modified_event.content["workspace_id"] == res["workspace_id"]
+
         assert modified_event.workspace == workspace
 
         res = web_testapp.get(
