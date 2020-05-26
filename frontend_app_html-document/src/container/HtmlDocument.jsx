@@ -107,7 +107,6 @@ class HtmlDocument extends React.Component {
       content: {
         ...prev.content,
         ...data.content
-        // raw_content: data.raw_content // TODO blocked by back
       },
       newComment: localStorageComment || '',
       rawContentBeforeEdit: prev.content.raw_content
@@ -124,13 +123,10 @@ class HtmlDocument extends React.Component {
       timeline: [
         ...prev.timeline,
         {
-          author: data.author,
-          content_id: data.content.content_id,
+          ...data.content,
           created: displayDistanceDate(data.content.created),
           created_raw: data.content.created,
-          parent_id: data.content.parent_id,
-          raw_content: state.newComment, // TODO blocked by back
-          timelineType: data.content.content_type
+          timelineType: 'comment'
         }
       ]
     }))
@@ -173,14 +169,7 @@ class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
     initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
-
-    this.setState(prev => ({
-      loggedUser: {
-        ...prev.loggedUser,
-        lang: data
-      }
-    }))
-    i18n.changeLanguage(data)
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
     this.loadContent()
   }
 
