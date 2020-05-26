@@ -7,7 +7,6 @@ import { translate } from 'react-i18next'
 import {
   PAGE,
   findUserRoleIdInWorkspace,
-  CONTENT_TYPE,
   sortWorkspaceContents,
   SHARE_FOLDER_ID
 } from '../util/helper.js'
@@ -27,7 +26,8 @@ import {
   PageContent,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  CONTENT_TYPE
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,

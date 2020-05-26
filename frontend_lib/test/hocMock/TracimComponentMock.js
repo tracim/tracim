@@ -1,9 +1,8 @@
 import React from 'react'
 
-
-export function tracimLiveMessageMock (cb) {
+export function TracimComponentMock (callback) {
   return function (WrappedComponent) {
-    return class tracimLiveMessageMock extends React.Component {
+    return class TracimComponentMock extends React.Component {
       render () {
         return (
           <WrappedComponent
@@ -11,10 +10,12 @@ export function tracimLiveMessageMock (cb) {
             registerLiveMessageHandlerList={(tlmList) => {
               const tlmHandlerList = {}
               tlmList.forEach(tlm => {
-                if (!tlmHandlerList[tlm.entityType]) tlmHandlerList[tlm.entityType] = {}
-                tlmHandlerList[tlm.entityType][tlm.coreEntityType] = tlm.handler
+                tlmHandlerList[`${tlm.entityType}.${tlm.coreEntityType}`] = tlm.handler
               })
-              cb(tlmHandlerList)
+              const triggerTLM = (eventType, data) => {
+                tlmHandlerList[eventType](data)
+              }
+              callback(triggerTLM)
             }}
           />
         )

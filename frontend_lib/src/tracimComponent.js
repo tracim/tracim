@@ -1,5 +1,6 @@
 import React from 'react'
 import { CUSTOM_EVENT } from './customEvent.js'
+import { eventTypeBuilder } from './helper.js'
 
 export function TracimComponent (WrappedComponent) {
   return class TracimComponent extends React.Component {
@@ -31,7 +32,7 @@ export function TracimComponent (WrappedComponent) {
 
     registerLiveMessageHandlerList = (liveMessageList) => {
       liveMessageList.forEach(({ entityType, coreEntityType, handler }) => {
-        const eventType = this.eventTypeBuilder(entityType, coreEntityType)
+        const eventType = eventTypeBuilder(entityType, coreEntityType)
         this.registeredLiveMessageHandlerList[eventType] = handler
       })
     }
@@ -40,8 +41,6 @@ export function TracimComponent (WrappedComponent) {
         this.registeredLiveMessageHandlerList[type](data)
       }
     }
-
-    eventTypeBuilder = (entityType, coreEntityType) => `${entityType}.${coreEntityType}`
 
     render () {
       return (

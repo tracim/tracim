@@ -1,12 +1,12 @@
 import { file } from './file.js'
-import { fixtureCommentList, fixtureRevisionList } from 'tracim_frontend_lib'
+import { commentList, revisionList } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test.js'
 import { shareList } from './shareList.js'
 
 const content = {
   file,
   shareList,
-  commentList: fixtureCommentList,
-  revisionList: fixtureRevisionList
+  commentList,
+  revisionList
 }
 
 export default content

@@ -10,6 +10,7 @@ module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
     lib: isProduction ? './src/index.js' : './src/index.dev.js',
+    test: './test/index.js',
     style: glob.sync('./src/**/*.styl')
   },
   output: {

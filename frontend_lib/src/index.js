@@ -22,7 +22,9 @@ import {
   buildFilePreviewUrl,
   removeExtensionOfFilename,
   computeProgressionPercentage,
-  buildHeadTitle
+  buildHeadTitle,
+  CONTENT_TYPE,
+  eventTypeBuilder
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -86,9 +88,6 @@ import ShareLink from './component/ShareLink/ShareLink.jsx'
 import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
-
-import { commentList as fixtureCommentList } from '../test/fixture/contentCommentList.js'
-import { revisionList as fixtureRevisionList } from '../test/fixture/contentRevisionList.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
@@ -168,6 +167,6 @@ export {
   ShareDownload,
   ProgressBar,
   RadioBtnGroup,
-  fixtureCommentList,
-  fixtureRevisionList
+  CONTENT_TYPE,
+  eventTypeBuilder
 }

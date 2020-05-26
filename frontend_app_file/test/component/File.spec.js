@@ -11,12 +11,16 @@ import {
 } from '../apiMock.js'
 import content from '../fixture/content/content.js'
 import { debug } from '../../src/debug.js'
-import { TLM_CORE_EVENT_TYPE as TLM_CET, TLM_ENTITY_TYPE as TLM_ET } from 'tracim_frontend_lib'
+import {
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  eventTypeBuilder
+} from 'tracim_frontend_lib'
 import { commentTlm } from '../fixture/tracimLiveMessageData/commentTlm.js'
-import { tracimLiveMessageMock } from '../tracimLiveMessageMock.js'
+import { TracimComponentMock } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test.js'
 
 describe('<File />', () => {
-  let tlmHandlerList = {}
+  let triggerTLM
 
   const props = {
     setApiUrl: () => {},
@@ -32,12 +36,12 @@ describe('<File />', () => {
   mockGetFileComment200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.commentList).persist()
   mockGetFileRevision200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.revisionList).persist()
 
-  const ComponentWithHoc = tracimLiveMessageMock(t => { tlmHandlerList = t })(ComponentWithoutHOC)
+  const ComponentWithHoc = TracimComponentMock(trigger => { triggerTLM = trigger })(ComponentWithoutHOC)
 
   // INFO - GM - 2020/05/22 - dive in order to render the HOC component AND the target component File, in order to not use useless mount
   const wrapper = shallow(<ComponentWithHoc {...props} />).dive()
 
-  describe('internal function', () => {
+  describe('TLM events', () => {
     describe('content created', () => {
       it('Timeline should contains the new comment created', () => {
         const tlmData = {
@@ -53,7 +57,7 @@ describe('<File />', () => {
           }
         }
 
-        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.CREATED](tlmData)
+        triggerTLM(eventTypeBuilder(TLM_ET.CONTENT.FILE, TLM_CET.CREATED), tlmData)
         expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData.content.content_id)
       })
 
@@ -75,8 +79,8 @@ describe('<File />', () => {
             created: '2020-05-22T14:02:05Z'
           }
         }
-        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.CREATED](tlmData2)
-        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.CREATED](tlmData1)
+        triggerTLM(eventTypeBuilder(TLM_ET.CONTENT.FILE, TLM_CET.CREATED), tlmData2)
+        triggerTLM(eventTypeBuilder(TLM_ET.CONTENT.FILE, TLM_CET.CREATED), tlmData1)
 
         expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData2.content.content_id)
         expect(wrapper.state('timeline')[wrapper.state('timeline').length - 2].content_id).to.equal(tlmData1.content.content_id)
@@ -92,7 +96,7 @@ describe('<File />', () => {
         }
         const oldTimelineLength = wrapper.state('timeline').length
 
-        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.CREATED](tlmData)
+        triggerTLM(eventTypeBuilder(TLM_ET.CONTENT.FILE, TLM_CET.CREATED), tlmData)
         expect(wrapper.state('timeline').length).to.equal(oldTimelineLength)
       })
     })
@@ -105,7 +109,7 @@ describe('<File />', () => {
           }
         }
 
-        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.MODIFIED](tlmData)
+        triggerTLM(eventTypeBuilder(TLM_ET.CONTENT.FILE, TLM_CET.MODIFIED), tlmData)
         expect(wrapper.state('content').filename).to.equal(tlmData.content.filename)
       })
 
@@ -118,7 +122,7 @@ describe('<File />', () => {
           }
         }
 
-        tlmHandlerList[TLM_ET.CONTENT][TLM_CET.MODIFIED](tlmData)
+        triggerTLM(eventTypeBuilder(TLM_ET.CONTENT.FILE, TLM_CET.MODIFIED), tlmData)
         expect(wrapper.state('content').filename).to.not.equal(tlmData.content.filename)
       })
     })

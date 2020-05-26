@@ -61,6 +61,7 @@
     "jsdom": "^15.1.1",
     "mocha": "^7.1.1",
     "pnp-webpack-plugin": "^1.6.4",
+    "tracim_frontend_lib/dist/tracim_frontend_lib.test.js": "^1.1.9",
     "sinon": "^7.4.1",
     "standard": "^14.3.3",
     "standard-loader": "^7.0.0",
