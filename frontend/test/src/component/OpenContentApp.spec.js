@@ -8,7 +8,7 @@ import { user } from '../../hocMock/redux/user/user.js'
 import { firstWorkspace } from '../../fixture/workspace/firstWorkspace.js'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { connectMock } from '../../hocMock/store'
-import { appList} from '../../hocMock/redux/appList/appList.js'
+import { appList } from '../../hocMock/redux/appList/appList.js'
 
 describe('<OpenContentApp />', () => {
   const dispatchCustomEventCallBack = sinon.spy()

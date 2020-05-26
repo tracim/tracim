@@ -58,7 +58,7 @@ export const serializeMember = m => {
     publicName: m.user.public_name,
     role: m.role,
     isActive: m.is_active || true,
-    doNotify: m.do_notify
+    doNotify: m.do_notify || false
   }
 }
 
@@ -82,7 +82,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         memberList: [
           ...state.memberList,
-          { ...serializeMember(action.newMember) }
+          serializeMember(action.newMember)
         ]
       }
 
@@ -140,7 +140,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
     case `${REMOVE}/${WORKSPACE_CONTENT}`:
       return {
         ...state,
-        recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.includes(c))
+        recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.id))
       }
 
     case `${SET}/${WORKSPACE_READ_STATUS_LIST}`:

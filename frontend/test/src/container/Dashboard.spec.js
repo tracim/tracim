@@ -28,8 +28,8 @@ describe('<Dashboard />', () => {
   const addWorkspaceContentListSpy = sinon.spy()
   const updateWorkspaceContentListSpy = sinon.spy()
 
-  const dispatchWatcher = (params) => {
-    if (isFunction(params)) return params(dispatchWatcher)
+  const dispatchMock = (params) => {
+    if (isFunction(params)) return params(dispatchMock)
 
     const { type } = params
     switch (type) {
@@ -62,7 +62,7 @@ describe('<Dashboard />', () => {
         instance_name: 'instanceTest'
       }
     },
-    dispatch: dispatchWatcher,
+    dispatch: dispatchMock,
     // mock TracimComponent
     registerCustomEventHandlerList: () => {},
     registerLiveMessageHandlerList: () => {},
