@@ -42,7 +42,7 @@ class UserCommand(AppContextCommand, ABC):
         parser.add_argument(
             "-e",
             "--email",
-            help="Email of the user",
+            help="set user email",
             dest="email",
             required=False,
             default=None,
@@ -51,7 +51,7 @@ class UserCommand(AppContextCommand, ABC):
         parser.add_argument(
             "-u",
             "--username",
-            help="Username of the user",
+            help="set username of the user",
             dest="username",
             required=False,
             default=None,
@@ -59,7 +59,7 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--public-name",
-            help="Public name of the user",
+            help="set user public name",
             dest="public_name",
             required=False,
             default=None,
@@ -67,7 +67,7 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--allowed_space",
-            help="Allowed space of user in bytes",
+            help="set user allowed space in bytes",
             dest="allowed_space",
             required=False,
             default=None,
@@ -75,7 +75,7 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--lang",
-            help="Lang of user",
+            help="set user lang (ISO 639 format)",
             dest="lang",
             required=False,
             default=None,
@@ -84,7 +84,7 @@ class UserCommand(AppContextCommand, ABC):
         parser.add_argument(
             "-p",
             "--password",
-            help="User password",
+            help="set user password",
             dest="password",
             required=False,
             default=None,

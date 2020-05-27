@@ -319,7 +319,12 @@ class AnonymizeUserCommand(AppContextCommand):
             required=False,
         )
         parser.add_argument(
-            "-l", "--login", nargs="+", help="user logins (email)", dest="logins", required=True
+            "-l",
+            "--login",
+            nargs="+",
+            help="user logins (email or username)",
+            dest="logins",
+            required=True,
         )
         return parser
 

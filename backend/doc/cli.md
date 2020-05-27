@@ -32,16 +32,85 @@ This will drop the entire database, be careful!
 
 ### add a user
 
-    tracimcli user create -l "john@john@john.john" -p "superpassword"
+```
+$ tracimcli user create -h
+usage: tracimcli user create [-h] [-c CONFIG_FILE] [-d] [-e EMAIL]
+                             [-u USERNAME] [--public-name PUBLIC_NAME]
+                             [--allowed_space ALLOWED_SPACE] [--lang LANG]
+                             [-p PASSWORD] [--profile PROFILE]
+                             [--timezone TIMEZONE] [--send-email]
+
+Create user
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG_FILE, --config CONFIG_FILE
+                        application config file to read (default:
+                        development.ini)
+  -d, --debug_mode      enable Tracim log for debug
+  -e EMAIL, --email EMAIL
+                        set user email
+  -u USERNAME, --username USERNAME
+                        set username of the user
+  --public-name PUBLIC_NAME
+                        set user public name
+  --allowed_space ALLOWED_SPACE
+                        set user allowed space in bytes
+  --lang LANG           set user lang (ISO 639 format)
+  -p PASSWORD, --password PASSWORD
+                        set user password
+  --profile PROFILE     set user profile
+  --timezone TIMEZONE   set user timezone
+  --send-email          Send mail to user
+```
+
+Example:
+
+```
+  tracimcli user create -e "john@john@john.john" -p "superpassword"
+```
 
 ### update user password
 
+```
+$ tracimcli user update -h
+usage: tracimcli user update [-h] [-c CONFIG_FILE] [-d] [-e EMAIL]
+                             [-u USERNAME] [--public-name PUBLIC_NAME]
+                             [--allowed_space ALLOWED_SPACE] [--lang LANG]
+                             [-p PASSWORD] [--profile PROFILE]
+                             [--timezone TIMEZONE] -l LOGIN
+
+Update user
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG_FILE, --config CONFIG_FILE
+                        application config file to read (default:
+                        development.ini)
+  -d, --debug_mode      enable Tracim log for debug
+  -e EMAIL, --email EMAIL
+                        set user email
+  -u USERNAME, --username USERNAME
+                        set username of the user
+  --public-name PUBLIC_NAME
+                        set user public name
+  --allowed_space ALLOWED_SPACE
+                        set user allowed space in bytes
+  --lang LANG           set user lang (ISO 639 format)
+  -p PASSWORD, --password PASSWORD
+                        set user password
+  --profile PROFILE     set user profile
+  --timezone TIMEZONE   set user timezone
+  -l LOGIN, --login LOGIN
+                        user login, can be either password or username
+```
+
+Example:
+
     tracimcli user update -l "john@john@john.john" -p "mynewsuperpassword"
 
-### Help
-
-    tracimcli user create -h
-    tracimcli user update -h
+Note: Login (-l) is a current login of the user whereas username(-u), Email (-e), Password(-p), etc… are the
+new value to set.
 
 ### Delete user(s)
 
@@ -53,9 +122,9 @@ We suggest to anonymize them (see `-a` or `-b` ) in case deleting them might cau
 
 ```
 $ tracimcli user delete -h
-usage: tracimcli user delete [-h] [-c CONFIG_FILE] [-d] [-w] [-a] [-r] [-b]
-                             [-f] [--dry-run] -l LOGINS [LOGINS ...]
-                             [--anonymize-name ANONYMIZE_NAME]
+usage: tracimcli user delete [-h] [-c CONFIG_FILE] [-d] [--dry-run] [-b] [-f]
+                             [-a] [--anonymize-name ANONYMIZE_NAME] [-r] [-w]
+                             -l LOGINS [LOGINS ...]
 
 Remove user and associated information from database
 
@@ -65,24 +134,25 @@ optional arguments:
                         application config file to read (default:
                         development.ini)
   -d, --debug_mode      enable Tracim log for debug
-  -w, --delete-owned-sharespaces
-                        delete also owned sharespaces of user
-  -a, --anonymize-if-required
-                        anonymizes the user where he cannot be deleted
-  -r, --delete-all-user-revisions
-                        this allow to delete all user revisions. Warning !
-                        This may create inconsistent database
+  --dry-run             dry-run mode, simulate action to be done but do not
+                        modify anything
   -b, --best-effort     trying doing the best deletion possible, same as '-w
                         -a'
   -f, --force           force user deletion, same as '-r -w'. Warning ! This
                         may create inconsistent database
-  --dry-run             dry-run mode, simulate action to be done but do not
-                        modify anything
-  -l LOGINS [LOGINS ...], --login LOGINS [LOGINS ...]
-                        user logins (email) to delete one or more user
+  -a, --anonymize-if-required
+                        anonymizes the user where he cannot be deleted
   --anonymize-name ANONYMIZE_NAME
                         anonymized user display name to use if anonymize
                         option is activated
+  -r, --delete-all-user-revisions
+                        this allow to delete all user revisions. Warning !
+                        This may create inconsistent database
+  -w, --delete-owned-sharespaces
+                        delete also owned sharespaces of user
+  -l LOGINS [LOGINS ...], --login LOGINS [LOGINS ...]
+                        user logins (email or username) to delete one or more
+                        user
 ```
 
 ### Anonymize User(s)
@@ -103,13 +173,13 @@ optional arguments:
   -c CONFIG_FILE, --config CONFIG_FILE
                         application config file to read (default:
                         development.ini)
-  -d, --debug_mode      enable tracim log for debug
+  -d, --debug_mode      enable Tracim log for debug
   --dry-run             dry-run mode
   --anonymize-name ANONYMIZE_NAME
                         anonymized user display name to use if anonymize
                         option is activated
   -l LOGINS [LOGINS ...], --login LOGINS [LOGINS ...]
-                        user logins (email)
+                        user logins (email or username)
 ```
 
 ## Caldav ##
