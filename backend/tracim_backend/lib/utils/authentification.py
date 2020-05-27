@@ -55,13 +55,13 @@ class TracimAuthenticationPolicy(ABC):
         except AuthenticationFailed:
             return None
 
-    def _remote_authenticated_user(self, request: Request, email: str) -> typing.Optional[User]:
+    def _remote_authenticated_user(self, request: Request, login: str) -> typing.Optional[User]:
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         if not app_config.REMOTE_USER_HEADER:
             return None
         try:
-            return uapi.remote_authenticate(email)
+            return uapi.remote_authenticate(login)
         except AuthenticationFailed:
             return None
 
@@ -166,20 +166,20 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
 
 @implementer(IAuthenticationPolicy)
 class RemoteAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
-    def __init__(self, remote_user_email_login_header: str) -> None:
-        self.remote_user_email_login_header = remote_user_email_login_header
+    def __init__(self, remote_user_login_header: str) -> None:
+        self.remote_user_login_header = remote_user_login_header
         self.callback = None
 
     def get_current_user(self, request: TracimRequest) -> typing.Optional[User]:
         user = self._remote_authenticated_user(
-            request=request, email=self.unauthenticated_userid(request)
+            request=request, login=self.unauthenticated_userid(request)
         )
         if not user:
             return None
         return user
 
     def unauthenticated_userid(self, request: TracimRequest) -> str:
-        return request.environ.get(self.remote_user_email_login_header)
+        return request.environ.get(self.remote_user_login_header) or ""
 
     def remember(
         self, request: TracimRequest, userid: int, **kw: typing.Any

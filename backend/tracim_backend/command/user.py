@@ -179,10 +179,7 @@ class UpdateUserCommand(UserCommand):
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
         self._user_api = UserApi(current_user=None, session=self._session, config=self._app_config)
-        if "@" in parsed_args.login:
-            user = self._user_api.get_one_by_email(email=parsed_args.login)
-        else:
-            user = self._user_api.get_one_by_username(username=parsed_args.login)
+        user = self._user_api.get_one_by_login(parsed_args.login)
         profile = None
         if parsed_args.profile:
             profile = Profile.get_profile_from_slug(parsed_args.profile)

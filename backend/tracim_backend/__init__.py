@@ -97,9 +97,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     policies = []
     if app_config.REMOTE_USER_HEADER:
         policies.append(
-            RemoteAuthentificationPolicy(
-                remote_user_email_login_header=app_config.REMOTE_USER_HEADER
-            )
+            RemoteAuthentificationPolicy(remote_user_login_header=app_config.REMOTE_USER_HEADER)
         )
     policies.append(
         CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION__REISSUE_TIME)
