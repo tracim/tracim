@@ -16,7 +16,7 @@ down_revision = "3c92f57c52b2"
 
 def upgrade():
     with op.batch_alter_table("events") as batch_op:
-        batch_op.add_column(sa.Column("entity_subtype", sa.String(), nullable=True))
+        batch_op.add_column(sa.Column("entity_subtype", sa.String(length=100), nullable=True))
     # NOTE SG 2020-05-26: subtype values are left to NULL as we do not have any production
     # database running with the events table.
 
