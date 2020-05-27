@@ -578,6 +578,19 @@ class TestWhoamiEndpointWithApiKey(object):
         assert res.json_body["avatar_url"] is None
         assert res.json_body["auth_type"] == "internal"
 
+    def test_api__try_whoami_endpoint_with_api_key__ok_200__username(self, web_testapp):
+        headers_auth = {"Tracim-Api-Key": "mysuperapikey", "Tracim-Api-Login": "TheAdmin"}
+        res = web_testapp.get("/api/v2/auth/whoami", status=200, headers=headers_auth)
+        assert res.json_body["public_name"] == "Global manager"
+        assert res.json_body["username"] == "TheAdmin"
+        assert res.json_body["email"] == "admin@admin.admin"
+        assert res.json_body["created"]
+        assert res.json_body["is_active"]
+        assert res.json_body["profile"]
+        assert res.json_body["profile"] == "administrators"
+        assert res.json_body["avatar_url"] is None
+        assert res.json_body["auth_type"] == "internal"
+
     def test_api__try_whoami_enpoint_with_api_key__ok_200__case_insensitive_email(
         self, web_testapp
     ):
