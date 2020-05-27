@@ -264,16 +264,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_download_enabled"] is False
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace.modified"
-        assert last_event.workspace == {
-            "workspace_id": workspace["workspace_id"],
-            "slug": workspace["slug"],
-            "label": workspace["label"],
-            "is_deleted": workspace["is_deleted"],
-            "agenda_enabled": workspace["agenda_enabled"],
-            "public_upload_enabled": workspace["public_upload_enabled"],
-            "public_download_enabled": workspace["public_download_enabled"],
-            "sidebar_entries": workspace["sidebar_entries"],
-        }
+        assert last_event.workspace == workspace
 
         # after
         res = web_testapp.get("/api/v2/workspaces/1", status=200)
@@ -517,18 +508,11 @@ class TestWorkspaceEndpoint(object):
         workspace_id = res.json_body["workspace_id"]
         (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
-        assert workspace_created.author == workspace["owner"]
-        assert workspace_created.workspace == {
-            "workspace_id": workspace_id,
-            "label": workspace["label"],
-            "is_deleted": workspace["is_deleted"],
-            "agenda_enabled": workspace["agenda_enabled"],
-            "public_upload_enabled": workspace["public_upload_enabled"],
-            "public_download_enabled": workspace["public_download_enabled"],
-            "sidebar_entries": workspace["sidebar_entries"],
-            "slug": workspace["slug"],
-        }
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert workspace_created.author == author
+        assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
+        assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
 
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
@@ -588,16 +572,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is True
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace.deleted"
-        assert last_event.workspace == {
-            "workspace_id": workspace["workspace_id"],
-            "slug": workspace["slug"],
-            "label": workspace["label"],
-            "is_deleted": workspace["is_deleted"],
-            "agenda_enabled": workspace["agenda_enabled"],
-            "public_upload_enabled": workspace["public_upload_enabled"],
-            "public_download_enabled": workspace["public_download_enabled"],
-            "sidebar_entries": workspace["sidebar_entries"],
-        }
+        assert last_event.workspace == workspace
 
     def test_api__delete_workspace__ok_200__manager_workspace_manager(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
@@ -1304,20 +1279,11 @@ class TestWorkspaceMembersEndpoint(object):
             "do_notify": user_role_found["do_notify"],
         }
         workspace = web_testapp.get("/api/v2/workspaces/1", status=200).json_body
-        del workspace["owner"]
-        del workspace["created"]
-        del workspace["description"]
         assert last_event.workspace == workspace
-        assert last_event.author == {
-            "user_id": 1,
-            "public_name": "Global manager",
-            "avatar_url": None,
-        }
-        assert last_event.user == {
-            "user_id": 2,
-            "public_name": "Lawrence L.",
-            "avatar_url": None,
-        }
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert last_event.author == author
+        user = web_testapp.get("/api/v2/users/2", status=200).json_body
+        assert last_event.user == user
 
         res = web_testapp.get("/api/v2/workspaces/1/members", status=200).json_body
         assert len(res) == 2
@@ -1648,20 +1614,13 @@ class TestWorkspaceMembersEndpoint(object):
         workspace_dict = web_testapp.get(
             "/api/v2/workspaces/{}".format(workspace.workspace_id), status=200
         ).json_body
-        del workspace_dict["owner"]
-        del workspace_dict["created"]
-        del workspace_dict["description"]
         assert last_event.workspace == workspace_dict
-        assert last_event.author == {
-            "user_id": user.user_id,
-            "public_name": "test",
-            "avatar_url": None,
-        }
-        assert last_event.user == {
-            "user_id": user2.user_id,
-            "public_name": "test2",
-            "avatar_url": None,
-        }
+        author = web_testapp.get("/api/v2/users/{}".format(user.user_id), status=200).json_body
+        assert last_event.author == author
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        user = web_testapp.get("/api/v2/users/{}".format(user2.user_id), status=200).json_body
+        assert last_event.user == user
 
         # after
         res = web_testapp.get(
@@ -1834,20 +1793,11 @@ class TestWorkspaceMembersEndpoint(object):
         workspace_dict = web_testapp.get(
             "/api/v2/workspaces/{}".format(workspace.workspace_id), status=200
         ).json_body
-        del workspace_dict["owner"]
-        del workspace_dict["created"]
-        del workspace_dict["description"]
         assert last_event.workspace == workspace_dict
-        assert last_event.author == {
-            "user_id": 1,
-            "public_name": "Global manager",
-            "avatar_url": None,
-        }
-        assert last_event.user == {
-            "user_id": user.user_id,
-            "public_name": "test",
-            "avatar_url": None,
-        }
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert last_event.author == author
+        user_dict = web_testapp.get("/api/v2/users/{}".format(user.user_id), status=200).json_body
+        assert last_event.user == user_dict
 
         # after
         roles = web_testapp.get(
