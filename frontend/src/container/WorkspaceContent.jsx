@@ -25,6 +25,7 @@ import {
   PageTitle,
   PageContent,
   BREADCRUMBS_TYPE,
+  CONTENT_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle
 } from 'tracim_frontend_lib'
@@ -57,7 +58,6 @@ import {
   setWorkspaceDetail
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
-import { CONTENT_TYPE } from 'tracim_frontend_lib/src/helper.js'
 
 const qs = require('query-string')
 

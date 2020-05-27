@@ -22,7 +22,8 @@ import {
   buildFilePreviewUrl,
   removeExtensionOfFilename,
   computeProgressionPercentage,
-  buildHeadTitle
+  buildHeadTitle,
+  CONTENT_TYPE
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -164,5 +165,6 @@ export {
   ShareLink,
   ShareDownload,
   ProgressBar,
-  RadioBtnGroup
+  RadioBtnGroup,
+  CONTENT_TYPE
 }
