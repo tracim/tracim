@@ -330,9 +330,8 @@ website.base_url = %(basic_setup.website_base_url)s
 # EMAIL-COMMON
 ####
 
-# set this to True, to force all user to have a valid email.
-# Disabling this, allow to have user with no attached email, which are identifiable only by
-# username.
+# all users need an email with his account.
+# Disabling this, allow users account work without email. In this case username is mandatory.
 ; email.required = True
 
 ### Email sending configuration ###

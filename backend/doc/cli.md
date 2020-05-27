@@ -62,12 +62,12 @@ optional arguments:
   --profile PROFILE     set user profile, valid values: users, trusted-users,
                         administrators
   --timezone TIMEZONE   set user timezone
-  --send-email          send mail to created user about user account creation
-                        (email parameter required an email notification need
-                        to be activated)
+  --send-email          send mail to created user(s)
+                        (you need to configure EMAIL-NOTIFICATION part
+                        in config file to use this feature)
 ```
 
-Example creating user with email an defined password:
+Example of creating user with email, password and sending account information by email:
 
 ```
   tracimcli user create -e "john.does@example.tld" -p "superpassword" --send-email
