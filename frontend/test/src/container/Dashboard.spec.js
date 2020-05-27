@@ -105,10 +105,30 @@ describe('<Dashboard />', () => {
         it('should call this.setHeadTitle()', () => {
           expect(setHeadTitleSpy.called).to.equal(true)
         })
+
+        describe('with a different workspace_id', () => {
+          before(() => {
+            setWorkspaceDetailSpy.resetHistory()
+            setHeadTitleSpy.resetHistory()
+          })
+
+          const tlmDataWithOtherWorkspaceId = {
+            ...tlmData,
+            workspace: { ...tlmData.workspace, workspace_id: 999 }
+          }
+          dashboardInstance.handleWorkspaceModified(tlmDataWithOtherWorkspaceId)
+
+          it('should not call this.props.dispatch(setWorkspaceDetail())', () => {
+            expect(setWorkspaceDetailSpy.called).to.equal(false)
+          })
+          it('should not call this.setHeadTitle', () => {
+            expect(setHeadTitleSpy.called).to.equal(false)
+          })
+        })
       })
     })
 
-    describe('eventType user_workspace_role', () => {
+    describe('eventType workspace_role', () => {
       const tlmData = {
         user: user,
         workspace: firstWorkspaceFromApi,
@@ -120,6 +140,21 @@ describe('<Dashboard />', () => {
         it('should call this.props.dispatch(addWorkspaceMember())', () => {
           expect(addWorkspaceMemberSpy.called).to.equal(true)
         })
+
+        describe('with a different workspace_id', () => {
+          before(() => {
+            addWorkspaceMemberSpy.resetHistory()
+          })
+
+          const tlmDataWithOtherWorkspaceId = {
+            ...tlmData,
+            workspace: { ...tlmData.workspace, workspace_id: 999 }
+          }
+          dashboardInstance.handleMemberCreated(tlmDataWithOtherWorkspaceId)
+          it('should not call this.props.dispatch(addWorkspaceMember())', () => {
+            expect(addWorkspaceMemberSpy.called).to.equal(false)
+          })
+        })
       })
 
       describe('handleMemberModified', () => {
@@ -127,12 +162,42 @@ describe('<Dashboard />', () => {
         it('should call this.props.dispatch(updateWorkspaceMember())', () => {
           expect(updateWorkspaceMemberSpy.called).to.equal(true)
         })
+
+        describe('with a different workspace_id', () => {
+          before(() => {
+            updateWorkspaceMemberSpy.resetHistory()
+          })
+
+          const tlmDataWithOtherWorkspaceId = {
+            ...tlmData,
+            workspace: { ...tlmData.workspace, workspace_id: 999 }
+          }
+          dashboardInstance.handleMemberModified(tlmDataWithOtherWorkspaceId)
+          it('should not call this.props.dispatch(updateWorkspaceMemberSpy())', () => {
+            expect(updateWorkspaceMemberSpy.called).to.equal(false)
+          })
+        })
       })
 
       describe('handleMemberDeleted', () => {
         dashboardInstance.handleMemberDeleted(tlmData)
         it('should call this.props.dispatch(removeWorkspaceMember())', () => {
           expect(removeWorkspaceMemberSpy.called).to.equal(true)
+        })
+
+        describe('with a different workspace_id', () => {
+          before(() => {
+            removeWorkspaceMemberSpy.resetHistory()
+          })
+
+          const tlmDataWithOtherWorkspaceId = {
+            ...tlmData,
+            workspace: { ...tlmData.workspace, workspace_id: 999 }
+          }
+          dashboardInstance.handleMemberDeleted(tlmDataWithOtherWorkspaceId)
+          it('should not call this.props.dispatch(removeWorkspaceMemberSpy())', () => {
+            expect(removeWorkspaceMemberSpy.called).to.equal(false)
+          })
         })
       })
     })
@@ -148,12 +213,42 @@ describe('<Dashboard />', () => {
         it('should call this.props.dispatch(handleContentCreated())', () => {
           expect(addWorkspaceContentListSpy.called).to.equal(true)
         })
+
+        describe('with a different workspace_id', () => {
+          before(() => {
+            addWorkspaceContentListSpy.resetHistory()
+          })
+
+          const tlmDataWithOtherWorkspaceId = {
+            ...tlmData,
+            workspace: { ...tlmData.workspace, workspace_id: 999 }
+          }
+          dashboardInstance.handleContentCreated(tlmDataWithOtherWorkspaceId)
+          it('should not call this.props.dispatch(addWorkspaceContentListSpy())', () => {
+            expect(addWorkspaceContentListSpy.called).to.equal(false)
+          })
+        })
       })
 
       describe('handleContentModified', () => {
         dashboardInstance.handleContentModified(tlmData)
         it('should call this.props.dispatch(updateWorkspaceContentList())', () => {
           expect(updateWorkspaceContentListSpy.called).to.equal(true)
+        })
+
+        describe('with a different workspace_id', () => {
+          before(() => {
+            updateWorkspaceContentListSpy.resetHistory()
+          })
+
+          const tlmDataWithOtherWorkspaceId = {
+            ...tlmData,
+            workspace: { ...tlmData.workspace, workspace_id: 999 }
+          }
+          dashboardInstance.handleContentModified(tlmDataWithOtherWorkspaceId)
+          it('should not call this.props.dispatch(updateWorkspaceContentListSpy())', () => {
+            expect(updateWorkspaceContentListSpy.called).to.equal(false)
+          })
         })
       })
     })
