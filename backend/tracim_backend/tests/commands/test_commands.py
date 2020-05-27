@@ -829,7 +829,7 @@ class TestCommands(object):
         with pytest.raises(NoResultFound):
             session.query(Content).filter(Content.id == folder2_id).one()
         test_user_retrieve = session.query(User).filter(User.user_id == user_id).one()
-        assert test_user_retrieve.display_name == "Lost Meerkat"
+        assert test_user_retrieve.display_name == "Deleted user"
         assert test_user_retrieve.email.endswith("@anonymous.local")
 
     def test_func__delete_user__ok__anonymize_with_best_effort_specific_display_name(
@@ -1103,7 +1103,7 @@ class TestCommands(object):
         assert result == 0
 
         test_user_retrieve = session.query(User).filter(User.user_id == user_id).one()
-        assert test_user_retrieve.display_name == "Lost Meerkat"
+        assert test_user_retrieve.display_name == "Deleted user"
         assert test_user_retrieve.email.endswith("@anonymous.local")
 
     def test_func__anonymize_user__ok__specific_display_name(

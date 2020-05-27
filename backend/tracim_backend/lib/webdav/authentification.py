@@ -47,7 +47,7 @@ class TracimDomainController(object):
         session = environ["tracim_dbsession"]  # type: Session
         api = UserApi(None, session, self.app_config)
         try:
-            api.get_one_by_email(username)
+            api.get_one_by_login(login=username)
             return True
         # TODO - G.M - 2019-04-25 - do better exception handling here,
         # see https://github.com/tracim/tracim/issues/1636

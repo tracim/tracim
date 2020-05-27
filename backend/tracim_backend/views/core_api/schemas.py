@@ -768,6 +768,15 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
     def make_role(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceMemberInvitation(**data)
 
+    @marshmallow.validates_schema(pass_original=True)
+    def has_user_id_email_or_username(self, data: dict, original_data: dict, **kwargs) -> None:
+        if not (
+            original_data.get("user_email")
+            or original_data.get("user_username")
+            or original_data.get("user_id")
+        ):
+            raise marshmallow.ValidationError("user_id, user_email or user_username required")
+
 
 class ResetPasswordRequestSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(

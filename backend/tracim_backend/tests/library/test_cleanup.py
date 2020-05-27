@@ -29,7 +29,7 @@ class TestCleanupLib(object):
         assert u.email == "bob@bob"
         cleanup_lib = CleanupLib(app_config=app_config, session=session)
         cleanup_lib.anonymize_user(u)
-        assert u.display_name == "Lost Meerkat"
+        assert u.display_name == "Deleted user"
         assert u.email.endswith("@anonymous.local")
         assert u.username is None
 
