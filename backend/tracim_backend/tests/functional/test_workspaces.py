@@ -511,19 +511,8 @@ class TestWorkspaceEndpoint(object):
         author = web_testapp.get("/api/v2/users/1", status=200).json_body
         assert workspace_created.author == author
         assert workspace_created.workspace == workspace
-        assert user_role_created.event_type == "workspace_user_role.created"
-        assert workspace_created.author == workspace["owner"]
-        assert workspace_created.workspace == {
-            "workspace_id": workspace_id,
-            "label": workspace["label"],
-            "is_deleted": workspace["is_deleted"],
-            "agenda_enabled": workspace["agenda_enabled"],
-            "public_upload_enabled": workspace["public_upload_enabled"],
-            "public_download_enabled": workspace["public_download_enabled"],
-            "sidebar_entries": workspace["sidebar_entries"],
-            "slug": workspace["slug"],
-        }
         assert user_role_created.event_type == "workspace_member.created"
+        assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
 
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
