@@ -92,7 +92,9 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--profile",
-            help="set user profile",
+            help="set user profile, valid values: {}".format(
+                ", ".join(Profile.get_all_valid_slugs())
+            ),
             dest="profile",
             default=None,
             type=ValidatorType(user_profile_validator),
@@ -115,7 +117,7 @@ class CreateUserCommand(UserCommand):
         parser = super().get_parser(prog_name)
         parser.add_argument(
             "--send-email",
-            help="Send mail to user",
+            help="send mail to created user about user account creation (email parameter required an email notification need to be activated)",
             dest="send_email",
             required=False,
             action="store_true",
