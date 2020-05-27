@@ -46,7 +46,7 @@ describe('appContentFactory.js', () => {
   }
   const appContentSlug = 'appContentSlugExample'
 
-  const fakeApiUrl = 'http://fake.url/api/v2'
+  const fakeApiUrl = 'http://fake.url/api'
 
   describe('The wrapped component', () => {
     it('should have all the new props', () => {
