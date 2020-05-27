@@ -65,12 +65,13 @@ class Event(DeclarativeBase):
     Event definition.
     """
 
+    ENTITY_SUBTYPE_LENGTH = 100
     __tablename__ = "events"
 
     event_id = Column(Integer, autoincrement=True, primary_key=True)
     operation = Column(Enum(OperationType), nullable=False)
     entity_type = Column(Enum(EntityType), nullable=False)
-    entity_subtype = Column(String(length=100), nullable=True, default=None)
+    entity_subtype = Column(String(length=ENTITY_SUBTYPE_LENGTH), nullable=True, default=None)
     created = Column(DateTime, nullable=False, default=datetime.utcnow)
     fields = Column(JSON, nullable=False)
 
