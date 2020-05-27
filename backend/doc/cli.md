@@ -109,8 +109,8 @@ Example:
 
     tracimcli user update -l "john@john@john.john" -p "mynewsuperpassword"
 
-Note: Login (-l) is a current login of the user whereas username(-u), Email (-e), Password(-p), etc… are the
-new value to set.
+Note: Login (-l) is the current login of the user whereas username(-u), Email (-e), Password(-p), etc… are the
+new values to set.
 
 ### Delete user(s)
 
