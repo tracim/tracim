@@ -2238,16 +2238,16 @@ class TestFiles(object):
         # A creation is in fact two events: created + modified to add the revision
         (created_event, modified_event) = event_helper.last_events(2)
         assert created_event.event_type == "content.created"
-        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        author = web_testapp.get("/api/users/1", status=200).json_body
         assert created_event.author == author
         workspace = web_testapp.get(
-            "/api/v2/workspaces/{}".format(business_workspace.workspace_id), status=200
+            "/api/workspaces/{}".format(business_workspace.workspace_id), status=200
         ).json_body
         assert created_event.workspace == workspace
 
         assert modified_event.event_type == "content.modified"
         content = web_testapp.get(
-            "/api/v2/workspaces/{}/files/{}".format(business_workspace.workspace_id, content_id),
+            "/api/workspaces/{}/files/{}".format(business_workspace.workspace_id, content_id),
             status=200,
         ).json_body
         for attr in (
@@ -2548,9 +2548,9 @@ class TestFiles(object):
         assert last_event.content["status"] == res["status"]
         assert last_event.content["sub_content_types"] == res["sub_content_types"]
         assert last_event.content["workspace_id"] == res["workspace_id"]
-        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        author = web_testapp.get("/api/users/1", status=200).json_body
         assert last_event.author == author
-        workspace = web_testapp.get("/api/v2/workspaces/1", status=200,).json_body
+        workspace = web_testapp.get("/api/workspaces/1", status=200,).json_body
         assert last_event.workspace == workspace
 
         res = web_testapp.get(

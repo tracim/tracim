@@ -3013,7 +3013,7 @@ class TestUserEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "user.created"
         assert last_event.fields["user"] == res
-        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        author = web_testapp.get("/api/users/1", status=200).json_body
         assert last_event.fields["author"] == author
 
     def test_api__create_user__ok_200__full_admin_with_allowed_space(

@@ -83,7 +83,7 @@ To manually test live messages, you can first open a connexion on live message s
 (this use the default admin user, of course you can do this with other users too)
 
 ~~~bash
-http -S -a admin@admin.admin:admin@admin.admin localhost:7999/api/v2/users/1/live_messages
+http -S -a admin@admin.admin:admin@admin.admin localhost:7999/api/users/1/live_messages
 ~~~
 
 

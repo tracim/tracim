@@ -370,16 +370,16 @@ Order of usage is (from less to more important, last is used if set):
 The Tracim API
 ----------
 
-Tracim_backend gives access to a REST API in */api/v2*.
+Tracim_backend gives access to a REST API in */api*.
 This API is auto-documented with [Hapic](https://github.com/algoo/hapic).
-The specification is accessible when you run Tracim, go to */api/v2/doc* .
+The specification is accessible when you run Tracim, go to */api/doc* .
 
 For example, with the default configuration:
 
     # run Tracim
     pserve development.ini
     # launch your favorite web-browser
-    firefox http://localhost:6543/api/v2/doc/
+    firefox http://localhost:6543/api/doc/
 
 ## Roles, Profile and Access Rights
 
