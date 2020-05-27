@@ -117,7 +117,7 @@ class CreateUserCommand(UserCommand):
         parser = super().get_parser(prog_name)
         parser.add_argument(
             "--send-email",
-            help="send mail to created user about user account creation (email parameter required an email notification need to be activated)",
+            help="send mail to created user(s) (you need to configure EMAIL-NOTIFICATION part in config file to use this feature)",
             dest="send_email",
             required=False,
             action="store_true",
