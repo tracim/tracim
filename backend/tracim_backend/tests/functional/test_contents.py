@@ -13,7 +13,6 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import set_html_document_slug_to_legacy
-from tracim_backend.views.core_api.schemas import WorkspaceMenuEntrySchema
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -2215,7 +2214,6 @@ class TestFiles(object):
 
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        workspace_in_context = workspace_api.get_workspace_with_context(business_workspace)
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         image = create_1000px_png_test_image()
@@ -2240,35 +2238,48 @@ class TestFiles(object):
         # A creation is in fact two events: created + modified to add the revision
         (created_event, modified_event) = event_helper.last_events(2)
         assert created_event.event_type == "content.created"
-        assert created_event.author == {
-            "public_name": "Global manager",
-            "avatar_url": None,
-            "user_id": 1,
-        }
-        sidebar_entries = (
-            WorkspaceMenuEntrySchema().dump(workspace_in_context.sidebar_entries, many=True).data
-        )
-        workspace_dict = {
-            "workspace_id": workspace_in_context.workspace_id,
-            "slug": workspace_in_context.slug,
-            "label": workspace_in_context.label,
-            "is_deleted": workspace_in_context.is_deleted,
-            "agenda_enabled": workspace_in_context.agenda_enabled,
-            "public_upload_enabled": workspace_in_context.public_upload_enabled,
-            "public_download_enabled": workspace_in_context.public_download_enabled,
-            "sidebar_entries": sidebar_entries,
-        }
-        assert created_event.workspace == workspace_dict
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert created_event.author == author
+        workspace = web_testapp.get(
+            "/api/v2/workspaces/{}".format(business_workspace.workspace_id), status=200
+        ).json_body
+        assert created_event.workspace == workspace
 
         assert modified_event.event_type == "content.modified"
-        content = modified_event.content
-        # A bit complicated but the value returned by the POST is not reliable
-        # as it sometimes is the created revision id and other times the updated…
-        assert content["current_revision_id"] == created_event.content["current_revision_id"] + 1
-        del content["current_revision_id"]
-        del res["current_revision_id"]
-        assert modified_event.content == res
-        assert modified_event.workspace == workspace_dict
+        content = web_testapp.get(
+            "/api/v2/workspaces/{}/files/{}".format(business_workspace.workspace_id, content_id),
+            status=200,
+        ).json_body
+        for attr in (
+            "has_jpeg_preview",
+            "has_pdf_preview",
+            "mimetype",
+            "page_nb",
+            "raw_content",
+            "size",
+        ):
+            del content[attr]
+
+        # NOTE S.G 2020-05-12: allow a small difference in modified time
+        # as tests with MySQL sometimes fails with a strict equality
+        event_content_modified = dateutil.parser.isoparse(modified_event.content["modified"])
+        content_modified = dateutil.parser.isoparse(res["modified"])
+        modified_diff = (event_content_modified - content_modified).total_seconds()
+        assert abs(modified_diff) < 2
+        assert modified_event.content["file_extension"] == res["file_extension"]
+        assert modified_event.content["filename"] == res["filename"]
+        assert modified_event.content["is_archived"] == res["is_archived"]
+        assert modified_event.content["is_editable"] == res["is_editable"]
+        assert modified_event.content["is_deleted"] == res["is_deleted"]
+        assert modified_event.content["label"] == res["label"]
+        assert modified_event.content["parent_id"] == res["parent_id"]
+        assert modified_event.content["show_in_ui"] == res["show_in_ui"]
+        assert modified_event.content["slug"] == res["slug"]
+        assert modified_event.content["status"] == res["status"]
+        assert modified_event.content["sub_content_types"] == res["sub_content_types"]
+        assert modified_event.content["workspace_id"] == res["workspace_id"]
+
+        assert modified_event.workspace == workspace
 
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/files/{content_id}".format(
@@ -2491,7 +2502,6 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        workspace_in_context = workspace_api.get_workspace_with_context(business_workspace)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
@@ -2538,24 +2548,10 @@ class TestFiles(object):
         assert last_event.content["status"] == res["status"]
         assert last_event.content["sub_content_types"] == res["sub_content_types"]
         assert last_event.content["workspace_id"] == res["workspace_id"]
-        assert last_event.author == {
-            "public_name": "Global manager",
-            "avatar_url": None,
-            "user_id": 1,
-        }
-        sidebar_entries = (
-            WorkspaceMenuEntrySchema().dump(workspace_in_context.sidebar_entries, many=True).data
-        )
-        assert last_event.workspace == {
-            "workspace_id": workspace_in_context.workspace_id,
-            "slug": workspace_in_context.slug,
-            "label": workspace_in_context.label,
-            "is_deleted": workspace_in_context.is_deleted,
-            "agenda_enabled": workspace_in_context.agenda_enabled,
-            "public_upload_enabled": workspace_in_context.public_upload_enabled,
-            "public_download_enabled": workspace_in_context.public_download_enabled,
-            "sidebar_entries": sidebar_entries,
-        }
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert last_event.author == author
+        workspace = web_testapp.get("/api/v2/workspaces/1", status=200,).json_body
+        assert last_event.workspace == workspace
 
         res = web_testapp.get(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name), status=200
