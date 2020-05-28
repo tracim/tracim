@@ -134,6 +134,9 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
             ...state.recentActivityList
           ],
           'id'
+        ),
+        contentReadStatusList: state.contentReadStatusList.filter(contentId =>
+          !action.workspaceContentList.some(content => content.content_id === contentId)
         )
       }
 
