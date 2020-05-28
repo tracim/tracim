@@ -56,8 +56,6 @@ _install_backend: &_install_backend
     - mkdir -p $TRACIM_SESSION__LOCK_DIR
     - mkdir -p $TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
     - ls -R /tmp/test
-    - sudo systemctl stop pushpin && sudo systemctl disable pushpin
-    - sudo systemctl stop zurl && sudo systemctl disable zurl
   install:
     - cd $TRAVIS_BUILD_DIR/backend
     - pip install --upgrade pip setuptools wheel
@@ -269,6 +267,8 @@ jobs:
         - BACKEND_TEST_CONFIG_FILE=cypress_test.ini
         - TRAVIS_NODE_VERSION="10"
       script:
+        - sudo systemctl stop pushpin && sudo systemctl disable pushpin
+        - sudo systemctl stop zurl && sudo systemctl disable zurl
         - docker run -d --net host -v ${TRAVIS_BUILD_DIR}/pushpin_cypress_config:/etc/pushpin --name pushpin-cypress fanout/pushpin
         - cd $TRAVIS_BUILD_DIR/backend
         - nohup pserve $BACKEND_TEST_CONFIG_FILE > $PSERVE_LOG 2>&1 &
