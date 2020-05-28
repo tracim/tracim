@@ -34,7 +34,7 @@ This will drop the entire database, be careful!
 
 ```
 $ tracimcli user create -h
-usage: tracimcli user create [-h] [-c CONFIG_FILE] [-d] [-e EMAIL]usage: tracimcli user create [-h] [-c CONFIG_FILE] [-d] [-e EMAIL]
+usage: tracimcli user create [-h] [-c CONFIG_FILE] [-d] [-e EMAIL]
                              [-u USERNAME] [--public-name PUBLIC_NAME]
                              [--allowed_space ALLOWED_SPACE] [--lang LANG]
                              [-p PASSWORD] [--profile PROFILE]
@@ -62,7 +62,7 @@ optional arguments:
   --profile PROFILE     set user profile, valid values: users, trusted-users,
                         administrators
   --timezone TIMEZONE   set user timezone
-  --send-email          send mail to created user(s) (you need to configure
+  --send-email          send mail to created user (you need to configure
                         EMAIL-NOTIFICATION part in config file to use this
                         feature)
 ```
