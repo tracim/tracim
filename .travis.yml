@@ -122,6 +122,7 @@ _backend_quick_test: &_backend_quick_test
       packages:
         - libimage-exiftool-perl
   services:
+    - redis-server
   before_script:
   script:
     - pytest backend --ignore "backend/tracim_backend/tests/functional" --ignore "backend/tracim_backend/tests/commands"
