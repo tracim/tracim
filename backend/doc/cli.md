@@ -40,13 +40,12 @@ usage: tracimcli user create [-h] [-c CONFIG_FILE] [-d] [-e EMAIL]
                              [-p PASSWORD] [--profile PROFILE]
                              [--timezone TIMEZONE] [--send-email]
 
-Create a user
+Create a new user account
 
 optional arguments:
   -h, --help            show this help message and exit
   -c CONFIG_FILE, --config CONFIG_FILE
-                        configuration file to use (default:
-                        development.ini)
+                        configuration file to use (default: development.ini)
   -d, --debug_mode      enable Tracim log for debug
   -e EMAIL, --email EMAIL
                         set the user's email address
@@ -55,16 +54,16 @@ optional arguments:
   --public-name PUBLIC_NAME
                         set the user's public name
   --allowed_space ALLOWED_SPACE
-                        set the user's allowed space in bytes
+                        set thes user's allowed space in bytes
   --lang LANG           set the user's language (ISO 639 format)
   -p PASSWORD, --password PASSWORD
-                        set the password of the user
-  --profile PROFILE     set the user's profile, valid values: users, trusted-users,
-                        administrators
+                        set the user's password
+  --profile PROFILE     set the user's profile. Valid values: users, trusted-
+                        users, administrators
   --timezone TIMEZONE   set the user's timezone
-  --send-email          send mail to created user (you need to configure
-                        EMAIL-NOTIFICATION part in config file to use this
-                        feature)
+  --send-email          send an email to the created user (you need to
+                        configure EMAIL-NOTIFICATION part in config file to
+                        use this feature)
 ```
 
 Example of creating a user with an email, a password and sending account information by email:
@@ -103,8 +102,7 @@ Edit the account of a user
 optional arguments:
   -h, --help            show this help message and exit
   -c CONFIG_FILE, --config CONFIG_FILE
-                        configuration file to use (default:
-                        development.ini)
+                        configuration file to use (default: development.ini)
   -d, --debug_mode      enable Tracim log for debug
   -e EMAIL, --email EMAIL
                         set the user's email address
@@ -113,15 +111,16 @@ optional arguments:
   --public-name PUBLIC_NAME
                         set the user's public name
   --allowed_space ALLOWED_SPACE
-                        set the user's allowed space in bytes
+                        set thes user's allowed space in bytes
   --lang LANG           set the user's language (ISO 639 format)
   -p PASSWORD, --password PASSWORD
                         set the user's password
-  --profile PROFILE     set the user's profile. Valid values: users, trusted-users,
-                        administrators
+  --profile PROFILE     set the user's profile. Valid values: users, trusted-
+                        users, administrators
   --timezone TIMEZONE   set the user's timezone
   -l LOGIN, --login LOGIN
-                        the user's login (either the email address or the username)
+                        the user's login (either the email address or the
+                        username)
 ```
 
 Example:
@@ -150,13 +149,12 @@ usage: tracimcli user delete [-h] [-c CONFIG_FILE] [-d] [--dry-run] [-b] [-f]
                              [-a] [--anonymize-name ANONYMIZE_NAME] [-r] [-w]
                              -l LOGINS [LOGINS ...]
 
-Remove the user account and related information from the database
+Remove user account(s) and related information from the database
 
 optional arguments:
   -h, --help            show this help message and exit
   -c CONFIG_FILE, --config CONFIG_FILE
-                        application config file to read (default:
-                        development.ini)
+                        configuration file to use (default: development.ini)
   -d, --debug_mode      enable Tracim log for debug
   --dry-run             dry-run mode, simulate action to be done but do not
                         modify anything
@@ -165,18 +163,18 @@ optional arguments:
   -f, --force           force user deletion, same as '-r -w'. Warning ! This
                         may create inconsistent database
   -a, --anonymize-if-required
-                        anonymizes the user where he cannot be deleted
+                        anonymize the user account when it cannot be deleted
   --anonymize-name ANONYMIZE_NAME
                         anonymized user display name to use if anonymize
                         option is activated
   -r, --delete-all-user-revisions
-                        this allow to delete all user revisions. Warning !
-                        This may create inconsistent database
+                        delete all user revisions. Warning ! This may put the
+                        database into an inconsistent state
   -w, --delete-owned-sharespaces
-                        delete also owned sharespaces of user
+                        also delete owned sharespaces of user
   -l LOGINS [LOGINS ...], --login LOGINS [LOGINS ...]
                         user logins (email or username) to delete one or more
-                        user
+                        users
 ```
 
 ### Anonymize User(s)
@@ -190,13 +188,12 @@ usage: tracimcli user anonymize [-h] [-c CONFIG_FILE] [-d] [--dry-run]
                                 [--anonymize-name ANONYMIZE_NAME] -l LOGINS
                                 [LOGINS ...]
 
-anonymize user from database
+anonymize user account(s) from database
 
 optional arguments:
   -h, --help            show this help message and exit
   -c CONFIG_FILE, --config CONFIG_FILE
-                        application config file to read (default:
-                        development.ini)
+                        configuration file to use (default: development.ini)
   -d, --debug_mode      enable Tracim log for debug
   --dry-run             dry-run mode
   --anonymize-name ANONYMIZE_NAME

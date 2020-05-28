@@ -42,7 +42,7 @@ class UserCommand(AppContextCommand, ABC):
         parser.add_argument(
             "-e",
             "--email",
-            help="set user email",
+            help="set the user's email address",
             dest="email",
             required=False,
             default=None,
@@ -51,7 +51,7 @@ class UserCommand(AppContextCommand, ABC):
         parser.add_argument(
             "-u",
             "--username",
-            help="set username of the user",
+            help="set the user's username",
             dest="username",
             required=False,
             default=None,
@@ -59,7 +59,7 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--public-name",
-            help="set user public name",
+            help="set the user's public name",
             dest="public_name",
             required=False,
             default=None,
@@ -67,7 +67,7 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--allowed_space",
-            help="set user allowed space in bytes",
+            help="set thes user's allowed space in bytes",
             dest="allowed_space",
             required=False,
             default=None,
@@ -75,7 +75,7 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--lang",
-            help="set user lang (ISO 639 format)",
+            help="set the user's language (ISO 639 format)",
             dest="lang",
             required=False,
             default=None,
@@ -84,7 +84,7 @@ class UserCommand(AppContextCommand, ABC):
         parser.add_argument(
             "-p",
             "--password",
-            help="set user password",
+            help="set the user's password",
             dest="password",
             required=False,
             default=None,
@@ -92,7 +92,7 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--profile",
-            help="set user profile, valid values: {}".format(
+            help="set the user's profile. Valid values: {}".format(
                 ", ".join(Profile.get_all_valid_slugs())
             ),
             dest="profile",
@@ -101,7 +101,7 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--timezone",
-            help="set user timezone",
+            help="set the user's timezone",
             dest="timezone",
             default=None,
             type=ValidatorType(user_timezone_validator),
@@ -111,13 +111,13 @@ class UserCommand(AppContextCommand, ABC):
 
 class CreateUserCommand(UserCommand):
     def get_description(self) -> str:
-        return """Create user"""
+        return """Create a new user account"""
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         parser.add_argument(
             "--send-email",
-            help="send mail to created user (you need to configure EMAIL-NOTIFICATION part in config file to use this feature)",
+            help="send an email to the created user (you need to configure EMAIL-NOTIFICATION part in config file to use this feature)",
             dest="send_email",
             required=False,
             action="store_true",
@@ -166,14 +166,14 @@ class UpdateUserCommand(UserCommand):
         parser.add_argument(
             "-l",
             "--login",
-            help="user login, can be either password or username",
+            help="the user's login (either the email address or the username)",
             dest="login",
             required=True,
         )
         return parser
 
     def get_description(self) -> str:
-        return """Update user"""
+        return """Edit the account of a user"""
 
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order

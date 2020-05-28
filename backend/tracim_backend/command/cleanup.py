@@ -28,7 +28,7 @@ class DeleteResultIds(object):
 
 class DeleteUserCommand(AppContextCommand):
     def get_description(self) -> str:
-        return """Remove user and associated information from database"""
+        return """Remove user account(s) and related information from the database"""
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
@@ -58,7 +58,7 @@ class DeleteUserCommand(AppContextCommand):
         parser.add_argument(
             "-a",
             "--anonymize-if-required",
-            help="anonymizes the user where he cannot be deleted",
+            help="anonymize the user account when it cannot be deleted",
             dest="anonymize_if_required",
             default=False,
             action="store_true",
@@ -73,7 +73,7 @@ class DeleteUserCommand(AppContextCommand):
         parser.add_argument(
             "-r",
             "--delete-all-user-revisions",
-            help="this allow to delete all user revisions. Warning ! This may create inconsistent database",
+            help="delete all user revisions. Warning ! This may put the database into an inconsistent state",
             dest="delete_revisions",
             default=False,
             action="store_true",
@@ -82,7 +82,7 @@ class DeleteUserCommand(AppContextCommand):
         parser.add_argument(
             "-w",
             "--delete-owned-sharespaces",
-            help="delete also owned sharespaces of user",
+            help="also delete owned sharespaces of user",
             dest="delete_sharespaces",
             default=False,
             action="store_true",
@@ -91,7 +91,7 @@ class DeleteUserCommand(AppContextCommand):
             "-l",
             "--login",
             nargs="+",
-            help="user logins (email or username) to delete one or more user",
+            help="user logins (email or username) to delete one or more users",
             dest="logins",
             required=True,
         )
@@ -301,7 +301,7 @@ class DeleteUserCommand(AppContextCommand):
 
 class AnonymizeUserCommand(AppContextCommand):
     def get_description(self) -> str:
-        return """anonymize user from database"""
+        return """anonymize user account(s) from database"""
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
