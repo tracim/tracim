@@ -24,7 +24,8 @@ import {
   computeProgressionPercentage,
   buildHeadTitle,
   CONTENT_TYPE,
-  eventTypeBuilder
+  buildTracimLiveMessageEventType,
+  sortTimelineByDate
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -168,5 +169,6 @@ export {
   ProgressBar,
   RadioBtnGroup,
   CONTENT_TYPE,
-  eventTypeBuilder
+  buildTracimLiveMessageEventType,
+  sortTimelineByDate
 }

@@ -21,11 +21,6 @@ export const file = {
   is_editable: true,
   status: 'open',
   has_jpeg_preview: true,
-  last_modifier: {
-    public_name: 'Global manager',
-    avatar_url: null,
-    user_id: 1
-  },
   page_nb: 1,
   modified: '2020-05-20T12:14:57Z',
   author: {
@@ -33,10 +28,10 @@ export const file = {
     avatar_url: null,
     user_id: 1
   },
-  mimetype: 'image/png',
-  filenameNoExtension: 'Capture du 2020-03-30 14-22-09',
-  previewUrl: '/api/v2/workspaces/1/files/1/revisions/1/preview/jpg/500x500/Random File.jpg?page=1&revision_id=1',
-  lightboxUrlList: [
-    '/api/v2/workspaces/1/files/1/revisions/1/preview/jpg/1920x1080/Random File.jpg?page=1'
-  ]
+  mimetype: 'image/png'
+  // filenameNoExtension: 'Capture du 2020-03-30 14-22-09',
+  // previewUrl: '/api/v2/workspaces/1/files/1/revisions/1/preview/jpg/500x500/Random File.jpg?page=1&revision_id=1',
+  // lightboxUrlList: [
+  //   '/api/v2/workspaces/1/files/1/revisions/1/preview/jpg/1920x1080/Random File.jpg?page=1'
+  // ]
 }

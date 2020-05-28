@@ -34,7 +34,8 @@ import {
   ROLE,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
-  FILE_PREVIEW_STATE
+  FILE_PREVIEW_STATE,
+  sortTimelineByDate
 } from 'tracim_frontend_lib'
 import { PAGE } from '../helper.js'
 import { debug } from '../debug.js'
@@ -186,13 +187,23 @@ export class File extends React.Component {
     if (data.content.content_id !== state.content.content_id) return
 
     this.sendGlobalFlashMessage(props.t('File has been updated'), 'info')
-    this.setState(prev => ({ content: { ...prev.content, ...data.content } }))
+
+    const filenameNoExtension = removeExtensionOfFilename(data.content.filename)
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...data.content,
+        previewUrl: buildFilePreviewUrl(prev.config.apiUrl, prev.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, 1, 500, 500),
+        lightboxUrlList: (new Array(data.content.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
+          buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, pageNb, 1920, 1080)
+        )
+      }
+    }))
   }
 
   handleContentCreated = (data) => {
     if (data.content.content_type === 'comment' && data.content.parent_id === this.state.content.content_id) {
-      const sortedNewTimeLine = [...this.state.timeline, { ...data.content, created_raw: data.content.created }]
-        .sort((a, b) => a.created_raw > b.created_raw ? 1 : -1)
+      const sortedNewTimeLine = sortTimelineByDate([...this.state.timeline, { ...data.content, created_raw: data.content.created }])
       this.setState({ timeline: sortedNewTimeLine })
     }
   }
@@ -227,17 +238,7 @@ export class File extends React.Component {
         this.setState({})
         this.loadShareLinkList()
       }
-    } else if (prevState.content.current_revision_id !== state.content.current_revision_id) {
-      const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
-      // INFO - GM - 2020/05/19 - if The file has a new version, fetch its content
-      if (revisionArray[revisionArray.length - 1] && state.content.current_revision_id > revisionArray[revisionArray.length - 1].revision_id) {
-        this.setState({ fileCurrentPage: 1 })
-        this.loadContent()
-        this.loadTimeline()
-      }
     }
-
-    if (state.timeline.length > prevState.timeline.length) this.loadTimeline()
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')

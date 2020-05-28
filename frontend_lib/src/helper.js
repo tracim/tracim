@@ -1,6 +1,6 @@
 import React from 'react'
 import i18n from './i18n.js'
-import { distanceInWords } from 'date-fns'
+import { distanceInWords, isAfter } from 'date-fns'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -289,7 +289,7 @@ export const IMG_LOAD_STATE = {
   ERROR: 'error'
 }
 
-export const eventTypeBuilder = (entityType, coreEntityType) => `${entityType}.${coreEntityType}`
+export const buildTracimLiveMessageEventType = (entityType, coreEntityType) => `${entityType}.${coreEntityType}`
 
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/v2/system/content_types
 export const CONTENT_TYPE = {
@@ -298,4 +298,8 @@ export const CONTENT_TYPE = {
   THREAD: 'thread',
   FOLDER: 'folder',
   COMMENT: 'comment'
+}
+
+export const sortTimelineByDate = (timeline) => {
+  return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
 }
