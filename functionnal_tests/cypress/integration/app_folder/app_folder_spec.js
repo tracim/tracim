@@ -41,7 +41,7 @@ describe('App Folder Advanced', function () {
         .should('be.visible')
     })
 
-    it('should closed itself when clicking on the close button', () => {
+    it('should close itself when clicking on the close button', () => {
       cy.loginAs('administrators')
       cy.visitPage({pageName: PAGES.EDIT_FOLDER, params: {workspaceId: workspaceId, folderId: folder1.content_id}})
 

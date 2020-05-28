@@ -1,5 +1,4 @@
 import { PAGES } from '../../support/urls_commands.js'
-import { SELECTORS as s } from '../../support/generic_selector_commands.js'
 
 describe('content :: admin > workspace', function () {
   before(() => {
