@@ -113,10 +113,6 @@ export function appContentFactory (WrappedComponent) {
       )
 
       switch (response.apiResponse.status) {
-        case 200:
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-          break
         case 400:
           switch (response.body.code) {
             case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification

@@ -84,7 +84,7 @@ describe('<File />', () => {
           it('should have correctly order the timeline with the last comment created at the end', () => {
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData2.content.content_id)
           })
-          it('should have correctly order the timeline with the before last comment created not at the end', () => {
+          it('should have correctly order the timeline with the second last comment created not at the end', () => {
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 2].content_id).to.equal(tlmData1.content.content_id)
           })
         })
