@@ -245,7 +245,8 @@ describe('reducer currentWorkspace.js', () => {
         ...initialState,
         recentActivityList: [
           serializeContent({ ...contentFromApi, label: 'content for test' })
-        ]
+        ],
+        contentReadStatusList: [1, 2, contentFromApi.content_id]
       }
       const rez = currentWorkspace(initialStateWithRecentActivity, updateWorkspaceContentList([contentFromApi]))
       it('should return a workspace object with a recent activity list with only one element updated', () => {
@@ -253,7 +254,8 @@ describe('reducer currentWorkspace.js', () => {
           ...initialStateWithRecentActivity,
           recentActivityList: [
             serializeContent(contentFromApi)
-          ]
+          ],
+          contentReadStatusList: [1, 2]
         })
       })
     })
