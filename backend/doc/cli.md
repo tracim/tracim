@@ -40,28 +40,28 @@ usage: tracimcli user create [-h] [-c CONFIG_FILE] [-d] [-e EMAIL]
                              [-p PASSWORD] [--profile PROFILE]
                              [--timezone TIMEZONE] [--send-email]
 
-Create user
+Create a user
 
 optional arguments:
   -h, --help            show this help message and exit
   -c CONFIG_FILE, --config CONFIG_FILE
-                        application config file to read (default:
+                        configuration file to use (default:
                         development.ini)
   -d, --debug_mode      enable Tracim log for debug
   -e EMAIL, --email EMAIL
-                        set user email
+                        set the user's email address
   -u USERNAME, --username USERNAME
-                        set username of the user
+                        set the user's username
   --public-name PUBLIC_NAME
-                        set user public name
+                        set the user's public name
   --allowed_space ALLOWED_SPACE
-                        set user allowed space in bytes
-  --lang LANG           set user lang (ISO 639 format)
+                        set the user's allowed space in bytes
+  --lang LANG           set the user's language (ISO 639 format)
   -p PASSWORD, --password PASSWORD
-                        set user password
-  --profile PROFILE     set user profile, valid values: users, trusted-users,
+                        set the password of the user
+  --profile PROFILE     set the user's profile, valid values: users, trusted-users,
                         administrators
-  --timezone TIMEZONE   set user timezone
+  --timezone TIMEZONE   set the user's timezone
   --send-email          send mail to created user (you need to configure
                         EMAIL-NOTIFICATION part in config file to use this
                         feature)
@@ -103,25 +103,25 @@ Edit the account of a user
 optional arguments:
   -h, --help            show this help message and exit
   -c CONFIG_FILE, --config CONFIG_FILE
-                        application config file to read (default:
+                        configuration file to use (default:
                         development.ini)
   -d, --debug_mode      enable Tracim log for debug
   -e EMAIL, --email EMAIL
-                        set user email
+                        set the user's email address
   -u USERNAME, --username USERNAME
-                        set username of the user
+                        set the user's username
   --public-name PUBLIC_NAME
-                        set user public name
+                        set the user's public name
   --allowed_space ALLOWED_SPACE
-                        set user allowed space in bytes
-  --lang LANG           set user lang (ISO 639 format)
+                        set the user's allowed space in bytes
+  --lang LANG           set the user's language (ISO 639 format)
   -p PASSWORD, --password PASSWORD
-                        set user password
-  --profile PROFILE     set user profile, valid values: users, trusted-users,
+                        set the user's password
+  --profile PROFILE     set the user's profile. Valid values: users, trusted-users,
                         administrators
-  --timezone TIMEZONE   set user timezone
+  --timezone TIMEZONE   set the user's timezone
   -l LOGIN, --login LOGIN
-                        user login, can be either password or username
+                        the user's login (either the email address or the username)
 ```
 
 Example:
