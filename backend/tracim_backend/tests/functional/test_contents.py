@@ -4012,7 +4012,24 @@ class TestThreads(object):
 
         modified_event = event_helper.last_event
         assert modified_event.event_type == "content.modified.thread"
-        assert modified_event.content == content
+        # NOTE S.G 2020-05-12: allow a small difference in modified time
+        # as tests with MySQL sometimes fails with a strict equality
+        event_content_modified = dateutil.parser.isoparse(modified_event.content["modified"])
+        content_modified = dateutil.parser.isoparse(content["modified"])
+        modified_diff = (event_content_modified - content_modified).total_seconds()
+        assert abs(modified_diff) < 2
+        assert modified_event.content["file_extension"] == content["file_extension"]
+        assert modified_event.content["filename"] == content["filename"]
+        assert modified_event.content["is_archived"] == content["is_archived"]
+        assert modified_event.content["is_editable"] == content["is_editable"]
+        assert modified_event.content["is_deleted"] == content["is_deleted"]
+        assert modified_event.content["label"] == content["label"]
+        assert modified_event.content["parent_id"] == content["parent_id"]
+        assert modified_event.content["show_in_ui"] == content["show_in_ui"]
+        assert modified_event.content["slug"] == content["slug"]
+        assert modified_event.content["status"] == content["status"]
+        assert modified_event.content["sub_content_types"] == content["sub_content_types"]
+        assert modified_event.content["workspace_id"] == content["workspace_id"]
         workspace = web_testapp.get("/api/v2/workspaces/2", status=200).json_body
         assert modified_event.workspace == workspace
 
