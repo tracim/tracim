@@ -11,7 +11,8 @@ import {
   WORKSPACE_MEMBER, UPDATE,
   USER_WORKSPACE_DO_NOTIFY,
   FOLDER_READ,
-  WORKSPACE_AGENDA_URL, WORKSPACE_CONTENT
+  WORKSPACE_AGENDA_URL,
+  WORKSPACE_CONTENT
 } from '../action-creator.sync.js'
 import { serializeContent } from './workspaceContentList.js'
 

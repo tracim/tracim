@@ -8,6 +8,7 @@ const SHAREDSPACE_MEMBER = 'workspace_member'
 const CREATED = 'created'
 const MODIFIED = 'modified'
 const DELETED = 'deleted'
+const UNDELETED = 'undeleted'
 
 export const TLM_ENTITY_TYPE = {
   USER,
@@ -18,5 +19,6 @@ export const TLM_ENTITY_TYPE = {
 export const TLM_CORE_EVENT_TYPE = {
   CREATED,
   MODIFIED,
-  DELETED
+  DELETED,
+  UNDELETED
 }
