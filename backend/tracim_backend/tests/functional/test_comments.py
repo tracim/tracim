@@ -70,6 +70,7 @@ class TestCommentsEndpoint(object):
         web_testapp,
         admin_user,
         content_type_list,
+        event_helper,
     ) -> None:
         """
         Get alls comments of a content
@@ -111,6 +112,14 @@ class TestCommentsEndpoint(object):
         assert comment["author"]["public_name"] == admin_user.display_name
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
+
+        created = event_helper.last_event
+        assert created.event_type == "content.created.comment"
+        assert created.content == comment
+        workspace = web_testapp.get(
+            "/api/v2/workspaces/{}".format(business_workspace.workspace_id), status=200
+        ).json_body
+        assert created.workspace == workspace
 
     def test_api__post_content_comment__err_400__content_not_editable(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
