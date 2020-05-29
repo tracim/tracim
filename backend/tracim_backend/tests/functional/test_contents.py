@@ -281,7 +281,12 @@ class TestFolder(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__update_folder__ok_200__nominal_case(
-        self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        content_type_list,
+        event_helper,
     ) -> None:
         """
         Update(put) one html document of a content
@@ -335,6 +340,14 @@ class TestFolder(object):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
+
+        modified_event = event_helper.last_event
+        assert modified_event.event_type == "content.modified.folder"
+        assert modified_event.content == content
+        workspace = web_testapp.get(
+            "/api/v2/workspaces/{}".format(test_workspace.workspace_id), status=200
+        ).json_body
+        assert modified_event.workspace == workspace
 
     def test_api__update_folder__err_400__not_modified(
         self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
@@ -1040,7 +1053,9 @@ class TestHtmlDocuments(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__update_html_document__ok_200__nominal_case(self, web_testapp) -> None:
+    def test_api__update_html_document__ok_200__nominal_case(
+        self, web_testapp, event_helper
+    ) -> None:
         """
         Update(put) one html document of a content
         """
@@ -1099,6 +1114,29 @@ class TestHtmlDocuments(object):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".document.html"
+
+        modified_event = event_helper.last_event
+        assert modified_event.event_type == "content.modified.html-document"
+        # NOTE S.G 2020-05-12: allow a small difference in modified time
+        # as tests with MySQL sometimes fails with a strict equality
+        event_content_modified = dateutil.parser.isoparse(modified_event.content["modified"])
+        content_modified = dateutil.parser.isoparse(content["modified"])
+        modified_diff = (event_content_modified - content_modified).total_seconds()
+        assert abs(modified_diff) < 2
+        assert modified_event.content["file_extension"] == content["file_extension"]
+        assert modified_event.content["filename"] == content["filename"]
+        assert modified_event.content["is_archived"] == content["is_archived"]
+        assert modified_event.content["is_editable"] == content["is_editable"]
+        assert modified_event.content["is_deleted"] == content["is_deleted"]
+        assert modified_event.content["label"] == content["label"]
+        assert modified_event.content["parent_id"] == content["parent_id"]
+        assert modified_event.content["show_in_ui"] == content["show_in_ui"]
+        assert modified_event.content["slug"] == content["slug"]
+        assert modified_event.content["status"] == content["status"]
+        assert modified_event.content["sub_content_types"] == content["sub_content_types"]
+        assert modified_event.content["workspace_id"] == content["workspace_id"]
+        workspace = web_testapp.get("/api/v2/workspaces/2", status=200).json_body
+        assert modified_event.workspace == workspace
 
     def test_api__update_html_document__err_400__not_editable(self, web_testapp) -> None:
         """
@@ -2267,7 +2305,7 @@ class TestFiles(object):
         assert res["slug"] == "test-image"
         # A creation is in fact two events: created + modified to add the revision
         (created_event, modified_event) = event_helper.last_events(2)
-        assert created_event.event_type == "content.created"
+        assert created_event.event_type == "content.created.file"
         author = web_testapp.get("/api/v2/users/1", status=200).json_body
         assert created_event.author == author
         workspace = web_testapp.get(
@@ -2275,20 +2313,11 @@ class TestFiles(object):
         ).json_body
         assert created_event.workspace == workspace
 
-        assert modified_event.event_type == "content.modified"
+        assert modified_event.event_type == "content.modified.file"
         content = web_testapp.get(
             "/api/v2/workspaces/{}/files/{}".format(business_workspace.workspace_id, content_id),
             status=200,
         ).json_body
-        for attr in (
-            "has_jpeg_preview",
-            "has_pdf_preview",
-            "mimetype",
-            "page_nb",
-            "raw_content",
-            "size",
-        ):
-            del content[attr]
 
         # NOTE S.G 2020-05-12: allow a small difference in modified time
         # as tests with MySQL sometimes fails with a strict equality
@@ -2311,28 +2340,20 @@ class TestFiles(object):
 
         assert modified_event.workspace == workspace
 
-        res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/files/{content_id}".format(
-                workspace_id=business_workspace.workspace_id, content_id=content_id
-            ),
-            status=200,
-        )
-
-        res = res.json_body
-        assert res["parent_id"] is None
-        assert res["content_type"] == "file"
-        assert res["is_archived"] is False
-        assert res["is_deleted"] is False
-        assert res["is_editable"] is True
-        assert res["content_namespace"] == "content"
-        assert res["workspace_id"] == business_workspace.workspace_id
-        assert isinstance(res["content_id"], int)
-        assert res["status"] == "open"
-        assert res["label"] == "test_image"
-        assert res["slug"] == "test-image"
-        assert res["author"]["user_id"] == admin_user.user_id
-        assert res["page_nb"] == 1
-        assert res["mimetype"] == "image/png"
+        assert content["parent_id"] is None
+        assert content["content_type"] == "file"
+        assert content["is_archived"] is False
+        assert content["is_deleted"] is False
+        assert content["is_editable"] is True
+        assert content["content_namespace"] == "content"
+        assert content["workspace_id"] == business_workspace.workspace_id
+        assert isinstance(content["content_id"], int)
+        assert content["status"] == "open"
+        assert content["label"] == "test_image"
+        assert content["slug"] == "test-image"
+        assert content["author"]["user_id"] == admin_user.user_id
+        assert content["page_nb"] == 1
+        assert content["mimetype"] == "image/png"
 
     def test_api__create_file__err_400__filename_already_used(
         self, workspace_api_factory, content_api_factory, session, web_testapp
@@ -2555,7 +2576,7 @@ class TestFiles(object):
             "/api/v2/workspaces/1/files/{}".format(content_id), status=200
         ).json_body
         last_event = event_helper.last_event
-        assert last_event.event_type == "content.modified"
+        assert last_event.event_type == "content.modified.file"
         assert last_event.content["actives_shares"] == res["actives_shares"]
         assert last_event.content["content_id"] == content_id
         assert last_event.content["content_namespace"] == res["content_namespace"]
@@ -3946,7 +3967,7 @@ class TestThreads(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
-    def test_api__update_thread__ok_200__nominal_case(self, web_testapp) -> None:
+    def test_api__update_thread__ok_200__nominal_case(self, web_testapp, event_helper) -> None:
         """
         Update(put) thread
         """
@@ -4005,6 +4026,29 @@ class TestThreads(object):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "My New label.thread.html"
+
+        modified_event = event_helper.last_event
+        assert modified_event.event_type == "content.modified.thread"
+        # NOTE S.G 2020-05-12: allow a small difference in modified time
+        # as tests with MySQL sometimes fails with a strict equality
+        event_content_modified = dateutil.parser.isoparse(modified_event.content["modified"])
+        content_modified = dateutil.parser.isoparse(content["modified"])
+        modified_diff = (event_content_modified - content_modified).total_seconds()
+        assert abs(modified_diff) < 2
+        assert modified_event.content["file_extension"] == content["file_extension"]
+        assert modified_event.content["filename"] == content["filename"]
+        assert modified_event.content["is_archived"] == content["is_archived"]
+        assert modified_event.content["is_editable"] == content["is_editable"]
+        assert modified_event.content["is_deleted"] == content["is_deleted"]
+        assert modified_event.content["label"] == content["label"]
+        assert modified_event.content["parent_id"] == content["parent_id"]
+        assert modified_event.content["show_in_ui"] == content["show_in_ui"]
+        assert modified_event.content["slug"] == content["slug"]
+        assert modified_event.content["status"] == content["status"]
+        assert modified_event.content["sub_content_types"] == content["sub_content_types"]
+        assert modified_event.content["workspace_id"] == content["workspace_id"]
+        workspace = web_testapp.get("/api/v2/workspaces/2", status=200).json_body
+        assert modified_event.workspace == workspace
 
     def test_api__update_thread__err_400__not_modified(self, web_testapp) -> None:
         """

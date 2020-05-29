@@ -167,6 +167,7 @@ FILE_TYPE = "file"
 MARKDOWNPLUSPAGE_TYPE = "markdownpage"
 HTML_DOCUMENTS_TYPE = "html-document"
 FOLDER_TYPE = "folder"
+COMMENT_TYPE = "comment"
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
 event_type = TracimContentType(
@@ -180,7 +181,7 @@ event_type = TracimContentType(
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
 comment_type = TracimContentType(
-    slug="comment",
+    slug=COMMENT_TYPE,
     fa_icon="",
     label="Comment",
     creation_label="Comment",
