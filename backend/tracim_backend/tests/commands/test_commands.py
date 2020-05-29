@@ -9,13 +9,11 @@ import transaction
 
 import tracim_backend
 from tracim_backend.command import TracimCLI
-from tracim_backend.exceptions import BadCommandError
 from tracim_backend.exceptions import DatabaseInitializationFailed
+from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
-from tracim_backend.exceptions import ProfileDoesNotExist
-from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
@@ -83,7 +81,7 @@ class TestCommands(object):
                 "create",
                 "-c",
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                "-l",
+                "-e",
                 "command_test@user",
                 "-p",
                 "new_password",
@@ -117,7 +115,7 @@ class TestCommands(object):
                 "create",
                 "-c",
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                "-l",
+                "-e",
                 "command_test@user",
                 "-p",
                 "new_password",
@@ -142,14 +140,14 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(ProfileDoesNotExist):
+        with pytest.raises(SystemExit):
             app.run(
                 [
                     "user",
                     "create",
                     "-c",
                     "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                    "-l",
+                    "-e",
                     "command_test@user",
                     "-p",
                     "new_password",
@@ -168,7 +166,7 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(UserAlreadyExistError):
+        with pytest.raises(EmailAlreadyExistInDb):
             app.run(
                 [
                     "--debug",
@@ -176,7 +174,7 @@ class TestCommands(object):
                     "create",
                     "-c",
                     "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                    "-l",
+                    "-e",
                     "admin@admin.admin",
                     "-p",
                     "new_password",
@@ -203,34 +201,11 @@ class TestCommands(object):
                     "create",
                     "-c",
                     "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                    "-l",
+                    "-e",
                     "pof@pof.pof",
                     "-p",
                     "new_password",
                     "--send-email",
-                    "--debug",
-                ]
-            )
-
-    def test_func__user_create_command__err__password_required(self, hapic, session) -> None:
-        """
-        Test User creation without filling password
-        """
-        session.close()
-        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
-        # TracimCLI need reseted context when ran.
-        DepotManager._clear()
-        app = TracimCLI()
-        with pytest.raises(BadCommandError):
-            app.run(
-                [
-                    "--debug",
-                    "user",
-                    "create",
-                    "-c",
-                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                    "-l",
-                    "admin@admin.admin",
                     "--debug",
                 ]
             )

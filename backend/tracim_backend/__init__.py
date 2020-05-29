@@ -37,7 +37,7 @@ from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
-from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
+from tracim_backend.lib.utils.authentification import TRACIM_API_USER_LOGIN_HEADER
 from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import QueryTokenAuthentificationPolicy
@@ -97,9 +97,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     policies = []
     if app_config.REMOTE_USER_HEADER:
         policies.append(
-            RemoteAuthentificationPolicy(
-                remote_user_email_login_header=app_config.REMOTE_USER_HEADER
-            )
+            RemoteAuthentificationPolicy(remote_user_login_header=app_config.REMOTE_USER_HEADER)
         )
     policies.append(
         CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION__REISSUE_TIME)
@@ -109,7 +107,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         policies.append(
             ApiTokenAuthentificationPolicy(
                 api_key_header=TRACIM_API_KEY_HEADER,
-                api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER,
+                api_user_login_header=TRACIM_API_USER_LOGIN_HEADER,
             )
         )
     policies.append(TracimBasicAuthAuthenticationPolicy(realm=BASIC_AUTH_WEBUI_REALM))

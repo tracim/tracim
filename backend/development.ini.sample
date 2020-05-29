@@ -330,6 +330,10 @@ website.base_url = %(basic_setup.website_base_url)s
 # EMAIL-COMMON
 ####
 
+# Require that every users have an email address associated with their account.
+# If disabled, users will be allowed to have accounts without an email address. In this case, the username is mandatory.
+; email.required = True
+
 ### Email sending configuration ###
 # processing_mode may be sync or async,
 # if async is choosen, you need also to run mail_notifier daemon

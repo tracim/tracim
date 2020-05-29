@@ -246,7 +246,7 @@ class UserApi(object):
             return False
 
     def _ldap_authenticate(
-        self, user: typing.Optional[User], email: str, password: str, ldap_connector: "Connector",
+        self, user: typing.Optional[User], login: str, password: str, ldap_connector: "Connector",
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
@@ -254,23 +254,23 @@ class UserApi(object):
         or UserAuthenticatedIsNotActive
         :param user: user to check,, can be none if user not found, will try
          to create new user if none but ldap auth succeed
-        :param email: email of the user
+        :param login: login of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         """
         auth_type = AuthType.LDAP
 
-        # INFO - G.M - 2018-11-22 - Do not authenticate user with auth_type
+        # INFO - G.M - 2018-11-22 - Do no_t authenticate user with auth_type
         # different from LDAP
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
                 'User "{}" auth_type is {} not {}'.format(
-                    email, user.auth_type.value, auth_type.value
+                    login, user.auth_type.value, auth_type.value
                 )
             )
 
         # INFO - G.M - 2018-11-22 - LDAP Auth
-        data = ldap_connector.authenticate(email, password)
+        data = ldap_connector.authenticate(login, password)
         if not data:
             raise WrongLDAPCredentials("LDAP credentials are not correct")
         ldap_data = data[1]
@@ -296,8 +296,12 @@ class UserApi(object):
             if self._config.LDAP_NAME_ATTRIBUTE:
                 name = ldap_data[self._config.LDAP_NAME_ATTRIBUTE][0]
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
+            use_email = False
+            if "@" in login:
+                use_email = True
             user = self.create_user(
-                email=email,
+                email=login if use_email else None,
+                username=login if not use_email else None,
                 name=name,
                 profile=profile,
                 auth_type=AuthType.LDAP,
@@ -307,7 +311,7 @@ class UserApi(object):
             self.execute_created_user_actions(user)
             transaction.commit()
             # INFO - G.M - 2018-11-08 - get new created user
-            user = self.get_one_by_email(email)
+            user = self.get_one_by_login(login)
 
         if user.is_deleted:
             raise UserDoesNotExist("This user has been deleted")
@@ -320,7 +324,7 @@ class UserApi(object):
         return user
 
     def _internal_db_authenticate(
-        self, user: typing.Optional[User], email: str, password: str
+        self, user: typing.Optional[User], login: str, password: str
     ) -> User:
         """
         Authenticate with internal db, return authenticated user
@@ -334,16 +338,16 @@ class UserApi(object):
         auth_type = AuthType.INTERNAL
 
         if not user:
-            raise UserDoesNotExist("User {} not found in database".format(email))
+            raise UserDoesNotExist("User {} not found in database".format(login))
 
         if user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
                 'User "{}" auth_type is {} not {}'.format(
-                    email, user.auth_type.value, auth_type.value
+                    login, user.auth_type.value, auth_type.value
                 )
             )
         if not user.validate_password(password):
-            raise WrongUserPassword('User "{}" password is incorrect'.format(email))
+            raise WrongUserPassword('User "{}" password is incorrect'.format(login))
 
         if user.is_deleted:
             raise UserDoesNotExist("This user has been deleted")
@@ -355,14 +359,14 @@ class UserApi(object):
             user.auth_type = auth_type
         return user
 
-    def _remote_user_authenticate(self, user: User, email: str) -> User:
+    def _remote_user_authenticate(self, user: User, login: str) -> User:
         """
         Authenticate with remote_auth, return authenticated user
         or raise Exception like WrongAuthTypeForUser,
         UserDoesNotExist or UserAuthenticatedIsNotActive
         :param user: user to check, can be none if user not found, will try
          to create new user if none
-        :param email: email of the user
+        :param login: email of the user
         """
         auth_type = AuthType.REMOTE
 
@@ -371,15 +375,19 @@ class UserApi(object):
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
                 'User "{}" auth_type is {} not {}'.format(
-                    email, user.auth_type.value, auth_type.value
+                    login, user.auth_type.value, auth_type.value
                 )
             )
 
         # INFO - G.M - 2018-12-12 - Create new user
         if not user:
             profile = None
+            use_email = False
+            if "@" in login:
+                use_email = True
             user = self.create_user(
-                email=email,
+                email=login if use_email else None,
+                username=login if not use_email else None,
                 profile=profile,
                 auth_type=AuthType.REMOTE,
                 do_save=True,
@@ -388,7 +396,7 @@ class UserApi(object):
             self.execute_created_user_actions(user)
             transaction.commit()
             # INFO - G.M - 2018-12-02 - get new created user
-            user = self.get_one_by_email(email)
+            user = self.get_one_by_login(login)
 
         if user.is_deleted:
             raise UserDoesNotExist("This user has been deleted")
@@ -400,7 +408,7 @@ class UserApi(object):
             user.auth_type = auth_type
         return user
 
-    def remote_authenticate(self, email: str) -> User:
+    def remote_authenticate(self, login: str) -> User:
         """
         Remote Authenticate user with email (no password check),
         raise AuthenticationFailed if uncorrect.
@@ -409,41 +417,44 @@ class UserApi(object):
         try:
             if not self._config.REMOTE_USER_HEADER:
                 raise RemoteUserAuthDisabled("Remote User Auth mechanism disabled")
-            return self._remote_authenticate(email)
+            return self._remote_authenticate(login)
         except AuthenticationFailed as exc:
             raise exc
         except WrongAuthTypeForUser as exc:
             raise AuthenticationFailed("Auth mechanism for this user is not activated") from exc
 
-    def _remote_authenticate(self, email: str):
+    def _remote_authenticate(self, login: str):
         """
-        Authenticate user with email given using remote mechanism,
+        Authenticate user with login given using remote mechanism,
         raise AuthenticationFailed if uncorrect.
-        :param email: email of the user
+        :param login: login of the user
         :return: User who was authenticated.
         """
         # get existing user
-        try:
-            user = self.get_one_by_email(email)
-        except UserDoesNotExist:
-            user = None
+        user = None
+        if login:
+            try:
+                user = self.get_one_by_login(login)
+            except UserDoesNotExist:
+                pass
         # try auth
         try:
-            return self._remote_user_authenticate(user, email)
+            return self._remote_user_authenticate(user, login)
         except (
             UserDoesNotExist,
             UserAuthenticatedIsDeleted,
             UserAuthenticatedIsNotActive,
             TracimValidationFailed,
+            EmailRequired,
         ) as exc:
-            raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc
+            raise AuthenticationFailed('User "{}" authentication failed'.format(login)) from exc
 
     def authenticate(self, password: str, login: str, ldap_connector: "Connector" = None,) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. try all auth available in order and raise issue of
         last auth if all auth failed.
-        :param login: email or username of the user
+        :param login: login or username of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :return: User who was authenticated.
@@ -473,27 +484,17 @@ class UserApi(object):
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. check only one auth
-        :param login: email of the user
+        :param login: login of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :param auth_type: auth type to test.
         :return: User who was authenticated.
         """
         user = None
-
-        # try to get existing user with email
         try:
-            user = self.get_one_by_email(login)
+            user = self.get_one_by_login(login)
         except UserDoesNotExist:
             pass
-
-        # try to get existing user with email
-        try:
-            user = self.get_one_by_username(login)
-        except UserDoesNotExist:
-            pass
-
-        # try auth
         try:
             if auth_type == AuthType.LDAP:
                 if ldap_connector:
@@ -504,6 +505,7 @@ class UserApi(object):
             else:
                 raise UnknownAuthType()
         except (
+            EmailRequired,
             WrongUserPassword,
             WrongLDAPCredentials,
             UserDoesNotExist,
