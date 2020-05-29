@@ -1,6 +1,7 @@
 import i18n from './i18n.js'
 import {
   addAllResourceI18n,
+  addRevisionFromTLM,
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
@@ -23,7 +24,8 @@ import {
   removeExtensionOfFilename,
   computeProgressionPercentage,
   buildHeadTitle,
-  CONTENT_TYPE
+  CONTENT_TYPE,
+  sortTimelineByDate
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -104,6 +106,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
 export {
   appContentFactory,
+  addRevisionFromTLM,
   TracimComponent,
   addAllResourceI18n,
   handleFetchResult,
@@ -166,5 +169,6 @@ export {
   ShareDownload,
   ProgressBar,
   RadioBtnGroup,
-  CONTENT_TYPE
+  CONTENT_TYPE,
+  sortTimelineByDate
 }

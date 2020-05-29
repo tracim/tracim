@@ -1,14 +1,7 @@
-import { CONTENT_TYPE } from './helper.js'
-
 // TLM Event Type list
 const USER = 'user'
-const CONTENT = {
-  FILE: `content.${CONTENT_TYPE.FILE}`,
-  HTML_DOCUMENT: `content.${CONTENT_TYPE.HTML_DOCUMENT}`,
-  THREAD: `content.${CONTENT_TYPE.THREAD}`,
-  FOLDER: `content.${CONTENT_TYPE.FOLDER}`,
-  COMMENT: `content.${CONTENT_TYPE.COMMENT}`
-}
+const CONTENT = 'content'
+
 const SHAREDSPACE = 'workspace'
 const SHAREDSPACE_USER_ROLE = 'workspace_user_role'
 

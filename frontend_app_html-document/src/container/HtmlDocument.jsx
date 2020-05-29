@@ -4,11 +4,13 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
+  addRevisionFromTLM,
   APP_FEATURE_MODE,
   appContentFactory,
   ArchiveDeleteContent,
   BREADCRUMBS_TYPE,
   buildHeadTitle,
+  CONTENT_TYPE,
   CUSTOM_EVENT,
   displayDistanceDate,
   generateLocalStorageContentId,
@@ -21,6 +23,7 @@ import {
   PopinFixedRightPart,
   ROLE,
   SelectStatus,
+  sortTimelineByDate,
   Timeline,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -80,10 +83,10 @@ class HtmlDocument extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated }
-      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleContentDeleted }
-      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, handler: this.handleContentUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.COMMENT, handler: this.handleContentCreated }
+      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentDeleted }
+      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentUndeleted }
     ])
   }
 
@@ -102,17 +105,6 @@ class HtmlDocument extends React.Component {
         keepEditingWarning: true
       })
     }
-    // TODO test and review
-    let commentList = state.timeline.filter(item => item.timelineType === 'comment')
-    let {
-      actives_shares,
-      author,
-      created,
-      current_revision_id,
-      current_revision_type,
-      last_modifier,
-      ...revisionObject
-    } = data.content
 
     this.setState(prev => ({
       ...prev,
@@ -122,25 +114,7 @@ class HtmlDocument extends React.Component {
       },
       newComment: localStorageComment || '',
       rawContentBeforeEdit: prev.content.raw_content,
-      timeline: [
-        ...prev.timeline,
-        {
-          ...revisionObject,
-          author: {
-            public_name: data.author.public_name,
-            avatar_url: data.author.avatar_url,
-            user_id: data.author.user_id
-          },
-          commentList: commentList,
-          comment_ids: commentList.map(comment => comment.content_id),
-          created: displayDistanceDate(data.content.modified, state.loggedUser.lang),
-          created_raw: data.content.modified,
-          number: prev.timeline.length + 1,
-          revision_id: data.content.current_revision_id,
-          revision_type: data.content.current_revision_type,
-          timelineType: 'revision'
-        }
-      ]
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
     }))
   }
 
@@ -148,9 +122,9 @@ class HtmlDocument extends React.Component {
     const { state } = this
     if (data.content.parent_id !== state.content.content_id || data.content.content_type !== 'comment') return
 
-    this.setState(prev => ({
-      timeline: [
-        ...prev.timeline,
+    const sortedNewTimeLine = sortTimelineByDate(
+      [
+        ...state.timeline,
         {
           ...data.content,
           created: displayDistanceDate(data.content.created, state.loggedUser.lang),
@@ -158,7 +132,9 @@ class HtmlDocument extends React.Component {
           timelineType: 'comment'
         }
       ]
-    }))
+    )
+
+    this.setState({ timeline: sortedNewTimeLine })
   }
 
   handleContentDeleted = data => {
@@ -464,10 +440,10 @@ class HtmlDocument extends React.Component {
         switch (fetchResultSaveHtmlDoc.body.code) {
           case 2044:
             this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
-          break
+            break
           default:
             this.sendGlobalFlashMessage(props.t('Error while saving new version'))
-          break
+            break
         }
         break
       default:
