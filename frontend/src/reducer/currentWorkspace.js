@@ -6,6 +6,7 @@ import {
   REMOVE,
   WORKSPACE_DETAIL,
   WORKSPACE_MEMBER_LIST,
+  WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_RECENT_ACTIVITY_LIST,
   WORKSPACE_MEMBER, UPDATE,
@@ -152,6 +153,16 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         contentReadStatusList: action.workspaceReadStatusList
           .filter(content => content.read_by_user)
           .map(content => content.content_id)
+      }
+
+    case `${REMOVE}/${WORKSPACE_READ_STATUS}`: // INFO - CH - 20200529 - this means "set content as unread"
+      return {
+        ...state,
+        contentReadStatusList: state.contentReadStatusList.filter(id => id !== action.unreadId),
+        recentActivityList: [
+          state.recentActivityList.find(content => content.id === action.unreadId),
+          ...state.recentActivityList.filter(content => content.id !== action.unreadId)
+        ]
       }
 
     case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`:

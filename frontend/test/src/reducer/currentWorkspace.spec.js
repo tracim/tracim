@@ -14,6 +14,7 @@ import {
   FOLDER_READ,
   REMOVE,
   removeWorkspaceMember,
+  removeWorkspaceReadStatus,
   SET,
   setWorkspaceAgendaUrl,
   setWorkspaceContentRead,
@@ -31,6 +32,7 @@ import {
   WORKSPACE_DETAIL,
   WORKSPACE_MEMBER,
   WORKSPACE_MEMBER_LIST,
+  WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_RECENT_ACTIVITY_LIST
 } from '../../../src/action-creator.sync.js'
@@ -294,6 +296,52 @@ describe('reducer currentWorkspace.js', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithReadStatusList,
           contentReadStatusList: [1, 3]
+        })
+      })
+    })
+
+    describe(`${REMOVE}/${WORKSPACE_READ_STATUS}`, () => {
+      const initialStateWithReadStatusList = {
+        ...initialState,
+        contentReadStatusList: [100, 101, contentFromApi.content_id],
+        recentActivityList: [serializeContent(contentFromApi)]
+      }
+      const rez = currentWorkspace(initialStateWithReadStatusList, removeWorkspaceReadStatus(contentFromApi.content_id))
+      it('should return a workspace with a read status list not containing the content id that we removed', () => {
+        expect(rez).to.deep.equal({
+          ...initialStateWithReadStatusList,
+          contentReadStatusList: [100, 101],
+          recentActivityList: [serializeContent(contentFromApi)]
+        })
+      })
+
+      describe('with the unread content at the last position in recentActivityList', () => {
+        const anotherContent = {
+          ...contentFromApi,
+          content_id: 51
+        }
+        const anotherContent2 = {
+          ...contentFromApi,
+          content_id: 73
+        }
+        const initialStateWithReadStatusList2 = {
+          ...initialStateWithReadStatusList,
+          recentActivityList: [
+            serializeContent(contentFromApi),
+            serializeContent(anotherContent),
+            serializeContent(anotherContent2)
+          ]
+        }
+        const rez = currentWorkspace(initialStateWithReadStatusList2, removeWorkspaceReadStatus(anotherContent2.content_id))
+        it('should put the unread content at the first position in recentActivityList', () => {
+          expect(rez).to.deep.equal({
+            ...initialStateWithReadStatusList2,
+            recentActivityList: [
+              serializeContent(anotherContent2),
+              serializeContent(contentFromApi),
+              serializeContent(anotherContent)
+            ]
+          })
         })
       })
     })

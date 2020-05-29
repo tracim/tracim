@@ -16,7 +16,7 @@ import { mockGetWorkspaceDetail200 } from '../../apiMock.js'
 import { Dashboard as DashboardWithoutHOC } from '../../../src/container/Dashboard.jsx'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
-  ADD, REMOVE, SET, UPDATE, WORKSPACE_CONTENT, WORKSPACE_DETAIL, WORKSPACE_MEMBER
+  ADD, REMOVE, SET, UPDATE, WORKSPACE_CONTENT, WORKSPACE_DETAIL, WORKSPACE_MEMBER, WORKSPACE_READ_STATUS
 } from '../../../src/action-creator.sync.js'
 import { ROLE } from 'tracim_frontend_lib'
 
@@ -26,6 +26,7 @@ describe('<Dashboard />', () => {
   const updateWorkspaceMemberSpy = sinon.spy()
   const removeWorkspaceMemberSpy = sinon.spy()
   const addWorkspaceContentListSpy = sinon.spy()
+  const removeWorkspaceReadStatusSpy = sinon.spy()
   const updateWorkspaceContentListSpy = sinon.spy()
 
   const dispatchMock = (params) => {
@@ -38,6 +39,7 @@ describe('<Dashboard />', () => {
       case `${UPDATE}/${WORKSPACE_MEMBER}`: updateWorkspaceMemberSpy(); break
       case `${REMOVE}/${WORKSPACE_MEMBER}`: removeWorkspaceMemberSpy(); break
       case `${ADD}/${WORKSPACE_CONTENT}`: addWorkspaceContentListSpy(); break
+      case `${REMOVE}/${WORKSPACE_READ_STATUS}`: removeWorkspaceReadStatusSpy(); break
       case `${UPDATE}/${WORKSPACE_CONTENT}`: updateWorkspaceContentListSpy(); break
     }
     return params
@@ -210,7 +212,7 @@ describe('<Dashboard />', () => {
 
       describe('handleContentCreated', () => {
         dashboardInstance.handleContentCreated(tlmData)
-        it('should call this.props.dispatch(handleContentCreated())', () => {
+        it('should call this.props.dispatch(addWorkspaceContentListSpy())', () => {
           expect(addWorkspaceContentListSpy.called).to.equal(true)
         })
 
@@ -226,6 +228,28 @@ describe('<Dashboard />', () => {
           dashboardInstance.handleContentCreated(tlmDataWithOtherWorkspaceId)
           it('should not call this.props.dispatch(addWorkspaceContentListSpy())', () => {
             expect(addWorkspaceContentListSpy.called).to.equal(false)
+          })
+        })
+      })
+
+      describe('handleContentCreatedComment', () => {
+        dashboardInstance.handleContentCreatedComment(tlmData)
+        it('should call this.props.dispatch(removeWorkspaceReadStatus())', () => {
+          expect(removeWorkspaceReadStatusSpy.called).to.equal(true)
+        })
+
+        describe('with a different workspace_id', () => {
+          before(() => {
+            removeWorkspaceReadStatusSpy.resetHistory()
+          })
+
+          const tlmDataWithOtherWorkspaceId = {
+            ...tlmData,
+            workspace: { ...tlmData.workspace, workspace_id: 999 }
+          }
+          dashboardInstance.handleContentCreatedComment(tlmDataWithOtherWorkspaceId)
+          it('should not call this.props.dispatch(removeWorkspaceReadStatus())', () => {
+            expect(removeWorkspaceReadStatusSpy.called).to.equal(false)
           })
         })
       })
