@@ -6,6 +6,11 @@ from sqlalchemy import inspect
 from sqlalchemy import null
 from sqlalchemy.orm import joinedload
 
+from tracim_backend.app_models.contents import COMMENT_TYPE
+from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import FOLDER_TYPE
+from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
+from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.content import ContentApi
@@ -30,8 +35,10 @@ from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
-from tracim_backend.views.core_api.schemas import ContentSchema
+from tracim_backend.views.core_api.schemas import CommentSchema
+from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
+from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
@@ -75,7 +82,13 @@ class EventBuilder:
 
     _user_schema = UserSchema()
     _workspace_schema = WorkspaceSchema()
-    _content_schema = ContentSchema()
+    _content_schemas = {
+        COMMENT_TYPE: CommentSchema(),
+        HTML_DOCUMENTS_TYPE: TextBasedContentSchema(),
+        FILE_TYPE: FileContentSchema(),
+        FOLDER_TYPE: TextBasedContentSchema(),
+        THREAD_TYPE: TextBasedContentSchema(),
+    }
     _event_schema = EventSchema()
     _workspace_user_role_schema = WorkspaceMemberDigestSchema()
 
@@ -170,6 +183,8 @@ class EventBuilder:
     ) -> None:
         content_api = ContentApi(db_session, self._current_user, self._config)
         content_in_context = content_api.get_content_in_context(content)
+        content_dict = self._content_schemas[content.type].dump(content_in_context).data
+
         workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace_id)
@@ -179,10 +194,15 @@ class EventBuilder:
             _AUTHOR_FIELD: self._user_schema.dump(
                 user_api.get_user_with_context(self._current_user)
             ).data,
-            _CONTENT_FIELD: self._content_schema.dump(content_in_context).data,
+            _CONTENT_FIELD: content_dict,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
-        event = Event(entity_type=EntityType.CONTENT, operation=operation, fields=fields)
+        event = Event(
+            entity_type=EntityType.CONTENT,
+            operation=operation,
+            fields=fields,
+            entity_subtype=content.type,
+        )
         db_session.add(event)
 
     # UserRoleInWorkspace events
