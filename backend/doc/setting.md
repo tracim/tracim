@@ -192,8 +192,7 @@ For instance:
 
 The last one will check the internal user database first. Then, if the auth fails, it will also try to authenticate the user using LDAP.
 
-The authentication can be done with a login. A login can be either the user's email address or the username. In case there is
-no clear distinction in the authentication method used, login with "@" will be considered as email and login without as username.
+The authentication is done with a login, which is either the user's email address or the username. For authentication methods which don't provide a way to distinguish between the two, a login with "@" will be considered as an email address and a login without as a username.
 
 :warning: If you use LDAP or the Remote Auth method, the automatic creation of a username-only user (without "@") can fail if:
 `email.required=True`, which means every user should have an email address set. To solve this case, either:
