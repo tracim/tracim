@@ -257,8 +257,7 @@ class EventBuilder:
         event = typing.cast(Event, instance)
         LiveMessageBuilder.session = db_session
         LiveMessageBuilder.config = self._config
-        # TODO - G.M - 2020-05-15 - this parameter should be renamed, it's not email-related anymore
-        if self._config.EMAIL__PROCESSING_MODE == self._config.CST.ASYNC:
+        if self._config.JOBS__PROCESSING_MODE == self._config.CST.ASYNC:
             redis_connection = get_redis_connection(self._config)
             queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
             logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))

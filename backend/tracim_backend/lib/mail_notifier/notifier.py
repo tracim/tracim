@@ -109,10 +109,7 @@ class EmailNotifier(INotifier):
         # (SQLA objects are related to a given thread/session)
         #
         try:
-            if (
-                self.config.EMAIL__NOTIFICATION__PROCESSING_MODE.lower()
-                == self.config.CST.ASYNC.lower()
-            ):
+            if self.config.JOBS__PROCESSING_MODE == self.config.CST.ASYNC:
                 logger.info(self, "Sending email in ASYNC mode")
                 # TODO - D.A - 2014-11-06
                 # This feature must be implemented in order to be able to scale to large communities
