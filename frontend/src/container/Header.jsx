@@ -79,7 +79,7 @@ class Header extends React.Component {
 
     const fetchPostUserLogout = await props.dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
-      props.TLMManager.closeLiveMessageConnection()
+      props.tlmManager.closeLiveMessageConnection()
       props.dispatch(setUserDisconnected())
       this.props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
       props.history.push(PAGE.LOGIN)
@@ -188,5 +188,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ searchResult, lang, user, system, appList, TLMManager }) => ({ searchResult, lang, user, system, appList, TLMManager })
+const mapStateToProps = ({ searchResult, lang, user, system, appList, tlmManager }) => ({ searchResult, lang, user, system, appList, tlmManager })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

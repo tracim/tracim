@@ -138,7 +138,7 @@ class Login extends React.Component {
         this.loadAppList()
         this.loadContentTypeList()
         this.loadWorkspaceList()
-        props.TLMManager.openLiveMessageConnection(fetchPostUserLogin.json.user_id)
+        props.tlmManager.openLiveMessageConnection(fetchPostUserLogin.json.user_id)
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)
@@ -291,5 +291,5 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, system, breadcrumbs, TLMManager }) => ({ user, system, breadcrumbs, TLMManager })
+const mapStateToProps = ({ user, system, breadcrumbs, tlmManager }) => ({ user, system, breadcrumbs, tlmManager })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Login))))
