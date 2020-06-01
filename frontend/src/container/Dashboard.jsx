@@ -3,6 +3,9 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { Link, withRouter } from 'react-router-dom'
 import {
+  TracimComponent,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   PageWrapper,
   PageTitle,
   PageContent,
@@ -33,6 +36,7 @@ import {
   setWorkspaceRecentActivityList,
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
+  updateWorkspaceMember,
   removeWorkspaceMember,
   updateUserWorkspaceSubscriptionNotif,
   setWorkspaceAgendaUrl,
@@ -55,7 +59,9 @@ class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
+      workspaceIdInUrl: props.match.params.idws
+        ? parseInt(props.match.params.idws)
+        : null, // this is used to avoid handling the parseInt every time
       advancedDashboardOpenedId: null,
       newMember: {
         id: '',
@@ -72,32 +78,47 @@ class Dashboard extends React.Component {
       displayWebdavBtn: false
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
-    document.addEventListener('TracimLiveMessage', this.liveMessageReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, handler: this.handleRefreshDashboardMemberList },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
+      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
+      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted }
+    ])
   }
 
-  customEventReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST:
-        this.loadMemberList()
-        break
-      case CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL:
-        await this.loadWorkspaceDetail()
-        this.buildBreadcrumbs()
-        break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        this.setHeadTitle()
-        break
-    }
+  // CustomEvent handlers
+  handleRefreshDashboardMemberList = () => this.loadMemberList()
+
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
   }
 
-  liveMessageReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      case 'sharedspace_user_role.created':
-        this.props.dispatch(addWorkspaceMember(data.fields))
-        break
-    }
+  // LiveMessage handlers
+  handleWorkspaceModified = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(setWorkspaceDetail(data.workspace))
+    this.setHeadTitle()
+  }
+
+  handleMemberCreated = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(addWorkspaceMember(data.user, data.workspace, data.role))
+  }
+
+  handleMemberModified = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(updateWorkspaceMember(data.user, data.workspace, data.role))
+  }
+
+  handleMemberDeleted = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(removeWorkspaceMember(data.user.user_id, data.workspace))
   }
 
   async componentDidMount () {
@@ -348,20 +369,20 @@ class Dashboard extends React.Component {
       role: state.newMember.role
     }))
 
+    this.setState({
+      newMember: {
+        id: '',
+        avatarUrl: '',
+        nameOrEmail: '',
+        role: '',
+        isEmail: false
+      },
+      autoCompleteFormNewMemberActive: false,
+      displayNewMemberForm: false
+    })
+
     switch (fetchWorkspaceNewMember.status) {
       case 200:
-        this.loadMemberList()
-        this.setState({
-          newMember: {
-            id: '',
-            avatarUrl: '',
-            nameOrEmail: '',
-            role: '',
-            isEmail: false
-          },
-          autoCompleteFormNewMemberActive: false,
-          displayNewMemberForm: false
-        })
         props.dispatch(newFlashMessage(props.t('Member added'), 'info'))
         return true
       case 400:
@@ -651,4 +672,4 @@ class Dashboard extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
   breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system
 })
-export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Dashboard)))))

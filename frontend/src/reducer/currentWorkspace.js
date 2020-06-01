@@ -68,13 +68,22 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         memberList: [
           ...state.memberList,
           {
-            id: action.member.user.user_id,
-            publicName: action.member.user.public_name,
-            role: action.member.role,
-            isActive: action.member.user.is_active,
-            doNotify: action.member.user.do_notify
+            id: action.newMember.user_id,
+            publicName: action.newMember.public_name,
+            role: action.role,
+            isActive: action.newMember.is_active,
+            doNotify: action.newMember.do_notify
           }
         ]
+      }
+
+    case `${UPDATE}/${WORKSPACE_MEMBER}`:
+      return {
+        ...state,
+        memberList: state.memberList.map(m => m.id === action.member.user_id
+          ? { ...m, id: action.member.user_id, ...action.member, role: action.role }
+          : m
+        )
       }
 
     case `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:

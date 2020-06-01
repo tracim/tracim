@@ -5,6 +5,7 @@ from pyramid.scripting import AppEnvironment
 from tracim_backend.command import AppContextCommand
 from tracim_backend.config import CFG
 from tracim_backend.config import ConfigParam
+from tracim_backend.lib.core.live_messages import LiveMessagesLib
 
 
 class ParametersListCommand(AppContextCommand):
@@ -156,3 +157,31 @@ class ParametersValueCommand(AppContextCommand):
                     deprecated=config_param.deprecated,
                 )
             )
+
+
+class LiveMessageTesterCommand(AppContextCommand):
+    def get_description(self) -> str:
+        return "send test live messages for testing"
+
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "-u", "--user_id", help="id of the user to test", dest="user_id", required=True,
+        )
+        return parser
+
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+        # TODO - G.M - 05-04-2018 -Refactor this in order
+        # to not setup object var outside of __init__ .
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]  # type: CFG
+        live_messages_lib = LiveMessagesLib(self._app_config)
+        # TODO - G.M - 07-05-2020 - Should be a real tracim_message instead of dict
+        test_message = {
+            "event_id": -1,
+            "event_type": "test",
+        }
+        live_messages_lib.publish_dict(
+            "user_{}".format(parsed_args.user_id), message_as_dict=test_message
+        )
+        print("test message (id=-1) send to user {}".format(parsed_args.user_id))
