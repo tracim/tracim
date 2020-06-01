@@ -11,6 +11,7 @@ import {
   PageContent,
   convertBackslashNToBr,
   BREADCRUMBS_TYPE,
+  CONTENT_TYPE,
   CUSTOM_EVENT,
   ROLE,
   ROLE_LIST,
@@ -48,7 +49,7 @@ import {
   // deleteWorkspaceContentList // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
-import { PAGE, findUserRoleIdInWorkspace, CONTENT_TYPE } from '../util/helper.js'
+import { PAGE, findUserRoleIdInWorkspace } from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
