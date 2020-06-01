@@ -6,7 +6,7 @@ describe('App Gallery', function () {
     cy.visit('/ui/workspaces/1/gallery')
   })
 
-  it(`should have translations`, () => {
+  it('should have translations', () => {
     cy.get('.gallery__action__button').contains('Play')
     cy.changeLanguage('fr')
     cy.get('.gallery__action__button').contains('Lecture')

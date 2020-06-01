@@ -106,8 +106,8 @@ export function delete_htmldocument (cy) {
 
 export function loginAsAdmin (cy) {
   var body = {
-    'email': 'admin@admin.admin',
-    'password': 'admin@admin.admin'
+    email: 'admin@admin.admin',
+    password: 'admin@admin.admin'
   }
   cy.request('POST', '/api/v2/sessions/login', body)
 }

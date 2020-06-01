@@ -6,11 +6,11 @@ describe('content :: home_page', function () {
     cy.visit('/')
   })
 
-  it("should have translations", () => {
+  it('should have translations', () => {
     cy.get('.homepagecard__title').contains('Welcome to Tracim')
 
     cy.changeLanguage('fr')
-    cy.get('.homepagecard__title').contains("Bienvenue sur Tracim")
+    cy.get('.homepagecard__title').contains('Bienvenue sur Tracim')
 
     cy.changeLanguage('pt')
     cy.get('.homepagecard__title').contains('Bem-vindo ao Tracim')

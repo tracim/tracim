@@ -12,10 +12,10 @@ const searchInput = '[data-cy=search__text]'
 
 let workspaceId
 
-const contentHtmlDocGetter = formatTag({selectorName: s.CONTENT_IN_SEARCH, attrs: {title: htmlDocTitle}})
-const contentThreadGetter = formatTag({selectorName: s.CONTENT_IN_SEARCH, attrs: {title: threadTitle}})
-const contentFileGetter = formatTag({selectorName: s.CONTENT_IN_SEARCH, attrs: {title: fileTitle}})
-const contentThreadTitleLongGetter = formatTag({selectorName: s.CONTENT_IN_SEARCH, attrs: {title: threadTitleLong}})
+const contentHtmlDocGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: htmlDocTitle } })
+const contentThreadGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: threadTitle } })
+const contentFileGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: fileTitle } })
+const contentThreadTitleLongGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: threadTitleLong } })
 
 describe('Searching keywords', () => {
   before(function () {
@@ -33,7 +33,7 @@ describe('Searching keywords', () => {
 
   beforeEach(function () {
     cy.loginAs('administrators')
-    cy.visitPage({pageName: PAGES.HOME})
+    cy.visitPage({ pageName: PAGES.HOME })
   })
 
   afterEach(function () {
@@ -97,7 +97,6 @@ describe('Searching keywords', () => {
     })
   })
 
-
   describe('by changing it in the url', () => {
     const pageNumber = '1'
     const numberByPage = '10'
@@ -120,7 +119,7 @@ describe('Searching keywords', () => {
     describe('that match two documents', () => {
       beforeEach(function () {
         cy.loginAs('users')
-        cy.visitPage({pageName: PAGES.SEARCH, params: {searchedKeywords: threadTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes}})
+        cy.visitPage({ pageName: PAGES.SEARCH, params: { searchedKeywords: threadTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes } })
       })
 
       it('Should display two results', () => {

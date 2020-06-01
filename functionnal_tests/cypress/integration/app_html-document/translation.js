@@ -10,7 +10,7 @@ describe('App Folder Advanced', function () {
     })
   })
 
-  it("should have translations", () => {
+  it('should have translations', () => {
     cy.get('.workspace__header__title').contains('List of text documents')
 
     cy.changeLanguage('fr')

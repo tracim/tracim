@@ -8,7 +8,7 @@ describe('content :: admin > workspace', function () {
     cy.visit('/ui/admin/workspace')
   })
 
-  it("should have translations", () => {
+  it('should have translations', () => {
     cy.get('.adminWorkspace__description').contains('List of every shared spaces')
 
     cy.changeLanguage('fr')
@@ -27,7 +27,7 @@ describe('content :: admin > user', function () {
     cy.visit('/ui/admin/user')
   })
 
-  it("should have translations", () => {
+  it('should have translations', () => {
     cy.get('.adminUser__description').contains('On this page you can manage the users of your Tracim instance.')
 
     cy.changeLanguage('fr')

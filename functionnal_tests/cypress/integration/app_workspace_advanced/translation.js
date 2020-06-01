@@ -1,13 +1,13 @@
 describe('App Workspace Advanced', function () {
   const newDescription = 'description'
-  let workspaceId = 1
-  let workspaceDescription = ''
+  const workspaceId = 1
+  const workspaceDescription = ''
 
   before(() => {
-      cy.resetDB()
-      cy.setupBaseDB()
-      cy.loginAs('administrators')
-      cy.visit("/ui/admin/workspace")
+    cy.resetDB()
+    cy.setupBaseDB()
+    cy.loginAs('administrators')
+    cy.visit('/ui/admin/workspace')
   })
 
   it('should have translations', () => {

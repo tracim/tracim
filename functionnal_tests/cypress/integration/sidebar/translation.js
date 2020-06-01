@@ -7,7 +7,7 @@ describe('content :: home_page', function () {
     cy.get('.sidebar__content__navigation__workspace__item__number').click()
   })
 
-  it("should have translations", () => {
+  it('should have translations', () => {
     cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Text Documents')
 
     cy.changeLanguage('fr')

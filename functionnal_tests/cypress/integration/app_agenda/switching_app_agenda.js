@@ -1,5 +1,5 @@
 import { PAGES } from '../../support/urls_commands.js'
-import {SELECTORS as s} from '../../support/generic_selector_commands.js'
+import { SELECTORS as s } from '../../support/generic_selector_commands.js'
 
 describe('App Agenda', () => {
   let workspace1 = {}
@@ -29,7 +29,7 @@ describe('App Agenda', () => {
 
   describe('Switching from app agenda of different workspace', () => {
     it('Should reload the iframe with the proper workspace id', () => {
-      cy.visitPage({pageName: PAGES.AGENDA, params: {workspaceId: workspace1.workspace_id}})
+      cy.visitPage({ pageName: PAGES.AGENDA, params: { workspaceId: workspace1.workspace_id } })
 
       cy.get('[data-cy="layoutPageTitle"]')
         .contains(workspace1.label)

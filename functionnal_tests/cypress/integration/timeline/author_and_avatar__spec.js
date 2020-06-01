@@ -2,7 +2,7 @@ describe('Author and avatar are shown in the timeline', () => {
   beforeEach(() => {
     cy.resetDB()
     cy.setupBaseDB()
-    let title = 'A title'
+    const title = 'A title'
     cy.loginAs('users').as('user')
     cy.fixture('baseWorkspace').as('workspace')
       .then((workspace) => {
@@ -14,7 +14,6 @@ describe('Author and avatar are shown in the timeline', () => {
           .as('documentUrl')
       })
   })
-
 
   afterEach(() => {
     cy.cancelXHR()

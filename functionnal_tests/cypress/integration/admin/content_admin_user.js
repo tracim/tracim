@@ -1,13 +1,12 @@
 import { PAGES } from '../../support/urls_commands'
 
-
 describe("An admin seeing a user's profile", () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
     cy.createRandomUser()
-    cy.visitPage({pageName: PAGES.HOME})
+    cy.visitPage({ pageName: PAGES.HOME })
   })
 
   afterEach(function () {

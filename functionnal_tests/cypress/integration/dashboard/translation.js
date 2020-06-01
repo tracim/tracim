@@ -10,11 +10,11 @@ describe('Dashboard button list', () => {
     })
   })
 
-  it("should have translations", () => {
+  it('should have translations', () => {
     cy.get('[data-cy="contentTypeBtn_contents/thread"]').contains('Start a topic')
 
     cy.changeLanguage('fr')
-    cy.get('[data-cy="contentTypeBtn_contents/thread"]').contains("Lancer une discussion")
+    cy.get('[data-cy="contentTypeBtn_contents/thread"]').contains('Lancer une discussion')
 
     cy.changeLanguage('pt')
     cy.get('[data-cy="contentTypeBtn_contents/thread"]').contains('Começar uma discussão')

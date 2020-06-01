@@ -3,7 +3,7 @@ const statusMessage = 'Status changed to'
 describe('New statuses are visible in timeline', () => {
   beforeEach(function () {
     cy.resetDB().then(() => {
-      let title = 'A title'
+      const title = 'A title'
       cy.setupBaseDB().then(() => {
         cy.loginAs('users').as('user').then(user => {
           cy.fixture('baseWorkspace').as('workspace')

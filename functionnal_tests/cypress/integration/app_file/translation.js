@@ -10,7 +10,7 @@ describe('App File', () => {
     })
   })
 
-  it("should have translations", () => {
+  it('should have translations', () => {
     cy.get('.folder__header__name').contains('Received files')
 
     cy.changeLanguage('fr')
