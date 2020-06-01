@@ -103,6 +103,8 @@ export class File extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated }
     ])
   }
@@ -179,6 +181,24 @@ export class File extends React.Component {
       ])
       this.setState({ timeline: sortedNewTimeLine })
     }
+  }
+
+  handleContentDeleted = data => {
+    const { state, props } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    this.sendGlobalFlashMessage(props.t('File has been deleted'), 'info')
+
+    this.setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: APP_FEATURE_MODE.VIEW }))
+  }
+
+  handleContentRestored = data => {
+    const { state, props } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    this.sendGlobalFlashMessage(props.t('File has been restored'), 'info')
+
+    this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
   }
 
   async componentDidMount () {

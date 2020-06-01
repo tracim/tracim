@@ -54,5 +54,7 @@
   "Upload files": "Subir ficheiros",
   "New file": "Novo ficheiro",
   "Preview loading...": "Pré-visualização carregando...",
-  "File has been updated": "O ficheiro foi actualizado"
+  "File has been updated": "O ficheiro foi actualizado",
+  "File has been deleted": "O ficheiro foi eliminado",
+  "File has been restored": "O ficheiro foi restaurado"
 }

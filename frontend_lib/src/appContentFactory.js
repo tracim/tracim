@@ -228,10 +228,7 @@ export function appContentFactory (WrappedComponent) {
       )
 
       switch (response.status) {
-        case 204:
-          setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: APP_FEATURE_MODE.VIEW }))
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
-          break
+        case 204: break
         default: GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
@@ -278,10 +275,7 @@ export function appContentFactory (WrappedComponent) {
       )
 
       switch (response.status) {
-        case 204:
-          setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
-          break
+        case 204: break
         default: GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
