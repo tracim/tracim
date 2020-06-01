@@ -74,6 +74,9 @@ from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.event import EntityType
+from tracim_backend.models.event import OperationType
+from tracim_backend.models.event import ReadStatus
 
 FIELD_LANG_DESC = "User langage in ISO 639 format. " "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
@@ -764,9 +767,19 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
         example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
     )
 
+
     @post_load
     def make_role(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceMemberInvitation(**data)
+
+    @marshmallow.validates_schema(pass_original=True)
+    def has_user_id_email_or_username(self, data: dict, original_data: dict, **kwargs) -> None:
+        if not (
+            original_data.get("user_email")
+            or original_data.get("user_username")
+            or original_data.get("user_id")
+        ):
+            raise marshmallow.ValidationError("user_id, user_email or user_username required")
 
 
 class ResetPasswordRequestSchema(marshmallow.Schema):
@@ -992,16 +1005,19 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     )
 
 
-class WorkspaceMemberSchema(marshmallow.Schema):
+class WorkspaceMemberDigestSchema(marshmallow.Schema):
     role = StrippedString(example="contributor", validate=user_role_validator)
-    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
-    user = marshmallow.fields.Nested(UserDigestSchema())
-    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(exclude=("sidebar_entries",)))
-    is_active = marshmallow.fields.Bool()
     do_notify = marshmallow.fields.Bool(
         description="has user enabled notification for this workspace", example=True
     )
+
+
+class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    is_active = marshmallow.fields.Bool()
+    user = marshmallow.fields.Nested(UserDigestSchema())
+    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(exclude=("sidebar_entries",)))
 
     class Meta:
         description = "Workspace Member information"
@@ -1151,6 +1167,10 @@ class ContentCreationSchema(marshmallow.Schema):
 class ContentDigestSchema(marshmallow.Schema):
     content_namespace = marshmallow.fields.String(example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    current_revision_id = marshmallow.fields.Int(example=12)
+    current_revision_type = StrippedString(
+        example=ActionDescription.CREATION, validate=action_description_validator
+    )
     slug = StrippedString(example="intervention-report-12")
     parent_id = marshmallow.fields.Int(
         example=34, allow_none=True, default=None, validate=positive_int_validator
@@ -1206,7 +1226,6 @@ class ReadStatusSchema(marshmallow.Schema):
 
 
 class ContentSchema(ContentDigestSchema):
-    current_revision_id = marshmallow.fields.Int(example=12)
     author = marshmallow.fields.Nested(UserDigestSchema)
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 
@@ -1284,6 +1303,7 @@ class CollaborativeDocumentEditionConfigSchema(marshmallow.Schema):
 class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
+    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
@@ -1363,3 +1383,45 @@ class ConfigSchema(marshmallow.Schema):
     workspaces_number_per_user_limit = marshmallow.fields.Integer()
     instance_name = marshmallow.fields.String()
     email_required = marshmallow.fields.Bool()
+
+
+class EventSchema(marshmallow.Schema):
+    """Event structure transmitted to workers."""
+
+    fields = marshmallow.fields.Dict()
+    event_id = marshmallow.fields.Int(example=42, validate=strictly_positive_int_validator)
+    operation = marshmallow.fields.String(validator=OneOf(OperationType.values()))
+    entity_type = marshmallow.fields.String(validator=OneOf(EntityType.values()))
+    created = marshmallow.fields.DateTime()
+
+    @marshmallow.post_load
+    def strings_to_enums(self, item):
+        item["operation"] = OperationType(item["operation"])
+        item["entity_type"] = EntityType(item["entity_type"])
+        return item
+
+
+class LiveMessageSchema(marshmallow.Schema):
+    """Message for the user."""
+
+    fields = marshmallow.fields.Dict()
+    event_id = marshmallow.fields.Int(example=42, validate=strictly_positive_int_validator)
+    event_type = marshmallow.fields.String(example="content.modified")
+    created = marshmallow.fields.DateTime(format=DATETIME_FORMAT, description="created date")
+    read = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="read date", allow_none=True
+    )
+
+
+class GetLiveMessageQuerySchema(marshmallow.Schema):
+    """Possible query parameters for the GET messages endpoint."""
+
+    read_status = marshmallow.fields.String(
+        missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values())
+    )
+
+
+class TracimLiveEventHeaderSchema(marshmallow.Schema):
+    # TODO - G.M - 2020-05-14 - Add Filtering for text/event-stream mimetype with accept header,
+    #  see: https://github.com/tracim/tracim/issues/3042
+    accept = marshmallow.fields.String(required=True, load_from="Accept", dump_to="Accept")
