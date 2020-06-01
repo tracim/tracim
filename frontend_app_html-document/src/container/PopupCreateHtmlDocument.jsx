@@ -5,11 +5,11 @@ import {
   appContentFactory,
   buildHeadTitle,
   CardPopupCreateContent,
-  CONTENT_TYPE,
   CUSTOM_EVENT,
   handleFetchResult,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
 import { postHtmlDocContent } from '../action.async.js'
@@ -39,7 +39,7 @@ class PopupCreateHtmlDocument extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentCreated }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentCreated }
     ])
   }
 

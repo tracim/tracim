@@ -31,7 +31,8 @@ import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
   TLM_ENTITY_TYPE,
-  TLM_CORE_EVENT_TYPE
+  TLM_CORE_EVENT_TYPE,
+  TLM_SUB_TYPE
 } from './tracimLiveMessage.js'
 
 import { appContentFactory } from './appContentFactory.js'
@@ -146,6 +147,7 @@ export {
   CUSTOM_EVENT,
   TLM_ENTITY_TYPE,
   TLM_CORE_EVENT_TYPE,
+  TLM_SUB_TYPE,
   BREADCRUMBS_TYPE,
   ROLE,
   ROLE_LIST,

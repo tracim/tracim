@@ -10,7 +10,6 @@ import {
   ArchiveDeleteContent,
   BREADCRUMBS_TYPE,
   buildHeadTitle,
-  CONTENT_TYPE,
   CUSTOM_EVENT,
   displayDistanceDate,
   generateLocalStorageContentId,
@@ -27,6 +26,7 @@ import {
   Timeline,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
@@ -83,10 +83,10 @@ class HtmlDocument extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.COMMENT, handler: this.handleContentCreated }
-      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentDeleted }
-      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUndeleted }
     ])
   }
 
@@ -122,7 +122,7 @@ class HtmlDocument extends React.Component {
     const { state } = this
     if (data.content.parent_id !== state.content.content_id || data.content.content_type !== 'comment') return
 
-    const sortedNewTimeLine = sortTimelineByDate(
+    const sortedNewTimeline = sortTimelineByDate(
       [
         ...state.timeline,
         {
@@ -134,19 +134,12 @@ class HtmlDocument extends React.Component {
       ]
     )
 
-    this.setState({ timeline: sortedNewTimeLine })
+    this.setState({ timeline: sortedNewTimeline })
   }
 
   handleContentDeleted = data => {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
-
-    if (state.mode === APP_FEATURE_MODE.EDIT && state.loggedUser.user_id !== data.author.user_id) {
-      this.setState({
-        editionAuthor: data.author.public_name,
-        keepEditingWarning: true
-      })
-    }
 
     this.setState(prev => ({
       ...prev,

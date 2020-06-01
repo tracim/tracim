@@ -223,12 +223,8 @@ export function appContentFactory (WrappedComponent) {
         await putContentDeleted(this.apiUrl, content.workspace_id, content.content_id)
       )
 
-      switch (response.status) {
-        case 204: // TODO review before delete
-          // setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: APP_FEATURE_MODE.VIEW }))
-          // GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
-          break
-        default: GLOBAL_dispatchEvent({
+      if (response.status !== 204) {
+        GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
             msg: i18n.t('Error while deleting document'),
@@ -274,9 +270,8 @@ export function appContentFactory (WrappedComponent) {
       )
 
       switch (response.status) {
-        case 204: // TODO review before delete
-          // setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
-          // GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
+        case 204:
+          setState({ mode: APP_FEATURE_MODE.VIEW })
           break
         default: GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
