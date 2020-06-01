@@ -169,7 +169,6 @@ export class File extends React.Component {
 
   handleContentCommentCreated = (data) => {
     if (data.content.parent_id === this.state.content.content_id) {
-
       const sortedNewTimeLine = sortTimelineByDate([...this.state.timeline, { ...data.content, created_raw: data.content.created, timelineType: data.content.content_type }])
       this.setState({ timeline: sortedNewTimeLine })
     }
