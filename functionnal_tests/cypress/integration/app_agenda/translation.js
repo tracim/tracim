@@ -5,7 +5,6 @@ describe('content :: admin > workspace', function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
-    //     cy.createRandomWorkspace().then(workspace => (workspace2 = workspace))
   })
 
   it('should have translations', () => {
