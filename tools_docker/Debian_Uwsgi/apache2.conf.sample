@@ -37,6 +37,7 @@
     ProxyPass /ui http://127.0.0.1:8080/ui
     ProxyPassReverse /ui http://127.0.0.1:8080/ui
 
+    ProxyPassMatch /api/(v2/users/.*/live_messages)$ http://127.0.0.1:7999/api/$1
     ProxyPass /api http://127.0.0.1:8080/api
     ProxyPassReverse /api http://127.0.0.1:8080/api
 
