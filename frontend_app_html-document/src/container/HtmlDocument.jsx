@@ -144,9 +144,10 @@ class HtmlDocument extends React.Component {
     this.setState(prev => ({
       ...prev,
       content: {
-        ...prev.content,
+        ...data.content,
         is_deleted: true
-      }
+      },
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
     }))
   }
 
@@ -157,9 +158,10 @@ class HtmlDocument extends React.Component {
     this.setState(prev => ({
       ...prev,
       content: {
-        ...prev.content,
+        ...data.content,
         is_deleted: false
-      }
+      },
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
     }))
   }
 

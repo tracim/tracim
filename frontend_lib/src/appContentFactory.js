@@ -223,15 +223,20 @@ export function appContentFactory (WrappedComponent) {
         await putContentDeleted(this.apiUrl, content.workspace_id, content.content_id)
       )
 
-      if (response.status !== 204) {
-        GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.ADD_FLASH_MSG,
-          data: {
-            msg: i18n.t('Error while deleting document'),
-            type: 'warning',
-            delay: undefined
-          }
-        })
+      switch (response.status) {
+        case 204:
+          setState({ mode: APP_FEATURE_MODE.VIEW })
+          break
+        default:
+          GLOBAL_dispatchEvent({
+            type: CUSTOM_EVENT.ADD_FLASH_MSG,
+            data: {
+              msg: i18n.t('Error while deleting document'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
+        break
       }
 
       return response
@@ -269,11 +274,8 @@ export function appContentFactory (WrappedComponent) {
         await putContentRestoreDelete(this.apiUrl, content.workspace_id, content.content_id)
       )
 
-      switch (response.status) {
-        case 204:
-          setState({ mode: APP_FEATURE_MODE.VIEW })
-          break
-        default: GLOBAL_dispatchEvent({
+      if (response.status !== 204) {
+        GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
             msg: i18n.t('Error while restoring document'),
