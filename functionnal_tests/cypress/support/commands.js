@@ -8,7 +8,7 @@ const userFixtures = {
 }
 
 
-let LOGIN_URL = '/api//auth/login'
+let LOGIN_URL = '/api/auth/login'
 
 Cypress.Commands.add('loginAs', (role = 'administrators') => {
   if (getCookieValueFromEnv(role)) {
@@ -46,7 +46,7 @@ Cypress.Commands.add('login', (user, role) => {
 })
 
 Cypress.Commands.add('logout', () => {
-  cy.request('POST', 'api/auth/logout')
+  cy.request('POST', '/api/auth/logout')
   cy.cleanSessionCookies()
 })
 
