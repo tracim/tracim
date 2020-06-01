@@ -10,7 +10,8 @@ import {
   buildHeadTitle,
   FileUploadList,
   FILE_PREVIEW_STATE,
-  TracimComponent, TLM_ENTITY_TYPE as TLM_ET,
+  TracimComponent,
+  TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST
 } from 'tracim_frontend_lib'
@@ -51,13 +52,17 @@ class PopupCreateFile extends React.Component {
   handleContentCreated = data => {
     const { state } = this
 
-    if (data.content.workspace_id !== state.workspaceId || state.loggedUser.user_id !== data.content.author.user_id || !state.fileToUploadList.some(f => f.name === data.content.filename)) return
+    if (
+      data.content.workspace_id !== state.workspaceId ||
+      state.loggedUser.user_id !== data.content.author.user_id ||
+      !state.fileToUploadList.some(f => f.name === data.content.filename)
+    ) return
 
     const filePosted = new File([data.content], data.content.filename)
 
-    filePosted.jsonResult = { ...data.content, code: 200 }
-    const newfileUploadedList = [...state.fileUploadedList, filePosted]
-    this.setState({ fileUploadedList: newfileUploadedList })
+    filePosted.content = { ...data.content }
+    const newFileUploadedList = [...state.fileUploadedList, filePosted]
+    this.setState({ fileUploadedList: newFileUploadedList })
   }
 
   handleAllAppChangeLanguage = data => {
@@ -107,8 +112,8 @@ class PopupCreateFile extends React.Component {
     const { state, props } = this
 
     const uploadedFileFailedList = uploadedFileList.filter(f => {
-      if (f.jsonResult.code === 200) {
-        putMyselfFileRead(state.config.apiUrl, state.workspaceId, f.jsonResult.content_id)
+      if (!f.errorMessage) {
+        putMyselfFileRead(state.config.apiUrl, state.workspaceId, f.content.content_id)
         return false
       }
       return true
@@ -120,9 +125,9 @@ class PopupCreateFile extends React.Component {
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.OPEN_CONTENT_URL,
           data: {
-            workspaceId: uploadedFileList[0].jsonResult.workspace_id,
+            workspaceId: uploadedFileList[0].content.workspace_id,
             contentType: state.appName,
-            contentId: uploadedFileList[0].jsonResult.content_id
+            contentId: uploadedFileList[0].content.content_id
           }
         })
       }
@@ -248,10 +253,10 @@ class PopupCreateFile extends React.Component {
     switch (xhr.status) {
       case 200: return
       case 400: {
-        const jsonResult400 = JSON.parse(xhr.responseText)
+        const jsonResult = JSON.parse(xhr.responseText)
 
         let errorMessage = props.t('Error while creating file')
-        switch (jsonResult400.code) {
+        switch (jsonResult.code) {
           case 3002:
             errorMessage = props.t('A content with the same name already exists')
             break
@@ -265,12 +270,11 @@ class PopupCreateFile extends React.Component {
             errorMessage = props.t('You have reach your storage limit, you cannot add new files')
             break
         }
-        filePosted.jsonResult = jsonResult400
+        filePosted.content = jsonResult
         filePosted.errorMessage = errorMessage
         break
       }
       default:
-        filePosted.jsonResult = { code: 0 }
         filePosted.errorMessage = props.t('Error while creating file')
         break
     }
