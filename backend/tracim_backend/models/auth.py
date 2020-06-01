@@ -104,7 +104,7 @@ class User(DeclarativeBase):
     MAX_AUTH_TOKEN_LENGTH = 255
     MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH = 255
     DEFAULT_ALLOWED_SPACE = 0
-    USERNAME_OR_EMAIL_REQUIRED_CONSTRAINT_NAME = "username_or_email_required"
+    USERNAME_OR_EMAIL_REQUIRED_CONSTRAINT_NAME = "ck_users_username_email"
 
     __tablename__ = "users"
     # INFO - G.M - 2018-10-24 - force table to use utf8 instead of
