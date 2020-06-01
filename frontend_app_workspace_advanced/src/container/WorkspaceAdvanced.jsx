@@ -76,9 +76,9 @@ class WorkspaceAdvanced extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
-      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
-      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
-      { entityType: TLM_ET.SHAREDSPACE_USER_ROLE, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted }
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted }
     ])
   }
 
@@ -132,9 +132,9 @@ class WorkspaceAdvanced extends React.Component {
           user: data.user,
           workspace_id: data.workspace.workspace_id,
           workspace: data.workspace,
-          do_notify: data.user.do_notify,
+          do_notify: data.member.do_notify,
           is_active: data.user.is_active,
-          role: data.role
+          role: data.member.role
         }]
       }
     }))
@@ -152,9 +152,9 @@ class WorkspaceAdvanced extends React.Component {
             user: data.user,
             workspace_id: data.workspace.workspace_id,
             workspace: data.workspace,
-            do_notify: data.user.do_notify,
+            do_notify: data.member.do_notify,
             is_active: data.user.is_active,
-            role: data.role
+            role: data.member.role
           }
           : m
         )
@@ -163,8 +163,6 @@ class WorkspaceAdvanced extends React.Component {
   }
 
   handleMemberDeleted = data => {
-    console.log('handleMemberDeleted', data)
-    console.log('handleMemberDeleted', this.state.content.memberList)
     this.setState(prev => ({
       content: {
         ...prev.content,

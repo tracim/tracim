@@ -36,7 +36,7 @@ class OperationType(enum.Enum):
 class EntityType(enum.Enum):
     USER = "user"
     WORKSPACE = "workspace"
-    WORKSPACE_USER_ROLE = "workspace_user_role"
+    WORKSPACE_MEMBER = "workspace_member"
     CONTENT = "content"
 
     def __str__(self) -> str:
@@ -80,7 +80,7 @@ class Event(DeclarativeBase):
     workspace = index_property("fields", "workspace")
     user = index_property("fields", "user")
     content = index_property("fields", "content")
-    role = index_property("fields", "role")
+    member = index_property("fields", "member")
 
     @property
     def event_type(self) -> str:

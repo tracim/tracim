@@ -4,7 +4,7 @@ import { CONTENT_TYPE } from './helper.js'
 const USER = 'user'
 const CONTENT = 'content'
 const SHAREDSPACE = 'workspace'
-const SHAREDSPACE_USER_ROLE = 'workspace_user_role'
+const SHAREDSPACE_MEMBER = 'workspace_member'
 
 // TLM Core Event Type List
 const CREATED = 'created'
@@ -19,7 +19,7 @@ export const TLM_ENTITY_TYPE = {
   USER,
   CONTENT,
   SHAREDSPACE,
-  SHAREDSPACE_USER_ROLE
+  SHAREDSPACE_MEMBER
 }
 export const TLM_CORE_EVENT_TYPE = {
   CREATED,
