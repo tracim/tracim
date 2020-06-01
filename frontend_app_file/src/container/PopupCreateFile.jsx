@@ -9,7 +9,8 @@ import {
   CUSTOM_EVENT,
   buildHeadTitle,
   FileUploadList,
-  FILE_PREVIEW_STATE
+  FILE_PREVIEW_STATE,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -35,7 +36,9 @@ class PopupCreateFile extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
@@ -52,6 +55,19 @@ class PopupCreateFile extends React.Component {
         this.setHeadTitle()
         break
     }
+  }
+
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<PopupCreateFile> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+
+    this.setState(prev => ({
+      loggedUser: {
+        ...prev.loggedUser,
+        lang: data
+      }
+    }))
+    i18n.changeLanguage(data)
+    this.setHeadTitle()
   }
 
   componentWillUnmount () {
@@ -339,4 +355,4 @@ class PopupCreateFile extends React.Component {
   }
 }
 
-export default translate()(PopupCreateFile)
+export default translate()(TracimComponent(PopupCreateFile))
