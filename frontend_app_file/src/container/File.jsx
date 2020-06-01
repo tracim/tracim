@@ -102,8 +102,8 @@ export class File extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified, subType: TLM_ST.FILE },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCommentCreated, subType: TLM_ST.COMMENT }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated }
     ])
   }
 

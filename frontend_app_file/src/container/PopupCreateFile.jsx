@@ -44,7 +44,7 @@ class PopupCreateFile extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated, subType: TLM_ST.FILE }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreated }
     ])
   }
 
