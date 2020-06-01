@@ -9,7 +9,7 @@ const mapStateToProps = ({ system, currentWorkspace, workspaceList }) => ({ syst
 
 export function appFactory (WrappedComponent) {
   return withRouter(connect(mapStateToProps)(class AppFactory extends React.Component {
-    renderAppFeature = (appConfig, user, userRoleIdInWorkspace, content) => GLOBAL_renderAppFeature({
+    renderAppFeature = (appConfig, user, userRoleIdInWorkspace, content) => globalThis.GLOBAL_renderAppFeature({
       loggedUser: user.logged
         ? { ...user, userRoleIdInWorkspace }
         : {},
@@ -27,7 +27,7 @@ export function appFactory (WrappedComponent) {
       content
     })
 
-    renderAppFullscreen = (appConfig, user, userRoleIdInWorkspace, content) => GLOBAL_renderAppFullscreen({
+    renderAppFullscreen = (appConfig, user, userRoleIdInWorkspace, content) => globalThis.GLOBAL_renderAppFullscreen({
       loggedUser: user.logged
         ? { ...user, userRoleIdInWorkspace }
         : {},
@@ -45,7 +45,7 @@ export function appFactory (WrappedComponent) {
       content
     })
 
-    renderAppPopupCreation = (appConfig, user, workspaceId, folderId) => GLOBAL_renderAppPopupCreation({
+    renderAppPopupCreation = (appConfig, user, workspaceId, folderId) => globalThis.GLOBAL_renderAppPopupCreation({
       loggedUser: user.logged ? user : {},
       config: {
         ...appConfig,
@@ -63,7 +63,7 @@ export function appFactory (WrappedComponent) {
       folderId: folderId === 'null' ? null : folderId
     })
 
-    dispatchCustomEvent = (type, data) => GLOBAL_dispatchEvent({ type, data })
+    dispatchCustomEvent = (type, data) => globalThis.GLOBAL_dispatchEvent({ type, data })
 
     render () {
       return (

@@ -19,7 +19,7 @@ import {
   WORKSPACE_LIST, WORKSPACE_LIST_MEMBER
 } from '../../../src/action-creator.sync'
 import { withRouterMock } from '../../hocMock/withRouter'
-import { FETCH_CONFIG } from '../../../src/helper'
+import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
   mockGetAppList200,
   mockGetConfig200,

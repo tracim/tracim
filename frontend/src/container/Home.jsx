@@ -3,13 +3,13 @@ import { connect } from 'react-redux'
 import * as Cookies from 'js-cookie'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
-import appFactory from '../appFactory.js'
+import appFactory from '../util/appFactory.js'
 import {
   ALLOWED_CHARACTERS_USERNAME,
   COOKIE_FRONTEND,
   MINIMUM_CHARACTERS_USERNAME,
   workspaceConfig
-} from '../helper.js'
+} from '../util/helper.js'
 import {
   buildHeadTitle,
   CUSTOM_EVENT,

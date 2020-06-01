@@ -18,7 +18,7 @@ import {
   FLASH_MESSAGE,
   REMOVE
 } from '../../../src/action-creator.sync.js'
-import { FETCH_CONFIG } from '../../../src/helper'
+import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
   restoreHistoryCallBack,
   isFunction

@@ -5,7 +5,7 @@ import {
   USER_USERNAME,
   USER_PUBLIC_NAME
 } from '../../../src/action-creator.sync'
-import { globalManager } from '../../fixture/user/globalManager.js'
+import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 
 describe('user reducer', () => {
   it('should return the default state', () => {
@@ -14,24 +14,24 @@ describe('user reducer', () => {
 
   it(`should handle ${UPDATE}/${USER_PUBLIC_NAME}`, () => {
     expect(
-      userReducer(globalManager, {
+      userReducer(globalManagerFromApi, {
         type: `${UPDATE}/${USER_PUBLIC_NAME}`,
         newName: 'new_public_name'
       })
     ).to.deep.equal({
-      ...globalManager,
+      ...globalManagerFromApi,
       public_name: 'new_public_name'
     })
   })
 
   it(`should handle ${UPDATE}/${USER_USERNAME}`, () => {
     expect(
-      userReducer(globalManager, {
+      userReducer(globalManagerFromApi, {
         type: `${UPDATE}/${USER_USERNAME}`,
         newUsername: 'new_username'
       })
     ).to.deep.equal({
-      ...globalManager,
+      ...globalManagerFromApi,
       username: 'new_username'
     })
   })

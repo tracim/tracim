@@ -37,6 +37,13 @@ For better preview support:
     sudo apt install libreoffice # most office documents file and text format
     sudo apt install inkscape # for .svg files.
 
+#### Supported database engines
+
+- SQLite 3.9+
+- PostgreSQL 9.3+
+- MySQL 8.0.1+
+- MariaDB 10.3+
+
 ### Get the Source ###
 
 get source from github:
@@ -69,8 +76,8 @@ Install the project in editable mode with its develop requirements:
 
     pip install -e ".[dev]"
 
-If you want to use PostgreSQL(9.3+), MySQL(8.0.1+) or MariaDB(10.3+) database engine instead of
-the default one (SQLite bundle with python), you need to install python driver for those databases
+If you want to use PostgreSQL, MySQL or MariaDB database engine instead of
+the default one (SQLite bundled with python), you need to install the python driver for those databases
 that are supported by SQLAlchemy.
 
 For PostgreSQL and MariaDB/MySQL, those are shortcuts to install Tracim with test and
@@ -231,6 +238,8 @@ daemons to work correctly.
     python3 daemons/mail_notifier.py &
     # email fetcher (if email reply is enabled)
     python3 daemons/mail_fetcher.py &
+    # RQ worker for live messages
+    rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event
 
 #### Stop Daemons
 

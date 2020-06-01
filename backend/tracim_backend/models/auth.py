@@ -156,6 +156,15 @@ class User(DeclarativeBase):
     def email_address(self):
         return self.email
 
+    @property
+    def public_name(self) -> str:
+        return self.display_name
+
+    @property
+    def avatar_url(self) -> typing.Optional[str]:
+        # TODO - G-M - 20-04-2018 - [Avatar] Add user avatar feature
+        return None
+
     def __repr__(self):
         return "<User: email=%s, username=%s display=%s>" % (
             repr(self.email),
@@ -294,7 +303,7 @@ class User(DeclarativeBase):
 
     def ensure_auth_token(self, validity_seconds) -> str:
         """
-        Create auth_token if None, regenerate auth_token if too much old.
+        Create auth_token if None, regenerate auth_token if too old.
         auth_token validity is set in
         :return: actual valid auth token
         """

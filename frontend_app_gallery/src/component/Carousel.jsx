@@ -107,7 +107,7 @@ export class Carousel extends React.Component {
             <MainPreview
               previewSrc={slide.src}
               index={index}
-              handleClickShowImageRaw={props.handleClickShowImageRaw}
+              onClickShowImageRaw={props.onClickShowImageRaw}
               rotationAngle={slide.rotationAngle}
               key={`mainPreview_${index}`}
               fileName={slide.fileName}
@@ -135,7 +135,7 @@ export default translate()(Carousel)
 
 Carousel.propTypes = {
   slides: PropTypes.array.isRequired,
-  handleClickShowImageRaw: PropTypes.func.isRequired,
+  onClickShowImageRaw: PropTypes.func.isRequired,
   fileSelected: PropTypes.number.isRequired,
   onFileDeleted: PropTypes.func.isRequired,
   disableAnimation: PropTypes.bool,
@@ -145,7 +145,7 @@ Carousel.propTypes = {
 Carousel.defaultProps = {
   slides: [],
   onCarouselPositionChange: () => {},
-  handleClickShowImageRaw: () => {},
+  onClickShowImageRaw: () => {},
   onFileDeleted: () => {},
   disableAnimation: false,
   fileSelected: 0,

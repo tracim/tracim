@@ -17,11 +17,13 @@ env:
     - TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/open_documents
     - TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER=/tmp/test/radicale_storage
     - TEST_CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tests_configs.ini
+    - TEST_PUSHPIN_FILE_PATH=$TRAVIS_BUILD_DIR/backend/pushpin_test.conf
     - TEST_MIGRATION_SCRIPT_LOCATION=$TRAVIS_BUILD_DIR/backend/tracim_backend/migration
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
 language: python
 dist: bionic
 python: "3.6"
+os: linux
 
 _install_backend: &_install_backend
   addons:
@@ -40,8 +42,9 @@ _install_backend: &_install_backend
         - libsasl2-dev
         - docker-ce
         - libimage-exiftool-perl
+        - pushpin
   services:
-    - redis-server
+    - redis
   before_install:
     # INFO - G.M - 2019-05-02 - some useful debug information
     - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
@@ -120,6 +123,7 @@ _backend_quick_test: &_backend_quick_test
       packages:
         - libimage-exiftool-perl
   services:
+    - redis-server
   before_script:
   script:
     - pytest backend --ignore "backend/tracim_backend/tests/functional" --ignore "backend/tracim_backend/tests/commands"
@@ -264,6 +268,9 @@ jobs:
         - BACKEND_TEST_CONFIG_FILE=cypress_test.ini
         - TRAVIS_NODE_VERSION="10"
       script:
+        - sudo systemctl stop pushpin && sudo systemctl disable pushpin
+        - sudo systemctl stop zurl && sudo systemctl disable zurl
+        - docker run -d --net host -v ${TRAVIS_BUILD_DIR}/pushpin_cypress_config:/etc/pushpin --name pushpin-cypress fanout/pushpin
         - cd $TRAVIS_BUILD_DIR/backend
         - nohup pserve $BACKEND_TEST_CONFIG_FILE > $PSERVE_LOG 2>&1 &
         - cd $TRAVIS_BUILD_DIR/functionnal_tests

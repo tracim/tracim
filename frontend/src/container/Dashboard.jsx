@@ -3,6 +3,9 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { Link, withRouter } from 'react-router-dom'
 import {
+  TracimComponent,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   PageWrapper,
   PageTitle,
   PageContent,
@@ -34,13 +37,19 @@ import {
   setWorkspaceRecentActivityList,
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
+  updateWorkspaceMember,
   removeWorkspaceMember,
   updateUserWorkspaceSubscriptionNotif,
   setWorkspaceAgendaUrl,
-  setBreadcrumbs
+  setBreadcrumbs,
+  addWorkspaceMember,
+  addWorkspaceContentList,
+  updateWorkspaceContentList,
+  removeWorkspaceReadStatus
+  // deleteWorkspaceContentList // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
 } from '../action-creator.sync.js'
-import appFactory from '../appFactory.js'
-import { PAGE, findUserRoleIdInWorkspace } from '../helper.js'
+import appFactory from '../util/appFactory.js'
+import { PAGE, findUserRoleIdInWorkspace, CONTENT_TYPE } from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
@@ -51,11 +60,13 @@ import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
 
 const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
 
-class Dashboard extends React.Component {
+export class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
+      workspaceIdInUrl: props.match.params.idws
+        ? parseInt(props.match.params.idws)
+        : null, // this is used to avoid handling the parseInt every time
       advancedDashboardOpenedId: null,
       newMember: {
         id: '',
@@ -72,22 +83,78 @@ class Dashboard extends React.Component {
       displayWebdavBtn: false
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, handler: this.handleRefreshDashboardMemberList },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.FILE, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.THREAD, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.COMMENT, handler: this.handleContentCreatedComment },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.FILE, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.THREAD, handler: this.handleContentModified }
+      // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
+      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleContentDeleted }
+    ])
   }
 
-  customEventReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST: this.loadMemberList(); break
-      case CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL:
-        await this.loadWorkspaceDetail()
-        this.buildBreadcrumbs()
-        break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        this.setHeadTitle()
-        break
-    }
+  // CustomEvent handlers
+  handleRefreshDashboardMemberList = () => this.loadMemberList()
+
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
   }
+
+  // LiveMessage handlers
+  handleWorkspaceModified = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(setWorkspaceDetail(data.workspace))
+    this.setHeadTitle()
+  }
+
+  handleMemberCreated = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(addWorkspaceMember(data.user, data.workspace, data.member))
+  }
+
+  handleMemberModified = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(updateWorkspaceMember(data.user, data.workspace, data.member))
+  }
+
+  handleMemberDeleted = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(removeWorkspaceMember(data.user.user_id, data.workspace))
+  }
+
+  handleContentCreated = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(addWorkspaceContentList([data.content]))
+  }
+
+  handleContentCreatedComment = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(removeWorkspaceReadStatus(data.content.parent_id))
+  }
+
+  handleContentModified = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.props.dispatch(updateWorkspaceContentList([data.content]))
+  }
+
+  // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
+  // handleContentDeleted = data => {
+  //   if (this.props.curWs.id !== data.workspace.workspace_id) return
+  //   this.props.dispatch(deleteWorkspaceContentList([data.content]))
+  // }
 
   async componentDidMount () {
     this.setHeadTitle()
@@ -338,20 +405,20 @@ class Dashboard extends React.Component {
       role: state.newMember.role
     }))
 
+    this.setState({
+      newMember: {
+        id: '',
+        avatarUrl: '',
+        nameOrEmail: '',
+        role: '',
+        isEmail: false
+      },
+      autoCompleteFormNewMemberActive: false,
+      displayNewMemberForm: false
+    })
+
     switch (fetchWorkspaceNewMember.status) {
       case 200:
-        this.loadMemberList()
-        this.setState({
-          newMember: {
-            id: '',
-            avatarUrl: '',
-            personalData: '',
-            role: '',
-            isEmail: false
-          },
-          autoCompleteFormNewMemberActive: false,
-          displayNewMemberForm: false
-        })
         props.dispatch(newFlashMessage(props.t('Member added'), 'info'))
         return true
       case 400:
@@ -388,7 +455,6 @@ class Dashboard extends React.Component {
     const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.user, props.curWs.id, memberId))
     switch (fetchWorkspaceRemoveMember.status) {
       case 204:
-        props.dispatch(removeWorkspaceMember(memberId))
         props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while removing member'), 'warning')); break
@@ -641,4 +707,4 @@ class Dashboard extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
   breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system
 })
-export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Dashboard)))))

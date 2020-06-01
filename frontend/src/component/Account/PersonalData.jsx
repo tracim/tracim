@@ -6,7 +6,7 @@ import { newFlashMessage } from '../../action-creator.sync.js'
 import {
   ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList
-} from '../../helper.js'
+} from '../../util/helper.js'
 
 require('./PersonalData.styl')
 

@@ -6,10 +6,10 @@ from rq.dummy import do_nothing
 from rq.worker import StopRequested
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.daemon import FakeDaemon
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.utils import get_redis_connection
-from tracim_backend.lib.utils.utils import get_rq_queue
 
 
 class MailSenderDaemon(FakeDaemon):

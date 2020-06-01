@@ -30,7 +30,7 @@ from tracim_backend.models.data import Workspace
 
 class TracimContext(ABC):
     """
-    Abstract class, Context of Tracim, neede for tracim authorization mechanism.
+    Abstract class, Context of Tracim, needed for tracim authorization mechanism.
     """
 
     def __init__(self) -> None:
@@ -250,6 +250,11 @@ class TracimRequest(TracimContext, Request):
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(self._cleanup)
 
+    def set_user(self, user: User):
+        """Overload TracimContext method to add plugin hook call."""
+        super().set_user(user)
+        self.plugin_manager.hook.on_current_user_set(user=user, request=self)
+
     @property
     def current_user(self) -> User:
         # INFO - G.M - 24-03-2020 - load authenticate mecanism by calling authenticated_userid.
@@ -273,8 +278,8 @@ class TracimRequest(TracimContext, Request):
         return self.registry.settings["CFG"]
 
     @property
-    def event_dispatcher(self) -> pluggy.PluginManager:
-        return self.registry.settings["event_dispatcher"]
+    def plugin_manager(self) -> pluggy.PluginManager:
+        return self.registry.settings["plugin_manager"]
 
     def _cleanup(self, request: "TracimRequest") -> None:
         """
@@ -285,9 +290,11 @@ class TracimRequest(TracimContext, Request):
         :param request: same as self, request
         :return: nothing.
         """
+        self.plugin_manager.hook.on_request_finished(request=self)
         self._current_user = None
         self._current_workspace = None
-        self.dbsession.close()
+        if self.dbsession:
+            self.dbsession.close()
 
     # INFO - G.M - 2018-12-03 - Internal utils function to simplify ID fetching
 

@@ -3,7 +3,7 @@ import { user } from '../hocMock/redux/user/user'
 import {
   putMyselfName
 } from '../../src/action-creator.async.js'
-import { FETCH_CONFIG } from '../../src/helper'
+import { FETCH_CONFIG } from '../../src/util/helper.js'
 import { mockPutMyselfName200 } from '../apiMock'
 
 const dispatch = () => {}

@@ -31,7 +31,7 @@ export const FlashMessage = props => {
 
           <div className='card-body nopadding'>
             <div className='flashmessage__container__close'>
-              <div className='flashmessage__container__close__icon' onClick={() => props.removeFlashMessage(props.flashMessage[0].message)}>
+              <div className='flashmessage__container__close__icon' onClick={() => props.onRemoveFlashMessage(props.flashMessage[0].message)}>
                 <i className='fa fa-times' />
               </div>
             </div>

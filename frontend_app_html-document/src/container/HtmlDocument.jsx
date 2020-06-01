@@ -80,13 +80,13 @@ class HtmlDocument extends React.Component {
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
-        tinymce.remove('#wysiwygNewVersion')
+        globalThis.tinymce.remove('#wysiwygNewVersion')
         break
 
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
-        tinymce.remove('#wysiwygNewVersion')
+        globalThis.tinymce.remove('#wysiwygNewVersion')
         break
 
       case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
@@ -127,17 +127,17 @@ class HtmlDocument extends React.Component {
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
       this.buildBreadcrumbs()
-      tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      globalThis.tinymce.remove('#wysiwygNewVersion')
+      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
 
     if (state.mode === APP_FEATURE_MODE.EDIT && prevState.mode !== APP_FEATURE_MODE.EDIT) {
-      tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      globalThis.tinymce.remove('#wysiwygNewVersion')
+      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
+    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
 
     // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
     if (!prevState.isVisible && state.isVisible) {
@@ -147,8 +147,8 @@ class HtmlDocument extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymce.remove('#wysiwygNewVersion')
-    tinymce.remove('#wysiwygTimelineComment')
+    globalThis.tinymce.remove('#wysiwygNewVersion')
+    globalThis.tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
@@ -296,7 +296,7 @@ class HtmlDocument extends React.Component {
   }
 
   handleCloseNewVersion = () => {
-    tinymce.remove('#wysiwygNewVersion')
+    globalThis.tinymce.remove('#wysiwygNewVersion')
 
     this.setState(prev => ({
       content: {
@@ -491,7 +491,7 @@ class HtmlDocument extends React.Component {
         </PopinFixedOption>
 
         <PopinFixedContent
-          customClass={`${state.config.slug}__contentpage`}
+          customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug

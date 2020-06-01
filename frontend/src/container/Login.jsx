@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
-import appFactory from '../appFactory.js'
-import i18n from '../i18n.js'
+import appFactory from '../util/appFactory.js'
+import i18n from '../util/i18n.js'
 import * as Cookies from 'js-cookie'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
@@ -39,7 +39,7 @@ import {
 import {
   PAGE,
   COOKIE_FRONTEND
-} from '../helper.js'
+} from '../util/helper.js'
 
 const qs = require('query-string')
 
