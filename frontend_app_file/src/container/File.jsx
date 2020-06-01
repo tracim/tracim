@@ -1,6 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import i18n from '../i18n.js'
+import i18n from '../util/i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
   TracimComponent,
@@ -38,7 +38,7 @@ import {
   FILE_PREVIEW_STATE,
   sortTimelineByDate
 } from 'tracim_frontend_lib'
-import { PAGE } from '../helper.js'
+import { PAGE } from '../util/helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
@@ -171,7 +171,6 @@ export class File extends React.Component {
     if (data.content.parent_id === this.state.content.content_id) {
 
       const sortedNewTimeLine = sortTimelineByDate([...this.state.timeline, { ...data.content, created_raw: data.content.created, timelineType: data.content.content_type }])
-      console.log('OCMMENT CREATED', sortedNewTimeLine)
       this.setState({ timeline: sortedNewTimeLine })
     }
   }
@@ -350,7 +349,6 @@ export class File extends React.Component {
       await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
-      case 200: this.sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
