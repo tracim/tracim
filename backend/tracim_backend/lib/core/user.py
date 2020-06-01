@@ -61,7 +61,6 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
-from tracim_backend.models.context_models import TypeUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 

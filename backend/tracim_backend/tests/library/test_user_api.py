@@ -195,13 +195,13 @@ class TestUserApi(object):
     def test_unit__create_minimal_user__error__invalid_username(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(InvalidUsernameFormat):
-            api.create_minimal_user(username="@boby", email="bob@boba.fet")
+            api.create_minimal_user(username="@boby", email="bob@boba.fet", save_now=True)
 
     def test_unit__create_minimal_user__error__already_used_username(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        api.create_minimal_user(username="boby", email="boby@boba.fet")
+        api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
         with pytest.raises(UsernameAlreadyExistInDb):
-            api.create_minimal_user(username="boby", email="boby2@boba.fet")
+            api.create_minimal_user(username="boby", email="boby2@boba.fet", save_now=True)
 
     def test_unit__create_minimal_user__err__too_short_username(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
@@ -247,8 +247,8 @@ class TestUserApi(object):
 
     def test_unit__update_user_username__error__already_used(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        u1 = api.create_minimal_user(username="boby", email="boby@boba.fet")
-        api.create_minimal_user(username="jean", email="boby2@boba.fet")
+        u1 = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
+        api.create_minimal_user(username="jean", email="boby2@boba.fet", save_now=True)
         with pytest.raises(UsernameAlreadyExistInDb):
             api.update(user=u1, username="jean")
 
@@ -456,7 +456,7 @@ class TestUserApi(object):
 
     def test_get_one_by_username(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        u = api.create_minimal_user(username="boby", email="boby@boba.fet")
+        u = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
         session.flush()
         transaction.commit()
 
