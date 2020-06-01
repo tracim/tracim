@@ -15,7 +15,7 @@ describe('reducer tlmManager.js', () => {
       const fakeTLMManagerInstance = { nothing: true }
       const rez = tlmManager(initialState, setLiveMessageManager(fakeTLMManagerInstance))
 
-      it('should return a the instance given', () => {
+      it('should return the instance given in parameter', () => {
         expect(rez).to.deep.equal(fakeTLMManagerInstance)
       })
     })
