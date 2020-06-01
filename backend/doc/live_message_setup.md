@@ -50,6 +50,13 @@ ls pushpin_config # just a verification
 docker create --net host -v ${PWD}/pushpin_config:/etc/pushpin --name pushpin fanout/pushpin
 ~~~
 
+for cypress test, you should use pushpin_cypress docker instead:
+~~~bash
+docker create --net host -v ${PWD}/pushpin_cypress_config:/etc/pushpin --name pushpin-cypress fanout/pushpin
+~~~
+
+:warning: you should not start pushpin and pushpin_cypress at the same time (they do use same ports)
+
 then you can start it:
 ~~bash
 docker start pushpin

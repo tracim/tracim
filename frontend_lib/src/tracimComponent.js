@@ -31,8 +31,8 @@ export function TracimComponent (WrappedComponent) {
     }
 
     registerLiveMessageHandlerList = (liveMessageList) => {
-      liveMessageList.forEach(({ entityType, coreEntityType, handler, subType }) => {
-        const eventType = buildTracimLiveMessageEventType(entityType, coreEntityType, subType)
+      liveMessageList.forEach(({ entityType, coreEntityType, optionalSubType, handler }) => {
+        const eventType = buildTracimLiveMessageEventType(entityType, coreEntityType, optionalSubType)
         this.registeredLiveMessageHandlerList[eventType] = handler
       })
     }
