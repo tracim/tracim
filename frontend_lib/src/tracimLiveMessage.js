@@ -1,7 +1,6 @@
 // TLM Event Type list
 const USER = 'user'
 const CONTENT = 'content'
-
 const SHAREDSPACE = 'workspace'
 const SHAREDSPACE_USER_ROLE = 'workspace_user_role'
 

@@ -38,7 +38,7 @@ class PopupCreateHtmlDocument extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentCreated }
     ])
   }
 
