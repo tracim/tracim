@@ -767,9 +767,8 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
         example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
     )
 
-
     @post_load
-    def make_role(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_workspace_member_invite(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceMemberInvitation(**data)
 
     @marshmallow.validates_schema(pass_original=True)
