@@ -6,6 +6,7 @@ import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_SUB_TYPE as TLM_ST,
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
@@ -101,8 +102,8 @@ export class File extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: 'content', coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
-      { entityType: 'content', coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified, subType: TLM_ST.FILE },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCommentCreated, subType: TLM_ST.COMMENT }
     ])
   }
 
@@ -166,9 +167,11 @@ export class File extends React.Component {
     }))
   }
 
-  handleContentCreated = (data) => {
-    if (data.content.content_type === 'comment' && data.content.parent_id === this.state.content.content_id) {
-      const sortedNewTimeLine = sortTimelineByDate([...this.state.timeline, { ...data.content, created_raw: data.content.created }])
+  handleContentCommentCreated = (data) => {
+    if (data.content.parent_id === this.state.content.content_id) {
+
+      const sortedNewTimeLine = sortTimelineByDate([...this.state.timeline, { ...data.content, created_raw: data.content.created, timelineType: data.content.content_type }])
+      console.log('OCMMENT CREATED', sortedNewTimeLine)
       this.setState({ timeline: sortedNewTimeLine })
     }
   }

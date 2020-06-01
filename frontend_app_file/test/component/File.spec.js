@@ -18,6 +18,7 @@ describe('<File />', () => {
     setApiUrl: () => {},
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
     registerLiveMessageHandlerList: () => {},
+    registerCustomEventHandlerList: () => {},
     i18n: {},
     content,
     t: key => key
@@ -49,7 +50,7 @@ describe('<File />', () => {
           }
 
           before(() => {
-            wrapper.instance().handleContentCreated(tlmData)
+            wrapper.instance().handleContentCommentCreated(tlmData)
           })
 
           it('should have the new comment in the Timeline', () => {
@@ -77,8 +78,8 @@ describe('<File />', () => {
           }
 
           before(function () {
-            wrapper.instance().handleContentCreated(tlmData2)
-            wrapper.instance().handleContentCreated(tlmData1)
+            wrapper.instance().handleContentCommentCreated(tlmData2)
+            wrapper.instance().handleContentCommentCreated(tlmData1)
           })
 
           it('should have correctly order the timeline with the last comment created at the end', () => {
@@ -101,7 +102,7 @@ describe('<File />', () => {
 
           before(() => {
             oldTimelineLength = wrapper.state('timeline').length
-            wrapper.instance().handleContentCreated(tlmData)
+            wrapper.instance().handleContentCommentCreated(tlmData)
           })
 
           it('should not modify the timeline', () => {
