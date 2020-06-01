@@ -1040,6 +1040,10 @@ class ContentInContext(object):
         return self.content.cached_revision_id
 
     @property
+    def current_revision_type(self) -> int:
+        return self.content.current_revision.revision_type
+
+    @property
     def created(self) -> datetime:
         return self.content.created
 
