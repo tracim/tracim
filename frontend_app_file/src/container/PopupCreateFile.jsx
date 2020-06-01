@@ -10,7 +10,9 @@ import {
   buildHeadTitle,
   FileUploadList,
   FILE_PREVIEW_STATE,
-  TracimComponent
+  TracimComponent, TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_SUB_TYPE as TLM_ST
 } from 'tracim_frontend_lib'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -28,6 +30,7 @@ class PopupCreateFile extends React.Component {
       workspaceId: props.data ? props.data.workspaceId : debug.workspaceId,
       folderId: props.data ? props.data.folderId : debug.folderId,
       fileToUploadList: [],
+      fileUploadedList: [],
       uploadFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       uploadStarted: false
     }
@@ -39,43 +42,45 @@ class PopupCreateFile extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, handler: this.handleContentCreated, subType: TLM_ST.FILE }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<PopupCreateFile> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        this.setHeadTitle()
-        break
-    }
+  handleContentCreated = data => {
+    const { state } = this
+
+    if (data.content.workspace_id !== state.workspaceId || state.loggedUser.user_id !== data.content.author.user_id || !state.fileToUploadList.some(f => f.name === data.content.filename)) return
+
+    const filePosted = new File([data.content], data.content.filename)
+
+    filePosted.jsonResult = { ...data.content, code: 200 }
+    const newfileUploadedList = [...state.fileUploadedList, filePosted]
+    this.setState({ fileUploadedList: newfileUploadedList })
   }
 
   handleAllAppChangeLanguage = data => {
+    const { state, props } = this
     console.log('%c<PopupCreateFile> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
-    this.setState(prev => ({
-      loggedUser: {
-        ...prev.loggedUser,
-        lang: data
-      }
-    }))
-    i18n.changeLanguage(data)
+    props.appContentCustomEventHandlerAllAppChangeLanguage(
+      data, this.setState.bind(this), i18n, state.timelineWysiwyg
+    )
     this.setHeadTitle()
-  }
-
-  componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   componentDidMount () {
     this.setHeadTitle()
+  }
+
+  componentDidUpdate () {
+    const { state } = this
+    if (state.fileUploadedList.length === 0) return
+
+    if (state.fileUploadedList.length === state.fileToUploadList.length) {
+      this.handleAllFileUploadEnd(this.state.fileUploadedList)
+    }
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -101,9 +106,13 @@ class PopupCreateFile extends React.Component {
   handleAllFileUploadEnd = (uploadedFileList) => {
     const { state, props } = this
 
-    const uploadedFileFailedList = uploadedFileList.filter(f => f.jsonResult.code !== 200)
-
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
+    const uploadedFileFailedList = uploadedFileList.filter(f => {
+      if (f.jsonResult.code === 200) {
+        putMyselfFileRead(state.config.apiUrl, state.workspaceId, f.jsonResult.content_id)
+        return false
+      }
+      return true
+    })
 
     if (uploadedFileFailedList.length === 0) {
       this.handleClose(false)
@@ -122,6 +131,7 @@ class PopupCreateFile extends React.Component {
 
     this.sendGlobalFlashMessage(props.t("Some file(s) couldn't be uploaded"))
     this.setState({
+      fileUploadedList: [],
       fileToUploadList: uploadedFileFailedList,
       uploadStarted: false
     })
@@ -222,10 +232,9 @@ class PopupCreateFile extends React.Component {
     Promise.all(state.fileToUploadList.map((file) =>
       this.buildUploadedFileResponse(file)
     )).then(async uploadedFileResponseList => {
-      const fileUploadList = await Promise.all(uploadedFileResponseList.map((uploadedFileResponse) =>
+      await Promise.all(uploadedFileResponseList.map((uploadedFileResponse) =>
         this.handleFileUploadEnd(uploadedFileResponse.xhr, uploadedFileResponse.file)
       ))
-      this.handleAllFileUploadEnd(fileUploadList)
     }).catch(() => {
       this.sendGlobalFlashMessage(props.t('Error while creating file'))
       this.handleClose(false)
@@ -237,13 +246,7 @@ class PopupCreateFile extends React.Component {
 
     const filePosted = new File([file], file.name)
     switch (xhr.status) {
-      case 200: {
-        const jsonResult200 = JSON.parse(xhr.responseText)
-        await putMyselfFileRead(state.config.apiUrl, state.workspaceId, jsonResult200.content_id)
-
-        filePosted.jsonResult = { ...jsonResult200, code: 200 }
-        break
-      }
+      case 200: return
       case 400: {
         const jsonResult400 = JSON.parse(xhr.responseText)
 
@@ -271,7 +274,8 @@ class PopupCreateFile extends React.Component {
         filePosted.errorMessage = props.t('Error while creating file')
         break
     }
-    return filePosted
+    const newfileUploadedList = [...state.fileUploadedList, filePosted]
+    this.setState({ fileUploadedList: newfileUploadedList })
   }
 
   handleDeleteFile = (file) => {
