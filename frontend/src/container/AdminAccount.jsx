@@ -276,8 +276,12 @@ class Account extends React.Component {
           switch (fetchPutUsername.json.code) {
             case 2062:
               props.dispatch(newFlashMessage(
-                props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
-              , 'warning'))
+                props.t(
+                  'Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}',
+                  { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME }
+                ),
+                'warning'
+              ))
               break
             default: props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning'))
           }
