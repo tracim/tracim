@@ -5,6 +5,7 @@ import {
   appContentFactory,
   buildHeadTitle,
   CardPopupCreateContent,
+  CONTENT_TYPE,
   CUSTOM_EVENT,
   handleFetchResult,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -45,7 +46,10 @@ class PopupCreateHtmlDocument extends React.Component {
   // TLM Handlers
   handleContentCreated = data => {
     const { state } = this
-    if (data.content.workspace_id !== state.workspaceId || state.loggedUser.user_id !== data.author.user_id) return
+    if (Number(data.content.parent_id) !== Number(state.folderId) ||
+      state.loggedUser.user_id !== data.author.user_id ||
+      state.newContentName !== data.content.label
+    ) return
 
     this.handleClose()
 
