@@ -9,6 +9,7 @@ import {
   mockGetShareLinksList200,
   mockGetFileRevision200
 } from '../apiMock.js'
+import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import content from '../fixture/content/content.js'
 import { debug } from '../../src/debug.js'
 import { commentTlm } from '../fixture/tracimLiveMessageData/commentTlm.js'
@@ -201,6 +202,83 @@ describe('<File />', () => {
 
           it('should not be updated when the modification do not concern the current file', () => {
             expect(wrapper.state('content').filename).to.not.equal(tlmData.content.filename)
+          })
+        })
+      })
+      describe('handleContentDeleted', () => {
+        describe('Delete the current content', () => {
+          const tlmData = {
+            content: content.file
+          }
+
+          before(() => {
+            wrapper.instance().handleContentDeleted(tlmData)
+          })
+
+          after(() => {
+            wrapper.setState({ content: content.file })
+          })
+
+          it('should be deleted correctly', () => {
+            expect(wrapper.state('content').is_deleted).to.equal(true)
+          })
+          it('should be in view mode', () => {
+            expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.VIEW)
+          })
+        })
+
+        describe('Delete a content which is not the current one', () => {
+          const tlmData = {
+            content: {
+              ...content.file,
+              content_id: content.file.content_id + 1
+            }
+          }
+
+          before(() => {
+            wrapper.instance().handleContentDeleted(tlmData)
+          })
+
+          it('should not be deleted', () => {
+            expect(wrapper.state('content').is_deleted).to.equal(false)
+          })
+        })
+      })
+      describe('handleContentRestored', () => {
+        describe('Restore the current content', () => {
+          const tlmData = {
+            content: content.file
+          }
+
+          before(() => {
+            wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
+            wrapper.instance().handleContentRestored(tlmData)
+          })
+
+          after(() => {
+            wrapper.setState({ content: content.file })
+          })
+
+          it('should be restored correctly', () => {
+            expect(wrapper.state('content').is_deleted).to.equal(false)
+          })
+        })
+
+        describe('Restore a content which is not the current one', () => {
+          const tlmData = {
+            content: {
+              ...content.file,
+              content_id: content.file.content_id + 1
+            }
+          }
+
+          before(() => {
+            wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
+            wrapper.instance().handleContentRestored(tlmData)
+          })
+
+          it('should not be restored', () => {
+            expect(wrapper.state('content').is_deleted).to.equal(true)
           })
         })
       })
