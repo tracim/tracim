@@ -1088,6 +1088,7 @@ class TestHtmlDocuments(object):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".document.html"
+        assert content["current_revision_type"] == "edition"
 
         res = web_testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
@@ -1114,6 +1115,7 @@ class TestHtmlDocuments(object):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".document.html"
+        assert content["current_revision_type"] == "edition"
 
         modified_event = event_helper.last_event
         assert modified_event.event_type == "content.modified.html-document"
@@ -1123,6 +1125,7 @@ class TestHtmlDocuments(object):
         content_modified = dateutil.parser.isoparse(content["modified"])
         modified_diff = (event_content_modified - content_modified).total_seconds()
         assert abs(modified_diff) < 2
+        assert modified_event.content["current_revision_type"] == content["current_revision_type"]
         assert modified_event.content["file_extension"] == content["file_extension"]
         assert modified_event.content["filename"] == content["filename"]
         assert modified_event.content["is_archived"] == content["is_archived"]
@@ -1704,6 +1707,7 @@ class TestFiles(object):
         assert content["page_nb"] == 1
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
+        assert content["current_revision_type"] == "edition"
 
         res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), status=200
@@ -1736,6 +1740,7 @@ class TestFiles(object):
         assert content["page_nb"] == 1
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
+        assert content["current_revision_type"] == "edition"
 
     def test_api__update_file_info__err_400__content_status_closed(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -3999,6 +4004,7 @@ class TestThreads(object):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "My New label.thread.html"
+        assert content["current_revision_type"] == "edition"
 
         res = web_testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
@@ -4026,6 +4032,7 @@ class TestThreads(object):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "My New label.thread.html"
+        assert content["current_revision_type"] == "edition"
 
         modified_event = event_helper.last_event
         assert modified_event.event_type == "content.modified.thread"
@@ -4035,6 +4042,7 @@ class TestThreads(object):
         content_modified = dateutil.parser.isoparse(content["modified"])
         modified_diff = (event_content_modified - content_modified).total_seconds()
         assert abs(modified_diff) < 2
+        assert content["current_revision_type"] == content["current_revision_type"]
         assert modified_event.content["file_extension"] == content["file_extension"]
         assert modified_event.content["filename"] == content["filename"]
         assert modified_event.content["is_archived"] == content["is_archived"]
