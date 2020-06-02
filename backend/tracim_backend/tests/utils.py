@@ -1,6 +1,7 @@
 from io import BytesIO
 import multiprocessing
 import os
+import subprocess
 import typing
 from typing import Any
 from typing import Optional
@@ -243,6 +244,23 @@ class EventHelper(object):
     @property
     def last_event(self) -> typing.Optional[Event]:
         return self._session.query(Event).order_by(Event.event_id.desc()).limit(1).one()
+
+
+class DockerCompose:
+    command = [
+        "docker-compose",
+        "-f",
+        os.path.join(os.path.dirname(__file__), "docker-compose.yml"),
+    ]
+
+    def up(self, *names: str, env: dict = None) -> None:
+        self.execute("up", "-d", *names, env=env)
+
+    def down(self) -> None:
+        self.execute("down")
+
+    def execute(self, *arguments: str, env: dict = None) -> None:
+        subprocess.run(self.command + list(arguments), env=env, check=True)
 
 
 def eq_(a: Any, b: Any, msg: Optional[str] = None) -> None:
