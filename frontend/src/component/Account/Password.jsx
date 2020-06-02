@@ -117,7 +117,7 @@ export class Password extends React.Component {
             />
           </div>
 
-          <div className='d-flex align-items-center flex-wrap mb-4'>
+          <div className='align-items-center flex-wrap mb-4'>
             <input
               className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control'
               type='password'
@@ -129,7 +129,7 @@ export class Password extends React.Component {
 
             {props.displayAdminInfo && state.newPassword !== '' && (
               <input
-                className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
+                className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3'
                 type='password'
                 placeholder={props.t("Administrator's password")}
                 value={state.checkAdminPassword}

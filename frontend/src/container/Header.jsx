@@ -74,15 +74,16 @@ class Header extends React.Component {
   handleClickHelp = () => {}
 
   handleClickLogout = async () => {
-    const { history, dispatch, t } = this.props
+    const { props } = this
 
-    const fetchPostUserLogout = await dispatch(postUserLogout())
+    const fetchPostUserLogout = await props.dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
-      dispatch(setUserDisconnected())
+      props.tlmManager.closeLiveMessageConnection()
+      props.dispatch(setUserDisconnected())
       this.props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
-      history.push(PAGE.LOGIN)
+      props.history.push(PAGE.LOGIN)
     } else {
-      dispatch(newFlashMessage(t('Disconnection error', 'danger')))
+      props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
     }
   }
 
@@ -186,5 +187,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ searchResult, lang, user, system, appList }) => ({ searchResult, lang, user, system, appList })
+const mapStateToProps = ({ searchResult, lang, user, system, appList, tlmManager }) => ({ searchResult, lang, user, system, appList, tlmManager })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

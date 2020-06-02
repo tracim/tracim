@@ -42,9 +42,9 @@ describe('<ForgotPassword />', () => {
 
     describe('handleChangeBackupEmail()', () => {
       it('should set backupEmail in the state', () => {
-        wrapperInstance.instance().handleChangeBackupEmail({ target: { value: 'testValue' } })
-        expect(wrapperInstance.state().backupEmail.value).to.equal('testValue')
-        expect(wrapperInstance.state().backupEmail.isInvalid).to.equal(false)
+        wrapperInstance.instance().handleChangeBackupLogin({ target: { value: 'testValue' } })
+        expect(wrapperInstance.state().backupLogin.value).to.equal('testValue')
+        expect(wrapperInstance.state().backupLogin.isInvalid).to.equal(false)
       })
     })
   })

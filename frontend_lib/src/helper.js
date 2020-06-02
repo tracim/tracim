@@ -334,3 +334,11 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
     }
   ]
 }
+
+export const removeAtInUsername = (username) => {
+  let trimmedUsername = username.trim()
+  if (trimmedUsername.length > 0 && trimmedUsername[0] === '@') {
+    trimmedUsername = trimmedUsername.substring(1)
+  }
+  return trimmedUsername
+}

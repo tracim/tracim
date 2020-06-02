@@ -7,6 +7,7 @@ export const PREPEND = 'Prepend'
 export const APPEND = 'Append'
 export const RESET = 'Reset'
 export const MOVE = 'Move'
+export const USERNAME_AVAILABILITY = 'username_availability'
 
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
@@ -35,8 +36,10 @@ export const setUserLang = lang => ({ type: `${SET}/${USER}/Lang`, lang })
 export const USER_KNOWN_MEMBER = `${USER}/KnownMember`
 export const USER_KNOWN_MEMBER_LIST = `${USER_KNOWN_MEMBER}/List`
 
-export const USER_NAME = `${USER}/PublicName`
-export const updateUserName = newName => ({ type: `${UPDATE}/${USER_NAME}`, newName })
+export const USER_PUBLIC_NAME = `${USER}/PublicName`
+export const updateUserPublicName = newName => ({ type: `${UPDATE}/${USER_PUBLIC_NAME}`, newName })
+export const USER_USERNAME = `${USER}/Username`
+export const updateUserUsername = newUsername => ({ type: `${UPDATE}/${USER_USERNAME}`, newUsername })
 export const USER_EMAIL = `${USER}/Email`
 export const updateUserEmail = newEmail => ({ type: `${UPDATE}/${USER_EMAIL}`, newEmail })
 export const USER_PASSWORD = `${USER}/Password`
@@ -156,3 +159,6 @@ export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
 export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
 export const SEARCH_CURRENT_PAGE = 'SearchCurrentPage'
 export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEARCH_CURRENT_PAGE}`, currentNumberPage })
+
+export const TLM_MANAGER = 'TracimLiveMessageManager'
+export const setLiveMessageManager = TLMManager => ({ type: `${SET}/${TLM_MANAGER}`, TLMManager })

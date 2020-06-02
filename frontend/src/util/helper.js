@@ -5,7 +5,10 @@ const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-tes
 
 const versionFile = require('../version.json')
 export const TRACIM_APP_VERSION = versionFile.tracim_app_version
+export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
 export const SHARE_FOLDER_ID = -1
+export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
+export const MINIMUM_CHARACTERS_USERNAME = 3
 
 export const history = require('history').createBrowserHistory()
 
@@ -77,7 +80,8 @@ export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
 export const COOKIE_FRONTEND = {
   LAST_CONNECTION: 'lastConnection',
   DEFAULT_LANGUAGE: 'defaultLanguage',
-  DEFAULT_EXPIRE_TIME: 180
+  DEFAULT_EXPIRE_TIME: 180,
+  HIDE_USERNAME_POPUP: 'hideUsernamePopup'
 }
 
 export const getUserProfile = slug => PROFILE_LIST.find(p => slug === p.slug) || {}
