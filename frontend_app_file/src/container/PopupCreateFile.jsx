@@ -1,5 +1,5 @@
 import React from 'react'
-import i18n from '../util/i18n.js'
+import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
@@ -118,6 +118,9 @@ class PopupCreateFile extends React.Component {
       }
       return true
     })
+
+    // TODO - GM - 2020/05/02 - Remove this line when WorkspaceContent support TLM
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
 
     if (uploadedFileFailedList.length === 0) {
       this.handleClose(false)

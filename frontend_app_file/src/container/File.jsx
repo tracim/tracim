@@ -1,6 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import i18n from '../util/i18n.js'
+import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
   TracimComponent,
@@ -38,7 +38,7 @@ import {
   FILE_PREVIEW_STATE,
   sortTimelineByDate
 } from 'tracim_frontend_lib'
-import { PAGE } from '../util/helper.js'
+import { PAGE } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
