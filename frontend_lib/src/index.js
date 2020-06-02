@@ -22,7 +22,8 @@ import {
   buildFilePreviewUrl,
   removeExtensionOfFilename,
   computeProgressionPercentage,
-  buildHeadTitle
+  buildHeadTitle,
+  removeAtInUsername
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -114,6 +115,7 @@ export {
   buildFilePreviewUrl,
   buildHeadTitle,
   removeExtensionOfFilename,
+  removeAtInUsername,
   computeProgressionPercentage,
   Breadcrumbs,
   PopinFixed,
