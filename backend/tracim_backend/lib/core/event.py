@@ -259,9 +259,10 @@ class EventBuilder:
         if not isinstance(instance, Event):
             return
         event = typing.cast(Event, instance)
-        message_builder: BaseLiveMessageBuilder
         if self._config.JOBS__PROCESSING_MODE == self._config.CST.ASYNC:
-            message_builder = AsyncLiveMessageBuilder(config=self._config)
+            message_builder = AsyncLiveMessageBuilder(
+                config=self._config
+            )  # type: BaseLiveMessageBuilder
         else:
             message_builder = SyncLiveMessageBuilder(session=db_session, config=self._config)
         message_builder.publish_messages_for_event(event.event_id)

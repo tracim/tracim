@@ -2,6 +2,7 @@ import logging
 import os
 from os.path import basename
 from os.path import dirname
+import requests
 import shutil
 import subprocess
 import typing
@@ -65,6 +66,12 @@ def pushpin(tracim_webserver, tmp_path_factory):
         routes.write("* {}:{}\n".format(tracim_webserver.hostname, tracim_webserver.port))
     compose = DockerCompose()
     compose.up("pushpin", env={"PUSHPIN_CONFIG_DIR": pushpin_config_dir})
+    while True:
+        try:
+            requests.get("http://localhost:7999")
+            break
+        except ConnectionError:
+            pass
     yield compose
     compose.down()
 
