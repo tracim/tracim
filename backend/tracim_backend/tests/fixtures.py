@@ -2,6 +2,8 @@ import logging
 import os
 from os.path import basename
 from os.path import dirname
+import shutil
+import subprocess
 import typing
 
 from depot.manager import DepotManager
@@ -34,6 +36,7 @@ from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
+from tracim_backend.tests.utils import DockerCompose
 from tracim_backend.tests.utils import ElasticSearchHelper
 from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import MailHogHelper
@@ -52,19 +55,32 @@ def pushpin_config_file():
 
 
 @pytest.fixture
-def pushpin(request, tracim_webserver, pushpin_config_file, watcher_getter):
-    assert tracim_webserver.uri.startswith("http")
-    return watcher_getter(
-        name="pushpin",
-        arguments=[
-            "--config",
-            pushpin_config_file,
-            "--route",
-            "* {}:{}".format(tracim_webserver.hostname, tracim_webserver.port),
-        ],
-        checker=lambda: os.path.exists("/tmp/testpushpin/rundir/pushpin-handler.pid"),
-        request=request,
+def pushpin(tracim_webserver, tmp_path_factory):
+    pushpin_config_dir = str(tmp_path_factory.mktemp("pushpin"))
+    my_dir = dirname(__file__)
+    shutil.copyfile(
+        os.path.join(my_dir, "pushpin.conf"), os.path.join(pushpin_config_dir, "pushpin.conf")
     )
+    with open(os.path.join(pushpin_config_dir, "routes"), "w") as routes:
+        routes.write("* {}:{}\n".format(tracim_webserver.hostname, tracim_webserver.port))
+    compose = DockerCompose(tmp_path_factory)
+    compose.up("pushpin", env={"PUSHPIN_CONFIG_DIR": pushpin_config_dir})
+    yield compose
+    compose.down()
+
+
+@pytest.fixture
+def rq_database_worker(config_uri):
+
+    worker_env = os.environ.copy()
+    worker_env["TRACIM_CONF_PATH"] = "{}#rq_worker_test".format(config_uri)
+    worker_process = subprocess.Popen(
+        "rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event".split(" "),
+        env=worker_env,
+    )
+    yield worker_process
+    worker_process.terminate()
+    worker_process.wait()
 
 
 @pytest.fixture

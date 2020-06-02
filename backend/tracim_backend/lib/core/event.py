@@ -1,3 +1,5 @@
+import abc
+import contextlib
 from datetime import datetime
 import typing
 
@@ -21,6 +23,8 @@ from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
+from tracim_backend.lib.rq import worker_app_config
+from tracim_backend.lib.rq import worker_session
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import Profile
@@ -255,16 +259,12 @@ class EventBuilder:
         if not isinstance(instance, Event):
             return
         event = typing.cast(Event, instance)
-        LiveMessageBuilder.session = db_session
-        LiveMessageBuilder.config = self._config
+        message_builder: BaseLiveMessageBuilder
         if self._config.JOBS__PROCESSING_MODE == self._config.CST.ASYNC:
-            redis_connection = get_redis_connection(self._config)
-            queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
-            logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
-            queue.enqueue(LiveMessageBuilder.publish_messages_for_event, event.event_id)
+            message_builder = AsyncLiveMessageBuilder(config=self._config)
         else:
-            logger.debug(self, "publish event {} synchronously".format(event))
-            LiveMessageBuilder.publish_messages_for_event(event.event_id)
+            message_builder = SyncLiveMessageBuilder(session=db_session, config=self._config)
+        message_builder.publish_messages_for_event(event.event_id)
 
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
@@ -285,62 +285,92 @@ class EventBuilder:
         return False
 
 
-class LiveMessageBuilder:
+class BaseLiveMessageBuilder(abc.ABC):
+    """"Base class for message building with most implementation."""
 
     _event_schema = EventSchema()
-    session = None
-    config = None
 
-    @classmethod
-    def _session(cls) -> TracimSession:
-        # TODO S.G 2020-05-07: acquire this from the RQ worker's context
-        assert cls.session
-        return cls.session
+    def __init__(self, config: CFG) -> None:
+        self._config = config
 
-    @classmethod
-    def _config(cls) -> CFG:
-        # TODO SG 2020-05-07: acquire this from the RQ worker's context
-        assert cls.config
-        return cls.config
+    @contextlib.contextmanager
+    @abc.abstractmethod
+    def session(self) -> typing.Generator[TracimSession, None, None]:
+        pass
 
-    @classmethod
-    def publish_messages_for_event(cls, event_id: int) -> None:
-        event = cls._session().query(Event).filter(Event.event_id == event_id).one()
-        if event.entity_type == EntityType.USER:
-            receiver_ids = cls._get_user_event_receiver_ids(event)
-        elif event.entity_type == EntityType.WORKSPACE:
-            receiver_ids = cls._get_workspace_event_receiver_ids(event)
-        elif event.entity_type == EntityType.CONTENT:
-            receiver_ids = cls._get_workspace_event_receiver_ids(event)
-        elif event.entity_type == EntityType.WORKSPACE_MEMBER:
-            receiver_ids = cls._get_workspace_event_receiver_ids(event)
+    @abc.abstractmethod
+    def publish_messages_for_event(self, event_id: int) -> None:
+        pass
 
-        messages = [
-            Message(
-                receiver_id=receiver_id,
-                event=event,
-                event_id=event.event_id,
-                sent=datetime.utcnow(),
-            )
-            for receiver_id in receiver_ids
-        ]
-        cls._session().add_all(messages)
-        live_message_lib = LiveMessagesLib(cls.config)
+    def _publish_messages_for_event(self, event_id: int) -> None:
+        with self.session() as session:
+            event = session.query(Event).filter(Event.event_id == event_id).one()
+            if event.entity_type == EntityType.USER:
+                receiver_ids = self._get_user_event_receiver_ids(event, session)
+            elif event.entity_type == EntityType.WORKSPACE:
+                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+            elif event.entity_type == EntityType.CONTENT:
+                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+            elif event.entity_type == EntityType.WORKSPACE_MEMBER:
+                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+
+            messages = [
+                Message(
+                    receiver_id=receiver_id,
+                    event=event,
+                    event_id=event.event_id,
+                    sent=datetime.utcnow(),
+                )
+                for receiver_id in receiver_ids
+            ]
+            session.add_all(messages)
+        live_message_lib = LiveMessagesLib(self._config)
         for message in messages:
             live_message_lib.publish_message_to_user(message)
 
-    @classmethod
-    def _get_user_event_receiver_ids(cls, event: Event) -> typing.Set[int]:
-        user_api = UserApi(current_user=None, session=cls._session(), config=cls._config())
+    def _get_user_event_receiver_ids(self, event: Event, session: TracimSession) -> typing.Set[int]:
+        user_api = UserApi(current_user=None, session=session, config=self._config)
         receiver_ids = set(user_api.get_user_ids_from_profile(Profile.ADMIN))
         if event.user:
             receiver_ids.add(event.user["user_id"])
         return receiver_ids
 
-    @classmethod
-    def _get_workspace_event_receiver_ids(cls, event: Event) -> typing.Set[int]:
-        user_api = UserApi(current_user=None, session=cls._session(), config=cls._config())
+    def _get_workspace_event_receiver_ids(
+        self, event: Event, session: TracimSession,
+    ) -> typing.Set[int]:
+        user_api = UserApi(current_user=None, session=session, config=self._config)
         administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
-        role_api = RoleApi(current_user=None, session=cls._session(), config=cls._config())
+        role_api = RoleApi(current_user=None, session=session, config=self._config)
         workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
         return set(administrators + workspace_members)
+
+
+class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
+    """"Live message building + sending executed in a RQ job."""
+
+    @contextlib.contextmanager
+    def session(self) -> typing.Generator[TracimSession, None, None]:
+        with worker_session() as session:
+            yield session
+
+    def publish_messages_for_event(self, event_id: int) -> None:
+        redis_connection = get_redis_connection(self._config)
+        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+        logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
+        queue.enqueue(self._publish_messages_for_event, event_id)
+
+
+class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
+    """"Live message building + sending executed in tracim web application."""
+
+    def __init__(self, session: TracimSession, config: CFG) -> None:
+        super().__init__(config)
+        self._session = session
+
+    @contextlib.contextmanager
+    def session(self) -> typing.Generator[TracimSession, None, None]:
+        yield self._session
+
+    def publish_messages_for_event(self, event_id: int) -> None:
+        logger.debug(self, "publish event {} synchronously".format(event))
+        self._publish_messages_for_event(event_id)
