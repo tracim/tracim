@@ -7,3 +7,8 @@ export const PAGE = {
   },
   ONLINE_EDITION: (contentId) => `/api/v2/collaborative-document-edition/wopi/files/${contentId}`
 }
+
+export const ALLOWED_VIDEO_MIME_TYPE_LIST = [
+  'video/webm',
+  'video/mp4'
+]

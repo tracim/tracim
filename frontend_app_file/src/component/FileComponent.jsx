@@ -9,6 +9,7 @@ import {
   FileDropzone,
   APP_FEATURE_MODE
 } from 'tracim_frontend_lib'
+import { ALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 
 const color = require('color')
 
@@ -46,7 +47,7 @@ export const FileComponent = props => (
       />
     )}
 
-    {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) &&
+    {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
       <PreviewComponent
         color={props.customColor}
         downloadRawUrl={props.downloadRawUrl}
@@ -61,7 +62,23 @@ export const FileComponent = props => (
         onClickPreviousPage={props.onClickPreviousPage}
         onClickNextPage={props.onClickNextPage}
       />
-    }
+    )}
+
+    {ALLOWED_VIDEO_MIME_TYPE_LIST.includes(props.mimeType) && (
+      <div
+        className={classnames('file__previewVideo', props.previewVideo ? 'open' : '')}
+        style={{ visibility: props.previewVideo ? 'visible' : 'hidden' }}
+        onClick={props.onClickClosePreviewVideo}
+      >
+        <video controls>
+          <source
+            src={props.downloadRawUrl}
+            type={props.mimeType}
+          />
+          {props.t("Unfortunately, your browser can't play the video.")}
+        </video>
+      </div>
+    )}
 
     {props.mode === APP_FEATURE_MODE.EDIT &&
       <div className='file__contentpage__dropzone'>
