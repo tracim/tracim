@@ -67,6 +67,7 @@ class TestFolder(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"]["user_id"] == 1
@@ -335,6 +336,7 @@ class TestFolder(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -399,6 +401,7 @@ class TestFolder(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -466,6 +469,7 @@ class TestFolder(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -504,6 +508,7 @@ class TestFolder(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -562,6 +567,7 @@ class TestFolder(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -600,6 +606,7 @@ class TestFolder(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -709,6 +716,7 @@ class TestFolder(object):
         assert revision["author"]["user_id"] == 1
         assert revision["author"]["avatar_url"] is None
         assert revision["author"]["public_name"] == "Global manager"
+        assert revision["author"]["username"] == "TheAdmin"
 
         revision = revisions[1]
         assert revision["content_type"] == "folder"
@@ -733,6 +741,7 @@ class TestFolder(object):
         assert revision["author"]["user_id"] == 1
         assert revision["author"]["avatar_url"] is None
         assert revision["author"]["public_name"] == "Global manager"
+        assert revision["author"]["username"] == "TheAdmin"
 
         revision = revisions[2]
         assert revision["content_type"] == "folder"
@@ -759,6 +768,7 @@ class TestFolder(object):
         assert revision["author"]["user_id"] == 1
         assert revision["author"]["avatar_url"] is None
         assert revision["author"]["public_name"] == "Global manager"
+        assert revision["author"]["username"] == "TheAdmin"
 
         revision = revisions[3]
         assert revision["content_type"] == "folder"
@@ -783,6 +793,7 @@ class TestFolder(object):
         assert revision["author"]["user_id"] == 1
         assert revision["author"]["avatar_url"] is None
         assert revision["author"]["public_name"] == "Global manager"
+        assert revision["author"]["username"] == "TheAdmin"
 
     def test_api__set_folder_status__ok_200__nominal_case(
         self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
@@ -908,11 +919,13 @@ class TestHtmlDocuments(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] != content["author"]
         assert content["last_modifier"]["user_id"] == 3
         assert content["last_modifier"]["public_name"] == "Bob i."
+        assert content["last_modifier"]["username"] == "TheBobi"
         assert content["last_modifier"]["avatar_url"] is None
         assert (
             content["raw_content"] == "<p>To cook a great Tiramisu, you need many ingredients.</p>"
@@ -944,11 +957,13 @@ class TestHtmlDocuments(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] != content["author"]
         assert content["last_modifier"]["user_id"] == 3
         assert content["last_modifier"]["public_name"] == "Bob i."
+        assert content["last_modifier"]["username"] == "TheBobi"
         assert content["last_modifier"]["avatar_url"] is None
         assert (
             content["raw_content"] == "<p>To cook a great Tiramisu, you need many ingredients.</p>"
@@ -1083,11 +1098,13 @@ class TestHtmlDocuments(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".document.html"
+        assert content["current_revision_type"] == "edition"
 
         res = web_testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
@@ -1109,11 +1126,13 @@ class TestHtmlDocuments(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".document.html"
+        assert content["current_revision_type"] == "edition"
 
         modified_event = event_helper.last_event
         assert modified_event.event_type == "content.modified.html-document"
@@ -1123,6 +1142,7 @@ class TestHtmlDocuments(object):
         content_modified = dateutil.parser.isoparse(content["modified"])
         modified_diff = (event_content_modified - content_modified).total_seconds()
         assert abs(modified_diff) < 2
+        assert modified_event.content["current_revision_type"] == content["current_revision_type"]
         assert modified_event.content["file_extension"] == content["file_extension"]
         assert modified_event.content["filename"] == content["filename"]
         assert modified_event.content["is_archived"] == content["is_archived"]
@@ -1184,6 +1204,7 @@ class TestHtmlDocuments(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -1209,6 +1230,7 @@ class TestHtmlDocuments(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -1252,6 +1274,7 @@ class TestHtmlDocuments(object):
         assert revision["author"]["user_id"] == 1
         assert revision["author"]["avatar_url"] is None
         assert revision["author"]["public_name"] == "Global manager"
+        assert revision["author"]["username"] == "TheAdmin"
         revision = revisions[1]
         assert revision["content_type"] == "html-document"
         assert revision["content_id"] == 6
@@ -1275,6 +1298,7 @@ class TestHtmlDocuments(object):
         assert revision["author"]["user_id"] == 1
         assert revision["author"]["avatar_url"] is None
         assert revision["author"]["public_name"] == "Global manager"
+        assert revision["author"]["username"] == "TheAdmin"
         revision = revisions[2]
         assert revision["content_type"] == "html-document"
         assert revision["content_id"] == 6
@@ -1411,6 +1435,7 @@ class TestFiles(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -1468,6 +1493,7 @@ class TestFiles(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -1533,6 +1559,7 @@ class TestFiles(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -1695,6 +1722,7 @@ class TestFiles(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -1704,6 +1732,7 @@ class TestFiles(object):
         assert content["page_nb"] == 1
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
+        assert content["current_revision_type"] == "edition"
 
         res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), status=200
@@ -1727,6 +1756,7 @@ class TestFiles(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -1736,6 +1766,7 @@ class TestFiles(object):
         assert content["page_nb"] == 1
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
+        assert content["current_revision_type"] == "edition"
 
     def test_api__update_file_info__err_400__content_status_closed(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -1906,6 +1937,7 @@ class TestFiles(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -1938,6 +1970,7 @@ class TestFiles(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -2069,6 +2102,7 @@ class TestFiles(object):
         assert revision["author"]["user_id"] == 1
         assert revision["author"]["avatar_url"] is None
         assert revision["author"]["public_name"] == "Global manager"
+        assert revision["author"]["username"] == "TheAdmin"
         assert revision["mimetype"] == "plain/text"
         assert revision["size"] == len(b"Test file")
         assert revision["page_nb"] == 1
@@ -3907,11 +3941,13 @@ class TestThreads(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] != content["author"]
         assert content["last_modifier"]["user_id"] == 3
         assert content["last_modifier"]["public_name"] == "Bob i."
+        assert content["last_modifier"]["username"] == "TheBobi"
         assert content["last_modifier"]["avatar_url"] is None
         assert content["raw_content"] == "What is the best cake?"
         assert content["file_extension"] == ".thread.html"
@@ -3993,12 +4029,14 @@ class TestThreads(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "My New label.thread.html"
+        assert content["current_revision_type"] == "edition"
 
         res = web_testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
@@ -4020,12 +4058,14 @@ class TestThreads(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "My New label.thread.html"
+        assert content["current_revision_type"] == "edition"
 
         modified_event = event_helper.last_event
         assert modified_event.event_type == "content.modified.thread"
@@ -4035,6 +4075,7 @@ class TestThreads(object):
         content_modified = dateutil.parser.isoparse(content["modified"])
         modified_diff = (event_content_modified - content_modified).total_seconds()
         assert abs(modified_diff) < 2
+        assert content["current_revision_type"] == content["current_revision_type"]
         assert modified_event.content["file_extension"] == content["file_extension"]
         assert modified_event.content["filename"] == content["filename"]
         assert modified_event.content["is_archived"] == content["is_archived"]
@@ -4076,6 +4117,7 @@ class TestThreads(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -4101,6 +4143,7 @@ class TestThreads(object):
         assert content["author"]["user_id"] == 1
         assert content["author"]["avatar_url"] is None
         assert content["author"]["public_name"] == "Global manager"
+        assert content["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
@@ -4153,6 +4196,7 @@ class TestThreads(object):
         assert revision["author"]["user_id"] == 1
         assert revision["author"]["avatar_url"] is None
         assert revision["author"]["public_name"] == "Global manager"
+        assert revision["author"]["username"] == "TheAdmin"
         assert revision["file_extension"] == ".thread.html"
         assert revision["filename"] == "Best Cake.thread.html"
         revision = revisions[1]

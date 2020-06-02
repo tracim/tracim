@@ -289,6 +289,8 @@ export const IMG_LOAD_STATE = {
   ERROR: 'error'
 }
 
+export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
+
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/v2/system/content_types
 export const CONTENT_TYPE = {
   HTML_DOCUMENT: 'html-document',
@@ -333,4 +335,12 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
       timelineType: 'revision'
     }
   ]
+}
+
+export const removeAtInUsername = (username) => {
+  let trimmedUsername = username.trim()
+  if (trimmedUsername.length > 0 && trimmedUsername[0] === '@') {
+    trimmedUsername = trimmedUsername.substring(1)
+  }
+  return trimmedUsername
 }

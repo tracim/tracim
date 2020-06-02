@@ -25,7 +25,9 @@ import {
   computeProgressionPercentage,
   buildHeadTitle,
   CONTENT_TYPE,
-  sortTimelineByDate
+  buildTracimLiveMessageEventType,
+  sortTimelineByDate,
+  removeAtInUsername
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -119,6 +121,7 @@ export {
   buildFilePreviewUrl,
   buildHeadTitle,
   removeExtensionOfFilename,
+  removeAtInUsername,
   computeProgressionPercentage,
   Breadcrumbs,
   PopinFixed,
@@ -172,5 +175,6 @@ export {
   ProgressBar,
   RadioBtnGroup,
   CONTENT_TYPE,
+  buildTracimLiveMessageEventType,
   sortTimelineByDate
 }

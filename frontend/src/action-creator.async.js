@@ -26,11 +26,13 @@ import {
   USER_LANG,
   USER_LOGIN,
   USER_LOGOUT,
-  USER_NAME,
   USER_PASSWORD,
+  USER_PUBLIC_NAME,
   USER_REQUEST_PASSWORD,
+  USER_USERNAME,
   USER_WORKSPACE_DO_NOTIFY,
   USER_WORKSPACE_LIST,
+  USERNAME_AVAILABILITY,
   WORKSPACE,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT_ARCHIVED,
@@ -116,7 +118,7 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
   }
 }
 
-export const postUserLogin = (login, password, rememberMe) => async dispatch => {
+export const postUserLogin = (credentials, rememberMe) => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/auth/login`,
     param: {
@@ -124,8 +126,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
       headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
-        email: login,
-        password: password
+        ...credentials
         // remember_me: rememberMe
       })
     },
@@ -134,7 +135,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
   })
 }
 
-export const postForgotPassword = email => async dispatch => {
+export const postForgotPassword = login => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/request`,
     param: {
@@ -142,7 +143,7 @@ export const postForgotPassword = email => async dispatch => {
       headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
-        email: email
+        ...login
       })
     },
     actionName: USER_REQUEST_PASSWORD,
@@ -257,12 +258,12 @@ export const putMyselfName = (user, newName) => dispatch => {
         lang: user.lang
       })
     },
-    actionName: USER_NAME,
+    actionName: USER_PUBLIC_NAME,
     dispatch
   })
 }
 
-export const putUserName = (user, newName) => dispatch => {
+export const putUserPublicName = (user, newName) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}`,
     param: {
@@ -277,7 +278,41 @@ export const putUserName = (user, newName) => dispatch => {
         lang: user.lang
       })
     },
-    actionName: USER_NAME,
+    actionName: USER_PUBLIC_NAME,
+    dispatch
+  })
+}
+
+export const putUserUsername = (user, newUsername, checkPassword) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/username`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        username: newUsername,
+        loggedin_user_password: checkPassword
+      })
+    },
+    actionName: USER_USERNAME,
+    dispatch
+  })
+}
+
+export const getUsernameAvailability = (username) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/username-availability?username=${username}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USERNAME_AVAILABILITY,
     dispatch
   })
 }
@@ -589,6 +624,7 @@ export const postWorkspaceMember = (user, workspaceId, newMember) => dispatch =>
         user_id: newMember.id || null,
         user_email: newMember.email || null,
         user_public_name: newMember.publicName || null,
+        user_username: newMember.username || null,
         role: newMember.role
       })
     },
@@ -650,19 +686,6 @@ export const getAppList = () => dispatch => {
     },
     actionName: APP_LIST,
     dispatch
-  })
-}
-
-export const getLiveMessage = () => dispatch => {
-  // FIXME #2842 - CH - 20200507 - This is a mock, it should use the endpoint to get the live messages list
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log('resolving getLiveMessage')
-      resolve({
-        status: 200,
-        json: []
-      })
-    }, 200)
   })
 }
 
