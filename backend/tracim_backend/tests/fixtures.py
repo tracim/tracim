@@ -2,7 +2,6 @@ import logging
 import os
 from os.path import basename
 from os.path import dirname
-import requests
 import shutil
 import subprocess
 import typing
@@ -12,6 +11,7 @@ import plaster
 from pyramid import testing
 import pytest
 from pytest_pyramid_server import PyramidTestServer
+import requests
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
