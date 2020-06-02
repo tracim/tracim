@@ -119,9 +119,6 @@ class PopupCreateFile extends React.Component {
       return true
     })
 
-    // TODO - GM - 2020/06/02 - Remove this line when WorkspaceContent support TLM
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-
     if (uploadedFileFailedList.length === 0) {
       this.handleClose(false)
       if (state.fileToUploadList.length === 1) {

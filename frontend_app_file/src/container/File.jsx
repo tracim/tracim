@@ -97,7 +97,6 @@ export class File extends React.Component {
       { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
       { name: CUSTOM_EVENT.HIDE_APP(this.state.config.slug), handler: this.handleHideApp },
       { name: CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), handler: this.handleReloadContent },
-      { name: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(this.state.config.slug), handler: this.handleReloadAppFeatureData },
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
@@ -130,13 +129,6 @@ export class File extends React.Component {
     console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), data)
 
     props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
-  }
-
-  handleReloadAppFeatureData = data => {
-    const { props, state } = this
-    console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug), data)
-
-    props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
   }
 
   handleAllAppChangeLanguage = data => {
