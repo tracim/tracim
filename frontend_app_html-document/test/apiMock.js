@@ -28,5 +28,5 @@ export {
   mockGetHtmlDocumentContent200,
   mockGetHtmlDocumentComment200,
   mockGetHtmlDocumentRevision200,
-  mockPutMyselfHtmlDocumentRead200,
+  mockPutMyselfHtmlDocumentRead200
 }
