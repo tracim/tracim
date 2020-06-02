@@ -116,6 +116,7 @@ class HtmlDocument extends React.Component {
       rawContentBeforeEdit: prev.content.raw_content,
       timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
     }))
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
   handleContentCreated = data => {
@@ -144,11 +145,13 @@ class HtmlDocument extends React.Component {
     this.setState(prev => ({
       ...prev,
       content: {
+        ...prev.content,
         ...data.content,
         is_deleted: true
       },
       timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
     }))
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
   handleContentUndeleted = data => {
@@ -158,11 +161,13 @@ class HtmlDocument extends React.Component {
     this.setState(prev => ({
       ...prev,
       content: {
+        ...prev.content,
         ...data.content,
         is_deleted: false
       },
       timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
     }))
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
   // Custom Event Handlers
