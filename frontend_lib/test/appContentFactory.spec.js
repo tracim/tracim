@@ -281,20 +281,6 @@ describe('appContentFactory.js', () => {
         expect(fakeCheckApiUrl.called).to.equal(true)
       })
 
-      it('should call the custom event RELOAD_APP_FEATURE_DATA', () => {
-        sinon.assert.calledWith(
-          global.GLOBAL_dispatchEvent.firstCall,
-          { type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appContentSlug), data: {} }
-        )
-      })
-
-      it('should call the custom event REFRESH_CONTENT_LIST', () => {
-        sinon.assert.calledWith(
-          global.GLOBAL_dispatchEvent.secondCall,
-          { type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }
-        )
-      })
-
       it('should return the response from api with handleFetchResponse called on it', () => {
         expect(response)
           .to.have.property('apiResponse')
@@ -370,13 +356,6 @@ describe('appContentFactory.js', () => {
         )
       })
 
-      it('should call the custom event RELOAD_APP_FEATURE_DATA', () => {
-        sinon.assert.calledWith(
-          global.GLOBAL_dispatchEvent,
-          { type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appContentSlug), data: {} }
-        )
-      })
-
       it('should return the response from api with handleFetchResponse called on it', () => {
         expect(response)
           .to.have.property('apiResponse')
@@ -402,13 +381,6 @@ describe('appContentFactory.js', () => {
 
       it('should call the function checkApiUrl', () => {
         expect(fakeCheckApiUrl.called).to.equal(true)
-      })
-
-      it('should call the custom event RELOAD_APP_FEATURE_DATA', () => {
-        sinon.assert.calledWith(
-          global.GLOBAL_dispatchEvent,
-          { type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appContentSlug), data: {} }
-        )
       })
     })
   })
@@ -464,18 +436,6 @@ describe('appContentFactory.js', () => {
       it('should call the function checkApiUrl', () => {
         expect(fakeCheckApiUrl.called).to.equal(true)
       })
-
-      it('should call setState to set the content as deleted', () => {
-        // INFO - CH - 2019-01-07 - I don't know how to do a callWith when setState is called with a function in parameter
-        sinon.assert.called(fakeSetState)
-      })
-
-      it('should call the custom event RELOAD_APP_FEATURE_DATA', () => {
-        sinon.assert.calledWith(
-          global.GLOBAL_dispatchEvent,
-          { type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appContentSlug), data: {} }
-        )
-      })
     })
   })
 
@@ -529,18 +489,6 @@ describe('appContentFactory.js', () => {
 
       it('should call the function checkApiUrl', () => {
         expect(fakeCheckApiUrl.called).to.equal(true)
-      })
-
-      it('should call setState to set the content as not deleted', () => {
-        // INFO - CH - 2019-01-07 - I don't know how to do a callWith when setState is called with a function in parameter
-        sinon.assert.called(fakeSetState)
-      })
-
-      it('should call the custom event RELOAD_APP_FEATURE_DATA', () => {
-        sinon.assert.calledWith(
-          global.GLOBAL_dispatchEvent,
-          { type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appContentSlug), data: {} }
-        )
       })
     })
   })
