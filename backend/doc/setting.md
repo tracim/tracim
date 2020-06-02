@@ -183,7 +183,7 @@ Tracim comes with several authentication methods:
 - Special authentifications mechanisms like Api-Key
 - REMOTE AUTH, like Apache Auth, later explained in the documentation.
 
-You can chose valid auth_source and order them by priority with `auth_types` paramaters in the INI configuration file.
+You can chose valid auth_source and order them by priority with `auth_types` parameters in the INI configuration file.
 
 For instance:
 
@@ -191,6 +191,14 @@ For instance:
 - `auth_types = internal,ldap`
 
 The last one will check the internal user database first. Then, if the auth fails, it will also try to authenticate the user using LDAP.
+
+The authentication is done with a login, which is either the user's email address or the username. For authentication methods which don't provide a way to distinguish between the two, a login with "@" will be considered as an email address and a login without as a username.
+
+:warning: If you use LDAP or the Remote Auth method, the automatic creation of a username-only user (without "@") can fail if:
+`email.required=True`, which means every user should have an email address set. To solve this case, either:
+- set `email.required` to `False`, or
+- create the user with both an username and an email address and then authenticate using the LDAP/Remote Auth.
+
 
 ### LDAP Authentication
 
@@ -232,14 +240,14 @@ This allow user with the key to act as anyone and to do anything possible with t
 It relies on 2 HTTP headers:
 
 - `Tracim-Api-Key` : Tracim api key, as marked in config in `api.key`
-- `Tracim-Api-Login` : User email login, in order to act as the user given
+- `Tracim-Api-Login` : User's login (either an email or a username), in order to act as the given user
 
 If `api.key` is empty, the API key authentication will be disabled.
 
 ### Remote Auth Authentification (eg apache authentication)
 
 It is possible to connect to Tracim using remote authentification (e.g. the Apache authentication method).
-The idea is that the webserver authenticates user and then pass the email of the authenticated user trhough uWSGI environment variables or an HTTP header.
+The idea is that the webserver authenticates the user and then pass the login of the authenticated user through uWSGI environment variables or an HTTP header.
 
 :heavy_exclamation_mark: When logging in Tracim, if a valid remote user doesn't
 exist in Tracim, it will be created as a standard user.

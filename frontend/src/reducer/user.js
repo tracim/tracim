@@ -4,14 +4,15 @@ import {
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_LANG,
-  USER_NAME,
+  USER_USERNAME,
+  USER_PUBLIC_NAME,
   USER_EMAIL,
   USER_AGENDA_URL
 } from '../action-creator.sync.js'
 import { getBrowserLang } from '../util/helper.js'
 import { PROFILE } from 'tracim_frontend_lib'
 
-const defaultUser = {
+export const defaultUser = {
   user_id: -1,
   logged: null, // null avoid to be redirected to /login while whoami ep has not responded yet
   auth_type: '',
@@ -23,7 +24,8 @@ const defaultUser = {
   created: '',
   public_name: '',
   lang: getBrowserLang(),
-  agendaUrl: ''
+  agendaUrl: '',
+  username: ''
 }
 
 export default function user (state = defaultUser, action) {
@@ -41,8 +43,11 @@ export default function user (state = defaultUser, action) {
     case `${SET}/${USER_LANG}`:
       return { ...state, lang: action.lang }
 
-    case `${UPDATE}/${USER_NAME}`:
+    case `${UPDATE}/${USER_PUBLIC_NAME}`:
       return { ...state, public_name: action.newName }
+
+    case `${UPDATE}/${USER_USERNAME}`:
+      return { ...state, username: action.newUsername }
 
     case `${UPDATE}/${USER_EMAIL}`:
       return { ...state, email: action.newEmail }

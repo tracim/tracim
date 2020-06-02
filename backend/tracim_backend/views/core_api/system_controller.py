@@ -1,5 +1,5 @@
 # coding=utf-8
-
+from hapic.data import HapicData
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import content_type_list
@@ -18,7 +18,9 @@ from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
 from tracim_backend.views.core_api.schemas import ErrorCodeSchema
+from tracim_backend.views.core_api.schemas import GetUsernameAvailability
 from tracim_backend.views.core_api.schemas import TimezoneSchema
+from tracim_backend.views.core_api.schemas import UsernameAvailability
 
 SWAGGER_TAG_SYSTEM_ENDPOINTS = "System"
 
@@ -65,6 +67,21 @@ class SystemController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
+    @hapic.input_query(GetUsernameAvailability())
+    @hapic.output_body(UsernameAvailability())
+    def username_availability(self, context, request: TracimRequest, hapic_data: HapicData) -> dict:
+        """
+        Return availability for each given username
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        system_api = SystemApi(app_config, request.dbsession)
+        return {
+            "username": hapic_data.query["username"],
+            "available": system_api.get_username_availability(hapic_data.query["username"]),
+        }
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
     @hapic.output_body(AboutSchema())
     def about(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -72,7 +89,7 @@ class SystemController(Controller):
         This is the equivalent of classical "help > about" menu in classical software.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        system_api = SystemApi(app_config)
+        system_api = SystemApi(app_config, request.dbsession)
         return system_api.get_about()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
@@ -86,14 +103,14 @@ class SystemController(Controller):
         # do not allow unauthenticated user to
         # get all config info
         app_config = request.registry.settings["CFG"]  # type: CFG
-        system_api = SystemApi(app_config)
+        system_api = SystemApi(app_config, request.dbsession)
         return system_api.get_config()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @hapic.output_body(ErrorCodeSchema(many=True))
     def error_codes(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
-        system_api = SystemApi(app_config)
+        system_api = SystemApi(app_config, request.dbsession)
         return system_api.get_error_codes()
 
     def bind(self, configurator: Configurator) -> None:
@@ -125,3 +142,9 @@ class SystemController(Controller):
         # Content_types
         configurator.add_route("timezones_list", "/system/timezones", request_method="GET")
         configurator.add_view(self.timezones_list, route_name="timezones_list")
+
+        # username availability
+        configurator.add_route(
+            "username_availability", "/system/username-availability", request_method="GET"
+        )
+        configurator.add_view(self.username_availability, route_name="username_availability")
