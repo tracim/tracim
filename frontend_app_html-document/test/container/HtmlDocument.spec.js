@@ -5,7 +5,7 @@ import {
   mockGetHtmlDocumentComment200,
   mockGetHtmlDocumentContent200,
   mockGetHtmlDocumentRevision200,
-  mockPutMyselfHtmlDocumentRead200
+  mockPutHtmlDocumentRead200
 } from '../apiMock.js'
 import { commentTLM } from '../fixture/tracimLiveMessageData/commentTLM.js'
 import { HtmlDocument } from '../../src/container/HtmlDocument.jsx'
@@ -25,7 +25,7 @@ describe('<HtmlDocument />', () => {
   }
 
   mockGetHtmlDocumentContent200(debug.config.apiUrl, content.htmlDocument.workspace_id, content.htmlDocument.content_id, content.htmlDocument)
-  mockPutMyselfHtmlDocumentRead200(debug.config.apiUrl, content.htmlDocument.workspace_id, content.htmlDocument.content_id)
+  mockPutHtmlDocumentRead200(debug.loggedUser, debug.config.apiUrl, content.htmlDocument.workspace_id, content.htmlDocument.content_id)
   mockGetHtmlDocumentComment200(debug.config.apiUrl, content.htmlDocument.workspace_id, content.htmlDocument.content_id, content.commentList).persist()
   mockGetHtmlDocumentRevision200(debug.config.apiUrl, content.htmlDocument.workspace_id, content.htmlDocument.content_id, content.revisionList).persist()
 
@@ -40,15 +40,12 @@ describe('<HtmlDocument />', () => {
               ...commentTLM,
               parent_id: content.htmlDocument.content_id,
               content_id: 9,
-              created: '2020-05-26T16:02:05Z'
+              created: '2020-01-07T16:28:05Z'
             }
           }
 
-          before(() => {
-            wrapper.instance().handleContentCommentCreated(tlmData)
-          })
-
           it('should update the timeline if is related to the current html-document', () => {
+            wrapper.instance().handleContentCreated(tlmData)
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData.content.content_id)
           })
 
@@ -61,7 +58,7 @@ describe('<HtmlDocument />', () => {
               }
             }
             const oldTimelineLength = wrapper.state('timeline').length
-            wrapper.instance().handleContentCommentCreated(tlmDataOtherContent)
+            wrapper.instance().handleContentCreated(tlmDataOtherContent)
 
             expect(wrapper.state('timeline').length).to.equal(oldTimelineLength)
           })
@@ -72,10 +69,11 @@ describe('<HtmlDocument />', () => {
                 ...commentTLM,
                 parent_id: content.htmlDocument.content_id,
                 content_id: 11,
-                created: '2020-05-26T14:02:05Z'
+                created: '2020-01-07T15:30:05Z'
               }
             }
-            wrapper.instance().handleContentCommentCreated(tlmData2)
+            wrapper.instance().handleContentCreated(tlmData)
+            wrapper.instance().handleContentCreated(tlmData2)
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData2.content.content_id)
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 2].content_id).to.equal(tlmData.content.content_id)
           })
@@ -85,9 +83,9 @@ describe('<HtmlDocument />', () => {
       describe('handleContentModified', () => {
         describe('modify the content name', () => {
           const tlmData = {
+            author: content.htmlDocument.last_modifier,
             content: {
               ...content.htmlDocument,
-              filename: 'newContentName.document.html',
               label: 'newContentName'
             }
           }
@@ -103,6 +101,7 @@ describe('<HtmlDocument />', () => {
 
         describe('modify the content of the html-document', () => {
           const tlmData = {
+            author: content.htmlDocument.last_modifier,
             content: {
               ...content.htmlDocument,
               raw_content: '<p>Html Document Content</p>'
@@ -142,22 +141,17 @@ describe('<HtmlDocument />', () => {
       describe('handleContentDeleted', () => {
         describe('delete the current content', () => {
           const tlmData = {
+            author: content.htmlDocument.last_modifier,
             content: content.htmlDocument
           }
-
-          before(() => {
-            wrapper.instance().handleContentDeleted(tlmData)
-          })
 
           after(() => {
             wrapper.setState({ content: content.htmlDocument })
           })
 
           it('should be deleted correctly', () => {
+            wrapper.instance().handleContentDeleted(tlmData)
             expect(wrapper.state('content').is_deleted).to.equal(true)
-          })
-          it('should be in view mode', () => {
-            expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.VIEW)
           })
         })
 
@@ -179,24 +173,23 @@ describe('<HtmlDocument />', () => {
       describe('handleContentUndeleted', () => {
         describe('restore the current content', () => {
           const tlmData = {
+            author: content.htmlDocument.last_modifier,
             content: content.htmlDocument
           }
-
-          before(() => {
-            wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-            wrapper.instance().handleContentRestored(tlmData)
-          })
 
           after(() => {
             wrapper.setState({ content: content.htmlDocument })
           })
 
           it('should be restored correctly', () => {
+            wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
+            wrapper.instance().handleContentUndeleted(tlmData)
+
             expect(wrapper.state('content').is_deleted).to.equal(false)
           })
         })
 
-        describe('Restore a content which is not the current one', () => {
+        describe('restore a content which is not the current one', () => {
           const tlmData = {
             content: {
               ...content.htmlDocument,
@@ -204,12 +197,10 @@ describe('<HtmlDocument />', () => {
             }
           }
 
-          before(() => {
-            wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-            wrapper.instance().handleContentRestored(tlmData)
-          })
-
           it('should not be restored', () => {
+            wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
+            wrapper.instance().handleContentUndeleted(tlmData)
+
             expect(wrapper.state('content').is_deleted).to.equal(true)
           })
         })

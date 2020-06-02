@@ -3,7 +3,8 @@ export const htmlDocument = {
   author: {
     avatar_url: null,
     public_name: 'Global manager',
-    user_id: 1
+    user_id: 1,
+    username: 'TheAdmin'
   },
   content_id: 0,
   content_namespace: 'content',
@@ -19,8 +20,9 @@ export const htmlDocument = {
   label: 'RandomHtmlDocument',
   last_modifier: {
     avatar_url: null,
-    public_name: 'Global manager',
-    user_id: 1
+    public_name: 'John Doe',
+    user_id: 2,
+    username: 'john'
   },
   modified: '2020-05-25T06:59:20Z',
   parent_id: null,

@@ -24,6 +24,12 @@ if (!global.window && !global.document) {
   global.localStorage = {
     getItem: () => {}
   }
+  global.globalThis = {
+    tinymce: {
+      remove: () => {}
+    },
+    wysiwyg: () => {}
+  }
 }
 
 Enzyme.configure({ adapter: new Adapter() })

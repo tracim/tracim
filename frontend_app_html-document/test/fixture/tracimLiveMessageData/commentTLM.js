@@ -1,11 +1,13 @@
 export const commentTLM = {
-  content_id: 7,
-  parent_id: 5,
-  raw_content: '<p> Html document raw content</p>',
   author: {
     avatar_url: null,
+    public_name: 'John Doe',
     user_id: 2,
-    public_name: 'John Doe'
+    username: 'john'
   },
-  created: '2019-06-09T10:28:43.511Z'
+  content_id: 7,
+  content_type: 'comment',
+  created: '2019-06-09T10:28:43.511Z',
+  parent_id: 5,
+  raw_content: '<p>Html document raw content</p>'
 }

@@ -3,5 +3,5 @@ import { revisionList } from './fixture/contentRevisionList.js'
 
 export {
   commentList,
-  revisionList,
+  revisionList
 }
