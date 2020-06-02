@@ -25,6 +25,7 @@ import {
   computeProgressionPercentage,
   buildHeadTitle,
   CONTENT_TYPE,
+  buildTracimLiveMessageEventType,
   sortTimelineByDate,
   removeAtInUsername
 } from './helper.js'
@@ -174,5 +175,6 @@ export {
   ProgressBar,
   RadioBtnGroup,
   CONTENT_TYPE,
+  buildTracimLiveMessageEventType,
   sortTimelineByDate
 }

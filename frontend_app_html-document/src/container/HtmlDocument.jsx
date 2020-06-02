@@ -144,6 +144,7 @@ export class HtmlDocument extends React.Component {
     this.setState(prev => ({
       ...prev,
       content: {
+        ...prev.content,
         ...data.content,
         is_deleted: true
       },
@@ -158,6 +159,7 @@ export class HtmlDocument extends React.Component {
     this.setState(prev => ({
       ...prev,
       content: {
+        ...prev.content,
         ...data.content,
         is_deleted: false
       },
