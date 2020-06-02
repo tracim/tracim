@@ -250,7 +250,7 @@ class DockerCompose:
     command = [
         "docker-compose",
         "-f",
-        os.path.join(os.path.dirname(__file__), "docker-compose.yml"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "docker-compose.yml"),
     ]
 
     def up(self, *names: str, env: dict = None) -> None:

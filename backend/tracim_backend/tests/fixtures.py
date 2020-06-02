@@ -63,7 +63,7 @@ def pushpin(tracim_webserver, tmp_path_factory):
     )
     with open(os.path.join(pushpin_config_dir, "routes"), "w") as routes:
         routes.write("* {}:{}\n".format(tracim_webserver.hostname, tracim_webserver.port))
-    compose = DockerCompose(tmp_path_factory)
+    compose = DockerCompose()
     compose.up("pushpin", env={"PUSHPIN_CONFIG_DIR": pushpin_config_dir})
     yield compose
     compose.down()

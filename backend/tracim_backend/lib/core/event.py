@@ -23,7 +23,6 @@ from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
-from tracim_backend.lib.rq import worker_app_config
 from tracim_backend.lib.rq import worker_session
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest

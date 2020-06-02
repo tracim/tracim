@@ -289,6 +289,12 @@ Run with (supervisord.conf should be provided, see [supervisord.conf default_pat
 
 ### Run Tests ###
 
+Some functional tests need additional daemons that are run through docker:
+
+```shell
+sudo apt install docker.io docker-compose
+```
+
 Some directories are required to make tests functional, you can create them and do some other check
 with this script:
 
