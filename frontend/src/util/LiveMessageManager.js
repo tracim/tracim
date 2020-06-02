@@ -23,6 +23,7 @@ export class LiveMessageManager {
       `${FETCH_CONFIG.apiUrl}/users/${userId}/live_messages`,
       { withCredentials: true }
     )
+    this.status = LIVE_MESSAGE_STATUS.PENDING
 
     this.eventSource.onopen = () => {
       console.log('%c.:. TLM Connected: ', 'color: #ccc0e2')
@@ -36,6 +37,7 @@ export class LiveMessageManager {
 
     this.eventSource.onerror = (e) => {
       console.log('%c.:. TLM Error: ', 'color: #ccc0e2', e)
+      this.status = LIVE_MESSAGE_STATUS.CLOSE
     }
   }
 
