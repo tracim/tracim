@@ -226,9 +226,6 @@ class Thread extends React.Component {
 
   handleClickDelete = async () => {
     const { props, state } = this
-    // TODO - GB - 2020-06-02 - This will be changed at https://github.com/tracim/tracim/issues/3109 for now is just a way to pass cypress tests
-    this.setState(prev => ({ content:{ ...prev.content, is_deleted: true } }))
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug), data: {} })
     props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
@@ -239,9 +236,6 @@ class Thread extends React.Component {
 
   handleClickRestoreDelete = async () => {
     const { props, state } = this
-    // TODO - GB - 2020-06-02 - This will be changed at https://github.com/tracim/tracim/issues/3109 for now is just a way to pass cypress tests
-    this.setState(prev => ({ content:{ ...prev.content, is_deleted: false } }))
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug), data: {} })
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 

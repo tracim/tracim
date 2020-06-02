@@ -150,8 +150,6 @@ class HtmlDocument extends React.Component {
       },
       timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
     }))
-    // TODO - GB - 2020-06-02 - This will be changed at https://github.com/tracim/tracim/issues/3110 for now is just a way to pass cypress tests
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
   handleContentUndeleted = data => {
