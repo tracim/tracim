@@ -33,7 +33,7 @@ import {
   computeProgressionPercentage,
   FILE_PREVIEW_STATE
 } from 'tracim_frontend_lib'
-import { PAGE } from '../helper.js'
+import { PAGE, ALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
@@ -80,7 +80,8 @@ class File extends React.Component {
       },
       shareEmails: '',
       sharePassword: '',
-      shareLinkList: []
+      shareLinkList: [],
+      previewVideo: false
     }
     this.refContentLeftTop = React.createRef()
 
@@ -783,6 +784,17 @@ class File extends React.Component {
                   {props.t('Last version')}
                 </button>
               )}
+
+              {ALLOWED_VIDEO_MIME_TYPE_LIST.includes(state.content.mimetype) && (
+                <GenericButton
+                  customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
+                  customColor={state.config.hexcolor}
+                  label={props.t('Play video')}
+                  onClick={() => this.setState({ previewVideo: true })}
+                  faIcon={'play'}
+                  style={{ marginLeft: '5px' }}
+                />
+              )}
             </div>
 
             <div className='d-flex'>
@@ -822,6 +834,7 @@ class File extends React.Component {
             filePageNb={state.content.page_nb}
             fileCurrentPage={state.fileCurrentPage}
             version={state.content.number}
+            mimeType={state.content.mimetype}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
@@ -842,6 +855,8 @@ class File extends React.Component {
             newFile={state.newFile}
             newFilePreview={state.newFilePreview}
             progressUpload={state.progressUpload}
+            previewVideo={state.previewVideo}
+            onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
             ref={this.refContentLeftTop}
           />
 

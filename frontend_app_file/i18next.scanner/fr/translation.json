@@ -53,5 +53,7 @@
   "Files already uploaded:": "Fichiers déjà téléversés",
   "Upload files": "Téléverser des fichiers",
   "New file": "Nouveau fichier",
-  "Preview loading...": "Chargement de l'aperçu ..."
+  "Preview loading...": "Chargement de l'aperçu ...",
+  "Play video": "Lire la vidéo",
+  "Unfortunately, your browser can't play the video.": "Malheureusement, votre navigateur ne peut pas lire la vidéo"
 }
