@@ -16,8 +16,7 @@ import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
   setUserLang,
-  setUserDisconnected,
-  resetLiveMessageManager
+  setUserDisconnected
 } from '../action-creator.sync.js'
 import {
   postUserLogout,
