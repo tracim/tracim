@@ -264,16 +264,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_download_enabled"] is False
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace.modified"
-        assert last_event.workspace == {
-            "workspace_id": workspace["workspace_id"],
-            "slug": workspace["slug"],
-            "label": workspace["label"],
-            "is_deleted": workspace["is_deleted"],
-            "agenda_enabled": workspace["agenda_enabled"],
-            "public_upload_enabled": workspace["public_upload_enabled"],
-            "public_download_enabled": workspace["public_download_enabled"],
-            "sidebar_entries": workspace["sidebar_entries"],
-        }
+        assert last_event.workspace == workspace
 
         # after
         res = web_testapp.get("/api/v2/workspaces/1", status=200)
@@ -513,22 +504,16 @@ class TestWorkspaceEndpoint(object):
         assert workspace["owner"]["user_id"] == 1
         assert workspace["owner"]["avatar_url"] is None
         assert workspace["owner"]["public_name"] == "Global manager"
+        assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
         workspace_id = res.json_body["workspace_id"]
         (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
-        assert workspace_created.author == workspace["owner"]
-        assert workspace_created.workspace == {
-            "workspace_id": workspace_id,
-            "label": workspace["label"],
-            "is_deleted": workspace["is_deleted"],
-            "agenda_enabled": workspace["agenda_enabled"],
-            "public_upload_enabled": workspace["public_upload_enabled"],
-            "public_download_enabled": workspace["public_download_enabled"],
-            "sidebar_entries": workspace["sidebar_entries"],
-            "slug": workspace["slug"],
-        }
-        assert user_role_created.event_type == "workspace_user_role.created"
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert workspace_created.author == author
+        assert workspace_created.workspace == workspace
+        assert user_role_created.event_type == "workspace_member.created"
+        assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
 
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
@@ -588,16 +573,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is True
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace.deleted"
-        assert last_event.workspace == {
-            "workspace_id": workspace["workspace_id"],
-            "slug": workspace["slug"],
-            "label": workspace["label"],
-            "is_deleted": workspace["is_deleted"],
-            "agenda_enabled": workspace["agenda_enabled"],
-            "public_upload_enabled": workspace["public_upload_enabled"],
-            "public_download_enabled": workspace["public_download_enabled"],
-            "sidebar_entries": workspace["sidebar_entries"],
-        }
+        assert last_event.workspace == workspace
 
     def test_api__delete_workspace__ok_200__manager_workspace_manager(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
@@ -997,6 +973,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["workspace"]["label"] == "Business"
         assert user_role["workspace"]["slug"] == "business"
         assert user_role["user"]["public_name"] == "Global manager"
+        assert user_role["user"]["username"] == "TheAdmin"
         assert user_role["user"]["user_id"] == 1
         assert user_role["is_active"] is True
         assert user_role["do_notify"] is True
@@ -1005,7 +982,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["avatar_url"] is None
 
     def test_api__get_workspace_members__ok_200_show_disabled_users(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
             Check obtain workspace members list with also disabled users
@@ -1039,7 +1016,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["do_notify"] is False
 
     def test_api__get_workspace_members__ok_200_show_only_enabled_users(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
             Check obtain workspace members list with only enabled users
@@ -1149,6 +1126,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["workspace"]["label"] == "Business"
         assert user_role["workspace"]["slug"] == "business"
         assert user_role["user"]["public_name"] == "Global manager"
+        assert user_role["user"]["username"] == "TheAdmin"
         assert user_role["user"]["user_id"] == 1
         assert user_role["is_active"] is True
         assert user_role["do_notify"] is True
@@ -1298,23 +1276,17 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["email_sent"] is False
         assert user_role_found["do_notify"] is False
         last_event = event_helper.last_event
-        assert last_event.event_type == "workspace_user_role.created"
-        assert last_event.role == user_role_found["role"]
+        assert last_event.event_type == "workspace_member.created"
+        assert last_event.member == {
+            "role": user_role_found["role"],
+            "do_notify": user_role_found["do_notify"],
+        }
         workspace = web_testapp.get("/api/v2/workspaces/1", status=200).json_body
-        del workspace["owner"]
-        del workspace["created"]
-        del workspace["description"]
         assert last_event.workspace == workspace
-        assert last_event.author == {
-            "user_id": 1,
-            "public_name": "Global manager",
-            "avatar_url": None,
-        }
-        assert last_event.user == {
-            "user_id": 2,
-            "public_name": "Lawrence L.",
-            "avatar_url": None,
-        }
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert last_event.author == author
+        user = web_testapp.get("/api/v2/users/2", status=200).json_body
+        assert last_event.user == user
 
         res = web_testapp.get("/api/v2/workspaces/1/members", status=200).json_body
         assert len(res) == 2
@@ -1516,6 +1488,34 @@ class TestWorkspaceMembersEndpoint(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_DELETED
 
+    def test_api__create_workspace_member_role__ok_200__user_username(self, web_testapp):
+        """
+        Create workspace member role
+        :return:
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # create workspace role
+        params = {"user_username": "TheBobi", "role": "content-manager"}
+        res = web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
+        user_role_found = res.json_body
+        assert user_role_found["role"] == "content-manager"
+        assert user_role_found["user_id"] == 3
+        assert user_role_found["workspace_id"] == 1
+        assert user_role_found["newly_created"] is False
+        assert user_role_found["email_sent"] is False
+        assert user_role_found["do_notify"] is False
+
+        res = web_testapp.get("/api/v2/workspaces/1/members", status=200).json_body
+        assert len(res) == 2
+        user_role = res[0]
+        assert user_role["role"] == "workspace-manager"
+        assert user_role["user_id"] == 1
+        assert user_role["workspace_id"] == 1
+        user_role = res[1]
+        assert user_role_found["role"] == user_role["role"]
+        assert user_role_found["user_id"] == user_role["user_id"]
+        assert user_role_found["workspace_id"] == user_role["workspace_id"]
+
     def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(
         self, web_testapp
     ):
@@ -1533,7 +1533,7 @@ class TestWorkspaceMembersEndpoint(object):
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(
         self, web_testapp
@@ -1637,25 +1637,21 @@ class TestWorkspaceMembersEndpoint(object):
 
         # role modified event
         last_event = event_helper.last_event
-        assert last_event.event_type == "workspace_user_role.modified"
-        assert last_event.role == user_role["role"]
+        assert last_event.event_type == "workspace_member.modified"
+        assert last_event.member == {
+            "role": user_role["role"],
+            "do_notify": user_role["do_notify"],
+        }
         workspace_dict = web_testapp.get(
             "/api/v2/workspaces/{}".format(workspace.workspace_id), status=200
         ).json_body
-        del workspace_dict["owner"]
-        del workspace_dict["created"]
-        del workspace_dict["description"]
         assert last_event.workspace == workspace_dict
-        assert last_event.author == {
-            "user_id": user.user_id,
-            "public_name": "test",
-            "avatar_url": None,
-        }
-        assert last_event.user == {
-            "user_id": user2.user_id,
-            "public_name": "test2",
-            "avatar_url": None,
-        }
+        author = web_testapp.get("/api/v2/users/{}".format(user.user_id), status=200).json_body
+        assert last_event.author == author
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        user = web_testapp.get("/api/v2/users/{}".format(user2.user_id), status=200).json_body
+        assert last_event.user == user
 
         # after
         res = web_testapp.get(
@@ -1819,25 +1815,20 @@ class TestWorkspaceMembersEndpoint(object):
 
         # role deleted event
         last_event = event_helper.last_event
-        assert last_event.event_type == "workspace_user_role.deleted"
-        assert last_event.role == "workspace-manager"
+        assert last_event.event_type == "workspace_member.deleted"
+        assert last_event.member == {
+            "role": "workspace-manager",
+            "do_notify": False,
+        }
+
         workspace_dict = web_testapp.get(
             "/api/v2/workspaces/{}".format(workspace.workspace_id), status=200
         ).json_body
-        del workspace_dict["owner"]
-        del workspace_dict["created"]
-        del workspace_dict["description"]
         assert last_event.workspace == workspace_dict
-        assert last_event.author == {
-            "user_id": 1,
-            "public_name": "Global manager",
-            "avatar_url": None,
-        }
-        assert last_event.user == {
-            "user_id": user.user_id,
-            "public_name": "test",
-            "avatar_url": None,
-        }
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert last_event.author == author
+        user_dict = web_testapp.get("/api/v2/users/{}".format(user.user_id), status=200).json_body
+        assert last_event.user == user_dict
 
         # after
         roles = web_testapp.get(

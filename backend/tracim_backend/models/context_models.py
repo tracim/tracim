@@ -2,8 +2,8 @@
 import base64
 import cgi
 from datetime import datetime
-from enum import Enum
-import typing
+from typing import List
+from typing import Optional
 
 from slugify import slugify
 from sqlalchemy.orm import Session
@@ -38,7 +38,7 @@ class AboutModel(object):
     def __init__(
         self,
         name: str,
-        version: typing.Optional[str],
+        version: Optional[str],
         build_version: str,
         datetime: datetime,
         website: str,
@@ -62,6 +62,7 @@ class ConfigModel(object):
         workspace_size_limit: int,
         workspaces_number_per_user_limit: int,
         instance_name: str,
+        email_required: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -72,6 +73,7 @@ class ConfigModel(object):
         self.workspace_size_limit = workspace_size_limit
         self.workspaces_number_per_user_limit = workspaces_number_per_user_limit
         self.instance_name = instance_name
+        self.email_required = email_required
 
 
 class ErrorCodeModel(object):
@@ -81,7 +83,7 @@ class ErrorCodeModel(object):
 
 
 class PreviewAllowedDim(object):
-    def __init__(self, restricted: bool, dimensions: typing.List[PreviewDim]) -> None:
+    def __init__(self, restricted: bool, dimensions: List[PreviewDim]) -> None:
         self.restricted = restricted
         self.dimensions = dimensions
 
@@ -101,8 +103,11 @@ class LoginCredentials(object):
     Login credentials model for login model
     """
 
-    def __init__(self, email: str, password: str) -> None:
+    def __init__(
+        self, password: str, email: Optional[str] = None, username: Optional[str] = None,
+    ) -> None:
         self.email = email
+        self.username = username
         self.password = password
 
 
@@ -111,8 +116,9 @@ class ResetPasswordRequest(object):
     Reset password : request to reset password of user
     """
 
-    def __init__(self, email: str) -> None:
+    def __init__(self, email: Optional[str] = None, username: Optional[str] = None) -> None:
         self.email = email
+        self.username = username
 
 
 class ResetPasswordCheckToken(object):
@@ -149,6 +155,16 @@ class SetEmail(object):
         self.email = email
 
 
+class SetUsername(object):
+    """
+    Just an username and password
+    """
+
+    def __init__(self, loggedin_user_password: str, username: str) -> None:
+        self.loggedin_user_password = loggedin_user_password
+        self.username = username
+
+
 class SimpleFile(object):
     def __init__(self, files: cgi.FieldStorage = None) -> None:
         self.files = files
@@ -179,9 +195,16 @@ class UserInfos(object):
     Just some user infos
     """
 
-    def __init__(self, timezone: str, public_name: str, lang: str) -> None:
+    def __init__(
+        self,
+        timezone: str,
+        lang: str,
+        public_name: Optional[str] = None,
+        username: Optional[str] = None,
+    ) -> None:
         self.timezone = timezone
         self.public_name = public_name
+        self.username = username
         self.lang = lang
 
 
@@ -210,20 +233,22 @@ class UserCreation(object):
 
     def __init__(
         self,
-        email: str,
-        password: str = None,
-        public_name: str = None,
-        timezone: str = None,
-        profile: str = None,
-        lang: str = None,
+        email: Optional[str] = None,
+        password: Optional[str] = None,
+        public_name: Optional[str] = None,
+        username: Optional[str] = None,
+        timezone: Optional[str] = None,
+        profile: Optional[str] = None,
+        lang: Optional[str] = None,
         email_notification: bool = True,
-        allowed_space: typing.Optional[int] = None,
+        allowed_space: Optional[int] = None,
     ) -> None:
         self.email = email
         # INFO - G.M - 2018-08-16 - cleartext password, default value
         # is auto-generated.
         self.password = password or None
         self.public_name = public_name or None
+        self.username = username or None
         self.timezone = timezone or ""
         self.lang = lang or None
         self.profile = profile or None
@@ -464,9 +489,16 @@ class WorkspaceMemberInvitation(object):
     Workspace Member Invitation
     """
 
-    def __init__(self, user_id: int = None, user_email: str = None, role: str = None,) -> None:
+    def __init__(
+        self,
+        user_id: int = None,
+        user_email: str = None,
+        user_username: str = None,
+        role: str = None,
+    ) -> None:
         self.role = role
         self.user_email = user_email
+        self.user_username = user_username
         self.user_id = user_id
 
 
@@ -477,11 +509,11 @@ class WorkspaceUpdate(object):
 
     def __init__(
         self,
-        label: typing.Optional[str] = None,
-        description: typing.Optional[str] = None,
-        agenda_enabled: typing.Optional[bool] = None,
-        public_upload_enabled: typing.Optional[bool] = None,
-        public_download_enabled: typing.Optional[bool] = None,
+        label: Optional[str] = None,
+        description: Optional[str] = None,
+        agenda_enabled: Optional[bool] = None,
+        public_upload_enabled: Optional[bool] = None,
+        public_download_enabled: Optional[bool] = None,
     ) -> None:
         self.label = label
         self.description = description
@@ -515,9 +547,7 @@ class ContentCreation(object):
     Content creation model
     """
 
-    def __init__(
-        self, label: str, content_type: str, parent_id: typing.Optional[int] = None
-    ) -> None:
+    def __init__(self, label: str, content_type: str, parent_id: Optional[int] = None) -> None:
         self.label = label
         self.content_type = content_type
         self.parent_id = parent_id or None
@@ -556,18 +586,10 @@ class FolderContentUpdate(object):
     Folder Content update model
     """
 
-    def __init__(self, label: str, raw_content: str, sub_content_types: typing.List[str]) -> None:
+    def __init__(self, label: str, raw_content: str, sub_content_types: List[str]) -> None:
         self.label = label
         self.raw_content = raw_content
         self.sub_content_types = sub_content_types
-
-
-class TypeUser(Enum):
-    """The method that helped to find a user"""
-
-    USER_ID = "found_id"
-    EMAIL = "found_email"
-    TOKEN = "found_user_token"
 
 
 class Agenda(object):
@@ -575,7 +597,7 @@ class Agenda(object):
         self,
         agenda_url: str,
         with_credentials: bool,
-        workspace_id: typing.Optional[int],
+        workspace_id: Optional[int],
         agenda_type: str,
     ) -> None:
         self.agenda_url = agenda_url
@@ -601,7 +623,7 @@ class UserInContext(object):
         return self
 
     @property
-    def email(self) -> str:
+    def email(self) -> Optional[str]:
         return self.user.email
 
     @property
@@ -609,11 +631,15 @@ class UserInContext(object):
         return self.user.user_id
 
     @property
-    def public_name(self) -> str:
+    def public_name(self) -> Optional[str]:
         return self.display_name
 
     @property
-    def display_name(self) -> str:
+    def username(self) -> Optional[str]:
+        return self.user.username
+
+    @property
+    def display_name(self) -> Optional[str]:
         return self.user.display_name
 
     @property
@@ -643,7 +669,7 @@ class UserInContext(object):
     # Context related
 
     @property
-    def avatar_url(self) -> typing.Optional[str]:
+    def avatar_url(self) -> Optional[str]:
         return self.user.avatar_url
 
     @property
@@ -740,7 +766,7 @@ class WorkspaceInContext(object):
         return self.workspace.public_upload_enabled
 
     @property
-    def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:
+    def sidebar_entries(self) -> List[WorkspaceMenuEntry]:
         """
         get sidebar entries, those depends on activated apps.
         """
@@ -760,7 +786,7 @@ class WorkspaceInContext(object):
         return root_frontend_url + workspace_frontend_url
 
     @property
-    def owner(self) -> typing.Optional[UserInContext]:
+    def owner(self) -> Optional[UserInContext]:
         if self.workspace.owner:
             return UserInContext(
                 dbsession=self.dbsession, config=self.config, user=self.workspace.owner
@@ -905,7 +931,7 @@ class ContentInContext(object):
         return self.content.content_namespace.value
 
     @property
-    def parent(self) -> typing.Optional["ContentInContext"]:
+    def parent(self) -> Optional["ContentInContext"]:
         if self.content.parent:
             from tracim_backend.lib.core.content import ContentApi
 
@@ -922,7 +948,7 @@ class ContentInContext(object):
         return None
 
     @property
-    def parents(self) -> typing.List["ContentInContext"]:
+    def parents(self) -> List["ContentInContext"]:
         parents = []
         if self.parent:
             parents.append(self.parent)
@@ -933,7 +959,7 @@ class ContentInContext(object):
         return parents
 
     @property
-    def comments(self) -> typing.List["ContentInContext"]:
+    def comments(self) -> List["ContentInContext"]:
         comments_in_context = []
         for comment in self.content.get_comments():
             from tracim_backend.lib.core.content import ContentApi
@@ -961,7 +987,7 @@ class ContentInContext(object):
         return content_type.slug
 
     @property
-    def sub_content_types(self) -> typing.List[str]:
+    def sub_content_types(self) -> List[str]:
         return [_type.slug for _type in self.content.get_allowed_content_types()]
 
     @property
@@ -973,7 +999,7 @@ class ContentInContext(object):
         return self.content.is_archived
 
     @property
-    def archived_through_parent_id(self) -> typing.Optional[int]:
+    def archived_through_parent_id(self) -> Optional[int]:
         from tracim_backend.lib.core.content import ContentApi
 
         content_api = ContentApi(
@@ -992,7 +1018,7 @@ class ContentInContext(object):
         return self.content.is_deleted
 
     @property
-    def deleted_through_parent_id(self) -> typing.Optional[int]:
+    def deleted_through_parent_id(self) -> Optional[int]:
         from tracim_backend.lib.core.content import ContentApi
 
         content_api = ContentApi(
@@ -1038,6 +1064,10 @@ class ContentInContext(object):
     @property
     def current_revision_id(self) -> int:
         return self.content.cached_revision_id
+
+    @property
+    def current_revision_type(self) -> int:
+        return self.content.current_revision.revision_type
 
     @property
     def created(self) -> datetime:
@@ -1088,7 +1118,7 @@ class ContentInContext(object):
 
     # file specific
     @property
-    def page_nb(self) -> typing.Optional[int]:
+    def page_nb(self) -> Optional[int]:
         """
         :return: page_nb of content if available, None if unavailable
         """
@@ -1118,7 +1148,7 @@ class ContentInContext(object):
         return self.content.file_mimetype
 
     @property
-    def size(self) -> typing.Optional[int]:
+    def size(self) -> Optional[int]:
         """
         :return: size of content if available, None if unavailable
         """
@@ -1196,7 +1226,7 @@ class ContentInContext(object):
         """
         return core_convert_file_name_to_display(self.content.file_name)
 
-    def get_b64_file(self) -> typing.Optional[str]:
+    def get_b64_file(self) -> Optional[str]:
         if self.content.depot_file:
             return base64.b64encode(self.content.depot_file.file.read()).decode("ascii")
         return None
@@ -1258,7 +1288,7 @@ class RevisionInContext(object):
         return content_type_list.get_one_by_slug(self.revision.type).slug
 
     @property
-    def sub_content_types(self) -> typing.List[str]:
+    def sub_content_types(self) -> List[str]:
         return [_type.slug for _type in self.revision.node.get_allowed_content_types()]
 
     @property
@@ -1321,7 +1351,7 @@ class RevisionInContext(object):
         return self.revision.updated
 
     @property
-    def next_revision(self) -> typing.Optional[ContentRevisionRO]:
+    def next_revision(self) -> Optional[ContentRevisionRO]:
         """
         Get next revision (later revision)
         :return: next_revision
@@ -1341,7 +1371,7 @@ class RevisionInContext(object):
             return None
 
     @property
-    def comment_ids(self) -> typing.List[int]:
+    def comment_ids(self) -> List[int]:
         """
         Get list of ids of all current revision related comments
         :return: list of comments ids
@@ -1388,7 +1418,7 @@ class RevisionInContext(object):
 
     # file specific
     @property
-    def page_nb(self) -> typing.Optional[int]:
+    def page_nb(self) -> Optional[int]:
         """
         :return: page_nb of content if available, None if unavailable
         """
@@ -1419,7 +1449,7 @@ class RevisionInContext(object):
         return self.revision.file_mimetype
 
     @property
-    def size(self) -> typing.Optional[int]:
+    def size(self) -> Optional[int]:
         """
         :return: size of content if available, None if unavailable
         """

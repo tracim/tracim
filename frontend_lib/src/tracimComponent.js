@@ -30,8 +30,8 @@ export function TracimComponent (WrappedComponent) {
     }
 
     registerLiveMessageHandlerList = (liveMessageList) => {
-      liveMessageList.forEach(({ entityType, coreEntityType, handler }) => {
-        const eventType = this.eventTypeBuilder(entityType, coreEntityType)
+      liveMessageList.forEach(({ entityType, coreEntityType, optionalSubType, handler }) => {
+        const eventType = this.eventNameBuilder(entityType, coreEntityType, optionalSubType)
         this.registeredLiveMessageHandlerList[eventType] = handler
       })
     }
@@ -41,7 +41,8 @@ export function TracimComponent (WrappedComponent) {
       }
     }
 
-    eventTypeBuilder = (entityType, coreEntityType) => `${entityType}.${coreEntityType}`
+    eventNameBuilder = (entityType, coreEntityType, optionalSubType = null) =>
+      `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
 
     render () {
       return (

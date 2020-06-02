@@ -364,6 +364,7 @@ class CleanupLib(object):
             anonymized_user_display_name or self.app_config.DEFAULT_ANONYMIZED_USER_DISPLAY_NAME
         )
         user.email = ANONYMIZED_USER_EMAIL_PATTERN.format(hash=hash)
+        user.username = None
         user.is_active = False
         user.is_deleted = True
         self.safe_update(user)
