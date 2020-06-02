@@ -105,7 +105,7 @@ basic_setup.session_secret = change_this_value_please!
 
 ## Anonymized User
 # You can set default display name for anonymized user.
-; default_anonymized_user_display_name = "Lost Meerkat"
+; default_anonymized_user_display_name = "Deleted user"
 
 ## Build Version
 # If you leave build_version empty or unsetted here, Tracim will automatically
@@ -348,6 +348,9 @@ website.base_url = %(basic_setup.website_base_url)s
 ####
 # EMAIL-COMMON
 ####
+# Require that every users have an email address associated with their account.
+# If disabled, users will be allowed to have accounts without an email address. In this case, the username is mandatory.
+; email.required = True
 
 ####
 # EMAIL-NOTIFICATION

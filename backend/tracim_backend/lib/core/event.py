@@ -28,6 +28,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -174,9 +175,9 @@ class EventBuilder:
 
     @hookimpl
     def on_content_modified(self, content: Content, db_session: TracimSession) -> None:
-        if self._has_just_been_deleted(content.current_revision):
+        if content.current_revision.revision_type == ActionDescription.DELETION:
             self._create_content_event(OperationType.DELETED, content, db_session)
-        elif self._has_just_been_undeleted(content.current_revision):
+        elif content.current_revision.revision_type == ActionDescription.UNDELETION:
             self._create_content_event(OperationType.UNDELETED, content, db_session)
         else:
             self._create_content_event(OperationType.MODIFIED, content, db_session)
@@ -269,7 +270,7 @@ class EventBuilder:
         """Check that an object has been deleted since it has been queried from database."""
         if obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
-            was_changed = not history.unchanged and history.deleted
+            was_changed = not history.unchanged and (history.deleted or history.added)
             return was_changed
         return False
 
@@ -279,7 +280,7 @@ class EventBuilder:
         """Check whether an object has been undeleted since queried from database."""
         if not obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
-            was_changed = not history.unchanged and history.deleted
+            was_changed = not history.unchanged and (history.deleted or history.added)
             return was_changed
         return False
 

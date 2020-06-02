@@ -282,7 +282,14 @@ class WorkspaceApi(object):
 
     def get_notifiable_roles(
         self, workspace: Workspace, force_notify: bool = False
-    ) -> [UserRoleInWorkspace]:
+    ) -> typing.List[UserRoleInWorkspace]:
+        """return workspace roles of given workspace which can be notified. Note that user without
+        email are excluded from return as user with no notification parameter (if force_notify is
+        False).
+
+        :param workspace: concerned workspace
+        :param force_notify: don't care about notification configuration of user
+        """
         roles = []
         for role in workspace.roles:
             if (
@@ -291,6 +298,7 @@ class WorkspaceApi(object):
                 and role.user.is_active
                 and not role.user.is_deleted
                 and role.user.auth_type != AuthType.UNKNOWN
+                and role.user.email
             ):
                 roles.append(role)
         return roles

@@ -29,6 +29,7 @@ from tracim_backend.app_models.validator import user_profile_validator_with_nobo
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
+from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ActiveContentFilter
@@ -57,6 +58,7 @@ from tracim_backend.models.context_models import RoleUpdate
 from tracim_backend.models.context_models import SetContentStatus
 from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
+from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
 from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
@@ -171,6 +173,9 @@ class UserDigestSchema(marshmallow.Schema):
         "an empty url as default avatar)",
     )
     public_name = StrippedString(example="John Doe")
+    username = StrippedString(
+        example="My-Power_User99", required=False, default=None, allow_none=True
+    )
 
 
 class UserDiskSpaceSchema(UserDigestSchema):
@@ -191,7 +196,7 @@ class UserSchema(UserDigestSchema):
     Complete user schema
     """
 
-    email = marshmallow.fields.Email(required=True, example="hello@tracim.fr")
+    email = marshmallow.fields.Email(required=False, example="hello@tracim.fr", allow_none=True)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Date of creation of the user account"
     )
@@ -253,6 +258,16 @@ class SetEmailSchema(LoggedInUserPasswordSchema):
         return SetEmail(**data)
 
 
+class SetUsernameSchema(LoggedInUserPasswordSchema):
+    username = StrippedString(
+        required=True, example="The-user_42", validate=user_username_validator
+    )
+
+    @post_load
+    def create_set_username_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return SetUsername(**data)
+
+
 class SetPasswordSchema(LoggedInUserPasswordSchema):
     new_password = String(example="8QLa$<w", required=True, validate=user_password_validator)
     new_password2 = String(example="8QLa$<w", required=True, validate=user_password_validator)
@@ -272,7 +287,7 @@ class SetUserInfoSchema(marshmallow.Schema):
         description=FIELD_TIMEZONE_DESC, example="Europe/Paris", required=True
     )
     public_name = StrippedString(
-        example="John Doe", required=True, validate=user_public_name_validator
+        example="John Doe", required=False, validate=user_public_name_validator, default=None
     )
     lang = StrippedString(
         description=FIELD_LANG_DESC,
@@ -326,7 +341,10 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
 
 class UserCreationSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
-        required=True, example="hello@tracim.fr", validate=user_email_validator
+        required=False, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
+    )
+    username = String(
+        required=False, example="My-Power_User99", validate=user_username_validator, allow_none=True
     )
     password = String(
         example="8QLa$<w",
@@ -372,6 +390,11 @@ class UserCreationSchema(marshmallow.Schema):
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
         "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
+
+    @marshmallow.validates_schema(pass_original=True)
+    def validate_email_and_username(self, data: dict, original_data: dict, **kwargs) -> None:
+        if not original_data.get("email") and not original_data.get("username"):
+            raise marshmallow.ValidationError("email or username required")
 
     @post_load
     def create_user(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -740,20 +763,42 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
     user_email = marshmallow.fields.Email(
         example="suri@cate.fr", default=None, allow_none=True, validate=user_email_validator
     )
+    user_username = StrippedString(
+        example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
+    )
 
     @post_load
-    def make_role(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_workspace_member_invite(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceMemberInvitation(**data)
+
+    @marshmallow.validates_schema(pass_original=True)
+    def has_user_id_email_or_username(self, data: dict, original_data: dict, **kwargs) -> None:
+        if not (
+            original_data.get("user_email")
+            or original_data.get("user_username")
+            or original_data.get("user_id")
+        ):
+            raise marshmallow.ValidationError("user_id, user_email or user_username required")
 
 
 class ResetPasswordRequestSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
-        required=True, example="hello@tracim.fr", validate=user_email_validator
+        example="hello@tracim.fr", default=None, allow_none=True, validate=user_email_validator
+    )
+
+    username = StrippedString(
+        example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
     )
 
     @post_load
     def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return ResetPasswordRequest(**data)
+
+    # TODO 2020-06-11 - RJ: duplicated code across this file
+    @marshmallow.validates_schema(pass_original=True)
+    def validate_email_and_username(self, data: dict, original_data: dict, **kwargs) -> None:
+        if not original_data.get("email") and not original_data.get("username"):
+            raise marshmallow.ValidationError("email or username required")
 
 
 class ResetPasswordCheckTokenSchema(marshmallow.Schema):
@@ -787,7 +832,10 @@ class ResetPasswordModifySchema(marshmallow.Schema):
 class BasicAuthSchema(marshmallow.Schema):
 
     email = marshmallow.fields.Email(
-        example="hello@tracim.fr", required=True, validate=user_email_validator
+        example="hello@tracim.fr", required=False, validate=user_email_validator, allow_none=True
+    )
+    username = String(
+        example="My-Power_User99", required=False, validate=user_username_validator, allow_none=True
     )
     password = String(
         example="8QLa$<w", required=True, load_only=True, validate=user_password_validator
@@ -795,6 +843,11 @@ class BasicAuthSchema(marshmallow.Schema):
 
     class Meta:
         description = "Entry for HTTP Basic Auth"
+
+    @marshmallow.validates_schema(pass_original=True)
+    def validate_email_and_username(self, data: dict, original_data: dict, **kwargs) -> None:
+        if not original_data.get("email") and not original_data.get("username"):
+            raise marshmallow.ValidationError("email or username required")
 
     @post_load
     def make_login(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -984,6 +1037,15 @@ class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
 
 class TimezoneSchema(marshmallow.Schema):
     name = StrippedString(example="Europe/London")
+
+
+class GetUsernameAvailability(marshmallow.Schema):
+    username = StrippedString(example="The-powerUser_42", required=True)
+
+
+class UsernameAvailability(marshmallow.Schema):
+    username = StrippedString(example="The-powerUser_42", required=True)
+    available = marshmallow.fields.Boolean(required=True)
 
 
 class AboutSchema(marshmallow.Schema):
@@ -1319,6 +1381,7 @@ class ConfigSchema(marshmallow.Schema):
     workspace_size_limit = marshmallow.fields.Integer()
     workspaces_number_per_user_limit = marshmallow.fields.Integer()
     instance_name = marshmallow.fields.String()
+    email_required = marshmallow.fields.Bool()
 
 
 class EventSchema(marshmallow.Schema):

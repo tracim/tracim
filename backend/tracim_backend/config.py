@@ -390,7 +390,7 @@ class CFG(object):
             do_strip=True,
         )
         self.DEFAULT_ANONYMIZED_USER_DISPLAY_NAME = self.get_raw_config(
-            "default_anonymized_user_display_name", "Lost Meerkat"
+            "default_anonymized_user_display_name", "Deleted user"
         )
 
         self.USER__AUTH_TOKEN__VALIDITY = int(
@@ -610,6 +610,8 @@ class CFG(object):
         self.NEW_USER__INVITATION__MINIMAL_PROFILE = self.get_raw_config(
             "new_user.invitation.minimal_profile", Profile.TRUSTED_USER.slug
         )
+
+        self.EMAIL__REQUIRED = asbool(self.get_raw_config("email.required", "True"))
 
     def _load_webdav_config(self) -> None:
         """

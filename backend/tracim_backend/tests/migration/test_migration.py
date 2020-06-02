@@ -68,3 +68,13 @@ class TestMigration(object):
             current_revision = get_revision(alembic_config, migration_engine, script, "current")
 
         assert current_revision == head_revision
+
+        # downgrade all revision
+        while current_revision is not None:
+            command.downgrade(alembic_config, "-1")
+            current_revision = get_revision(alembic_config, migration_engine, script, "current")
+        assert current_revision is None
+        # upgrade all revision
+        while current_revision != head_revision:
+            command.upgrade(alembic_config, "+1")
+            current_revision = get_revision(alembic_config, migration_engine, script, "current")
