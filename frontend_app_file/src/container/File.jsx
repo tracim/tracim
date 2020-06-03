@@ -181,7 +181,16 @@ export class File extends React.Component {
 
     this.sendGlobalFlashMessage(props.t('File has been deleted'), 'info')
 
-    this.setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: APP_FEATURE_MODE.VIEW }))
+    this.setState(prev =>
+      ({
+        content: {
+          ...prev.content,
+          ...data.content,
+          is_deleted: true
+        },
+        mode: APP_FEATURE_MODE.VIEW
+      })
+    )
   }
 
   handleContentRestored = data => {
@@ -190,7 +199,16 @@ export class File extends React.Component {
 
     this.sendGlobalFlashMessage(props.t('File has been restored'), 'info')
 
-    this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
+    this.setState(prev =>
+      ({
+        content:
+          {
+            ...prev.content,
+            ...data.content,
+            is_deleted: false
+          }
+      })
+    )
   }
 
   async componentDidMount () {
