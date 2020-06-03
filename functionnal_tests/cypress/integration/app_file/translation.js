@@ -6,7 +6,7 @@ describe('App File', () => {
     cy.setupBaseDB()
     cy.loginAs('users')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-      cy.visit(`/ui/workspaces/${workspace.workspace_id}/contents?type=file`)
+      cy.visitPage({ pageName: PAGES.CONTENTS, getters: { type: 'file' }, params: { workspaceId: workspace.workspace_id } })
     })
   })
 

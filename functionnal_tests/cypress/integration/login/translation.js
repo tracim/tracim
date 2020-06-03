@@ -1,8 +1,10 @@
+import { PAGES } from '../../support/urls_commands'
+
 describe('Login page', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
-    cy.visit('/ui/login')
+    cy.visitPage({ pageName: PAGES.LOGIN, params: { loginParam: '' } })
   })
 
   it('should have translations', () => {

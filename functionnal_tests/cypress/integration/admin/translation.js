@@ -5,7 +5,7 @@ describe('content :: admin > workspace', function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
-    cy.visit('/ui/admin/workspace')
+    cy.visitPage({ pageName: PAGES.ADMIN_WORKSPACE })
   })
 
   it('should have translations', () => {

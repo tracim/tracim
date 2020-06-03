@@ -6,7 +6,11 @@ describe('App Folder Advanced', function () {
     cy.setupBaseDB()
     cy.loginAs('users')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-      cy.visit(`/ui/workspaces/${workspace.workspace_id}/contents?type=html-document`)
+      cy.visitPage({
+        pageName: PAGES.CONTENTS,
+        getters: { type: 'html-document' },
+        params: { workspaceId: workspace.workspace_id }
+      })
     })
   })
 

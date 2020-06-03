@@ -1,9 +1,13 @@
+import { PAGES } from '../../support/urls_commands'
+
 describe('App Gallery', function () {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
-    cy.loginAs('users')
-    cy.visit('/ui/workspaces/1/gallery')
+    cy.loginAs('administrators')
+    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+      cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId: workspace.workspace_id } })
+    })
   })
 
   it('should have translations', () => {

@@ -85,7 +85,7 @@ cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: 1}})
 
 cy.visit('/ui/workspaces/1/contents?type=file')
 =>
-cy.vistPage({pageName: p.CONTENTS, getters: {type: 'file'}, params: {workspaceId: 1}})
+cy.visitPage({ pageName: p.CONTENTS, getters: { type: 'file' }, params: { workspaceId: 1 } })
 
 ```
 

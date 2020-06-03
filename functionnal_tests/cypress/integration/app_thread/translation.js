@@ -1,9 +1,17 @@
+import { PAGES } from '../../support/urls_commands'
+
 describe('navigate :: workspace > create_new > thread', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('users')
-    cy.visit('/ui/workspaces/1/contents?type=thread')
+    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+      cy.visitPage({
+        pageName: PAGES.CONTENTS,
+        getters: { type: 'thread' },
+        params: { workspaceId: workspace.workspace_id }
+      })
+    })
   })
 
   it('should have translations', () => {

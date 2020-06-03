@@ -5,7 +5,7 @@ describe('Account page', function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('users')
-    cy.visit('/ui/account')
+    cy.visitPage({ pageName: PAGES.ACCOUNT })
   })
 
   it('should have translations', () => {

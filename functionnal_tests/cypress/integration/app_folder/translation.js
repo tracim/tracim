@@ -6,17 +6,17 @@ describe('App Folder Advanced', function () {
     cy.setupBaseDB()
     cy.loginAs('users')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-      cy.visit(`/ui/workspaces/${workspace.workspace_id}/contents?type=file`)
+      cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspace.workspace_id } })
     })
   })
 
   it('should have translations', () => {
-    cy.get('.folder__header__name').contains('Received files')
+    cy.get('.workspace__header__title').contains('List of contents')
 
     cy.changeLanguage('fr')
-    cy.get('.folder__header__name').contains('Fichiers reçus')
+    cy.get('.workspace__header__title').contains('Liste des contenus')
 
     cy.changeLanguage('pt')
-    cy.get('.folder__header__name').contains('Ficheiros recebidos')
+    cy.get('.workspace__header__title').contains('Lista de conteúdos')
   })
 })
