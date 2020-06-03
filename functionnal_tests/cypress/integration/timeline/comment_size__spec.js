@@ -35,6 +35,9 @@ describe('Add a new comment', () => {
   })
 
   it('Should not change the comment area size', function () {
+    // TODO - GM - 2020/06/03 - Add this test when Html document app support TLM
+    // https://github.com/tracim/tracim/issues/3066
+    this.skip()
     cy.get(contentHtmlDocGetter).click()
     cy.get(cancelDocBtn).click()
 

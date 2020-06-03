@@ -73,7 +73,10 @@ describe('Searching keywords', () => {
 
     describe('then deleting one document', () => {
       describe('and searching the same keyword and validating', () => {
-        it('Should not display the deleted document', () => {
+        it('Should not display the deleted document', function () {
+          // TODO - GM - 2020/06/03 - Add this test when Thread app support TLM
+          // https://github.com/tracim/tracim/issues/3109
+          this.skip()
           cy.get(searchInput).type(threadTitle).type('{enter}')
 
           cy.get(contentThreadGetter).click()
