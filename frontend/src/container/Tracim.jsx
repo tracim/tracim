@@ -48,7 +48,8 @@ import {
   setWorkspaceList,
   setBreadcrumbs,
   appendBreadcrumbs,
-  setWorkspaceListMemberList
+  setWorkspaceListMemberList,
+  setLiveMessageManager
 } from '../action-creator.sync.js'
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
@@ -59,6 +60,7 @@ export class Tracim extends React.Component {
     super(props)
 
     this.liveMessageManager = new LiveMessageManager()
+    props.dispatch(setLiveMessageManager(this.liveMessageManager))
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
@@ -123,6 +125,7 @@ export class Tracim extends React.Component {
         this.loadAppConfig()
         this.loadLiveMessage()
         this.loadWorkspaceList()
+
         this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id)
 
         break

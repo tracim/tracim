@@ -25,7 +25,7 @@ context('Known users as a workspace-manager', function () {
       })
   })
 
-  it('Adds a known member to a workspace using public name', function () {
+  it('should add a known member to a workspace using public name', function () {
     cy.get('[data-cy=memberlist__btnadd]').click()
     cy.get('[data-cy=addmember]').type(this.userToAdd.email)
     cy.get('[data-cy=autocomplete__item__name]')
@@ -39,9 +39,23 @@ context('Known users as a workspace-manager', function () {
     cy.get('[data-cy=memberlist]').contains(this.userToAdd.public_name)
   })
 
-  it('Adds a known member to a workspace using email', function () {
+  it('should add a known member to a workspace using email', function () {
     cy.get('[data-cy=memberlist__btnadd]').click()
     cy.get('[data-cy=addmember]').type(this.userToAdd.email)
+    cy.get('[data-cy=autocomplete__item__name]')
+      .contains(this.userToAdd.public_name)
+      .click()
+    cy.get('[data-cy=memberlist]')
+      .contains(sharedSpaceManager)
+      .click()
+    cy.contains('Validate').click()
+    cy.get('[data-cy=flashmessage]').contains('Member added').should('be.visible')
+    cy.get('[data-cy=memberlist]').contains(this.userToAdd.public_name)
+  })
+
+  it('should add a known member to a workspace using username', function () {
+    cy.get('[data-cy=memberlist__btnadd]').click()
+    cy.get('[data-cy=addmember]').type(this.userToAdd.username)
     cy.get('[data-cy=autocomplete__item__name]')
       .contains(this.userToAdd.public_name)
       .click()

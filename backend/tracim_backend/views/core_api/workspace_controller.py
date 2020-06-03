@@ -350,7 +350,12 @@ class WorkspaceController(Controller):
             show_deleted=True,
         )
         try:
-            _, user = uapi.get(user_id=hapic_data.body.user_id, email=hapic_data.body.user_email)
+            if hapic_data.body.user_id:
+                user = uapi.get_one(hapic_data.body.user_id)
+            elif hapic_data.body.user_email:
+                user = uapi.get_one_by_email(hapic_data.body.user_email)
+            else:
+                user = uapi.get_one_by_username(hapic_data.body.user_username)
             if user.is_deleted:
                 raise UserIsDeleted("This user has been deleted. Unable to invite him.")
             if not user.is_active:
@@ -369,7 +374,7 @@ class WorkspaceController(Controller):
                 if (
                     app_config.EMAIL__NOTIFICATION__ACTIVATED
                     and app_config.NEW_USER__INVITATION__DO_NOTIFY
-                    and app_config.EMAIL__PROCESSING_MODE.lower() == "sync"
+                    and app_config.JOBS__PROCESSING_MODE == app_config.CST.SYNC
                 ):
                     email_sent = True
             else:

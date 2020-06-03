@@ -27,7 +27,7 @@ class Controller(ABC):
     ...    @hapic.output_body(AboutSchema())
     ...    def about(self, context, request: TracimRequest, hapic_data=None,request=None):
     ...        app_config = request.registry.settings["CFG"]  # type: CFG
-    ...        system_api = SystemApi(app_config)
+    ...        system_api = SystemApi(app_config, request.dbsession)
     ...        return system_api.get_about()
     ...
     ...    def bind(self, configurator: Configurator) -> None:

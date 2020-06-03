@@ -1,3 +1,3 @@
-import { globalManager } from '../../../fixture/user/globalManager.js'
+import { globalManagerFromApi } from '../../../fixture/user/globalManagerFromApi.js'
 
-export const user = globalManager
+export const user = globalManagerFromApi

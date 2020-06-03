@@ -14,9 +14,9 @@ def get_redis_connection(config: CFG) -> redis.Redis:
     :return: redis connection
     """
     return redis.Redis(
-        host=config.EMAIL__ASYNC__REDIS__HOST,
-        port=config.EMAIL__ASYNC__REDIS__PORT,
-        db=config.EMAIL__ASYNC__REDIS__DB,
+        host=config.JOBS__ASYNC__REDIS__HOST,
+        port=config.JOBS__ASYNC__REDIS__PORT,
+        db=config.JOBS__ASYNC__REDIS__DB,
     )
 
 

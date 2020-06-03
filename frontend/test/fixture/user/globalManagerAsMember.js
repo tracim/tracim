@@ -1,13 +1,14 @@
-import { globalManager } from './globalManager.js'
+import { globalManagerFromApi } from './globalManagerFromApi.js'
 import { ROLE } from 'tracim_frontend_lib'
+import { serializeMember } from '../../../src/reducer/currentWorkspace.js'
 
-const { id, publicName, isActive, doNotify } = globalManager
-
-// INFO - CH - 2019-06-24 - this is a user returned by the api as a member of a workspace
-export const globalManagerAsMember = {
-  id,
-  publicName,
-  isActive,
-  doNotify,
-  role: ROLE.workspaceManager.id
+export const globalManagerAsMemberFromApi = {
+  user: {
+    ...globalManagerFromApi
+  },
+  role: ROLE.workspaceManager.slug,
+  is_active: true,
+  do_notify: true
 }
+
+export const globalManagerAsMember = serializeMember(globalManagerAsMemberFromApi)

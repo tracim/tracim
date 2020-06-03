@@ -10,7 +10,6 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
 class TestLivesMessages(object):
     def test_api__user_live_messages_endpoint_without_GRIP_proxy__ok_200__nominal_case(
         self, user_api_factory, web_testapp, admin_user
@@ -41,28 +40,26 @@ class TestLivesMessages(object):
     ):
         headers = {"Accept": "text/event-stream"}
         response = requests.get(
-            "http://localhost:7997/api/users/1/live_messages",
+            "http://localhost:7999/api/users/1/live_messages",
             auth=("admin@admin.admin", "admin@admin.admin"),
             stream=True,
             headers=headers,
         )
         client = sseclient.SSEClient(response)
         LiveMessagesLib(config=app_config).publish_dict("user_1", {"test_message": "example"})
-        for event in client.events():
-            event1 = event
-            # INFO - GM - 2020-05-12  we skip the live message stream after receiving the first message
-            break
+        event1 = next(client.events())
         response.close()
         assert json.loads(event1.data) == {"test_message": "example"}
         assert event1.event == "message"
 
+    @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update(
         self, pushpin, app_config
     ):
 
         headers = {"Accept": "text/event-stream"}
         response = requests.get(
-            "http://localhost:7997/api/users/1/live_messages",
+            "http://localhost:7999/api/users/1/live_messages",
             auth=("admin@admin.admin", "admin@admin.admin"),
             stream=True,
             headers=headers,
@@ -70,15 +67,48 @@ class TestLivesMessages(object):
         client = sseclient.SSEClient(response)
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
         update_user_request = requests.put(
-            "http://localhost:7997/api/users/1",
+            "http://localhost:7999/api/users/1",
             auth=("admin@admin.admin", "admin@admin.admin"),
             json=params,
         )
         assert update_user_request.status_code == 200
-        for event in client.events():
-            event1 = event
-            # INFO - GM - 2020-05-12  we skip the live message stream after receiving the first message
-            break
+        event1 = next(client.events())
+        response.close()
+        result = json.loads(event1.data)
+        assert result["read"] is None
+        assert result["fields"]
+        assert result["created"]
+        assert result["event_id"]
+        assert result["fields"]["user"]
+        assert result["fields"]["user"]["user_id"] == 1
+        assert result["fields"]["author"]["user_id"] == 1
+        assert result["fields"]["author"]
+        assert result["event_type"] == "user.modified"
+        assert event1.event == "message"
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_async_live_test"}], indirect=True
+    )
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update__async(
+        self, pushpin, app_config, rq_database_worker
+    ):
+
+        headers = {"Accept": "text/event-stream"}
+        response = requests.get(
+            "http://localhost:7999/api/v2/users/1/live_messages",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            stream=True,
+            headers=headers,
+        )
+        client = sseclient.SSEClient(response)
+        params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
+        update_user_request = requests.put(
+            "http://localhost:7999/api/v2/users/1",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            json=params,
+        )
+        assert update_user_request.status_code == 200
+        event1 = next(client.events())
         response.close()
         result = json.loads(event1.data)
         assert result["read"] is None

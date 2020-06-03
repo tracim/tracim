@@ -1015,6 +1015,7 @@ class TestAccountDiskSpaceEndpoint(object):
             email="test@test.test",
             password="test@test.test",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -1036,6 +1037,7 @@ class TestAccountDiskSpaceEndpoint(object):
         res = res.json_body
         assert res["used_space"] == 6210
         assert res["user"]["public_name"] == "bob"
+        assert res["user"]["username"] == "boby"
         assert res["user"]["avatar_url"] is None
         assert res["allowed_space"] == 134217728
 
@@ -1066,6 +1068,7 @@ class TestAccountEndpoint(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -1085,6 +1088,7 @@ class TestAccountEndpoint(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
 
@@ -1112,6 +1116,7 @@ class TestAccountKnownMembersEndpointKnownMembersFilterDisabled(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -1155,14 +1160,17 @@ class TestAccountKnownMembersEndpointKnownMembersFilterDisabled(object):
         assert len(res) == 3
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
+        assert res[0]["username"] == test_user.username
         assert res[0]["avatar_url"] is None
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
+        assert res[1]["username"] is None
         assert res[1]["avatar_url"] is None
 
         assert res[2]["user_id"] == test_user3.user_id
         assert res[2]["public_name"] == test_user3.display_name
+        assert res[2]["username"] is None
         assert res[2]["avatar_url"] is None
 
 
@@ -1193,6 +1201,7 @@ class TestAccountKnownMembersEndpoint(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -1221,10 +1230,12 @@ class TestAccountKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
+        assert res[0]["username"] == test_user.username
         assert res[0]["avatar_url"] is None
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
+        assert res[1]["username"] is None
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(
@@ -1246,6 +1257,7 @@ class TestAccountKnownMembersEndpoint(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -1275,6 +1287,7 @@ class TestAccountKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
+        assert res[0]["username"] == test_user.username
         assert res[0]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(
@@ -1306,6 +1319,7 @@ class TestAccountKnownMembersEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -1329,6 +1343,7 @@ class TestAccountKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
+        assert res[0]["username"] == test_user.username
         assert res[0]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(
@@ -1479,6 +1494,7 @@ class TestAccountKnownMembersEndpoint(object):
             email="test2@test2.test2",
             password="password",
             name="bob2",
+            username="boby2",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -1497,10 +1513,12 @@ class TestAccountKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
+        assert res[0]["username"] is None
         assert res[0]["avatar_url"] is None
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
+        assert res[1]["username"] == test_user2.username
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__err_403__admin__too_small_acp(
@@ -2017,6 +2035,7 @@ class TestSetUserInfoEndpoint(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -2033,6 +2052,7 @@ class TestSetUserInfoEndpoint(object):
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         # Set params
@@ -2043,5 +2063,6 @@ class TestSetUserInfoEndpoint(object):
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "updated"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"

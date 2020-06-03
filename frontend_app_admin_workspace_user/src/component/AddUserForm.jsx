@@ -1,9 +1,12 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { Popover, PopoverBody } from 'reactstrap'
 import {
   CUSTOM_EVENT,
-  PROFILE_LIST
+  PROFILE_LIST,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
+import { ALLOWED_CHARACTERS_USERNAME } from '../helper.js'
 
 export class AddUserForm extends React.Component {
   constructor (props) {
@@ -11,13 +14,26 @@ export class AddUserForm extends React.Component {
 
     this.state = {
       newUserName: '',
+      newUserUsername: '',
       newUserEmail: '',
       newUserPassword: '',
-      newUserProfile: ''
+      newUserProfile: '',
+      popoverEmailInfoOpen: false
     }
   }
 
+  handleTogglePopoverEmailInfo = () => {
+    this.setState(prevState => ({
+      popoverEmailInfoOpen: !prevState.popoverEmailInfoOpen
+    }))
+  }
+
   handleChangeNewUserName = e => this.setState({ newUserName: e.target.value })
+
+  handleChangeNewUserUsername = e => {
+    this.setState({ newUserUsername: e.target.value })
+    this.props.onChangeUsername(e.target.value)
+  }
 
   handleChangeNewUserEmail = e => this.setState({ newUserEmail: e.target.value })
 
@@ -28,11 +44,11 @@ export class AddUserForm extends React.Component {
   handleClickAddUser = () => {
     const { props, state } = this
 
-    if (state.newUserName === '' || state.newUserEmail === '' || state.newUserProfile === '') {
+    if (state.newUserName === '' || (state.newUserUsername === '' && state.newUserEmail === '') || state.newUserProfile === '') {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
-          msg: props.t('Please type a name, an email, a password and select a profile'),
+          msg: props.t('Please enter a name, a password, select a profile, and at least one between username or email'),
           type: 'warning',
           delay: undefined
         }
@@ -40,14 +56,30 @@ export class AddUserForm extends React.Component {
       return
     }
 
-    props.onClickAddUser(state.newUserName, state.newUserEmail, state.newUserProfile, state.newUserPassword)
+    props.onClickAddUser(
+      state.newUserName,
+      removeAtInUsername(state.newUserUsername),
+      state.newUserEmail,
+      state.newUserProfile,
+      state.newUserPassword
+    )
   }
 
   isValidateButtonDisabled = () => {
     const { props, state } = this
+
     return props.emailNotifActivated
-      ? [state.newUserName, state.newUserEmail, state.newUserProfile].some(i => i === '')
-      : [state.newUserName, state.newUserEmail, state.newUserPassword, state.newUserProfile].some(i => i === '')
+      ? (
+        state.newUserName === '' ||
+        ((state.newUserUsername === '' || !props.newUsernameAvailability) && state.newUserEmail === '') ||
+        state.newUserProfile === ''
+      )
+      : (
+        state.newUserName === '' ||
+        ((state.newUserUsername === '' || !props.newUsernameAvailability) && state.newUserEmail === '') ||
+        state.newUserProfile === '' ||
+        state.newUserPassword === ''
+      )
   }
 
   render () {
@@ -55,14 +87,14 @@ export class AddUserForm extends React.Component {
 
     return (
       <form className='adminUser__adduser__form' data-cy='adminUser__adduser__form'>
-        <div className='adminUser__adduser__form__username'>
-          <label className='username__text' htmlFor='adduser_name'>
+        <div className='adminUser__adduser__form__userData'>
+          <label className='userData__text' htmlFor='adduser_name'>
             {props.t('Full name')}
           </label>
 
           <input
             type='text'
-            className='username__input form-control'
+            className='userData__input form-control'
             id='adduser_name'
             placeholder={props.t('Full name')}
             value={state.newUserName}
@@ -70,13 +102,66 @@ export class AddUserForm extends React.Component {
             data-cy='adduser_name'
           />
 
-          <label className='username__text' htmlFor='adduser_email'>
-            {props.t('Email')}
+          <label className='userData__text' htmlFor='adduser_username'>
+            {props.t('Username')}
           </label>
 
           <input
             type='text'
-            className='username__input form-control'
+            className='userData__input form-control'
+            id='adduser_username'
+            placeholder={props.t('@username')}
+            value={state.newUserUsername}
+            onChange={this.handleChangeNewUserUsername}
+            data-cy='adduser_username'
+          />
+
+          {!props.newUsernameAvailability && state.newUserUsername !== '' && (
+            <div className='userData__input__username__errorMsg'>
+              <i className='userData__input__username__errorIcon fa fa-times' />
+              {props.t('This username is not available')}
+            </div>
+          )}
+          {props.newUsernameAvailability && state.newUserUsername !== '' && (
+            <div className='userData__input__username__errorInfo'>
+              {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
+            </div>
+          )}
+
+          <div className='userData__email'>
+            <label className='userData__text' htmlFor='adduser_email'>
+              {props.t('Email')}
+            </label>
+
+            {!props.emailNotifActivated && (
+              <>
+                <button
+                  type='button'
+                  className='userData__email__info'
+                  id='popoverEmailInfo'
+                >
+                  <i className='fa fa-fw fa-question-circle' />
+                </button>
+
+                <Popover
+                  placement='bottom'
+                  isOpen={state.popoverEmailInfoOpen}
+                  target='popoverEmailInfo'
+                  // INFO - GB - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+                  toggle={this.handleTogglePopoverEmailInfo} // eslint-disable-line react/jsx-handler-names
+                  trigger='hover'
+                >
+                  <PopoverBody>
+                    {props.t('Linking an email address is required for the user to be able to reset the password.')}
+                  </PopoverBody>
+                </Popover>
+              </>
+            )}
+          </div>
+
+          <input
+            type='text'
+            className='userData__input form-control'
             id='adduser_email'
             placeholder={props.t('Email')}
             value={state.newUserEmail}
@@ -84,21 +169,27 @@ export class AddUserForm extends React.Component {
             data-cy='adduser_email'
           />
 
-          {!props.emailNotifActivated && (
+          {(!props.emailNotifActivated || state.newUserEmail === '') && (
             <div>
-              <label className='username__text' htmlFor='adduser_password'>
+              <label className='userData__text' htmlFor='adduser_password'>
                 {props.t('Password')}
               </label>
 
               <input
                 type='text'
-                className='username__input form-control'
+                className='userData__input form-control'
                 id='adduser_password'
                 placeholder={props.t('Password')}
                 value={state.newUserPassword}
                 onChange={this.handleChangeNewUserPassword}
                 data-cy='adduser_password'
               />
+            </div>
+          )}
+          {(props.emailNotifActivated && state.newUserEmail === '') && (
+            <div className='userData__info'>
+              <i className='fa fa-exclamation-triangle userData__info__icon' />
+              {props.t('If you do not link an email to this new user, please notify manually the username and password.')}
             </div>
           )}
         </div>

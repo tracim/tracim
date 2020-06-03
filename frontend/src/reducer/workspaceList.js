@@ -57,17 +57,19 @@ export function workspaceList (state = [], action) {
       )
 
     case `${ADD}/${WORKSPACE_MEMBER}`:
-      const memberToAdd = {
-        id: action.newMember.user_id,
-        publicName: action.newMember.public_name,
-        role: action.role,
-        isActive: action.newMember.is_active,
-        doNotify: action.newMember.do_notify
-      }
       return state.map(ws => ws.id === action.workspace.workspace_id
         ? {
           ...ws,
-          memberList: [...ws.memberList, memberToAdd]
+          memberList: [
+            ...ws.memberList,
+            {
+              id: action.newMember.user_id,
+              publicName: action.newMember.public_name,
+              role: action.role,
+              isActive: action.newMember.is_active,
+              doNotify: action.newMember.do_notify
+            }
+          ]
         }
         : ws
       )

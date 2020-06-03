@@ -223,6 +223,10 @@ class NotificationDisabledCantCreateUserWithInvitation(TracimException):
     error_code = ErrorCode.NOTIFICATION_DISABLED_CANT_NOTIFY_NEW_USER
 
 
+class MissingEmailCantResetPassword(TracimException):
+    error_code = ErrorCode.MISSING_EMAIL_CANT_RESET_PASSWORD
+
+
 class NotificationDisabledCantResetPassword(TracimException):
     error_code = ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
@@ -415,6 +419,18 @@ class EmailValidationFailed(TracimValidationFailed):
     error_code = ErrorCode.INTERNAL_TRACIM_VALIDATION_ERROR
 
 
+class EmailOrUsernameRequired(TracimValidationFailed):
+    error_code = ErrorCode.EMAIL_OR_USERNAME_REQUIRED
+
+
+class EmailRequired(TracimValidationFailed):
+    error_code = ErrorCode.EMAIL_REQUIRED
+
+
+class InvalidUsernameFormat(TracimValidationFailed):
+    error_code = ErrorCode.INVALID_USERNAME_FORMAT
+
+
 class InconsistentDatabase(TracimException):
     pass
 
@@ -457,6 +473,10 @@ class AppDoesNotExist(TracimException):
 
 class EmailAlreadyExistInDb(TracimException):
     error_code = ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+
+
+class UsernameAlreadyExistInDb(TracimException):
+    error_code = ErrorCode.USERNAME_ALREADY_EXIST_IN_DB
 
 
 class UnavailablePreview(TracimException):

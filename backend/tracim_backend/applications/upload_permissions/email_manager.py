@@ -125,16 +125,26 @@ class UploadPermissionEmailManager(EmailManager):
         if upload_permission_password:
             upload_permission_password_enabled = True
         translator = Translator(self.config, default_lang=emitter.lang)
-        message = self._notify_emitter(
-            emitter=emitter,
-            workspace_in_context=workspace_in_context,
-            upload_permission_receivers=upload_permission_receivers,
-            upload_permission_password=upload_permission_password,
-            translator=translator,
-        )
-        send_email_through(
-            config=self.config, sendmail_callable=email_sender.send_mail, message=message
-        )
+
+        # NOTE BS 20200428: #2829: Email no longer required for User
+        if emitter.email:
+            message = self._notify_emitter(
+                emitter=emitter,
+                workspace_in_context=workspace_in_context,
+                upload_permission_receivers=upload_permission_receivers,
+                upload_permission_password=upload_permission_password,
+                translator=translator,
+            )
+            send_email_through(
+                config=self.config, sendmail_callable=email_sender.send_mail, message=message
+            )
+        else:
+            logger.debug(
+                self,
+                "Skip upload permission notification email to"
+                "emitter '{}' because have no email".format(emitter.username),
+            )
+
         emails_receivers_list = [
             upload_permission.email for upload_permission in upload_permission_receivers
         ]

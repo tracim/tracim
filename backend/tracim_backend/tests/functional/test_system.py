@@ -168,6 +168,26 @@ class TestAboutEndpoint(object):
         assert "details" in res.json.keys()
 
 
+@pytest.mark.usefixtures("test_fixture")
+class TestUsernameAvailabilitiesEndpoint(object):
+    """
+    Tests for /api/v2/system/username-availability
+    """
+
+    @pytest.mark.parametrize(
+        "username,is_available",
+        [("TheAdmin", False), ("TheBobi", False), ("Cloclo", True), ("anotherOne", True)],
+    )
+    def test_api__get_username_availability__ok_200__nominal_case(
+        self, web_testapp, username: str, is_available: bool
+    ) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/v2/system/username-availability?username={}".format(username), status=200
+        )
+        assert res.json["available"] == is_available
+
+
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
 class TestConfigEndpointCollabora(object):
@@ -233,6 +253,7 @@ class TestConfigEndpoint(object):
         assert res.json_body["content_length_file_size_limit"] == 0
         assert res.json_body["workspace_size_limit"] == 0
         assert res.json_body["workspaces_number_per_user_limit"] == 0
+        assert res.json_body["email_required"] is True
 
     @pytest.mark.xfail(reason="[config_unauthenticated] issue #1270 ")
     def test_api__get_config__err_401__unregistered_user(self, web_testapp):

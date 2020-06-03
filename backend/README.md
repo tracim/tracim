@@ -239,7 +239,7 @@ daemons to work correctly.
     # email fetcher (if email reply is enabled)
     python3 daemons/mail_fetcher.py &
     # RQ worker for live messages
-    rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event
+    rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event &
 
 #### Stop Daemons
 
@@ -247,6 +247,8 @@ daemons to work correctly.
     killall python3 daemons/mail_notifier.py
     # email fetcher
     killall python3 daemons/mail_fetcher.py
+    # RQ worker
+    killall rq
 
 ### Using Supervisor
 
@@ -261,7 +263,7 @@ Example of `supervisord.conf`:
     [supervisord]
     ; You need to replace <PATH> with correct absolute path
 
-    ; email notifier (if async email notification is enabled)
+    ; email notifier (if async jobs processing is enabled)
     [program:tracim_mail_notifier]
     directory=<PATH>/tracim/backend/
     command=<PATH>/tracim/backend/env/bin/python <PATH>/tracim/backend/daemons/mail_notifier.py
@@ -281,6 +283,16 @@ Example of `supervisord.conf`:
     autorestart=true
     environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
+    ; RQ worker (if async jobs processing is enabled)
+    [program:rq_database_worker]
+    directory=<PATH>/tracim/backend/
+    command=rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event
+    stdout_logfile =/tmp/rq_database_worker.log
+    redirect_stderr=true
+    autostart=true
+    autorestart=true
+    environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
+
 Run with (supervisord.conf should be provided, see [supervisord.conf default_paths](http://supervisord.org/configuration.html):
 
     supervisord
@@ -288,6 +300,12 @@ Run with (supervisord.conf should be provided, see [supervisord.conf default_pat
 ## Run Tests and Others Checks ##
 
 ### Run Tests ###
+
+Some functional tests need additional daemons that are run through docker:
+
+```shell
+sudo apt install docker.io docker-compose
+```
 
 Some directories are required to make tests functional, you can create them and do some other check
 with this script:
