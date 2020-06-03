@@ -1,10 +1,16 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
-  CardPopupCreateContent,
-  handleFetchResult,
   addAllResourceI18n,
-  CUSTOM_EVENT, buildHeadTitle
+  appContentFactory,
+  buildHeadTitle,
+  CardPopupCreateContent,
+  CUSTOM_EVENT,
+  handleFetchResult,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { postHtmlDocContent } from '../action.async.js'
 import i18n from '../i18n.js'
@@ -28,11 +34,41 @@ class PopupCreateHtmlDocument extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentCreated }
+    ])
   }
 
-  componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  // TLM Handlers
+  handleContentCreated = data => {
+    const { state } = this
+    if (Number(data.content.parent_id) !== Number(state.folderId) ||
+      state.loggedUser.user_id !== data.author.user_id ||
+      state.newContentName !== data.content.label
+    ) return
+
+    this.handleClose()
+
+    GLOBAL_dispatchEvent({
+      type: CUSTOM_EVENT.OPEN_CONTENT_URL,
+      data: {
+        workspaceId: data.content.workspace_id,
+        contentType: state.appName,
+        contentId: data.content.content_id
+      }
+    })
+  }
+
+  // Custom Event Handlers
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<PopupCreateHtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, data)
+
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+    this.setHeadTitle()
   }
 
   componentDidMount () {
@@ -50,22 +86,6 @@ class PopupCreateHtmlDocument extends React.Component {
     }
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<PopupCreateHtmlDocument> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        this.setHeadTitle()
-        break
-    }
-  }
-
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
@@ -76,50 +96,37 @@ class PopupCreateHtmlDocument extends React.Component {
   })
 
   handleValidate = async () => {
-    const { config, appName, workspaceId, folderId, newContentName } = this.state
+    const { config, workspaceId, folderId, newContentName } = this.state
 
     const fetchSaveNewHtmlDoc = postHtmlDocContent(config.apiUrl, workspaceId, folderId, config.slug, newContentName)
 
     const resSave = await handleFetchResult(await fetchSaveNewHtmlDoc)
 
-    switch (resSave.apiResponse.status) {
-      case 200:
-        this.handleClose()
-
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-
-        GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.OPEN_CONTENT_URL,
+    if (resSave.apiResponse.status !== 200) {
+      switch (resSave.apiResponse.status) {
+        case 400:
+          switch (resSave.body.code) {
+            case 3002:
+              GLOBAL_dispatchEvent({
+                type: CUSTOM_EVENT.ADD_FLASH_MSG,
+                data: {
+                  msg: this.props.t('A content with the same name already exists'),
+                  type: 'warning',
+                  delay: undefined
+                }
+              })
+              break
+          }
+          break
+        default: GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
-            workspaceId: resSave.body.workspace_id,
-            contentType: appName,
-            contentId: resSave.body.content_id
-            // will be open in edit mode because revision.length === 1
+            msg: this.props.t('Error while creating document'),
+            type: 'warning',
+            delay: undefined
           }
         })
-        break
-      case 400:
-        switch (resSave.body.code) {
-          case 3002:
-            GLOBAL_dispatchEvent({
-              type: CUSTOM_EVENT.ADD_FLASH_MSG,
-              data: {
-                msg: this.props.t('A content with the same name already exists'),
-                type: 'warning',
-                delay: undefined
-              }
-            })
-            break
-        }
-        break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while creating document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      }
     }
   }
 
@@ -140,4 +147,4 @@ class PopupCreateHtmlDocument extends React.Component {
   }
 }
 
-export default translate()(PopupCreateHtmlDocument)
+export default translate()(appContentFactory(TracimComponent(PopupCreateHtmlDocument)))

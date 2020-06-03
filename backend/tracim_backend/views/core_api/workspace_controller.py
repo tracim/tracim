@@ -374,7 +374,7 @@ class WorkspaceController(Controller):
                 if (
                     app_config.EMAIL__NOTIFICATION__ACTIVATED
                     and app_config.NEW_USER__INVITATION__DO_NOTIFY
-                    and app_config.EMAIL__PROCESSING_MODE.lower() == "sync"
+                    and app_config.JOBS__PROCESSING_MODE == app_config.CST.SYNC
                 ):
                     email_sent = True
             else:

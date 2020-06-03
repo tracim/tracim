@@ -331,22 +331,26 @@ website.base_url = %(basic_setup.website_base_url)s
 ; webdav.ui.enabled = True
 
 ####
-# EMAIL-COMMON
+# JOB EXECUTION
 ####
 
+### configuration of potentially lengthy jobs ###
+# processing_mode may be sync or async,
+# if async is choosen, you need also to run:
+#  - a custom rq worker (see backend/README.md)
+#  - a redis server
+; jobs.processing_mode = sync
+## with async, please also configure redis below
+; jobs.async.redis.host = localhost
+; jobs.async.redis.port = 6379
+; jobs.async.redis.db = 0
+
+####
+# EMAIL-COMMON
+####
 # Require that every users have an email address associated with their account.
 # If disabled, users will be allowed to have accounts without an email address. In this case, the username is mandatory.
 ; email.required = True
-
-### Email sending configuration ###
-# processing_mode may be sync or async,
-# if async is choosen, you need also to run mail_notifier daemon
-# see README for more info.
-; email.processing_mode = sync
-## with async, please also configure redis below
-; email.async.redis.host = localhost
-; email.async.redis.port = 6379
-; email.async.redis.db = 0
 
 ####
 # EMAIL-NOTIFICATION

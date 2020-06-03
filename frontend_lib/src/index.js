@@ -1,6 +1,7 @@
 import i18n from './i18n.js'
 import {
   addAllResourceI18n,
+  addRevisionFromTLM,
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
@@ -23,13 +24,17 @@ import {
   removeExtensionOfFilename,
   computeProgressionPercentage,
   buildHeadTitle,
+  CONTENT_TYPE,
+  buildTracimLiveMessageEventType,
+  sortTimelineByDate,
   removeAtInUsername
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
   TLM_ENTITY_TYPE,
-  TLM_CORE_EVENT_TYPE
+  TLM_CORE_EVENT_TYPE,
+  TLM_SUB_TYPE
 } from './tracimLiveMessage.js'
 
 import { appContentFactory } from './appContentFactory.js'
@@ -104,6 +109,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
 export {
   appContentFactory,
+  addRevisionFromTLM,
   TracimComponent,
   addAllResourceI18n,
   handleFetchResult,
@@ -144,6 +150,7 @@ export {
   CUSTOM_EVENT,
   TLM_ENTITY_TYPE,
   TLM_CORE_EVENT_TYPE,
+  TLM_SUB_TYPE,
   BREADCRUMBS_TYPE,
   ROLE,
   ROLE_LIST,
@@ -166,5 +173,8 @@ export {
   ShareLink,
   ShareDownload,
   ProgressBar,
-  RadioBtnGroup
+  RadioBtnGroup,
+  CONTENT_TYPE,
+  buildTracimLiveMessageEventType,
+  sortTimelineByDate
 }

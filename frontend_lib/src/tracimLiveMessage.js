@@ -1,3 +1,5 @@
+import { CONTENT_TYPE } from './helper.js'
+
 // TLM Event Type list
 const USER = 'user'
 const CONTENT = 'content'
@@ -10,6 +12,9 @@ const MODIFIED = 'modified'
 const DELETED = 'deleted'
 const UNDELETED = 'undeleted'
 
+export const TLM_SUB_TYPE = {
+  ...CONTENT_TYPE
+}
 export const TLM_ENTITY_TYPE = {
   USER,
   CONTENT,
