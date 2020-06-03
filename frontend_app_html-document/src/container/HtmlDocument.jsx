@@ -3,24 +3,31 @@ import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  appContentFactory,
   addAllResourceI18n,
+  addRevisionFromTLM,
+  APP_FEATURE_MODE,
+  appContentFactory,
+  ArchiveDeleteContent,
+  BREADCRUMBS_TYPE,
+  buildHeadTitle,
+  CUSTOM_EVENT,
+  displayDistanceDate,
+  generateLocalStorageContentId,
   handleFetchResult,
+  NewVersionBtn,
   PopinFixed,
+  PopinFixedContent,
   PopinFixedHeader,
   PopinFixedOption,
-  PopinFixedContent,
   PopinFixedRightPart,
-  Timeline,
-  NewVersionBtn,
-  ArchiveDeleteContent,
-  SelectStatus,
-  generateLocalStorageContentId,
-  BREADCRUMBS_TYPE,
   ROLE,
-  CUSTOM_EVENT,
-  APP_FEATURE_MODE,
-  buildHeadTitle
+  SelectStatus,
+  sortTimelineByDate,
+  Timeline,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -58,56 +65,147 @@ class HtmlDocument extends React.Component {
       timeline: [],
       newComment: '',
       timelineWysiwyg: false,
-      mode: APP_FEATURE_MODE.VIEW
+      mode: APP_FEATURE_MODE.VIEW,
+      keepEditingWarning: false,
+      editionAuthor: ''
     }
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
+      { name: CUSTOM_EVENT.HIDE_APP(this.state.config.slug), handler: this.handleHideApp },
+      { name: CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), handler: this.handleReloadContent },
+      { name: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(this.state.config.slug), handler: this.handleReloadAppFeatureData },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUndeleted }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    const { props, state } = this
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
-        if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
-        break
+  // TLM Handlers
+  handleContentModified = data => {
+    const { state } = this
+    if (data.content.content_id !== state.content.content_id) return
 
-      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
-        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
-        globalThis.tinymce.remove('#wysiwygNewVersion')
-        break
+    const localStorageComment = localStorage.getItem(
+      generateLocalStorageContentId(data.content.workspace_id, data.content.content_id, state.appName, 'comment')
+    )
 
-      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
-        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
-        globalThis.tinymce.remove('#wysiwygNewVersion')
-        break
-
-      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
-        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
-        break
-
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-
-        initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
-
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        this.loadContent()
-        break
+    if (state.mode === APP_FEATURE_MODE.EDIT && state.loggedUser.user_id !== data.author.user_id) {
+      this.setState({
+        editionAuthor: data.author.public_name,
+        keepEditingWarning: true
+      })
     }
+
+    this.setState(prev => ({
+      ...prev,
+      content: {
+        ...prev.content,
+        ...data.content
+      },
+      newComment: localStorageComment || '',
+      rawContentBeforeEdit: prev.content.raw_content,
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+    }))
+  }
+
+  handleContentCreated = data => {
+    const { state } = this
+    if (data.content.parent_id !== state.content.content_id || data.content.content_type !== 'comment') return
+
+    const sortedNewTimeline = sortTimelineByDate(
+      [
+        ...state.timeline,
+        {
+          ...data.content,
+          created: displayDistanceDate(data.content.created, state.loggedUser.lang),
+          created_raw: data.content.created,
+          timelineType: 'comment'
+        }
+      ]
+    )
+
+    this.setState({ timeline: sortedNewTimeline })
+  }
+
+  handleContentDeleted = data => {
+    const { state } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    this.setState(prev => ({
+      ...prev,
+      content: {
+        ...prev.content,
+        ...data.content,
+        is_deleted: true
+      },
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+    }))
+  }
+
+  handleContentUndeleted = data => {
+    const { state } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    this.setState(prev => ({
+      ...prev,
+      content: {
+        ...prev.content,
+        ...data.content,
+        is_deleted: false
+      },
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+    }))
+  }
+
+  // Custom Event Handlers
+  handleShowApp = data => {
+    const { props, state } = this
+    console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP, data)
+
+    props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+    if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
+  }
+
+  handleHideApp = data => {
+    const { props } = this
+    console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP, data)
+
+    props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
+    globalThis.tinymce.remove('#wysiwygNewVersion')
+  }
+
+  handleReloadContent = data => {
+    const { props, state } = this
+    console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT, data)
+
+    props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+    globalThis.tinymce.remove('#wysiwygNewVersion')
+  }
+
+  handleReloadAppFeatureData = data => {
+    const { props } = this
+    console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA, data)
+
+    props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
+  }
+
+  handleAllAppChangeLanguage = data => {
+    const { state } = this
+    console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+
+    initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+    this.loadContent()
   }
 
   async componentDidMount () {
@@ -149,7 +247,6 @@ class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
     globalThis.tinymce.remove('#wysiwygNewVersion')
     globalThis.tinymce.remove('#wysiwygTimelineComment')
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -327,12 +424,29 @@ class HtmlDocument extends React.Component {
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
       case 200:
-        this.handleCloseNewVersion()
-        this.loadContent()
+        globalThis.tinymce.remove('#wysiwygNewVersion')
+
+        localStorage.removeItem(
+          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
+        )
+
+        this.setState({ mode: APP_FEATURE_MODE.VIEW })
+        break
+      case 400:
+        this.setLocalStorageItem('rawContent', backupLocalStorage)
+        switch (fetchResultSaveHtmlDoc.body.code) {
+          case 2044:
+            this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
+            break
+          default:
+            this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+            break
+        }
         break
       default:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
-        this.sendGlobalFlashMessage(props.t('Error while saving new version')); break
+        this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+        break
     }
   }
 
@@ -365,25 +479,25 @@ class HtmlDocument extends React.Component {
     props.appContentChangeStatus(state.content, newStatus, state.config.slug)
   }
 
-  handleClickArchive = async () => {
-    const { props, state } = this
-    props.appContentArchive(state.content, this.setState.bind(this), state.config.slug)
-  }
-
   handleClickDelete = async () => {
     const { props, state } = this
     props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
-  }
-
-  handleClickRestoreArchive = async () => {
-    const { props, state } = this
-    props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
   handleClickRestoreDelete = async () => {
     const { props, state } = this
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
+
+  // INFO - G.B. - 2020-05-20 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
+  // handleClickArchive = async () => {
+  //   const { props, state } = this
+  //   props.appContentArchive(state.content, this.setState.bind(this), state.config.slug)
+  // }
+  // handleClickRestoreArchive = async () => {
+  //   const { props, state } = this
+  //   props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
+  // }
 
   handleClickShowRevision = revision => {
     const { state } = this
@@ -415,6 +529,13 @@ class HtmlDocument extends React.Component {
   handleClickLastVersion = () => {
     this.loadContent()
     this.setState({ mode: APP_FEATURE_MODE.VIEW })
+  }
+
+  handleClickRefresh = () => {
+    this.setState({
+      mode: APP_FEATURE_MODE.VIEW,
+      keepEditingWarning: false
+    })
   }
 
   render () {
@@ -517,6 +638,9 @@ class HtmlDocument extends React.Component {
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
+            keepEditingWarning={state.keepEditingWarning}
+            onClickRefresh={this.handleClickRefresh}
+            editionAuthor={state.editionAuthor}
           />
 
           <PopinFixedRightPart
@@ -551,4 +675,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default translate()(Radium(appContentFactory(HtmlDocument)))
+export default translate()(Radium(appContentFactory(TracimComponent(HtmlDocument))))
