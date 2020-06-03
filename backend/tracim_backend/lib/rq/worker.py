@@ -32,6 +32,7 @@ def worker_session() -> typing.Generator[TracimSession, None, None]:
         session.commit()
     except Exception:
         session.rollback()
+        raise
     finally:
         session.close()
 

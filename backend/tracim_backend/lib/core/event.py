@@ -357,7 +357,7 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
     def publish_messages_for_event(self, event_id: int) -> None:
         redis_connection = get_redis_connection(self._config)
         queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
-        logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
+        logger.debug(self, "publish event_id {} to RQ queue {}".format(event_id, RQ_QUEUE_NAME))
         queue.enqueue(self._publish_messages_for_event, event_id)
 
 
