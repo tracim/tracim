@@ -24,9 +24,14 @@ live_messages.control_uri = http://localhost:5561
 
 ## Run tracim with Pushpin (dev)
 
-run pushpin docker (from tracim root dir):
+First move to `backend` dir:
+
 ~~~bash
 cd backend
+~~~
+
+run pushpin docker (from tracim root dir):
+~~~bash
 docker compose up -d pushpin
 ~~~
 
@@ -37,29 +42,31 @@ PUSHPIN_CONFIG_DIR=./pushpin_cypress_config docker compose up -d pushpin
 
 then run tracim :
 ~~~bash
-cd backend
 pserve development.ini
 ~~~
 
 :warning: pushpin for dev and pushpin for cypress cannot be started at the same time (they do use same ports)
 
-then you can check if pushpin reverse-proxy work correctly:
+you can check if pushpin reverse-proxy works correctly:
 
 ~~~bash
 firefox localhost:7999
 ~~~
+
 ### More info about docker
 
 
 to stop "pushpin" containers (from `backend` directory):
-~~bash
-docker compose down
-~~
 
-to see running container list:
-~~bash
+~~~bash
+docker compose down
+~~~
+
+to see running container list (pushping container will be named `backend_pushpin_1`):
+
+~~~bash
 docker ps
-~~
+~~~
 
 ## Manually testing live messages
 
