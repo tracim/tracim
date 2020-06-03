@@ -6,26 +6,12 @@
 On ubuntu/debian:
 
 ~~~bash
-apt install docker.io
-docker pull fanout/pushpin
+apt install docker.io docker-compose
 ~~~
+
+:warning: do not install pushpin package as it will conflict with the docker based pushpin (`apt remove pushpin` if installed).
 
 ## Some configuration needed
-
-First you need to verify that both zurl and pushpin service are not running locally,
-on debian/ubuntu(you can also verify if pushpin or zurl package are installed on your OS).
-
-with systemd:
-
-~~~bash
-systemctl status pushpin
-sudo systemctl disable pushpin
-sudo systemctl stop pushpin
-
-systemctl status zurl
-sudo systemctl disable zurl
-sudo systemctl stop zurl
-~~~
 
 you need to set tracim config like this to use default pushpin port:
 
@@ -34,55 +20,53 @@ basic_setup.website_base_url = http://localhost:7999
 live_messages.control_uri = http://localhost:5561
 ~~~
 
-:warning:  Temporary, you also need to ensure "email.processing_mode" parameter is unset or set to "sync".
+:warning:  Temporary, you also need to ensure "jobs.processing_mode" parameter is unset or set to "sync".
 
 ## Run tracim with Pushpin (dev)
 
-First Run tracim :
+First move to `backend` dir:
+
 ~~~bash
 cd backend
+~~~
+
+run pushpin docker (from tracim root dir):
+~~~bash
+docker-compose up -d pushpin
+~~~
+
+for cypress test, you should use:
+~~~bash
+PUSHPIN_CONFIG_DIR=./pushpin_cypress_config docker compose up -d pushpin
+~~~
+
+then run tracim :
+~~~bash
 pserve development.ini
 ~~~
 
-create pushpin docker (from tracim root dir):
-~~~bash
-ls pushpin_config # just a verification
-docker create --net host -v ${PWD}/pushpin_config:/etc/pushpin --name pushpin fanout/pushpin
-~~~
+:warning: pushpin for dev and pushpin for cypress cannot be started at the same time (they do use same ports)
 
-for cypress test, you should use pushpin_cypress docker instead:
-~~~bash
-docker create --net host -v ${PWD}/pushpin_cypress_config:/etc/pushpin --name pushpin-cypress fanout/pushpin
-~~~
-
-:warning: you should not start pushpin and pushpin_cypress at the same time (they do use same ports)
-
-then you can start it:
-~~bash
-docker start pushpin
-~~
-
-then you can check if pushpin reverse-proxy work correctly:
+you can check if pushpin reverse-proxy works correctly:
 
 ~~~bash
 firefox localhost:7999
 ~~~
+
 ### More info about docker
 
-to recreate the pushpin container, you may need to drop the named container "pushpin":
-~~bash
-docker rm pushpin
-~~
 
-to stop "pushpin" containers:
-~~bash
-docker stop pushpin
-~~
+to stop "pushpin" containers (from `backend` directory):
 
-to see running container list:
-~~bash
+~~~bash
+docker-compose down
+~~~
+
+to see running container list (pushping container will be named `backend_pushpin_1`):
+
+~~~bash
 docker ps
-~~
+~~~
 
 ## Manually testing live messages
 

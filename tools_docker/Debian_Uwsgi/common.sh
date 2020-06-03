@@ -26,10 +26,10 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|^; webdav.base_url = .*|webdav.base_url = http://localhost:8080|g" /etc/tracim/development.ini
     sed -i "s|^; webdav.ui.enabled = .*|webdav.ui.enabled = True|g" /etc/tracim/development.ini
     sed -i "s|^; webdav.root_path = /|webdav.root_path = /webdav|g" /etc/tracim/development.ini
-    sed -i "s|^; email.processing_mode = sync|email.processing_mode = async|g" /etc/tracim/development.ini
-    sed -i "s|^; email.async.redis.host = .*|email.async.redis.host = localhost|g" /etc/tracim/development.ini
-    sed -i "s|^; email.async.redis.port = .*|email.async.redis.port = 6379|g" /etc/tracim/development.ini
-    sed -i "s|^; email.async.redis.db = .*|email.async.redis.db = 0|g" /etc/tracim/development.ini
+    sed -i "s|^; jobs.processing_mode = sync|jobs.processing_mode = async|g" /etc/tracim/development.ini
+    sed -i "s|^; jobs.async.redis.host = .*|jobs.async.redis.host = localhost|g" /etc/tracim/development.ini
+    sed -i "s|^; jobs.async.redis.port = .*|jobs.async.redis.port = 6379|g" /etc/tracim/development.ini
+    sed -i "s|^; jobs.async.redis.db = .*|jobs.async.redis.db = 0|g" /etc/tracim/development.ini
     sed -i "s|^; plugin.folder_path = .*|plugin.folder_path = /etc/tracim/plugins|g" /etc/tracim/development.ini
     sed -i "s|^; frontend.custom_toolbox_folder_path =.*|frontend.custom_toolbox_folder_path = /etc/tracim/custom_toolbox|g" /etc/tracim/development.ini
     sed -i "s|^; collaborative_document_edition.file_template_dir = .*|collaborative_document_edition.file_template_dir = /tracim/backend/tracim_backend/templates/open_documents|g" /etc/tracim/development.ini

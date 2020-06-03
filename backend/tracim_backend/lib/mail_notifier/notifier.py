@@ -109,19 +109,15 @@ class EmailNotifier(INotifier):
         # (SQLA objects are related to a given thread/session)
         #
         try:
-            if (
-                self.config.EMAIL__NOTIFICATION__PROCESSING_MODE.lower()
-                == self.config.CST.ASYNC.lower()
-            ):
-                logger.info(self, "Sending email in ASYNC mode")
-                # TODO - D.A - 2014-11-06
-                # This feature must be implemented in order to be able to scale to large communities
-                raise NotImplementedError("Sending emails through ASYNC mode is not working yet")
+            # TODO - D.A - 2014-11-06
+            # This feature must be implemented in order to be able to scale to large communities
+            if self.config.JOBS__PROCESSING_MODE == self.config.CST.ASYNC:
+                logger.warning(self, "Creating mails in SYNC mode as ASYNC is not supported yet.")
             else:
-                logger.info(self, "Sending email in SYNC mode")
-                EmailManager(self._smtp_config, self.config, self.session).notify_content_update(
-                    self._user.user_id, content.content_id
-                )
+                logger.info(self, "Creating email in SYNC mode")
+            EmailManager(self._smtp_config, self.config, self.session).notify_content_update(
+                self._user.user_id, content.content_id
+            )
         except Exception:
             logger.exception(self, "Exception catched during email notification")
 
