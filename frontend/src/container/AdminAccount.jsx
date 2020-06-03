@@ -75,7 +75,8 @@ class Account extends React.Component {
         auth_type: 'internal',
         agendaUrl: '',
         username: '',
-        newUsernameAvailability: true
+        isUsernameValid: true,
+        usernameInvalidMsg: ''
       },
       userToEditWorkspaceList: [],
       subComponentMenu: builtSubComponentMenu
@@ -217,7 +218,7 @@ class Account extends React.Component {
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
     subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName })),
-    userToEdit: { ...prev.userToEdit, newUsernameAvailability: true }
+    userToEdit: { ...prev.userToEdit, isUsernameValid: true }
   }))
 
   handleSubmitPersonalData = async (newPublicName, newUsername, newEmail, checkPassword) => {
@@ -248,19 +249,6 @@ class Account extends React.Component {
 
     if (newUsername !== '') {
       const username = removeAtInUsername(newUsername)
-
-      if (username.length < MINIMUM_CHARACTERS_USERNAME) {
-        props.dispatch(newFlashMessage(
-          props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-          , 'warning')
-        )
-        return false
-      }
-
-      if (/\s/.test(username)) {
-        props.dispatch(newFlashMessage(props.t("Username can't contain any whitespace"), 'warning'))
-        return false
-      }
 
       const fetchPutUsername = await props.dispatch(putUserUsername(state.userToEdit, username, checkPassword))
       switch (fetchPutUsername.status) {
@@ -308,16 +296,43 @@ class Account extends React.Component {
     return false
   }
 
-  handleChangeUsername = async (username) => {
+  handleChangeUsername = async (newUsername) => {
     const { props } = this
 
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(removeAtInUsername(username)))
+    const username = removeAtInUsername(newUsername)
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
 
     switch (fetchUsernameAvailability.status) {
       case 200:
-        this.setState(prev => ({ userToEdit: { ...prev.userToEdit, newUsernameAvailability: fetchUsernameAvailability.json.available } }))
+        this.setState(prev => ({
+          userToEdit: {
+            ...prev.userToEdit,
+            isUsernameValid: fetchUsernameAvailability.json.available,
+            usernameInvalidMsg: props.t('This username is not available')
+          }
+        }))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning')); break
+    }
+
+    if (/\s/.test(username)) {
+      this.setState(prev => ({
+        userToEdit: {
+          ...prev.userToEdit,
+          isUsernameValid: false,
+          usernameInvalidMsg: props.t("Username can't contain any whitespace")
+        }
+      }))
+    }
+
+    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+      this.setState(prev => ({
+        userToEdit: {
+          ...prev.userToEdit,
+          isUsernameValid: false,
+          usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+        }
+      }))
     }
   }
 
@@ -409,7 +424,8 @@ class Account extends React.Component {
                             userAuthType={state.userToEdit.auth_type}
                             onClickSubmit={this.handleSubmitPersonalData}
                             onChangeUsername={this.handleChangeUsername}
-                            newUsernameAvailability={state.userToEdit.newUsernameAvailability}
+                            isUsernameValid={state.userToEdit.isUsernameValid}
+                            usernameInvalidMsg={state.userToEdit.usernameInvalidMsg}
                             displayAdminInfo
                           />
                         )

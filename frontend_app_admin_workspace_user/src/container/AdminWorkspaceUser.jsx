@@ -50,7 +50,8 @@ class AdminWorkspaceUser extends React.Component {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
-      newUsernameAvailability: true,
+      isUsernameValid: true,
+      usernameInvalidMsg: '',
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
       workspaceIdOpened: null,
@@ -297,18 +298,6 @@ class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
-      this.sendGlobalFlashMsg(
-        props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-      )
-      return
-    }
-
-    if (/\s/.test(username)) {
-      this.sendGlobalFlashMsg(props.t("Username can't contain any whitespace"), 'warning')
-      return
-    }
-
     if (!state.config.system.config.email_notification_activated) {
       if (password === '') {
         this.sendGlobalFlashMsg(props.t('Please set a password'), 'warning')
@@ -393,16 +382,36 @@ class AdminWorkspaceUser extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {} })
   }
 
-  handleChangeUsername = async (username) => {
+  handleChangeUsername = async (newUsername) => {
     const { props, state } = this
 
-    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, removeAtInUsername(username)))
+    const username = removeAtInUsername(newUsername)
+    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, username))
 
     switch (fetchUsernameAvailability.apiResponse.status) {
       case 200:
-        this.setState({ newUsernameAvailability: fetchUsernameAvailability.body.available })
+        this.setState({
+          isUsernameValid: fetchUsernameAvailability.body.available,
+          usernameInvalidMsg: props.t('This username is not available')
+        })
         break
-      default: this.sendGlobalFlashMsg(props.t('Error while checking username availability'))
+      default:
+        this.sendGlobalFlashMsg(props.t('Error while checking username availability'))
+        break
+    }
+
+    if (/\s/.test(username)) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t("Username can't contain any whitespace")
+      })
+    }
+
+    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+      })
     }
   }
 
@@ -433,7 +442,8 @@ class AdminWorkspaceUser extends React.Component {
             onClickAddUser={this.handleClickAddUser}
             onChangeUsername={this.handleChangeUsername}
             breadcrumbsList={state.breadcrumbsList}
-            newUsernameAvailability={state.newUsernameAvailability}
+            isUsernameValid={state.isUsernameValid}
+            usernameInvalidMsg={state.usernameInvalidMsg}
           />
         )}
 

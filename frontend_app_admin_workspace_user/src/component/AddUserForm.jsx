@@ -44,11 +44,11 @@ export class AddUserForm extends React.Component {
   handleClickAddUser = () => {
     const { props, state } = this
 
-    if (state.newUserName === '' || (state.newUserUsername === '' && state.newUserEmail === '') || state.newUserProfile === '') {
+    if (state.newUserName === '' || state.newUserEmail === '' || state.newUserProfile === '') {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
-          msg: props.t('Please enter a name, a password, select a profile, and at least one between username or email'),
+          msg: props.t('Please enter a name, an email, a password and select a profile'),
           type: 'warning',
           delay: undefined
         }
@@ -71,12 +71,14 @@ export class AddUserForm extends React.Component {
     return props.emailNotifActivated
       ? (
         state.newUserName === '' ||
-        ((state.newUserUsername === '' || !props.newUsernameAvailability) && state.newUserEmail === '') ||
+        !props.isUsernameValid ||
+        state.newUserEmail === '' ||
         state.newUserProfile === ''
       )
       : (
         state.newUserName === '' ||
-        ((state.newUserUsername === '' || !props.newUsernameAvailability) && state.newUserEmail === '') ||
+        !props.isUsernameValid ||
+        state.newUserEmail === '' ||
         state.newUserProfile === '' ||
         state.newUserPassword === ''
       )
@@ -116,13 +118,13 @@ export class AddUserForm extends React.Component {
             data-cy='adduser_username'
           />
 
-          {!props.newUsernameAvailability && state.newUserUsername !== '' && (
+          {!props.isUsernameValid && state.newUserUsername !== '' && (
             <div className='userData__input__username__errorMsg'>
               <i className='userData__input__username__errorIcon fa fa-times' />
-              {props.t('This username is not available')}
+              {props.usernameInvalidMsg}
             </div>
           )}
-          {props.newUsernameAvailability && state.newUserUsername !== '' && (
+          {props.isUsernameValid && (
             <div className='userData__input__username__errorInfo'>
               {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
             </div>
