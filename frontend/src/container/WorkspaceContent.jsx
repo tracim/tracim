@@ -27,8 +27,7 @@ import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle,
-  CONTENT_TYPE
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
