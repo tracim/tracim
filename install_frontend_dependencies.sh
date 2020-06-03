@@ -141,7 +141,7 @@ setup_yarn() {
 setup_config() {
     log "Checking if configEnv.json exist.."
 
-    if [ ! -f configEnv.json ]; then
+    if [ ! -f frontend/configEnv.json ]; then
         log "cp frontend/configEnv.json.sample frontend/configEnv.json ..."
         cp frontend/configEnv.json.sample frontend/configEnv.json && \
             loggood "ok" || \

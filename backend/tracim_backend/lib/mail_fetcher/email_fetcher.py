@@ -22,7 +22,7 @@ from tracim_backend.exceptions import NoKeyFound
 from tracim_backend.exceptions import UnsupportedRequestMethod
 from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
-from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
+from tracim_backend.lib.utils.authentification import TRACIM_API_USER_LOGIN_HEADER
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer  # nopep8
 
@@ -500,7 +500,7 @@ class MailFetcher(object):
                 logger.exception(self, log)
 
     def _get_auth_headers(self, user_email) -> dict:
-        return {TRACIM_API_KEY_HEADER: self.api_key, TRACIM_API_USER_EMAIL_LOGIN_HEADER: user_email}
+        return {TRACIM_API_KEY_HEADER: self.api_key, TRACIM_API_USER_LOGIN_HEADER: user_email}
 
     def _get_content_info(self, content_id, user_email):
         endpoint = "{api_base_url}contents/{content_id}".format(

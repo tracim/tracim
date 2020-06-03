@@ -6,6 +6,11 @@ from sqlalchemy import inspect
 from sqlalchemy import null
 from sqlalchemy.orm import joinedload
 
+from tracim_backend.app_models.contents import COMMENT_TYPE
+from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import FOLDER_TYPE
+from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
+from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.content import ContentApi
@@ -20,27 +25,30 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import WorkspaceRoles
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
-from tracim_backend.views.core_api.schemas import ContentDigestSchema
+from tracim_backend.views.core_api.schemas import CommentSchema
+from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
-from tracim_backend.views.core_api.schemas import UserDigestSchema
+from tracim_backend.views.core_api.schemas import TextBasedContentSchema
+from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
 _WORKSPACE_FIELD = "workspace"
 _CONTENT_FIELD = "content"
-_ROLE_FIELD = "role"
+_MEMBER_FIELD = "member"
 
 
 RQ_QUEUE_NAME = "event"
@@ -73,10 +81,17 @@ class EventApi:
 class EventBuilder:
     """Create Event objects from the database crud hooks."""
 
-    _user_schema = UserDigestSchema()
+    _user_schema = UserSchema()
     _workspace_schema = WorkspaceSchema()
-    _content_schema = ContentDigestSchema()
+    _content_schemas = {
+        COMMENT_TYPE: CommentSchema(),
+        HTML_DOCUMENTS_TYPE: TextBasedContentSchema(),
+        FILE_TYPE: FileContentSchema(),
+        FOLDER_TYPE: TextBasedContentSchema(),
+        THREAD_TYPE: TextBasedContentSchema(),
+    }
     _event_schema = EventSchema()
+    _workspace_user_role_schema = WorkspaceMemberDigestSchema()
 
     def __init__(self, config: CFG) -> None:
         self._config = config
@@ -103,15 +118,20 @@ class EventBuilder:
     def on_user_modified(self, user: User, db_session: TracimSession) -> None:
         if self._has_just_been_deleted(user):
             self._create_user_event(OperationType.DELETED, user, db_session)
+        elif self._has_just_been_undeleted(user):
+            self._create_user_event(OperationType.UNDELETED, user, db_session)
         else:
             self._create_user_event(OperationType.MODIFIED, user, db_session)
 
     def _create_user_event(
         self, operation: OperationType, user: User, db_session: TracimSession
     ) -> None:
+        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
-            _USER_FIELD: self._user_schema.dump(user).data,
+            _AUTHOR_FIELD: self._user_schema.dump(
+                user_api.get_user_with_context(self._current_user)
+            ).data,
+            _USER_FIELD: self._user_schema.dump(user_api.get_user_with_context(user)).data,
         }
         event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
         db_session.add(event)
@@ -125,6 +145,8 @@ class EventBuilder:
     def on_workspace_modified(self, workspace: Workspace, db_session: TracimSession) -> None:
         if self._has_just_been_deleted(workspace):
             self._create_workspace_event(OperationType.DELETED, workspace, db_session)
+        elif self._has_just_been_undeleted(workspace):
+            self._create_workspace_event(OperationType.UNDELETED, workspace, db_session)
         else:
             self._create_workspace_event(OperationType.MODIFIED, workspace, db_session)
 
@@ -132,9 +154,12 @@ class EventBuilder:
         self, operation: OperationType, workspace: Workspace, db_session: TracimSession
     ) -> None:
         api = WorkspaceApi(db_session, self._current_user, self._config)
+        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
         workspace_in_context = api.get_workspace_with_context(workspace)
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
+            _AUTHOR_FIELD: self._user_schema.dump(
+                user_api.get_user_with_context(self._current_user)
+            ).data,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
@@ -147,8 +172,10 @@ class EventBuilder:
 
     @hookimpl
     def on_content_modified(self, content: Content, db_session: TracimSession) -> None:
-        if self._has_just_been_deleted(content.current_revision):
+        if content.current_revision.revision_type == ActionDescription.DELETION:
             self._create_content_event(OperationType.DELETED, content, db_session)
+        elif content.current_revision.revision_type == ActionDescription.UNDELETION:
+            self._create_content_event(OperationType.UNDELETED, content, db_session)
         else:
             self._create_content_event(OperationType.MODIFIED, content, db_session)
 
@@ -157,16 +184,26 @@ class EventBuilder:
     ) -> None:
         content_api = ContentApi(db_session, self._current_user, self._config)
         content_in_context = content_api.get_content_in_context(content)
+        content_dict = self._content_schemas[content.type].dump(content_in_context).data
+
         workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace_id)
         )
+        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
-            _CONTENT_FIELD: self._content_schema.dump(content_in_context).data,
+            _AUTHOR_FIELD: self._user_schema.dump(
+                user_api.get_user_with_context(self._current_user)
+            ).data,
+            _CONTENT_FIELD: content_dict,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
-        event = Event(entity_type=EntityType.CONTENT, operation=operation, fields=fields)
+        event = Event(
+            entity_type=EntityType.CONTENT,
+            operation=operation,
+            fields=fields,
+            entity_subtype=content.type,
+        )
         db_session.add(event)
 
     # UserRoleInWorkspace events
@@ -194,22 +231,25 @@ class EventBuilder:
         workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(role.workspace)
         user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
-
+        role_api = RoleApi(current_user=self._current_user, session=db_session, config=self._config)
         try:
-            user_field = self._user_schema.dump(user_api.get_one(role.user_id)).data
+            user_field = self._user_schema.dump(
+                user_api.get_user_with_context(user_api.get_one(role.user_id))
+            ).data
         except UserDoesNotExist:
             # It is possible to have an already deleted user when deleting his roles.
             user_field = None
 
+        role_in_context = role_api.get_user_role_workspace_with_context(role)
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(self._current_user).data,
+            _AUTHOR_FIELD: self._user_schema.dump(
+                user_api.get_user_with_context(self._current_user)
+            ).data,
             _USER_FIELD: user_field,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
-            _ROLE_FIELD: WorkspaceRoles.get_role_from_level(role.role).label,
+            _MEMBER_FIELD: self._workspace_user_role_schema.dump(role_in_context).data,
         }
-        event = Event(
-            entity_type=EntityType.WORKSPACE_USER_ROLE, operation=operation, fields=fields
-        )
+        event = Event(entity_type=EntityType.WORKSPACE_MEMBER, operation=operation, fields=fields)
         db_session.add(event)
 
     def _publish_event(self, db_session: TracimSession, instance: object) -> None:
@@ -232,7 +272,18 @@ class EventBuilder:
         """Check that an object has been deleted since it has been queried from database."""
         if obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
-            return history.has_changes()
+            was_changed = not history.unchanged and (history.deleted or history.added)
+            return was_changed
+        return False
+
+    def _has_just_been_undeleted(
+        self, obj: typing.Union[User, Workspace, ContentRevisionRO]
+    ) -> bool:
+        """Check whether an object has been undeleted since queried from database."""
+        if not obj.is_deleted:
+            history = inspect(obj).attrs.is_deleted.history
+            was_changed = not history.unchanged and (history.deleted or history.added)
+            return was_changed
         return False
 
 
@@ -263,8 +314,8 @@ class LiveMessageBuilder:
             receiver_ids = cls._get_workspace_event_receiver_ids(event)
         elif event.entity_type == EntityType.CONTENT:
             receiver_ids = cls._get_workspace_event_receiver_ids(event)
-        elif event.entity_type == EntityType.WORKSPACE_USER_ROLE:
-            receiver_ids = cls._get_user_event_receiver_ids(event)
+        elif event.entity_type == EntityType.WORKSPACE_MEMBER:
+            receiver_ids = cls._get_workspace_event_receiver_ids(event)
 
         messages = [
             Message(

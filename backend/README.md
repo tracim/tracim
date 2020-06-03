@@ -238,6 +238,8 @@ daemons to work correctly.
     python3 daemons/mail_notifier.py &
     # email fetcher (if email reply is enabled)
     python3 daemons/mail_fetcher.py &
+    # RQ worker for live messages
+    rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event
 
 #### Stop Daemons
 
