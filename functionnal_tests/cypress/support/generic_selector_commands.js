@@ -17,17 +17,17 @@ const SELECTORS = {
 
 const TAGS = {
   [SELECTORS.CONTENT_FRAME]: () => '[data-cy="popinFixed"]',
-  [SELECTORS.CONTENT_IN_LIST]: ({ read }) => `.workspace__content__fileandfolder > .content${read ? '.read': ''}`,
+  [SELECTORS.CONTENT_IN_LIST]: ({ read }) => `.workspace__content__fileandfolder > .content${read ? '.read' : ''}`,
   [SELECTORS.RECENT_ACTIVITY_IN_LIST]: () => '.recentactivity__list__item',
-  [SELECTORS.CONTENT_IN_SEARCH]: () => `.content__name`,
+  [SELECTORS.CONTENT_IN_SEARCH]: () => '.content__name',
   [SELECTORS.FOLDER_IN_LIST]: ({ folderId }) => `[data-cy=folder_${folderId}]`,
   [SELECTORS.WORKSPACE_MENU]: ({ workspaceId }) => `[data-cy=sidebar__content__navigation__workspace__item_${workspaceId}]`,
   [SELECTORS.WORKSPACE_DASHBOARD]: () => '.dashboard.pageWrapperGeneric',
   [SELECTORS.LOGIN_PAGE_CARD]: () => '.loginpage__card.card',
   [SELECTORS.HEADER]: () => '.header',
   [SELECTORS.ADMIN_USER_PAGE]: () => '.adminUser.pageContentGeneric',
-  [SELECTORS.TRACIM_CONTENT]: () => `.tracim__content-scrollview`,
-  [SELECTORS.GALLERY_FRAME]: () => `.gallery.pageWrapperGeneric`,
+  [SELECTORS.TRACIM_CONTENT]: () => '.tracim__content-scrollview',
+  [SELECTORS.GALLERY_FRAME]: () => '.gallery.pageWrapperGeneric',
   [SELECTORS.CARD_POPUP_BODY]: () => '.cardPopup__body',
   [SELECTORS.SIDEBAR_ARROW]: () => '.sidebar__expand > i'
 }

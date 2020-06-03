@@ -1,7 +1,7 @@
 const userFixtures = {
-  'administrators': 'defaultAdmin',
+  administrators: 'defaultAdmin',
   'trusted-users': '',
-  'users': 'baseUser'
+  users: 'baseUser'
 }
 
 function makeRandomString (length = 5) {
@@ -25,9 +25,9 @@ Cypress.Commands.add('addUserToWorkspace', (userId, workspaceId, role = 'contrib
 
 Cypress.Commands.add('execAsAdmin', (user, callback) => {
   cy.logout()
-  cy.loginAs('administrators').then( () => {
+  cy.loginAs('administrators').then(() => {
     return callback().then(res => cy.log(res.email))
-  }).then( (result) => {
+  }).then((result) => {
     cy.logout()
     cy.login(user)
   })
@@ -67,7 +67,7 @@ Cypress.Commands.add('createRandomUser', (profile = 'users') => {
     .then(response => {
       response.body.password = '8QLa$<w'
       return response.body
-  })
+    })
 })
 
 Cypress.Commands.add('createUser', (fixturePath = 'baseUser') => {
@@ -89,7 +89,7 @@ Cypress.Commands.add('createUser', (fixturePath = 'baseUser') => {
 
 Cypress.Commands.add('createRandomWorkspace', () => {
   const workspaceName = makeRandomString()
-  let url = '/api/v2/workspaces'
+  const url = '/api/v2/workspaces'
   const data = {
     description: `A super description of ${workspaceName}.`,
     label: workspaceName
@@ -110,7 +110,7 @@ Cypress.Commands.add('createRandomWorkspace', () => {
 })
 
 Cypress.Commands.add('createWorkspace', (fixturePath = 'baseWorkspace') => {
-  let url = '/api/v2/workspaces'
+  const url = '/api/v2/workspaces'
   return cy
     .fixture(fixturePath)
     .then(workspaceJSON => cy.request('POST', url, workspaceJSON))
@@ -161,8 +161,8 @@ Cypress.Commands.add('getUserByRole', (role) => {
 })
 
 Cypress.Commands.add('createHtmlDocument', (title, workspaceId, parentId = null) => {
-  let url = `/api/v2/workspaces/${workspaceId}/contents`
-  let data = {
+  const url = `/api/v2/workspaces/${workspaceId}/contents`
+  const data = {
     content_type: 'html-document',
     label: title,
     parent_id: parentId
@@ -183,8 +183,8 @@ Cypress.Commands.add('createHtmlDocument', (title, workspaceId, parentId = null)
 })
 
 Cypress.Commands.add('updateHtmlDocument', (contentId, workspaceId, text, title) => {
-  let url = `/api/v2/workspaces/${workspaceId}/html-documents/${contentId}`
-  let data = {
+  const url = `/api/v2/workspaces/${workspaceId}/html-documents/${contentId}`
+  const data = {
     raw_content: text,
     label: title
   }
@@ -194,16 +194,16 @@ Cypress.Commands.add('updateHtmlDocument', (contentId, workspaceId, text, title)
 })
 
 Cypress.Commands.add('changeHtmlDocumentStatus', (contentId, workspaceId, status) => {
-  let url = `/api/v2/workspaces/${workspaceId}/html-documents/${contentId}/status`
-  let data = { status: status }
+  const url = `/api/v2/workspaces/${workspaceId}/html-documents/${contentId}/status`
+  const data = { status: status }
   cy
     .request('PUT', url, data)
     .then(response => response.body)
 })
 
 Cypress.Commands.add('createThread', (title, workspaceId, parentId = null) => {
-  let url = `/api/v2/workspaces/${workspaceId}/contents`
-  let data = {
+  const url = `/api/v2/workspaces/${workspaceId}/contents`
+  const data = {
     content_type: 'thread',
     label: title,
     parent_id: parentId
@@ -224,8 +224,8 @@ Cypress.Commands.add('createThread', (title, workspaceId, parentId = null) => {
 })
 
 Cypress.Commands.add('createFolder', (title, workspaceId, parentId = null) => {
-  let url = `/api/v2/workspaces/${workspaceId}/contents`
-  let data = {
+  const url = `/api/v2/workspaces/${workspaceId}/contents`
+  const data = {
     content_type: 'folder',
     label: title,
     parent_id: parentId
@@ -246,12 +246,12 @@ Cypress.Commands.add('createFolder', (title, workspaceId, parentId = null) => {
 })
 
 Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspaceId, parentId = null) => {
-  let url = `/api/v2/workspaces/${workspaceId}/files`
+  const url = `/api/v2/workspaces/${workspaceId}/files`
 
   return cy.fixture(fixturePath, 'base64')
     .then(fixture => Cypress.Blob.base64StringToBlob(fixture, fixtureMime))
     .then(blob => {
-      let form = new FormData()
+      const form = new FormData()
 
       form.set('files', blob, fileTitle)
       if (parentId) form.set('parent_id', parentId)
@@ -261,12 +261,12 @@ Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspa
 })
 
 Cypress.Commands.add('updateFile', (fixturePath, fixtureMime, workspaceId, contentId, fileTitle) => {
-  let url = `/api/v2/workspaces/${workspaceId}/files/${contentId}/raw/${fileTitle}`
+  const url = `/api/v2/workspaces/${workspaceId}/files/${contentId}/raw/${fileTitle}`
 
   return cy.fixture(fixturePath, 'base64')
     .then(fixture => Cypress.Blob.base64StringToBlob(fixture, fixtureMime))
     .then(blob => {
-      let form = new FormData()
+      const form = new FormData()
 
       form.set('files', blob, fileTitle)
 
@@ -289,4 +289,3 @@ Cypress.Commands.add('createGuestUploadLink', (workspaceId, emailList, password 
   }
   return cy.request('POST', url, data)
 })
-

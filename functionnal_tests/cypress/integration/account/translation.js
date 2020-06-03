@@ -9,12 +9,12 @@ describe('Account page', function () {
   })
 
   it('should have translations', () => {
-    cy.get('.account__title').contains('My account')
+    cy.get('.account__userpreference__setting').contains('Change my profile')
 
     cy.changeLanguage('fr')
-    cy.get('.account__title').contains('Mon compte')
+    cy.get('.account__userpreference__setting').contains('Changer mon profil')
 
     cy.changeLanguage('pt')
-    cy.get('.account__title').contains('Minha conta')
+    cy.get('.account__userpreference__setting').contains('Mudar meu perfil')
   })
 })
