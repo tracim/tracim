@@ -62,7 +62,7 @@ describe('App Workspace Advanced', function () {
     })
 
     it('Should be able to add a user with their public name', () => {
-      cy.visitPage({pageName: p.DASHBOARD, params: { workspaceId }})
+      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__header__advancedmode__button.btn')
@@ -96,69 +96,69 @@ describe('App Workspace Advanced', function () {
     })
 
     it('Should be able to add a user with his email', () => {
-      cy.visitPage({pageName: p.DASHBOARD, params: { workspaceId }})
+      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
-      cy.getTag({selectorName: s.WORKSPACE_DASHBOARD})
+      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__header__advancedmode__button.btn')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('div.workspace_advanced__userlist__adduser__button')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('#addmember')
         .clear()
         .type(userEmail)
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('div.autocomplete__item')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('.item__radiobtn > input')
         .first()
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('.memberlist__form__submitbtn > button')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)
         .should('be.visible')
     })
 
     it('Should be able to add a user with his username', () => {
-      cy.visitPage({pageName: p.DASHBOARD, params: { workspaceId }})
+      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
-      cy.getTag({selectorName: s.WORKSPACE_DASHBOARD})
+      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__header__advancedmode__button.btn')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('div.workspace_advanced__userlist__adduser__button')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('#addmember')
         .clear()
         .type(userUsername)
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('div.autocomplete__item')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('.item__radiobtn > input')
         .first()
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('.memberlist__form__submitbtn > button')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)
         .should('be.visible')
     })
