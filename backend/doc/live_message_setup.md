@@ -32,7 +32,7 @@ cd backend
 
 run pushpin docker (from tracim root dir):
 ~~~bash
-docker compose up -d pushpin
+docker-compose up -d pushpin
 ~~~
 
 for cypress test, you should use:
@@ -59,7 +59,7 @@ firefox localhost:7999
 to stop "pushpin" containers (from `backend` directory):
 
 ~~~bash
-docker compose down
+docker-compose down
 ~~~
 
 to see running container list (pushping container will be named `backend_pushpin_1`):
