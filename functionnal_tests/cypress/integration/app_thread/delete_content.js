@@ -13,7 +13,7 @@ describe('delete a thread content', function () {
   })
 
   it('should show the content as deleted and remove it from the content list', function () {
-    // TODO - GM - 2020/06/03 - Add this test when Thread app support TLM
+    // TODO - GB - 2020-06-02 - This test fails because of a refactor that has not yet been done, but which is scheduled in ticket
     // https://github.com/tracim/tracim/issues/3109
     this.skip()
     cy.visit('/ui/workspaces/1/dashboard')

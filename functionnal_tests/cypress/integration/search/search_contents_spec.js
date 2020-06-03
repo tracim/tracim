@@ -71,25 +71,24 @@ describe('Searching keywords', () => {
     //   })
     // })
 
-    describe('then deleting one document', () => {
-      describe('and searching the same keyword and validating', () => {
-        it('Should not display the deleted document', function () {
-          // TODO - GM - 2020/06/03 - Add this test when Thread app support TLM
-          // https://github.com/tracim/tracim/issues/3109
-          this.skip()
-          cy.get(searchInput).type(threadTitle).type('{enter}')
+    // TODO - GB - 2020-06-02 - This test fails because of a refactor that has not yet been done, but which is scheduled in ticket
+    // https://github.com/tracim/tracim/issues/3109
+    // describe('then deleting one document', () => {
+    //   describe('and searching the same keyword and validating', () => {
+    //     it('Should not display the deleted document', () => {
+    //       cy.get(searchInput).type(threadTitle).type('{enter}')
 
-          cy.get(contentThreadGetter).click()
-          cy.get('[data-cy=delete__button]').click()
+    //       cy.get(contentThreadGetter).click()
+    //       cy.get('[data-cy=delete__button]').click()
 
-          cy.get('[data-cy=displaystate]')
-          cy.get(searchInput).type('{enter}')
+    //       cy.get('[data-cy=displaystate]')
+    //       cy.get(searchInput).type('{enter}')
 
-          cy.get('.content').should('have.length', 1)
-          // cy.get('.searchResult__content__empty').should('be.visible') // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
-        })
-      })
-    })
+    //       cy.get('.content').should('have.length', 1)
+    //       // cy.get('.searchResult__content__empty').should('be.visible') // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
+    //     })
+    //   })
+    // })
   })
 
   describe('that does not match any documents and validating', () => {

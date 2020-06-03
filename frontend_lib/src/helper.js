@@ -289,6 +289,54 @@ export const IMG_LOAD_STATE = {
   ERROR: 'error'
 }
 
+export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
+
+// INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/v2/system/content_types
+export const CONTENT_TYPE = {
+  HTML_DOCUMENT: 'html-document',
+  FILE: 'file',
+  THREAD: 'thread',
+  FOLDER: 'folder',
+  COMMENT: 'comment'
+}
+
+export const sortTimelineByDate = (timeline) => {
+  return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
+}
+
+export const addRevisionFromTLM = (data, timeline, lang) => {
+  // INFO - GB - 2020-05-29 In the filter below we use the names from the TLM message so they are not in camelCase and it is necessary to ignore the eslint rule.
+  const {
+    actives_shares, // eslint-disable-line camelcase
+    author,
+    created,
+    current_revision_id, // eslint-disable-line camelcase
+    current_revision_type, // eslint-disable-line camelcase
+    last_modifier, // eslint-disable-line camelcase
+    ...revisionObject
+  } = data.content
+
+  return [
+    ...timeline,
+    {
+      ...revisionObject,
+      author: {
+        public_name: data.author.public_name,
+        avatar_url: data.author.avatar_url,
+        user_id: data.author.user_id
+      },
+      commentList: [], // INFO - GB - 2020-05-29 For now it is not possible to get commentList and comment_ids via TLM message, and since such properties are not used, we leave them empty.
+      comment_ids: [],
+      created: displayDistanceDate(data.content.modified, lang),
+      created_raw: data.content.modified,
+      number: timeline.length + 1,
+      revision_id: data.content.current_revision_id,
+      revision_type: data.content.current_revision_type,
+      timelineType: 'revision'
+    }
+  ]
+}
+
 export const removeAtInUsername = (username) => {
   let trimmedUsername = username.trim()
   if (trimmedUsername.length > 0 && trimmedUsername[0] === '@') {

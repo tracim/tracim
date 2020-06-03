@@ -112,17 +112,18 @@ export function appContentFactory (WrappedComponent) {
         await putEditContent(this.apiUrl, content.workspace_id, content.content_id, appSlug, newTitle, content.raw_content, propertiesToAddToBody)
       )
 
-      switch (response.apiResponse.status) {
-        case 400:
-          switch (response.body.code) {
-            case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-            case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
-            default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
-          }
-          break
-        default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+      if (response.apiResponse.status !== 200) {
+        switch (response.apiResponse.status) {
+          case 400:
+            switch (response.body.code) {
+              case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
+              case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
+              default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+            }
+            break
+          default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+        }
       }
-
       return response
     }
 
@@ -181,13 +182,8 @@ export function appContentFactory (WrappedComponent) {
         await putEditStatus(this.apiUrl, content.workspace_id, content.content_id, appSlug, newStatus)
       )
 
-      switch (response.status) {
-        case 204:
-          this.sendGlobalFlashMessage(i18n.t('Status has been changed'), 'info')
-          break
-        default:
-          this.sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
-          break
+      if (response.status !== 204) {
+        this.sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
       }
 
       return response
@@ -228,15 +224,19 @@ export function appContentFactory (WrappedComponent) {
       )
 
       switch (response.status) {
-        case 204: break
-        default: GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.ADD_FLASH_MSG,
-          data: {
-            msg: i18n.t('Error while deleting document'),
-            type: 'warning',
-            delay: undefined
-          }
-        })
+        case 204:
+          setState({ mode: APP_FEATURE_MODE.VIEW })
+          break
+        default:
+          GLOBAL_dispatchEvent({
+            type: CUSTOM_EVENT.ADD_FLASH_MSG,
+            data: {
+              msg: i18n.t('Error while deleting document'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
+        break
       }
 
       return response
@@ -274,9 +274,8 @@ export function appContentFactory (WrappedComponent) {
         await putContentRestoreDelete(this.apiUrl, content.workspace_id, content.content_id)
       )
 
-      switch (response.status) {
-        case 204: break
-        default: GLOBAL_dispatchEvent({
+      if (response.status !== 204) {
+        GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
             msg: i18n.t('Error while restoring document'),

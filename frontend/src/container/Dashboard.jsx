@@ -12,6 +12,7 @@ import {
   PageContent,
   convertBackslashNToBr,
   BREADCRUMBS_TYPE,
+  CONTENT_TYPE,
   CUSTOM_EVENT,
   ROLE,
   ROLE_LIST,

@@ -12,6 +12,7 @@ import contentType from './contentType.js'
 import timezone from './timezone.js'
 import system from './system.js'
 import searchResult from './searchResult.js'
+import tlmManager from './tlmManager.js'
 
 const rootReducer = combineReducers({
   lang,
@@ -26,7 +27,8 @@ const rootReducer = combineReducers({
   contentType,
   timezone,
   system,
-  searchResult
+  searchResult,
+  tlmManager
 })
 
 export default rootReducer
