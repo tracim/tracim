@@ -16,6 +16,7 @@ from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.roles import WorkspaceRoles
@@ -307,6 +308,12 @@ def check_right(authorization_checker: AuthorizationChecker):
         @functools.wraps(func)
         def wrapper(self, context, request: "TracimRequest") -> typing.Callable:
             authorization_checker.check(tracim_context=request)
+            logger.info(
+                request,
+                "{} {} from authenticated user {}".format(
+                    request.method, request.path, request.current_user.user_id
+                ),
+            )
             return func(self, context, request)
 
         return wrapper

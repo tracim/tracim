@@ -114,6 +114,8 @@ export const postWorkspaceMember = (apiUrl, workspaceId, newMember) =>
     body: JSON.stringify({
       user_id: newMember.id || null,
       user_email: newMember.email || null,
+      user_public_name: newMember.publicName || null,
+      user_username: newMember.username || null,
       role: newMember.role
     })
   })

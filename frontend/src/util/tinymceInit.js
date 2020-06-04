@@ -1,51 +1,71 @@
+import i18n from './i18n.js'
+
 (function () {
-  function base64EncodeAndTinyMceInsert (files) { // @todo move this function out of wysiwyg = { ... }
-    for (var i = 0; i < files.length; i++) {
-      if (files[i].size > 1000000)
-        files[i].allowed = confirm(files[i].name + ' is bigger than 1mo, it can takes some time to upload, do you wish to continue?')
+  function base64EncodeAndTinyMceInsert (files) {
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].size > 1000000) {
+        files[i].allowed = globalThis.confirm(
+          i18n.t(
+            '{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?',
+            { filename: files[i].name }
+          )
+        )
+      }
     }
 
-    for (var i = 0; i < files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
       if (files[i].allowed !== false && files[i].type.match('image.*')) {
-        var img = document.createElement('img')
+        const img = document.createElement('img')
 
-        var fr = new FileReader()
+        const fr = new globalThis.FileReader()
 
         fr.readAsDataURL(files[i])
 
         fr.onloadend = function (e) {
           img.src = e.target.result
-          tinymce.activeEditor.execCommand('mceInsertContent', false, img.outerHTML)
+          globalThis.tinymce.activeEditor.execCommand('mceInsertContent', false, img.outerHTML)
         }
       }
     }
   }
 
-  wysiwyg = function (selector, lang, handleOnChange) {
+  globalThis.wysiwyg = function (selector, lang, handleOnChange) {
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
     // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
-    $(document).on('focusin', function(e) {
-      if ($(e.target).closest(".mce-window").length) {
+    $(document).on('focusin', function (e) {
+      if ($(e.target).closest('.mce-window').length) {
         e.stopImmediatePropagation()
       }
     })
 
-    getIframeHeight = function (iframeElement) {
-      var currentHeight = iframeElement.frameElement.style.height
-      var currentHeightInt = parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
-      return currentHeightInt
+    const getIframeHeight = function (iframeElement) {
+      const currentHeight = iframeElement.frameElement.style.height
+      return parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
     }
 
-    tinymce.init({
+    // TODO - GM - 2020/05/07 - find a better way to handle language support in order to make it more generic
+    // see: https://github.com/tracim/tracim/issues/3011
+    const getTinyMceLang = (lang) => {
+      switch (lang) {
+        case 'fr':
+          return 'fr_FR'
+        case 'pt':
+          return 'pt_PT'
+        default:
+          return lang
+      }
+    }
+
+    globalThis.tinymce.init({
       selector: selector,
-      language: lang === 'fr' ? 'fr_FR' : lang,
+      language: getTinyMceLang(lang),
       menubar: false,
       resize: false,
       skin: 'lightgray',
       relative_urls: false,
-      remove_script_host : false,
-      plugins:'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
+      remove_script_host: false,
+      plugins: 'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
       toolbar: [
         'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
         'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
@@ -60,33 +80,34 @@
           $editor.focus()
           $editor.selection.select($editor.getBody(), true)
           $editor.selection.collapse(false)
-          const event = new CustomEvent('tinymceLoaded', {detail: {}, editor: this})
+          const event = new globalThis.CustomEvent('tinymceLoaded', { detail: {}, editor: this })
           document.dispatchEvent(event)
         })
 
         $editor.on('change keyup', function (e) {
-          handleOnChange({target: {value: $editor.getContent()}}) // target.value to emulate a js event so the react handler can expect one
+          handleOnChange({ target: { value: $editor.getContent() } }) // target.value to emulate a js event so the react handler can expect one
         })
 
-        //////////////////////////////////////////////
+        // ////////////////////////////////////////////
         // add custom btn to handle image by selecting them with system explorer
         $editor.addButton('customInsertImage', {
           icon: 'mce-ico mce-i-image',
           title: 'Image',
           onclick: function () {
-            if ($('#hidden_tinymce_fileinput').length > 0) $('#hidden_tinymce_fileinput').remove()
+            const hiddenTinymceFileInput = $('#hidden_tinymce_fileinput')
+            if (hiddenTinymceFileInput.length > 0) hiddenTinymceFileInput.remove()
 
-            fileTag = document.createElement('input')
+            const fileTag = document.createElement('input')
             fileTag.id = 'hidden_tinymce_fileinput'
             fileTag.type = 'file'
             fileTag.style.display = 'none'
             $('body').append(fileTag)
 
-            $('#hidden_tinymce_fileinput').on('change', function () {
+            hiddenTinymceFileInput.on('change', function () {
               base64EncodeAndTinyMceInsert($(this)[0].files)
             })
 
-            $('#hidden_tinymce_fileinput').click()
+            hiddenTinymceFileInput.click()
           }
         })
 
@@ -128,14 +149,14 @@
           }
         })
 
-        //////////////////////////////////////////////
+        // ////////////////////////////////////////////
         // Handle drag & drop image into TinyMce by encoding them in base64 (to avoid uploading them somewhere and keep saving comment in string format)
         $editor
           .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
             e.preventDefault()
             e.stopPropagation()
           })
-          .on('drop', function(e) {
+          .on('drop', function (e) {
             base64EncodeAndTinyMceInsert(e.dataTransfer.files)
           })
       }

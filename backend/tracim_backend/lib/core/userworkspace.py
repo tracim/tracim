@@ -73,11 +73,13 @@ class RoleApi(object):
 
     # TODO - Gui.M - 26-03-2020 - For now it only filters enabled/disabled user, it does not filters deleted
     #  workspaces/users
-    def _base_query(self):
-        query = self._session.query(UserRoleInWorkspace)
+    def _apply_base_filters(self, query):
         if not self._show_disabled_user:
-            query = query.join(User).filter(User.is_active)
+            query = query.join(User).filter(User.is_active == True)  # noqa:E712
         return query
+
+    def _base_query(self):
+        return self._apply_base_filters(self._session.query(UserRoleInWorkspace))
 
     def get_user_workspaces_ids(self, user_id: int, min_role: int) -> typing.List[int]:
         assert self._user.profile == Profile.ADMIN or self._user.user_id == user_id
@@ -166,7 +168,6 @@ class RoleApi(object):
         with_notif: bool,
         flush: bool = True,
     ) -> UserRoleInWorkspace:
-
         # INFO - G.M - 2018-10-29 - Check if role already exist
         query = self._get_one_rsc(user.user_id, workspace.workspace_id)
         if query.count() > 0:
@@ -189,14 +190,8 @@ class RoleApi(object):
             raise UserCantRemoveHisOwnRoleInWorkspace(
                 "user {} can't remove is own role in workspace".format(user_id)
             )
-        if self._get_one_rsc(user_id, workspace_id).count() == 0:
-            raise UserRoleNotFound(
-                "Role for user {user_id} "
-                "in workspace {workspace_id} was not found.".format(
-                    user_id=user_id, workspace_id=workspace_id
-                )
-            )
-        self._get_one_rsc(user_id, workspace_id).delete()
+        role = self.get_one(user_id, workspace_id)
+        self._session.delete(role)
         if flush:
             self._session.flush()
 
@@ -207,6 +202,14 @@ class RoleApi(object):
             .order_by(UserRoleInWorkspace.user_id)
         )
         return query.all()
+
+    def get_workspace_member_ids(self, workspace_id: int) -> typing.List[int]:
+        query = self._apply_base_filters(
+            self._session.query(UserRoleInWorkspace.user_id).filter(
+                UserRoleInWorkspace.workspace_id == workspace_id
+            )
+        )
+        return [res[0] for res in query]
 
     def save(self, role: UserRoleInWorkspace) -> None:
         self._session.flush()

@@ -7,8 +7,8 @@ import transaction
 from tracim_backend.applications.share.models import ContentShareType
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.error import ErrorCode
-from tracim_backend.lib.utils.utils import get_redis_connection
-from tracim_backend.lib.utils.utils import get_rq_queue
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.models.auth import User
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image

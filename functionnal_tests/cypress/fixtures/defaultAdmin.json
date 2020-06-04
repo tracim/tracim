@@ -5,6 +5,7 @@
   "lang": "en",
   "user_id": 1,
   "email": "admin@admin.admin",
+  "username": "TheAdmin",
   "password": "admin@admin.admin",
   "profile": "administators",
   "timezone": "Europe/Paris"

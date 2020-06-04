@@ -18,7 +18,7 @@ import {
   FLASH_MESSAGE,
   REMOVE
 } from '../../../src/action-creator.sync.js'
-import { FETCH_CONFIG } from '../../../src/helper'
+import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
   restoreHistoryCallBack,
   isFunction
@@ -114,28 +114,38 @@ describe('In <Account />', () => {
       ])
     })
 
-    describe('handleSubmitNameOrEmail', () => {
+    describe('handleSubmitPersonalData', () => {
       it('should call updateUserPublicNameCallBack with a new Name', (done) => {
         const newName = 'randomNewName'
 
         mockPutMyselfName200(FETCH_CONFIG.apiUrl, newName, props.user.timezone, props.user.lang)
-        wrapper.instance().handleSubmitNameOrEmail(newName, '', '').then(() => {
+        wrapper.instance().handleSubmitPersonalData(newName, '', '', '').then(() => {
           expect(updateUserPublicNameCallBack.called).to.equal(true)
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
       })
 
+      // TODO Enable this test
+      // it('updateUserNameCallBack should be called when the function handleSubmitPersonalData() is called with a new username', (done) => {
+      //   const newUserName = 'randomNewUserName'
+      //   mockPutMyselfName200(FETCH_CONFIG.apiUrl, newUserName, props.user.timezone, props.user.lang)
+      //   wrapper.instance().handleSubmitPersonalData('', newUserName, '', '').then(() => {
+      //     expect(updateUserNameCallBack.called).to.equal(true)
+      //     expect(newFlashMessageWarningCallBack.called).to.equal(false)
+      //   }).then(done, done)
+      // })
+
       it('should call updateUserEmailCallBack with a new Email', (done) => {
         const newMail = 'randomNewEmail'
 
         mockPutMyselfEmail200(FETCH_CONFIG.apiUrl, newMail, password)
-        wrapper.instance().handleSubmitNameOrEmail('', newMail, password).then(() => {
+        wrapper.instance().handleSubmitPersonalData('', '', newMail, password).then(() => {
           expect(updateUserEmailCallBack.called).to.equal(true)
         }).then(done, done)
       })
 
       it('should call newFlashMessageWarningCallBack with invalid new Name', (done) => {
-        wrapper.instance().handleSubmitNameOrEmail('d', '', '').then(() => {
+        wrapper.instance().handleSubmitPersonalData('d', '', '').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
         }).then(done, done)
       })

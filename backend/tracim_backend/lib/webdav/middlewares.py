@@ -18,6 +18,8 @@ from wsgidav.middleware import BaseMiddleware
 import yaml
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.core.event import EventBuilder
+from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import get_engine
@@ -258,6 +260,8 @@ class TracimEnv(BaseMiddleware):
         self.settings = config["tracim_settings"]
         self.app_config = CFG(self.settings)
         self.app_config.configure_filedepot()
+        self.plugin_manager = create_plugin_manager()
+        self.plugin_manager.register(EventBuilder(self.app_config))
         self.engine = get_engine(self.app_config)
         self.session_factory = get_scoped_session_factory(self.engine)
 

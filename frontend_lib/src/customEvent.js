@@ -1,4 +1,5 @@
 export const CUSTOM_EVENT = {
+  TRACIM_LIVE_MESSAGE: 'TracimLiveMessage',
   ADD_FLASH_MSG: 'addFlashMsg',
   ALL_APP_CHANGE_LANGUAGE: 'allApp_changeLanguage',
   APPEND_BREADCRUMBS: 'appendBreadcrumbs',

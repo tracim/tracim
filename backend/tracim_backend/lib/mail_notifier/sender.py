@@ -6,9 +6,9 @@ import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.utils import get_redis_connection
-from tracim_backend.lib.utils.utils import get_rq_queue
 
 
 def send_email_through(
@@ -23,10 +23,10 @@ def send_email_through(
     :param sendmail_callable: A callable who get message on first parameter
     :param message: The message who have to be sent
     """
-    if config.EMAIL__PROCESSING_MODE == config.CST.SYNC:
+    if config.JOBS__PROCESSING_MODE == config.CST.SYNC:
         logger.info(send_email_through, "send email to {} synchronously".format(message["To"]))
         sendmail_callable(message)
-    elif config.EMAIL__PROCESSING_MODE == config.CST.ASYNC:
+    elif config.JOBS__PROCESSING_MODE == config.CST.ASYNC:
         logger.info(
             send_email_through,
             "send email to {} asynchronously:"
@@ -38,9 +38,7 @@ def send_email_through(
         queue.enqueue(sendmail_callable, message)
     else:
         raise NotImplementedError(
-            "Mail sender processing mode {} is not implemented".format(
-                config.EMAIL__PROCESSING_MODE
-            )
+            "Mail sender processing mode {} is not implemented".format(config.JOBS__PROCESSING_MODE)
         )
 
 

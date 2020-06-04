@@ -104,7 +104,7 @@ class User(DeclarativeBase):
     MAX_AUTH_TOKEN_LENGTH = 255
     MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH = 255
     DEFAULT_ALLOWED_SPACE = 0
-    USERNAME_OR_EMAIL_REQUIRED_CONSTRAINT_NAME = "username_or_email_required"
+    USERNAME_OR_EMAIL_REQUIRED_CONSTRAINT_NAME = "ck_users_username_email"
 
     __tablename__ = "users"
     # INFO - G.M - 2018-10-24 - force table to use utf8 instead of
@@ -155,6 +155,15 @@ class User(DeclarativeBase):
     @hybrid_property
     def email_address(self):
         return self.email
+
+    @property
+    def public_name(self) -> str:
+        return self.display_name
+
+    @property
+    def avatar_url(self) -> typing.Optional[str]:
+        # TODO - G-M - 20-04-2018 - [Avatar] Add user avatar feature
+        return None
 
     def __repr__(self):
         return "<User: email=%s, username=%s display=%s>" % (
@@ -294,7 +303,7 @@ class User(DeclarativeBase):
 
     def ensure_auth_token(self, validity_seconds) -> str:
         """
-        Create auth_token if None, regenerate auth_token if too much old.
+        Create auth_token if None, regenerate auth_token if too old.
         auth_token validity is set in
         :return: actual valid auth token
         """

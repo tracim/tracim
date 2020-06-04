@@ -34,10 +34,11 @@ from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.core.event import EventBuilder
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
-from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
+from tracim_backend.lib.utils.authentification import TRACIM_API_USER_LOGIN_HEADER
 from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import QueryTokenAuthentificationPolicy
@@ -82,8 +83,12 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_config = CFG(settings)
     app_config.configure_filedepot()
     settings["CFG"] = app_config
+
+    # Init plugin manager
     plugin_manager = init_plugin_manager(app_config)
-    settings["event_dispatcher"] = plugin_manager.event_dispatcher
+    plugin_manager.register(EventBuilder(app_config))
+    settings["plugin_manager"] = plugin_manager
+
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
     tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
@@ -97,9 +102,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     policies = []
     if app_config.REMOTE_USER_HEADER:
         policies.append(
-            RemoteAuthentificationPolicy(
-                remote_user_email_login_header=app_config.REMOTE_USER_HEADER
-            )
+            RemoteAuthentificationPolicy(remote_user_login_header=app_config.REMOTE_USER_HEADER)
         )
     policies.append(
         CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION__REISSUE_TIME)
@@ -109,7 +112,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         policies.append(
             ApiTokenAuthentificationPolicy(
                 api_key_header=TRACIM_API_KEY_HEADER,
-                api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER,
+                api_user_login_header=TRACIM_API_USER_LOGIN_HEADER,
             )
         )
     policies.append(TracimBasicAuthAuthenticationPolicy(realm=BASIC_AUTH_WEBUI_REALM))
@@ -228,9 +231,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         configurator.include(frontend_controller.bind)
 
     # INFO - G.M - 2019-11-27 - Include plugin custom web code
-    plugin_manager.event_dispatcher.hook.web_include(
-        configurator=configurator, app_config=app_config
-    )
+    plugin_manager.hook.web_include(configurator=configurator, app_config=app_config)
 
     hapic.add_documentation_view("/api/v2/doc", "Tracim v2 API", "API of Tracim v2")
     return configurator.make_wsgi_app()

@@ -8,7 +8,7 @@
   "Error while saving new description": "Erreur lors de la sauvegarde de la description",
   "Error while saving new role for member": "Erreur lors de la sauvegarde du rôle",
   "Error while fetching known members list": "Erreur lors du chargement de la liste des membres connus",
-  "Please set a name or email": "Veuillez saisir le nom ou l'email",
+  "Please set a name, an email or a username": "Veuillez saisir le nom, l'email ou l'identifiant",
   "Please set a role": "Veuillez choisir un rôle",
   "Member removed": "Membre supprimé",
   "Member added": "Membre ajouté",

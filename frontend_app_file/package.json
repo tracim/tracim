@@ -72,6 +72,7 @@
   },
   "standard": {
     "globals": [
+      "globalThis",
       "fetch",
       "history",
       "btoa",

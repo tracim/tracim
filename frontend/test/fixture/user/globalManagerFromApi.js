@@ -1,4 +1,4 @@
-export const globalManager = {
+export const globalManagerFromApi = {
   user_id: 1,
   logged: true,
   auth_type: 'internal',

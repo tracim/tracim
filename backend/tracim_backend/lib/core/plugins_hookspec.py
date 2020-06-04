@@ -3,12 +3,13 @@ Plugins Management event hooks
 ==============================
 
 """
-from tracim_backend.lib.core.plugins import TracimPluginManager
+import pluggy
+
 from tracim_backend.lib.core.plugins import hookspec
 
 
 @hookspec
-def on_plugins_loaded(plugin_manager: TracimPluginManager) -> None:
+def on_plugins_loaded(plugin_manager: pluggy.PluginManager) -> None:
     """
     Event at end of loading of all plugins
 
@@ -19,14 +20,14 @@ def on_plugins_loaded(plugin_manager: TracimPluginManager) -> None:
 
 
 @hookspec(historic=True)
-def add_new_hooks(plugin_manager: TracimPluginManager) -> None:
+def add_new_hooks(plugin_manager: pluggy.PluginManager) -> None:
     """
     Called after plugin registration, allow to add new hook to tracim.
     Hooks can be used like this to implement new specfile:
 
     >>> @hookimpl
-    ... def add_new_hooks(plugin_manager: TracimPluginManager):
-    ...     plugin_manager.event_dispatcher.add_hookspecs(myplugin.spec)
+    ... def add_new_hooks(plugin_manager: pluggy.PluginManager):
+    ...     plugin_manager.add_hookspecs(myplugin.spec)
     ... # doctest: +SKIP
 
     :param pluginmanager: plugin manager of tracim

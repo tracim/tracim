@@ -20,7 +20,7 @@ export const TextAreaApp = props =>
         type='button'
         className={`${props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn mr-3`}
         onClick={props.onClickCancelBtn}
-        tabindex='1'
+        tabIndex='1'
         style={{
           backgroundColor: '#fdfdfd',
           color: props.customColor,
@@ -41,7 +41,7 @@ export const TextAreaApp = props =>
         className={`${props.customClass}__submit editionmode__button__submit btn highlightBtn`}
         onClick={props.onClickValidateBtn}
         disabled={props.disableValidateBtn}
-        tabindex='0'
+        tabIndex='0'
         style={{
           backgroundColor: props.customColor,
           color: '#fdfdfd',

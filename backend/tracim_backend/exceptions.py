@@ -223,6 +223,10 @@ class NotificationDisabledCantCreateUserWithInvitation(TracimException):
     error_code = ErrorCode.NOTIFICATION_DISABLED_CANT_NOTIFY_NEW_USER
 
 
+class MissingEmailCantResetPassword(TracimException):
+    error_code = ErrorCode.MISSING_EMAIL_CANT_RESET_PASSWORD
+
+
 class NotificationDisabledCantResetPassword(TracimException):
     error_code = ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
@@ -417,6 +421,10 @@ class EmailValidationFailed(TracimValidationFailed):
 
 class EmailOrUsernameRequired(TracimValidationFailed):
     error_code = ErrorCode.EMAIL_OR_USERNAME_REQUIRED
+
+
+class EmailRequired(TracimValidationFailed):
+    error_code = ErrorCode.EMAIL_REQUIRED
 
 
 class InvalidUsernameFormat(TracimValidationFailed):

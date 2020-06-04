@@ -15,6 +15,7 @@ const DisplayState = props => (
       <button
         className='displaystate__btn'
         onClick={props.onClickBtn}
+        title={props.tooltip}
       >
         <i className={`fa fa-fw fa-${props.icon}`} />
         {props.btnLabel}
@@ -41,12 +42,14 @@ DisplayState.propTypes = {
   ]),
   icon: PropTypes.string,
   btnLabel: PropTypes.string,
-  onClickBtn: PropTypes.func
+  onClickBtn: PropTypes.func,
+  tooltip: PropTypes.string
 }
 
 DisplayState.defaultState = {
   msg: '',
   icon: '',
   btnLabel: '',
-  onClickBtn: () => {}
+  onClickBtn: () => {},
+  tooltip: ''
 }

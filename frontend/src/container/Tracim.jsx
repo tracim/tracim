@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
-import i18n from '../i18n.js'
+import i18n from '../util/i18n.js'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
@@ -20,16 +20,18 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
+import { LiveMessageManager } from '../util/LiveMessageManager.js'
 import { buildHeadTitle, CUSTOM_EVENT, PROFILE } from 'tracim_frontend_lib'
 import {
   PAGE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile
-} from '../helper.js'
+} from '../util/helper.js'
 import {
   getConfig,
   getAppList,
+  getLiveMessage,
   getContentTypeList,
   getUserIsConnected,
   getMyselfWorkspaceList,
@@ -46,7 +48,8 @@ import {
   setWorkspaceList,
   setBreadcrumbs,
   appendBreadcrumbs,
-  setWorkspaceListMemberList
+  setWorkspaceListMemberList,
+  setLiveMessageManager
 } from '../action-creator.sync.js'
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
@@ -55,6 +58,9 @@ import GuestDownload from './GuestDownload.jsx'
 export class Tracim extends React.Component {
   constructor (props) {
     super(props)
+
+    this.liveMessageManager = new LiveMessageManager()
+    props.dispatch(setLiveMessageManager(this.liveMessageManager))
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
@@ -117,7 +123,11 @@ export class Tracim extends React.Component {
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
 
         this.loadAppConfig()
+        this.loadLiveMessage()
         this.loadWorkspaceList()
+
+        this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id)
+
         break
       case 401: props.dispatch(setUserConnected({ logged: false })); break
       default: props.dispatch(setUserConnected({ logged: false })); break
@@ -125,6 +135,7 @@ export class Tracim extends React.Component {
   }
 
   componentWillUnmount () {
+    this.liveMessageManager.closeLiveMessageConnection()
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
@@ -154,6 +165,21 @@ export class Tracim extends React.Component {
 
     const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
+  }
+
+  loadLiveMessage = async () => {
+    const { props } = this
+    const response = await props.dispatch(getLiveMessage())
+
+    switch (response.status) {
+      case 200:
+        console.log('got live messages already sent')
+        break
+      default:
+        // props.dispatch(newFlashMessage(('Error while getting live messages'), 'error'))
+        console.log('error while getting live message')
+        break
+    }
   }
 
   loadWorkspaceList = async (openInSidebarId = undefined) => {
@@ -227,7 +253,11 @@ export class Tracim extends React.Component {
     return (
       <div className='tracim fullWidthFullHeight'>
         <Header />
-        <FlashMessage flashMessage={props.flashMessage} removeFlashMessage={this.handleRemoveFlashMessage} t={props.t} />
+        <FlashMessage
+          flashMessage={props.flashMessage}
+          onRemoveFlashMessage={this.handleRemoveFlashMessage}
+          t={props.t}
+        />
 
         <div className='sidebarpagecontainer'>
           <Route render={() => <Sidebar />} />

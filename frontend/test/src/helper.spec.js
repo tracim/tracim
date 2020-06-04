@@ -3,7 +3,7 @@ import {
   sortWorkspaceContents,
   findUserRoleIdInWorkspace,
   getUserProfile
-} from '../../src/helper.js'
+} from '../../src/util/helper.js'
 import {
   ROLE,
   ROLE_LIST,

@@ -112,7 +112,8 @@ class DownloadForm extends React.Component {
                 placement='bottom'
                 isOpen={this.state.popoverPasswordInfoOpen}
                 target='popoverPasswordInfo'
-                toggle={this.handleTogglePopoverPasswordInfo}
+                // INFO - CH - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+                toggle={this.handleTogglePopoverPasswordInfo} // eslint-disable-line react/jsx-handler-names
                 trigger={isMobile ? 'focus' : 'hover'}
               >
                 <PopoverBody>

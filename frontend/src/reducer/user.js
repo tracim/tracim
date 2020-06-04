@@ -9,7 +9,7 @@ import {
   USER_EMAIL,
   USER_AGENDA_URL
 } from '../action-creator.sync.js'
-import { getBrowserLang } from '../helper.js'
+import { getBrowserLang } from '../util/helper.js'
 import { PROFILE } from 'tracim_frontend_lib'
 
 export const defaultUser = {

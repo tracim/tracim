@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import i18n from '../i18n.js'
-import appFactory from '../appFactory.js'
+import i18n from '../util/i18n.js'
+import appFactory from '../util/appFactory.js'
 import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
@@ -27,7 +27,7 @@ import {
   PAGE,
   unLoggedAllowedPageList,
   ALL_CONTENT_TYPES
-} from '../helper.js'
+} from '../util/helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
 import {
@@ -74,15 +74,16 @@ class Header extends React.Component {
   handleClickHelp = () => {}
 
   handleClickLogout = async () => {
-    const { history, dispatch, t } = this.props
+    const { props } = this
 
-    const fetchPostUserLogout = await dispatch(postUserLogout())
+    const fetchPostUserLogout = await props.dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
-      dispatch(setUserDisconnected())
+      props.tlmManager.closeLiveMessageConnection()
+      props.dispatch(setUserDisconnected())
       this.props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
-      history.push(PAGE.LOGIN)
+      props.history.push(PAGE.LOGIN)
     } else {
-      dispatch(newFlashMessage(t('Disconnection error', 'danger')))
+      props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
     }
   }
 
@@ -186,5 +187,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ searchResult, lang, user, system, appList }) => ({ searchResult, lang, user, system, appList })
+const mapStateToProps = ({ searchResult, lang, user, system, appList, tlmManager }) => ({ searchResult, lang, user, system, appList, tlmManager })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

@@ -37,6 +37,17 @@ export const HtmlDocument = props => {
         />
       )}
 
+      {props.keepEditingWarning && (
+        <DisplayState
+          msg={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
+          btnType='button'
+          icon='repeat'
+          btnLabel={props.t('Refresh')}
+          onClickBtn={props.onClickRefresh}
+          tooltip={props.t('If you refresh, you will lose the current changes')}
+        />
+      )}
+
       <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
         {props.mode === APP_FEATURE_MODE.VIEW && props.isDraftAvailable && (
           <DisplayState

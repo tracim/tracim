@@ -12,13 +12,13 @@ class ThumbnailPreview extends React.Component {
     }
   }
 
-  onImageLoad = () => {
+  handleImageLoad = () => {
     this.setState({
       imageLoaded: IMG_LOAD_STATE.LOADED
     })
   }
 
-  onImageError = () => {
+  handleImageError = () => {
     this.setState({
       imageLoaded: IMG_LOAD_STATE.ERROR
     })
@@ -41,8 +41,8 @@ class ThumbnailPreview extends React.Component {
             <img
               src={props.previewSrc}
               className={classnames(`rotate${props.rotationAngle}`, state.imageLoaded ? 'carousel__thumbnail__item__preview__content__image img-thumbnail' : null)}
-              onLoad={this.onImageLoad}
-              onError={this.onImageError}
+              onLoad={this.handleImageLoad}
+              onError={this.handleImageError}
               alt={props.fileName}
             />
           )
