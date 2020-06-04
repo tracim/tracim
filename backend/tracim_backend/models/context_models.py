@@ -809,6 +809,7 @@ class WorkspaceInContext(object):
 class UserRoleWorkspaceInContext(object):
     """
     Interface to get UserRoleInWorkspace data and related content
+
     """
 
     def __init__(

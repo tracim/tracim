@@ -346,7 +346,6 @@ class UserCreationSchema(marshmallow.Schema):
     username = String(
         required=False, example="My-Power_User99", validate=user_username_validator, allow_none=True
     )
-    username = String(required=False, example="My-Power_User99", validate=user_username_validator)
     password = String(
         example="8QLa$<w",
         required=False,
@@ -767,9 +766,6 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
     user_username = StrippedString(
         example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
     )
-    user_username = StrippedString(
-        example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
-    )
 
     @post_load
     def make_workspace_member_invite(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -841,7 +837,6 @@ class BasicAuthSchema(marshmallow.Schema):
     username = String(
         example="My-Power_User99", required=False, validate=user_username_validator, allow_none=True
     )
-    username = String(example="My-Power_User99", required=False, validate=user_username_validator)
     password = String(
         example="8QLa$<w", required=True, load_only=True, validate=user_password_validator
     )

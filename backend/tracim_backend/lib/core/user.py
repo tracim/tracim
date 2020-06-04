@@ -957,6 +957,7 @@ class UserApi(object):
         WARNING ! This method Will be Deprecated soon, see
         https://github.com/tracim/tracim/issues/1589 and
         https://github.com/tracim/tracim/issues/1487
+
         This method do post-update user actions
         """
 
@@ -988,6 +989,7 @@ class UserApi(object):
         WARNING ! This method Will be Deprecated soon, see
         https://github.com/tracim/tracim/issues/1589 and
         https://github.com/tracim/tracim/issues/1487
+
         This method do post-create user actions
         """
 

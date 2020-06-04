@@ -3968,6 +3968,7 @@ class TestSetEmailPasswordLdapEndpoint(object):
     """
     Tests for PUT /api/v2/users/{user_id}/email
     Tests for PUT /api/v2/users/{user_id}/password
+
     for ldap user
     """
 

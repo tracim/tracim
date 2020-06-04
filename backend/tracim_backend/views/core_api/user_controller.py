@@ -7,10 +7,8 @@ from pyramid.response import Response
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmailAlreadyExistInDb
-from tracim_backend.exceptions import EmailOrUsernameRequired
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
-from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
