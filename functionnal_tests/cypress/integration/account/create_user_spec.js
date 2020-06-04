@@ -2,6 +2,7 @@ import { PAGES as p } from '../../support/urls_commands'
 
 const publicName = 'new_public_name'
 const username = 'new_username'
+const anotherUsername = 'another_new_username'
 const email = 'new.email@tracim.fr'
 const correctPwd = '123456'
 
@@ -150,14 +151,14 @@ describe('When "Create new user" at Administration', () => {
     cy.get('[data-cy=adminUser__adduser__button]').click()
     cy.get('[data-cy=adminUser__adduser__form]')
     cy.get('[data-cy=adduser_name]').type(publicName)
-    cy.get('[data-cy=adduser_username]').type(username)
+    cy.get('[data-cy=adduser_username]').type(anotherUsername)
     cy.get('[data-cy=adduser_email]').type(email)
     cy.get('[data-cy=adduser_password]').type(correctPwd)
     cy.get('[data-cy=profile__list__item__administrators]').click()
     cy.get('[data-cy=adminUser__adduser__form__submit]').click()
     cy.get('[data-cy=flashmessage]').contains('Email already exists')
     cy.contains(publicName)
-    cy.contains(username)
+    cy.contains(anotherUsername)
     cy.contains(email)
   })
 })

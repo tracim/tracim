@@ -38,9 +38,10 @@ export class Home extends React.Component {
     this.state = {
       hidePopupCheckbox: false,
       newUsername: '',
-      newUsernameAvailability: true,
+      isUsernameValid: true,
       password: '',
-      usernamePopup: false
+      usernamePopup: false,
+      usernameInvalidMsg: ''
     }
   }
 
@@ -100,18 +101,6 @@ export class Home extends React.Component {
     } else {
       const username = removeAtInUsername(state.newUsername)
 
-      if (username.length < MINIMUM_CHARACTERS_USERNAME) {
-        props.dispatch(
-          newFlashMessage(props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME }), 'warning')
-        )
-        return false
-      }
-
-      if (/\s/.test(username)) {
-        props.dispatch(newFlashMessage(props.t("Username can't contain any whitespace"), 'warning'))
-        return false
-      }
-
       const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, state.password))
       switch (fetchPutUsername.status) {
         case 200:
@@ -153,12 +142,32 @@ export class Home extends React.Component {
     const { props } = this
 
     this.setState({ newUsername: e.target.value })
+    const username = removeAtInUsername(e.target.value)
 
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(removeAtInUsername(e.target.value)))
+    if (username.length < MINIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (/\s/.test(username)) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t("Username can't contain any whitespace")
+      })
+      return
+    }
+
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
 
     switch (fetchUsernameAvailability.status) {
       case 200:
-        this.setState({ newUsernameAvailability: fetchUsernameAvailability.json.available })
+        this.setState({
+          isUsernameValid: fetchUsernameAvailability.json.available,
+          usernameInvalidMsg: props.t('This username is not available')
+        })
         break
       default:
         props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning'))
@@ -173,7 +182,7 @@ export class Home extends React.Component {
 
     return (
       (state.newUsername === '' && !state.hidePopupCheckbox) ||
-      !state.newUsernameAvailability ||
+      !state.isUsernameValid ||
       (state.newUsername !== '' && state.password === '')
     )
   }
@@ -231,10 +240,16 @@ export class Home extends React.Component {
                     data-cy='usernamePopup_username'
                   />
 
-                  {!this.state.newUsernameAvailability && (
+                  {!this.state.isUsernameValid && (
                     <div className='homepage__usernamePopup__errorMsg'>
                       <i className='homepage__usernamePopup__errorIcon fa fa-times' />
-                      {props.t('This username is not available')}
+                      {this.state.usernameInvalidMsg}
+                    </div>
+                  )}
+
+                  {this.state.isUsernameValid && (
+                    <div className='homepage__usernamePopup__infoMsg'>
+                      {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
                     </div>
                   )}
 
