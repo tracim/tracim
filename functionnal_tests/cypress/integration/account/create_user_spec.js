@@ -158,7 +158,7 @@ describe('When "Create new user" at Administration', () => {
     cy.get('[data-cy=adminUser__adduser__form__submit]').click()
     cy.get('[data-cy=flashmessage]').contains('Email already exists')
     cy.contains(publicName)
-    cy.contains(anotherUsername)
+    cy.contains(username)
     cy.contains(email)
   })
 })
