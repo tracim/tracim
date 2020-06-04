@@ -61,6 +61,7 @@ export const updateWorkspaceContentList = workspaceContentList => ({ type: `${UP
 export const deleteWorkspaceContentList = workspaceContentList => ({ type: `${REMOVE}/${WORKSPACE_CONTENT}`, workspaceContentList })
 
 export const addWorkspaceShareFolderContentList = workspaceShareFolderContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList })
+export const updateWorkspaceShareFolderContentList = workspaceShareFolderContentList => ({ type: `${UPDATE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`

@@ -27,7 +27,8 @@ import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  TracimComponent, TLM_ENTITY_TYPE as TLM_ET, TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -55,7 +56,10 @@ import {
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
   moveWorkspaceContent,
-  setWorkspaceDetail
+  setWorkspaceDetail,
+  removeWorkspaceReadStatus,
+  updateWorkspaceContentList,
+  updateWorkspaceShareFolderContentList
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -83,45 +87,101 @@ class WorkspaceContent extends React.Component {
       }
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.REFRESH_CONTENT_LIST, handler: this.handleRefreshContentList },
+      { name: CUSTOM_EVENT.OPEN_CONTENT_URL, handler: this.handleOpenContentUrl },
+      { name: CUSTOM_EVENT.APP_CLOSED, handler: this.handleCloseHideApp(CUSTOM_EVENT.APP_CLOSED) },
+      { name: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, handler: this.handleCloseHideApp(CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT) },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.FILE, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.THREAD, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.FOLDER, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: CONTENT_TYPE.COMMENT, handler: this.handleContentCreatedComment },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.FILE, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.FOLDER, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.THREAD, handler: this.handleContentModified }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    const { props, state } = this
-    switch (type) {
-      case CUSTOM_EVENT.REFRESH_CONTENT_LIST:
-        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
-        this.loadAllWorkspaceContent(state.workspaceIdInUrl)
-        break
+  // CustomEvent handlers
+  handleRefreshContentList = data => {
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.REFRESH_CONTENT_LIST, data)
+    this.loadAllWorkspaceContent(this.state.workspaceIdInUrl)
+  }
 
-      case CUSTOM_EVENT.OPEN_CONTENT_URL:
-        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
-        props.history.push(PAGE.WORKSPACE.CONTENT(data.workspaceId, data.contentType, data.contentId) + props.location.search)
-        break
+  handleOpenContentUrl = data => {
+    const { props } = this
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.OPEN_CONTENT_URL, data)
+    props.history.push(PAGE.WORKSPACE.CONTENT(data.workspaceId, data.contentType, data.contentId) + props.location.search)
+  }
 
-      case CUSTOM_EVENT.APP_CLOSED:
-      case CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT: {
-        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.workspaceIdInUrl)
+  handleCloseHideApp = type => data => {
+    const { state, props } = this
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.workspaceIdInUrl)
 
-        const contentFolderPath = props.workspaceContentList.filter(c => c.isOpen).map(c => c.id)
-        const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
+    const contentFolderPath = props.workspaceContentList.filter(c => c.isOpen).map(c => c.id)
+    const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
 
-        const newUrlSearch = {
-          ...qs.parse(props.location.search),
-          folder_open: [...folderListInUrl, ...contentFolderPath].join(',')
+    const newUrlSearch = {
+      ...qs.parse(props.location.search),
+      folder_open: [...folderListInUrl, ...contentFolderPath].join(',')
+    }
+
+    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, { encode: false }))
+    this.setState({ appOpenedType: false })
+
+    this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
+    this.props.dispatch(resetBreadcrumbsAppFeature())
+  }
+
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    if (!this.state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(this.props.location.search).type))
+  }
+
+  // LiveMessage handlers
+  handleWorkspaceModified = data => {
+    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
+    this.props.dispatch(setWorkspaceDetail(data.workspace))
+    this.setHeadTitle()
+  }
+
+  handleContentCreated = data => {
+    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
+    if (data.content.content_namespace === 'upload') {
+      this.props.dispatch(updateWorkspaceShareFolderContentList([
+        {
+          ...data.content,
+          ...(data.content.content_type === CONTENT_TYPE.FOLDER && { parent_id: SHARE_FOLDER_ID })
         }
+      ]))
+    } else {
+      this.props.dispatch(addWorkspaceContentList([data.content]))
+    }
+  }
 
-        props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, { encode: false }))
-        this.setState({ appOpenedType: false })
+  handleContentCreatedComment = data => {
+    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
+    this.props.dispatch(removeWorkspaceReadStatus(data.content.parent_id))
+  }
 
-        this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
-        this.props.dispatch(resetBreadcrumbsAppFeature())
-        break
-      }
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        if (!state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
-        break
+  handleContentModified = data => {
+    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
+    if (data.content.content_namespace === 'upload') {
+      this.props.dispatch(updateWorkspaceShareFolderContentList([
+        {
+          ...data.content,
+          ...(data.content.content_type === CONTENT_TYPE.FOLDER && { parent_id: SHARE_FOLDER_ID })
+        }
+      ]))
+    } else {
+      this.props.dispatch(updateWorkspaceContentList([data.content]))
     }
   }
 
@@ -181,7 +241,6 @@ class WorkspaceContent extends React.Component {
 
   componentWillUnmount () {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent = false) => {
@@ -668,6 +727,8 @@ class WorkspaceContent extends React.Component {
 
     const urlFilter = qs.parse(location.search).type
 
+    console.log('rerender', workspaceContentList, workspaceShareFolderContentList)
+
     const filteredWorkspaceContentList = workspaceContentList.length > 0
       ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
@@ -869,4 +930,4 @@ class WorkspaceContent extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList }) => ({
   breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList
 })
-export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))
+export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(WorkspaceContent)))))

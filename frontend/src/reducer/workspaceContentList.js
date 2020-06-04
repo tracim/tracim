@@ -1,6 +1,7 @@
 import {
   SET,
   ADD,
+  UPDATE,
   TOGGLE,
   WORKSPACE,
   WORKSPACE_CONTENT,
@@ -43,6 +44,20 @@ export default function workspaceContentList (state = [], action) {
       ]
       return [
         ...state,
+        ...action.workspaceContentList.map(c => ({
+          ...serializeContent(c),
+          isOpen: parentIdList.includes(c.content_id)
+        }))
+      ]
+    }
+
+    case `${UPDATE}/${WORKSPACE_CONTENT}`: {
+      const parentIdList = [
+        ...state.filter(c => c.parentId),
+        ...action.workspaceContentList.filter(c => c.parentId)
+      ]
+      return [
+        ...state.filter(c => !action.workspaceContentList.some(wc => wc.content_id === c.id)),
         ...action.workspaceContentList.map(c => ({
           ...serializeContent(c),
           isOpen: parentIdList.includes(c.content_id)

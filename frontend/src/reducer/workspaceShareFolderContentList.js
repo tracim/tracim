@@ -3,6 +3,7 @@ import {
   TOGGLE,
   WORKSPACE,
   FOLDER,
+  UPDATE,
   WORKSPACE_CONTENT_SHARE_FOLDER, ADD, WORKSPACE_CONTENT_SHARE_FOLDER_ARCHIVED, WORKSPACE_CONTENT_SHARE_FOLDER_DELETED
 } from '../action-creator.sync.js'
 import { serializeContent } from './workspaceContentList.js'
@@ -26,6 +27,20 @@ export default function workspaceShareFolderContentList (state = [], action) {
 
       return [
         ...state,
+        ...action.workspaceShareFolderContentList.map(c => ({
+          ...serializeContent(c),
+          isOpen: parentIdList.includes(c.content_id)
+        }))
+      ]
+    }
+
+    case `${UPDATE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`: {
+      const parentIdList = [
+        ...state.filter(c => c.parentId),
+        ...action.workspaceShareFolderContentList.filter(c => c.parentId)
+      ]
+      return [
+        ...state.filter(c => !action.workspaceShareFolderContentList.some(wc => wc.content_id === c.id)),
         ...action.workspaceShareFolderContentList.map(c => ({
           ...serializeContent(c),
           isOpen: parentIdList.includes(c.content_id)
