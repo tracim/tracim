@@ -347,7 +347,7 @@ class TestFolder(object):
         assert modified_event.event_type == "content.modified.folder"
         assert modified_event.content == content
         workspace = web_testapp.get(
-            "/api/v2/workspaces/{}".format(test_workspace.workspace_id), status=200
+            "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
         assert modified_event.workspace == workspace
 
@@ -1151,7 +1151,7 @@ class TestHtmlDocuments(object):
         assert modified_event.content["status"] == content["status"]
         assert modified_event.content["sub_content_types"] == content["sub_content_types"]
         assert modified_event.content["workspace_id"] == content["workspace_id"]
-        workspace = web_testapp.get("/api/v2/workspaces/2", status=200).json_body
+        workspace = web_testapp.get("/api/workspaces/2", status=200).json_body
         assert modified_event.workspace == workspace
 
     def test_api__update_html_document__err_400__not_editable(self, web_testapp) -> None:
@@ -4048,7 +4048,7 @@ class TestThreads(object):
         assert modified_event.content["status"] == content["status"]
         assert modified_event.content["sub_content_types"] == content["sub_content_types"]
         assert modified_event.content["workspace_id"] == content["workspace_id"]
-        workspace = web_testapp.get("/api/v2/workspaces/2", status=200).json_body
+        workspace = web_testapp.get("/api/workspaces/2", status=200).json_body
         assert modified_event.workspace == workspace
 
     def test_api__update_thread__err_400__not_modified(self, web_testapp) -> None:

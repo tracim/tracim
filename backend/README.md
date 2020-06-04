@@ -1,7 +1,7 @@
 The Tracim Backend
 ==================
 
-Backend source code of Tracim v2, using Pyramid Framework.
+Backend source code of Tracim, using Pyramid Framework.
 
 Installation
 ---------------

@@ -44,7 +44,7 @@ class TestResetPasswordRequestEndpointMailSync(object):
         transaction.commit()
 
         params = {"username": "boby"}
-        web_testapp.post_json("/api/v2/auth/password/reset/request", status=204, params=params)
+        web_testapp.post_json("/api/auth/password/reset/request", status=204, params=params)
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
@@ -72,9 +72,7 @@ class TestResetPasswordRequestEndpointMailSync(object):
         transaction.commit()
 
         params = {"username": "boby"}
-        res = web_testapp.post_json(
-            "/api/v2/auth/password/reset/request", status=400, params=params
-        )
+        res = web_testapp.post_json("/api/auth/password/reset/request", status=400, params=params)
 
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()

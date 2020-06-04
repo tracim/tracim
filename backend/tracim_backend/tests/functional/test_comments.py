@@ -121,7 +121,7 @@ class TestCommentsEndpoint(object):
         assert created.event_type == "content.created.comment"
         assert created.content == comment
         workspace = web_testapp.get(
-            "/api/v2/workspaces/{}".format(business_workspace.workspace_id), status=200
+            "/api/workspaces/{}".format(business_workspace.workspace_id), status=200
         ).json_body
         assert created.workspace == workspace
 

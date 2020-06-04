@@ -171,7 +171,7 @@ class TestAboutEndpoint(object):
 @pytest.mark.usefixtures("test_fixture")
 class TestUsernameAvailabilitiesEndpoint(object):
     """
-    Tests for /api/v2/system/username-availability
+    Tests for /api/system/username-availability
     """
 
     @pytest.mark.parametrize(
@@ -183,7 +183,7 @@ class TestUsernameAvailabilitiesEndpoint(object):
     ) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/system/username-availability?username={}".format(username), status=200
+            "/api/system/username-availability?username={}".format(username), status=200
         )
         assert res.json["available"] == is_available
 

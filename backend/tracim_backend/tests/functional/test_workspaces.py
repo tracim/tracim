@@ -1488,7 +1488,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # create workspace role
         params = {"user_username": "TheBobi", "role": "content-manager"}
-        res = web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
+        res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
         user_role_found = res.json_body
         assert user_role_found["role"] == "content-manager"
         assert user_role_found["user_id"] == 3
@@ -1497,7 +1497,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["email_sent"] is False
         assert user_role_found["do_notify"] is False
 
-        res = web_testapp.get("/api/v2/workspaces/1/members", status=200).json_body
+        res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
         assert len(res) == 2
         user_role = res[0]
         assert user_role["role"] == "workspace-manager"

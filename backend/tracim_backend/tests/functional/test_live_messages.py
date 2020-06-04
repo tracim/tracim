@@ -95,7 +95,7 @@ class TestLivesMessages(object):
 
         headers = {"Accept": "text/event-stream"}
         response = requests.get(
-            "http://localhost:7999/api/v2/users/1/live_messages",
+            "http://localhost:7999/api/users/1/live_messages",
             auth=("admin@admin.admin", "admin@admin.admin"),
             stream=True,
             headers=headers,
@@ -103,7 +103,7 @@ class TestLivesMessages(object):
         client = sseclient.SSEClient(response)
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
         update_user_request = requests.put(
-            "http://localhost:7999/api/v2/users/1",
+            "http://localhost:7999/api/users/1",
             auth=("admin@admin.admin", "admin@admin.admin"),
             json=params,
         )

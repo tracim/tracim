@@ -3039,7 +3039,7 @@ class TestUserEndpoint(object):
             "username": "testu",
             "email_notification": False,
         }
-        web_testapp.post_json("/api/v2/users", status=status, params=params)
+        web_testapp.post_json("/api/users", status=status, params=params)
 
     def test_api__create_user__err_400__with_no_username_and_no_email(
         self, web_testapp, user_api_factory, app_config
@@ -3054,7 +3054,7 @@ class TestUserEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=400, params=params)
+        res = web_testapp.post_json("/api/users", status=400, params=params)
         res = res.json_body
         assert res["code"] == 2001
         assert res["message"] == "Validation error of input data"
@@ -4261,7 +4261,7 @@ class TestSetEmailEndpoint(object):
 class TestSetUsernameEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for PUT /api/v2/users/{user_id}/username
+    Tests for PUT /api/users/{user_id}/username
     """
 
     def test_api__set_user_username__ok_200__admin(
@@ -4285,15 +4285,15 @@ class TestSetUsernameEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert not res["username"]
 
         # Set username
         params = {"username": "MyHero", "loggedin_user_password": "admin@admin.admin"}
-        web_testapp.put_json("/api/v2/users/{}/username".format(user_id), params=params, status=200)
+        web_testapp.put_json("/api/users/{}/username".format(user_id), params=params, status=200)
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["username"] == "MyHero"
 
@@ -4319,20 +4319,20 @@ class TestSetUsernameEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["username"] == "TheHero"
 
         # Set username
         params = {"username": "TheAdmin", "loggedin_user_password": "admin@admin.admin"}
         res = web_testapp.put_json(
-            "/api/v2/users/{}/username".format(user_id), params=params, status=400
+            "/api/users/{}/username".format(user_id), params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.USERNAME_ALREADY_EXIST_IN_DB
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["username"] == "TheHero"
 
@@ -4357,20 +4357,20 @@ class TestSetUsernameEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert not res["username"]
 
         # Set password
         params = {"username": "TheTest", "loggedin_user_password": "badpassword"}
         res = web_testapp.put_json(
-            "/api/v2/users/{}/username".format(user_id), params=params, status=403
+            "/api/users/{}/username".format(user_id), params=params, status=403
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WRONG_USER_PASSWORD
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert not res["username"]
 
@@ -4396,21 +4396,21 @@ class TestSetUsernameEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert not res["username"]
 
         # Set password
         params = {"username": "This is not correct", "loggedin_user_password": "admin@admin.admin"}
         res = web_testapp.put_json(
-            "/api/v2/users/{}/username".format(user_id), params=params, status=400
+            "/api/users/{}/username".format(user_id), params=params, status=400
         )
         # TODO - G.M - 2018-09-10 - Handled by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INVALID_USERNAME_FORMAT
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert not res["username"]
 
@@ -4437,16 +4437,16 @@ class TestSetUsernameEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["username"] == "TheTestUser"
 
         # Set password
         params = {"username": "TheNewTestUser", "loggedin_user_password": "password"}
-        web_testapp.put_json("/api/v2/users/{}/username".format(user_id), params=params, status=200)
+        web_testapp.put_json("/api/users/{}/username".format(user_id), params=params, status=200)
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["username"] == "TheNewTestUser"
 
@@ -4485,7 +4485,7 @@ class TestSetUsernameEndpoint(object):
         # Set password
         params = {"username": "TheTestUserBis", "loggedin_user_password": "password"}
         res = web_testapp.put_json(
-            "/api/v2/users/{}/username".format(user_id), params=params, status=403
+            "/api/users/{}/username".format(user_id), params=params, status=403
         )
         assert res.json_body
         assert "code" in res.json_body
