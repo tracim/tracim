@@ -12,15 +12,19 @@ describe('navigate :: workspace > create_new > thread', function () {
         params: { workspaceId: workspace.workspace_id }
       })
     })
+    cy.get('[data-cy="dropdownCreateBtn"]').click()
+    cy.get('.subdropdown__link__thread__text').click()
+    cy.get('[data-cy="createcontent__form__input"]').type('test')
+    cy.get('[data-cy="popup__createcontent__form__button"]').type('test')
   })
 
   it('should have translations', () => {
-    cy.get('.workspace__header__title').contains('List of threads')
+    cy.get('.thread__contentpage__texteditor__submit__btn').contains('Send')
 
     cy.changeLanguage('fr')
-    cy.get('.workspace__header__title').contains('Liste des discussions')
+    cy.get('.thread__contentpage__texteditor__submit__btn').contains('Envoyer')
 
     cy.changeLanguage('pt')
-    cy.get('.workspace__header__title').contains('Lista de discussões')
+    cy.get('.thread__contentpage__texteditor__submit__btn').contains('Envíar')
   })
 })
