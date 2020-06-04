@@ -29,9 +29,4 @@ export const file = {
     user_id: 1
   },
   mimetype: 'image/png'
-  // filenameNoExtension: 'Capture du 2020-03-30 14-22-09',
-  // previewUrl: '/api/v2/workspaces/1/files/1/revisions/1/preview/jpg/500x500/Random File.jpg?page=1&revision_id=1',
-  // lightboxUrlList: [
-  //   '/api/v2/workspaces/1/files/1/revisions/1/preview/jpg/1920x1080/Random File.jpg?page=1'
-  // ]
 }

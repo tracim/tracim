@@ -56,5 +56,6 @@
   "Preview loading...": "Preview loading...",
   "File has been updated": "File has been updated",
   "File has been deleted": "File has been deleted",
-  "File has been restored": "File has been restored"
+  "File has been restored": "File has been restored",
+  "The file has been updated, it can't be edited anymore": "The file has been updated, it can't be edited anymore"
 }

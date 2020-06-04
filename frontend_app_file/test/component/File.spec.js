@@ -10,9 +10,9 @@ import {
   mockGetFileRevision200
 } from '../apiMock.js'
 import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
-import content from '../fixture/content/content.js'
+import contentFile from '../fixture/content/contentFile.js'
 import { debug } from '../../src/debug.js'
-import { commentTlm } from '../fixture/tracimLiveMessageData/commentTlm.js'
+import { commentTlm } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 
 describe('<File />', () => {
   const props = {
@@ -21,15 +21,15 @@ describe('<File />', () => {
     registerLiveMessageHandlerList: () => {},
     registerCustomEventHandlerList: () => {},
     i18n: {},
-    content,
+    content: contentFile,
     t: key => key
   }
 
-  mockGetFileContent200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.file)
-  mockPutMyselfFileRead200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id)
-  mockGetShareLinksList200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.shareList)
-  mockGetFileComment200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.commentList).persist()
-  mockGetFileRevision200(debug.config.apiUrl, content.file.workspace_id, content.file.content_id, content.revisionList).persist()
+  mockGetFileContent200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id, contentFile.file)
+  mockPutMyselfFileRead200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id)
+  mockGetShareLinksList200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id, contentFile.shareList)
+  mockGetFileComment200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id, contentFile.commentList).persist()
+  mockGetFileRevision200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id, contentFile.revisionList).persist()
 
   const wrapper = shallow(<File {...props} />)
 
@@ -45,7 +45,7 @@ describe('<File />', () => {
             },
             content: {
               ...commentTlm,
-              parent_id: content.file.content_id,
+              parent_id: contentFile.file.content_id,
               content_id: 9
             }
           }
@@ -63,7 +63,7 @@ describe('<File />', () => {
           const tlmData1 = {
             content: {
               ...commentTlm,
-              parent_id: content.file.content_id,
+              parent_id: contentFile.file.content_id,
               content_id: 10,
               created: '2020-05-22T14:02:02Z'
             }
@@ -72,7 +72,7 @@ describe('<File />', () => {
           const tlmData2 = {
             content: {
               ...commentTlm,
-              parent_id: content.file.content_id,
+              parent_id: contentFile.file.content_id,
               content_id: 11,
               created: '2020-05-22T14:02:05Z'
             }
@@ -95,7 +95,7 @@ describe('<File />', () => {
           const tlmData = {
             content: {
               ...commentTlm,
-              parent_id: content.file.content_id + 1,
+              parent_id: contentFile.file.content_id + 1,
               content_id: 12
             }
           }
@@ -115,7 +115,7 @@ describe('<File />', () => {
         describe('Modify the fileName of the current content', () => {
           const tlmData = {
             content: {
-              ...content.file,
+              ...contentFile.file,
               filename: 'newName.jpeg'
             }
           }
@@ -132,7 +132,7 @@ describe('<File />', () => {
         describe('Modify the description of the current content', () => {
           const tlmData = {
             content: {
-              ...content.file,
+              ...contentFile.file,
               raw_content: 'new random description'
             }
           }
@@ -149,10 +149,10 @@ describe('<File />', () => {
         describe('Upload a new file to the current content', () => {
           const tlmData = {
             content: {
-              ...content.file,
+              ...contentFile.file,
               size: 42,
               filename: 'New File.jpeg',
-              current_revision_id: content.file.current_revision_id + 1,
+              current_revision_id: contentFile.file.current_revision_id + 1,
               file_extension: '.jpeg',
               label: 'New File',
               slug: 'newFile',
@@ -190,9 +190,9 @@ describe('<File />', () => {
         describe('Modify a content not related to the current file', () => {
           const tlmData = {
             content: {
-              ...content.file,
+              ...contentFile.file,
               filename: 'WrongName.jpeg',
-              content_id: content.file.content_id + 1
+              content_id: contentFile.file.content_id + 1
             }
           }
 
@@ -208,7 +208,7 @@ describe('<File />', () => {
       describe('handleContentDeleted', () => {
         describe('Delete the current content', () => {
           const tlmData = {
-            content: content.file
+            content: contentFile.file
           }
 
           before(() => {
@@ -216,7 +216,7 @@ describe('<File />', () => {
           })
 
           after(() => {
-            wrapper.setState({ content: content.file })
+            wrapper.setState({ content: contentFile.file })
           })
 
           it('should be deleted correctly', () => {
@@ -230,8 +230,8 @@ describe('<File />', () => {
         describe('Delete a content which is not the current one', () => {
           const tlmData = {
             content: {
-              ...content.file,
-              content_id: content.file.content_id + 1
+              ...contentFile.file,
+              content_id: contentFile.file.content_id + 1
             }
           }
 
@@ -247,7 +247,7 @@ describe('<File />', () => {
       describe('handleContentRestored', () => {
         describe('Restore the current content', () => {
           const tlmData = {
-            content: content.file
+            content: contentFile.file
           }
 
           before(() => {
@@ -256,7 +256,7 @@ describe('<File />', () => {
           })
 
           after(() => {
-            wrapper.setState({ content: content.file })
+            wrapper.setState({ content: contentFile.file })
           })
 
           it('should be restored correctly', () => {
@@ -267,8 +267,8 @@ describe('<File />', () => {
         describe('Restore a content which is not the current one', () => {
           const tlmData = {
             content: {
-              ...content.file,
-              content_id: content.file.content_id + 1
+              ...contentFile.file,
+              content_id: contentFile.file.content_id + 1
             }
           }
 
