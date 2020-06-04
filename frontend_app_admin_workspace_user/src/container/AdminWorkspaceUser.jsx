@@ -386,6 +386,23 @@ class AdminWorkspaceUser extends React.Component {
     const { props, state } = this
 
     const username = removeAtInUsername(newUsername)
+
+    if (/\s/.test(username)) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t("Username can't contain any whitespace")
+      })
+      return
+    }
+
+    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
     const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, username))
 
     switch (fetchUsernameAvailability.apiResponse.status) {
@@ -398,20 +415,6 @@ class AdminWorkspaceUser extends React.Component {
       default:
         this.sendGlobalFlashMsg(props.t('Error while checking username availability'))
         break
-    }
-
-    if (/\s/.test(username)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t("Username can't contain any whitespace")
-      })
-    }
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-      })
     }
   }
 

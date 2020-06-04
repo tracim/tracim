@@ -300,6 +300,29 @@ class Account extends React.Component {
     const { props } = this
 
     const username = removeAtInUsername(newUsername)
+
+    if (/\s/.test(username)) {
+      this.setState(prev => ({
+        userToEdit: {
+          ...prev.userToEdit,
+          isUsernameValid: false,
+          usernameInvalidMsg: props.t("Username can't contain any whitespace")
+        }
+      }))
+      return
+    }
+
+    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+      this.setState(prev => ({
+        userToEdit: {
+          ...prev.userToEdit,
+          isUsernameValid: false,
+          usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+        }
+      }))
+      return
+    }
+
     const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
 
     switch (fetchUsernameAvailability.status) {
@@ -313,26 +336,6 @@ class Account extends React.Component {
         }))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning')); break
-    }
-
-    if (/\s/.test(username)) {
-      this.setState(prev => ({
-        userToEdit: {
-          ...prev.userToEdit,
-          isUsernameValid: false,
-          usernameInvalidMsg: props.t("Username can't contain any whitespace")
-        }
-      }))
-    }
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
-      this.setState(prev => ({
-        userToEdit: {
-          ...prev.userToEdit,
-          isUsernameValid: false,
-          usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-        }
-      }))
     }
   }
 
