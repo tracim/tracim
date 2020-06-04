@@ -90,9 +90,11 @@ export class MemberList extends React.Component {
                           </div>
                         </div>
 
-                        <div className='memberlist__list__item__info__username'>
-                          @{m.username}
-                        </div>
+                        {m.username &&
+                          <div className='memberlist__list__item__info__username'>
+                            @{m.username}
+                          </div>
+                        }
                       </div>
 
                       {props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && m.id !== props.loggedUser.user_id && (
