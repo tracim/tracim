@@ -75,10 +75,7 @@ export default function workspaceContentList (state = [], action) {
       )
 
     case `${SET}/${WORKSPACE_CONTENT_DELETED}`:
-      return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
-        ? { ...wsc, isDeleted: true }
-        : wsc
-      )
+      return state.filter(wsc => wsc.id !== action.contentId)
 
     default:
       return state

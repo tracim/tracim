@@ -55,11 +55,12 @@ import {
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  moveWorkspaceContent,
   setWorkspaceDetail,
   removeWorkspaceReadStatus,
   updateWorkspaceContentList,
-  updateWorkspaceShareFolderContentList
+  updateWorkspaceShareFolderContentList,
+  setWorkspaceContentShareFolderDeleted,
+  setWorkspaceContentDeleted
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -105,7 +106,15 @@ class WorkspaceContent extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.FOLDER, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.THREAD, handler: this.handleContentModified }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: CONTENT_TYPE.THREAD, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: CONTENT_TYPE.FILE, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: CONTENT_TYPE.FOLDER, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: CONTENT_TYPE.THREAD, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: CONTENT_TYPE.FILE, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: CONTENT_TYPE.HTML_DOCUMENT, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: CONTENT_TYPE.FOLDER, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: CONTENT_TYPE.THREAD, handler: this.handleContentCreated }
     ])
   }
 
@@ -182,6 +191,15 @@ class WorkspaceContent extends React.Component {
       ]))
     } else {
       this.props.dispatch(updateWorkspaceContentList([data.content]))
+    }
+  }
+
+  handleContentDeleted = data => {
+    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
+    if (data.content.content_namespace === 'upload') {
+      this.props.dispatch(setWorkspaceContentShareFolderDeleted(data.workspace.workspace_id, data.content.content_id))
+    } else {
+      this.props.dispatch(setWorkspaceContentDeleted(data.workspace.workspace_id, data.content.content_id))
     }
   }
 
@@ -455,30 +473,26 @@ class WorkspaceContent extends React.Component {
   }
 
   handleClickDeleteContentItem = async (e, content) => {
-    const { props, state } = this
+    const { props } = this
 
     e.preventDefault()
     e.stopPropagation()
     const fetchPutContentDeleted = await props.dispatch(putWorkspaceContentDeleted(content.workspaceId, content.id))
-    switch (fetchPutContentDeleted.status) {
-      case 204:
-        this.loadContentList(state.workspaceIdInUrl)
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
+
+    if (fetchPutContentDeleted.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
     }
   }
 
   handleClickDeleteShareFolderContentItem = async (e, content) => {
-    const { props, state } = this
+    const { props } = this
 
     e.preventDefault()
     e.stopPropagation()
     const fetchPutContentDeleted = await props.dispatch(putWorkspaceContentDeleted(content.workspaceId, content.id))
-    switch (fetchPutContentDeleted.status) {
-      case 204:
-        this.loadShareFolderContent(state.workspaceIdInUrl)
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
+
+    if (fetchPutContentDeleted.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
     }
   }
 
@@ -555,7 +569,7 @@ class WorkspaceContent extends React.Component {
   }
 
   handleDropMoveContent = async (source, destination) => {
-    const { props, state } = this
+    const { props } = this
 
     if (source.contentId === destination.contentId) return
 
@@ -582,13 +596,6 @@ class WorkspaceContent extends React.Component {
 
     const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
     switch (fetchMoveContent.status) {
-      case 200: {
-        const { dropEffect, ...actionDestination } = destination
-        props.dispatch(moveWorkspaceContent(source, actionDestination))
-        this.loadContentList(state.workspaceIdInUrl)
-        this.loadShareFolderContent(state.workspaceIdInUrl)
-        break
-      }
       case 400:
         switch (fetchMoveContent.json.code) {
           case 3002:
@@ -726,8 +733,6 @@ class WorkspaceContent extends React.Component {
     const { state, props } = this
 
     const urlFilter = qs.parse(location.search).type
-
-    console.log('rerender', workspaceContentList, workspaceShareFolderContentList)
 
     const filteredWorkspaceContentList = workspaceContentList.length > 0
       ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
