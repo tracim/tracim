@@ -50,7 +50,7 @@ describe('<MemberList />', () => {
       }
     })
 
-    it('should display the publicName of each member in memberList', () => {
+    it('should display the username of each member in memberList', () => {
       for (let i = 0; i < props.memberList.length; i++) {
         expect(wrapper.find('div.memberlist__list__item__info__username').at(i)).to.text().equal(`@${props.memberList[i].username}`)
       }
