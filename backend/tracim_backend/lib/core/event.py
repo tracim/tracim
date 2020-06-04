@@ -1,6 +1,7 @@
 import abc
 import contextlib
 from datetime import datetime
+import threading
 import typing
 
 from sqlalchemy import event
@@ -98,11 +99,16 @@ class EventBuilder:
 
     def __init__(self, config: CFG) -> None:
         self._config = config
-        self._current_user = None  # type: typing.Optional[User]
+        self._thread_local = threading.local()
+        self._thread_local.current_user = None
+
+    @property
+    def _current_user(self) -> typing.Optional[User]:
+        return self._thread_local.current_user
 
     @hookimpl
     def on_current_user_set(self, user: User) -> None:
-        self._current_user = user
+        self._thread_local.current_user = user
 
     @hookimpl
     def on_request_session_created(self, request: TracimRequest, session: TracimSession) -> None:
@@ -110,7 +116,7 @@ class EventBuilder:
 
     @hookimpl
     def on_request_finished(self) -> None:
-        self._current_user = None
+        self._thread_local.current_user = None
 
     # User events
     @hookimpl
