@@ -209,7 +209,7 @@ in` development.ini.sample`
 :warning: By default, python warning are disabled. To enable warning please set
 `PYTHONWARNINGS` env var, for example `export PYTHONWARNINGS=default` .
 
-Run the Tracim backend web API:
+Run the Tracim backend web API (don't include live messages):
 
     pserve development.ini
 
@@ -220,6 +220,7 @@ Run the WsgiDAV server:
 Run the CalDAV server:
 
     tracimcli caldav start
+
 
 Running Tracim Backend Daemon
 ---------------
@@ -296,6 +297,31 @@ Example of `supervisord.conf`:
 Run with (supervisord.conf should be provided, see [supervisord.conf default_paths](http://supervisord.org/configuration.html):
 
     supervisord
+
+
+Running Pushpin Service
+---------------
+
+For a working Tracim instance, you need to setup pushpin as proxy for tracim web service.
+
+### Development purpose
+for dev, it's recommended to follow [this documentation](./doc/live_message_setup.md) for docker installation of pushpin
+
+### Production install
+
+for production, you can install pushpin daemon directly.
+
+You should install pushpin, for example in debian/ubuntu:
+
+    apt install pushpin
+
+and configure it to proxy tracim web (by default tracim web run on port 6543):
+
+    echo "* localhost:6543" > /etc/pushpin/routes
+
+and after this change you need to restart your pushpin service:
+
+    systemctl restart pushpin
 
 ## Run Tests and Others Checks ##
 

@@ -374,7 +374,7 @@ class CFG(object):
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
 
         # base url of the frontend
-        self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "http://localhost:6543")
+        self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "http://localhost:7999")
 
         self.API__BASE_URL = self.get_raw_config("api.base_url", self.WEBSITE__BASE_URL)
 

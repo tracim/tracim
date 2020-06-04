@@ -172,7 +172,7 @@ With this configuration, CORS can work with 2 different servers with 2 different
 This may be needed if the frontend and the backend are on different domains.
 You can add as many servers as you want, separated by ','.
 
-     cors.access-control-allowed-origin = http://mysuperservername.ndd:6543,http://myotherservername.ndd:8090
+     cors.access-control-allowed-origin = http://mysuperservername.ndd:7999,http://myotherservername.ndd:8090
 
 ## Authentication in Tracim
 
@@ -274,7 +274,7 @@ In the Tracim INI configuration file:
    remote_user_header = HTTP_X_REMOTE_USER
 `
 
-apache_virtualhost (Tracim should be listening on port 6543):
+apache_virtualhost (Tracim should be listening on port 6543, pushpin on 7999):
 
 
 ```
@@ -295,6 +295,8 @@ Listen 6544
     # RequestHeader set X-Remote-User %{REMOTE_USER}s
 
     ProxyPreserveHost On
+    ProxyPassMatch /api/(v2/users/.*/live_messages)$ http://127.0.0.1:7999/api/$1
+
     ProxyPass / http://127.0.0.1:6543/
     ProxyPassReverse / http://127.0.0.1:6543/
 </VirtualHost>
