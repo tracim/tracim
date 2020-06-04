@@ -95,24 +95,14 @@ class HtmlDocument extends React.Component {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
-    const localStorageComment = localStorage.getItem(
-      generateLocalStorageContentId(data.content.workspace_id, data.content.content_id, state.appName, 'comment')
-    )
-
-    if (state.mode === APP_FEATURE_MODE.EDIT && state.loggedUser.user_id !== data.author.user_id) {
-      this.setState({
-        editionAuthor: data.author.public_name,
-        keepEditingWarning: true
-      })
-    }
-
     this.setState(prev => ({
       ...prev,
       content: {
         ...prev.content,
         ...data.content
       },
-      newComment: localStorageComment || '',
+      editionAuthor: data.author.public_name,
+      keepEditingWarning: (state.mode === APP_FEATURE_MODE.EDIT && state.loggedUser.user_id !== data.author.user_id),
       rawContentBeforeEdit: prev.content.raw_content,
       timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
     }))
