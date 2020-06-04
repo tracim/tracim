@@ -7,16 +7,16 @@ import {
   mockGetHtmlDocumentRevision200,
   mockPutHtmlDocumentRead200
 } from '../apiMock.js'
-import { commentTLM } from '../fixture/tracimLiveMessageData/commentTLM.js'
+import { commentTlm } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 import { HtmlDocument } from '../../src/container/HtmlDocument.jsx'
 import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
-import content from '../fixture/content/content.js'
+import contentHtmlDocument from '../fixture/content/contentHtmlDocument.js'
 import { debug } from '../../src/debug.js'
 
 describe('<HtmlDocument />', () => {
   const props = {
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    content,
+    content: contentHtmlDocument,
     i18n: {},
     registerCustomEventHandlerList: () => { },
     registerLiveMessageHandlerList: () => { },
@@ -24,10 +24,10 @@ describe('<HtmlDocument />', () => {
     t: key => key
   }
 
-  mockGetHtmlDocumentContent200(debug.config.apiUrl, content.htmlDocument.workspace_id, content.htmlDocument.content_id, content.htmlDocument)
-  mockPutHtmlDocumentRead200(debug.loggedUser, debug.config.apiUrl, content.htmlDocument.workspace_id, content.htmlDocument.content_id)
-  mockGetHtmlDocumentComment200(debug.config.apiUrl, content.htmlDocument.workspace_id, content.htmlDocument.content_id, content.commentList).persist()
-  mockGetHtmlDocumentRevision200(debug.config.apiUrl, content.htmlDocument.workspace_id, content.htmlDocument.content_id, content.revisionList).persist()
+  mockGetHtmlDocumentContent200(debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id, contentHtmlDocument.htmlDocument)
+  mockPutHtmlDocumentRead200(debug.loggedUser, debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id)
+  mockGetHtmlDocumentComment200(debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id, contentHtmlDocument.commentList).persist()
+  mockGetHtmlDocumentRevision200(debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id, contentHtmlDocument.revisionList).persist()
 
   const wrapper = shallow(<HtmlDocument {...props} />)
 
@@ -35,16 +35,14 @@ describe('<HtmlDocument />', () => {
     describe('eventType content', () => {
       describe('handleContentCreated', () => {
         describe('create a new comment', () => {
-          const tlmData = {
-            content: {
-              ...commentTLM,
-              parent_id: content.htmlDocument.content_id,
-              content_id: 9,
-              created: '2020-01-07T16:28:05Z'
-            }
-          }
-
           it('should update the timeline if is related to the current html-document', () => {
+            const tlmData = {
+              content: {
+                ...commentTlm,
+                parent_id: contentHtmlDocument.htmlDocument.content_id,
+                content_id: 9
+              }
+            }
             wrapper.instance().handleContentCreated(tlmData)
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData.content.content_id)
           })
@@ -52,8 +50,8 @@ describe('<HtmlDocument />', () => {
           it('should not update the timeline if is not related to the current html-document', () => {
             const tlmDataOtherContent = {
               content: {
-                ...commentTLM,
-                parent_id: content.htmlDocument.content_id + 1,
+                ...commentTlm,
+                parent_id: contentHtmlDocument.htmlDocument.content_id + 1,
                 content_id: 12
               }
             }
@@ -64,18 +62,30 @@ describe('<HtmlDocument />', () => {
           })
 
           it('should sort the timeline if two TracimLiveMessages arrive in the wrong order', () => {
-            const tlmData2 = {
+            const tlmData1 = {
               content: {
-                ...commentTLM,
-                parent_id: content.htmlDocument.content_id,
-                content_id: 11,
-                created: '2020-01-07T15:30:05Z'
+                ...commentTlm,
+                parent_id: contentHtmlDocument.htmlDocument.content_id,
+                content_id: 10,
+                created: '2020-05-22T14:02:02Z'
               }
             }
-            wrapper.instance().handleContentCreated(tlmData)
+
+            const tlmData2 = {
+              content: {
+                ...commentTlm,
+                parent_id: contentHtmlDocument.htmlDocument.content_id,
+                content_id: 11,
+                created: '2020-05-22T14:02:05Z'
+              }
+            }
+
             wrapper.instance().handleContentCreated(tlmData2)
+            wrapper.instance().handleContentCreated(tlmData1)
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData2.content.content_id)
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 2].content_id).to.equal(tlmData.content.content_id)
+
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 2].content_id).to.equal(tlmData1.content.content_id)
+
           })
         })
       })
@@ -83,9 +93,9 @@ describe('<HtmlDocument />', () => {
       describe('handleContentModified', () => {
         describe('modify the content name', () => {
           const tlmData = {
-            author: content.htmlDocument.last_modifier,
+            author: contentHtmlDocument.htmlDocument.last_modifier,
             content: {
-              ...content.htmlDocument,
+              ...contentHtmlDocument.htmlDocument,
               label: 'newContentName'
             }
           }
@@ -101,9 +111,9 @@ describe('<HtmlDocument />', () => {
 
         describe('modify the content of the html-document', () => {
           const tlmData = {
-            author: content.htmlDocument.last_modifier,
+            author: contentHtmlDocument.htmlDocument.last_modifier,
             content: {
-              ...content.htmlDocument,
+              ...contentHtmlDocument.htmlDocument,
               raw_content: '<p>Html Document Content</p>'
             }
           }
@@ -125,9 +135,9 @@ describe('<HtmlDocument />', () => {
         describe('modify a content not related to another content', () => {
           const tlmData = {
             content: {
-              ...content.htmlDocument,
+              ...contentHtmlDocument.htmlDocument,
               raw_content: '<p>Html Document content on other doc</p>',
-              content_id: content.htmlDocument.content_id + 1
+              content_id: contentHtmlDocument.htmlDocument.content_id + 1
             }
           }
 
@@ -141,12 +151,12 @@ describe('<HtmlDocument />', () => {
       describe('handleContentDeleted', () => {
         describe('delete the current content', () => {
           const tlmData = {
-            author: content.htmlDocument.last_modifier,
-            content: content.htmlDocument
+            author: contentHtmlDocument.htmlDocument.last_modifier,
+            content: contentHtmlDocument.htmlDocument
           }
 
           after(() => {
-            wrapper.setState({ content: content.htmlDocument })
+            wrapper.setState({ content: contentHtmlDocument.htmlDocument })
           })
 
           it('should be deleted correctly', () => {
@@ -158,8 +168,8 @@ describe('<HtmlDocument />', () => {
         describe('delete a content which is not the current one', () => {
           const tlmData = {
             content: {
-              ...content.htmlDocument,
-              content_id: content.htmlDocument.content_id + 1
+              ...contentHtmlDocument.htmlDocument,
+              content_id: contentHtmlDocument.htmlDocument.content_id + 1
             }
           }
 
@@ -173,12 +183,12 @@ describe('<HtmlDocument />', () => {
       describe('handleContentUndeleted', () => {
         describe('restore the current content', () => {
           const tlmData = {
-            author: content.htmlDocument.last_modifier,
-            content: content.htmlDocument
+            author: contentHtmlDocument.htmlDocument.last_modifier,
+            content: contentHtmlDocument.htmlDocument
           }
 
           after(() => {
-            wrapper.setState({ content: content.htmlDocument })
+            wrapper.setState({ content: contentHtmlDocument.htmlDocument })
           })
 
           it('should be restored correctly', () => {
@@ -192,8 +202,8 @@ describe('<HtmlDocument />', () => {
         describe('restore a content which is not the current one', () => {
           const tlmData = {
             content: {
-              ...content.htmlDocument,
-              content_id: content.htmlDocument.content_id + 1
+              ...contentHtmlDocument.htmlDocument,
+              content_id: contentHtmlDocument.htmlDocument.content_id + 1
             }
           }
 
