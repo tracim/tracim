@@ -104,7 +104,7 @@ describe('<HtmlDocument />', () => {
             wrapper.instance().handleContentModified(tlmData)
           })
 
-          it('should be updated with the content modified', () => {
+          it('should update the document with the new name', () => {
             expect(wrapper.state('content').label).to.equal(tlmData.content.label)
           })
         })
@@ -118,7 +118,7 @@ describe('<HtmlDocument />', () => {
             }
           }
 
-          it('should be updated with the content modified', () => {
+          it('should update the document with the new content', () => {
             wrapper.instance().handleContentModified(tlmData)
             expect(wrapper.state('content').raw_content).to.equal(tlmData.content.raw_content)
           })
@@ -141,7 +141,7 @@ describe('<HtmlDocument />', () => {
             }
           }
 
-          it('should not be updated when the modification that do not concern the current content', () => {
+          it('should not update when the modification that do not concern the current content', () => {
             wrapper.instance().handleContentModified(tlmData)
             expect(wrapper.state('content').raw_content).to.not.equal(tlmData.content.raw_content)
           })
