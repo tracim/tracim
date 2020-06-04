@@ -1,17 +1,9 @@
-FROM debian:buster
+FROM debian:buster AS builder
 MAINTAINER contact@tracim.fr
 
 ARG TAG=""
 ARG BRANCH=""
 ARG REPO="https://github.com/tracim/tracim.git"
-
-ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission,gallery"
-ENV START_WEBDAV=1
-ENV START_CALDAV=1
-ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0
-ENV LANG C.UTF-8
-ENV LANGUAGE C.UTF-8
-ENV LC_ALL C.UTF-8
 
 RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
     then echo "Its not possible to use ARG TAG and ARG BRANCH in same time." && exit 1;fi
@@ -20,41 +12,21 @@ RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
 RUN \
     apt update && apt upgrade -qy \
     && apt install -qy \
-    apache2 \
     build-essential \
     curl \
-    ghostscript \
     git \
-    gnupg \
-    imagemagick \
-    inkscape \
-    libapache2-mod-wsgi-py3 \
     libfile-mimeinfo-perl \
     libimage-exiftool-perl \
     libjpeg-dev \
     libmagickwand-dev \
     libpq-dev \
-    libreoffice \
     locales \
-    poppler-utils \
-    postgresql-client \
     python3 \
     python3-dev \
     python3-pip \
     python3-venv \
-    qpdf \
-    ufraw-batch \
-    ffmpeg \
-    redis-server \
-    supervisor \
-    uwsgi \
-    uwsgi-plugin-python3 \
-    vim \
-    xvfb \
-    zlib1g-dev \
     nodejs \
-    npm \
-    pushpin
+    npm
 
 # Clone repo
 RUN \
@@ -91,23 +63,56 @@ RUN \
     mv /tracim/frontend/dist/assets/images/logo-tracim.png /tracim/frontend/dist/assets/images/logo-tracim.png.default \
 # Clean frontend installation
     && rm -rf /tracim/frontend*/node_modules \
-    && rm -rf /tracim/node_modules \
+    && rm -rf /tracim/node_modules
+
+
+FROM debian:buster
+
+ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission,gallery"
+ENV START_WEBDAV=1
+ENV START_CALDAV=1
+ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0
+ENV LANG C.UTF-8
+ENV LANGUAGE C.UTF-8
+ENV LC_ALL C.UTF-8
+
+RUN \
+    apt update && apt upgrade -qy \
+    && apt install -qy \
+    apache2 \
+    ghostscript \
+    git \
+    gnupg \
+    imagemagick \
+    inkscape \
+    libapache2-mod-wsgi-py3 \
+    libfile-mimeinfo-perl \
+    libimage-exiftool-perl \
+    libreoffice \
+    locales \
+    poppler-utils \
+    postgresql-client \
+    python3 \
+    qpdf \
+    ufraw-batch \
+    ffmpeg \
+    redis-server \
+    supervisor \
+    uwsgi \
+    uwsgi-plugin-python3 \
+    vim \
+    xvfb \
+    pushpin \
 # Remove default conf about apache2
     && rm /etc/apache2/sites-enabled/000-default.conf \
 # Do not show apache version
     && sed -i "s|ServerTokens OS|ServerTokens Prod|g" /etc/apache2/conf-enabled/security.conf \
-    && sed -i "s|ServerSignature On|ServerSignature Off|g" /etc/apache2/conf-enabled/security.conf \
-# Purge useless packages
-    && apt purge -yq \
-    build-essential \
-    curl \
-    nodejs \
-    npm \
-    yarn \
-    *-dev \
-    && apt autoremove -qy \
-    && apt clean -qy \
-    && rm -rf /var/lib/apt/list/*
+    && sed -i "s|ServerSignature On|ServerSignature Off|g" /etc/apache2/conf-enabled/security.conf
+
+# Tracim code
+COPY --from=builder /tracim /tracim
+# Python dependencies installed through pip
+COPY --from=builder /usr/local /usr/local
 
 VOLUME ["/etc/tracim", "/var/tracim"]
 EXPOSE 80
