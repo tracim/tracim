@@ -81,7 +81,8 @@ describe('reducer currentWorkspace.js', () => {
           id: globalManagerAsMemberFromApi.user.user_id,
           publicName: globalManagerAsMemberFromApi.user.public_name,
           role: globalManagerAsMemberFromApi.role,
-          doNotify: globalManagerAsMemberFromApi.do_notify
+          doNotify: globalManagerAsMemberFromApi.do_notify,
+          username:  globalManagerAsMemberFromApi.user.username
         })
       })
     })
@@ -123,7 +124,8 @@ describe('reducer currentWorkspace.js', () => {
         id: 15,
         publicName: 'random user',
         role: ROLE.reader.slug,
-        doNotify: true
+        doNotify: true,
+        username: 'random'
       }
       const initialStateWithMember = { ...initialState, memberList: [randomMember] }
       const rez = currentWorkspace(
