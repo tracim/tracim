@@ -15,7 +15,7 @@ import {
 } from 'tracim_frontend_lib'
 import {
   PAGE
-} from '../helper.js'
+} from '../util/helper.js'
 import ContentItemSearch from '../component/ContentItemSearch.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {

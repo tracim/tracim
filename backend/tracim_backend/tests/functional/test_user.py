@@ -5,6 +5,7 @@ Tests for /api/v2/users subpath endpoints.
 
 import pytest
 import transaction
+from webtest import TestApp
 
 from tracim_backend import AuthType
 from tracim_backend.error import ErrorCode
@@ -12,6 +13,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import create_1000px_png_test_image
 
 
@@ -2743,6 +2745,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -2762,6 +2765,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
         assert res["lang"] == "fr"
@@ -2776,6 +2780,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
             "timezone": "Europe/Paris",
             "lang": "fr",
             "public_name": "test user",
+            "username": "testu",
             "email_notification": False,
         }
         res = web_testapp.post_json("/api/v2/users", status=200, params=params)
@@ -2786,6 +2791,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "test user"
+        assert res["username"] == "testu"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 134217728
@@ -2894,6 +2900,7 @@ class TestUserEndpoint(object):
         profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
+            username="testu",
             password="password",
             name="bob",
             profile=profile,
@@ -2915,6 +2922,7 @@ class TestUserEndpoint(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "bob"
+        assert res["username"] == "testu"
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
         assert res["lang"] == "fr"
@@ -2985,7 +2993,9 @@ class TestUserEndpoint(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
 
-    def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
+    def test_api__create_user__ok_200__full_admin(
+        self, web_testapp, user_api_factory, event_helper
+    ):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "email": "test@test.test",
@@ -3007,6 +3017,47 @@ class TestUserEndpoint(object):
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 0
+
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.created"
+        assert last_event.fields["user"] == res
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert last_event.fields["author"] == author
+
+    @pytest.mark.parametrize("email_required,status", ((True, 400), (False, 200)))
+    def test_api__create_user__with_only_username(
+        self, web_testapp, user_api_factory, email_required, status
+    ):
+        web_testapp.app.registry.settings["CFG"].EMAIL__REQUIRED = email_required
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "username": "testu",
+            "email_notification": False,
+        }
+        web_testapp.post_json("/api/v2/users", status=status, params=params)
+
+    def test_api__create_user__err_400__with_no_username_and_no_email(
+        self, web_testapp, user_api_factory, app_config
+    ):
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=400, params=params)
+        res = res.json_body
+        assert res["code"] == 2001
+        assert res["message"] == "Validation error of input data"
 
     def test_api__create_user__ok_200__full_admin_with_allowed_space(
         self, web_testapp, user_api_factory
@@ -3151,6 +3202,32 @@ class TestUserEndpoint(object):
         assert user.email == "test@test.test"
         assert user.password is None
 
+    def test_api__update_user__ok_200__infos(self, web_testapp, user_api_factory, event_helper):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/v2/users", status=200, params=params).json_body
+        user_id = res["user_id"]
+
+        res = web_testapp.put_json(
+            "/api/v2/users/{}".format(user_id),
+            status=200,
+            params={"timezone": "Europe/London", "lang": "en", "public_name": "John Doe"},
+        ).json_body
+        assert res["timezone"] == "Europe/London"
+        assert res["lang"] == "en"
+        assert res["public_name"] == "John Doe"
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.modified"
+        assert last_event.fields["user"]["public_name"] == "John Doe"
+
     def test_api__create_user__err_400__email_already_in_db(self, user_api_factory, web_testapp):
 
         uapi = user_api_factory.get()
@@ -3292,7 +3369,7 @@ class TestUserWithNotificationEndpoint(object):
         assert headers["To"][0] == "test <test@test.test>"
         assert headers["Subject"][0] == "[Tracim] Created account"
 
-    def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, mailhog):
+    def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, event_helper):
 
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -3314,6 +3391,8 @@ class TestUserWithNotificationEndpoint(object):
         web_testapp.put("/api/v2/users/{}/trashed".format(user_id), status=204)
         res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200).json_body
         assert res["is_deleted"] is True
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.deleted"
 
     def test_api_delete_user__err_400__admin_itself(self, web_testapp, admin_user):
 
@@ -3338,6 +3417,7 @@ class TestUsersEndpoint(object):
         profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
+            username="TheTestUSer",
             password="password",
             name="bob",
             profile=profile,
@@ -3359,6 +3439,7 @@ class TestUsersEndpoint(object):
 
         assert res[1]["user_id"] == admin_user.user_id
         assert res[1]["public_name"] == admin_user.display_name
+        assert res[1]["username"] == admin_user.username
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
@@ -4205,6 +4286,242 @@ class TestSetEmailEndpoint(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestSetUsernameEndpoint(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for PUT /api/v2/users/{user_id}/username
+    """
+
+    def test_api__set_user_username__ok_200__admin(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # check before
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert not res["username"]
+
+        # Set username
+        params = {"username": "MyHero", "loggedin_user_password": "admin@admin.admin"}
+        web_testapp.put_json("/api/v2/users/{}/username".format(user_id), params=params, status=200)
+        # Check After
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["username"] == "MyHero"
+
+    def test_api__set_user_username__err_400__admin_already_exist_username(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            username="TheHero",
+            password="password",
+            email="boby@boba.fet",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # check before
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["username"] == "TheHero"
+
+        # Set username
+        params = {"username": "TheAdmin", "loggedin_user_password": "admin@admin.admin"}
+        res = web_testapp.put_json(
+            "/api/v2/users/{}/username".format(user_id), params=params, status=400
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.USERNAME_ALREADY_EXIST_IN_DB
+        # Check After
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["username"] == "TheHero"
+
+    def test_api__set_user_username__err_403__admin_wrong_password(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # check before
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert not res["username"]
+
+        # Set password
+        params = {"username": "TheTest", "loggedin_user_password": "badpassword"}
+        res = web_testapp.put_json(
+            "/api/v2/users/{}/username".format(user_id), params=params, status=403
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.WRONG_USER_PASSWORD
+        # Check After
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert not res["username"]
+
+    def test_api__set_user_username__err_400__admin_string_is_not_valid(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # check before
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert not res["username"]
+
+        # Set password
+        params = {"username": "This is not correct", "loggedin_user_password": "admin@admin.admin"}
+        res = web_testapp.put_json(
+            "/api/v2/users/{}/username".format(user_id), params=params, status=400
+        )
+        # TODO - G.M - 2018-09-10 - Handled by marshmallow schema
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.INVALID_USERNAME_FORMAT
+        # Check After
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert not res["username"]
+
+    def test_api__set_user_username__ok_200__user_itself(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            username="TheTestUser",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        # check before
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["username"] == "TheTestUser"
+
+        # Set password
+        params = {"username": "TheNewTestUser", "loggedin_user_password": "password"}
+        web_testapp.put_json("/api/v2/users/{}/username".format(user_id), params=params, status=200)
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        # Check After
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["username"] == "TheNewTestUser"
+
+    def test_api__set_user_username__err_403__other_normal_user(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="bob2",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user2)
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
+        # Set password
+        params = {"username": "TheTestUserBis", "loggedin_user_password": "password"}
+        res = web_testapp.put_json(
+            "/api/v2/users/{}/username".format(user_id), params=params, status=403
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestSetPasswordEndpoint(object):
     # -*- coding: utf-8 -*-
     """
@@ -4439,6 +4756,7 @@ class TestSetUserInfoEndpoint(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -4455,6 +4773,7 @@ class TestSetUserInfoEndpoint(object):
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         # Set params
@@ -4465,6 +4784,7 @@ class TestSetUserInfoEndpoint(object):
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "updated"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
 
@@ -4477,6 +4797,7 @@ class TestSetUserInfoEndpoint(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -4493,6 +4814,7 @@ class TestSetUserInfoEndpoint(object):
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         # Set params
@@ -4503,6 +4825,7 @@ class TestSetUserInfoEndpoint(object):
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "updated"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
 

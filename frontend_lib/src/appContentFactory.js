@@ -54,7 +54,7 @@ export function appContentFactory (WrappedComponent) {
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp in case of opening another app feature
     appContentCustomEventHandlerHideApp = setState => {
-      tinymce.remove('#wysiwygTimelineComment')
+      globalThis.tinymce.remove('#wysiwygTimelineComment')
       setState({
         isVisible: false,
         timelineWysiwyg: false
@@ -63,7 +63,7 @@ export function appContentFactory (WrappedComponent) {
 
     // CH - 2019-31-12 - This event is used to send a new content_id that will trigger data reload through componentDidUpdate
     appContentCustomEventHandlerReloadContent = (newContent, setState, appSlug) => {
-      tinymce.remove('#wysiwygTimelineComment')
+      globalThis.tinymce.remove('#wysiwygTimelineComment')
 
       const previouslyUnsavedComment = localStorage.getItem(
         generateLocalStorageContentId(newContent.workspace_id, newContent.content_id, appSlug, 'comment')
@@ -89,8 +89,8 @@ export function appContentFactory (WrappedComponent) {
     // INFO - 2019-01-09 - if param isTimelineWysiwyg is false, param changeNewCommentHandler isn't required
     appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n, isTimelineWysiwyg, changeNewCommentHandler = null) => {
       if (isTimelineWysiwyg) {
-        tinymce.remove('#wysiwygTimelineComment')
-        wysiwyg('#wysiwygTimelineComment', newLang, changeNewCommentHandler)
+        globalThis.tinymce.remove('#wysiwygTimelineComment')
+        globalThis.wysiwyg('#wysiwygTimelineComment', newLang, changeNewCommentHandler)
       }
 
       setState(prev => ({
@@ -112,21 +112,18 @@ export function appContentFactory (WrappedComponent) {
         await putEditContent(this.apiUrl, content.workspace_id, content.content_id, appSlug, newTitle, content.raw_content, propertiesToAddToBody)
       )
 
-      switch (response.apiResponse.status) {
-        case 200:
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-          break
-        case 400:
-          switch (response.body.code) {
-            case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-            case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
-            default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
-          }
-          break
-        default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+      if (response.apiResponse.status !== 200) {
+        switch (response.apiResponse.status) {
+          case 400:
+            switch (response.body.code) {
+              case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
+              case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
+              default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+            }
+            break
+          default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+        }
       }
-
       return response
     }
 
@@ -159,8 +156,6 @@ export function appContentFactory (WrappedComponent) {
           localStorage.removeItem(
             generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment')
           )
-
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
           break
         case 400:
           switch (response.body.code) {
@@ -187,13 +182,8 @@ export function appContentFactory (WrappedComponent) {
         await putEditStatus(this.apiUrl, content.workspace_id, content.content_id, appSlug, newStatus)
       )
 
-      switch (response.status) {
-        case 204:
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
-          break
-        default:
-          this.sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
-          break
+      if (response.status !== 204) {
+        this.sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
       }
 
       return response
@@ -235,17 +225,18 @@ export function appContentFactory (WrappedComponent) {
 
       switch (response.status) {
         case 204:
-          setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: APP_FEATURE_MODE.VIEW }))
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
+          setState({ mode: APP_FEATURE_MODE.VIEW })
           break
-        default: GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.ADD_FLASH_MSG,
-          data: {
-            msg: i18n.t('Error while deleting document'),
-            type: 'warning',
-            delay: undefined
-          }
-        })
+        default:
+          GLOBAL_dispatchEvent({
+            type: CUSTOM_EVENT.ADD_FLASH_MSG,
+            data: {
+              msg: i18n.t('Error while deleting document'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
+        break
       }
 
       return response
@@ -283,12 +274,8 @@ export function appContentFactory (WrappedComponent) {
         await putContentRestoreDelete(this.apiUrl, content.workspace_id, content.content_id)
       )
 
-      switch (response.status) {
-        case 204:
-          setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
-          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(appSlug), data: {} })
-          break
-        default: GLOBAL_dispatchEvent({
+      if (response.status !== 204) {
+        GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
             msg: i18n.t('Error while restoring document'),

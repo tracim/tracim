@@ -14,7 +14,7 @@ import {
   DRAG_AND_DROP,
   sortWorkspaceContents,
   SHARE_FOLDER_ID
-} from '../../helper.js'
+} from '../../util/helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 require('./Folder.styl')
@@ -193,7 +193,7 @@ class Folder extends React.Component {
                 onDropMoveContentItem={props.onDropMoveContentItem}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
-                setFolderRead={props.setFolderRead}
+                onSetFolderRead={props.onSetFolderRead}
                 isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
                 t={props.t}

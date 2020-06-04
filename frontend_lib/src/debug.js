@@ -82,6 +82,7 @@ export const defaultDebug = {
     auth_type: 'internal',
     user_id: 1,
     public_name: 'Global manager',
+    username: 'global_manager',
     email: 'osef@algoo.fr',
     lang: 'fr',
     avatar_url: null,

@@ -214,7 +214,7 @@ class TestWorkspaceEndpoint(object):
             workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
 
     def test_api__update_workspace__ok_200__nominal_case(
-        self, workspace_api_factory, application_api_factory, web_testapp, app_config
+        self, workspace_api_factory, application_api_factory, web_testapp, app_config, event_helper
     ) -> None:
         """
         Test update workspace
@@ -262,6 +262,9 @@ class TestWorkspaceEndpoint(object):
         assert workspace["agenda_enabled"] is False
         assert workspace["public_upload_enabled"] is False
         assert workspace["public_download_enabled"] is False
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace.modified"
+        assert last_event.workspace == workspace
 
         # after
         res = web_testapp.get("/api/v2/workspaces/1", status=200)
@@ -478,7 +481,7 @@ class TestWorkspaceEndpoint(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__create_workspace__ok_200__nominal_case(self, web_testapp) -> None:
+    def test_api__create_workspace__ok_200__nominal_case(self, web_testapp, event_helper) -> None:
         """
         Test create workspace
         """
@@ -501,8 +504,17 @@ class TestWorkspaceEndpoint(object):
         assert workspace["owner"]["user_id"] == 1
         assert workspace["owner"]["avatar_url"] is None
         assert workspace["owner"]["public_name"] == "Global manager"
+        assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
         workspace_id = res.json_body["workspace_id"]
+        (workspace_created, user_role_created) = event_helper.last_events(2)
+        assert workspace_created.event_type == "workspace.created"
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert workspace_created.author == author
+        assert workspace_created.workspace == workspace
+        assert user_role_created.event_type == "workspace_member.created"
+        assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
+
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
         assert workspace["workspace_id"] == workspace_2["workspace_id"]
@@ -528,7 +540,7 @@ class TestWorkspaceEndpoint(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__delete_workspace__ok_200__admin(
-        self, web_testapp, user_api_factory, workspace_api_factory
+        self, web_testapp, user_api_factory, workspace_api_factory, event_helper
     ) -> None:
         """
         Test delete workspace as admin
@@ -559,6 +571,9 @@ class TestWorkspaceEndpoint(object):
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace = res.json_body
         assert workspace["is_deleted"] is True
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace.deleted"
+        assert last_event.workspace == workspace
 
     def test_api__delete_workspace__ok_200__manager_workspace_manager(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
@@ -958,6 +973,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["workspace"]["label"] == "Business"
         assert user_role["workspace"]["slug"] == "business"
         assert user_role["user"]["public_name"] == "Global manager"
+        assert user_role["user"]["username"] == "TheAdmin"
         assert user_role["user"]["user_id"] == 1
         assert user_role["is_active"] is True
         assert user_role["do_notify"] is True
@@ -966,7 +982,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["avatar_url"] is None
 
     def test_api__get_workspace_members__ok_200_show_disabled_users(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
             Check obtain workspace members list with also disabled users
@@ -1000,7 +1016,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["do_notify"] is False
 
     def test_api__get_workspace_members__ok_200_show_only_enabled_users(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user,
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
             Check obtain workspace members list with only enabled users
@@ -1110,6 +1126,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["workspace"]["label"] == "Business"
         assert user_role["workspace"]["slug"] == "business"
         assert user_role["user"]["public_name"] == "Global manager"
+        assert user_role["user"]["username"] == "TheAdmin"
         assert user_role["user"]["user_id"] == 1
         assert user_role["is_active"] is True
         assert user_role["do_notify"] is True
@@ -1238,7 +1255,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api__create_workspace_member_role__ok_200__user_id(self, web_testapp):
+    def test_api__create_workspace_member_role__ok_200__user_id(self, web_testapp, event_helper):
         """
         Create workspace member role
         :return:
@@ -1248,7 +1265,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": 2,
             "user_email": None,
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
@@ -1259,6 +1275,18 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["newly_created"] is False
         assert user_role_found["email_sent"] is False
         assert user_role_found["do_notify"] is False
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace_member.created"
+        assert last_event.member == {
+            "role": user_role_found["role"],
+            "do_notify": user_role_found["do_notify"],
+        }
+        workspace = web_testapp.get("/api/v2/workspaces/1", status=200).json_body
+        assert last_event.workspace == workspace
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert last_event.author == author
+        user = web_testapp.get("/api/v2/users/2", status=200).json_body
+        assert last_event.user == user
 
         res = web_testapp.get("/api/v2/workspaces/1/members", status=200).json_body
         assert len(res) == 2
@@ -1294,7 +1322,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json(
@@ -1351,7 +1378,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json(
@@ -1388,7 +1414,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
@@ -1430,7 +1455,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1457,7 +1481,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1465,23 +1488,18 @@ class TestWorkspaceMembersEndpoint(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_DELETED
 
-    def test_api__create_workspace_member_role__ok_200__user_public_name(self, web_testapp):
+    def test_api__create_workspace_member_role__ok_200__user_username(self, web_testapp):
         """
         Create workspace member role
         :return:
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # create workspace role
-        params = {
-            "user_id": None,
-            "user_email": None,
-            "user_public_name": "Lawrence L.",
-            "role": "content-manager",
-        }
+        params = {"user_username": "TheBobi", "role": "content-manager"}
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
         user_role_found = res.json_body
         assert user_role_found["role"] == "content-manager"
-        assert user_role_found["user_id"] == 2
+        assert user_role_found["user_id"] == 3
         assert user_role_found["workspace_id"] == 1
         assert user_role_found["newly_created"] is False
         assert user_role_found["email_sent"] is False
@@ -1498,27 +1516,6 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == user_role["user_id"]
         assert user_role_found["workspace_id"] == user_role["workspace_id"]
 
-    def test_api__create_workspace_member_role__ok_400__user_public_name_user_already_in_workspace(
-        self, web_testapp
-    ):
-        """
-        Create workspace member role
-        :return:
-        """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        # create workspace role
-        params = {
-            "user_id": None,
-            "user_email": None,
-            "user_public_name": "Lawrence L.",
-            "role": "content-manager",
-        }
-        web_testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
-        res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.USER_ROLE_ALREADY_EXIST
-
     def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(
         self, web_testapp
     ):
@@ -1531,13 +1528,12 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": None,
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(
         self, web_testapp
@@ -1551,7 +1547,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": 47,
             "user_email": None,
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1571,7 +1566,6 @@ class TestWorkspaceMembersEndpoint(object):
         params = {
             "user_id": None,
             "user_email": "nothing@nothing.nothing",
-            "user_public_name": None,
             "role": "content-manager",
         }
         res = web_testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
@@ -1580,7 +1574,13 @@ class TestWorkspaceMembersEndpoint(object):
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
 
     def test_api__update_workspace_member_role__ok_200__nominal_case(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
+        event_helper,
     ):
         """
         Update worskpace member role
@@ -1634,6 +1634,25 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["role"] == "content-manager"
         assert user_role["user_id"] == user2.user_id
         assert user_role["workspace_id"] == workspace.workspace_id
+
+        # role modified event
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace_member.modified"
+        assert last_event.member == {
+            "role": user_role["role"],
+            "do_notify": user_role["do_notify"],
+        }
+        workspace_dict = web_testapp.get(
+            "/api/v2/workspaces/{}".format(workspace.workspace_id), status=200
+        ).json_body
+        assert last_event.workspace == workspace_dict
+        author = web_testapp.get("/api/v2/users/{}".format(user.user_id), status=200).json_body
+        assert last_event.author == author
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        user = web_testapp.get("/api/v2/users/{}".format(user2.user_id), status=200).json_body
+        assert last_event.user == user
+
         # after
         res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/members/{user_id}".format(
@@ -1764,7 +1783,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["workspace_id"] == workspace.workspace_id
 
     def test_api__delete_workspace_member_role__ok_200__as_admin(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, event_helper
     ):
         """
         Delete worskpace member role
@@ -1793,6 +1812,24 @@ class TestWorkspaceMembersEndpoint(object):
             ),
             status=204,
         )
+
+        # role deleted event
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace_member.deleted"
+        assert last_event.member == {
+            "role": "workspace-manager",
+            "do_notify": False,
+        }
+
+        workspace_dict = web_testapp.get(
+            "/api/v2/workspaces/{}".format(workspace.workspace_id), status=200
+        ).json_body
+        assert last_event.workspace == workspace_dict
+        author = web_testapp.get("/api/v2/users/1", status=200).json_body
+        assert last_event.author == author
+        user_dict = web_testapp.get("/api/v2/users/{}".format(user.user_id), status=200).json_body
+        assert last_event.user == user_dict
+
         # after
         roles = web_testapp.get(
             "/api/v2/workspaces/{}/members".format(workspace.workspace_id), status=200
@@ -2015,7 +2052,6 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2080,7 +2116,6 @@ class TestUserInvitationWithMailActivatedSync(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2139,7 +2174,6 @@ class TestUserInvitationWithMailActivatedSync(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2196,7 +2230,6 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2293,7 +2326,6 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2334,7 +2366,6 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2372,7 +2403,6 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2413,7 +2443,6 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
@@ -2445,7 +2474,6 @@ class TestUserInvitationWithMailActivatedASync(object):
         # create workspace role
         params = {
             "user_id": None,
-            "user_public_name": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }

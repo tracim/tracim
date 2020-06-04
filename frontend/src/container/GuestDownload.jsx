@@ -15,7 +15,7 @@ import {
   buildHeadTitle,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
-import { PAGE } from '../helper.js'
+import { PAGE } from '../util/helper.js'
 
 class GuestDownload extends React.Component {
   constructor (props) {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { PAGE, workspaceConfig } from '../../../helper.js'
+import { PAGE, workspaceConfig } from '../../../util/helper.js'
 
 require('./AdminLink.styl')
 

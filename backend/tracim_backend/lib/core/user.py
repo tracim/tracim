@@ -19,16 +19,21 @@ from tracim_backend.app_models.validator import user_lang_validator
 from tracim_backend.app_models.validator import user_password_validator
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
+from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import EmailOrUsernameRequired
+from tracim_backend.exceptions import EmailRequired
 from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import InvalidUsernameFormat
+from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
@@ -46,6 +51,7 @@ from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UsernameAlreadyExistInDb
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
@@ -55,7 +61,6 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
-from tracim_backend.models.context_models import TypeUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 
@@ -77,13 +82,15 @@ class UserApi(object):
         self._show_deleted = show_deleted
         self._show_deactivated = show_deactivated
 
-    def _base_query(self):
-        query = self._session.query(User)
+    def _apply_base_filters(self, query):
         if not self._show_deleted:
             query = query.filter(User.is_deleted == False)  # noqa: E711
         if not self._show_deactivated:
             query = query.filter(User.is_active == True)  # noqa: E711
         return query
+
+    def _base_query(self):
+        return self._apply_base_filters(self._session.query(User))
 
     def get_user_with_context(self, user: User) -> UserInContext:
         """
@@ -103,6 +110,15 @@ class UserApi(object):
         except NoResultFound as exc:
             raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
         return user
+
+    def get_one_by_login(self, login: str) -> User:
+        """Return the user identified by the given login.
+        User's email is searched if the login is an email
+        User's username is searched in other cases
+        """
+        if "@" in login:
+            return self.get_one_by_email(login)
+        return self.get_one_by_username(login)
 
     def get_one_by_token(self, token: str) -> User:
         try:
@@ -125,14 +141,18 @@ class UserApi(object):
             raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc
         return user
 
-    def get_one_by_public_name(self, public_name: str) -> User:
+    def get_one_by_username(self, username: str) -> User:
         """
-        Get one user by public_name
+        Get one user by username
+        :param username: username of the user
+        :return: one user
         """
         try:
-            user = self._base_query().filter(User.display_name == public_name).one()
+            user = self._base_query().filter(User.username == username).one()
         except NoResultFound as exc:
-            raise UserDoesNotExist('User "{}" not found in database'.format(public_name)) from exc
+            raise UserDoesNotExist(
+                'User for username "{}" not found in database'.format(username)
+            ) from exc
         return user
 
     # FIXME - G.M - 24-04-2018 - Duplicate method with get_one.
@@ -154,6 +174,10 @@ class UserApi(object):
     def get_all(self) -> typing.Iterable[User]:
         return self._get_all_query().all()
 
+    def get_user_ids_from_profile(self, profile: Profile) -> typing.Iterable[int]:
+        query = self._apply_base_filters(self._session.query(User.user_id))
+        return [res[0] for res in query.filter(User.profile == profile)]
+
     def get_known_user(
         self,
         acp: str,
@@ -163,7 +187,7 @@ class UserApi(object):
         filter_results: bool = True,
     ) -> typing.Iterable[User]:
         """
-        Return list of know user by current UserApi user.
+        Return list of known user by current UserApi user.
         :param acp: autocomplete filter by name/email
         :param exclude_user_ids: user id to exclude from result
         :param exclude_workspace_ids: workspace user to exclude from result
@@ -191,7 +215,11 @@ class UserApi(object):
             exclude_user_ids.extend(user_ids_in_workspaces)
         query = self._base_query().order_by(User.display_name)
         query = query.filter(
-            or_(User.display_name.ilike("%{}%".format(acp)), User.email.ilike("%{}%".format(acp)),)
+            or_(
+                User.display_name.ilike("%{}%".format(acp)),
+                User.email.ilike("%{}%".format(acp)),
+                User.username.ilike("%{}%".format(acp)),
+            )
         )
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
         # should show only user in same workspace as user
@@ -214,43 +242,6 @@ class UserApi(object):
         query = query.limit(nb_elem)
         return query.all()
 
-    def find(
-        self, user_id: int = None, email: str = None, public_name: str = None, token: str = None,
-    ) -> typing.Tuple[TypeUser, User]:
-        """
-        Find existing user from all theses params.
-        Check is made in this order: user_id, email, public_name
-        If no user found raise UserDoesNotExist exception
-        """
-        user = None
-
-        if user_id:
-            try:
-                user = self.get_one(user_id)
-                return TypeUser.USER_ID, user
-            except UserDoesNotExist:
-                pass
-        if token:
-            try:
-                user = self.get_one_by_token(token)
-                return TypeUser.TOKEN, user
-            except UserDoesNotExist:
-                pass
-        if email:
-            try:
-                user = self.get_one_by_email(email)
-                return TypeUser.EMAIL, user
-            except UserDoesNotExist:
-                pass
-        if public_name:
-            try:
-                user = self.get_one_by_public_name(public_name)
-                return TypeUser.PUBLIC_NAME, user
-            except UserDoesNotExist:
-                pass
-
-        raise UserDoesNotExist("User not found with any of given params.")
-
     # Check methods
 
     def user_with_email_exists(self, email: str) -> bool:
@@ -261,7 +252,7 @@ class UserApi(object):
             return False
 
     def _ldap_authenticate(
-        self, user: typing.Optional[User], email: str, password: str, ldap_connector: "Connector",
+        self, user: typing.Optional[User], login: str, password: str, ldap_connector: "Connector",
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
@@ -269,23 +260,23 @@ class UserApi(object):
         or UserAuthenticatedIsNotActive
         :param user: user to check,, can be none if user not found, will try
          to create new user if none but ldap auth succeed
-        :param email: email of the user
+        :param login: login of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         """
         auth_type = AuthType.LDAP
 
-        # INFO - G.M - 2018-11-22 - Do not authenticate user with auth_type
+        # INFO - G.M - 2018-11-22 - Do no_t authenticate user with auth_type
         # different from LDAP
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
                 'User "{}" auth_type is {} not {}'.format(
-                    email, user.auth_type.value, auth_type.value
+                    login, user.auth_type.value, auth_type.value
                 )
             )
 
         # INFO - G.M - 2018-11-22 - LDAP Auth
-        data = ldap_connector.authenticate(email, password)
+        data = ldap_connector.authenticate(login, password)
         if not data:
             raise WrongLDAPCredentials("LDAP credentials are not correct")
         ldap_data = data[1]
@@ -311,8 +302,12 @@ class UserApi(object):
             if self._config.LDAP_NAME_ATTRIBUTE:
                 name = ldap_data[self._config.LDAP_NAME_ATTRIBUTE][0]
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
+            use_email = False
+            if "@" in login:
+                use_email = True
             user = self.create_user(
-                email=email,
+                email=login if use_email else None,
+                username=login if not use_email else None,
                 name=name,
                 profile=profile,
                 auth_type=AuthType.LDAP,
@@ -322,7 +317,7 @@ class UserApi(object):
             self.execute_created_user_actions(user)
             transaction.commit()
             # INFO - G.M - 2018-11-08 - get new created user
-            user = self.get_one_by_email(email)
+            user = self.get_one_by_login(login)
 
         if user.is_deleted:
             raise UserDoesNotExist("This user has been deleted")
@@ -335,7 +330,7 @@ class UserApi(object):
         return user
 
     def _internal_db_authenticate(
-        self, user: typing.Optional[User], email: str, password: str
+        self, user: typing.Optional[User], login: str, password: str
     ) -> User:
         """
         Authenticate with internal db, return authenticated user
@@ -349,16 +344,16 @@ class UserApi(object):
         auth_type = AuthType.INTERNAL
 
         if not user:
-            raise UserDoesNotExist("User {} not found in database".format(email))
+            raise UserDoesNotExist("User {} not found in database".format(login))
 
         if user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
                 'User "{}" auth_type is {} not {}'.format(
-                    email, user.auth_type.value, auth_type.value
+                    login, user.auth_type.value, auth_type.value
                 )
             )
         if not user.validate_password(password):
-            raise WrongUserPassword('User "{}" password is incorrect'.format(email))
+            raise WrongUserPassword('User "{}" password is incorrect'.format(login))
 
         if user.is_deleted:
             raise UserDoesNotExist("This user has been deleted")
@@ -370,14 +365,14 @@ class UserApi(object):
             user.auth_type = auth_type
         return user
 
-    def _remote_user_authenticate(self, user: User, email: str) -> User:
+    def _remote_user_authenticate(self, user: User, login: str) -> User:
         """
         Authenticate with remote_auth, return authenticated user
         or raise Exception like WrongAuthTypeForUser,
         UserDoesNotExist or UserAuthenticatedIsNotActive
         :param user: user to check, can be none if user not found, will try
          to create new user if none
-        :param email: email of the user
+        :param login: email of the user
         """
         auth_type = AuthType.REMOTE
 
@@ -386,15 +381,19 @@ class UserApi(object):
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
                 'User "{}" auth_type is {} not {}'.format(
-                    email, user.auth_type.value, auth_type.value
+                    login, user.auth_type.value, auth_type.value
                 )
             )
 
         # INFO - G.M - 2018-12-12 - Create new user
         if not user:
             profile = None
+            use_email = False
+            if "@" in login:
+                use_email = True
             user = self.create_user(
-                email=email,
+                email=login if use_email else None,
+                username=login if not use_email else None,
                 profile=profile,
                 auth_type=AuthType.REMOTE,
                 do_save=True,
@@ -403,7 +402,7 @@ class UserApi(object):
             self.execute_created_user_actions(user)
             transaction.commit()
             # INFO - G.M - 2018-12-02 - get new created user
-            user = self.get_one_by_email(email)
+            user = self.get_one_by_login(login)
 
         if user.is_deleted:
             raise UserDoesNotExist("This user has been deleted")
@@ -415,7 +414,7 @@ class UserApi(object):
             user.auth_type = auth_type
         return user
 
-    def remote_authenticate(self, email: str) -> User:
+    def remote_authenticate(self, login: str) -> User:
         """
         Remote Authenticate user with email (no password check),
         raise AuthenticationFailed if uncorrect.
@@ -424,90 +423,95 @@ class UserApi(object):
         try:
             if not self._config.REMOTE_USER_HEADER:
                 raise RemoteUserAuthDisabled("Remote User Auth mechanism disabled")
-            return self._remote_authenticate(email)
+            return self._remote_authenticate(login)
         except AuthenticationFailed as exc:
             raise exc
         except WrongAuthTypeForUser as exc:
             raise AuthenticationFailed("Auth mechanism for this user is not activated") from exc
 
-    def _remote_authenticate(self, email: str):
+    def _remote_authenticate(self, login: str):
         """
-        Authenticate user with email given using remote mechanism,
+        Authenticate user with login given using remote mechanism,
         raise AuthenticationFailed if uncorrect.
-        :param email: email of the user
+        :param login: login of the user
         :return: User who was authenticated.
         """
         # get existing user
-        try:
-            user = self.get_one_by_email(email)
-        except UserDoesNotExist:
-            user = None
+        user = None
+        if login:
+            try:
+                user = self.get_one_by_login(login)
+            except UserDoesNotExist:
+                pass
         # try auth
         try:
-            return self._remote_user_authenticate(user, email)
+            return self._remote_user_authenticate(user, login)
         except (
             UserDoesNotExist,
             UserAuthenticatedIsDeleted,
             UserAuthenticatedIsNotActive,
             TracimValidationFailed,
+            EmailRequired,
         ) as exc:
-            raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc
+            raise AuthenticationFailed('User "{}" authentication failed'.format(login)) from exc
 
-    def authenticate(self, email: str, password: str, ldap_connector: "Connector" = None) -> User:
+    def authenticate(self, password: str, login: str, ldap_connector: "Connector" = None,) -> User:
         """
-        Authenticate user with email and password, raise AuthenticationFailed
-        if uncorrect. try all auth available in order and raise issue of
+        Authenticate user with email/username and password, raise AuthenticationFailed
+        if incorrect. try all auth available in order and raise issue of
         last auth if all auth failed.
-        :param email: email of the user
+        :param login: login or username of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :return: User who was authenticated.
         """
-        user_auth_type_not_available = AuthenticationFailed(
-            "Auth mechanism for this user is not activated"
-        )
         for auth_type in self._config.AUTH_TYPES:
             try:
-                return self._authenticate(email, password, ldap_connector, auth_type=auth_type)
+                return self._authenticate(
+                    login=login,
+                    password=password,
+                    ldap_connector=ldap_connector,
+                    auth_type=auth_type,
+                )
             except AuthenticationFailed as exc:
                 raise exc
             except WrongAuthTypeForUser:
                 pass
 
-        raise user_auth_type_not_available
+        raise AuthenticationFailed("Auth mechanism for this user is not activated")
 
     def _authenticate(
         self,
-        email: str,
         password: str,
+        login: str,
         ldap_connector: "Connector" = None,
         auth_type: AuthType = AuthType.INTERNAL,
     ) -> User:
         """
-        Authenticate user with email and password, raise AuthenticationFailed
-        if uncorrect. check only one auth
-        :param email: email of the user
+        Authenticate user with email/username and password, raise AuthenticationFailed
+        if incorrect. check only one auth
+        :param login: login of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :param auth_type: auth type to test.
         :return: User who was authenticated.
         """
-        # get existing user
+        user = None
         try:
-            user = self.get_one_by_email(email)
+            user = self.get_one_by_login(login)
         except UserDoesNotExist:
-            user = None
-        # try auth
+            pass
         try:
             if auth_type == AuthType.LDAP:
                 if ldap_connector:
-                    return self._ldap_authenticate(user, email, password, ldap_connector)
+                    return self._ldap_authenticate(user, login, password, ldap_connector)
                 raise MissingLDAPConnector()
             elif auth_type == AuthType.INTERNAL:
-                return self._internal_db_authenticate(user, email, password)
+                return self._internal_db_authenticate(user, login, password)
             else:
                 raise UnknownAuthType()
         except (
+            EmailRequired,
             WrongUserPassword,
             WrongLDAPCredentials,
             UserDoesNotExist,
@@ -515,7 +519,7 @@ class UserApi(object):
             UserAuthenticatedIsNotActive,
             TracimValidationFailed,
         ) as exc:
-            raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc
+            raise AuthenticationFailed('User "{}" authentication failed'.format(login)) from exc
 
     # Actions
     def set_password(
@@ -555,7 +559,9 @@ class UserApi(object):
             self.save(user)
         return user
 
-    def set_email(self, user: User, loggedin_user_password: str, email: str, do_save: bool = True):
+    def set_email(
+        self, user: User, loggedin_user_password: str, email: str, do_save: bool = True
+    ) -> User:
         """
         Set email address of user if loggedin user password is correct
         :param user: User who need email changed
@@ -575,6 +581,28 @@ class UserApi(object):
                 "Wrong password for authenticated user {}".format(self._user.user_id)
             )
         self.update(user=user, email=email, do_save=do_save)
+        return user
+
+    def set_username(
+        self, user: User, loggedin_user_password: str, username: str, do_save: bool = True
+    ) -> User:
+        """
+        Set username of user if loggedin user password is correct
+        :param user: User who need email changed
+        :param loggedin_user_password: cleartext password of logged user (not
+        same as user)
+        :param username: new username
+        :param do_save: if True, flush database session
+        :return:
+        """
+        if not self._user:
+            raise NoUserSetted("Current User should be set in UserApi to use this method")
+
+        if not self._user.validate_password(loggedin_user_password):
+            raise WrongUserPassword(
+                "Wrong password for authenticated user {}".format(self._user.user_id)
+            )
+        self.update(user=user, username=username, do_save=do_save)
         return user
 
     def set_password_reset_token(
@@ -611,11 +639,29 @@ class UserApi(object):
             )
         return True
 
+    def _check_username(self, username: str) -> None:
+        """Check given username. Raise InvalidUsernameFormat if not match required format and
+        UsernameAlreadyExistInDb if username already used.
+        """
+        if not self._check_username_correctness(username):
+            raise InvalidUsernameFormat("Username '{}' is not correct".format(username))
+
+        if self.check_username_already_in_db(username):
+            raise UsernameAlreadyExistInDb(
+                "Username given '{}' already exist, please choose something else".format(username)
+            )
+
     def check_email_already_in_db(self, email: str) -> bool:
         """
-        Verify if given email does not already exist in db
+        Verify if given email does already exist in db
         """
         return self._session.query(User.email).filter(User.email == email).count() != 0
+
+    def check_username_already_in_db(self, username: str) -> bool:
+        """
+        Verify if given username already used in db
+        """
+        return self._session.query(User.username).filter(User.username == username).count() != 0
 
     def _check_email_correctness(self, email: str) -> bool:
         """
@@ -631,6 +677,14 @@ class UserApi(object):
             return False
         return True
 
+    def _check_username_correctness(self, username: str) -> bool:
+        if len(username) < User.MIN_USERNAME_LENGTH or len(username) > User.MAX_USERNAME_LENGTH:
+            return False
+        for char in username:
+            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_":
+                return False
+        return True
+
     def update(
         self,
         user: User,
@@ -642,12 +696,15 @@ class UserApi(object):
         auth_type: AuthType = None,
         profile: typing.Optional[Profile] = None,
         allowed_space: typing.Optional[int] = None,
+        username: str = None,
         do_save=True,
     ) -> User:
+        """Update given user instance with given parameters"""
         validator = TracimValidator()
         validator.add_validator("name", name, user_public_name_validator)
         validator.add_validator("password", password, user_password_validator)
         validator.add_validator("email", email, user_email_validator)
+        validator.add_validator("username", name, user_username_validator)
         validator.add_validator("timezone", timezone, user_timezone_validator)
         validator.add_validator("lang", lang, user_lang_validator)
         validator.validate_all()
@@ -662,7 +719,7 @@ class UserApi(object):
             ):
                 raise UserAuthTypeDisabled(
                     'Can\'t update user "{}" auth_type with unavailable value "{}".'.format(
-                        user.email, auth_type
+                        user.login, auth_type
                     )
                 )
             user.auth_type = auth_type
@@ -673,6 +730,11 @@ class UserApi(object):
                 self._check_email_modification_allowed(user)
                 self._check_email(lowercase_email)
                 user.email = lowercase_email
+
+        if username is not None:
+            if username != user.username:
+                self._check_username(username)
+                user.username = username
 
         if password is not None:
             self._check_password_modification_allowed(user)
@@ -706,7 +768,7 @@ class UserApi(object):
         ]:
             raise ExternalAuthUserPasswordModificationDisallowed(
                 "user {} is link to external auth {},"
-                "password modification disallowed".format(user.email, user.auth_type)
+                "password modification disallowed".format(user.login, user.auth_type)
             )
         return True
 
@@ -717,17 +779,18 @@ class UserApi(object):
         ]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 "user {} is link to external auth {},"
-                "email modification disallowed".format(user.email, user.auth_type)
+                "email modification disallowed".format(user.login, user.auth_type)
             )
         return True
 
     def create_user(
         self,
-        email,
-        password: str = None,
-        name: str = None,
+        email: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+        password: typing.Optional[str] = None,
+        name: typing.Optional[str] = None,
         timezone: str = "",
-        lang: str = None,
+        lang: typing.Optional[str] = None,
         auth_type: AuthType = AuthType.UNKNOWN,
         profile: typing.Optional[Profile] = None,
         allowed_space: typing.Optional[int] = None,
@@ -738,12 +801,13 @@ class UserApi(object):
             raise NotificationDisabledCantCreateUserWithInvitation(
                 "Can't create user with invitation mail because " "notification are disabled."
             )
-        new_user = self.create_minimal_user(email, profile, save_now=False)
+        new_user = self.create_minimal_user(email, username, profile, save_now=False)
         if allowed_space is None:
             allowed_space = self._config.LIMITATION__USER_DEFAULT_ALLOWED_SPACE
         self.update(
             user=new_user,
             name=name,
+            username=username,
             email=email,
             auth_type=auth_type,
             password=password,
@@ -752,7 +816,12 @@ class UserApi(object):
             lang=lang,
             do_save=False,
         )
-        if do_notify:
+        # TODO - G.M - 04-04-2018 - [auth]
+        # Check if this is already needed with
+        # new auth system
+        new_user.ensure_auth_token(validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY)
+        # NOTE BS 20200428: #2829: Email no longer required for User
+        if do_notify and new_user.email:
             try:
                 email_manager = get_email_manager(self._config, self._session)
                 email_manager.notify_created_account(
@@ -778,27 +847,40 @@ class UserApi(object):
         return new_user
 
     def create_minimal_user(
-        self, email, profile: typing.Optional[Profile] = None, save_now=False
+        self,
+        email: typing.Optional[str] = None,
+        username: typing.Optional[str] = None,
+        profile: typing.Optional[Profile] = None,
+        save_now=False,
     ) -> User:
         """Previous create_user method"""
+        if not email:
+            if self._config.EMAIL__REQUIRED:
+                raise EmailRequired("Email is required to create an user")
+            if not username:
+                raise EmailOrUsernameRequired("Email or username is required to create an user")
+
         lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
         validator.add_validator("email", lowercase_email, user_email_validator)
         validator.validate_all()
-        self._check_email(lowercase_email)
+        if lowercase_email is not None:
+            self._check_email(lowercase_email)
+        if username is not None:
+            self._check_username(username)
         user = User()
         user.email = lowercase_email
+        user.username = username
         # TODO - G.M - 2018-11-29 - Check if this default_value can be
         # incorrect according to user_public_name_validator
-        user.display_name = email.split("@")[0]
+        user.display_name = email.split("@")[0] if email else username
         user.created = datetime.datetime.utcnow()
         if not profile:
             profile = Profile.get_profile_from_slug(self._config.USER__DEFAULT_PROFILE)
         user.profile = profile
 
-        self._session.add(user)
-
         if save_now:
+            self._session.add(user)
             self._session.flush()
 
         return user
@@ -812,10 +894,15 @@ class UserApi(object):
         """
         self._check_user_auth_validity(user)
         self._check_password_modification_allowed(user)
+
+        if not user.email:
+            raise MissingEmailCantResetPassword("Can't reset password without an email address")
+
         if not self._config.EMAIL__NOTIFICATION__ACTIVATED:
             raise NotificationDisabledCantResetPassword(
-                "cant reset password with notification disabled"
+                "Can't reset password with notification disabled"
             )
+
         token = user.generate_reset_password_token()
         try:
             email_manager = get_email_manager(self._config, self._session)
@@ -862,6 +949,7 @@ class UserApi(object):
             self.save(user)
 
     def save(self, user: User):
+        self._session.add(user)
         self._session.flush()
 
     def execute_updated_user_actions(self, user: User) -> None:
@@ -905,11 +993,6 @@ class UserApi(object):
         This method do post-create user actions
         """
 
-        # TODO - G.M - 04-04-2018 - [auth]
-        # Check if this is already needed with
-        # new auth system
-        user.ensure_auth_token(validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY)
-
         # FIXME - G.M - 2019-03-18 - move this code to another place when
         # event mechanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_created_user should start hook use by agenda  app code.
@@ -938,7 +1021,7 @@ class UserApi(object):
     def _check_user_auth_validity(self, user: User) -> None:
         if not self._user_can_authenticate(user):
             raise UserAuthTypeDisabled(
-                "user {} auth type {} is disabled".format(user.email, user.auth_type.value)
+                "user {} auth type {} is disabled".format(user.login, user.auth_type.value)
             )
 
     def _user_can_authenticate(self, user: User) -> bool:

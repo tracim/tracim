@@ -126,7 +126,12 @@ class PopupCreateFile extends React.Component {
 
     const alreadyUploadedList = newFileList.filter((newFile) => this.isFileAlreadyInList(newFile, state.fileToUploadList))
     if (alreadyUploadedList.length > 0) {
-      this.sendGlobalFlashMessage(<div>{props.t('Files already uploaded:')}<br /><ul>{alreadyUploadedList.map(file => <li>{file.name}</li>)}</ul></div>)
+      this.sendGlobalFlashMessage(
+        <div>
+          {props.t('Files already uploaded:')}<br />
+          <ul>{alreadyUploadedList.map(file => <li key={file.name}>{file.name}</li>)}</ul>
+        </div>
+      )
       newFileListResult = newFileList.filter((newFile) => !this.isFileAlreadyInList(newFile, state.fileToUploadList))
     }
     newFileListResult = newFileListResult.concat(state.fileToUploadList)

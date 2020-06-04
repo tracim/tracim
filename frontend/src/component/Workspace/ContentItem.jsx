@@ -3,7 +3,7 @@ import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { DragSource } from 'react-dnd'
-import { DRAG_AND_DROP } from '../../helper.js'
+import { DRAG_AND_DROP } from '../../util/helper.js'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import DragHandle from '../DragHandle.jsx'
 import {

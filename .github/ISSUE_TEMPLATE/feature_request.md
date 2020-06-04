@@ -8,7 +8,7 @@ assignees: ""
 
 ## Feature description
 
-*Explain the requested feature and the functionnal and technical expectations.*
+*Explain the requested feature and the functional and technical expectations.*
 
 ## Context
 
@@ -37,4 +37,4 @@ assignees: ""
 
 ## Extra information
 
-*Optional - Add any extra information which will be usefull for understanding and developing the feature*
+*Optional - Add any useful information to understand and develop the feature*

@@ -23,23 +23,53 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 class TestCleanupLib(object):
     def test_unit__anonymize_user__ok__nominal_case(self, session, app_config) -> None:
         api = UserApi(current_user=None, session=session, config=app_config)
-        u = api.create_minimal_user("bob@bob")
+        u = api.create_minimal_user(email="bob@bob", username="bob")
         assert u.display_name == "bob"
+        assert u.username == "bob"
         assert u.email == "bob@bob"
         cleanup_lib = CleanupLib(app_config=app_config, session=session)
         cleanup_lib.anonymize_user(u)
-        assert u.display_name == "Lost Meerkat"
+        assert u.display_name == "Deleted user"
         assert u.email.endswith("@anonymous.local")
+        assert u.username is None
 
     def test_unit__anonymize_user__ok__explicit_name(self, session, app_config) -> None:
         api = UserApi(current_user=None, session=session, config=app_config)
-        u = api.create_minimal_user("bob@bob")
+        u = api.create_minimal_user(email="bob@bob", username="bob")
         assert u.display_name == "bob"
         assert u.email == "bob@bob"
         cleanup_lib = CleanupLib(app_config=app_config, session=session)
         cleanup_lib.anonymize_user(u, anonymized_user_display_name="anonymous")
         assert u.display_name == "anonymous"
         assert u.email.endswith("@anonymous.local")
+        assert u.username is None
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "base_test_optional_email"}], indirect=True
+    )
+    def test_unit__anonymize_user__ok__with_only_username(self, session, app_config) -> None:
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="bob")
+        assert u.display_name == "bob"
+        assert u.username == "bob"
+        assert u.email is None
+        cleanup_lib = CleanupLib(app_config=app_config, session=session)
+        cleanup_lib.anonymize_user(u, anonymized_user_display_name="anonymous")
+        assert u.display_name == "anonymous"
+        assert u.email.endswith("@anonymous.local")
+        assert u.username is None
+
+    def test_unit__anonymize_user__ok__with_only_email(self, session, app_config) -> None:
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(email="bob@bob")
+        assert u.display_name == "bob"
+        assert u.email == "bob@bob"
+        assert u.username is None
+        cleanup_lib = CleanupLib(app_config=app_config, session=session)
+        cleanup_lib.anonymize_user(u, anonymized_user_display_name="anonymous")
+        assert u.display_name == "anonymous"
+        assert u.email.endswith("@anonymous.local")
+        assert u.username is None
 
     def test_unit__delete_content__ok__nominal_case(
         self,

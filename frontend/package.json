@@ -13,7 +13,8 @@
     "buildwindoz": "set NODE_ENV=production&& webpack-cli -p",
     "build-devwindoz": "set NODE_ENV=production&& webpack-cli",
     "build-translation": "node i18next.scanner.js",
-    "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js"
+    "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js",
+    "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
   "license": "ISC",
@@ -92,6 +93,7 @@
   },
   "standard": {
     "globals": [
+      "$",
       "fetch",
       "btoa",
       "history",
@@ -103,7 +105,8 @@
       "GLOBAL_primaryColor",
       "FormData",
       "XMLHttpRequest",
-      "Image"
+      "Image",
+      "globalThis"
     ],
     "parser": "babel-eslint",
     "ignore": []

@@ -1,6 +1,7 @@
 import i18n from './i18n.js'
 import {
   addAllResourceI18n,
+  addRevisionFromTLM,
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
@@ -22,9 +23,19 @@ import {
   buildFilePreviewUrl,
   removeExtensionOfFilename,
   computeProgressionPercentage,
-  buildHeadTitle
+  buildHeadTitle,
+  CONTENT_TYPE,
+  buildTracimLiveMessageEventType,
+  sortTimelineByDate,
+  removeAtInUsername
 } from './helper.js'
+import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
+import {
+  TLM_ENTITY_TYPE,
+  TLM_CORE_EVENT_TYPE,
+  TLM_SUB_TYPE
+} from './tracimLiveMessage.js'
 
 import { appContentFactory } from './appContentFactory.js'
 
@@ -87,7 +98,6 @@ const customEventReducer = ({ detail: { type, data } }) => {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
       i18n.changeLanguage(data)
       break
-    default: break
   }
 }
 
@@ -99,6 +109,8 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
 export {
   appContentFactory,
+  addRevisionFromTLM,
+  TracimComponent,
   addAllResourceI18n,
   handleFetchResult,
   displayDistanceDate,
@@ -109,6 +121,7 @@ export {
   buildFilePreviewUrl,
   buildHeadTitle,
   removeExtensionOfFilename,
+  removeAtInUsername,
   computeProgressionPercentage,
   Breadcrumbs,
   PopinFixed,
@@ -135,6 +148,9 @@ export {
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
   CUSTOM_EVENT,
+  TLM_ENTITY_TYPE,
+  TLM_CORE_EVENT_TYPE,
+  TLM_SUB_TYPE,
   BREADCRUMBS_TYPE,
   ROLE,
   ROLE_LIST,
@@ -157,5 +173,8 @@ export {
   ShareLink,
   ShareDownload,
   ProgressBar,
-  RadioBtnGroup
+  RadioBtnGroup,
+  CONTENT_TYPE,
+  buildTracimLiveMessageEventType,
+  sortTimelineByDate
 }

@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import typing
+from unittest import mock
+
 import pytest
 import transaction
 
@@ -6,11 +9,13 @@ from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UsernameAlreadyExistInDb
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
@@ -37,6 +42,7 @@ class TestUserApiWithCustomDefaultProfileForUser(object):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_user(
             email="bob@bob",
+            username="boby",
             password="password",
             name="bob",
             timezone="+2",
@@ -46,11 +52,36 @@ class TestUserApiWithCustomDefaultProfileForUser(object):
         )
         assert u is not None
         assert u.email == "bob@bob"
+        assert u.username == "boby"
         assert u.validate_password("password")
         assert u.display_name == "bob"
         assert u.timezone == "+2"
         assert u.lang == "en"
         assert u.profile.slug == "trusted-users"
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+)
+class TestUserApiWithNotifications:
+    @pytest.mark.parametrize("email", ("bob@bob.local", None))
+    def test__unit__create_user__ok__with_or_without_email(
+        self, session, app_config, email: typing.Optional[str],
+    ):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        with mock.patch(
+            "tracim_backend.lib.mail_notifier.notifier.EmailManager.notify_created_account"
+        ) as mocked_notify_created_account:
+            api.create_user(
+                email=email,
+                username="boby",
+                password="password",
+                name="bob",
+                do_save=True,
+                do_notify=True,
+            )
+        assert mocked_notify_created_account.called == (email is not None)
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -89,6 +120,11 @@ class TestUserApi(object):
         with pytest.raises(TracimValidationFailed):
             email = "b{}b@bob".format("o" * 255)
             api.create_minimal_user(email)
+
+    def test_unit__create_minimal_user__err__no_email(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        with pytest.raises(TracimValidationFailed):
+            api.create_minimal_user(username="foobar")
 
     # email
     def test_unit__update_user_email__ok__nominal_case(self, session, app_config):
@@ -139,6 +175,82 @@ class TestUserApi(object):
         email = "b{}b@bob".format(chars)
         u = api.update(user=u, email=email)
         assert u.email == email
+
+    # username
+    def test_unit__create_minimal_user__ok__with_username_and_email(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user("bob@bob", "boby")
+        assert u.email == "bob@bob"
+        assert u.username == "boby"
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "base_test_optional_email"}], indirect=True
+    )
+    def test_unit__create_minimal_user__ok__with_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby")
+        assert u.email is None
+        assert u.username == "boby"
+
+    def test_unit__create_minimal_user__error__invalid_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        with pytest.raises(InvalidUsernameFormat):
+            api.create_minimal_user(username="@boby", email="bob@boba.fet", save_now=True)
+
+    def test_unit__create_minimal_user__error__already_used_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
+        with pytest.raises(UsernameAlreadyExistInDb):
+            api.create_minimal_user(username="boby", email="boby2@boba.fet", save_now=True)
+
+    def test_unit__create_minimal_user__err__too_short_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        with pytest.raises(InvalidUsernameFormat):
+            api.create_minimal_user(
+                username="a" * (User.MIN_USERNAME_LENGTH - 1), email="boby2@boba.fet"
+            )
+
+    def test_unit__create_minimal_user__err__too_long_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        with pytest.raises(InvalidUsernameFormat):
+            api.create_minimal_user(
+                username="a" * (User.MAX_USERNAME_LENGTH + 1), email="boby2@boba.fet"
+            )
+
+    def test_unit__update_user_username__ok__nominal_case(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby", email="boby2@boba.fet")
+        assert u.username == "boby"
+        u = api.update(user=u, username="bibou")
+        assert u.username == "bibou"
+
+    def test_unit__update_user_username__error__wrong_format(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby", email="boby2@boba.fet")
+        assert u.username == "boby"
+        with pytest.raises(InvalidUsernameFormat):
+            api.update(user=u, username="@bibou")
+
+    def test_unit__update_user_username__error__too_short(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby", email="boby2@boba.fet")
+        assert u.username == "boby"
+        with pytest.raises(InvalidUsernameFormat):
+            api.update(user=u, username="b" * (User.MIN_USERNAME_LENGTH - 1))
+
+    def test_unit__update_user_username__error__too_long(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby", email="boby2@boba.fet")
+        assert u.username == "boby"
+        with pytest.raises(InvalidUsernameFormat):
+            api.update(user=u, username="b" * (User.MAX_USERNAME_LENGTH + 1))
+
+    def test_unit__update_user_username__error__already_used(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u1 = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
+        api.create_minimal_user(username="jean", email="boby2@boba.fet", save_now=True)
+        with pytest.raises(UsernameAlreadyExistInDb):
+            api.update(user=u1, username="jean")
 
     # password
     def test_unit__update_user_password__ok__nominal_case(self, session, app_config):
@@ -292,6 +404,18 @@ class TestUserApi(object):
         assert u.email == "newbobemail@bob"
 
     @pytest.mark.internal_auth
+    def test_unit__create_minimal_user_and_set_username__ok__nominal_case(
+        self, session, app_config
+    ):
+        user = User()
+        user.username = "boby"
+        user.password = "pass"
+        api = UserApi(current_user=user, session=session, config=app_config)
+        assert user.username == "boby"
+        user = api.set_username(user, "pass", "TheBoby")
+        assert user.username == "TheBoby"
+
+    @pytest.mark.internal_auth
     def test__unit__create__user__ok_nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_user(
@@ -330,6 +454,14 @@ class TestUserApi(object):
 
         assert uid == api.get_one_by_email("bibi@bibi").user_id
 
+    def test_get_one_by_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
+        session.flush()
+        transaction.commit()
+
+        assert u.user_id == api.get_one_by_username("boby").user_id
+
     def test_unit__get_one_by_email__err__user_does_not_exist(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(UserDoesNotExist):
@@ -337,7 +469,7 @@ class TestUserApi(object):
 
     def test_unit__get_all__ok__nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        api.create_minimal_user("bibi@bibi")
+        api.create_minimal_user("bibi@bibi", save_now=True)
 
         users = api.get_all()
         # u1 + Admin user from BaseFixture
@@ -354,6 +486,16 @@ class TestUserApi(object):
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
 
         users = api.get_known_user("email")
+        assert len(users) == 1
+        assert users[0] == u1
+
+    def test_unit__get_known__user__admin__by_username(self, session, app_config, admin_user):
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
+        u1 = api.create_user(
+            name="name", username="FooBarBaz", email="boby@boba.fet", do_notify=False, do_save=True
+        )
+
+        users = api.get_known_user("obar")
         assert len(users) == 1
         assert users[0] == u1
 
@@ -553,9 +695,18 @@ class TestUserApi(object):
     @pytest.mark.internal_auth
     def test_unit__authenticate_user___ok__nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        user = api.authenticate("admin@admin.admin", "admin@admin.admin")
+        user = api.authenticate(login="admin@admin.admin", password="admin@admin.admin")
         assert isinstance(user, User)
         assert user.email == "admin@admin.admin"
+        assert user.auth_type == AuthType.INTERNAL
+
+    @pytest.mark.internal_auth
+    def test_unit__authenticate_user__ok__with_username(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        user = api.authenticate(login="TheAdmin", password="admin@admin.admin")
+        assert isinstance(user, User)
+        assert user.email == "admin@admin.admin"
+        assert user.username == "TheAdmin"
         assert user.auth_type == AuthType.INTERNAL
 
     @pytest.mark.internal_auth
@@ -574,19 +725,19 @@ class TestUserApi(object):
         )
         api.disable(user)
         with pytest.raises(AuthenticationFailed):
-            api.authenticate("test@test.test", "test@test.test")
+            api.authenticate(login="test@test.test", password="test@test.test")
 
     @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__wrong_password(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(AuthenticationFailed):
-            api.authenticate("admin@admin.admin", "wrong_password")
+            api.authenticate(login="admin@admin.admin", password="wrong_password")
 
     @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__wrong_user(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(AuthenticationFailed):
-            api.authenticate("admin@admin.admin", "wrong_password")
+            api.authenticate(login="admin@admin.admin", password="wrong_password")
 
     def test_unit__disable_user___ok__nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
@@ -647,7 +798,7 @@ class TestFakeLDAPUserApi(object):
     def test_unit__authenticate_user___err__no_ldap_connector(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(MissingLDAPConnector):
-            api.authenticate("hubert@planetexpress.com", "professor")
+            api.authenticate(login="hubert@planetexpress.com", password="professor")
 
     @pytest.mark.xfail(reason="create account with specific profile ldap feature disabled")
     @pytest.mark.ldap
@@ -671,7 +822,11 @@ class TestFakeLDAPUserApi(object):
                 ]
 
         api = UserApi(current_user=None, session=session, config=app_config)
-        user = api.authenticate("hubert@planetexpress.com", "professor", fake_ldap_connector())
+        user = api.authenticate(
+            login="hubert@planetexpress.com",
+            password="professor",
+            ldap_connector=fake_ldap_connector(),
+        )
         assert isinstance(user, User)
         assert user.email == "hubert@planetexpress.com"
         assert user.auth_type == AuthType.LDAP
@@ -687,7 +842,11 @@ class TestFakeLDAPUserApi(object):
                 return [None, {"mail": ["huber@planetepress.com"], "givenName": ["Hubert"]}]
 
         api = UserApi(current_user=None, session=session, config=app_config)
-        user = api.authenticate("hubert@planetexpress.com", "professor", fake_ldap_connector())
+        user = api.authenticate(
+            login="hubert@planetexpress.com",
+            password="professor",
+            ldap_connector=fake_ldap_connector(),
+        )
         assert isinstance(user, User)
         assert user.email == "hubert@planetexpress.com"
         assert user.auth_type == AuthType.LDAP
