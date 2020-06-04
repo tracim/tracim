@@ -352,7 +352,11 @@ Run your project's tests:
 
     pytest
 
-### Lints and Others Checks ###
+### Linting and Other Checks ###
+
+Install the required versions:
+
+    pip install -r requirements-static-tests.txt
 
 Install required versions:
 
