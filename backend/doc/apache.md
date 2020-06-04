@@ -41,6 +41,7 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
         ProxyPass /ui http://127.0.0.1:6543/ui
         ProxyPassReverse /ui http://127.0.0.1:6543/ui
 
+        ProxyPassMatch /api/(v2/users/.*/live_messages)$ http://127.0.0.1:7999/api/$1
         ProxyPass /api http://127.0.0.1:6543/api
         ProxyPassReverse /api http://127.0.0.1:6543/api
 
