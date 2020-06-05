@@ -20,11 +20,7 @@ import {
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
-  updateUserPublicName,
-  updateUserEmail,
-  updateUserWorkspaceSubscriptionNotif,
-  updateUserAgendaUrl,
-  updateUserUsername,
+  updateUser,
   setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
@@ -81,16 +77,26 @@ export class Account extends React.Component {
       newUsernameAvailability: true
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        this.setHeadTitle()
-        break
-    }
+  // Custom Event Handler
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
+  }
+
+  // TLM Handlers
+  handleUserModified = data => {
+    const { props } = this
+    if (props.user.user_id !== data.user.user_id) return
+    props.dispatch(updateUser(data.user))
   }
 
   componentDidMount () {
@@ -115,7 +121,7 @@ export class Account extends React.Component {
     switch (fetchUserAgenda.status) {
       case 200: {
         const newAgendaUrl = (fetchUserAgenda.json.find(a => a.agenda_type === 'private') || { agenda_url: '' }).agenda_url
-        props.dispatch(updateUserAgendaUrl(newAgendaUrl))
+        // props.dispatch(updateUserAgendaUrl(newAgendaUrl))
         break
       }
       default:
@@ -179,7 +185,7 @@ export class Account extends React.Component {
       const fetchPutPublicName = await props.dispatch(putMyselfName(props.user, newPublicName))
       switch (fetchPutPublicName.status) {
         case 200:
-          props.dispatch(updateUserPublicName(newPublicName))
+          // props.dispatch(updateUserPublicName(newPublicName))
           if (newEmail === '' && newUsername === '') {
             props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
             return true
@@ -212,7 +218,7 @@ export class Account extends React.Component {
       const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, checkPassword))
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(updateUserUsername(username))
+          // props.dispatch(updateUserUsername(username))
           if (newEmail === '') {
             if (newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your username and your name has been changed'), 'info'))
             else props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
@@ -244,7 +250,7 @@ export class Account extends React.Component {
       const fetchPutUserEmail = await props.dispatch(putMyselfEmail(newEmail, checkPassword))
       switch (fetchPutUserEmail.status) {
         case 200:
-          props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
+          // props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
           if (newUsername !== '' || newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your personal data has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
           return true

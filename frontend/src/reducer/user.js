@@ -1,6 +1,7 @@
 import {
   SET,
   UPDATE,
+  USER,
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_LANG,
@@ -27,7 +28,7 @@ export const defaultUser = {
   agendaUrl: '',
   username: ''
 }
-
+// TODO serializers
 export default function user (state = defaultUser, action) {
   switch (action.type) {
     case `${SET}/${USER_CONNECTED}`:
@@ -42,6 +43,9 @@ export default function user (state = defaultUser, action) {
 
     case `${SET}/${USER_LANG}`:
       return { ...state, lang: action.lang }
+
+    case `${UPDATE}/${USER}`:
+      return action.newUser
 
     case `${UPDATE}/${USER_PUBLIC_NAME}`:
       return { ...state, public_name: action.newName }

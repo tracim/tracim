@@ -31,7 +31,7 @@ import {
   mockPutMyselfName200,
   mockPutMyselfPassword204, mockPutMyselfPassword403
 } from '../../apiMock'
-
+// TODO update tests
 describe('In <Account />', () => {
   const setWorkspaceListMemberListCallBack = sinon.spy()
   const updateUserPublicNameCallBack = sinon.spy()
