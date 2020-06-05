@@ -40,7 +40,7 @@ import {
 } from '../action.async.js'
 import Radium from 'radium'
 
-class HtmlDocument extends React.Component {
+export class HtmlDocument extends React.Component {
   constructor (props) {
     super(props)
 
