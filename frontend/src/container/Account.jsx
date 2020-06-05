@@ -246,18 +246,26 @@ export class Account extends React.Component {
 
     const username = removeAtInUsername(newUsername)
 
-    if (/\s/.test(username)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t("Username can't contain any whitespace")
-      })
-      return
-    }
-
     if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (/\s/.test(username)) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t("Username can't contain any whitespace")
       })
       return
     }
