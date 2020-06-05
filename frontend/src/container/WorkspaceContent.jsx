@@ -91,8 +91,8 @@ class WorkspaceContent extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.REFRESH_CONTENT_LIST, handler: this.handleRefreshContentList },
       { name: CUSTOM_EVENT.OPEN_CONTENT_URL, handler: this.handleOpenContentUrl },
-      { name: CUSTOM_EVENT.APP_CLOSED, handler: this.handleCloseHideApp(CUSTOM_EVENT.APP_CLOSED) },
-      { name: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, handler: this.handleCloseHideApp(CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT) },
+      { name: CUSTOM_EVENT.APP_CLOSED, handler: this.handleCloseApp },
+      { name: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, handler: this.handleHidePopupCreateContent },
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
@@ -130,9 +130,18 @@ class WorkspaceContent extends React.Component {
     props.history.push(PAGE.WORKSPACE.CONTENT(data.workspaceId, data.contentType, data.contentId) + props.location.search)
   }
 
-  handleCloseHideApp = type => data => {
+  handleCloseApp = data => {
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CLOSED, data, this.state.workspaceIdInUrl)
+    this.updateUrlTitleBreadcrumbs()
+  }
+
+  handleHidePopupCreateContent = data => {
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, data, this.state.workspaceIdInUrl)
+    this.updateUrlTitleBreadcrumbs()
+  }
+
+  updateUrlTitleBreadcrumbs = () => {
     const { state, props } = this
-    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.workspaceIdInUrl)
 
     const contentFolderPath = props.workspaceContentList.filter(c => c.isOpen).map(c => c.id)
     const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
@@ -167,7 +176,7 @@ class WorkspaceContent extends React.Component {
       this.props.dispatch(addWorkspaceShareFolderContentList([
         {
           ...data.content,
-          ...(data.content.content_type === CONTENT_TYPE.FOLDER && { parent_id: SHARE_FOLDER_ID })
+          parent_id: data.content.content_type === CONTENT_TYPE.FOLDER ? SHARE_FOLDER_ID : data.content.parent_id
         }
       ]))
     } else {
@@ -186,7 +195,7 @@ class WorkspaceContent extends React.Component {
       this.props.dispatch(updateWorkspaceShareFolderContentList([
         {
           ...data.content,
-          ...(data.content.content_type === CONTENT_TYPE.FOLDER && { parent_id: SHARE_FOLDER_ID })
+          parent_id: data.content.content_type === CONTENT_TYPE.FOLDER ? SHARE_FOLDER_ID : data.content.parent_id
         }
       ]))
     } else {
