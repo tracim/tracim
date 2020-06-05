@@ -52,6 +52,7 @@ class TracimContext(ABC):
     # INFO - G.M - 2018-12-03 - Useful property of Tracim Context
     def set_user(self, user: User):
         self._current_user = user
+        self.plugin_manager.hook.on_context_current_user_set(user=user, context=self)
 
     @property
     @abstractmethod
@@ -219,6 +220,14 @@ class TracimContext(ABC):
         """
         pass
 
+    @property
+    @abstractmethod
+    def plugin_manager(self) -> pluggy.PluginManager:
+        """
+        Plugin manager of the context
+        """
+        pass
+
     def _get_current_workspace_id(self) -> int:
         raise NotImplementedError()
 
@@ -249,11 +258,6 @@ class TracimRequest(TracimContext, Request):
 
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(self._cleanup)
-
-    def set_user(self, user: User):
-        """Overload TracimContext method to add plugin hook call."""
-        super().set_user(user)
-        self.plugin_manager.hook.on_current_user_set(user=user, request=self)
 
     @property
     def current_user(self) -> User:
@@ -290,7 +294,7 @@ class TracimRequest(TracimContext, Request):
         :param request: same as self, request
         :return: nothing.
         """
-        self.plugin_manager.hook.on_request_finished(request=self)
+        self.plugin_manager.hook.on_context_finished(context=self)
         self._current_user = None
         self._current_workspace = None
         if self.dbsession:

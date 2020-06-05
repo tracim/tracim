@@ -4,6 +4,7 @@ from os.path import dirname
 import re
 import typing
 
+from pluggy import PluginManager
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from wsgidav.dav_provider import DAVProvider
@@ -30,12 +31,19 @@ from tracim_backend.models.data import Workspace
 
 
 class WebdavTracimContext(TracimContext):
-    def __init__(self, environ: typing.Dict[str, typing.Any], app_config: CFG, session: Session):
+    def __init__(
+        self,
+        environ: typing.Dict[str, typing.Any],
+        app_config: CFG,
+        session: Session,
+        plugin_manager: PluginManager,
+    ):
         super().__init__()
         self.environ = environ
         self._candidate_parent_content = None
         self._app_config = app_config
         self._session = session
+        self._plugin_manager = plugin_manager
 
     def set_path(self, path: str):
         self.path = path
@@ -53,13 +61,17 @@ class WebdavTracimContext(TracimContext):
         return self._app_config
 
     @property
+    def plugin_manager(self) -> PluginManager:
+        return self._plugin_manager
+
+    @property
     def current_user(self):
         """
         Current authenticated user if exist
         """
-        return self._generate_if_none(
-            self._current_user, self._get_user, self._get_current_webdav_username
-        )
+        if not self._current_user:
+            self.set_user(self._get_user(self._get_current_webdav_username))
+        return self._current_user
 
     def _get_user(self, get_webdav_username: typing.Callable):
         login = get_webdav_username()

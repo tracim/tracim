@@ -101,15 +101,15 @@ class EventBuilder:
         self._current_user = None  # type: typing.Optional[User]
 
     @hookimpl
-    def on_current_user_set(self, user: User) -> None:
+    def on_context_current_user_set(self, user: User) -> None:
         self._current_user = user
 
     @hookimpl
-    def on_request_session_created(self, request: TracimRequest, session: TracimSession) -> None:
+    def on_context_session_created(self, session: TracimSession) -> None:
         event.listen(session, "pending_to_persistent", self._publish_event)
 
     @hookimpl
-    def on_request_finished(self) -> None:
+    def on_context_finished(self) -> None:
         self._current_user = None
 
     # User events
