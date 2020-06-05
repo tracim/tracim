@@ -13,7 +13,8 @@ import {
   USER_WORKSPACE_DO_NOTIFY,
   FOLDER_READ,
   WORKSPACE_AGENDA_URL,
-  WORKSPACE_CONTENT
+  WORKSPACE_CONTENT,
+  WORKSPACE_CONTENT_SHARE_FOLDER
 } from '../action-creator.sync.js'
 import { serializeContent } from './workspaceContentList.js'
 
@@ -147,6 +148,36 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.id))
       }
 
+    case `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`:
+      return {
+        ...state,
+        recentActivityList: [
+          ...action.workspaceShareFolderContentList.map(c => serializeContent(c)),
+          ...state.recentActivityList
+        ]
+      }
+
+    case `${REMOVE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`:
+      return {
+        ...state,
+        recentActivityList: state.recentActivityList.filter(c => !action.workspaceShareFolderContentList.some(cc => c.id === cc.id))
+      }
+
+    case `${UPDATE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`:
+      return {
+        ...state,
+        recentActivityList: uniqBy(
+          [ // INFO - CH - 2020-05-18 - always put the updated element at the beginning. Then remove duplicates
+            ...action.workspaceShareFolderContentList.map(c => serializeContent(c)),
+            ...state.recentActivityList
+          ],
+          'id'
+        ),
+        contentReadStatusList: state.contentReadStatusList.filter(contentId =>
+          !action.workspaceShareFolderContentList.some(content => content.content_id === contentId)
+        )
+      }
+
     case `${SET}/${WORKSPACE_READ_STATUS_LIST}`:
       return {
         ...state,
@@ -160,7 +191,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         contentReadStatusList: state.contentReadStatusList.filter(id => id !== action.unreadId),
         recentActivityList: [
-          ...state.recentActivityList.filter(content => content.id === action.unreadId),
+          state.recentActivityList.find(content => content.id === action.unreadId),
           ...state.recentActivityList.filter(content => content.id !== action.unreadId)
         ]
       }
