@@ -77,6 +77,12 @@ const mockGetMyselfWorkspaceList200 = (apiUrl, showOwnedWorkspace, workspaceList
     .reply(200, workspaceList)
 }
 
+const mockGetWorkspaceDetail200 = (apiUrl, workspaceId, workspaceDetail) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}`)
+    .reply(200, workspaceDetail)
+}
+
 const mockGetWorkspaceMemberList200 = (apiUrl, workspaceId, memberList) => {
   return nock(apiUrl)
     .get(`/workspaces/${workspaceId}/members`)
@@ -84,6 +90,7 @@ const mockGetWorkspaceMemberList200 = (apiUrl, workspaceId, memberList) => {
 }
 
 export {
+  mockGetWorkspaceDetail200,
   mockGetWorkspaceMemberList200,
   mockGetMyselfWorkspaceList200,
   mockGetContentType200,

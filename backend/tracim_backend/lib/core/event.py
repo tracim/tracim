@@ -1,3 +1,5 @@
+import abc
+import contextlib
 from datetime import datetime
 import typing
 
@@ -6,6 +8,11 @@ from sqlalchemy import inspect
 from sqlalchemy import null
 from sqlalchemy.orm import joinedload
 
+from tracim_backend.app_models.contents import COMMENT_TYPE
+from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import FOLDER_TYPE
+from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
+from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.content import ContentApi
@@ -16,31 +23,35 @@ from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
+from tracim_backend.lib.rq import worker_session
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import WorkspaceRoles
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
-from tracim_backend.views.core_api.schemas import ContentSchema
+from tracim_backend.views.core_api.schemas import CommentSchema
+from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
+from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
 _WORKSPACE_FIELD = "workspace"
 _CONTENT_FIELD = "content"
-_ROLE_FIELD = "role"
+_MEMBER_FIELD = "member"
 
 
 RQ_QUEUE_NAME = "event"
@@ -75,8 +86,15 @@ class EventBuilder:
 
     _user_schema = UserSchema()
     _workspace_schema = WorkspaceSchema()
-    _content_schema = ContentSchema()
+    _content_schemas = {
+        COMMENT_TYPE: CommentSchema(),
+        HTML_DOCUMENTS_TYPE: TextBasedContentSchema(),
+        FILE_TYPE: FileContentSchema(),
+        FOLDER_TYPE: TextBasedContentSchema(),
+        THREAD_TYPE: TextBasedContentSchema(),
+    }
     _event_schema = EventSchema()
+    _workspace_user_role_schema = WorkspaceMemberDigestSchema()
 
     def __init__(self, config: CFG) -> None:
         self._config = config
@@ -157,9 +175,9 @@ class EventBuilder:
 
     @hookimpl
     def on_content_modified(self, content: Content, db_session: TracimSession) -> None:
-        if self._has_just_been_deleted(content.current_revision):
+        if content.current_revision.revision_type == ActionDescription.DELETION:
             self._create_content_event(OperationType.DELETED, content, db_session)
-        elif self._has_just_been_undeleted(content.current_revision):
+        elif content.current_revision.revision_type == ActionDescription.UNDELETION:
             self._create_content_event(OperationType.UNDELETED, content, db_session)
         else:
             self._create_content_event(OperationType.MODIFIED, content, db_session)
@@ -169,6 +187,8 @@ class EventBuilder:
     ) -> None:
         content_api = ContentApi(db_session, self._current_user, self._config)
         content_in_context = content_api.get_content_in_context(content)
+        content_dict = self._content_schemas[content.type].dump(content_in_context).data
+
         workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace_id)
@@ -178,10 +198,15 @@ class EventBuilder:
             _AUTHOR_FIELD: self._user_schema.dump(
                 user_api.get_user_with_context(self._current_user)
             ).data,
-            _CONTENT_FIELD: self._content_schema.dump(content_in_context).data,
+            _CONTENT_FIELD: content_dict,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
-        event = Event(entity_type=EntityType.CONTENT, operation=operation, fields=fields)
+        event = Event(
+            entity_type=EntityType.CONTENT,
+            operation=operation,
+            fields=fields,
+            entity_subtype=content.type,
+        )
         db_session.add(event)
 
     # UserRoleInWorkspace events
@@ -209,7 +234,7 @@ class EventBuilder:
         workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(role.workspace)
         user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
-
+        role_api = RoleApi(current_user=self._current_user, session=db_session, config=self._config)
         try:
             user_field = self._user_schema.dump(
                 user_api.get_user_with_context(user_api.get_one(role.user_id))
@@ -218,40 +243,36 @@ class EventBuilder:
             # It is possible to have an already deleted user when deleting his roles.
             user_field = None
 
+        role_in_context = role_api.get_user_role_workspace_with_context(role)
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(
                 user_api.get_user_with_context(self._current_user)
             ).data,
             _USER_FIELD: user_field,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
-            _ROLE_FIELD: WorkspaceRoles.get_role_from_level(role.role).label,
+            _MEMBER_FIELD: self._workspace_user_role_schema.dump(role_in_context).data,
         }
-        event = Event(
-            entity_type=EntityType.WORKSPACE_USER_ROLE, operation=operation, fields=fields
-        )
+        event = Event(entity_type=EntityType.WORKSPACE_MEMBER, operation=operation, fields=fields)
         db_session.add(event)
 
     def _publish_event(self, db_session: TracimSession, instance: object) -> None:
         if not isinstance(instance, Event):
             return
         event = typing.cast(Event, instance)
-        LiveMessageBuilder.session = db_session
-        LiveMessageBuilder.config = self._config
-        # TODO - G.M - 2020-05-15 - this parameter should be renamed, it's not email-related anymore
-        if self._config.EMAIL__PROCESSING_MODE == self._config.CST.ASYNC:
-            redis_connection = get_redis_connection(self._config)
-            queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
-            logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
-            queue.enqueue(LiveMessageBuilder.publish_messages_for_event, event.event_id)
+        if self._config.JOBS__PROCESSING_MODE == self._config.CST.ASYNC:
+            message_builder = AsyncLiveMessageBuilder(
+                config=self._config
+            )  # type: BaseLiveMessageBuilder
         else:
-            logger.debug(self, "publish event {} synchronously".format(event))
-            LiveMessageBuilder.publish_messages_for_event(event.event_id)
+            message_builder = SyncLiveMessageBuilder(session=db_session, config=self._config)
+        message_builder.publish_messages_for_event(event.event_id)
 
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
         if obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
-            return history.has_changes()
+            was_changed = not history.unchanged and (history.deleted or history.added)
+            return was_changed
         return False
 
     def _has_just_been_undeleted(
@@ -260,66 +281,97 @@ class EventBuilder:
         """Check whether an object has been undeleted since queried from database."""
         if not obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
-            return history.has_changes()
+            was_changed = not history.unchanged and (history.deleted or history.added)
+            return was_changed
         return False
 
 
-class LiveMessageBuilder:
+class BaseLiveMessageBuilder(abc.ABC):
+    """"Base class for message building with most implementation."""
 
     _event_schema = EventSchema()
-    session = None
-    config = None
 
-    @classmethod
-    def _session(cls) -> TracimSession:
-        # TODO S.G 2020-05-07: acquire this from the RQ worker's context
-        assert cls.session
-        return cls.session
+    def __init__(self, config: CFG) -> None:
+        self._config = config
 
-    @classmethod
-    def _config(cls) -> CFG:
-        # TODO SG 2020-05-07: acquire this from the RQ worker's context
-        assert cls.config
-        return cls.config
+    @contextlib.contextmanager
+    @abc.abstractmethod
+    def session(self) -> typing.Generator[TracimSession, None, None]:
+        pass
 
-    @classmethod
-    def publish_messages_for_event(cls, event_id: int) -> None:
-        event = cls._session().query(Event).filter(Event.event_id == event_id).one()
-        if event.entity_type == EntityType.USER:
-            receiver_ids = cls._get_user_event_receiver_ids(event)
-        elif event.entity_type == EntityType.WORKSPACE:
-            receiver_ids = cls._get_workspace_event_receiver_ids(event)
-        elif event.entity_type == EntityType.CONTENT:
-            receiver_ids = cls._get_workspace_event_receiver_ids(event)
-        elif event.entity_type == EntityType.WORKSPACE_USER_ROLE:
-            receiver_ids = cls._get_user_event_receiver_ids(event)
+    @abc.abstractmethod
+    def publish_messages_for_event(self, event_id: int) -> None:
+        pass
 
-        messages = [
-            Message(
-                receiver_id=receiver_id,
-                event=event,
-                event_id=event.event_id,
-                sent=datetime.utcnow(),
-            )
-            for receiver_id in receiver_ids
-        ]
-        cls._session().add_all(messages)
-        live_message_lib = LiveMessagesLib(cls.config)
+    def _publish_messages_for_event(self, event_id: int) -> None:
+        with self.session() as session:
+            event = session.query(Event).filter(Event.event_id == event_id).one()
+            if event.entity_type == EntityType.USER:
+                receiver_ids = self._get_user_event_receiver_ids(event, session)
+            elif event.entity_type == EntityType.WORKSPACE:
+                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+            elif event.entity_type == EntityType.CONTENT:
+                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+            elif event.entity_type == EntityType.WORKSPACE_MEMBER:
+                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+
+            messages = [
+                Message(
+                    receiver_id=receiver_id,
+                    event=event,
+                    event_id=event.event_id,
+                    sent=datetime.utcnow(),
+                )
+                for receiver_id in receiver_ids
+            ]
+            session.add_all(messages)
+        live_message_lib = LiveMessagesLib(self._config)
         for message in messages:
             live_message_lib.publish_message_to_user(message)
 
-    @classmethod
-    def _get_user_event_receiver_ids(cls, event: Event) -> typing.Set[int]:
-        user_api = UserApi(current_user=None, session=cls._session(), config=cls._config())
+    def _get_user_event_receiver_ids(self, event: Event, session: TracimSession) -> typing.Set[int]:
+        user_api = UserApi(current_user=None, session=session, config=self._config)
         receiver_ids = set(user_api.get_user_ids_from_profile(Profile.ADMIN))
         if event.user:
             receiver_ids.add(event.user["user_id"])
         return receiver_ids
 
-    @classmethod
-    def _get_workspace_event_receiver_ids(cls, event: Event) -> typing.Set[int]:
-        user_api = UserApi(current_user=None, session=cls._session(), config=cls._config())
+    def _get_workspace_event_receiver_ids(
+        self, event: Event, session: TracimSession,
+    ) -> typing.Set[int]:
+        user_api = UserApi(current_user=None, session=session, config=self._config)
         administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
-        role_api = RoleApi(current_user=None, session=cls._session(), config=cls._config())
+        role_api = RoleApi(current_user=None, session=session, config=self._config)
         workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
         return set(administrators + workspace_members)
+
+
+class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
+    """"Live message building + sending executed in a RQ job."""
+
+    @contextlib.contextmanager
+    def session(self) -> typing.Generator[TracimSession, None, None]:
+        with worker_session() as session:
+            yield session
+
+    def publish_messages_for_event(self, event_id: int) -> None:
+        redis_connection = get_redis_connection(self._config)
+        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+        logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
+        queue.enqueue(self._publish_messages_for_event, event_id)
+
+
+class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
+    """"Live message building + sending executed in tracim web application."""
+
+    def __init__(self, session: TracimSession, config: CFG) -> None:
+        super().__init__(config)
+        self._session = session
+
+    @contextlib.contextmanager
+    def session(self) -> typing.Generator[TracimSession, None, None]:
+        yield self._session
+
+    def publish_messages_for_event(self, event_id: int) -> None:
+        logger.debug(self, "publish event {} synchronously".format(event))
+        self._publish_messages_for_event(event_id)

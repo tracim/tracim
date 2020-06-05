@@ -13,7 +13,7 @@ revision = "3c92f57c52b2"
 down_revision = "96e812178cec"
 
 operation_type_enum = sa.Enum("CREATED", "MODIFIED", "DELETED", name="operationtype")
-entity_type_enum = sa.Enum("USER", "WORKSPACE", "WORKSPACE_USER_ROLE", "CONTENT", name="entitytype")
+entity_type_enum = sa.Enum("USER", "WORKSPACE", "WORKSPACE_MEMBER", "CONTENT", name="entitytype")
 
 
 def upgrade():

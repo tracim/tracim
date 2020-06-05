@@ -94,8 +94,8 @@ export class AdminUser extends React.Component {
     else this.props.onChangeProfile(userId, 'trusted-users')
   }
 
-  handleClickAddUser = async (name, email, profile, password) => {
-    const resultSuccess = await this.props.onClickAddUser(name, email, profile, password)
+  handleClickAddUser = async (publicName, username, email, profile, password) => {
+    const resultSuccess = await this.props.onClickAddUser(publicName, username, email, profile, password)
     if (resultSuccess) this.handleToggleAddUser()
   }
 
@@ -144,7 +144,9 @@ export class AdminUser extends React.Component {
           {state.displayAddUser && (
             <AddUserForm
               onClickAddUser={this.handleClickAddUser}
+              onChangeUsername={props.onChangeUsername}
               emailNotifActivated={props.emailNotifActivated}
+              newUsernameAvailability={props.newUsernameAvailability}
             />
           )}
 
@@ -157,6 +159,7 @@ export class AdminUser extends React.Component {
                   <th scope='col'>{props.t('Active')}</th>
                   <th />
                   <th scope='col'>{props.t('User')}</th>
+                  <th scope='col'>{props.t('Username')}</th>
                   <th scope='col'>{props.t('Email')}</th>
                   <th scope='col'>{props.t('Can create shared space')}</th>
                   <th scope='col'>{props.t('Administrator')}</th>
@@ -195,6 +198,10 @@ export class AdminUser extends React.Component {
                         <Link to={`/ui/admin/user/${u.user_id}`}>
                           {u.public_name}
                         </Link>
+                      </td>
+
+                      <td>
+                        {u.username}
                       </td>
 
                       <td>{u.email}</td>
