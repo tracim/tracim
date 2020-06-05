@@ -102,6 +102,8 @@ class EventBuilder:
         # NOTE S.G. 2020-06-04: need thread local storage as EventBuilder()
         # is created only once/wsgi application
         self._thread_local = threading.local()
+        self._thread_local.current_user = None
+        self._thread_local.pending_events = []
 
     @property
     def _current_user(self) -> typing.Optional[User]:
