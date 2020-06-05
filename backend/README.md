@@ -209,7 +209,7 @@ in` development.ini.sample`
 :warning: By default, python warning are disabled. To enable warning please set
 `PYTHONWARNINGS` env var, for example `export PYTHONWARNINGS=default` .
 
-Run the Tracim backend web API (don't include live messages):
+Run the Tracim backend web API (doesn't include live messages):
 
     pserve development.ini
 

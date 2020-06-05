@@ -116,15 +116,15 @@ you should follow this documentation : [Live message setup for dev env](/backend
 
 You should install pushpin, for example in debian/ubuntu:
 
-    apt install pushpin
+    sudo apt install pushpin
 
 and configure it to proxy tracim (by default tracim web run on port 6543):
 
-    echo "* localhost:6543" > /etc/pushpin/routes
+    echo "* localhost:6543" | sudo tee /etc/pushpin/routes
 
 and after this change you need to restart your pushpin service:
 
-    systemctl restart pushpin
+    sudo systemctl restart pushpin
 
 more info about installation are available in [Backend README](backend/README.md).
 
@@ -170,9 +170,7 @@ You can now head to (if pushpin is correctly configured and use default port 799
  * user: `admin@admin.admin`
  * password: `admin@admin.admin`
 
-:warning: If this does not work, you can try first:
-[http://127.0.0.1:6543](http://127.0.0.1:6543) and if it's working.
-It's a pushpin configuration issue.
+:warning: If this does not work, you can try to access [http://127.0.0.1:6543](http://127.0.0.1:6543). If it works, the issue is related to the configuration of pushpin.
 
 :warning: Using tracim without pushpin will mean no live message leading to unrefreshed frontend information.
 
