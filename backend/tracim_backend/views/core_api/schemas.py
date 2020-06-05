@@ -166,7 +166,7 @@ class UserDigestSchema(marshmallow.Schema):
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
     avatar_url = marshmallow.fields.Url(
         allow_none=True,
-        example="/api/v2/asset/avatars/john-doe.jpg",
+        example="/api/asset/avatars/john-doe.jpg",
         description="avatar_url is the url of the image file. "
         "If no avatar, then set it to an empty string "
         "(frontend should interpret "
@@ -1424,3 +1424,13 @@ class TracimLiveEventHeaderSchema(marshmallow.Schema):
     # TODO - G.M - 2020-05-14 - Add Filtering for text/event-stream mimetype with accept header,
     #  see: https://github.com/tracim/tracim/issues/3042
     accept = marshmallow.fields.String(required=True, load_from="Accept", dump_to="Accept")
+
+
+# INFO - G.M - 2020-05-19 - This is only used for documentation
+class PathSuffixSchema(marshmallow.Schema):
+    path_suffix = marshmallow.fields.Str(
+        required=False,
+        description='any path, could include "/"',
+        default="",
+        example="/workspaces/1/notifications/activate",
+    )

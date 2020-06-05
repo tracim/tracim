@@ -346,8 +346,8 @@ class CFG(object):
         self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", default_sqlalchemy_url)
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        tracim_v2_folder = os.path.dirname(backend_folder)
-        default_color_config_file_path = os.path.join(tracim_v2_folder, "color.json")
+        tracim_folder = os.path.dirname(backend_folder)
+        default_color_config_file_path = os.path.join(tracim_folder, "color.json")
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
         )
@@ -432,9 +432,9 @@ class CFG(object):
         self.FRONTEND__SERVE = asbool(self.get_raw_config("frontend.serve", "True"))
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
         # is probably in frontend subfolder
-        # of tracim_v2 parent of both backend and frontend
+        # of tracim parent of both backend and frontend
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        tracim_v2_folder = os.path.dirname(backend_folder)
+        tracim_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")
 
         self.FRONTEND__CACHE_TOKEN = self.get_raw_config(
@@ -445,7 +445,7 @@ class CFG(object):
             "backend.i18n_folder_path", backend_i18n_folder
         )
 
-        frontend_dist_folder = os.path.join(tracim_v2_folder, "frontend", "dist")
+        frontend_dist_folder = os.path.join(tracim_folder, "frontend", "dist")
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )

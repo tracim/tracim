@@ -194,7 +194,7 @@ class TracimApplication(ABC):
 
         To import controller in tracim web app (pyramid) you need to use configurator.include on bind
         method of a Controller object.
-        route_prefix should be by default BASE_API_V2 ("/api/v2/")
+        route_prefix should be by default BASE_API ("/api/")
         It's also the best place to add new globally web handled exception (handled by hapic).
         example:
 
@@ -207,7 +207,7 @@ class TracimApplication(ABC):
         ... ) -> None:
         ...     from tracim_backend.applications.agenda.controller import AgendaController
         ...     agenda_controller = AgendaController()
-        ...     configurator.include(agenda_controller.bind, route_prefix=BASE_API_V2)
+        ...     configurator.include(agenda_controller.bind, route_prefix=BASE_API)
         ...
         ...     context.handle_exception(CaldavNotAuthorized, HTTPStatus.FORBIDDEN)
         ...     context.handle_exception(CaldavNotAuthenticated, HTTPStatus.UNAUTHORIZED)
