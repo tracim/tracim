@@ -136,4 +136,4 @@ if [ "$START_CALDAV" = "1" ]; then
     cd /tracim/backend/
     tracimcli caldav sync -c /etc/tracim/development.ini
 fi
-tail -f /var/log/uwsgi/app/tracim_web.log
+tail -f /var/tracim/logs/tracim_web.log
