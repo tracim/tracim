@@ -40,8 +40,8 @@ from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import CommentSchema
-from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
+from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
@@ -49,6 +49,7 @@ from tracim_backend.views.core_api.schemas import WorkspaceSchema
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
+_CLIENT_ID_FIELD = "client_id"
 _WORKSPACE_FIELD = "workspace"
 _CONTENT_FIELD = "content"
 _MEMBER_FIELD = "member"
@@ -99,10 +100,15 @@ class EventBuilder:
     def __init__(self, config: CFG) -> None:
         self._config = config
         self._current_user = None  # type: typing.Optional[User]
+        self._client_id = None  # type: typing.Optional[str]
 
     @hookimpl
     def on_current_user_set(self, user: User) -> None:
         self._current_user = user
+
+    @hookimpl
+    def on_current_client_id_set(self, client_id: str) -> None:
+        self._client_id = client_id
 
     @hookimpl
     def on_request_session_created(self, request: TracimRequest, session: TracimSession) -> None:
@@ -163,6 +169,7 @@ class EventBuilder:
             _AUTHOR_FIELD: self._user_schema.dump(
                 user_api.get_user_with_context(self._current_user)
             ).data,
+            _CLIENT_ID_FIELD: self._client_id,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
@@ -199,6 +206,7 @@ class EventBuilder:
                 user_api.get_user_with_context(self._current_user)
             ).data,
             _CONTENT_FIELD: content_dict,
+            _CLIENT_ID_FIELD: self._client_id,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(
@@ -249,6 +257,7 @@ class EventBuilder:
                 user_api.get_user_with_context(self._current_user)
             ).data,
             _USER_FIELD: user_field,
+            _CLIENT_ID_FIELD: self._client_id,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
             _MEMBER_FIELD: self._workspace_user_role_schema.dump(role_in_context).data,
         }

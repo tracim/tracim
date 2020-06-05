@@ -27,6 +27,16 @@ class TracimRequestHookSpec:
         pass
 
     @hookspec
+    def on_current_client_id_set(self, client_id: str, request: TracimRequest) -> None:
+        """
+        Called when a current client_id is defined on the request.
+
+        :param client_id: current client id
+        :param request: current request
+        """
+        pass
+
+    @hookspec
     def on_request_session_created(self, request: TracimRequest, session: TracimSession) -> None:
         """
         Called when the request has been initialized.

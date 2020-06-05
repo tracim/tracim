@@ -24,6 +24,7 @@ BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
 TRACIM_API_USER_LOGIN_HEADER = "Tracim-Api-Login"
 AUTH_TOKEN_QUERY_PARAMETER = "access_token"
+CLIENT_ID_HEADER = "X-Tracim-ClientId"
 
 
 class TracimAuthenticationPolicy(ABC):
@@ -73,6 +74,10 @@ class TracimAuthenticationPolicy(ABC):
         user = self.get_current_user(request)
         if user:
             request.set_user(user)
+        client_id = request.headers.get(CLIENT_ID_HEADER)
+        if client_id:
+            request.set_client_id(client_id)
+
         return user
 
     def authenticated_userid(self, request: TracimRequest) -> typing.Optional[int]:
