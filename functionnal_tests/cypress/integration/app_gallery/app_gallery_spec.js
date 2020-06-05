@@ -1,4 +1,5 @@
 import { PAGES } from '../../support/urls_commands.js'
+import { SELECTORS as s } from '../../support/generic_selector_commands.js'
 
 describe('App Gallery', function () {
   let workspaceId
