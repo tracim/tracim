@@ -198,6 +198,20 @@ class TracimContext(ABC):
         content_type_slug = content_type_slug_fetcher()
         return content_type_list.get_one_by_slug(content_type_slug)
 
+    def cleanup(self) -> None:
+        """
+        Close dbsession at the end of the request in order to avoid exception
+        about not properly closed session or "object created in another thread"
+        issue
+        see https://github.com/tracim/tracim_backend/issues/62
+        :return: nothing.
+        """
+        self.plugin_manager.hook.on_context_finished(context=self)
+        self._current_user = None
+        self._current_workspace = None
+        if self.dbsession:
+            self.dbsession.close()
+
     # INFO - G.M - 2018-12-03 - Theses method need to be implemented
     # to support correctly Tracim Context
     # Method to Implements
@@ -257,7 +271,7 @@ class TracimRequest(TracimContext, Request):
         TracimContext.__init__(self)
 
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
-        self.add_finished_callback(self._cleanup)
+        self.add_finished_callback(lambda r: r.cleanup())
 
     @property
     def current_user(self) -> User:
@@ -284,21 +298,6 @@ class TracimRequest(TracimContext, Request):
     @property
     def plugin_manager(self) -> pluggy.PluginManager:
         return self.registry.settings["plugin_manager"]
-
-    def _cleanup(self, request: "TracimRequest") -> None:
-        """
-        Close dbsession at the end of the request in order to avoid exception
-        about not properly closed session or "object created in another thread"
-        issue
-        see https://github.com/tracim/tracim_backend/issues/62
-        :param request: same as self, request
-        :return: nothing.
-        """
-        self.plugin_manager.hook.on_context_finished(context=self)
-        self._current_user = None
-        self._current_workspace = None
-        if self.dbsession:
-            self.dbsession.close()
 
     # INFO - G.M - 2018-12-03 - Internal utils function to simplify ID fetching
 

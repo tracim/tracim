@@ -26,6 +26,8 @@ if typing.TYPE_CHECKING:
     # INFO - G.M - 2019-05-03 - import for type-checking only, setted here to
     # avoid circular import issue
     from tracim_backend.config import CFG
+    from tracim_backend.lib.utils.request import TracimContext
+
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
 configure_mappers()
@@ -96,10 +98,13 @@ def get_tm_session(session_factory, transaction_manager) -> Session:
     return dbsession
 
 
-def _create_dbsession(session_factory, request) -> Session:
-    dbsession = get_tm_session(session_factory, request.tm)
-    dbsession.info["crud_hook_caller"] = DatabaseCrudHookCaller(dbsession, request.plugin_manager)
-    request.plugin_manager.hook.on_request_session_created(request=request, session=dbsession)
+def create_dbsession_for_context(
+    session_factory, transaction_manager, context: "TracimContext"
+) -> Session:
+    """Creates and initialize a sqlalchemy session for the given context"""
+    dbsession = get_tm_session(session_factory, transaction_manager)
+    dbsession.info["crud_hook_caller"] = DatabaseCrudHookCaller(dbsession, context.plugin_manager)
+    context.plugin_manager.hook.on_context_session_created(session=dbsession, context=context)
     return dbsession
 
 
@@ -122,7 +127,7 @@ def init_models(configurator: Configurator, app_config: "CFG") -> None:
     # make request.dbsession available for use in Pyramid
     configurator.add_request_method(
         # r.tm is the transaction manager used by pyramid_tm
-        lambda r: _create_dbsession(session_factory, r),
+        lambda r: create_dbsession_for_context(session_factory, r.tm, r),
         "dbsession",
         reify=True,
     )

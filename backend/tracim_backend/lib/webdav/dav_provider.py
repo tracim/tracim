@@ -32,17 +32,13 @@ from tracim_backend.models.data import Workspace
 
 class WebdavTracimContext(TracimContext):
     def __init__(
-        self,
-        environ: typing.Dict[str, typing.Any],
-        app_config: CFG,
-        session: Session,
-        plugin_manager: PluginManager,
+        self, environ: typing.Dict[str, typing.Any], app_config: CFG, plugin_manager: PluginManager,
     ):
         super().__init__()
         self.environ = environ
         self._candidate_parent_content = None
         self._app_config = app_config
-        self._session = session
+        self._session = None
         self._plugin_manager = plugin_manager
 
     def set_path(self, path: str):
@@ -54,7 +50,12 @@ class WebdavTracimContext(TracimContext):
 
     @property
     def dbsession(self) -> Session:
+        assert self._session
         return self._session
+
+    @dbsession.setter
+    def dbsession(self, session: Session) -> None:
+        self._session = session
 
     @property
     def app_config(self) -> CFG:
