@@ -78,7 +78,6 @@ export class HtmlDocument extends React.Component {
       { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
       { name: CUSTOM_EVENT.HIDE_APP(this.state.config.slug), handler: this.handleHideApp },
       { name: CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), handler: this.handleReloadContent },
-      { name: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(this.state.config.slug), handler: this.handleReloadAppFeatureData },
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
@@ -102,9 +101,9 @@ export class HtmlDocument extends React.Component {
         ...data.content
       },
       editionAuthor: data.author.public_name,
-      keepEditingWarning: (state.mode === APP_FEATURE_MODE.EDIT && state.loggedUser.user_id !== data.author.user_id),
-      rawContentBeforeEdit: prev.content.raw_content,
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+      keepEditingWarning: (prev.mode === APP_FEATURE_MODE.EDIT && prev.loggedUser.user_id !== data.author.user_id),
+      rawContentBeforeEdit: data.content.raw_content,
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
     }))
   }
 
@@ -180,13 +179,6 @@ export class HtmlDocument extends React.Component {
 
     props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
     globalThis.tinymce.remove('#wysiwygNewVersion')
-  }
-
-  handleReloadAppFeatureData = data => {
-    const { props } = this
-    console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA, data)
-
-    props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
   }
 
   handleAllAppChangeLanguage = data => {
@@ -415,11 +407,6 @@ export class HtmlDocument extends React.Component {
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
       case 200:
         globalThis.tinymce.remove('#wysiwygNewVersion')
-
-        localStorage.removeItem(
-          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
-        )
-
         this.setState({ mode: APP_FEATURE_MODE.VIEW })
         break
       case 400:
@@ -522,10 +509,16 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickRefresh = () => {
-    this.setState({
+    globalThis.tinymce.remove('#wysiwygNewVersion')
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        raw_content: prev.rawContentBeforeEdit
+      },
       mode: APP_FEATURE_MODE.VIEW,
       keepEditingWarning: false
-    })
+    }))
   }
 
   render () {
