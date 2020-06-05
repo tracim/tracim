@@ -1,7 +1,11 @@
 from contextlib import contextmanager
 import typing
+import weakref
 
 from sqlalchemy.orm import Session
+
+if typing.TYPE_CHECKING:
+    from tracim_backend.lib.utils.request import TracimContext
 
 
 class TracimSession(Session):
@@ -12,6 +16,15 @@ class TracimSession(Session):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._allow_revision_deletion = False  # type: bool
+        self._context = None  # type: typing.Optional[weakref.CallableProxyType]
+
+    @property
+    def context(self) -> "TracimContext":
+        assert self._context, "This session has no context"
+        return self._context
+
+    def set_context(self, tracim_context: "TracimContext") -> None:
+        self._context = weakref.proxy(tracim_context)
 
     def set_allowed_revision_deletion(self, value: bool) -> None:
         self._allow_revision_deletion = value

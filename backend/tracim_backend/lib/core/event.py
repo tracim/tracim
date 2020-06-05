@@ -59,7 +59,9 @@ RQ_QUEUE_NAME = "event"
 class EventApi:
     """Api to query event & messages"""
 
-    def __init__(self, current_user: User, session: TracimSession, config: CFG) -> None:
+    def __init__(
+        self, current_user: typing.Optional[User], session: TracimSession, config: CFG
+    ) -> None:
         self._current_user = current_user
         self._session = session
         self._config = config
@@ -97,41 +99,32 @@ class EventBuilder:
 
     def __init__(self, config: CFG) -> None:
         self._config = config
-        self._current_user = None  # type: typing.Optional[User]
-
-    @hookimpl
-    def on_context_current_user_set(self, user: User) -> None:
-        self._current_user = user
 
     @hookimpl
     def on_context_session_created(self, session: TracimSession) -> None:
         event.listen(session, "pending_to_persistent", self._publish_event)
 
-    @hookimpl
-    def on_context_finished(self) -> None:
-        self._current_user = None
-
     # User events
     @hookimpl
-    def on_user_created(self, user: User, db_session: TracimSession) -> None:
-        self._create_user_event(OperationType.CREATED, user, db_session)
+    def on_user_created(self, user: User, db_session: TracimSession, current_user: User) -> None:
+        self._create_user_event(OperationType.CREATED, user, db_session, current_user)
 
     @hookimpl
-    def on_user_modified(self, user: User, db_session: TracimSession) -> None:
+    def on_user_modified(self, user: User, db_session: TracimSession, current_user: User) -> None:
         if self._has_just_been_deleted(user):
-            self._create_user_event(OperationType.DELETED, user, db_session)
+            self._create_user_event(OperationType.DELETED, user, db_session, current_user)
         elif self._has_just_been_undeleted(user):
-            self._create_user_event(OperationType.UNDELETED, user, db_session)
+            self._create_user_event(OperationType.UNDELETED, user, db_session, current_user)
         else:
-            self._create_user_event(OperationType.MODIFIED, user, db_session)
+            self._create_user_event(OperationType.MODIFIED, user, db_session, current_user)
 
     def _create_user_event(
-        self, operation: OperationType, user: User, db_session: TracimSession
+        self, operation: OperationType, user: User, db_session: TracimSession, current_user: User
     ) -> None:
-        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
+        user_api = UserApi(current_user, db_session, self._config, show_deleted=True)
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(self._current_user)
+                user_api.get_user_with_context(current_user)
             ).data,
             _USER_FIELD: self._user_schema.dump(user_api.get_user_with_context(user)).data,
         }
@@ -140,27 +133,39 @@ class EventBuilder:
 
     # Workspace events
     @hookimpl
-    def on_workspace_created(self, workspace: Workspace, db_session: TracimSession) -> None:
-        self._create_workspace_event(OperationType.CREATED, workspace, db_session)
+    def on_workspace_created(
+        self, workspace: Workspace, db_session: TracimSession, current_user: User
+    ) -> None:
+        self._create_workspace_event(OperationType.CREATED, workspace, db_session, current_user)
 
     @hookimpl
-    def on_workspace_modified(self, workspace: Workspace, db_session: TracimSession) -> None:
+    def on_workspace_modified(
+        self, workspace: Workspace, db_session: TracimSession, current_user: User
+    ) -> None:
         if self._has_just_been_deleted(workspace):
-            self._create_workspace_event(OperationType.DELETED, workspace, db_session)
+            self._create_workspace_event(OperationType.DELETED, workspace, db_session, current_user)
         elif self._has_just_been_undeleted(workspace):
-            self._create_workspace_event(OperationType.UNDELETED, workspace, db_session)
+            self._create_workspace_event(
+                OperationType.UNDELETED, workspace, db_session, current_user
+            )
         else:
-            self._create_workspace_event(OperationType.MODIFIED, workspace, db_session)
+            self._create_workspace_event(
+                OperationType.MODIFIED, workspace, db_session, current_user
+            )
 
     def _create_workspace_event(
-        self, operation: OperationType, workspace: Workspace, db_session: TracimSession
+        self,
+        operation: OperationType,
+        workspace: Workspace,
+        db_session: TracimSession,
+        current_user: typing.Optional[User],
     ) -> None:
-        api = WorkspaceApi(db_session, self._current_user, self._config)
-        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
+        api = WorkspaceApi(db_session, current_user, self._config)
+        user_api = UserApi(current_user, db_session, self._config, show_deleted=True)
         workspace_in_context = api.get_workspace_with_context(workspace)
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(self._current_user)
+                user_api.get_user_with_context(current_user)
             ).data,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
@@ -169,33 +174,41 @@ class EventBuilder:
 
     # Content events
     @hookimpl
-    def on_content_created(self, content: Content, db_session: TracimSession) -> None:
-        self._create_content_event(OperationType.CREATED, content, db_session)
+    def on_content_created(
+        self, content: Content, db_session: TracimSession, current_user: User
+    ) -> None:
+        self._create_content_event(OperationType.CREATED, content, db_session, current_user)
 
     @hookimpl
-    def on_content_modified(self, content: Content, db_session: TracimSession) -> None:
+    def on_content_modified(
+        self, content: Content, db_session: TracimSession, current_user: User
+    ) -> None:
         if content.current_revision.revision_type == ActionDescription.DELETION:
-            self._create_content_event(OperationType.DELETED, content, db_session)
+            self._create_content_event(OperationType.DELETED, content, db_session, current_user)
         elif content.current_revision.revision_type == ActionDescription.UNDELETION:
-            self._create_content_event(OperationType.UNDELETED, content, db_session)
+            self._create_content_event(OperationType.UNDELETED, content, db_session, current_user)
         else:
-            self._create_content_event(OperationType.MODIFIED, content, db_session)
+            self._create_content_event(OperationType.MODIFIED, content, db_session, current_user)
 
     def _create_content_event(
-        self, operation: OperationType, content: Content, db_session: TracimSession
+        self,
+        operation: OperationType,
+        content: Content,
+        db_session: TracimSession,
+        current_user: typing.Optional[User],
     ) -> None:
-        content_api = ContentApi(db_session, self._current_user, self._config)
+        content_api = ContentApi(db_session, current_user, self._config)
         content_in_context = content_api.get_content_in_context(content)
         content_dict = self._content_schemas[content.type].dump(content_in_context).data
 
-        workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
+        workspace_api = WorkspaceApi(db_session, current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace_id)
         )
-        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
+        user_api = UserApi(current_user, db_session, self._config, show_deleted=True)
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(self._current_user)
+                user_api.get_user_with_context(current_user)
             ).data,
             _CONTENT_FIELD: content_dict,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
@@ -211,29 +224,33 @@ class EventBuilder:
     # UserRoleInWorkspace events
     @hookimpl
     def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, db_session: TracimSession
+        self, role: UserRoleInWorkspace, db_session: TracimSession, current_user: User
     ) -> None:
-        self._create_role_event(OperationType.CREATED, role, db_session)
+        self._create_role_event(OperationType.CREATED, role, db_session, current_user)
 
     @hookimpl
     def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, db_session: TracimSession
+        self, role: UserRoleInWorkspace, db_session: TracimSession, current_user: User
     ) -> None:
-        self._create_role_event(OperationType.MODIFIED, role, db_session)
+        self._create_role_event(OperationType.MODIFIED, role, db_session, current_user)
 
     @hookimpl
     def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, db_session: TracimSession
+        self, role: UserRoleInWorkspace, db_session: TracimSession, current_user: User
     ) -> None:
-        self._create_role_event(OperationType.DELETED, role, db_session)
+        self._create_role_event(OperationType.DELETED, role, db_session, current_user)
 
     def _create_role_event(
-        self, operation: OperationType, role: UserRoleInWorkspace, db_session: TracimSession
+        self,
+        operation: OperationType,
+        role: UserRoleInWorkspace,
+        db_session: TracimSession,
+        current_user: typing.Optional[User],
     ) -> None:
-        workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
+        workspace_api = WorkspaceApi(db_session, current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(role.workspace)
-        user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
-        role_api = RoleApi(current_user=self._current_user, session=db_session, config=self._config)
+        user_api = UserApi(current_user, db_session, self._config, show_deleted=True)
+        role_api = RoleApi(current_user=current_user, session=db_session, config=self._config)
         try:
             user_field = self._user_schema.dump(
                 user_api.get_user_with_context(user_api.get_one(role.user_id))
@@ -245,7 +262,7 @@ class EventBuilder:
         role_in_context = role_api.get_user_role_workspace_with_context(role)
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(self._current_user)
+                user_api.get_user_with_context(current_user)
             ).data,
             _USER_FIELD: user_field,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,

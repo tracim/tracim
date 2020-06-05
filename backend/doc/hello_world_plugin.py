@@ -14,7 +14,7 @@ def on_plugins_loaded(plugin_manager: PluginManager) -> None:
 class HookImpl:
     """Needs a registration using 'register_tracim_plugin' function."""
 
-    def on_user_created(self, user, dbsession) -> None:
+    def on_user_created(self, user, dbsession, current_user) -> None:
         print("created user {}".format(user.public_name))
 
 

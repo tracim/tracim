@@ -28,6 +28,7 @@ from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
@@ -218,6 +219,19 @@ def session(empty_session, engine, app_config, test_logger):
     dbsession.close_all()
     transaction.abort()
     DeclarativeBase.metadata.drop_all(engine)
+
+
+@pytest.fixture
+def session_with_tracim_context(session, app_config):
+    class TestTracimContext(TracimContext):
+        app_config = app_config
+        dbsession = session
+        plugin_manager = None
+        current_user = None
+
+    context = TestTracimContext()
+    session.set_context(context)
+    yield session
 
 
 @pytest.fixture

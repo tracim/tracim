@@ -14,10 +14,14 @@ from tracim_backend.models.tracim_session import TracimSession
 
 
 class TracimContextHookSpec:
-    """Hooks for tracim context changes."""
+    """Hooks for tracim context changes.
+
+    Don't assume that there is only one active context at one point in time if
+    the WSGI app is launched with threads.
+    """
 
     @hookspec
-    def on_context_user_set(self, user: User, context: TracimContext) -> None:
+    def on_context_current_user_set(self, user: User, context: TracimContext) -> None:
         """
         Called when a current user is defined on the context.
 

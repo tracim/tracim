@@ -12,8 +12,9 @@ from tracim_backend.tests.fixtures import *  # noqa F403,F401
 @pytest.mark.usefixtures("base_fixture")
 class TestEventBuilder:
     def test_unit__on_modified_user__is_deleted(
-        self, user_api_factory, session, app_config, event_helper
+        self, user_api_factory, session_with_tracim_context, app_config, event_helper
     ) -> None:
+        session = session_with_tracim_context
         manager = init_plugin_manager(app_config)
         DatabaseCrudHookCaller(session, manager)
         manager.register(EventBuilder(app_config))
@@ -38,11 +39,12 @@ class TestEventBuilder:
         self,
         content_api_factory,
         workspace_api_factory,
-        session,
+        session_with_tracim_context,
         app_config,
         event_helper,
         content_type_list,
     ) -> None:
+        session = session_with_tracim_context
         manager = init_plugin_manager(app_config)
         DatabaseCrudHookCaller(session, manager)
         manager.register(EventBuilder(app_config))

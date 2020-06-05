@@ -103,6 +103,8 @@ def create_dbsession_for_context(
 ) -> Session:
     """Creates and initialize a sqlalchemy session for the given context"""
     dbsession = get_tm_session(session_factory, transaction_manager)
+    dbsession.set_context(context)
+    # Keep a reference on the crud hook caller for the session's lifetime
     dbsession.info["crud_hook_caller"] = DatabaseCrudHookCaller(dbsession, context.plugin_manager)
     context.plugin_manager.hook.on_context_session_created(session=dbsession, context=context)
     return dbsession

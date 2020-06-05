@@ -94,7 +94,8 @@ class UserRoleInWorkspaceHookImpl:
 
 @pytest.mark.usefixtures("base_fixture")
 class TestDatabaseCrudHookCaller:
-    def test_unit__crud_caller__ok__user(self, session):
+    def test_unit__crud_caller__ok__user(self, session_with_tracim_context):
+        session = session_with_tracim_context
         plugin_manager = PluginManager(PLUGIN_NAMESPACE)
         plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
         hook = UserHookImpl()
@@ -114,7 +115,8 @@ class TestDatabaseCrudHookCaller:
         session.flush()
         hook.mock_hooks.assert_called_with("deleted", user=user, db_session=session)
 
-    def test_unit__crud_caller__ok__workspace(self, session):
+    def test_unit__crud_caller__ok__workspace(self, session_with_tracim_context):
+        session = session_with_tracim_context
         plugin_manager = PluginManager(PLUGIN_NAMESPACE)
         plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
         hook = WorkspaceHookImpl()
@@ -138,7 +140,8 @@ class TestDatabaseCrudHookCaller:
         session.flush()
         hook.mock_hooks.assert_called_with("deleted", workspace=workspace, db_session=session)
 
-    def test_unit__crud_caller__ok__user_role_in_workspace(self, session):
+    def test_unit__crud_caller__ok__user_role_in_workspace(self, session_with_tracim_context):
+        session = session_with_tracim_context
         plugin_manager = PluginManager(PLUGIN_NAMESPACE)
         plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
         hook = UserRoleInWorkspaceHookImpl()
@@ -164,7 +167,8 @@ class TestDatabaseCrudHookCaller:
         session.flush()
         hook.mock_hooks.assert_called_with("deleted", role=role, db_session=session)
 
-    def test_unit__crud_caller__ok__content(self, session):
+    def test_unit__crud_caller__ok__content(self, session_with_tracim_context):
+        session = session_with_tracim_context
         plugin_manager = PluginManager(PLUGIN_NAMESPACE)
         plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
         hook = ContentHookImpl()
