@@ -3,7 +3,7 @@ import { defaultDebug } from 'tracim_frontend_lib'
 export const debug = {
   config: {
     ...defaultDebug.config,
-    apiUrl: '',
+    apiUrl: 'http://localhost',
     slug: 'thread',
     faIcon: 'comments-o',
     hexcolor: '#428BCA',
