@@ -20,6 +20,7 @@ describe('content :: workspace > dashbord', function () {
     cy.get('.memberlist .memberlist__list__item__info').should('be.visible')
     cy.get('.memberlist .memberlist__list__item__info__firstLine__name').should('be.visible')
     cy.get('.memberlist .memberlist__list__item__info__firstLine__role').should('be.visible')
+    cy.get('.memberlist').scrollIntoView({ offset: { bottom: 0 } })
     cy.get('.memberlist .memberlist__list__item__delete').should('be.visible')
     cy.get('.memberlist .fa-trash-o').should('be.visible')
   })
