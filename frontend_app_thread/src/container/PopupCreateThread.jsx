@@ -115,6 +115,7 @@ class PopupCreateThread extends React.Component {
     const resSave = await handleFetchResult(await fetchSaveThreadDoc)
 
     switch (resSave.apiResponse.status) {
+      case 200: break
       case 400:
         switch (resSave.body.code) {
           case 3002:

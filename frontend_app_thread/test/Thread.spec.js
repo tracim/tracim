@@ -9,7 +9,6 @@ import {
   mockPutMyselfThreadRead200
 } from './apiMock.js'
 import { contentThread } from './fixture/contentThread.js'
-import { debug } from '../src/debug.js'
 import { commentTlm, author } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 
 describe('<Thread />', () => {
@@ -26,10 +25,12 @@ describe('<Thread />', () => {
     t: key => key
   }
 
-  mockGetThreadContent200(debug.config.apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.thread)
-  mockPutMyselfThreadRead200(debug.config.apiUrl, props.loggedUser.user_id, contentThread.thread.workspace_id, contentThread.thread.content_id)
-  mockGetThreadComment200(debug.config.apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.commentList)
-  mockGetThreadRevision200(debug.config.apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.revisionList)
+  const apiUrl = 'http://localhost/api/v2'
+
+  mockGetThreadContent200(apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.thread)
+  mockPutMyselfThreadRead200(apiUrl, props.loggedUser.user_id, contentThread.thread.workspace_id, contentThread.thread.content_id)
+  mockGetThreadComment200(apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.commentList)
+  mockGetThreadRevision200(apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.revisionList)
 
   const wrapper = shallow(<Thread {...props} />)
 
