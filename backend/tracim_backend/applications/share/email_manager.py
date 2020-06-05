@@ -38,16 +38,27 @@ class ShareEmailManager(EmailManager):
         if share_password:
             share_password_enabled = True
         translator = Translator(self.config, default_lang=emitter.lang)
-        message = self._notify_emitter(
-            emitter=emitter,
-            shared_content=shared_content,
-            content_share_receivers=content_share_receivers,
-            share_password=share_password,
-            translator=translator,
-        )
-        send_email_through(
-            config=self.config, sendmail_callable=email_sender.send_mail, message=message
-        )
+
+        # NOTE BS 20200428: #2829: Email no longer required for User
+        if emitter.email:
+            message = self._notify_emitter(
+                emitter=emitter,
+                shared_content=shared_content,
+                content_share_receivers=content_share_receivers,
+                share_password=share_password,
+                translator=translator,
+            )
+            send_email_through(
+                config=self.config, sendmail_callable=email_sender.send_mail, message=message
+            )
+        else:
+            logger.debug(
+                self,
+                "Skip share notification email to emitter '{}' because have no email".format(
+                    emitter.username
+                ),
+            )
+
         for content_share in content_share_receivers:
             emails_receivers_list = [
                 share_content.email for share_content in content_share_receivers

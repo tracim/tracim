@@ -14,28 +14,35 @@ import {
   PageContent,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
-  updateUserName,
+  updateUserPublicName,
   updateUserEmail,
   updateUserWorkspaceSubscriptionNotif,
   updateUserAgendaUrl,
+  updateUserUsername,
   setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
   getWorkspaceMemberList,
   putMyselfName,
   putMyselfEmail,
+  putUserUsername,
   putMyselfPassword,
   putMyselfWorkspaceDoNotify,
-  getLoggedUserCalendar
+  getLoggedUserCalendar,
+  getUsernameAvailability
 } from '../action-creator.async.js'
 import {
+  ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList,
-  PAGE
+  PAGE,
+  MINIMUM_CHARACTERS_PUBLIC_NAME,
+  MINIMUM_CHARACTERS_USERNAME
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
@@ -70,7 +77,8 @@ export class Account extends React.Component {
     }]
 
     this.state = {
-      subComponentMenu: builtSubComponentMenu.filter(menu => menu.display)
+      subComponentMenu: builtSubComponentMenu.filter(menu => menu.display),
+      newUsernameAvailability: true
     }
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
@@ -152,23 +160,27 @@ export class Account extends React.Component {
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
-    subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
+    subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName })),
+    newUsernameAvailability: true
   }))
 
-  handleSubmitNameOrEmail = async (newName, newEmail, checkPassword) => {
+  handleSubmitPersonalData = async (newPublicName, newUsername, newEmail, checkPassword) => {
     const { props } = this
 
-    if (newName !== '') {
-      if (newName.length < 3) {
-        props.dispatch(newFlashMessage(props.t('Full name must be at least 3 characters'), 'warning'))
+    if (newPublicName !== '') {
+      if (newPublicName.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
+        props.dispatch(newFlashMessage(
+          props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
+          , 'warning')
+        )
         return false
       }
 
-      const fetchPutUserName = await props.dispatch(putMyselfName(props.user, newName))
-      switch (fetchPutUserName.status) {
+      const fetchPutPublicName = await props.dispatch(putMyselfName(props.user, newPublicName))
+      switch (fetchPutPublicName.status) {
         case 200:
-          props.dispatch(updateUserName(newName))
-          if (newEmail === '') {
+          props.dispatch(updateUserPublicName(newPublicName))
+          if (newEmail === '' && newUsername === '') {
             props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
             return true
           }
@@ -181,16 +193,76 @@ export class Account extends React.Component {
       }
     }
 
+    if (newUsername !== '') {
+      const username = removeAtInUsername(newUsername)
+
+      if (username.length < MINIMUM_CHARACTERS_USERNAME) {
+        props.dispatch(newFlashMessage(
+          props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+          , 'warning')
+        )
+        return false
+      }
+
+      if (/\s/.test(username)) {
+        props.dispatch(newFlashMessage(props.t("Username can't contain any whitespace"), 'warning'))
+        return false
+      }
+
+      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, checkPassword))
+      switch (fetchPutUsername.status) {
+        case 200:
+          props.dispatch(updateUserUsername(username))
+          if (newEmail === '') {
+            if (newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your username and your name has been changed'), 'info'))
+            else props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
+            return true
+          }
+          break
+        case 400:
+          switch (fetchPutUsername.json.code) {
+            case 2062:
+              props.dispatch(newFlashMessage(
+                props.t(
+                  'Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}',
+                  { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME }
+                ),
+                'warning'
+              ))
+              break
+            default: props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning'))
+          }
+          return false
+        case 403:
+          props.dispatch(newFlashMessage(props.t('Invalid password'), 'warning'))
+          return false
+        default: props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning')); return false
+      }
+    }
+
     if (newEmail !== '') {
       const fetchPutUserEmail = await props.dispatch(putMyselfEmail(newEmail, checkPassword))
       switch (fetchPutUserEmail.status) {
         case 200:
           props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
-          if (newName !== '') props.dispatch(newFlashMessage(props.t('Your name and email has been changed'), 'info'))
+          if (newUsername !== '' || newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your personal data has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
           return true
         default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); return false
       }
+    }
+  }
+
+  handleChangeUsername = async (username) => {
+    const { props } = this
+
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(removeAtInUsername(username)))
+
+    switch (fetchUsernameAvailability.status) {
+      case 200:
+        this.setState({ newUsernameAvailability: fetchUsernameAvailability.json.available })
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning')); break
     }
   }
 
@@ -259,7 +331,9 @@ export class Account extends React.Component {
                         return (
                           <PersonalData
                             userAuthType={props.user.auth_type}
-                            onClickSubmit={this.handleSubmitNameOrEmail}
+                            onClickSubmit={this.handleSubmitPersonalData}
+                            onChangeUsername={this.handleChangeUsername}
+                            newUsernameAvailability={state.newUsernameAvailability}
                           />
                         )
 

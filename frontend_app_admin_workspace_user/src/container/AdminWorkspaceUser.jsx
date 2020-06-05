@@ -10,13 +10,20 @@ import {
   BREADCRUMBS_TYPE,
   ROLE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
-import { debug } from '../helper.js'
+import {
+  ALLOWED_CHARACTERS_USERNAME,
+  debug,
+  MINIMUM_CHARACTERS_PUBLIC_NAME,
+  MINIMUM_CHARACTERS_USERNAME
+} from '../helper.js'
 import {
   deleteWorkspace,
   getUserDetail,
   getUserList,
+  getUsernameAvailability,
   getWorkspaceList,
   getWorkspaceMemberList,
   postAddUser,
@@ -43,6 +50,7 @@ class AdminWorkspaceUser extends React.Component {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
+      newUsernameAvailability: true,
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
       workspaceIdOpened: null,
@@ -279,11 +287,25 @@ class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  handleClickAddUser = async (name, email, profile, password) => {
+  handleClickAddUser = async (name, username, email, profile, password) => {
     const { props, state } = this
 
-    if (name.length < 3) {
-      this.sendGlobalFlashMsg(props.t('Full name must be at least 3 characters'), 'warning')
+    if (name.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
+      this.sendGlobalFlashMsg(
+        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
+      )
+      return
+    }
+
+    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+      this.sendGlobalFlashMsg(
+        props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+      )
+      return
+    }
+
+    if (/\s/.test(username)) {
+      this.sendGlobalFlashMsg(props.t("Username can't contain any whitespace"), 'warning')
       return
     }
 
@@ -305,7 +327,7 @@ class AdminWorkspaceUser extends React.Component {
     }
 
     const newUserResult = await handleFetchResult(
-      await postAddUser(state.config.apiUrl, name, email, profile, state.config.system.config.email_notification_activated, password)
+      await postAddUser(state.config.apiUrl, name, username, email, profile, state.config.system.config.email_notification_activated, password)
     )
 
     switch (newUserResult.apiResponse.status) {
@@ -321,6 +343,11 @@ class AdminWorkspaceUser extends React.Component {
       case 400:
         switch (newUserResult.body.code) {
           case 2001: this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning'); break
+          case 2062:
+            this.sendGlobalFlashMsg(
+              props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+            )
+            break
           case 2036: this.sendGlobalFlashMsg(props.t('Email already exists'), 'warning'); break
           default: this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
         }
@@ -366,6 +393,19 @@ class AdminWorkspaceUser extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {} })
   }
 
+  handleChangeUsername = async (username) => {
+    const { props, state } = this
+
+    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, removeAtInUsername(username)))
+
+    switch (fetchUsernameAvailability.apiResponse.status) {
+      case 200:
+        this.setState({ newUsernameAvailability: fetchUsernameAvailability.body.available })
+        break
+      default: this.sendGlobalFlashMsg(props.t('Error while checking username availability'))
+    }
+  }
+
   render () {
     const { props, state } = this
 
@@ -391,7 +431,9 @@ class AdminWorkspaceUser extends React.Component {
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}
+            onChangeUsername={this.handleChangeUsername}
             breadcrumbsList={state.breadcrumbsList}
+            newUsernameAvailability={state.newUsernameAvailability}
           />
         )}
 

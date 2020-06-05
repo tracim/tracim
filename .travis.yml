@@ -23,6 +23,7 @@ env:
 language: python
 dist: bionic
 python: "3.6"
+os: linux
 
 _install_backend: &_install_backend
   addons:
@@ -40,10 +41,10 @@ _install_backend: &_install_backend
         - libldap2-dev
         - libsasl2-dev
         - docker-ce
+        - docker-compose
         - libimage-exiftool-perl
-        - pushpin
   services:
-    - redis-server
+    - redis
   before_install:
     # INFO - G.M - 2019-05-02 - some useful debug information
     - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
@@ -122,6 +123,7 @@ _backend_quick_test: &_backend_quick_test
       packages:
         - libimage-exiftool-perl
   services:
+    - redis-server
   before_script:
   script:
     - pytest backend --ignore "backend/tracim_backend/tests/functional" --ignore "backend/tracim_backend/tests/commands"
@@ -267,9 +269,10 @@ jobs:
         - TRAVIS_NODE_VERSION="10"
       script:
         - cd $TRAVIS_BUILD_DIR/backend
+        - PUSHPIN_CONFIG_DIR=./pushpin_cypress_config docker-compose up -d pushpin
         - nohup pserve $BACKEND_TEST_CONFIG_FILE > $PSERVE_LOG 2>&1 &
+        - nohup tracimcli caldav start &
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
-        - nohup tracimcli caldav start&
         - yarn run travis-cypress-run
         - cd $TRAVIS_BUILD_DIR
       if: commit_message !~ /(\[skip ci cypress\])/

@@ -7,3 +7,5 @@ dist/tracim_frontend_lib.lib.js
 dist/tracim_frontend_lib.style.js
 dist/tracim_frontend_lib.tracim.lib.js
 dist/tracim_frontend_lib.tracim.style.js
+dist/tracim_frontend_lib.test_utils.js
+dist/tracim_frontend_lib.tracim.test_utils.js
