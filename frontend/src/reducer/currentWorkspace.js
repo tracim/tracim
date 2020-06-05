@@ -160,7 +160,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         contentReadStatusList: state.contentReadStatusList.filter(id => id !== action.unreadId),
         recentActivityList: [
-          state.recentActivityList.find(content => content.id === action.unreadId),
+          ...(state.recentActivityList.find(content => content.id === action.unreadId) || []),
           ...state.recentActivityList.filter(content => content.id !== action.unreadId)
         ]
       }

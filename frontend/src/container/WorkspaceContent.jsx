@@ -164,7 +164,7 @@ class WorkspaceContent extends React.Component {
   handleContentCreated = data => {
     if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
     if (data.content.content_namespace === 'upload') {
-      this.props.dispatch(updateWorkspaceShareFolderContentList([
+      this.props.dispatch(addWorkspaceShareFolderContentList([
         {
           ...data.content,
           ...(data.content.content_type === CONTENT_TYPE.FOLDER && { parent_id: SHARE_FOLDER_ID })
