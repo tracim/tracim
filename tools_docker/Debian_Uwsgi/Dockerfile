@@ -1,5 +1,15 @@
-FROM debian:buster AS builder
-MAINTAINER contact@tracim.fr
+FROM debian:stretch AS base_install
+RUN \
+    apt update \
+    && apt upgrade -qy \
+    && apt install -qy \
+        git \
+        libfile-mimeinfo-perl \
+        libimage-exiftool-perl \
+        locales \
+        python3
+
+FROM base_install AS builder
 
 ARG TAG=""
 ARG BRANCH=""
@@ -10,23 +20,18 @@ RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
 
 # Install required packages
 RUN \
-    apt update && apt upgrade -qy \
+    apt install -qy curl \
+    # Node.JS 10
+    && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
     && apt install -qy \
-    build-essential \
-    curl \
-    git \
-    libfile-mimeinfo-perl \
-    libimage-exiftool-perl \
-    libjpeg-dev \
-    libmagickwand-dev \
-    libpq-dev \
-    locales \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-venv \
-    nodejs \
-    npm
+        build-essential \
+        libjpeg-dev \
+        libmagickwand-dev \
+        libpq-dev \
+        nodejs \
+        python3-dev \
+        python3-pip \
+        python3-venv
 
 # Clone repo
 RUN \
@@ -66,7 +71,9 @@ RUN \
     && rm -rf /tracim/node_modules
 
 
-FROM debian:buster
+FROM base_install
+
+MAINTAINER contact@tracim.fr
 
 ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission,gallery"
 ENV START_WEBDAV=1
@@ -77,41 +84,35 @@ ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
 
 RUN \
-    apt update && apt upgrade -qy \
-    && apt install -qy \
-    apache2 \
-    ghostscript \
-    git \
-    gnupg \
-    imagemagick \
-    inkscape \
-    libapache2-mod-wsgi-py3 \
-    libfile-mimeinfo-perl \
-    libimage-exiftool-perl \
-    libreoffice \
-    locales \
-    poppler-utils \
-    postgresql-client \
-    python3 \
-    qpdf \
-    ufraw-batch \
-    ffmpeg \
-    redis-server \
-    supervisor \
-    uwsgi \
-    uwsgi-plugin-python3 \
-    vim \
-    xvfb \
-    pushpin \
+    apt install -qy \
+        apache2 \
+        ffmpeg \
+        ghostscript \
+        gnupg \
+        imagemagick \
+        inkscape \
+        libapache2-mod-wsgi-py3 \
+        libreoffice \
+        poppler-utils \
+        postgresql-client \
+        pushpin \
+        qpdf \
+        redis-server \
+        supervisor \
+        ufraw-batch \
+        uwsgi \
+        uwsgi-plugin-python3 \
+        vim \
+        xvfb \
 # Remove default conf about apache2
     && rm /etc/apache2/sites-enabled/000-default.conf \
 # Do not show apache version
     && sed -i "s|ServerTokens OS|ServerTokens Prod|g" /etc/apache2/conf-enabled/security.conf \
     && sed -i "s|ServerSignature On|ServerSignature Off|g" /etc/apache2/conf-enabled/security.conf
 
-# Tracim code
+# Tracim code (backend & frontend)
 COPY --from=builder /tracim /tracim
-# Python dependencies installed through pip
+# backend dependencies installed through pip
 COPY --from=builder /usr/local /usr/local
 
 VOLUME ["/etc/tracim", "/var/tracim"]
