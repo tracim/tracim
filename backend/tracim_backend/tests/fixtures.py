@@ -70,7 +70,7 @@ def pushpin(tracim_webserver, tmp_path_factory):
         try:
             requests.get("http://localhost:7999")
             break
-        except ConnectionError:
+        except requests.exceptions.ConnectionError:
             pass
     yield compose
     compose.down()

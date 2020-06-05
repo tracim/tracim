@@ -4,7 +4,7 @@ from datetime import datetime
 import threading
 import typing
 
-from sqlalchemy import event
+from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
 from sqlalchemy import null
 from sqlalchemy.orm import joinedload
@@ -99,12 +99,16 @@ class EventBuilder:
 
     def __init__(self, config: CFG) -> None:
         self._config = config
+        # NOTE S.G. 2020-06-04: need thread local storage as EventBuilder()
+        # is created only once/wsgi application
         self._thread_local = threading.local()
-        self._thread_local.current_user = None
 
     @property
     def _current_user(self) -> typing.Optional[User]:
-        return self._thread_local.current_user
+        try:
+            return self._thread_local.current_user
+        except AttributeError:
+            return None
 
     @hookimpl
     def on_current_user_set(self, user: User) -> None:
@@ -112,7 +116,20 @@ class EventBuilder:
 
     @hookimpl
     def on_request_session_created(self, request: TracimRequest, session: TracimSession) -> None:
-        event.listen(session, "pending_to_persistent", self._publish_event)
+        commit_event = "after_flush"
+        if self._config.JOBS__PROCESSING_MODE == self._config.CST.ASYNC:
+            # We need after commit event when processing in async
+            # Otherwise we can't be sure that events will be visible
+            # to the RQ worker when it queries the database.
+            commit_event = "after_commit"
+
+        sqlalchemy_event.listen(session, commit_event, self._publish_events)
+        sqlalchemy_event.listen(
+            session,
+            "after_soft_rollback",
+            lambda session, previous_transaction: self._clear_pending_events,
+        )
+        self._thread_local.pending_events = []
 
     @hookimpl
     def on_request_finished(self) -> None:
@@ -143,7 +160,7 @@ class EventBuilder:
             _USER_FIELD: self._user_schema.dump(user_api.get_user_with_context(user)).data,
         }
         event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
-        db_session.add(event)
+        self._add_event(event, db_session)
 
     # Workspace events
     @hookimpl
@@ -172,7 +189,7 @@ class EventBuilder:
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
-        db_session.add(event)
+        self._add_event(event, db_session)
 
     # Content events
     @hookimpl
@@ -197,7 +214,7 @@ class EventBuilder:
 
         workspace_api = WorkspaceApi(db_session, self._current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(
-            workspace_api.get_one(content_in_context.workspace_id)
+            workspace_api.get_one(content_in_context.workspace.workspace_id)
         )
         user_api = UserApi(self._current_user, db_session, self._config, show_deleted=True)
         fields = {
@@ -213,7 +230,7 @@ class EventBuilder:
             fields=fields,
             entity_subtype=content.type,
         )
-        db_session.add(event)
+        self._add_event(event, db_session)
 
     # UserRoleInWorkspace events
     @hookimpl
@@ -259,19 +276,37 @@ class EventBuilder:
             _MEMBER_FIELD: self._workspace_user_role_schema.dump(role_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE_MEMBER, operation=operation, fields=fields)
-        db_session.add(event)
+        self._add_event(event, db_session)
 
-    def _publish_event(self, db_session: TracimSession, instance: object) -> None:
-        if not isinstance(instance, Event):
-            return
-        event = typing.cast(Event, instance)
+    def _add_event(self, event: Event, db_session: TracimSession) -> None:
+        db_session.add(event)
+        self._thread_local.pending_events.append(event)
+
+    def _publish_events(self, db_session: TracimSession, flush_context=None) -> None:
         if self._config.JOBS__PROCESSING_MODE == self._config.CST.ASYNC:
             message_builder = AsyncLiveMessageBuilder(
                 config=self._config
             )  # type: BaseLiveMessageBuilder
         else:
             message_builder = SyncLiveMessageBuilder(session=db_session, config=self._config)
-        message_builder.publish_messages_for_event(event.event_id)
+
+        # We only publish events that have an event_id from the DB.
+        # we can have `new` events here as we add events in the session
+        # in a `after_flush` sqlalchemy event and _publish_events is also
+        # called during the same `after_flush` event.
+        publishable_events = []
+        not_publishable_events = []
+        for event in self._thread_local.pending_events:
+            if event.event_id:
+                publishable_events.append(event)
+            else:
+                not_publishable_events.append(event)
+        for event in publishable_events:
+            message_builder.publish_messages_for_event(event.event_id)
+        self._thread_local.pending_events = not_publishable_events
+
+    def _clear_pending_events(self) -> None:
+        self._thread_local.pending_events.clear()
 
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
@@ -363,7 +398,10 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
     def publish_messages_for_event(self, event_id: int) -> None:
         redis_connection = get_redis_connection(self._config)
         queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
-        logger.debug(self, "publish event_id {} to RQ queue {}".format(event_id, RQ_QUEUE_NAME))
+        logger.debug(
+            self,
+            "publish event(id={}) asynchronously to RQ queue {}".format(event_id, RQ_QUEUE_NAME),
+        )
         queue.enqueue(self._publish_messages_for_event, event_id)
 
 
@@ -379,5 +417,5 @@ class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
         yield self._session
 
     def publish_messages_for_event(self, event_id: int) -> None:
-        logger.debug(self, "publish event {} synchronously".format(event))
+        logger.debug(self, "publish event(id={}) synchronously".format(event_id))
         self._publish_messages_for_event(event_id)
