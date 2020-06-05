@@ -12,7 +12,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestCommentsEndpoint(object):
     """
-    Tests for /api/v2/workspaces/{workspace_id}/contents/{content_id}/comments
+    Tests for /api/workspaces/{workspace_id}/contents/{content_id}/comments
     endpoint
     """
 
@@ -21,7 +21,7 @@ class TestCommentsEndpoint(object):
         Get alls comments of a content
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
+        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 3
         comment = res.json_body[0]
         assert comment["content_id"] == 18
@@ -98,7 +98,7 @@ class TestCommentsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": "I strongly disagree, Tiramisu win!"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/{}/contents/{}/comments".format(
+            "/api/workspaces/{}/contents/{}/comments".format(
                 business_workspace.workspace_id, test_thread.content_id
             ),
             params=params,
@@ -121,7 +121,7 @@ class TestCommentsEndpoint(object):
         assert created.event_type == "content.created.comment"
         assert created.content == comment
         workspace = web_testapp.get(
-            "/api/v2/workspaces/{}".format(business_workspace.workspace_id), status=200
+            "/api/workspaces/{}".format(business_workspace.workspace_id), status=200
         ).json_body
         assert created.workspace == workspace
 
@@ -153,7 +153,7 @@ class TestCommentsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": "I strongly disagree, Tiramisu win!"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/{}/contents/{}/comments".format(
+            "/api/workspaces/{}/contents/{}/comments".format(
                 business_workspace.workspace_id, test_thread.content_id
             ),
             params=params,
@@ -170,7 +170,7 @@ class TestCommentsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": ""}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+            "/api/workspaces/2/contents/7/comments", params=params, status=400
         )
         # INFO - G.M - 2018-09-10 - error handle by marshmallow validator.
         assert res.json_body
@@ -182,7 +182,7 @@ class TestCommentsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": "<p></p>"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+            "/api/workspaces/2/contents/7/comments", params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
@@ -192,7 +192,7 @@ class TestCommentsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": "<p><p></p><p><p></p></p></p>"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+            "/api/workspaces/2/contents/7/comments", params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
@@ -204,7 +204,7 @@ class TestCommentsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": "<p><p></p><p><p><br/><br/></p><br/></p></p>"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+            "/api/workspaces/2/contents/7/comments", params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
@@ -217,7 +217,7 @@ class TestCommentsEndpoint(object):
         delete comment (user is workspace_manager and owner)
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
+        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 3
         comment = res.json_body[0]
         assert comment["content_id"] == 18
@@ -235,8 +235,8 @@ class TestCommentsEndpoint(object):
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
 
-        res = web_testapp.delete("/api/v2/workspaces/2/contents/7/comments/18", status=204)
-        res = web_testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
+        res = web_testapp.delete("/api/workspaces/2/contents/7/comments/18", status=204)
+        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 2
         assert not [content for content in res.json_body if content["content_id"] == 18]
 
@@ -247,7 +247,7 @@ class TestCommentsEndpoint(object):
         delete comment (user is workspace_manager)
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
+        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 3
         comment = res.json_body[1]
         assert comment["content_id"] == 19
@@ -262,8 +262,8 @@ class TestCommentsEndpoint(object):
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
 
-        res = web_testapp.delete("/api/v2/workspaces/2/contents/7/comments/19", status=204)
-        res = web_testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
+        res = web_testapp.delete("/api/workspaces/2/contents/7/comments/19", status=204)
+        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 2
         assert not [content for content in res.json_body if content["content_id"] == 19]
 
@@ -274,7 +274,7 @@ class TestCommentsEndpoint(object):
         delete comment (user is content-manager and owner)
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
+        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 3
         comment = res.json_body[1]
         assert comment["content_id"] == 19
@@ -289,8 +289,8 @@ class TestCommentsEndpoint(object):
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
 
-        res = web_testapp.delete("/api/v2/workspaces/2/contents/7/comments/19", status=204)
-        res = web_testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
+        res = web_testapp.delete("/api/workspaces/2/contents/7/comments/19", status=204)
+        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 2
         assert not [content for content in res.json_body if content["content_id"] == 19]
 
@@ -301,7 +301,7 @@ class TestCommentsEndpoint(object):
         delete comment (user is content-manager)
         """
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
+        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 3
         comment = res.json_body[2]
         assert comment["content_id"] == 20
@@ -318,7 +318,7 @@ class TestCommentsEndpoint(object):
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
 
-        res = web_testapp.delete("/api/v2/workspaces/2/contents/7/comments/20", status=403)
+        res = web_testapp.delete("/api/workspaces/2/contents/7/comments/20", status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
@@ -330,7 +330,7 @@ class TestCommentsEndpoint(object):
         delete comment (user is reader and owner)
         """
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
+        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 3
         comment = res.json_body[2]
         assert comment["content_id"] == 20
@@ -347,7 +347,7 @@ class TestCommentsEndpoint(object):
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
 
-        res = web_testapp.delete("/api/v2/workspaces/2/contents/7/comments/20", status=403)
+        res = web_testapp.delete("/api/workspaces/2/contents/7/comments/20", status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
@@ -357,7 +357,7 @@ class TestCommentsEndpoint(object):
         delete comment (user is reader)
         """
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
+        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 3
         comment = res.json_body[2]
         assert comment["content_id"] == 20
@@ -374,7 +374,7 @@ class TestCommentsEndpoint(object):
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
 
-        res = web_testapp.delete("/api/v2/workspaces/2/contents/7/comments/20", status=403)
+        res = web_testapp.delete("/api/workspaces/2/contents/7/comments/20", status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
@@ -383,7 +383,7 @@ class TestCommentsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": "<p></i>"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+            "/api/workspaces/2/contents/7/comments", params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
@@ -396,7 +396,7 @@ class TestCommentsEndpoint(object):
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": "<p>Hello</i>"}
-        web_testapp.post_json("/api/v2/workspaces/2/contents/7/comments", params=params, status=200)
+        web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=200)
 
     def test_api__post_content_comment__err_400__invalid_html(self, web_testapp) -> None:
         """
@@ -404,7 +404,7 @@ class TestCommentsEndpoint(object):
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": "<p></p>Hello"}
-        web_testapp.post_json("/api/v2/workspaces/2/contents/7/comments", params=params, status=200)
+        web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=200)
 
     def test_api__post_content_comment__ok__200__empty_iframes_are_not_deleted(
         self, web_testapp
@@ -417,7 +417,7 @@ class TestCommentsEndpoint(object):
             "raw_content": '<p><p><iframe src="//www.youtube.com/embed/_TrVid1WuE8" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p></p>'
         }
         response = web_testapp.post_json(
-            "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
+            "/api/workspaces/2/contents/7/comments", params=params, status=200
         )
         assert 'src="//www.youtube.com/embed/_TrVid1WuE8"' in response.json_body["raw_content"]
 
@@ -430,7 +430,7 @@ class TestCommentsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": '<p><img src="data:images/jpeg,123456789=="/></p>'}
         response = web_testapp.post_json(
-            "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
+            "/api/workspaces/2/contents/7/comments", params=params, status=200
         )
         assert '<img src="data:images/jpeg,123456789=="/>' in response.json_body["raw_content"]
 
@@ -442,7 +442,7 @@ class TestCommentsEndpoint(object):
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": '<p><span style="display: none;"><p>test</p></span></p>'}
-        web_testapp.post_json("/api/v2/workspaces/2/contents/7/comments", params=params, status=200)
+        web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=200)
 
     def test_api__post_content_comment__ok__200__script_is_sanitized(self, web_testapp) -> None:
         """
@@ -453,7 +453,7 @@ class TestCommentsEndpoint(object):
             "raw_content": "<p>I have a script next to me <script>alert( 'Hello, world!' );</script></p>"
         }
         response = web_testapp.post_json(
-            "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
+            "/api/workspaces/2/contents/7/comments", params=params, status=200
         )
         assert "<p>I have a script next to me </p>" in response.json_body["raw_content"]
 
@@ -466,7 +466,7 @@ class TestCommentsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": "<script>alert( 'Hello, world!' );</script>"}
         response = web_testapp.post_json(
-            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+            "/api/workspaces/2/contents/7/comments", params=params, status=400
         )
         assert response.json_body
         assert "code" in response.json_body

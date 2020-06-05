@@ -4,7 +4,7 @@ from tracim_backend.config import CFG
 from tracim_backend.lib.mail_fetcher.email_fetcher import MailFetcher
 from tracim_backend.lib.utils.daemon import FakeDaemon
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.views import BASE_API_V2
+from tracim_backend.views import BASE_API
 
 
 class MailFetcherDaemon(FakeDaemon):
@@ -42,7 +42,7 @@ class MailFetcherDaemon(FakeDaemon):
             heartbeat=self.config.EMAIL__REPLY__CHECK__HEARTBEAT,
             use_idle=self.config.EMAIL__REPLY__IMAP__USE_IDLE,
             connection_max_lifetime=self.config.EMAIL__REPLY__CONNECTION__MAX_LIFETIME,
-            api_base_url=self.config.WEBSITE__BASE_URL + BASE_API_V2,
+            api_base_url=self.config.WEBSITE__BASE_URL + BASE_API,
             api_key=self.config.API__KEY,
             reply_to_pattern=self.config.EMAIL__NOTIFICATION__REPLY_TO__EMAIL,
             references_pattern=self.config.EMAIL__NOTIFICATION__REFERENCES__EMAIL,

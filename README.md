@@ -180,7 +180,7 @@ If you need to run Cypress with an external server of Tracim, modify "baseurl" i
 
 You must change the apiUrl property in `frontend/configEnv.json` to:
 
-    http://localhost:1337/api/v2
+    http://localhost:1337/api
 
 Then rebuild the frontend:
 

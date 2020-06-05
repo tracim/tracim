@@ -125,7 +125,7 @@ class GuestDownload extends React.Component {
               guestPassword={state.guestPassword}
               onChangePassword={this.handleChangePassword}
               token={props.match.params.token}
-              downloadUrl={`/api/v2/public/guest-download/${props.match.params.token}/${state.file.fileName}`}
+              downloadUrl={`/api/public/guest-download/${props.match.params.token}/${state.file.fileName}`}
               onDownloadSubmitted={this.handleDownloadSubmitted}
             />
           </CardBody>
