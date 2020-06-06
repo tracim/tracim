@@ -80,11 +80,8 @@ class WebdavTracimContext(TracimContext):
         return uapi.get_one_by_login(login)
 
     def _get_current_webdav_username(self) -> str:
-        try:
-            if not self.environ["http_authenticator.username"]:
-                raise UserNotFoundInTracimRequest("No current user has been found in the context")
-        except UserNotFoundInTracimRequest as exc:
-            raise NotAuthenticated("User not found") from exc
+        if not self.environ.get("http_authenticator.username"):
+            raise NotAuthenticated("User not found")
         return self.environ["http_authenticator.username"]
 
     @property

@@ -18,7 +18,6 @@ from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.attributes import QueryableAttribute
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
 import transaction
 
@@ -72,6 +71,7 @@ from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
 
@@ -146,7 +146,7 @@ class ContentApi(object):
 
     def __init__(
         self,
-        session: Session,
+        session: TracimSession,
         current_user: typing.Optional[User],
         config: CFG,
         show_archived: bool = False,
@@ -158,6 +158,7 @@ class ContentApi(object):
         disable_user_workspaces_filter: bool = False,
         namespaces_filter: typing.Optional[typing.List[ContentNamespaces]] = None,
     ) -> None:
+        session.assert_event_mecanism()
         self._session = session
         self._user = current_user
         self._config = config

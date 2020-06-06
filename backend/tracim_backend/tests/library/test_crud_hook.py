@@ -1,13 +1,9 @@
 from unittest.mock import MagicMock
 
-from pluggy import PluginManager
 import pytest
 import transaction
 
-from tracim_backend.lib.core.plugins import PLUGIN_NAMESPACE
 from tracim_backend.lib.core.plugins import hookimpl
-from tracim_backend.lib.crud_hook.caller import DatabaseCrudHookCaller
-from tracim_backend.lib.crud_hook.hookspec import DatabaseCrudHookSpec
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
@@ -94,14 +90,9 @@ class UserRoleInWorkspaceHookImpl:
 
 @pytest.mark.usefixtures("base_fixture")
 class TestDatabaseCrudHookCaller:
-    def test_unit__crud_caller__ok__user(self, session_with_tracim_context):
-        session = session_with_tracim_context
-        plugin_manager = PluginManager(PLUGIN_NAMESPACE)
-        plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
+    def test_unit__crud_caller__ok__user(self, session):
         hook = UserHookImpl()
-        plugin_manager.register(hook)
-        DatabaseCrudHookCaller(session, plugin_manager)
-
+        session.context.plugin_manager.register(hook)
         user = User(email="foo@bar")
         session.add(user)
         session.flush()
@@ -115,13 +106,9 @@ class TestDatabaseCrudHookCaller:
         session.flush()
         hook.mock_hooks.assert_called_with("deleted", user=user, db_session=session)
 
-    def test_unit__crud_caller__ok__workspace(self, session_with_tracim_context):
-        session = session_with_tracim_context
-        plugin_manager = PluginManager(PLUGIN_NAMESPACE)
-        plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
+    def test_unit__crud_caller__ok__workspace(self, session):
         hook = WorkspaceHookImpl()
-        plugin_manager.register(hook)
-        DatabaseCrudHookCaller(session, plugin_manager)
+        session.context.plugin_manager.register(hook)
 
         owner = User(email="john")
         session.add(owner)
@@ -140,13 +127,10 @@ class TestDatabaseCrudHookCaller:
         session.flush()
         hook.mock_hooks.assert_called_with("deleted", workspace=workspace, db_session=session)
 
-    def test_unit__crud_caller__ok__user_role_in_workspace(self, session_with_tracim_context):
-        session = session_with_tracim_context
-        plugin_manager = PluginManager(PLUGIN_NAMESPACE)
-        plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
+    def test_unit__crud_caller__ok__user_role_in_workspace(self, session):
+
         hook = UserRoleInWorkspaceHookImpl()
-        plugin_manager.register(hook)
-        DatabaseCrudHookCaller(session, plugin_manager)
+        session.context.plugin_manager.register(hook)
 
         owner = User(email="john")
         workspace = Workspace(label="Hello", owner=owner)
@@ -167,13 +151,9 @@ class TestDatabaseCrudHookCaller:
         session.flush()
         hook.mock_hooks.assert_called_with("deleted", role=role, db_session=session)
 
-    def test_unit__crud_caller__ok__content(self, session_with_tracim_context):
-        session = session_with_tracim_context
-        plugin_manager = PluginManager(PLUGIN_NAMESPACE)
-        plugin_manager.add_hookspecs(DatabaseCrudHookSpec)
+    def test_unit__crud_caller__ok__content(self, session):
         hook = ContentHookImpl()
-        plugin_manager.register(hook)
-        DatabaseCrudHookCaller(session, plugin_manager)
+        session.context.plugin_manager.register(hook)
 
         owner = User(email="john")
         session.add(owner)

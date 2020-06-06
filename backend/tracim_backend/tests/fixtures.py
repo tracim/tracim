@@ -23,6 +23,8 @@ from tracim_backend import init_models
 from tracim_backend import web
 from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.app_models.contents import ContentTypeList
+from tracim_backend.lib.core.event import EventBuilder
+from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
@@ -33,7 +35,7 @@ from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
 from tracim_backend.models.setup_models import get_session_factory
-from tracim_backend.models.setup_models import get_tm_session
+from tracim_backend.models.setup_models import create_dbsession_for_context
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
@@ -189,11 +191,6 @@ def session_factory(engine):
 
 
 @pytest.fixture
-def empty_session(session_factory):
-    return get_tm_session(session_factory, transaction.manager)
-
-
-@pytest.fixture
 def migration_engine(engine):
     yield engine
     sql = text("DROP TABLE IF EXISTS migrate_version;")
@@ -201,8 +198,18 @@ def migration_engine(engine):
 
 
 @pytest.fixture
-def session(empty_session, engine, app_config, test_logger):
-    dbsession = empty_session
+def session(engine, session_factory, app_config, test_logger):
+    class TracimTestContext(TracimContext):
+        app_config = app_config
+        dbsession = None
+        plugin_manager = create_plugin_manager()
+        current_user = None
+
+    context = TracimTestContext()
+    dbsession = create_dbsession_for_context(session_factory, transaction.manager, context)
+    context.plugin_manager.register(EventBuilder(app_config))
+    dbsession.set_context(context)
+
     from tracim_backend.models.meta import DeclarativeBase
 
     with transaction.manager:
@@ -219,19 +226,6 @@ def session(empty_session, engine, app_config, test_logger):
     dbsession.close_all()
     transaction.abort()
     DeclarativeBase.metadata.drop_all(engine)
-
-
-@pytest.fixture
-def session_with_tracim_context(session, app_config):
-    class TestTracimContext(TracimContext):
-        app_config = app_config
-        dbsession = session
-        plugin_manager = None
-        current_user = None
-
-    context = TestTracimContext()
-    session.set_context(context)
-    yield session
 
 
 @pytest.fixture

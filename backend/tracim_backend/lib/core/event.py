@@ -97,6 +97,9 @@ class EventBuilder:
     _event_schema = EventSchema()
     _workspace_user_role_schema = WorkspaceMemberDigestSchema()
 
+    # pluggy uses this attribute to name the plugin
+    __name__ = "EventBuilder"
+
     def __init__(self, config: CFG) -> None:
         self._config = config
 
