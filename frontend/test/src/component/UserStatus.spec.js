@@ -13,7 +13,7 @@ describe('<UserStatus />', () => {
   const props = {
     user: {
       publicName: 'randomPublicName',
-      user_id: 1
+      userId: 1
     },
     displayNotifBtn: true,
     curWs: {
