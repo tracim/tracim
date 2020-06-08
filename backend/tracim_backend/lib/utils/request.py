@@ -48,7 +48,7 @@ class TracimContext(ABC):
         self._candidate_workspace = None  # type: Workspace
         # Candidate content_type found in request body
         self._candidate_content_type = None
-        # Client Id, useful to permit link between request and TLM response
+        # Client token, useful to permit link between request and TLM response
         self._client_token = None  # type: typing.Optional[str]
 
     # INFO - G.M - 2018-12-03 - Useful property of Tracim Context
