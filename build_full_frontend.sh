@@ -40,7 +40,7 @@ build_tracim_lib() {
 
 build_frontend() {
     log "Building the frontend"
-    yarn workspace tracim run buildUsingExternalVendors || logerror "Could not build the frontend"
+    yarn workspace tracim run buildwithextvendors || logerror "Could not build the frontend"
 }
 
 parallel_build_lib() {
@@ -68,7 +68,7 @@ build_vendors() {
 build_lib_using_externals() {
     # Tracim Lib for the browsers
     log "Building tracim_frontend_lib for Tracim"
-    yarn workspace tracim_frontend_lib run buildUsingExternalVendors && loggood "Built tracim_frontend_lib for Tracim successfully" || logerror "Failed to build tracim_frontend_lib for Tracim"
+    yarn workspace tracim_frontend_lib run buildwithextvendors && loggood "Built tracim_frontend_lib for Tracim successfully" || logerror "Failed to build tracim_frontend_lib for Tracim"
 }
 
 build_app() {
