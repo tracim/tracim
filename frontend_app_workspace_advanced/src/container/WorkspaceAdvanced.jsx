@@ -369,7 +369,7 @@ class WorkspaceAdvanced extends React.Component {
       newMember: {
         ...prev.newMember,
         id: knownMember.user_id,
-        personalData: knownMember.public_name,
+        personalData: knownMember.username,
         avatarUrl: knownMember.avatar_url,
         isEmail: false
       },
@@ -418,31 +418,21 @@ class WorkspaceAdvanced extends React.Component {
 
     const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.user_id === state.newMember.id)
 
-    if (
-      state.config.system && state.config.system.config &&
-      !state.config.system.config.email_notification_activated &&
-      !newMemberInKnownMemberList
-    ) {
-      this.sendGlobalFlashMessage(props.t('Unknown user'), 'warning')
-      return false
-    }
-
     if (state.newMember.id === '' && newMemberInKnownMemberList) { // this is to force sending the id of the user to the api if he exists
       this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
     const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      publicName: state.newMember.isEmail ? '' : state.newMember.personalData,
       email: state.newMember.isEmail ? state.newMember.personalData : '',
-      username: newMemberInKnownMemberList.user_username,
+      username: state.newMember.isEmail ? '' : state.newMember.personalData,
       role: state.newMember.role
     }))
 
     this.setState({
       newMember: {
         id: '',
-        nameOrEmail: '',
+        personalData: '',
         role: '',
         avatarUrl: '',
         isEmail: false
