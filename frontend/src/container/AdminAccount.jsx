@@ -15,6 +15,8 @@ import {
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
+  hasNotAllowedCharacters,
+  hasSpaces,
   removeAtInUsername
 } from 'tracim_frontend_lib'
 import {
@@ -312,23 +314,23 @@ class Account extends React.Component {
       return
     }
 
-    if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
-      this.setState(prev => ({
-        userToEdit: {
-          ...prev.userToEdit,
-          isUsernameValid: false,
-          usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
-        }
-      }))
-      return
-    }
-
-    if (/\s/.test(username)) {
+    if (hasSpaces(username)) {
       this.setState(prev => ({
         userToEdit: {
           ...prev.userToEdit,
           isUsernameValid: false,
           usernameInvalidMsg: props.t("Username can't contain any whitespace")
+        }
+      }))
+      return
+    }
+
+    if (hasNotAllowedCharacters(username)) {
+      this.setState(prev => ({
+        userToEdit: {
+          ...prev.userToEdit,
+          isUsernameValid: false,
+          usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
         }
       }))
       return

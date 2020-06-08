@@ -44,7 +44,7 @@ export class AddUserForm extends React.Component {
   handleClickAddUser = () => {
     const { props, state } = this
 
-    if (state.newUserName === '' || state.newUserEmail === '' || state.newUserProfile === '') {
+    if (state.newUserName === '' || (state.newUserUsername === '' && state.newUserEmail === '') || state.newUserProfile === '') {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
@@ -67,21 +67,10 @@ export class AddUserForm extends React.Component {
 
   isValidateButtonDisabled = () => {
     const { props, state } = this
-
-    return props.emailNotifActivated
-      ? (
-        state.newUserName === '' ||
-        !props.isUsernameValid ||
-        state.newUserEmail === '' ||
-        state.newUserProfile === ''
-      )
-      : (
-        state.newUserName === '' ||
-        !props.isUsernameValid ||
-        state.newUserEmail === '' ||
-        state.newUserProfile === '' ||
-        state.newUserPassword === ''
-      )
+    if (state.newUserName === '' || state.newUserProfile === '') return true
+    if (!props.emailNotifActivated && state.newUserPassword === '') return true
+    if (props.isEmailRequired && state.newUserEmail === '') return true
+    else return ((state.newUserUsername === '' || !props.isUsernameValid) && state.newUserEmail === '')
   }
 
   render () {

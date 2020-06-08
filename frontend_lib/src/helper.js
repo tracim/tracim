@@ -344,3 +344,8 @@ export const removeAtInUsername = (username) => {
   }
   return trimmedUsername
 }
+
+// INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
+export const hasNotAllowedCharacters = name => !(/^[A-Za-z0-9_-]*$/.test(name))
+
+export const hasSpaces = name => /\s/.test(name)

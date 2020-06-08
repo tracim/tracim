@@ -14,6 +14,8 @@ import {
   buildHeadTitle,
   CUSTOM_EVENT,
   CardPopup,
+  hasNotAllowedCharacters,
+  hasSpaces,
   removeAtInUsername
 } from 'tracim_frontend_lib'
 import {
@@ -152,18 +154,18 @@ export class Home extends React.Component {
       return
     }
 
-    if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+    if (hasSpaces(username)) {
       this.setState({
         isUsernameValid: false,
-        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+        usernameInvalidMsg: props.t("Username can't contain any whitespace")
       })
       return
     }
 
-    if (/\s/.test(username)) {
+    if (hasNotAllowedCharacters(username)) {
       this.setState({
         isUsernameValid: false,
-        usernameInvalidMsg: props.t("Username can't contain any whitespace")
+        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
       })
       return
     }

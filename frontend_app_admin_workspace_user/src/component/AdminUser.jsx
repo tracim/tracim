@@ -148,6 +148,7 @@ export class AdminUser extends React.Component {
               emailNotifActivated={props.emailNotifActivated}
               isUsernameValid={props.isUsernameValid}
               usernameInvalidMsg={props.usernameInvalidMsg}
+              isEmailRequired={props.isEmailRequired}
             />
           )}
 

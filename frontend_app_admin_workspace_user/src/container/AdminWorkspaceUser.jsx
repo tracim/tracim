@@ -11,6 +11,8 @@ import {
   ROLE,
   CUSTOM_EVENT,
   buildHeadTitle,
+  hasNotAllowedCharacters,
+  hasSpaces,
   removeAtInUsername
 } from 'tracim_frontend_lib'
 import {
@@ -395,18 +397,18 @@ class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+    if (hasSpaces(username)) {
       this.setState({
         isUsernameValid: false,
-        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+        usernameInvalidMsg: props.t("Username can't contain any whitespace")
       })
       return
     }
 
-    if (/\s/.test(username)) {
+    if (hasNotAllowedCharacters(username)) {
       this.setState({
         isUsernameValid: false,
-        usernameInvalidMsg: props.t("Username can't contain any whitespace")
+        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
       })
       return
     }
@@ -455,6 +457,7 @@ class AdminWorkspaceUser extends React.Component {
             breadcrumbsList={state.breadcrumbsList}
             isUsernameValid={state.isUsernameValid}
             usernameInvalidMsg={state.usernameInvalidMsg}
+            isEmailRequired={state.config.system.config.email_required}
           />
         )}
 
