@@ -1,16 +1,16 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import { Thread } from '../src/container/Thread.jsx'
+import { Thread } from '../../src/container/Thread.jsx'
 import { expect } from 'chai'
 import {
   mockGetThreadContent200,
   mockGetThreadComment200,
   mockGetThreadRevision200,
   mockPutMyselfThreadRead200
-} from './apiMock.js'
-import { contentThread } from './fixture/contentThread.js'
+} from '../apiMock.js'
+import { contentThread } from '../fixture/contentThread.js'
 import { commentTlm, author } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
-import { debug } from '../src/debug.js'
+import { debug } from '../../src/debug.js'
 
 describe('<Thread />', () => {
   const props = {
