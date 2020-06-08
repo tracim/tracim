@@ -27,7 +27,7 @@ if [ "$1" = "-d" ]; then
 fi
 
 log "building frontend_app_workspace"
-yarn run buildUsingExternalVendors$dev && loggood "success" || logerror "some error"
+yarn run buildwithextvendors$dev && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/workspace.app.js ../frontend/dist/app && loggood "success" || logerror "some error"
 log "copying en translation.json"

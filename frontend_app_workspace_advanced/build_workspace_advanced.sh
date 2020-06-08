@@ -29,7 +29,7 @@ fi
 log "creating debug file"
 cp src/debug.js.sample src/debug.js
 log "building frontend_app_workspace_advanced"
-yarn run buildUsingExternalVendors$dev && loggood "success" || logerror "some error"
+yarn run buildwithextvendors$dev && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/workspace_advanced.app.js ../frontend/dist/app && loggood "success" || logerror "some error"
 log "copying en translation.json"

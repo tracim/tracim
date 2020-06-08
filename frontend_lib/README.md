@@ -40,7 +40,7 @@ This can be done by using the `externals.json` file built when bundling `tracim_
 
 Run:
 
-    yarn run buildUsingExternalVendors
+    yarn run buildwithextvendors
 
 This will produce two scripst:
 - `dist/tracim_frontend_lib.tracim.lib.js`: the library part, declaring the `tracim_fontend_lib` global variable

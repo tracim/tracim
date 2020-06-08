@@ -29,7 +29,7 @@ fi
 log "creating debug file"
 cp src/debug.js.sample src/debug.js
 log "building frontend_app_share_folder"
-yarn run buildUsingExternalVendors$dev && loggood "success" || logerror "some error"
+yarn run buildwithextvendors$dev && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/share_folder.app.js ../frontend/dist/app && loggood "success" || logerror "some error"
 log "copying en translation.json"

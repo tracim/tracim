@@ -6,9 +6,9 @@
   "scripts": {
     "servdev": "NODE_ENV=development webpack-dev-server --config webpack.tracim.config.js --watch --colors --inline --hot --progress",
     "build": "NODE_ENV=production webpack-cli -p",
-    "buildUsingExternalVendors": "NODE_ENV=production webpack-cli -p --config webpack.tracim.config.js",
+    "buildwithextvendors": "NODE_ENV=production webpack-cli -p --config webpack.tracim.config.js",
     "build-dev": "NODE_ENV=production webpack-cli",
-    "buildUsingExternalVendors-dev": "NODE_ENV=production webpack-cli --config webpack.tracim.config.js",
+    "buildwithextvendors-dev": "NODE_ENV=production webpack-cli --config webpack.tracim.config.js",
     "build-translation": "node i18next.scanner.js",
     "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js"
   },
