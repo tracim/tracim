@@ -12,9 +12,9 @@ export const debug = {
   },
   content: {
     ...defaultDebug.content,
-    content_id: 0,
+    content_id: 1,
     content_type: 'thread',
-    workspace_id: 0
+    workspace_id: 1
   },
   loggedUser: {
     ...defaultDebug.loggedUser
