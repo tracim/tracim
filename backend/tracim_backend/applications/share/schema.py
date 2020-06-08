@@ -185,7 +185,7 @@ class ContentShareSchema(marshmallow.Schema):
     )
     direct_url = marshmallow.fields.URL(
         allow_none=True,
-        example="http://localhost:6543/api/v2/public/guest-download/444b026a068d42d6ab5e12fde08efb7b/myfile.txt",
+        example="http://localhost:6543/api/public/guest-download/444b026a068d42d6ab5e12fde08efb7b/myfile.txt",
     )
     author_id = marshmallow.fields.Integer(
         example=3, validate=strictly_positive_int_validator, required=True

@@ -18,7 +18,7 @@ const debug = { // outdated
     hexcolor: '#3f52e3',
     creationLabel: 'Write a document',
     domContainer: 'appFeatureContainer',
-    apiUrl: 'http://localhost:6543/api/v2',
+    apiUrl: 'http://localhost:6543/api',
     apiHeader: {
       Accept: 'application/json',
       'Content-Type': 'application/json'

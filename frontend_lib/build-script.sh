@@ -17,7 +17,7 @@ while [ "$1" != "" ]; do
             build "$PRODFLAG" "$CONFIG" && print_time
         ;;
 
-        buildUsingExternalVendors-dev)
+        buildwithextvendors-dev)
             build "" webpack.tracim.config.js && print_time
         ;;
 

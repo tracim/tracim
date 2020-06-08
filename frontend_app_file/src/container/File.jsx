@@ -3,6 +3,10 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
+  TracimComponent,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_SUB_TYPE as TLM_ST,
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
@@ -31,7 +35,8 @@ import {
   ROLE,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
-  FILE_PREVIEW_STATE
+  FILE_PREVIEW_STATE,
+  sortTimelineByDate
 } from 'tracim_frontend_lib'
 import { PAGE } from '../helper.js'
 import { debug } from '../debug.js'
@@ -47,7 +52,7 @@ import {
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 
-class File extends React.Component {
+export class File extends React.Component {
   constructor (props) {
     super(props)
 
@@ -88,41 +93,122 @@ class File extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
+      { name: CUSTOM_EVENT.HIDE_APP(this.state.config.slug), handler: this.handleHideApp },
+      { name: CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), handler: this.handleReloadContent },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
+  // Custom Event Handlers
+  handleShowApp = data => {
     const { props, state } = this
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-        console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
-        if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
-        break
+    console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
 
-      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
-        console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
-        break
+    props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+    if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
+  }
 
-      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
-        console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
-        break
+  handleHideApp = data => {
+    const { props, state } = this
+    console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP(state.config.slug), data)
 
-      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
-        console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
-        break
+    props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
+  }
 
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerAllAppChangeLanguage(
-          data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
+  handleReloadContent = data => {
+    const { props, state } = this
+    console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), data)
+
+    props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+  }
+
+  handleAllAppChangeLanguage = data => {
+    const { state, props } = this
+    console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+
+    props.appContentCustomEventHandlerAllAppChangeLanguage(
+      data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
+    )
+    this.loadTimeline()
+  }
+
+  handleContentModified = (data) => {
+    const { state, props } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    this.sendGlobalFlashMessage(props.t('File has been updated'), 'info')
+
+    const filenameNoExtension = removeExtensionOfFilename(data.content.filename)
+    this.setHeadTitle(filenameNoExtension)
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...data.content,
+        previewUrl: buildFilePreviewUrl(prev.config.apiUrl, prev.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, 1, 500, 500),
+        lightboxUrlList: (new Array(data.content.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
+          buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, pageNb, 1920, 1080)
         )
-        this.loadTimeline()
-        break
+      }
+    }))
+  }
+
+  handleContentCommentCreated = (data) => {
+    if (data.content.parent_id === this.state.content.content_id) {
+      const sortedNewTimeLine = sortTimelineByDate([
+        ...this.state.timeline,
+        {
+          ...data.content,
+          created_raw: data.content.created,
+          timelineType: data.content.content_type
+        }
+      ])
+      this.setState({ timeline: sortedNewTimeLine })
     }
+  }
+
+  handleContentDeleted = data => {
+    const { state, props } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    this.sendGlobalFlashMessage(props.t('File has been deleted'), 'info')
+
+    this.setState(prev =>
+      ({
+        content: {
+          ...prev.content,
+          ...data.content,
+          is_deleted: true
+        },
+        mode: APP_FEATURE_MODE.VIEW
+      })
+    )
+  }
+
+  handleContentRestored = data => {
+    const { state, props } = this
+    if (data.content.content_id !== state.content.content_id) return
+
+    this.sendGlobalFlashMessage(props.t('File has been restored'), 'info')
+
+    this.setState(prev =>
+      ({
+        content:
+          {
+            ...prev.content,
+            ...data.content,
+            is_deleted: false
+          }
+      })
+    )
   }
 
   async componentDidMount () {
@@ -164,14 +250,13 @@ class File extends React.Component {
   componentWillUnmount () {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
     globalThis.tinymce.remove('#wysiwygTimelineComment')
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+  sendGlobalFlashMessage = (msg, type) => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
-      type: 'warning',
+      type: type || 'warning',
       delay: undefined
     }
   })
@@ -300,7 +385,6 @@ class File extends React.Component {
       await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
-      case 200: this.setState(prev => ({ content: { ...prev.content, raw_content: newDescription } })); break
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
@@ -455,8 +539,6 @@ class File extends React.Component {
               fileCurrentPage: 1,
               mode: APP_FEATURE_MODE.VIEW
             })
-            this.loadContent(1)
-            this.loadTimeline()
             break
           case 400: {
             const jsonResult400 = JSON.parse(xhr.responseText)
@@ -858,4 +940,4 @@ class File extends React.Component {
   }
 }
 
-export default translate()(appContentFactory(File))
+export default translate()(appContentFactory(TracimComponent(File)))

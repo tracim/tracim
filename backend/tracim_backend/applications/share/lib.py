@@ -25,7 +25,7 @@ from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
-from tracim_backend.views import BASE_PUBLIC_API_V2
+from tracim_backend.views import BASE_PUBLIC_API
 
 FRONTEND_SHARED_CONTENT_LINK_PATTERN = "{frontend_ui_base_url}guest-download/{share_token}"
 PUBLIC_API_SHARED_CONTENT_LINK_PATTERN = (
@@ -193,7 +193,7 @@ class ShareLib(object):
 
         return PUBLIC_API_SHARED_CONTENT_LINK_PATTERN.format(
             api_base_url=self._config.WEBSITE__BASE_URL,
-            base_public_api=BASE_PUBLIC_API_V2,
+            base_public_api=BASE_PUBLIC_API,
             share_token=content_share.share_token,
             filename=quote(core_convert_file_name_to_display(content.file_name)),
         )

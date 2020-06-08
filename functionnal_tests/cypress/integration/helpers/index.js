@@ -109,7 +109,7 @@ export function loginAsAdmin (cy) {
     'email': 'admin@admin.admin',
     'password': 'admin@admin.admin'
   }
-  cy.request('POST', '/api/v2/sessions/login', body)
+  cy.request('POST', '/api/sessions/login', body)
 }
 
 export function assertPopupCreateContent (cy) {

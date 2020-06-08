@@ -5,12 +5,12 @@
   "scripts": {
     "mockapi": "node jsonserver/server.js",
     "servdev": "NODE_ENV=development webpack-dev-server --config webpack.tracim.config.js --watch --colors --inline --hot --progress",
-    "buildtracimlib": "build && buildUsingExternalVendors",
+    "buildtracimlib": "build && buildwithextvendors",
     "build-translation": "node i18next.scanner.js",
     "build": "./build-script.sh",
     "build-dev": "./build-script.sh dev",
-    "buildUsingExternalVendors": "./build-script.sh tracim",
-    "buildUsingExternalVendors-dev": "./build-script.sh tracim dev",
+    "buildwithextvendors": "./build-script.sh tracim",
+    "buildwithextvendors-dev": "./build-script.sh tracim dev",
     "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
