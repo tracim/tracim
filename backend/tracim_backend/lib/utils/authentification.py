@@ -24,7 +24,7 @@ BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
 TRACIM_API_USER_LOGIN_HEADER = "Tracim-Api-Login"
 AUTH_TOKEN_QUERY_PARAMETER = "access_token"
-CLIENT_TOKEN_HEADER = "X-Tracim-ClientId"
+CLIENT_TOKEN_HEADER = "X-Tracim-ClientToken"
 
 
 class TracimAuthenticationPolicy(ABC):

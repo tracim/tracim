@@ -310,7 +310,7 @@ class TestFolder(object):
             "raw_content": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
-        headers = {"X-Tracim-ClientId": "justaclienttoken"}
+        headers = {"X-Tracim-ClientToken": "justaclienttoken"}
         res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
