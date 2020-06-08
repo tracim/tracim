@@ -12,7 +12,7 @@ describe('<UserStatus />', () => {
 
   const props = {
     user: {
-      public_name: 'randomPublicName',
+      publicName: 'randomPublicName',
       user_id: 1
     },
     displayNotifBtn: true,
@@ -30,8 +30,8 @@ describe('<UserStatus />', () => {
   const wrapper = shallow(<UserStatusWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
-    it(`should display the user public name: ${props.user.public_name}`, () =>
-      expect(wrapper.find('div.userstatus__username')).to.text().equal(props.user.public_name)
+    it(`should display the user public name: ${props.user.publicName}`, () =>
+      expect(wrapper.find('div.userstatus__username')).to.text().equal(props.user.publicName)
     )
 
     it(`should display his role icon: ${testRole.faIcon}`, () =>

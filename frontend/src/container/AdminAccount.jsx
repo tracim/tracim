@@ -41,6 +41,7 @@ import {
   MINIMUM_CHARACTERS_USERNAME
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
+import serializeUser from '../reducer/user.js'
 
 class Account extends React.Component {
   constructor (props) {
@@ -71,8 +72,8 @@ class Account extends React.Component {
     this.state = {
       userToEditId: props.match.params.userid,
       userToEdit: {
-        public_name: '',
-        auth_type: 'internal',
+        publicName: '',
+        authType: 'internal',
         agendaUrl: '',
         username: '',
         newUsernameAvailability: true
@@ -139,7 +140,7 @@ class Account extends React.Component {
     switch (fetchGetUser.status) {
       case 200:
         this.setState(prev => ({
-          userToEdit: fetchGetUser.json,
+          userToEdit: serializeUser(fetchGetUser.json),
           subComponentMenu: prev.subComponentMenu
             .filter(menu => editableUserAuthTypeList.includes(fetchGetUser.json.auth_type) ? true : menu.name !== 'password')
         }))
@@ -175,8 +176,8 @@ class Account extends React.Component {
       type: BREADCRUMBS_TYPE.CORE
     }, {
       link: (
-        <Link to={PAGE.ADMIN.USER_EDIT(state.userToEdit.user_id)}>
-          {state.userToEdit.public_name}
+        <Link to={PAGE.ADMIN.USER_EDIT(state.userToEdit.userId)}>
+          {state.userToEdit.publicName}
         </Link>
       ),
       type: BREADCRUMBS_TYPE.CORE
@@ -204,13 +205,7 @@ class Account extends React.Component {
       userToEditWorkspaceList: wsList.map(ws => ({
         ...ws,
         id: ws.workspace_id, // duplicate id to be able use <Notification /> easily
-        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.workspaceId).memberList.map(m => ({
-          id: m.user_id,
-          publicName: m.user.public_name,
-          role: m.role,
-          isActive: m.is_active,
-          doNotify: m.do_notify
-        }))
+        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.workspaceId)
       }))
     })
   }
@@ -235,7 +230,7 @@ class Account extends React.Component {
       const fetchPutUserPublicName = await props.dispatch(putUserPublicName(state.userToEdit, newPublicName))
       switch (fetchPutUserPublicName.status) {
         case 200:
-          this.setState(prev => ({ userToEdit: { ...prev.userToEdit, public_name: newPublicName } }))
+          this.setState(prev => ({ userToEdit: { ...prev.userToEdit, publicName: newPublicName } }))
           if (newEmail === '') {
             props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
             return true
@@ -329,7 +324,7 @@ class Account extends React.Component {
       case 204:
         this.setState(prev => ({
           userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === workspaceId
-            ? { ...ws, memberList: ws.memberList.map(u => u.id === state.userToEdit.user_id ? { ...u, doNotify: doNotify } : u) }
+            ? { ...ws, memberList: ws.memberList.map(u => u.id === state.userToEdit.userId ? { ...u, doNotify: doNotify } : u) }
             : ws
           )
         }))
@@ -359,7 +354,7 @@ class Account extends React.Component {
     return (
       <div
         dangerouslySetInnerHTML={{
-          __html: props.t('{{userName}} account edition', { userName: state.userToEdit.public_name, interpolation: { escapeValue: false } })
+          __html: props.t('{{userName}} account edition', { userName: state.userToEdit.publicName, interpolation: { escapeValue: false } })
         }}
       />
     )
@@ -367,10 +362,10 @@ class Account extends React.Component {
 
   setHeadTitle = () => {
     const { props, state } = this
-    if (props.system.config.instance_name && state.userToEdit.public_name) {
+    if (props.system.config.instance_name && state.userToEdit.publicName) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([this.props.t('User administration'), state.userToEdit.public_name, props.system.config.instance_name]) }
+        data: { title: buildHeadTitle([this.props.t('User administration'), state.userToEdit.publicName, props.system.config.instance_name]) }
       })
     }
   }
@@ -406,7 +401,7 @@ class Account extends React.Component {
                       case 'personalData':
                         return (
                           <PersonalData
-                            userAuthType={state.userToEdit.auth_type}
+                            userAuthType={state.userToEdit.authType}
                             onClickSubmit={this.handleSubmitPersonalData}
                             onChangeUsername={this.handleChangeUsername}
                             newUsernameAvailability={state.userToEdit.newUsernameAvailability}
