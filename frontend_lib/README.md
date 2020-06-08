@@ -23,6 +23,10 @@ This will produce two UMD modules:
 
 The Webpack configuration used to build the standalone bundle is `webpack.config.js`.
 
+## When to use this bundle
+
+This bundle should be used when building a Tracim app outside of Tracim.
+
 # Building without shared vendors, using externals
 
 This build can be included using a `<script>` tag.
@@ -47,6 +51,10 @@ This will produce two scripst:
 - `dist/tracim_frontend_lib.tracim.style.js`: the styling part
 
 The Webpack configuration used to build tracim_frontend_lib this way `webpack.tracim.config.js`.
+
+## When to use this bundle
+
+This bundle should be used when building a Tracim app for Tracim.
 
 # Frontend unit tests
 
