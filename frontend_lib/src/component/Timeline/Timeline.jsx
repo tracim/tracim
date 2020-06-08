@@ -99,7 +99,7 @@ class Timeline extends React.Component {
                     createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
                     createdDistance={content.created}
                     text={content.raw_content}
-                    fromMe={props.loggedUser.user_id === content.author.user_id}
+                    fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}
                   />
                 )
@@ -215,7 +215,7 @@ Timeline.defaultProps = {
   customClass: '',
   customColor: '',
   loggedUser: {
-    id: '',
+    userId: '',
     name: '',
     userRoleIdInWorkspace: ROLE.reader.id
   },

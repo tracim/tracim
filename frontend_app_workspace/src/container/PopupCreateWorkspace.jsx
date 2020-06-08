@@ -29,7 +29,7 @@ const debug = {
     }
   },
   loggedUser: {
-    id: 5,
+    userId: 5,
     username: 'Smoi',
     firstname: 'Côme',
     lastname: 'Stoilenom',

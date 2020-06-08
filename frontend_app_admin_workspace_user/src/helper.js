@@ -27,12 +27,12 @@ export const debug = {
     profileObject: PROFILE
   },
   loggedUser: {
-    user_id: 1,
-    public_name: 'Global Manager',
+    userId: 1,
+    publicName: 'Global Manager',
     username: 'global_manager',
     email: 'osef@algoo.fr',
     lang: 'en',
-    avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
+    avatarUrl: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
   },
   content: {
     workspaceList: [],

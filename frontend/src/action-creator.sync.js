@@ -38,11 +38,9 @@ export const USER_KNOWN_MEMBER_LIST = `${USER_KNOWN_MEMBER}/List`
 
 export const updateUser = newUser => ({ type: `${UPDATE}/${USER}`, newUser })
 export const USER_PUBLIC_NAME = `${USER}/PublicName`
-// export const updateUserPublicName = newName => ({ type: `${UPDATE}/${USER_PUBLIC_NAME}`, newName })
 export const USER_USERNAME = `${USER}/Username`
 export const updateUserUsername = newUsername => ({ type: `${UPDATE}/${USER_USERNAME}`, newUsername })
 export const USER_EMAIL = `${USER}/Email`
-// export const updateUserEmail = newEmail => ({ type: `${UPDATE}/${USER_EMAIL}`, newEmail })
 export const USER_PASSWORD = `${USER}/Password`
 export const USER_AGENDA_URL = `${USER}/Agenda`
 export const updateUserAgendaUrl = newAgendaUrl => ({ type: `${SET}/${USER_AGENDA_URL}`, newAgendaUrl })

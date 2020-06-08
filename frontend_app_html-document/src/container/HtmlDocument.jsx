@@ -99,7 +99,7 @@ class HtmlDocument extends React.Component {
       generateLocalStorageContentId(data.content.workspace_id, data.content.content_id, state.appName, 'comment')
     )
 
-    if (state.mode === APP_FEATURE_MODE.EDIT && state.loggedUser.user_id !== data.author.user_id) {
+    if (state.mode === APP_FEATURE_MODE.EDIT && state.loggedUser.userId !== data.author.user_id) {
       this.setState({
         editionAuthor: data.author.public_name,
         keepEditingWarning: true

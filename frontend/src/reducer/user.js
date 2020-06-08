@@ -16,7 +16,7 @@ export const serializeUser = u => ({
   logged: u.logged,
   authType: u.auth_type,
   timezone: u.timezone,
-  profile: u.profiler,
+  profile: u.profile,
   email: u.email,
   isActive: u.is_active,
   avatarUrl: u.avatar_url,
@@ -49,7 +49,7 @@ export default function user (state = defaultUser, action) {
       return {
         ...state,
         ...serializeUser(action.user),
-        lang: serializeUser(action.user).lang ? serializeUser(action.user).lang : state.lang
+        lang: serializeUser(action.user).lang || state.lang
       }
 
     case `${SET}/${USER_DISCONNECTED}`:
@@ -62,8 +62,8 @@ export default function user (state = defaultUser, action) {
       return {
         ...state,
         ...serializeUser(action.newUser),
-        agendaUrl: serializeUser(action.newUser).agendaUrl ? serializeUser(action.newUser).agendaUrl : state.agendaUrl,
-        logged: serializeUser(action.newUser).logged ? serializeUser(action.newUser).logged : state.logged
+        agendaUrl: serializeUser(action.newUser).agendaUrl || state.agendaUrl,
+        logged: serializeUser(action.newUser).logged || state.logged
       }
 
     case `${UPDATE}/${USER_USERNAME}`:
