@@ -14,7 +14,6 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import NotAuthenticated
-from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.content import ContentRevisionRO

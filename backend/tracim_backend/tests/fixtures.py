@@ -23,19 +23,19 @@ from tracim_backend import init_models
 from tracim_backend import web
 from tracim_backend.app_models.applications import TracimApplicationInContext
 from tracim_backend.app_models.contents import ContentTypeList
-from tracim_backend.lib.core.event import EventBuilder
-from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
+from tracim_backend.lib.core.event import EventBuilder
+from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
-from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import create_dbsession_for_context
+from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
