@@ -41,8 +41,8 @@ _install_backend: &_install_backend
         - libldap2-dev
         - libsasl2-dev
         - docker-ce
+        - docker-compose
         - libimage-exiftool-perl
-        - pushpin
   services:
     - redis
   before_install:
@@ -268,13 +268,11 @@ jobs:
         - BACKEND_TEST_CONFIG_FILE=cypress_test.ini
         - TRAVIS_NODE_VERSION="10"
       script:
-        - sudo systemctl stop pushpin && sudo systemctl disable pushpin
-        - sudo systemctl stop zurl && sudo systemctl disable zurl
-        - docker run -d --net host -v ${TRAVIS_BUILD_DIR}/pushpin_cypress_config:/etc/pushpin --name pushpin-cypress fanout/pushpin
         - cd $TRAVIS_BUILD_DIR/backend
+        - PUSHPIN_CONFIG_DIR=./pushpin_cypress_config docker-compose up -d pushpin
         - nohup pserve $BACKEND_TEST_CONFIG_FILE > $PSERVE_LOG 2>&1 &
+        - nohup tracimcli caldav start &
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
-        - nohup tracimcli caldav start&
         - yarn run travis-cypress-run
         - cd $TRAVIS_BUILD_DIR
       if: commit_message !~ /(\[skip ci cypress\])/

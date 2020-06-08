@@ -14,7 +14,7 @@ export const debug = {
     hexcolor: '#7d4e24',
     type: 'user', // 'user' or 'workspace'
     translation: { en: {}, fr: {} },
-    apiUrl: 'http://localhost:6543/api/v2',
+    apiUrl: 'http://localhost:6543/api',
     apiHeader: {
       Accept: 'application/json',
       'Content-Type': 'application/json'

@@ -313,6 +313,8 @@ class CFG(object):
         self._load_live_messages_config()
         self.log_config_header("Limitation config parameters:")
         self._load_limitation_config()
+        self.log_config_header("Jobs config parameters:")
+        self._load_jobs_config()
         self.log_config_header("Email config parameters:")
         self._load_email_config()
         self.log_config_header("LDAP config parameters:")
@@ -344,8 +346,8 @@ class CFG(object):
         self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", default_sqlalchemy_url)
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        tracim_v2_folder = os.path.dirname(backend_folder)
-        default_color_config_file_path = os.path.join(tracim_v2_folder, "color.json")
+        tracim_folder = os.path.dirname(backend_folder)
+        default_color_config_file_path = os.path.join(tracim_folder, "color.json")
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
         )
@@ -430,9 +432,9 @@ class CFG(object):
         self.FRONTEND__SERVE = asbool(self.get_raw_config("frontend.serve", "True"))
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
         # is probably in frontend subfolder
-        # of tracim_v2 parent of both backend and frontend
+        # of tracim parent of both backend and frontend
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        tracim_v2_folder = os.path.dirname(backend_folder)
+        tracim_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")
 
         self.FRONTEND__CACHE_TOKEN = self.get_raw_config(
@@ -443,7 +445,7 @@ class CFG(object):
             "backend.i18n_folder_path", backend_i18n_folder
         )
 
-        frontend_dist_folder = os.path.join(tracim_v2_folder, "frontend", "dist")
+        frontend_dist_folder = os.path.join(tracim_folder, "frontend", "dist")
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
@@ -555,7 +557,6 @@ class CFG(object):
 
         # TODO - G.M - 2019-01-22 - add feature to process notification email
         # asynchronously see issue https://github.com/tracim/tracim/issues/1345
-        self.EMAIL__NOTIFICATION__PROCESSING_MODE = "sync"
         self.EMAIL__NOTIFICATION__ACTIVATED = asbool(
             self.get_raw_config("email.notification.activated", "False")
         )
@@ -602,12 +603,6 @@ class CFG(object):
         self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config(
             "email.reply.lockfile_path", self.here_macro_replace("%(here)s/email_fetcher.lock")
         )
-
-        self.EMAIL__PROCESSING_MODE = self.get_raw_config("email.processing_mode", "sync").upper()
-
-        self.EMAIL__ASYNC__REDIS__HOST = self.get_raw_config("email.async.redis.host", "localhost")
-        self.EMAIL__ASYNC__REDIS__PORT = int(self.get_raw_config("email.async.redis.port", "6379"))
-        self.EMAIL__ASYNC__REDIS__DB = int(self.get_raw_config("email.async.redis.db", "0"))
         self.NEW_USER__INVITATION__DO_NOTIFY = asbool(
             self.get_raw_config("new_user.invitation.do_notify", "True")
         )
@@ -729,6 +724,12 @@ class CFG(object):
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
         )
 
+    def _load_jobs_config(self) -> None:
+        self.JOBS__PROCESSING_MODE = self.get_raw_config("jobs.processing_mode", "sync").upper()
+        self.JOBS__ASYNC__REDIS__HOST = self.get_raw_config("jobs.async.redis.host", "localhost")
+        self.JOBS__ASYNC__REDIS__PORT = int(self.get_raw_config("jobs.async.redis.port", "6379"))
+        self.JOBS__ASYNC__REDIS__DB = int(self.get_raw_config("jobs.async.redis.db", "0"))
+
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -737,6 +738,7 @@ class CFG(object):
         """
         self._check_global_config_validity()
         self._check_live_messages_config_validity()
+        self._check_jobs_config_validity()
         self._check_email_config_validity()
         self._check_ldap_config_validity()
         self._check_search_config_validity()
@@ -929,12 +931,13 @@ class CFG(object):
                         )
                     )
 
-        if self.EMAIL__PROCESSING_MODE not in (self.CST.ASYNC, self.CST.SYNC):
+    def _check_jobs_config_validity(self) -> None:
+        if self.JOBS__PROCESSING_MODE not in (self.CST.ASYNC, self.CST.SYNC):
             raise Exception(
-                "EMAIL__PROCESSING_MODE "
+                "JOBS__PROCESSING_MODE "
                 "can "
                 'be "{}" or "{}", not "{}"'.format(
-                    self.CST.ASYNC, self.CST.SYNC, self.EMAIL__PROCESSING_MODE
+                    self.CST.ASYNC, self.CST.SYNC, self.JOBS__PROCESSING_MODE
                 )
             )
 

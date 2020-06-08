@@ -31,7 +31,7 @@ describe('Login', function () {
     cy.setupBaseDB()
     cy.loginAs('administrators')
 
-    cy.request('POST', '/api/v2/users', userWithoutUsername)
+    cy.request('POST', '/api/users', userWithoutUsername)
       .then(response => {
         response.body.password = '8QLa$<w'
         return response.body

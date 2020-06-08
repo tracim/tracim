@@ -9,7 +9,7 @@ from tracim_backend.applications.collaborative_document_edition.factory import (
 )
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.app import TracimApplication
-from tracim_backend.views import BASE_API_V2
+from tracim_backend.views import BASE_API
 
 
 class CollaborativeDocumentEditionApp(TracimApplication):
@@ -54,13 +54,11 @@ class CollaborativeDocumentEditionApp(TracimApplication):
         )
 
         wopi_controller = WOPIController()
-        configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
+        configurator.include(wopi_controller.bind, route_prefix=BASE_API)
         collaborative_document_edition_controller = CollaborativeDocumentEditionFactory().get_controller(
             app_config
         )
-        configurator.include(
-            collaborative_document_edition_controller.bind, route_prefix=BASE_API_V2
-        )
+        configurator.include(collaborative_document_edition_controller.bind, route_prefix=BASE_API)
 
 
 def create_app() -> TracimApplication:
