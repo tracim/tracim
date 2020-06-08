@@ -81,7 +81,7 @@ class Event(DeclarativeBase):
     user = index_property("fields", "user")
     content = index_property("fields", "content")
     member = index_property("fields", "member")
-    client_id = index_property("fields", "client_id")
+    client_token = index_property("fields", "client_token")
 
     @property
     def event_type(self) -> str:

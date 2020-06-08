@@ -49,14 +49,14 @@ class TracimContext(ABC):
         # Candidate content_type found in request body
         self._candidate_content_type = None
         # Client Id, useful to permit link between request and TLM response
-        self._client_id = None  # type: typing.Optional[str]
+        self._client_token = None  # type: typing.Optional[str]
 
     # INFO - G.M - 2018-12-03 - Useful property of Tracim Context
     def set_user(self, user: User):
         self._current_user = user
 
-    def set_client_id(self, client_id: str):
-        self._client_id = client_id
+    def set_client_token(self, client_token: str):
+        self._client_token = client_token
 
     @property
     @abstractmethod
@@ -260,10 +260,12 @@ class TracimRequest(TracimContext, Request):
         super().set_user(user)
         self.plugin_manager.hook.on_current_user_set(user=user, request=self)
 
-    def set_client_id(self, client_id: str):
+    def set_client_token(self, client_token: str):
         """Overload TracimContext method to add plugin hook call."""
-        super().set_client_id(client_id)
-        self.plugin_manager.hook.on_current_client_id_set(client_id=client_id, request=self)
+        super().set_client_token(client_token)
+        self.plugin_manager.hook.on_current_client_token_set(
+            client_token=client_token, request=self
+        )
 
     @property
     def current_user(self) -> User:

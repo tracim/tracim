@@ -27,11 +27,11 @@ class TracimRequestHookSpec:
         pass
 
     @hookspec
-    def on_current_client_id_set(self, client_id: str, request: TracimRequest) -> None:
+    def on_current_client_token_set(self, client_token: str, request: TracimRequest) -> None:
         """
-        Called when a current client_id is defined on the request.
+        Called when a current client_token is defined on the request.
 
-        :param client_id: current client id
+        :param client_token: current client token
         :param request: current request
         """
         pass

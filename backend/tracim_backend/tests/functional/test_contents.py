@@ -310,7 +310,7 @@ class TestFolder(object):
             "raw_content": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
-        headers = {"X-Tracim-ClientId": "justaclientid"}
+        headers = {"X-Tracim-ClientId": "justaclienttoken"}
         res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
@@ -346,7 +346,7 @@ class TestFolder(object):
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         modified_event = event_helper.last_event
-        assert modified_event.client_id == "justaclientid"
+        assert modified_event.client_token == "justaclienttoken"
         assert modified_event.event_type == "content.modified.folder"
         assert modified_event.content == content
         workspace = web_testapp.get(
@@ -4078,7 +4078,7 @@ class TestThreads(object):
         content_modified = dateutil.parser.isoparse(content["modified"])
         modified_diff = (event_content_modified - content_modified).total_seconds()
         assert abs(modified_diff) < 2
-        assert modified_event.client_id is None
+        assert modified_event.client_token is None
         assert content["current_revision_type"] == content["current_revision_type"]
         assert modified_event.content["file_extension"] == content["file_extension"]
         assert modified_event.content["filename"] == content["filename"]
