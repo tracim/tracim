@@ -12,7 +12,7 @@ require('./css/index.styl')
 // So we use the frontend/ connection function
 setTimeout(() => {
   const liveMessageManager = new LiveMessageManager()
-  liveMessageManager.openLiveMessageConnection(1, 'http://192.168.1.19:7999/api/v2')
+  liveMessageManager.openLiveMessageConnection(1, 'http://192.168.1.19:7999/api')
 }, 1000)
 
 // ReactDOM.render(
