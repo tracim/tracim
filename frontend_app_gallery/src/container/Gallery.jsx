@@ -12,6 +12,11 @@ import {
   CardPopup,
   handleFetchResult,
   buildHeadTitle,
+  appContentFactory,
+  TracimComponent,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
   BREADCRUMBS_TYPE,
   ROLE
 } from 'tracim_frontend_lib'
@@ -55,7 +60,7 @@ export class Gallery extends React.Component {
       },
       imagesPreviews: [],
       fileCurrentPage: 1,
-      fileSelected: 0,
+      displayedPictureIndex: 0,
       autoPlay: null,
       fullscreen: false,
       displayPopupDelete: false,
@@ -67,41 +72,94 @@ export class Gallery extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    this.lightboxRotation = new LightboxRotation()
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrModifiedOrUndeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrModifiedOrUndeleted }
+    ])
+
+    this.lightboxRotation = new LightboxRotation()
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    const { state, props } = this
+  // TLM Handlers
+  handleContentCreatedOrModifiedOrUndeleted = data => {
+    // A picture has been added or modified - let's reload the gallery list.
+    // The picture could have been added anywhere in the list.
+    // Any attempt to patch the image list may lead to inconsistency between a
+    // page reload and an update using data in the TLM.
+    this.loadGalleryList(this.state.config.appConfig.workspaceId, this.state.folderId)
+  }
 
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(state.config.slug): {
-        console.log('%c<Gallery> Custom event', 'color: #28a745', type, data)
-        const newFolderId = qs.parse(data.config.history.location.search).folder_ids
-        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || newFolderId !== state.folderId) {
-          this.setState({
-            config: data.config,
-            folderId: newFolderId
-          })
+  handleContentDeleted = data => {
+    const { state } = this
+
+    let newDisplayedPictureIndex = state.displayedPictureIndex
+    let newImagesPreviews = state.imagesPreviews
+
+    // We remove it from the list of previews
+    for (let i = 0; i < state.imagesPreviews.length; i++) {
+      if (state.imagesPreviews[i].contentId === data.content.content_id) {
+        // We found the picture to delete
+
+        // We remove it in the new list of images
+        newImagesPreviews = state.imagesPreviews.slice()
+        newImagesPreviews.splice(i, 1)
+
+        // We set the new current index
+        if (i < state.displayedPictureIndex) {
+          // if the currently displayed picture is after the deleted image
+          // we have to fix its index. The current picture's new index is
+          // decremented.
+          newDisplayedPictureIndex--
+        } else if (i == state.displayedPictureIndex) {
+          // if the currently displayed picture is the one being deleted
+          // we show the next picture, which index is the now the one of the
+          // deleted picture.
+
+          if (state.displayedPictureIndex >= newImagesPreviews.length) {
+            // if this picture does not exist, though, we take the previous one.
+            // if no there are no pictures left, we take 0, which is the default
+            // value of displayedPictureIndex.
+            newDisplayedPictureIndex = Math.max(0, state.displayedPictureIndex - 1)
+          }
         }
         break
       }
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<Gallery> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        this.buildBreadcrumbs()
-        if (state.workspaceLabel) this.setHeadTitle(`${props.t('Gallery')} · ${state.workspaceLabel}`)
-        break
-      default:
-        break
     }
+
+    this.setState({
+      imagesPreviews: newImagesPreviews,
+      displayedPictureIndex: newDisplayedPictureIndex
+    })
+  }
+
+  handleShowApp = data => {
+    console.log('%c<Gallery> Custom event', 'color: #28a745', data)
+    const newFolderId = qs.parse(data.config.history.location.search).folder_ids
+    if (data.config.appConfig.workspaceId !== this.state.config.appConfig.workspaceId || newFolderId !== this.state.folderId) {
+      this.setState({
+        config: data.config,
+        folderId: newFolderId
+      })
+    }
+  }
+
+  handleAllAppChangeLanguage = data => {
+      console.log('%c<Gallery> Custom event', 'color: #28a745', data)
+      this.setState(prev => ({
+        loggedUser: {
+          ...prev.loggedUser,
+          lang: data
+        }
+      }))
+      i18n.changeLanguage(data)
+      this.buildBreadcrumbs()
+      if (this.state.workspaceLabel) this.setHeadTitle(`${props.t('Gallery')} · ${this.state.workspaceLabel}`)
   }
 
   async componentDidMount () {
@@ -124,7 +182,7 @@ export class Gallery extends React.Component {
       this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
       const contentDetail = await this.loadContentDetails()
       this.buildBreadcrumbs(contentDetail.workspaceLabel, contentDetail.folderDetail, false)
-    } else if (prevState.fileSelected !== state.fileSelected || prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded || prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded) {
+    } else if (prevState.displayedPictureIndex !== state.displayedPictureIndex || prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded || prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded) {
       this.buildBreadcrumbs(state.workspaceLabel, state.folderDetail, true)
     }
   }
@@ -168,9 +226,9 @@ export class Gallery extends React.Component {
       breadcrumbsList.push({
         link: (
           <Link
-            to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${state.imagesPreviews[state.fileSelected].contentId}`}
+            to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${this.currentPictureId()}`}
           >
-            {state.imagesPreviews[state.fileSelected].fileName}
+            {this.currentPicture().fileName}
           </Link>
         ),
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
@@ -244,14 +302,31 @@ export class Gallery extends React.Component {
     switch (fetchContentList.apiResponse.status) {
       case 200: {
         const images = fetchContentList.body.filter(c => c.content_type === 'file').map(c => ({ src: '', contentId: c.content_id }))
-
         const imagesPreviews = await this.loadPreview(images)
 
-        this.setState({ imagesPreviews, imagesPreviewsLoaded: true })
+        // If the list of pictures is modified and we already were displaying
+        // a picture, we attempt to set the currently displayed picture
+        // to this picture.
+        // We fall back to the index that was already here.
+
+        let displayedPictureIndex = state.displayedPictureIndex
+        const currentPictureId = this.currentPictureId()
+        if (currentPictureId) {
+          for (let i = 0; i < imagesPreviews.length; i++) {
+            if (imagesPreviews[i].contentId === currentPictureId) {
+              displayedPictureIndex = i
+              break
+            }
+          }
+        }
+
+        this.setState({ imagesPreviews, displayedPictureIndex, imagesPreviewsLoaded: true })
 
         break
       }
-      default: this.sendGlobalFlashMessage(props.t('Error while loading content list'))
+      default:
+        console.log("fetchContentList", fetchContentList)
+        this.sendGlobalFlashMessage(props.t('Error while loading content list'))
     }
   }
 
@@ -343,13 +418,13 @@ export class Gallery extends React.Component {
   handleClickPreviousNextPage = previousNext => {
     const { state } = this
 
-    let nextPageNumber = previousNext === DIRECTION.LEFT ? state.fileSelected - 1 : state.fileSelected + 1
+    let nextPageNumber = previousNext === DIRECTION.LEFT ? state.displayedPictureIndex - 1 : state.displayedPictureIndex + 1
 
-    if (previousNext === DIRECTION.RIGHT && state.fileSelected === state.imagesPreviews.length - 1) nextPageNumber = 0
-    if (previousNext === DIRECTION.LEFT && state.fileSelected === 0) nextPageNumber = state.imagesPreviews.length - 1
+    if (previousNext === DIRECTION.RIGHT && state.displayedPictureIndex === state.imagesPreviews.length - 1) nextPageNumber = 0
+    if (previousNext === DIRECTION.LEFT && state.displayedPictureIndex === 0) nextPageNumber = state.imagesPreviews.length - 1
 
     this.setState({
-      fileSelected: nextPageNumber
+      displayedPictureIndex: nextPageNumber
     })
   }
 
@@ -358,8 +433,8 @@ export class Gallery extends React.Component {
 
     if (state.imagesPreviews.length <= 1) return
 
-    if (state.fileSelected === 0) return state.imagesPreviews[state.imagesPreviews.length - 1].lightBoxUrlList[0]
-    return state.imagesPreviews[state.fileSelected - 1].lightBoxUrlList[0]
+    if (state.displayedPictureIndex === 0) return state.imagesPreviews[state.imagesPreviews.length - 1].lightBoxUrlList[0]
+    return state.imagesPreviews[state.displayedPictureIndex - 1].lightBoxUrlList[0]
   }
 
   getNextImageUrl = () => {
@@ -367,13 +442,13 @@ export class Gallery extends React.Component {
 
     if (state.imagesPreviews.length <= 1) return
 
-    if (state.fileSelected === state.imagesPreviews.length - 1) return state.imagesPreviews[0].lightBoxUrlList[0]
-    return state.imagesPreviews[state.fileSelected + 1].lightBoxUrlList[0]
+    if (state.displayedPictureIndex === state.imagesPreviews.length - 1) return state.imagesPreviews[0].lightBoxUrlList[0]
+    return state.imagesPreviews[state.displayedPictureIndex + 1].lightBoxUrlList[0]
   }
 
-  handleCarouselPositionChange = (fileSelected) => {
-    if (fileSelected < 0) return
-    this.setState({ fileSelected })
+  handleCarouselPositionChange = (pictureIndex) => {
+    if (pictureIndex < 0) return
+    this.setState({ displayedPictureIndex: pictureIndex })
   }
 
   handleOpenDeleteFilePopup = () => {
@@ -390,18 +465,18 @@ export class Gallery extends React.Component {
 
   deleteFile = async (filePosition) => {
     const { state } = this
-    const contentIdToDelete = state.imagesPreviews[filePosition].contentId
-    const putResult = await putFileIsDeleted(state.config.apiUrl, state.config.appConfig.workspaceId, state.imagesPreviews[filePosition].contentId)
+    const putResult = await putFileIsDeleted(
+      state.config.apiUrl,
+      state.config.appConfig.workspaceId,
+      state.imagesPreviews[filePosition].contentId
+    )
 
     switch (putResult.status) {
-      case 204: {
-        const newImagesPreviews = this.state.imagesPreviews.filter((image) => (image.contentId !== contentIdToDelete))
+      case 204:
         this.setState({
-          imagesPreviews: newImagesPreviews,
           displayPopupDelete: false
         })
         break
-      }
       case 403:
         this.sendGlobalFlashMessage(this.props.t('Insufficient permissions'))
         break
@@ -434,16 +509,16 @@ export class Gallery extends React.Component {
     })
   }
 
-  rotateImg (fileSelected, direction) {
+  rotateImg (pictureId, direction) {
     const { state } = this
 
-    if (fileSelected < 0 || fileSelected >= state.imagesPreviews.length || !direction) return
+    if (pictureId < 0 || pictureId >= state.imagesPreviews.length || !direction) return
 
-    if (!state.imagesPreviews[fileSelected]) return
+    if (!state.imagesPreviews[pictureId]) return
 
     const imagesPreviews = state.imagesPreviews
     let rotationAngle = 0
-    switch (imagesPreviews[fileSelected].rotationAngle) {
+    switch (imagesPreviews[pictureId].rotationAngle) {
       case (0):
         rotationAngle = direction === DIRECTION.RIGHT ? 90 : 270
         break
@@ -458,16 +533,16 @@ export class Gallery extends React.Component {
         break
       default:
     }
-    imagesPreviews[fileSelected].rotationAngle = rotationAngle
+    imagesPreviews[pictureId].rotationAngle = rotationAngle
     this.setState({ imagesPreviews })
   }
 
   getRawFileUrlSelectedFile () {
     const { state } = this
 
-    if (state.imagesPreviews.length === 0 || !state.imagesPreviews[state.fileSelected]) return
+    if (state.imagesPreviews.length === 0 || !this.currentPicture()) return
 
-    return state.imagesPreviews[state.fileSelected].rawFileUrl
+    return this.currentPicture().rawFileUrl
   }
 
   handleMouseMove = () => {
@@ -502,10 +577,19 @@ export class Gallery extends React.Component {
     if (state.autoPlay) this.displayReactImageLightBoxArrows(false)
   }
 
+  // note: returns undefined if there is no current picture
+  currentPicture () {
+    return this.state.imagesPreviews[this.state.displayedPictureIndex]
+  }
+
+  currentPictureId () {
+    return (this.currentPicture() || {}).contentId
+  }
+
   render () {
     const { state, props } = this
 
-    if (state.imagesPreviews[state.fileSelected]) this.lightboxRotation.changeAngle(state.imagesPreviews[state.fileSelected].rotationAngle)
+    if (this.currentPicture()) this.lightboxRotation.changeAngle(this.currentPicture().rotationAngle)
 
     return (
       <div className='gallery-scrollView'>
@@ -532,7 +616,7 @@ export class Gallery extends React.Component {
 
               <button
                 className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__left'
-                onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
+                onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.LEFT)}
               >
                 <span className='gallery__action__button__text'>{props.t('Rotate 90° left')}</span>
                 <i className='fa fa-fw fa-undo' />
@@ -540,7 +624,7 @@ export class Gallery extends React.Component {
 
               <button
                 className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__right'
-                onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
+                onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.RIGHT)}
               >
                 <span className='gallery__action__button__text'>{props.t('Rotate 90° right')}</span>
                 <i className='fa fa-fw fa-undo' />
@@ -560,7 +644,7 @@ export class Gallery extends React.Component {
             {(state.imagesPreviewsLoaded
               ? (
                 <Carousel
-                  fileSelected={state.fileSelected}
+                  fileSelected={state.displayedPictureIndex}
                   slides={state.imagesPreviews}
                   onCarouselPositionChange={this.handleCarouselPositionChange}
                   onClickShowImageRaw={this.handleClickShowImageRaw}
@@ -581,11 +665,11 @@ export class Gallery extends React.Component {
             >
               <div ref={modalRoot => (this.reactImageLightBoxModalRoot = modalRoot)} />
 
-              {state.displayLightbox && (
+              {state.displayLightbox && this.currentPicture() && (
                 <div className='gallery__mouse__listener' onMouseMove={this.handleMouseMove}>
                   <ReactImageLightbox
                     prevSrc={this.getPreviousImageUrl()}
-                    mainSrc={state.imagesPreviews[state.fileSelected].lightBoxUrlList[0]}
+                    mainSrc={this.currentPicture().lightBoxUrlList[0]}
                     nextSrc={this.getNextImageUrl()}
                     onCloseRequest={this.handleClickHideImageRaw}
                     onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
@@ -616,7 +700,7 @@ export class Gallery extends React.Component {
                     ), (
                       <button
                         className='btn iconBtn'
-                        onClick={() => this.rotateImg(state.fileSelected, DIRECTION.LEFT)}
+                        onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.LEFT)}
                         title={props.t('Rotate 90° left')}
                         data-cy='gallery__action__button__lightbox__rotation__left'
                         key='btn_rotate_left'
@@ -626,7 +710,7 @@ export class Gallery extends React.Component {
                     ), (
                       <button
                         className='btn iconBtn gallery__action__button__lightbox__rotation__right'
-                        onClick={() => this.rotateImg(state.fileSelected, DIRECTION.RIGHT)}
+                        onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.RIGHT)}
                         title={props.t('Rotate 90° right')}
                         key='btn_rotate_right'
                       >
@@ -656,7 +740,7 @@ export class Gallery extends React.Component {
                 onClose={this.handleCloseDeleteFilePopup}
               >
                 <div className='gallery__delete__file__popup__body'>
-                  <div className='gallery__delete__file__popup__body__msg'>{props.t('Are you sure ?')}</div>
+                  <div className='gallery__delete__file__popup__body__msg'>{props.t('Are you sure?')}</div>
                   <div className='gallery__delete__file__popup__body__btn'>
                     <button
                       type='button'
@@ -669,7 +753,7 @@ export class Gallery extends React.Component {
                     <button
                       type='button'
                       className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
-                      onClick={() => this.deleteFile(this.state.fileSelected)}
+                      onClick={() => this.deleteFile(this.state.displayedPictureIndex)}
                       data-cy='gallery__delete__file__popup__body__btn__delete'
                     >
                       {props.t('Delete')}
@@ -685,4 +769,4 @@ export class Gallery extends React.Component {
   }
 }
 
-export default translate()(Gallery)
+export default translate()(appContentFactory(TracimComponent(Gallery)))
