@@ -8,7 +8,7 @@ const userFixtures = {
 }
 
 
-let LOGIN_URL = '/api/v2/auth/login'
+let LOGIN_URL = '/api/auth/login'
 
 Cypress.Commands.add('loginAs', (role = 'administrators') => {
   if (getCookieValueFromEnv(role)) {
@@ -35,7 +35,7 @@ Cypress.Commands.add('login', (user, role) => {
     }))
     return cy.request({
       method: 'PUT',
-      url: '/api/v2/users/' + response.body.user_id,
+      url: '/api/users/' + response.body.user_id,
       body: {
         lang: 'en',
         public_name: response.body.public_name,
@@ -46,7 +46,7 @@ Cypress.Commands.add('login', (user, role) => {
 })
 
 Cypress.Commands.add('logout', () => {
-  cy.request('POST', 'api/v2/auth/logout')
+  cy.request('POST', '/api/auth/logout')
   cy.cleanSessionCookies()
 })
 
@@ -162,5 +162,5 @@ Cypress.Commands.add('cleanSessionCookies', () => {
 })
 
 Cypress.Commands.add('cancelXHR', () => {
-  cy.visit('/api/v2/doc/')
+  cy.visit('/api/doc/')
 })

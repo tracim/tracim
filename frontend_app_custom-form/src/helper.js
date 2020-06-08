@@ -21,7 +21,7 @@ export const debug = {
     hexcolor: '#3f52e3',
     creationLabel: 'Write a document',
     domContainer: 'appFeatureContainer',
-    apiUrl: 'http://192.168.1.163:6543/api/v2',
+    apiUrl: 'http://192.168.1.163:6543/api',
     workspace_id: 1,
     content_id: 198,
     availableStatuses: [{
