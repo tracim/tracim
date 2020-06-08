@@ -18,7 +18,7 @@ describe('<CollaborativeEditionFrame />', function () {
         lang: 'en'
       },
       config: {
-        apiUrl: 'http://unit.test:6543/api/v2',
+        apiUrl: 'http://unit.test:6543/api',
         translation: { en: { translation: {} } },
         system: {
           appListLoaded: true,
@@ -53,7 +53,7 @@ describe('<CollaborativeEditionFrame />', function () {
     const getContentApiResult = {
       actives_shares: 0,
       author: {
-        avatar_url: '/api/v2/asset/avatars/mrwhite.jpg',
+        avatar_url: '/api/asset/avatars/mrwhite.jpg',
         public_name: 'John Doe',
         user_id: 1
       },
@@ -71,7 +71,7 @@ describe('<CollaborativeEditionFrame />', function () {
       is_editable: true,
       label: 'Intervention Report 12',
       last_modifier: {
-        avatar_url: '/api/v2/asset/avatars/mrwhite.jpg',
+        avatar_url: '/api/asset/avatars/mrwhite.jpg',
         public_name: 'John Doe',
         user_id: 1
       },
@@ -103,7 +103,7 @@ describe('<CollaborativeEditionFrame />', function () {
         .get(`/workspaces/${props.data.content.workspace_id}`)
         .reply(200, {})
 
-      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=about:///api/v2/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en'
+      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=about:///api/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en'
       await wrapper.instance().loadContent()
       const urlResult = wrapper.instance().buildCompleteIframeUrl(urlSource, accessToken)
       expect(urlResult).to.equal(expectedResult)
@@ -119,7 +119,7 @@ describe('<CollaborativeEditionFrame />', function () {
         .get(`/workspaces/${props.data.content.workspace_id}`)
         .reply(200, {})
 
-      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=about:///api/v2/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en&permission=readonly'
+      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=about:///api/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en&permission=readonly'
       await wrapper.instance().loadContent()
       const urlResult = wrapper.instance().buildCompleteIframeUrl(urlSource, accessToken)
       expect(urlResult).to.equal(expectedResult)
@@ -143,7 +143,7 @@ describe('<CollaborativeEditionFrame />', function () {
         <CollaborativeEditionFrameWithoutHOC { ...updatedProps } />
       )
 
-      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=about:///api/v2/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en&permission=readonly'
+      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=about:///api/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en&permission=readonly'
       await wrapperWithUserAsReader.instance().loadContent()
       const urlResult = wrapperWithUserAsReader.instance().buildCompleteIframeUrl(urlSource, accessToken)
       expect(urlResult).to.equal(expectedResult)

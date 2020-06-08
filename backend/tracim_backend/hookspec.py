@@ -53,7 +53,7 @@ def web_include(configurator: Configurator, app_config: CFG) -> None:
     >>> @hookimpl
     ... def web_include(configurator: Configurator, app_config: CFG) -> None:
     ...     my_controller = MyController()
-    ...     configurator.include(mycontroller.bind, route_prefix=BASE_API_V2)
+    ...     configurator.include(mycontroller.bind, route_prefix=BASE_API)
     ... # doctest: +SKIP
 
     :param configurator: Tracim pyramid configurator

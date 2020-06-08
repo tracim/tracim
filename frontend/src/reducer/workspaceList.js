@@ -14,7 +14,7 @@ export function workspaceList (state = [], action) {
         id: ws.workspace_id,
         label: ws.label,
         slug: ws.slug,
-        // description: ws.description, // not returned by /api/v2/users/:idUser/workspaces
+        // description: ws.description, // not returned by /api/users/:idUser/workspaces
         sidebarEntry: ws.sidebar_entries.map(sbe => ({
           slug: sbe.slug,
           route: sbe.route,
