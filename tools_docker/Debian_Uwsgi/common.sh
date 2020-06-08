@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
+# address on which tracim web is accessible within docker
+# on port 8080 as uwsgi listens here by default.
+tracim_web_internal_listen="localhost:8080"
+
 # Create tracim conf file if none exists
 if [ ! -f /etc/tracim/development.ini ]; then
     CONFIG_FILE_IS_NEW=1
     KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
     SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
     cp /tracim/backend/development.ini.sample /etc/tracim/development.ini
-    sed -i "s|^basic_setup.website_base_url = .*|basic_setup.website_base_url = http://localhost:8080|g" /etc/tracim/development.ini
+    sed -i "s|^basic_setup.website_base_url = .*|basic_setup.website_base_url = http://${tracim_web_internal_listen}|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = /var/tracim/data/depot|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.caldav_storage_dir = .*|basic_setup.caldav_storage_dir = /var/tracim/data/radicale_storage|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.preview_cache_dir = .*|basic_setup.preview_cache_dir = /var/tracim/data/preview|g" /etc/tracim/development.ini
@@ -23,7 +27,7 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|^; email.notification.new_upload_event.template.html = .*|email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak|g" /etc/tracim/development.ini
     sed -i "s|^; email.template_dir =.*|email.template_dir = /tracim/backend/tracim_backend/templates/mail|g" /etc/tracim/development.ini
     sed -i "s|^; email.reply.lockfile_path = .*|email.reply.lockfile_path = /var/tracim/data/email_fetcher.lock|g" /etc/tracim/development.ini
-    sed -i "s|^; webdav.base_url = .*|webdav.base_url = http://localhost:8080|g" /etc/tracim/development.ini
+    sed -i "s|^; webdav.base_url = .*|webdav.base_url = http://${tracim_web_internal_listen}|g" /etc/tracim/development.ini
     sed -i "s|^; webdav.ui.enabled = .*|webdav.ui.enabled = True|g" /etc/tracim/development.ini
     sed -i "s|^; webdav.root_path = /|webdav.root_path = /webdav|g" /etc/tracim/development.ini
     sed -i "s|^; jobs.processing_mode = sync|jobs.processing_mode = async|g" /etc/tracim/development.ini
@@ -64,6 +68,9 @@ fi
 if [ ! -L /etc/uwsgi/apps-enabled/tracim_web.ini ]; then
     ln -s /etc/uwsgi/apps-available/tracim_web.ini /etc/uwsgi/apps-enabled/tracim_web.ini
 fi
+
+# Create pushpin route file
+echo "* ${tracim_web_internal_listen}" > /etc/pushpin/routes
 
 # Create color.json file if no exist
 if [ ! -f /etc/tracim/color.json ]; then

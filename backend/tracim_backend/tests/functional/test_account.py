@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Tests for /api/v2/users/me subpath endpoints.
+Tests for /api/users/me subpath endpoints.
 This is limited list, just to ensure the redirect between /me and /{user_id} work correctly
 """
 
@@ -20,7 +20,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 class TestAccountEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users/me
+    Tests for GET /api/users/me
     """
 
     def test_api__get_user__ok_200__nominal(
@@ -52,7 +52,7 @@ class TestAccountEndpoint(object):
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = web_testapp.get("/api/v2/users/me", status=307).follow(status=200)
+        res = web_testapp.get("/api/users/me", status=307).follow(status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["created"]
@@ -69,7 +69,7 @@ class TestAccountEndpoint(object):
 class TestAccountKnownMembersEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users/me
+    Tests for GET /api/users/me
     """
 
     def test_api__get_user__ok_200__admin__by_name(
@@ -114,7 +114,7 @@ class TestAccountKnownMembersEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
-        res = web_testapp.get("/api/v2/users/me/known_members", status=307, params=params).follow(
+        res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
             status=200
         )
         res = res.json_body
@@ -170,7 +170,7 @@ class TestAccountKnownMembersEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_user_ids": str(test_user2.user_id)}
-        res = web_testapp.get("/api/v2/users/me/known_members", status=307, params=params).follow(
+        res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
             status=200
         )
         res = res.json_body
@@ -220,7 +220,7 @@ class TestAccountKnownMembersEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "t"}
-        res = web_testapp.get("/api/v2/users/me/known_members", status=307, params=params).follow(
+        res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
             status=400
         )
         assert isinstance(res.json, dict)
@@ -283,7 +283,7 @@ class TestAccountKnownMembersEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {"acp": "test"}
-        res = web_testapp.get("/api/v2/users/me/known_members", status=307, params=params).follow(
+        res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
             status=200
         )
         res = res.json_body
@@ -311,7 +311,7 @@ def follow_put_json(response: TestResponse, **kw):
 class TestSetEmailEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for PUT /api/v2/users/me/email
+    Tests for PUT /api/users/me/email
     """
 
     def test_api__set_account_email__err_400__admin_same_email(
@@ -344,14 +344,14 @@ class TestSetEmailEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = web_testapp.get("/api/v2/users/me", status=307).follow(status=200)
+        res = web_testapp.get("/api/users/me", status=307).follow(status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "admin@admin.admin", "loggedin_user_password": "password"}
         res = follow_put_json(
-            web_testapp.put_json("/api/v2/users/me/email", params=params, status=307),
+            web_testapp.put_json("/api/users/me/email", params=params, status=307),
             status=400,
             params=params,
         )
@@ -359,7 +359,7 @@ class TestSetEmailEndpoint(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
         # Check After
-        res = web_testapp.get("/api/v2/users/me", status=307).follow(status=200)
+        res = web_testapp.get("/api/users/me", status=307).follow(status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
@@ -393,14 +393,14 @@ class TestSetEmailEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = web_testapp.get("/api/v2/users/me", status=307).follow(status=200)
+        res = web_testapp.get("/api/users/me", status=307).follow(status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "badpassword"}
         res = follow_put_json(
-            web_testapp.put_json("/api/v2/users/me/email", params=params, status=307),
+            web_testapp.put_json("/api/users/me/email", params=params, status=307),
             status=403,
             params=params,
         )
@@ -408,7 +408,7 @@ class TestSetEmailEndpoint(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WRONG_USER_PASSWORD
         # Check After
-        res = web_testapp.get("/api/v2/users/me", status=307).follow(status=200)
+        res = web_testapp.get("/api/users/me", status=307).follow(status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
@@ -442,19 +442,19 @@ class TestSetEmailEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = web_testapp.get("/api/v2/users/me", status=307).follow(status=200)
+        res = web_testapp.get("/api/users/me", status=307).follow(status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "password"}
         follow_put_json(
-            web_testapp.put_json("/api/v2/users/me/email", params=params, status=307),
+            web_testapp.put_json("/api/users/me/email", params=params, status=307),
             status=200,
             params=params,
         )
         web_testapp.authorization = ("Basic", ("mysuperemail@email.fr", "password"))
         # Check After
-        res = web_testapp.get("/api/v2/users/me", status=307).follow(status=200)
+        res = web_testapp.get("/api/users/me", status=307).follow(status=200)
         res = res.json_body
         assert res["email"] == "mysuperemail@email.fr"

@@ -9,7 +9,7 @@ from tracim_backend.exceptions import CaldavNotAuthenticated
 from tracim_backend.exceptions import CaldavNotAuthorized
 from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.lib.utils.app import TracimApplication
-from tracim_backend.views import BASE_API_V2
+from tracim_backend.views import BASE_API
 
 
 class AgendaApp(TracimApplication):
@@ -101,7 +101,7 @@ class AgendaApp(TracimApplication):
             radicale_workspace_path=app_config.CALDAV_RADICALE_WORKSPACE_PATH,
         )
         agenda_controller = AgendaController()
-        configurator.include(agenda_controller.bind, route_prefix=BASE_API_V2)
+        configurator.include(agenda_controller.bind, route_prefix=BASE_API)
         configurator.include(radicale_proxy_controller.bind)
 
 

@@ -39,7 +39,7 @@ def create_events_and_messages(session) -> tracim_event.Event:
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestMessages(object):
     """
-    Tests for /api/v2/users/{user_id}/messages
+    Tests for /api/users/{user_id}/messages
     endpoint
     """
 
@@ -58,7 +58,7 @@ class TestMessages(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         message_dicts = web_testapp.get(
-            "/api/v2/users/1/messages?read_status={}".format(read_status), status=200,
+            "/api/users/1/messages?read_status={}".format(read_status), status=200,
         ).json_body
         assert len(messages) == len(message_dicts)
         for message, message_dict in zip(messages, message_dicts):
