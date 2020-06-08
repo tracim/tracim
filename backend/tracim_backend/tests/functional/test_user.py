@@ -3021,6 +3021,7 @@ class TestUserEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "user.created"
         assert last_event.fields["user"] == res
+        assert last_event.fields["client_token"] is None
         author = web_testapp.get("/api/v2/users/1", status=200).json_body
         assert last_event.fields["author"] == author
 

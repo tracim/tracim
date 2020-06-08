@@ -140,6 +140,7 @@ class EventBuilder:
             _AUTHOR_FIELD: self._user_schema.dump(
                 user_api.get_user_with_context(self._current_user)
             ).data,
+            _CLIENT_TOKEN_FIELD: self._client_token,
             _USER_FIELD: self._user_schema.dump(user_api.get_user_with_context(user)).data,
         }
         event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
