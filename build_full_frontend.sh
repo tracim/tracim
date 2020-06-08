@@ -46,7 +46,7 @@ yarn workspace tracim_frontend_lib run build && loggood "success" || logerror "C
 
 # Tracim Lib for the browsers
 log "Building tracim_frontend_lib for Tracim"
-yarn workspace tracim_frontend_lib run buildUsingExternalVendors && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
+yarn workspace tracim_frontend_lib run buildwithextvendors && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
 
 for app in "$DEFAULTDIR"/frontend_app_*; do
 	if [ -f "$app/.disabled-app" ]; then
@@ -59,6 +59,6 @@ done
 
 # build Tracim
 log "building the Tracim frontend"
-yarn workspace tracim run buildUsingExternalVendors && loggood "success" || logerror "Could not build the Tracim frontend."
+yarn workspace tracim run buildwithextvendors && loggood "success" || logerror "Could not build the Tracim frontend."
 
 loggood "-- frontend build successful."
