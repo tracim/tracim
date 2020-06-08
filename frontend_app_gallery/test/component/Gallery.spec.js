@@ -17,7 +17,7 @@ describe('<Gallery />', () => {
   const props = {
     data: {
       config: {
-        apiUrl: 'http://localhost:1337/api/v2',
+        apiUrl: 'http://localhost:1337/api',
         slug: 'gallery',
         faIcon: 'paperclip',
         hexcolor: '#ffa500',
