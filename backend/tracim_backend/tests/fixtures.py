@@ -200,16 +200,34 @@ def migration_engine(engine):
 @pytest.fixture
 def session(engine, session_factory, app_config, test_logger):
     class TracimTestContext(TracimContext):
-        app_config = app_config
-        dbsession = None
-        plugin_manager = create_plugin_manager()
-        current_user = None
+        def __init__(self, app_config) -> None:
+            super().__init__()
+            self._app_config = app_config
+            self._plugin_manager = create_plugin_manager()
+            self._dbsession = create_dbsession_for_context(
+                session_factory, transaction.manager, self
+            )
+            self._dbsession.set_context(self)
+            self._plugin_manager.register(EventBuilder(app_config))
+            self._current_user = None
 
-    context = TracimTestContext()
-    dbsession = create_dbsession_for_context(session_factory, transaction.manager, context)
-    context.plugin_manager.register(EventBuilder(app_config))
-    dbsession.set_context(context)
+        @property
+        def dbsession(self):
+            return self._dbsession
 
+        @property
+        def plugin_manager(self):
+            return self._plugin_manager
+
+        @property
+        def current_user(self):
+            return self._current_user
+
+        @property
+        def app_config(self):
+            return self._app_config
+
+    context = TracimTestContext(app_config)
     from tracim_backend.models.meta import DeclarativeBase
 
     with transaction.manager:
@@ -219,11 +237,11 @@ def session(engine, session_factory, app_config, test_logger):
         except Exception as e:
             transaction.abort()
             raise e
-    yield dbsession
+    yield context.dbsession
     from tracim_backend.models.meta import DeclarativeBase
 
-    dbsession.rollback()
-    dbsession.close_all()
+    context.dbsession.rollback()
+    context.dbsession.close_all()
     transaction.abort()
     DeclarativeBase.metadata.drop_all(engine)
 

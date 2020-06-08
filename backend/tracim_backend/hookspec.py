@@ -31,9 +31,9 @@ class TracimContextHookSpec:
         pass
 
     @hookspec
-    def on_context_session_created(self, session: TracimSession, context: TracimContext) -> None:
+    def on_context_session_created(self, db_session: TracimSession, context: TracimContext) -> None:
         """
-        Called when the context's session has been initialized.
+        Called when the context's dbsession has been initialized.
         """
         pass
 

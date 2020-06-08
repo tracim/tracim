@@ -92,7 +92,7 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
-        role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=5)
+        role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=2)
         session.add(current_user)
         session.add(current_workspace)
         session.add(role)
@@ -172,7 +172,7 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.profile = Profile.TRUSTED_USER
         candidate_workspace = Workspace(workspace_id=3, owner=current_user)
-        role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=5)
+        role = UserRoleInWorkspace(user_id=2, workspace_id=3, role=2)
         session.add(current_user)
         session.add(candidate_workspace)
         session.add(role)

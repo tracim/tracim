@@ -2,7 +2,6 @@ from pluggy import PluginManager
 from sqlalchemy import event
 from sqlalchemy.orm.session import UOWTransaction
 
-from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -20,27 +19,21 @@ class DatabaseCrudHookCaller:
         event.listen(session, "after_flush", self._call_hooks)
 
     def _call_hooks(self, session: TracimSession, flush_context: UOWTransaction,) -> None:
-        try:
-            current_user = session.context.current_user
-        except NotAuthenticated:
-            current_user = None
+        assert session.context, "session must have a context"
+        assert session.context.dbsession
         for obj in session.new:
             if isinstance(obj, User):
-                self._plugin_manager.hook.on_user_created(
-                    user=obj, db_session=session, current_user=current_user
-                )
+                self._plugin_manager.hook.on_user_created(user=obj, context=session.context)
             elif isinstance(obj, Workspace):
                 self._plugin_manager.hook.on_workspace_created(
-                    workspace=obj, db_session=session, current_user=current_user
+                    workspace=obj, context=session.context
                 )
             elif isinstance(obj, UserRoleInWorkspace):
                 self._plugin_manager.hook.on_user_role_in_workspace_created(
-                    role=obj, db_session=session, current_user=current_user
+                    role=obj, context=session.context
                 )
             elif isinstance(obj, Content):
-                self._plugin_manager.hook.on_content_created(
-                    content=obj, db_session=session, current_user=current_user
-                )
+                self._plugin_manager.hook.on_content_created(content=obj, context=session.context)
 
         for obj in session.dirty:
             # NOTE S.G 2020-05-08: session.dirty contains objects that do not have to be
@@ -49,36 +42,28 @@ class DatabaseCrudHookCaller:
             if not session.is_modified(obj):
                 continue
             if isinstance(obj, User):
-                self._plugin_manager.hook.on_user_modified(
-                    user=obj, db_session=session, current_user=current_user
-                )
+                self._plugin_manager.hook.on_user_modified(user=obj, context=session.context)
             elif isinstance(obj, Workspace):
                 self._plugin_manager.hook.on_workspace_modified(
-                    workspace=obj, db_session=session, current_user=current_user
+                    workspace=obj, context=session.context
                 )
             elif isinstance(obj, UserRoleInWorkspace):
                 self._plugin_manager.hook.on_user_role_in_workspace_modified(
-                    role=obj, db_session=session, current_user=current_user
+                    role=obj, context=session.context
                 )
             elif isinstance(obj, Content):
-                self._plugin_manager.hook.on_content_modified(
-                    content=obj, db_session=session, current_user=current_user
-                )
+                self._plugin_manager.hook.on_content_modified(content=obj, context=session.context)
 
         for obj in session.deleted:
             if isinstance(obj, User):
-                self._plugin_manager.hook.on_user_deleted(
-                    user=obj, db_session=session, current_user=current_user
-                )
+                self._plugin_manager.hook.on_user_deleted(user=obj, context=session.context)
             elif isinstance(obj, Workspace):
                 self._plugin_manager.hook.on_workspace_deleted(
-                    workspace=obj, db_session=session, current_user=current_user
+                    workspace=obj, context=session.context
                 )
             elif isinstance(obj, UserRoleInWorkspace):
                 self._plugin_manager.hook.on_user_role_in_workspace_deleted(
-                    role=obj, db_session=session, current_user=current_user
+                    role=obj, context=session.context
                 )
             elif isinstance(obj, Content):
-                self._plugin_manager.hook.on_content_deleted(
-                    content=obj, db_session=session, current_user=current_user
-                )
+                self._plugin_manager.hook.on_content_deleted(content=obj, context=session.context)

@@ -14,6 +14,7 @@ from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
@@ -23,8 +24,9 @@ from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
-from tracim_backend.lib.rq import worker_session
+from tracim_backend.lib.rq.worker import worker_context
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
@@ -45,6 +47,7 @@ from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
+
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
@@ -104,67 +107,78 @@ class EventBuilder:
         self._config = config
 
     @hookimpl
-    def on_context_session_created(self, session: TracimSession) -> None:
-        event.listen(session, "pending_to_persistent", self._publish_event)
+    def on_context_session_created(self, db_session: TracimSession, context: TracimContext) -> None:
+        event.listen(db_session, "pending_to_persistent", self._publish_event)
+
+    @staticmethod
+    def _get_current_user(context: TracimContext) -> typing.Optional[User]:
+        """Return context's current user or None.
+
+        tracimcli commands do not have a current_user so take care of it.
+        """
+        try:
+            return context.current_user
+        except NotAuthenticated:
+            return None
 
     # User events
     @hookimpl
-    def on_user_created(self, user: User, db_session: TracimSession, current_user: User) -> None:
-        self._create_user_event(OperationType.CREATED, user, db_session, current_user)
+    def on_user_created(self, user: User, context: TracimContext) -> None:
+        self._create_user_event(OperationType.CREATED, user, context)
 
     @hookimpl
-    def on_user_modified(self, user: User, db_session: TracimSession, current_user: User) -> None:
+    def on_user_modified(self, user: User, context: TracimContext) -> None:
         if self._has_just_been_deleted(user):
-            self._create_user_event(OperationType.DELETED, user, db_session, current_user)
+            self._create_user_event(OperationType.DELETED, user, context)
         elif self._has_just_been_undeleted(user):
-            self._create_user_event(OperationType.UNDELETED, user, db_session, current_user)
+            self._create_user_event(OperationType.UNDELETED, user, context)
         else:
-            self._create_user_event(OperationType.MODIFIED, user, db_session, current_user)
+            self._create_user_event(OperationType.MODIFIED, user, context)
 
     def _create_user_event(
-        self, operation: OperationType, user: User, db_session: TracimSession, current_user: User
+        self, operation: OperationType, user: User, context: TracimContext
     ) -> None:
-        user_api = UserApi(current_user, db_session, self._config, show_deleted=True)
+        user_api = UserApi(
+            self._get_current_user(context), context.dbsession, self._config, show_deleted=True
+        )
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(current_user)
+                user_api.get_user_with_context(self._get_current_user(context))
             ).data,
             _USER_FIELD: self._user_schema.dump(user_api.get_user_with_context(user)).data,
         }
         event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
-        db_session.add(event)
+        context.dbsession.add(event)
 
     # Workspace events
     @hookimpl
-    def on_workspace_created(
-        self, workspace: Workspace, db_session: TracimSession, current_user: User
-    ) -> None:
-        self._create_workspace_event(OperationType.CREATED, workspace, db_session, current_user)
+    def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
+        self._create_workspace_event(OperationType.CREATED, workspace, context)
 
     @hookimpl
-    def on_workspace_modified(
-        self, workspace: Workspace, db_session: TracimSession, current_user: User
-    ) -> None:
+    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
         if self._has_just_been_deleted(workspace):
-            self._create_workspace_event(OperationType.DELETED, workspace, db_session, current_user)
+            self._create_workspace_event(OperationType.DELETED, workspace, context)
         elif self._has_just_been_undeleted(workspace):
-            self._create_workspace_event(
-                OperationType.UNDELETED, workspace, db_session, current_user
-            )
+            self._create_workspace_event(OperationType.UNDELETED, workspace, context)
         else:
-            self._create_workspace_event(
-                OperationType.MODIFIED, workspace, db_session, current_user
-            )
+            self._create_workspace_event(OperationType.MODIFIED, workspace, context)
 
     def _create_workspace_event(
-        self,
-        operation: OperationType,
-        workspace: Workspace,
-        db_session: TracimSession,
-        current_user: typing.Optional[User],
+        self, operation: OperationType, workspace: Workspace, context: TracimContext,
     ) -> None:
-        api = WorkspaceApi(db_session, current_user, self._config)
-        user_api = UserApi(current_user, db_session, self._config, show_deleted=True)
+        api = WorkspaceApi(
+            current_user=self._get_current_user(context),
+            session=context.dbsession,
+            config=self._config,
+        )
+        current_user = self._get_current_user(context)
+        user_api = UserApi(
+            current_user=current_user,
+            session=context.dbsession,
+            config=self._config,
+            show_deleted=True,
+        )
         workspace_in_context = api.get_workspace_with_context(workspace)
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(
@@ -173,42 +187,37 @@ class EventBuilder:
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
-        db_session.add(event)
+        context.dbsession.add(event)
 
     # Content events
     @hookimpl
-    def on_content_created(
-        self, content: Content, db_session: TracimSession, current_user: User
-    ) -> None:
-        self._create_content_event(OperationType.CREATED, content, db_session, current_user)
+    def on_content_created(self, content: Content, context: TracimContext) -> None:
+        self._create_content_event(OperationType.CREATED, content, context)
 
     @hookimpl
-    def on_content_modified(
-        self, content: Content, db_session: TracimSession, current_user: User
-    ) -> None:
+    def on_content_modified(self, content: Content, context: TracimContext) -> None:
         if content.current_revision.revision_type == ActionDescription.DELETION:
-            self._create_content_event(OperationType.DELETED, content, db_session, current_user)
+            self._create_content_event(OperationType.DELETED, content, context)
         elif content.current_revision.revision_type == ActionDescription.UNDELETION:
-            self._create_content_event(OperationType.UNDELETED, content, db_session, current_user)
+            self._create_content_event(OperationType.UNDELETED, content, context)
         else:
-            self._create_content_event(OperationType.MODIFIED, content, db_session, current_user)
+            self._create_content_event(OperationType.MODIFIED, content, context)
 
     def _create_content_event(
-        self,
-        operation: OperationType,
-        content: Content,
-        db_session: TracimSession,
-        current_user: typing.Optional[User],
+        self, operation: OperationType, content: Content, context: TracimContext,
     ) -> None:
-        content_api = ContentApi(db_session, current_user, self._config)
+        current_user = self._get_current_user(context)
+        content_api = ContentApi(context.dbsession, current_user, self._config)
         content_in_context = content_api.get_content_in_context(content)
         content_dict = self._content_schemas[content.type].dump(content_in_context).data
 
-        workspace_api = WorkspaceApi(db_session, current_user, self._config)
+        workspace_api = WorkspaceApi(
+            context.dbsession, self._get_current_user(context), self._config
+        )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace_id)
         )
-        user_api = UserApi(current_user, db_session, self._config, show_deleted=True)
+        user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(
                 user_api.get_user_with_context(current_user)
@@ -222,38 +231,37 @@ class EventBuilder:
             fields=fields,
             entity_subtype=content.type,
         )
-        db_session.add(event)
+        context.dbsession.add(event)
 
     # UserRoleInWorkspace events
     @hookimpl
     def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, db_session: TracimSession, current_user: User
+        self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        self._create_role_event(OperationType.CREATED, role, db_session, current_user)
+        self._create_role_event(OperationType.CREATED, role, context)
 
     @hookimpl
     def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, db_session: TracimSession, current_user: User
+        self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        self._create_role_event(OperationType.MODIFIED, role, db_session, current_user)
+        self._create_role_event(OperationType.MODIFIED, role, context)
 
     @hookimpl
     def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, db_session: TracimSession, current_user: User
+        self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        self._create_role_event(OperationType.DELETED, role, db_session, current_user)
+        self._create_role_event(OperationType.DELETED, role, context)
 
     def _create_role_event(
-        self,
-        operation: OperationType,
-        role: UserRoleInWorkspace,
-        db_session: TracimSession,
-        current_user: typing.Optional[User],
+        self, operation: OperationType, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        workspace_api = WorkspaceApi(db_session, current_user, self._config)
+        current_user = self._get_current_user(context)
+        workspace_api = WorkspaceApi(context.dbsession, current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(role.workspace)
-        user_api = UserApi(current_user, db_session, self._config, show_deleted=True)
-        role_api = RoleApi(current_user=current_user, session=db_session, config=self._config)
+        user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
+        role_api = RoleApi(
+            current_user=current_user, session=context.dbsession, config=self._config
+        )
         try:
             user_field = self._user_schema.dump(
                 user_api.get_user_with_context(user_api.get_one(role.user_id))
@@ -272,18 +280,18 @@ class EventBuilder:
             _MEMBER_FIELD: self._workspace_user_role_schema.dump(role_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE_MEMBER, operation=operation, fields=fields)
-        db_session.add(event)
+        context.dbsession.add(event)
 
-    def _publish_event(self, db_session: TracimSession, instance: object) -> None:
+    def _publish_event(self, session: TracimSession, instance: object) -> None:
         if not isinstance(instance, Event):
             return
         event = typing.cast(Event, instance)
         if self._config.JOBS__PROCESSING_MODE == self._config.CST.ASYNC:
             message_builder = AsyncLiveMessageBuilder(
-                config=self._config
+                context=session.context
             )  # type: BaseLiveMessageBuilder
         else:
-            message_builder = SyncLiveMessageBuilder(session=db_session, config=self._config)
+            message_builder = SyncLiveMessageBuilder(context=session.context)
         message_builder.publish_messages_for_event(event.event_id)
 
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
@@ -315,7 +323,7 @@ class BaseLiveMessageBuilder(abc.ABC):
 
     @contextlib.contextmanager
     @abc.abstractmethod
-    def session(self) -> typing.Generator[TracimSession, None, None]:
+    def context(self) -> typing.Generator[TracimContext, None, None]:
         pass
 
     @abc.abstractmethod
@@ -323,7 +331,8 @@ class BaseLiveMessageBuilder(abc.ABC):
         pass
 
     def _publish_messages_for_event(self, event_id: int) -> None:
-        with self.session() as session:
+        with self.context() as context:
+            session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
             if event.entity_type == EntityType.USER:
                 receiver_ids = self._get_user_event_receiver_ids(event, session)
@@ -344,9 +353,9 @@ class BaseLiveMessageBuilder(abc.ABC):
                 for receiver_id in receiver_ids
             ]
             session.add_all(messages)
-        live_message_lib = LiveMessagesLib(self._config)
-        for message in messages:
-            live_message_lib.publish_message_to_user(message)
+            live_message_lib = LiveMessagesLib(self._config)
+            for message in messages:
+                live_message_lib.publish_message_to_user(message)
 
     def _get_user_event_receiver_ids(self, event: Event, session: TracimSession) -> typing.Set[int]:
         user_api = UserApi(current_user=None, session=session, config=self._config)
@@ -368,10 +377,13 @@ class BaseLiveMessageBuilder(abc.ABC):
 class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
     """"Live message building + sending executed in a RQ job."""
 
+    def __init__(self, context: TracimContext) -> None:
+        super().__init__(context.app_config)
+
     @contextlib.contextmanager
-    def session(self) -> typing.Generator[TracimSession, None, None]:
-        with worker_session() as session:
-            yield session
+    def context(self) -> typing.Generator[TracimContext, None, None]:
+        with worker_context() as context:
+            yield context
 
     def publish_messages_for_event(self, event_id: int) -> None:
         redis_connection = get_redis_connection(self._config)
@@ -383,13 +395,13 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
 class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
     """"Live message building + sending executed in tracim web application."""
 
-    def __init__(self, session: TracimSession, config: CFG) -> None:
-        super().__init__(config)
-        self._session = session
+    def __init__(self, context: TracimContext) -> None:
+        super().__init__(context.app_config)
+        self._context = context
 
     @contextlib.contextmanager
-    def session(self) -> typing.Generator[TracimSession, None, None]:
-        yield self._session
+    def context(self) -> typing.Generator[TracimContext, None, None]:
+        yield self._context
 
     def publish_messages_for_event(self, event_id: int) -> None:
         logger.debug(self, "publish event {} synchronously".format(event))

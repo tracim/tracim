@@ -106,7 +106,7 @@ def create_dbsession_for_context(
     dbsession.set_context(context)
     # Keep a reference on the crud hook caller for the session's lifetime
     dbsession.info["crud_hook_caller"] = DatabaseCrudHookCaller(dbsession, context.plugin_manager)
-    context.plugin_manager.hook.on_context_session_created(session=dbsession, context=context)
+    context.plugin_manager.hook.on_context_session_created(db_session=dbsession, context=context)
     return dbsession
 
 
