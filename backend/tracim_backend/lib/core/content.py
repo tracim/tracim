@@ -1632,7 +1632,7 @@ class ContentApi(object):
         for rev, is_current_rev in content.get_tree_revisions_advanced():
 
             if rev.content_id == content.content_id:
-                related_content = new_content
+                related_content = new_content  # type: Content
                 related_parent = new_parent
             else:
                 # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
@@ -1640,7 +1640,7 @@ class ContentApi(object):
                 if rev.content_id not in new_content_children:
                     new_content_children[rev.content_id] = Content()
                     original_content_children[rev.content_id] = rev.node
-                related_content = new_content_children[rev.content_id]  # type: Content
+                related_content = new_content_children[rev.content_id]
                 if rev.parent_id == content.content_id:
                     related_parent = new_content
                 else:
@@ -1648,8 +1648,7 @@ class ContentApi(object):
             # INFO - G.M - 2019-04-30 - copy of revision itself.
             cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
             cpy_rev.node = related_content
-            if is_current_rev:
-                related_content.current_revision = cpy_rev
+            related_content.current_revision = cpy_rev
             self._session.add(related_content)
             self._session.flush()
         return AddCopyRevisionsResult(
