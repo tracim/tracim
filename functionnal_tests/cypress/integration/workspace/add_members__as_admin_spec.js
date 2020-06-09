@@ -148,7 +148,7 @@ describe('Add a member at dashboard', () => {
           .contains(sharedSpaceManager)
           .click()
         cy.contains('Validate').click()
-        cy.get('[data-cy=flashmessage]').contains('Unknown user')
+        cy.get('[data-cy=flashmessage]').contains('This user already is in the workspace')
       })
   })
 
