@@ -40,21 +40,21 @@ describe('Open a file', () => {
       cy.get('.file__contentpage__content__right').contains(newShareTiltle).should('be.visible')
     })
 
-    describe('and clicking on the Cancel button',() => {
-      it('Should redirect to share page at the right part',() => {
+    describe('and clicking on the Cancel button', () => {
+      it('Should redirect to share page at the right part', () => {
         cy.get('.shareDownload__cancel').should('be.visible').click()
         cy.get('.file__contentpage__content__right').contains('File share').should('be.visible')
       })
 
-      it('Should have the "no share link" message',() => {
+      it('Should have the "no share link" message', () => {
         cy.get('.shareDownload__cancel').should('be.visible').click()
         cy.get('.shareDownload').contains(emptyPhrase).should('be.visible')
       })
     })
 
-    describe('and creating a share link',() => {
-      describe('and clicking to delete share link',() => {
-        it('Should delete the share link',() => {
+    describe('and creating a share link', () => {
+      describe('and clicking to delete share link', () => {
+        it('Should delete the share link', () => {
           // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
           cy.wait(1000)
           cy.get('.shareDownload__email__input').type('email@email.email')
@@ -63,8 +63,8 @@ describe('Open a file', () => {
           cy.get('.shareDownload').contains(emptyPhrase).should('be.visible')
         })
 
-        describe('and clicking on the New button',() => {
-          it('Should redirect to new share page at the right part',() => {
+        describe('and clicking on the New button', () => {
+          it('Should redirect to new share page at the right part', () => {
             cy.wait(1000)
             // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
             cy.get('.shareDownload__email__input').type('email@email.email')

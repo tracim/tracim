@@ -35,7 +35,7 @@ describe('Login', function () {
       .then(response => {
         response.body.password = '8QLa$<w'
         return response.body
-    })
+      })
 
     cy.createRandomUser().then(user => {
       userWithUsernameEmail = user.email
@@ -53,8 +53,8 @@ describe('Login', function () {
   describe('if username is null', function () {
     beforeEach(() => {
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=email]')
-      .type(userWithoutUsername.email)
+        .find('input[type=email]')
+        .type(userWithoutUsername.email)
 
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
         .find('input[type=password]')
@@ -98,7 +98,6 @@ describe('Login', function () {
       cy.get(passwordInput).type(newUsername)
       cy.get(confirmButton).click()
       cy.get('.flashmessage').contains('Invalid password')
-
     })
 
     it('should be able to set username', function () {
@@ -117,8 +116,8 @@ describe('Login', function () {
         cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-        .find('input[type=email]')
-        .type(userWithoutUsername.email)
+          .find('input[type=email]')
+          .type(userWithoutUsername.email)
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
           .find('input[type=password]')
@@ -136,8 +135,8 @@ describe('Login', function () {
   describe('if username is not null', function () {
     beforeEach(() => {
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=email]')
-      .type(userWithUsernameEmail)
+        .find('input[type=email]')
+        .type(userWithUsernameEmail)
 
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
         .find('input[type=password]')

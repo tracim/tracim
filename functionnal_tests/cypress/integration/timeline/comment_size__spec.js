@@ -6,7 +6,7 @@ let workspaceId
 const htmlDocTitle = 'HtmlDoc'
 const veryLongComment = 'this_is_a_very_long_comment lorem_ipsum_dolor_sit_amet_consectetur_adipiscing_elit_Nunc_sem_quam_imperdiet_sed_eros_in, finibus facilisis nibh. Cras vulputate, neque quis hendrerit lacinia, neque libero accumsan mauris, vitae venenatis lacus orci et justo.'
 
-const contentHtmlDocGetter = formatTag({selectorName: s.CONTENT_IN_SEARCH, attrs: {title: htmlDocTitle}})
+const contentHtmlDocGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: htmlDocTitle } })
 
 const commentArea = '.comment__body'
 const commentText = '.comment__body__text'
@@ -27,7 +27,7 @@ describe('Add a new comment', () => {
 
   beforeEach(function () {
     cy.loginAs('users')
-    cy.visitPage({pageName: PAGES.CONTENTS, params: {workspaceId: workspaceId}})
+    cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
   })
 
   afterEach(() => {

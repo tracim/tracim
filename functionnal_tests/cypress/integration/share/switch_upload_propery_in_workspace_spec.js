@@ -14,7 +14,7 @@ describe('Workspace upload property', () => {
 
   beforeEach(() => {
     cy.loginAs('administrators')
-    cy.visitPage({pageName: p.DASHBOARD, params: { workspaceId }})
+    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
   })
 
   afterEach(() => {
@@ -23,19 +23,19 @@ describe('Workspace upload property', () => {
 
   describe("Disable the workspace's upload feature", () => {
     it('Upload folder should not be visible', function () {
-      cy.getTag({selectorName: s.WORKSPACE_DASHBOARD})
+      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__header__advancedmode__button.btn')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('[data-cy=popin_right_part_optional_functionalities]')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('[data-cy=upload_enabled]')
         .click()
 
-      cy.visitPage({pageName: p.CONTENTS, params: { workspaceId }})
+      cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId } })
 
       cy.get('[data-cy=-1]')
         .should('not.exist')
@@ -44,19 +44,19 @@ describe('Workspace upload property', () => {
 
   describe("Enable the workspace's upload feature", () => {
     it('Upload folder should be visible', function () {
-      cy.getTag({selectorName: s.WORKSPACE_DASHBOARD})
+      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__header__advancedmode__button.btn')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('[data-cy=popin_right_part_optional_functionalities]')
         .click()
 
-      cy.getTag({selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('[data-cy=upload_enabled]')
         .click()
 
-      cy.visitPage({pageName: p.CONTENTS, params: { workspaceId }})
+      cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId } })
 
       cy.get('[data-cy=-1]')
         .should('be.visible')

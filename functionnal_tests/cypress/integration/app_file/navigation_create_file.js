@@ -9,6 +9,7 @@ describe('navigate :: workspace > create_new > file', function () {
     cy.visit('/')
     cy.get('.sidebar__content__navigation__workspace__item__number').click()
   })
+
   it('dashboard > button', function () {
     cy.get('.sidebar__content__navigation__workspace__item__name').should('be.visible')
     cy.get('.rah-static--height-auto').should('have.attr', 'aria-hidden', 'false')

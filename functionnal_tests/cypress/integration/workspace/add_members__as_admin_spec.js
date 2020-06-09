@@ -152,7 +152,7 @@ describe('Add a member at dashboard', () => {
       })
   })
 
-  it('should not allow to add a member twice using the same username', () => {
+  it('should not allow adding a member twice using the same username', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.username)
