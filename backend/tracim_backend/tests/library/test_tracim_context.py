@@ -9,6 +9,7 @@ class BaseFakeTracimContext(TracimContext):
     app_config = None
     dbsession = None
     current_user = None
+    plugin_manager = None
 
 
 class TestBaseFakeTracimContext(object):

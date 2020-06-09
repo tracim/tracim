@@ -4,7 +4,6 @@ import typing
 
 from sqlalchemy import func
 from sqlalchemy.orm import Query
-from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend import app_list
@@ -27,6 +26,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
 
@@ -34,7 +34,7 @@ __author__ = "damien"
 class WorkspaceApi(object):
     def __init__(
         self,
-        session: Session,
+        session: TracimSession,
         current_user: typing.Optional[User],
         config: CFG,
         force_role: bool = False,
@@ -44,6 +44,7 @@ class WorkspaceApi(object):
         :param current_user: Current user of context
         :param force_role: If True, app role in queries even if admin
         """
+        session.assert_event_mecanism()
         self._session = session
         self._user = current_user
         self._config = config

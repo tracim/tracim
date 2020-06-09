@@ -8,7 +8,6 @@ from pyramid_ldap3 import Connector
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
-from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
@@ -63,6 +62,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.tracim_session import TracimSession
 
 DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT = 5
 
@@ -71,11 +71,12 @@ class UserApi(object):
     def __init__(
         self,
         current_user: typing.Optional[User],
-        session: Session,
+        session: TracimSession,
         config: CFG,
         show_deleted: bool = False,
         show_deactivated: bool = True,
     ) -> None:
+        session.assert_event_mecanism()
         self._session = session
         self._user = current_user
         self._config = config

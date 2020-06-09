@@ -54,9 +54,14 @@ class TracimContext(ABC):
     # INFO - G.M - 2018-12-03 - Useful property of Tracim Context
     def set_user(self, user: User):
         self._current_user = user
+        self.plugin_manager.hook.on_context_current_user_set(user=user, context=self)
 
     def set_client_token(self, client_token: str):
         self._client_token = client_token
+
+    @property
+    def client_token(self) -> typing.Optional[str]:
+        return self._client_token
 
     @property
     @abstractmethod
@@ -202,6 +207,20 @@ class TracimContext(ABC):
         content_type_slug = content_type_slug_fetcher()
         return content_type_list.get_one_by_slug(content_type_slug)
 
+    def cleanup(self) -> None:
+        """
+        Close dbsession at the end of the request in order to avoid exception
+        about not properly closed session or "object created in another thread"
+        issue
+        see https://github.com/tracim/tracim_backend/issues/62
+        :return: nothing.
+        """
+        self.plugin_manager.hook.on_context_finished(context=self)
+        self._current_user = None
+        self._current_workspace = None
+        if self.dbsession:
+            self.dbsession.close()
+
     # INFO - G.M - 2018-12-03 - Theses method need to be implemented
     # to support correctly Tracim Context
     # Method to Implements
@@ -221,6 +240,14 @@ class TracimContext(ABC):
     def app_config(self) -> CFG:
         """
         Current config available
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def plugin_manager(self) -> pluggy.PluginManager:
+        """
+        Plugin manager of the context
         """
         pass
 
@@ -253,19 +280,7 @@ class TracimRequest(TracimContext, Request):
         TracimContext.__init__(self)
 
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
-        self.add_finished_callback(self._cleanup)
-
-    def set_user(self, user: User):
-        """Overload TracimContext method to add plugin hook call."""
-        super().set_user(user)
-        self.plugin_manager.hook.on_current_user_set(user=user, request=self)
-
-    def set_client_token(self, client_token: str):
-        """Overload TracimContext method to add plugin hook call."""
-        super().set_client_token(client_token)
-        self.plugin_manager.hook.on_current_client_token_set(
-            client_token=client_token, request=self
-        )
+        self.add_finished_callback(lambda r: r.cleanup())
 
     @property
     def current_user(self) -> User:
@@ -292,21 +307,6 @@ class TracimRequest(TracimContext, Request):
     @property
     def plugin_manager(self) -> pluggy.PluginManager:
         return self.registry.settings["plugin_manager"]
-
-    def _cleanup(self, request: "TracimRequest") -> None:
-        """
-        Close dbsession at the end of the request in order to avoid exception
-        about not properly closed session or "object created in another thread"
-        issue
-        see https://github.com/tracim/tracim_backend/issues/62
-        :param request: same as self, request
-        :return: nothing.
-        """
-        self.plugin_manager.hook.on_request_finished(request=self)
-        self._current_user = None
-        self._current_workspace = None
-        if self.dbsession:
-            self.dbsession.close()
 
     # INFO - G.M - 2018-12-03 - Internal utils function to simplify ID fetching
 
