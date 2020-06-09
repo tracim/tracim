@@ -180,12 +180,10 @@ export class Gallery extends React.Component {
   handleContentCreatedOrUndeleted = data => {
     if (this.liveMessageNotRelevant(data)) return
 
-    const { state } = this
-
-    this.setNewPicturesPreviews([
-      this.buildPreview(data.content),
-      ...state.imagesPreviews
-    ])
+    const preview = this.buildPreview(data.content)
+    if (preview) {
+      this.setNewPicturesPreviews([preview, ...this.state.imagesPreviews])
+    }
   }
 
   handleContentModified = data => {
@@ -197,12 +195,18 @@ export class Gallery extends React.Component {
     // We could test whether this is the case, but handling only one case is
     // probably better.
 
-    this.setNewPicturesPreviews([
-      this.buildPreview(data.content),
-      ...state.imagesPreviews.filter(
-        image => image.contentId !== data.content.content_id
-      )
-    ])
+    const imagePreviews = state.imagesPreviews.filter(
+      image => image.contentId !== data.content.content_id
+    )
+
+    const preview = this.buildPreview(data.content)
+    if (preview) {
+      // unlikely, but a picture could be replaced by a file of another type
+      // hence the check.
+      imagePreviews.push(preview)
+    }
+
+    this.setNewPicturesPreviews(imagePreviews)
   }
 
   handleContentDeleted = data => {
@@ -303,7 +307,7 @@ export class Gallery extends React.Component {
       const contentDetail = await this.loadContentDetails()
       this.buildBreadcrumbs(contentDetail.workspaceLabel, contentDetail.folderDetail, false)
     } else if (
-      (prevState.imagesPreviews[prevState.displayedPictureIndex] || {}).fileName !== this.displayedPicture().fileName ||
+      (prevState.imagesPreviews[prevState.displayedPictureIndex] || {}).fileName !== (this.displayedPicture() || {}).fileName ||
       prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded ||
       prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded
     ) {
