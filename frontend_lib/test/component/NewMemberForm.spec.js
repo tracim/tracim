@@ -18,12 +18,12 @@ describe('<NewMemberForm />', () => {
     onClickCloseAddMemberBtn: onClickCloseAddMemberBtnCallBack,
     personalData: 'randomPersonalData',
     searchedKnownMemberList: [
-      { public_name: 'random', user_id: 1 },
-      { public_name: 'Searched', user_id: 2 },
-      { public_name: 'Known', user_id: 3 },
-      { public_name: 'Member', user_id: 4 },
-      { public_name: 'List', user_id: 5 },
-      { public_name: 'Test', user_id: 6 }
+      { public_name: 'random', username: 'random', user_id: 1 },
+      { public_name: 'Searched', username: 'Searched', user_id: 2 },
+      { public_name: 'Known', username: 'Known', user_id: 3 },
+      { public_name: 'Member', username: 'Member', user_id: 4 },
+      { public_name: 'List', username: 'List', user_id: 5 },
+      { public_name: 'Test', username: 'Test', user_id: 6 }
     ],
     isEmail: false,
     onClickAutoComplete: onClickAutoCompleteCallBack,
@@ -72,7 +72,7 @@ describe('<NewMemberForm />', () => {
         expect(wrapper.find('div.autocomplete__item__avatar > Avatar').at(i).prop('publicName'))
           .to.equal(props.searchedKnownMemberList[i].public_name)
         expect(wrapper.find('div.autocomplete__item__name').at(i))
-          .to.have.text().equal(props.searchedKnownMemberList[i].public_name)
+          .to.have.text().equal(`${props.searchedKnownMemberList[i].public_name}@${props.searchedKnownMemberList[i].username}`)
       }
     })
   })
