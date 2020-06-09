@@ -101,34 +101,29 @@ export class Gallery extends React.Component {
     let newDisplayedPictureIndex = state.displayedPictureIndex
     let newImagesPreviews = state.imagesPreviews
 
-    // We remove it from the list of previews
-    for (let i = 0; i < state.imagesPreviews.length; i++) {
-      if (state.imagesPreviews[i].contentId === data.content.content_id) {
-        // We found the picture to delete
+    const deletedIndex = state.imagesPreviews.findIndex(image => image.contentId === data.content.content_id)
+    if (deletedIndex !== -1) {
+      newImagesPreviews = state.imagesPreviews.slice(0, deletedIndex - 1).concat(
+        state.imagesPreviews.slice(deletedIndex)
+      )
 
-        // We remove it in the new list of images
-        newImagesPreviews = state.imagesPreviews.slice()
-        newImagesPreviews.splice(i, 1)
+      // We set the new current index
+      if (deletedIndex < state.displayedPictureIndex) {
+        // if the currently displayed picture is after the deleted image
+        // we have to fix its index. The current picture's new index is
+        // decremented.
+        newDisplayedPictureIndex--
+      } else if (deletedIndex === state.displayedPictureIndex) {
+        // if the currently displayed picture is the one being deleted
+        // we show the next picture, which index is the now the one of the
+        // deleted picture.
 
-        // We set the new current index
-        if (i < state.displayedPictureIndex) {
-          // if the currently displayed picture is after the deleted image
-          // we have to fix its index. The current picture's new index is
-          // decremented.
-          newDisplayedPictureIndex--
-        } else if (i === state.displayedPictureIndex) {
-          // if the currently displayed picture is the one being deleted
-          // we show the next picture, which index is the now the one of the
-          // deleted picture.
-
-          if (state.displayedPictureIndex >= newImagesPreviews.length) {
-            // if this picture does not exist, though, we take the previous one.
-            // if no there are no pictures left, we take 0, which is the default
-            // value of displayedPictureIndex.
-            newDisplayedPictureIndex = Math.max(0, state.displayedPictureIndex - 1)
-          }
+        if (state.displayedPictureIndex >= newImagesPreviews.length) {
+          // if this picture does not exist, though, we take the previous one.
+          // if no there are no pictures left, we take 0, which is the default
+          // value of displayedPictureIndex.
+          newDisplayedPictureIndex = Math.max(0, state.displayedPictureIndex - 1)
         }
-        break
       }
     }
 
@@ -150,16 +145,16 @@ export class Gallery extends React.Component {
   }
 
   handleAllAppChangeLanguage = data => {
-      console.log('%c<Gallery> Custom event', 'color: #28a745', data)
-      this.setState(prev => ({
-        loggedUser: {
-          ...prev.loggedUser,
-          lang: data
-        }
-      }))
-      i18n.changeLanguage(data)
-      this.buildBreadcrumbs()
-      if (this.state.workspaceLabel) this.setHeadTitle(`${props.t('Gallery')} · ${this.state.workspaceLabel}`)
+    console.log('%c<Gallery> Custom event', 'color: #28a745', data)
+    this.setState(prev => ({
+      loggedUser: {
+        ...prev.loggedUser,
+        lang: data
+      }
+    }))
+    i18n.changeLanguage(data)
+    this.buildBreadcrumbs()
+    if (this.state.workspaceLabel) this.setHeadTitle(`${this.props.t('Gallery')} · ${this.state.workspaceLabel}`)
   }
 
   async componentDidMount () {
@@ -230,7 +225,7 @@ export class Gallery extends React.Component {
       breadcrumbsList.push({
         link: (
           <Link
-            to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${this.currentPictureId()}`}
+            to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${this.displayedPictureId()}`}
           >
             {this.currentPicture().fileName}
           </Link>
@@ -313,24 +308,22 @@ export class Gallery extends React.Component {
         // to this picture.
         // We fall back to the index that was already here.
 
-        let displayedPictureIndex = state.displayedPictureIndex
-        const currentPictureId = this.currentPictureId()
-        if (currentPictureId) {
-          for (let i = 0; i < imagesPreviews.length; i++) {
-            if (imagesPreviews[i].contentId === currentPictureId) {
-              displayedPictureIndex = i
-              break
-            }
-          }
+        let displayedPictureIndex = -1
+
+        const displayedPictureId = this.displayedPictureId()
+        if (displayedPictureId) {
+          displayedPictureIndex = imagesPreviews.findIndex(image => image.contentId === displayedPictureId)
+        }
+
+        if (displayedPictureIndex === -1) {
+          displayedPictureIndex = state.displayedPictureIndex
         }
 
         this.setState({ imagesPreviews, displayedPictureIndex, imagesPreviewsLoaded: true })
 
         break
       }
-      default:
-        console.log("fetchContentList", fetchContentList)
-        this.sendGlobalFlashMessage(props.t('Error while loading content list'))
+      default: this.sendGlobalFlashMessage(props.t('Error while loading content list'))
     }
   }
 
@@ -586,7 +579,7 @@ export class Gallery extends React.Component {
     return this.state.imagesPreviews[this.state.displayedPictureIndex]
   }
 
-  currentPictureId () {
+  displayedPictureId () {
     return (this.currentPicture() || {}).contentId
   }
 
