@@ -27,6 +27,16 @@ class TracimRequestHookSpec:
         pass
 
     @hookspec
+    def on_current_client_token_set(self, client_token: str, request: TracimRequest) -> None:
+        """
+        Called when a current client_token is defined on the request.
+
+        :param client_token: current client token
+        :param request: current request
+        """
+        pass
+
+    @hookspec
     def on_request_session_created(self, request: TracimRequest, session: TracimSession) -> None:
         """
         Called when the request has been initialized.
@@ -53,7 +63,7 @@ def web_include(configurator: Configurator, app_config: CFG) -> None:
     >>> @hookimpl
     ... def web_include(configurator: Configurator, app_config: CFG) -> None:
     ...     my_controller = MyController()
-    ...     configurator.include(mycontroller.bind, route_prefix=BASE_API_V2)
+    ...     configurator.include(mycontroller.bind, route_prefix=BASE_API)
     ... # doctest: +SKIP
 
     :param configurator: Tracim pyramid configurator

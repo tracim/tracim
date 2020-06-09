@@ -15,6 +15,8 @@ import {
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
+  hasNotAllowedCharacters,
+  hasSpaces,
   removeAtInUsername,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -79,7 +81,8 @@ export class Account extends React.Component {
 
     this.state = {
       subComponentMenu: builtSubComponentMenu.filter(menu => menu.display),
-      newUsernameAvailability: true
+      isUsernameValid: true,
+      usernameInvalidMsg: ''
     }
 
     props.registerCustomEventHandlerList([
@@ -172,7 +175,7 @@ export class Account extends React.Component {
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
     subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName })),
-    newUsernameAvailability: true
+    isUsernameValid: true
   }))
 
   handleSubmitPersonalData = async (newPublicName, newUsername, newEmail, checkPassword) => {
@@ -205,21 +208,8 @@ export class Account extends React.Component {
 
     if (newUsername !== '') {
       const username = removeAtInUsername(newUsername)
-
-      if (username.length < MINIMUM_CHARACTERS_USERNAME) {
-        props.dispatch(newFlashMessage(
-          props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-          , 'warning')
-        )
-        return false
-      }
-
-      if (/\s/.test(username)) {
-        props.dispatch(newFlashMessage(props.t("Username can't contain any whitespace"), 'warning'))
-        return false
-      }
-
       const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, checkPassword))
+
       switch (fetchPutUsername.status) {
         case 200:
           if (newEmail === '') {
@@ -261,14 +251,43 @@ export class Account extends React.Component {
     }
   }
 
-  handleChangeUsername = async (username) => {
+  handleChangeUsername = async (newUsername) => {
     const { props } = this
 
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(removeAtInUsername(username)))
+    const username = removeAtInUsername(newUsername)
+
+    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (hasSpaces(username)) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t("Username can't contain any whitespace")
+      })
+      return
+    }
+
+    if (hasNotAllowedCharacters(username)) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
 
     switch (fetchUsernameAvailability.status) {
       case 200:
-        this.setState({ newUsernameAvailability: fetchUsernameAvailability.json.available })
+        this.setState({
+          isUsernameValid: fetchUsernameAvailability.json.available,
+          usernameInvalidMsg: props.t('This username is not available')
+        })
         break
       default: props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning')); break
     }
@@ -341,7 +360,8 @@ export class Account extends React.Component {
                             userAuthType={props.user.authType}
                             onClickSubmit={this.handleSubmitPersonalData}
                             onChangeUsername={this.handleChangeUsername}
-                            newUsernameAvailability={state.newUsernameAvailability}
+                            isUsernameValid={state.isUsernameValid}
+                            usernameInvalidMsg={state.usernameInvalidMsg}
                           />
                         )
 

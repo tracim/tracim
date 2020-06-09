@@ -291,7 +291,7 @@ export const IMG_LOAD_STATE = {
 
 export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
 
-// INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/v2/system/content_types
+// INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/system/content_types
 export const CONTENT_TYPE = {
   HTML_DOCUMENT: 'html-document',
   FILE: 'file',
@@ -344,3 +344,8 @@ export const removeAtInUsername = (username) => {
   }
   return trimmedUsername
 }
+
+// INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
+export const hasNotAllowedCharacters = name => !(/^[A-Za-z0-9_-]*$/.test(name))
+
+export const hasSpaces = name => /\s/.test(name)

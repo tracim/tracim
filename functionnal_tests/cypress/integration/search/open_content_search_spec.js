@@ -8,9 +8,9 @@ const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
 
 const searchInput = '[data-cy=search__text]'
-const contentThreadGetter = formatTag({selectorName: s.CONTENT_IN_SEARCH, attrs: {title: threadTitle}})
-const contentHtmlDocGetter = formatTag({selectorName: s.CONTENT_IN_SEARCH, attrs: {title: htmlDocTitle}})
-const contentFileGetter = formatTag({selectorName: s.CONTENT_IN_SEARCH, attrs: {title: fileTitle}})
+const contentThreadGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: threadTitle } })
+const contentHtmlDocGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: htmlDocTitle } })
+const contentFileGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: fileTitle } })
 
 let workspaceId
 
@@ -30,7 +30,7 @@ describe('Searching keywords', () => {
 
   beforeEach(function () {
     cy.loginAs('users')
-    cy.visitPage({pageName: PAGES.HOME})
+    cy.visitPage({ pageName: PAGES.HOME })
     cy.ignoreTinyMceError()
   })
 

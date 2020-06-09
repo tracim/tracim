@@ -41,10 +41,10 @@ describe('Account page', () => {
         .should('be.visible')
     })
     it("should have username with an @ at user's info", () => {
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('[data-cy=userinfo__username]')
-          .contains(`@${baseUser.username}`)
-          .should('be.visible')
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('[data-cy=userinfo__username]')
+        .contains(`@${baseUser.username}`)
+        .should('be.visible')
     })
   })
 

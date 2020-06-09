@@ -21,7 +21,7 @@ class TestFolderMove(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        move_url = "/api/v2/workspaces/{}/contents/{}/move".format(
+        move_url = "/api/workspaces/{}/contents/{}/move".format(
             workspace.workspace_id, moved_folder.content_id
         )
         body = {
@@ -53,7 +53,7 @@ class TestFolderMove(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        move_url = "/api/v2/workspaces/{}/contents/{}/move".format(
+        move_url = "/api/workspaces/{}/contents/{}/move".format(
             workspace.workspace_id, moved_folder.content_id
         )
         body = {
@@ -92,7 +92,7 @@ class TestFolderMove(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        move_url = "/api/v2/workspaces/{}/contents/{}/move".format(
+        move_url = "/api/workspaces/{}/contents/{}/move".format(
             workspace.workspace_id, moved_folder.content_id
         )
         body = {

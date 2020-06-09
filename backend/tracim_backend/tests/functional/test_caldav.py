@@ -230,7 +230,7 @@ class TestAgendaApi(object):
         rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        result = web_testapp.get("/api/v2/users/{}/agenda".format(user.user_id), status=200)
+        result = web_testapp.get("/api/users/{}/agenda".format(user.user_id), status=200)
 
         assert len(result.json_body) == 3
         agenda = result.json_body[0]
@@ -279,7 +279,7 @@ class TestAgendaApi(object):
             "agenda_types": "workspace",
         }
         result = web_testapp.get(
-            "/api/v2/users/{}/agenda".format(user.user_id), params=params, status=200
+            "/api/users/{}/agenda".format(user.user_id), params=params, status=200
         )
         assert len(result.json_body) == 2
         agenda = result.json_body[0]
