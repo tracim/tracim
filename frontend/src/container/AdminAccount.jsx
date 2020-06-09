@@ -43,7 +43,7 @@ import {
   MINIMUM_CHARACTERS_USERNAME
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
-import serializeUser from '../reducer/user.js'
+import { serializeUser } from '../reducer/user.js'
 
 class Account extends React.Component {
   constructor (props) {
@@ -143,7 +143,12 @@ class Account extends React.Component {
     switch (fetchGetUser.status) {
       case 200:
         this.setState(prev => ({
-          userToEdit: serializeUser(fetchGetUser.json),
+          userToEdit: {
+            ...prev.userToEdit,
+            allowedSpace: fetchGetUser.json.allowed_space,
+            isDeleted: fetchGetUser.json.is_deleted,
+            ...serializeUser({ ...fetchGetUser.json, agenda_url: '', logged: false })
+          },
           subComponentMenu: prev.subComponentMenu
             .filter(menu => editableUserAuthTypeList.includes(fetchGetUser.json.auth_type) ? true : menu.name !== 'password')
         }))

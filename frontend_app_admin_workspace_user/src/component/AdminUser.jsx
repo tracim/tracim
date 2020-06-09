@@ -56,7 +56,7 @@ export class AdminUser extends React.Component {
 
     const { props } = this
 
-    if (props.userList.find(u => u.user_id === userId).profile === PROFILE.administrator.slug) {
+    if (props.userList.find(u => u.userId === userId).profile === PROFILE.administrator.slug) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
@@ -173,14 +173,14 @@ export class AdminUser extends React.Component {
                   const userProfile = getUserProfile(PROFILE_LIST, u.profile)
                   return (
                     <tr
-                      className={classnames('adminUser__table__tr', { 'user-deactivated': !u.is_active })}
-                      key={u.user_id}
+                      className={classnames('adminUser__table__tr', { 'user-deactivated': !u.isActive })}
+                      key={u.userId}
                       data-cy='adminUser__table__tr'
                     >
                       <td>
                         <BtnSwitch
-                          checked={u.is_active}
-                          onChange={e => this.handleToggleUser(e, u.user_id, !u.is_active)}
+                          checked={u.isActive}
+                          onChange={e => this.handleToggleUser(e, u.userId, !u.isActive)}
                           activeLabel=''
                           inactiveLabel={props.t('Account deactivated')}
                         />
@@ -197,8 +197,8 @@ export class AdminUser extends React.Component {
                       <td
                         className='adminUser__table__tr__td-link primaryColorFont'
                       >
-                        <Link to={`/ui/admin/user/${u.user_id}`}>
-                          {u.public_name}
+                        <Link to={`/ui/admin/user/${u.userId}`}>
+                          {u.publicName}
                         </Link>
                       </td>
 
@@ -211,20 +211,20 @@ export class AdminUser extends React.Component {
                       <td>
                         <BtnSwitch
                           checked={u.profile === PROFILE.manager.slug || u.profile === PROFILE.administrator.slug}
-                          onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === PROFILE.manager.slug || u.profile === PROFILE.administrator.slug))}
+                          onChange={e => this.handleToggleProfileManager(e, u.userId, !(u.profile === PROFILE.manager.slug || u.profile === PROFILE.administrator.slug))}
                           activeLabel={props.t('Activated')}
                           inactiveLabel={props.t('Deactivated')}
-                          disabled={!u.is_active}
+                          disabled={!u.isActive}
                         />
                       </td>
 
                       <td>
                         <BtnSwitch
                           checked={u.profile === PROFILE.administrator.slug}
-                          onChange={e => this.handleToggleProfileAdministrator(e, u.user_id, !(u.profile === PROFILE.administrator.slug))}
+                          onChange={e => this.handleToggleProfileAdministrator(e, u.userId, !(u.profile === PROFILE.administrator.slug))}
                           activeLabel={props.t('Activated')}
                           inactiveLabel={props.t('Deactivated')}
-                          disabled={!u.is_active}
+                          disabled={!u.isActive}
                         />
                       </td>
                     </tr>
