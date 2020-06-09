@@ -37,7 +37,7 @@ docker-compose up -d pushpin
 
 for cypress test, you should use:
 ~~~bash
-PUSHPIN_CONFIG_DIR=./pushpin_cypress_config docker compose up -d pushpin
+PUSHPIN_CONFIG_DIR=./pushpin_cypress_config docker-compose up -d pushpin
 ~~~
 
 then run tracim :
