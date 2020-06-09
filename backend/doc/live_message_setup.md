@@ -62,7 +62,7 @@ to stop "pushpin" containers (from `backend` directory):
 docker-compose down
 ~~~
 
-to see running container list (pushping container will be named `backend_pushpin_1`):
+to see running container list (pushpin container will be named `backend_pushpin_1`):
 
 ~~~bash
 docker ps
