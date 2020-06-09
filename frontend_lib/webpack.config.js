@@ -54,7 +54,7 @@ module.exports = {
   devtool: isProduction ? false : 'cheap-module-source-map',
   module: {
     rules: [
-      isProduction || process.env.LINTING !== "false"
+      isProduction || process.env.LINTING === "false"
         ? {}
         : {
           test: /\.jsx?$/,

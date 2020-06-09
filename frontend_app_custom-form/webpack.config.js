@@ -37,7 +37,7 @@ module.exports = {
   },
   // exclure la lib des json
   module: {
-    rules: [ process.env.LINTING !== "false" ? {} : {
+    rules: [ process.env.LINTING === "false" ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',

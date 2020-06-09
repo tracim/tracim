@@ -43,7 +43,7 @@ module.exports = {
     hints: false
   },
   module: {
-    rules: [ process.env.LINTING !== "false" ? {} : {
+    rules: [ process.env.LINTING === "false" ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       exclude: [/node_modules/, /frontend_lib/],
