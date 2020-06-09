@@ -156,12 +156,16 @@ class EventBuilder:
     def _create_user_event(
         self, operation: OperationType, user: User, context: TracimContext
     ) -> None:
+        current_user = self._get_current_user(context)
         user_api = UserApi(
-            self._get_current_user(context), context.dbsession, self._config, show_deleted=True
+            current_user=current_user,
+            session=context.dbsession,
+            config=self._config,
+            show_deleted=True,
         )
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(self._get_current_user(context))
+                user_api.get_user_with_context(current_user)
             ).data,
             _CLIENT_TOKEN_FIELD: context.client_token,
             _USER_FIELD: self._user_schema.dump(user_api.get_user_with_context(user)).data,
