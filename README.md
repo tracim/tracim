@@ -102,9 +102,9 @@ Alternatively, under root:
 
 You can add "-d" to build_full_frontend.sh to disable obfuscation and reduce build time.
 
-### Install The Pushpin-Proxy for Live Messages
+### Install and run pushpin for UI updates
 
-Tracim rely on pushpin for live_message feature, so you need to have a working pushpin in order to make tracim work as
+Tracim relies on [pushpin](https://pushpin.org/docs/about/) for UI updates, so you need to setup pushpin.
 expected.
 
 ## For development purpose
