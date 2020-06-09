@@ -40,6 +40,7 @@ from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
+from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
@@ -209,7 +210,18 @@ class EventBuilder:
         current_user = self._get_current_user(context)
         content_api = ContentApi(context.dbsession, current_user, self._config)
         content_in_context = content_api.get_content_in_context(content)
-        content_dict = self._content_schemas[content.type].dump(content_in_context).data
+        try:
+            content_schema = content_dict = self._content_schemas[content.type]
+        except KeyError:
+            content_schema = ContentSchema()
+            logger.error(
+                self,
+                (
+                    "Cannot dump proper content for content-type '{}' in generated event "
+                    "as it is unknown, falling back to generic content schema"
+                ).format(content.type),
+            )
+        content_dict = content_schema.dump(content_in_context).data
 
         workspace_api = WorkspaceApi(
             context.dbsession, self._get_current_user(context), self._config
