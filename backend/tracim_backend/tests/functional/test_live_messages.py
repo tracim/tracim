@@ -123,39 +123,3 @@ class TestLivesMessages(object):
         assert result["fields"]["author"]
         assert result["event_type"] == "user.modified"
         assert event1.event == "message"
-
-    @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_async_live_test"}], indirect=True
-    )
-    def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__content_creation__async(
-        self, pushpin, app_config, rq_database_worker
-    ):
-        headers = {"Accept": "text/event-stream"}
-        response = requests.get(
-            "http://localhost:7999/api/v2/users/1/live_messages",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            stream=True,
-            headers=headers,
-        )
-        client = sseclient.SSEClient(response)
-        requests.post(
-            "http://localhost:7999/api/v2/workspaces",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            json={"description": "foo bar", "label": "Workspace"},
-        )
-
-        params = {"content_type": "html-document", "label": "Hello"}
-        create_content_request = requests.post(
-            "http://localhost:7999/api/v2/workspaces/1/contents",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            json=params,
-        )
-        assert create_content_request.status_code == 200
-        events = []
-        for e in client.events():
-            events.append(e)
-            if 3 == len(events):
-                break
-        result = json.loads(events[-1].data)
-        assert result["event_type"] == "content.created.html-document"
-        response.close()
