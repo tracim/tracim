@@ -42,8 +42,8 @@ from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import CommentSchema
-from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
+from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
@@ -52,6 +52,7 @@ from tracim_backend.views.core_api.schemas import WorkspaceSchema
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
+_CLIENT_TOKEN_FIELD = "client_token"
 _WORKSPACE_FIELD = "workspace"
 _CONTENT_FIELD = "content"
 _MEMBER_FIELD = "member"
@@ -106,6 +107,8 @@ class EventBuilder:
 
     def __init__(self, config: CFG) -> None:
         self._config = config
+        self._current_user = None  # type: typing.Optional[User]
+        self._client_token = None  # type: typing.Optional[str]
 
     @hookimpl
     def on_context_session_created(self, db_session: TracimSession, context: TracimContext) -> None:
@@ -113,9 +116,9 @@ class EventBuilder:
 
     @staticmethod
     def _get_current_user(context: TracimContext) -> typing.Optional[User]:
-        """Return context's current user or None.
+        """Return the current user of the given context or None if not authenticated.
 
-        tracimcli commands do not have a current_user so take care of it.
+        Not authenticated happens with tracimcli commands.
         """
         try:
             return context.current_user
@@ -146,6 +149,7 @@ class EventBuilder:
             _AUTHOR_FIELD: self._user_schema.dump(
                 user_api.get_user_with_context(self._get_current_user(context))
             ).data,
+            _CLIENT_TOKEN_FIELD: context.client_token,
             _USER_FIELD: self._user_schema.dump(user_api.get_user_with_context(user)).data,
         }
         event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
@@ -185,6 +189,7 @@ class EventBuilder:
             _AUTHOR_FIELD: self._user_schema.dump(
                 user_api.get_user_with_context(current_user)
             ).data,
+            _CLIENT_TOKEN_FIELD: context._client_token,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
@@ -235,6 +240,7 @@ class EventBuilder:
                 user_api.get_user_with_context(current_user)
             ).data,
             _CONTENT_FIELD: content_dict,
+            _CLIENT_TOKEN_FIELD: context._client_token,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(
@@ -288,6 +294,7 @@ class EventBuilder:
                 user_api.get_user_with_context(current_user)
             ).data,
             _USER_FIELD: user_field,
+            _CLIENT_TOKEN_FIELD: context.client_token,
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
             _MEMBER_FIELD: self._workspace_user_role_schema.dump(role_in_context).data,
         }

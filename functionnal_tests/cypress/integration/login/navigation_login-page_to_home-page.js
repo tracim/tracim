@@ -1,4 +1,4 @@
-let GREETING_MSG = 'Welcome to Tracim'
+const GREETING_MSG = 'Welcome to Tracim'
 
 describe('logging in tracim', function () {
   before(() => {

@@ -26,7 +26,7 @@ describe('New share download form', () => {
         })
     }).then(promise => {
       cy.visitPage({
-        pageName: PAGES.CONTENT_OPEN, 
+        pageName: PAGES.CONTENT_OPEN,
         params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
       })
       cy.get('[data-cy=popin_right_part_share]').should('be.visible').click()
@@ -37,7 +37,7 @@ describe('New share download form', () => {
     cy.cancelXHR()
   })
 
-  it('nominal case',() => {
+  it('nominal case', () => {
     // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
     cy.wait(1000)
     cy.get(emailInput).type(`${email1}`)
@@ -45,33 +45,33 @@ describe('New share download form', () => {
     cy.get('.shareLink__linkInfos__email').contains(email1).should('be.visible')
   })
 
-  it('separating emails by space then pressing Enter, should separate the emails by new line',() => {
+  it('separating emails by space then pressing Enter, should separate the emails by new line', () => {
     // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
     cy.wait(1000)
     cy.get(emailInput).type(`${email1},${email2},${email3}`).should('be.visible').type('{enter}')
     cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
   })
 
-  it('separating emails by commas then pressing Enter, should separate the emails by new line',() => {
+  it('separating emails by commas then pressing Enter, should separate the emails by new line', () => {
     // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
     cy.wait(1000)
     cy.get(emailInput).type(`${email1},${email2},${email3}`).should('be.visible').type('{enter}')
     cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
   })
 
-  describe('protected by password',() => {
-    it('Should include the input',() => {
+  describe('protected by password', () => {
+    it('Should include the input', () => {
       cy.get('.shareDownload__password__link').should('be.visible').click()
       cy.get('.shareDownload__password__wrapper').should('be.visible')
     })
 
-    it('Should be possible to unhide the password',() => {
+    it('Should be possible to unhide the password', () => {
       cy.get('.shareDownload__password__link').should('be.visible').click()
       // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
       cy.wait(1000)
       cy.get('.shareDownload__password__input').should('be.visible').type('Password')
       cy.get('[data-cy=seePassword]').should('be.visible').click()
-      cy.get('.shareDownload__password__input').should('have.value','Password')
+      cy.get('.shareDownload__password__input').should('have.value', 'Password')
     })
   })
 })

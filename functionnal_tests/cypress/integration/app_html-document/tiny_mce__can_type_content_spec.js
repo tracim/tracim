@@ -16,7 +16,6 @@ describe('Known users as a workspace-manager', function () {
     cy.log('TODO find better way to deal with tinyMCE than using wait')
   })
 
-
   it.only('Check TinyMCE is active if document is empty when opening', function () {
     cy.get('[data-cy=dropdownCreateBtn]').first().click()
     cy.contains('Write a document').click()
@@ -72,7 +71,6 @@ describe('Known users as a workspace-manager', function () {
         cy.assertTinyMCEContent(DOCUMENT_HTML_CONTENT)
       })
   })
-
 
   it('Check TinyMCE is not active when opening if document has been modified', function () {
     cy.get('[data-cy=dropdownCreateBtn]').first().click()
