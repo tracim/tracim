@@ -78,33 +78,148 @@ export class Gallery extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrModifiedOrUndeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrUndeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrModifiedOrUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrUndeleted }
     ])
 
     this.lightboxRotation = new LightboxRotation()
   }
 
   // TLM Handlers
-  handleContentCreatedOrModifiedOrUndeleted = data => {
-    // A picture has been added or modified - let's reload the gallery list.
-    // The picture could have been added anywhere in the list.
-    // Any attempt to patch the image list may lead to inconsistency between a
-    // page reload and an update using data in the TLM.
-    this.loadGalleryList(this.state.config.appConfig.workspaceId, this.state.folderId)
+
+  // NOTE - RJ - 2020-06-10
+  //
+  // We are going to update the list of pictures as well as the currently
+  // displayed picture according to the live messages we receive.
+  // A first approach was to just reload the list of pictures from the server
+  // to ensure that we are always consistent with the list the backend sends.
+  // However, this did not end well.
+  //
+  // If several pictures are uploaded / modified in a short time, the list of
+  // pictures was downloaded several times before the state of the component
+  // had time to change even once, leading to crashes and weird behavior.
+  // Even if it worked, this would be an easy but inefficient way of handling
+  // updates.
+  //
+  // Imagine a folder with 1000 pictures. Are we handling this list again and
+  // again if 10 pictures are added? Come on, what was I thinking.
+  //
+  // So we are applying the harder but more correct approach: updating the list
+  // using the TLM.
+  //
+  // We still want to ensure consistency with what would be displayed if we
+  // downloaded the list of pictures from the backend though.
+  //
+  // This list built there at the time of writing this comment:
+  //
+  //    backend/tracim_backend/views/core_api/workspace_controller.py
+  //
+  // In the workspace_content method of the WorkspaceController class
+  // we can see that the contents of a folder is **sorted by label**.
+  //
+  // That's what we are going to do.
+  //
+  // This is bad news though: if we are currently watching a picture that is
+  // renamed, it will move in the list.
+  //
+  // What is the correct behavior?
+  //  1) Not changing the current picture index if a picture is renamed.
+  //     This will not change the position, but this will make the currently
+  //     picture change "out of nowhere"
+  //  2) Changing the position does not has this downside, but the user might
+  //     lose track of its picture browsing session.
+  //
+  // Since anything could happen with the list of pictures anyway (imagine
+  // someone taking the time to sort their Tracim folder and renaming random
+  // pictures for instance). We cannot really avoid the downsides of 2) anyway.
+  // We will at least free the user from liberal image jumping.
+  //
+  // I hope that I convinced you, and myself, that the thereafter implemented
+  // solution, 2), is the superior solution.
+  //
+  // We are not done yet though. As you may know, sorting is a rabbit hole.
+  // You may know that sorting depends on a lot of things like the
+  // charset and the locale. How does the backend sorts strings here?
+  //
+  // This is defined by the order_by_properties attribute, used in
+  // method _get_all_query of the ContentApi class defined in:
+  //
+  //    backend/tracim_backend/lib/core/content.py
+  //
+  // There, we can see that this property is used to build an ORDER BY SQL
+  // clause. So how does SQL sort? Here is the relevent documentation for
+  // PostgreSQL: https://www.postgresql.org/docs/current/locale.html
+  // Long story short, this is configurable using LC_COLLATE.
+  // This means we need to get this piece of information from the backend, which
+  // we probably don't have yet.
+  //
+  // In Javascript, we have String.localeCompare method to sort strings.
+  //
+  //    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
+  //
+  // It takes an optional locale parameter to use the right sorting algorithm.
+  // We have two choices:
+  //  1) leave it blank. The exact sorting is implementation-defined.
+  //  2) we pick an arbitrary value (like English).
+  //
+  // For now:
+  //  - we will not specify the locale. Any value is incorrect anyway. We can
+  //    hope that visitors and the serveur are set to the same locale so this
+  //    will work by chance in many cases.
+  //  - this will cause discrepancies between the backend and the frontend if
+  //    it's not the case and people use accents or other funny characters.
+  //  - we will mark this as a FIXME add an issue to the bugtracker.
+
+  liveMessageNotRelevant = data => (
+    Number(data.content.workspace_id) !== Number(this.state.config.appConfig.workspaceId) ||
+    Number(data.content.parent_id) !== Number(this.state.folderId)
+  )
+
+  handleContentCreatedOrUndeleted = data => {
+    if (this.liveMessageNotRelevant(data)) return
+
+    const { state } = this
+
+    this.setNewPicturesPreviews([
+      this.buildPreview(data.content),
+      ...state.imagesPreviews
+    ])
+  }
+
+  handleContentModified = data => {
+    if (this.liveMessageNotRelevant(data)) return
+
+    const { state } = this
+
+    // We need to reorder the list because the label of the file could have changed.
+    // We could test whether this is the case, but handling only one case is
+    // probably better.
+
+    this.setNewPicturesPreviews([
+      this.buildPreview(data.content),
+      ...state.imagesPreviews.filter(
+        image => image.contentId !== data.content.content_id
+      )
+    ])
   }
 
   handleContentDeleted = data => {
+    if (this.liveMessageNotRelevant(data)) return
+
     const { state } = this
 
-    let newDisplayedPictureIndex = state.displayedPictureIndex
-    let newImagesPreviews = state.imagesPreviews
+    let displayedPictureIndex = state.displayedPictureIndex
+    let imagesPreviews = state.imagesPreviews
 
-    const deletedIndex = state.imagesPreviews.findIndex(image => image.contentId === data.content.content_id)
+    const deletedIndex = state.imagesPreviews.findIndex(
+      image => image.contentId === data.content.content_id
+    )
+
     if (deletedIndex !== -1) {
-      newImagesPreviews = state.imagesPreviews.slice(0, deletedIndex - 1).concat(
-        state.imagesPreviews.slice(deletedIndex)
+      imagesPreviews = state.imagesPreviews.slice(0, deletedIndex).concat(
+        state.imagesPreviews.slice(deletedIndex + 1)
       )
 
       // We set the new current index
@@ -112,25 +227,35 @@ export class Gallery extends React.Component {
         // if the currently displayed picture is after the deleted image
         // we have to fix its index. The current picture's new index is
         // decremented.
-        newDisplayedPictureIndex--
+        displayedPictureIndex--
       } else if (deletedIndex === state.displayedPictureIndex) {
         // if the currently displayed picture is the one being deleted
         // we show the next picture, which index is the now the one of the
         // deleted picture.
 
-        if (state.displayedPictureIndex >= newImagesPreviews.length) {
+        if (state.displayedPictureIndex >= imagesPreviews.length) {
           // if this picture does not exist, though, we take the previous one.
           // if no there are no pictures left, we take 0, which is the default
           // value of displayedPictureIndex.
-          newDisplayedPictureIndex = Math.max(0, state.displayedPictureIndex - 1)
+          displayedPictureIndex = Math.max(0, state.displayedPictureIndex - 1)
         }
       }
     }
 
-    this.setState({
-      imagesPreviews: newImagesPreviews,
-      displayedPictureIndex: newDisplayedPictureIndex
-    })
+    this.setState({ imagesPreviews, displayedPictureIndex })
+  }
+
+  setNewPicturesPreviews = imagesPreviews => {
+    // WARNING: modifies its parameter in the following line
+    imagesPreviews.sort((img1, img2) => img1.label.localeCompare(img2.label))
+
+    const displayedPictureId = this.displayedPictureId()
+
+    const displayedPictureIndex = imagesPreviews.findIndex(
+      image => image.contentId === displayedPictureId
+    )
+
+    this.setState({ imagesPreviews, displayedPictureIndex })
   }
 
   handleShowApp = data => {
@@ -178,7 +303,7 @@ export class Gallery extends React.Component {
       const contentDetail = await this.loadContentDetails()
       this.buildBreadcrumbs(contentDetail.workspaceLabel, contentDetail.folderDetail, false)
     } else if (
-      prevState.displayedPictureIndex !== state.displayedPictureIndex ||
+      (prevState.imagesPreviews[prevState.displayedPictureIndex] || {}).fileName !== this.displayedPicture().fileName ||
       prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded ||
       prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded
     ) {
@@ -227,7 +352,7 @@ export class Gallery extends React.Component {
           <Link
             to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${this.displayedPictureId()}`}
           >
-            {this.currentPicture().fileName}
+            {this.displayedPicture().fileName}
           </Link>
         ),
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
@@ -300,26 +425,16 @@ export class Gallery extends React.Component {
 
     switch (fetchContentList.apiResponse.status) {
       case 200: {
-        const images = fetchContentList.body.filter(c => c.content_type === 'file').map(c => ({ src: '', contentId: c.content_id }))
-        const imagesPreviews = await this.loadPreview(images)
+        const imagesPreviews = await this.loadPreviews(
+          fetchContentList.body
+            .filter(c => c.content_type === 'file')
+            .map(c => c.content_id)
+        )
 
-        // If the list of pictures is modified and we already were displaying
-        // a picture, we attempt to set the currently displayed picture
-        // to this picture.
-        // We fall back to the index that was already here.
-
-        let displayedPictureIndex = -1
-
-        const displayedPictureId = this.displayedPictureId()
-        if (displayedPictureId) {
-          displayedPictureIndex = imagesPreviews.findIndex(image => image.contentId === displayedPictureId)
-        }
-
-        if (displayedPictureIndex === -1) {
-          displayedPictureIndex = state.displayedPictureIndex
-        }
-
-        this.setState({ imagesPreviews, displayedPictureIndex, imagesPreviewsLoaded: true })
+        this.setState({
+          imagesPreviews,
+          imagesPreviewsLoaded: true
+        })
 
         break
       }
@@ -327,39 +442,85 @@ export class Gallery extends React.Component {
     }
   }
 
-  loadPreview = async (images) => {
-    const { state, props } = this
+  buildPreview = (file) => {
+    if (!file.has_jpeg_preview) return false
 
-    return (await Promise.all(images.map(async (image) => {
+    const { state } = this
+
+    const filenameNoExtension = removeExtensionOfFilename(file.filename)
+
+    const previewUrl = buildFilePreviewUrl(
+      state.config.apiUrl,
+      state.config.appConfig.workspaceId,
+      file.content_id,
+      file.current_revision_id,
+      filenameNoExtension,
+      1,
+      1400,
+      1400
+    )
+
+    const previewUrlForThumbnail = buildFilePreviewUrl(
+      state.config.apiUrl,
+      state.config.appConfig.workspaceId,
+      file.content_id,
+      file.current_revision_id,
+      filenameNoExtension,
+      1,
+      125,
+      125
+    )
+
+    const lightBoxUrlList = (
+      new Array(file.page_nb)
+        .fill('')
+        .map((n, j) => buildFilePreviewUrl(
+          state.config.apiUrl,
+          state.config.appConfig.workspaceId,
+          file.content_id,
+          file.current_revision_id,
+          filenameNoExtension,
+          j + 1,
+          1920,
+          1920
+        ))
+    )
+
+    const rawFileUrl = buildRawFileUrl(
+      state.config.apiUrl,
+      state.config.appConfig.workspaceId,
+      file.content_id,
+      file.filename
+    )
+
+    return {
+      contentId: file.content_id,
+      label: file.label,
+      src: previewUrl,
+      fileName: file.filename,
+      lightBoxUrlList,
+      previewUrlForThumbnail,
+      rotationAngle: 0,
+      rawFileUrl
+    }
+  }
+
+  loadPreviews = async (imageContentIds) => {
+    return (await Promise.all(imageContentIds.map(async (contentId) => {
       const fetchFileContent = await handleFetchResult(
-        await getFileContent(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId)
+        await getFileContent(
+          this.state.config.apiUrl,
+          this.state.config.appConfig.workspaceId,
+          contentId
+        )
       )
-      switch (fetchFileContent.apiResponse.status) {
-        case 200: {
-          if (!fetchFileContent.body.has_jpeg_preview) return false
 
-          const filenameNoExtension = removeExtensionOfFilename(fetchFileContent.body.filename)
-          const previewUrl = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 1400, 1400)
-          const previewUrlForThumbnail = buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, 1, 125, 125)
-          const lightBoxUrlList = (new Array(fetchFileContent.body.page_nb)).fill('').map((n, j) =>
-            buildFilePreviewUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.current_revision_id, filenameNoExtension, j + 1, 1920, 1920)
-          )
-          const rawFileUrl = buildRawFileUrl(state.config.apiUrl, state.config.appConfig.workspaceId, image.contentId, fetchFileContent.body.filename)
-
-          return {
-            ...image,
-            src: previewUrl,
-            fileName: fetchFileContent.body.filename,
-            lightBoxUrlList,
-            previewUrlForThumbnail,
-            rotationAngle: 0,
-            rawFileUrl
-          }
-        }
-        default:
-          this.sendGlobalFlashMessage(props.t('Error while loading file preview'))
-          return false
+      if (fetchFileContent.apiResponse.status === 200) {
+        return this.buildPreview(fetchFileContent.body)
       }
+
+      this.sendGlobalFlashMessage(this.props.t('Error while loading file preview'))
+      return false
     }))).filter(i => i !== false)
   }
 
@@ -449,14 +610,19 @@ export class Gallery extends React.Component {
   }
 
   handleOpenDeleteFilePopup = () => {
-    this.setState({
-      displayPopupDelete: true
-    })
+    if (this.state.imagesPreviews.length) {
+      this.setState({
+        displayPopupDelete: true
+      })
+    } else {
+      this.sendGlobalFlashMessage(this.props.t('There isn’t any picture to delete.'))
+    }
   }
 
   handleCloseDeleteFilePopup = () => {
     this.setState({
-      displayPopupDelete: false
+      displayPopupDelete: false,
+      displayPopupDeleteErrorNoPhotoToDelete: false
     })
   }
 
@@ -537,9 +703,9 @@ export class Gallery extends React.Component {
   getRawFileUrlSelectedFile () {
     const { state } = this
 
-    if (state.imagesPreviews.length === 0 || !this.currentPicture()) return
+    if (state.imagesPreviews.length === 0 || !this.displayedPicture()) return
 
-    return this.currentPicture().rawFileUrl
+    return this.displayedPicture().rawFileUrl
   }
 
   handleMouseMove = () => {
@@ -575,18 +741,18 @@ export class Gallery extends React.Component {
   }
 
   // INFO - 2020-06-09 - RJ this function returns undefined if there is no current picture
-  currentPicture () {
+  displayedPicture () {
     return this.state.imagesPreviews[this.state.displayedPictureIndex]
   }
 
   displayedPictureId () {
-    return (this.currentPicture() || {}).contentId
+    return (this.displayedPicture() || { contentId: -1 }).contentId
   }
 
   render () {
     const { state, props } = this
 
-    if (this.currentPicture()) this.lightboxRotation.changeAngle(this.currentPicture().rotationAngle)
+    if (this.displayedPicture()) this.lightboxRotation.changeAngle(this.displayedPicture().rotationAngle)
 
     return (
       <div className='gallery-scrollView'>
@@ -662,11 +828,11 @@ export class Gallery extends React.Component {
             >
               <div ref={modalRoot => (this.reactImageLightBoxModalRoot = modalRoot)} />
 
-              {state.displayLightbox && this.currentPicture() && (
+              {state.displayLightbox && this.displayedPicture() && (
                 <div className='gallery__mouse__listener' onMouseMove={this.handleMouseMove}>
                   <ReactImageLightbox
                     prevSrc={this.getPreviousImageUrl()}
-                    mainSrc={this.currentPicture().lightBoxUrlList[0]}
+                    mainSrc={this.displayedPicture().lightBoxUrlList[0]}
                     nextSrc={this.getNextImageUrl()}
                     onCloseRequest={this.handleClickHideImageRaw}
                     onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}
