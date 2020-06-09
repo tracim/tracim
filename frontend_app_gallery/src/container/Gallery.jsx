@@ -581,7 +581,7 @@ export class Gallery extends React.Component {
     if (state.autoPlay) this.displayReactImageLightBoxArrows(false)
   }
 
-  // note: returns undefined if there is no current picture
+  // INFO - 2020-06-09 - RJ this function returns undefined if there is no current picture
   currentPicture () {
     return this.state.imagesPreviews[this.state.displayedPictureIndex]
   }
