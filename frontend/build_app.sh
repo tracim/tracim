@@ -29,7 +29,7 @@ if [ -f src/debug.js.sample ]; then
     cp src/debug.js.sample src/debug.js || logerror "Could not copy the debug file"
 fi
 
-yarn run buildUsingExternalVendors$dev || logerror "Build failed"
+yarn run buildwithextvendors$dev || logerror "Build failed"
 
 cp dist/$APP_NAME.app.js ../frontend/dist/app || logerror "Failed copying the app"
 
