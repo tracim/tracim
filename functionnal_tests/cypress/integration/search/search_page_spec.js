@@ -24,7 +24,7 @@ describe('Searching keywords', () => {
 
     beforeEach(function () {
       cy.loginAs('users')
-      cy.visitPage({pageName: PAGES.HOME})
+      cy.visitPage({ pageName: PAGES.HOME })
     })
 
     afterEach(function () {
@@ -83,7 +83,7 @@ describe('Searching keywords', () => {
 
     before(function () {
       cy.loginAs('users')
-      cy.visitPage({pageName: PAGES.SEARCH, params: {searchedKeywords: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes}})
+      cy.visitPage({ pageName: PAGES.SEARCH, params: { searchedKeywords: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes } })
     })
 
     describe('the subtitle', () => {

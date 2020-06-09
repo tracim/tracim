@@ -40,9 +40,14 @@ for cypress test, you should use:
 PUSHPIN_CONFIG_DIR=./pushpin_cypress_config docker compose up -d pushpin
 ~~~
 
-then run tracim :
+then run tracim:
 ~~~bash
 pserve development.ini
+~~~
+
+or, for cypress tests:
+~~~bash
+pserve cypress_test.ini
 ~~~
 
 :warning: pushpin for dev and pushpin for cypress cannot be started at the same time (they do use same ports)
@@ -74,7 +79,7 @@ To manually test live messages, you can first open a connexion on live message s
 (this use the default admin user, of course you can do this with other users too)
 
 ~~~bash
-http -S -a admin@admin.admin:admin@admin.admin localhost:7999/api/v2/users/1/live_messages
+http -S -a admin@admin.admin:admin@admin.admin localhost:7999/api/users/1/live_messages
 ~~~
 
 

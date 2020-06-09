@@ -2,13 +2,12 @@ import 'cypress-wait-until'
 import 'cypress-file-upload'
 
 const userFixtures = {
-  'administrators': 'defaultAdmin',
+  administrators: 'defaultAdmin',
   'trusted-users': '',
-  'users': 'baseUser'
+  users: 'baseUser'
 }
 
-
-let LOGIN_URL = '/api/v2/auth/login'
+let LOGIN_URL = '/api/auth/login'
 
 Cypress.Commands.add('loginAs', (role = 'administrators') => {
   if (getCookieValueFromEnv(role)) {
@@ -23,8 +22,8 @@ Cypress.Commands.add('login', (user, role) => {
     method: 'POST',
     url: LOGIN_URL,
     body: {
-      'email': user.email,
-      'password': user.password
+      email: user.email,
+      password: user.password
     }
   }).then(response => {
     cy.waitUntil(() => cy.getCookie('session_key').then(cookie => {
@@ -35,7 +34,7 @@ Cypress.Commands.add('login', (user, role) => {
     }))
     return cy.request({
       method: 'PUT',
-      url: '/api/v2/users/' + response.body.user_id,
+      url: '/api/users/' + response.body.user_id,
       body: {
         lang: 'en',
         public_name: response.body.public_name,
@@ -46,7 +45,7 @@ Cypress.Commands.add('login', (user, role) => {
 })
 
 Cypress.Commands.add('logout', () => {
-  cy.request('POST', 'api/v2/auth/logout')
+  cy.request('POST', '/api/auth/logout')
   cy.cleanSessionCookies()
 })
 
@@ -95,7 +94,7 @@ Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZon
       {
         subjectType: 'drag-n-drop',
         subjectNature: 'dom'
-      },
+      }
     )
   })
 
@@ -162,5 +161,14 @@ Cypress.Commands.add('cleanSessionCookies', () => {
 })
 
 Cypress.Commands.add('cancelXHR', () => {
-  cy.visit('/api/v2/doc/')
+  cy.visit('/api/doc/')
+})
+
+Cypress.Commands.add('changeLanguage', (langCode) => {
+  cy.get('#headerDropdownMenuButton')
+    .click()
+
+  cy.get('.dropdownlang__dropdown__subdropdown')
+    .find('[data-cy="' + langCode + '"]')
+    .click()
 })

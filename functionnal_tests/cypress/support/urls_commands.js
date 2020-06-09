@@ -22,10 +22,10 @@ const URLS = {
   [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`,
   [PAGES.AGENDA]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/agenda/`,
   [PAGES.EDIT_FOLDER]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/contents/folder/${folderId}`,
-  [PAGES.SEARCH]: ({searchedKeywords, pageNumber, numberByPage, actived, deleted, archived, contentTypes}) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchedKeywords}&t=${contentTypes}`,
+  [PAGES.SEARCH]: ({ searchedKeywords, pageNumber, numberByPage, actived, deleted, archived, contentTypes }) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchedKeywords}&t=${contentTypes}`,
   [PAGES.SHARE_FOLDER]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/share_folder`,
   [PAGES.ADMIN_WORKSPACE]: () => '/ui/admin/workspace',
-  [PAGES.ADMIN_USER]: ({userId}) => `/ui/admin/user/${userId ? userId : ''}`,
+  [PAGES.ADMIN_USER]: ({ userId }) => `/ui/admin/user/${userId || ''}`,
   [PAGES.GALLERY]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/gallery` + (folderId ? `?folder_ids=${folderId}` : '/'),
   [PAGES.ACCOUNT]: () => '/ui/account'
 }
@@ -62,7 +62,7 @@ const formatUrl = ({ pageName, params = {}, getters = null }) => {
 }
 
 Cypress.Commands.add('visitPage', ({ pageName, params = {}, getters = null }) => {
-  let url = formatUrl({ pageName: pageName, params: params, getters: getters })
+  const url = formatUrl({ pageName: pageName, params: params, getters: getters })
   return cy.visit(url)
 })
 export { PAGES, reverseUrl, formatUrl }
@@ -85,7 +85,7 @@ cy.visitPage({pageName: p.DASHBOARD, params: {workspaceId: 1}})
 
 cy.visit('/ui/workspaces/1/contents?type=file')
 =>
-cy.vistPage({pageName: p.CONTENTS, getters: {type: 'file'}, params: {workspaceId: 1}})
+cy.visitPage({ pageName: p.CONTENTS, getters: { type: 'file' }, params: { workspaceId: 1 } })
 
 ```
 
