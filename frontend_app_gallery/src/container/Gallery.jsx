@@ -182,7 +182,11 @@ export class Gallery extends React.Component {
       this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
       const contentDetail = await this.loadContentDetails()
       this.buildBreadcrumbs(contentDetail.workspaceLabel, contentDetail.folderDetail, false)
-    } else if (prevState.displayedPictureIndex !== state.displayedPictureIndex || prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded || prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded) {
+    } else if (
+      prevState.displayedPictureIndex !== state.displayedPictureIndex ||
+      prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded ||
+      prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded
+    ) {
       this.buildBreadcrumbs(state.workspaceLabel, state.folderDetail, true)
     }
   }
