@@ -105,7 +105,6 @@ You can add "-d" to build_full_frontend.sh to disable obfuscation and reduce bui
 ### Install and run pushpin for UI updates
 
 Tracim relies on [pushpin](https://pushpin.org/docs/about/) for UI updates, so you need to setup pushpin.
-expected.
 
 #### For development purpose
 
