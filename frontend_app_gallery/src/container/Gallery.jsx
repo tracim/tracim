@@ -116,7 +116,7 @@ export class Gallery extends React.Component {
           // we have to fix its index. The current picture's new index is
           // decremented.
           newDisplayedPictureIndex--
-        } else if (i == state.displayedPictureIndex) {
+        } else if (i === state.displayedPictureIndex) {
           // if the currently displayed picture is the one being deleted
           // we show the next picture, which index is the now the one of the
           // deleted picture.
