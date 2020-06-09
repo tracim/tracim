@@ -69,7 +69,7 @@ def worker_context() -> typing.Generator[TracimContext, None, None]:
         yield context
         transaction.commit()
     except Exception:
-        transaction.rollback()
+        transaction.abort()
         raise
     finally:
         context.cleanup()
