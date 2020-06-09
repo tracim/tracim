@@ -60,8 +60,6 @@ _MEMBER_FIELD = "member"
 
 RQ_QUEUE_NAME = "event"
 
-_PENDING_EVENTS = "pending_events"
-
 
 class EventApi:
     """Api to query event & messages"""
@@ -290,8 +288,15 @@ class EventBuilder:
         self, operation: OperationType, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
         current_user = self._get_current_user(context)
-        workspace_api = WorkspaceApi(context.dbsession, current_user, self._config)
-        workspace_in_context = workspace_api.get_workspace_with_context(role.workspace)
+        workspace_api = WorkspaceApi(
+            session=context.dbsession,
+            current_user=current_user,
+            config=self._config,
+            show_deleted=True,
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(
+            workspace_api.get_one(role.workspace_id)
+        )
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         role_api = RoleApi(
             current_user=current_user, session=context.dbsession, config=self._config
@@ -331,18 +336,15 @@ class EventBuilder:
 
         # We only publish events that have an event_id from the DB.
         # we can have `new` events here as we add events in the session
-        # in a `after_flush` sqlalchemy event and _publish_events is also
-        # called during the same `after_flush` event.
-        publishable_events = []
-        not_publishable_events = []
+        # in a `after_flush` sqlalchemy event and `_publish_events` is also
+        # called during the same `after_flush` event (when PROCESSING_MODE is `sync`).
+        new_events = []
         for event in context.pending_events:
             if event.event_id:
-                publishable_events.append(event)
+                message_builder.publish_messages_for_event(event.event_id)
             else:
-                not_publishable_events.append(event)
-        for event in publishable_events:
-            message_builder.publish_messages_for_event(event.event_id)
-        context.pending_events = not_publishable_events
+                new_events.append(event)
+        context.pending_events = new_events
 
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
