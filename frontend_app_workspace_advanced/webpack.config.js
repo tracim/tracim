@@ -7,7 +7,7 @@ const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {
   mode: isProduction ? 'production' : 'development',
-  entry: isProduction
+  entry: process.env.SERVDEV !== 'true'
     ? './src/index.js' // only one instance of babel-polyfill is allowed
     : ['@babel/polyfill', './src/index.dev.js'],
   output: {

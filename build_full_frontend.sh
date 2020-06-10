@@ -22,8 +22,10 @@ logerror() {
 }
 
 dev=""
+appdev=""
 if [ "$1" = "-d" ]; then
-    dev="-d"
+    dev="-dev"
+    appdev="-d"
 fi
 
 echo -e "\n${BROWN}/!\ ${NC}this script does not run 'yarn install'\n${BROWN}/!\ ${NC}"
@@ -35,30 +37,29 @@ export DEFAULTDIR
 mkdir -p $DEFAULTDIR/frontend/dist/app/ || logerror "Failed to make directory $DEFAULTDIR/frontend/dist/app/"
 
 # Tracim vendors
-log "Building tracim_frontend_vendors"
 cd "$DEFAULTDIR/frontend_vendors"
-./build_vendors.sh && loggood "success" || logerror "Could not build tracim_frontend_vendors"
+./build_vendors.sh $appdev && loggood "success" || logerror "Could not build tracim_frontend_vendors"
 
 
 # Tracim Lib Bundle
 log "Building tracim_frontend_lib"
-yarn workspace tracim_frontend_lib run build && loggood "success" || logerror "Could not build tracim_frontend_lib"
+yarn workspace tracim_frontend_lib run build$dev && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
 # Tracim Lib for the browsers
 log "Building tracim_frontend_lib for Tracim"
-yarn workspace tracim_frontend_lib run buildwithextvendors && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
+yarn workspace tracim_frontend_lib run buildwithextvendors$dev && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
 
 for app in "$DEFAULTDIR"/frontend_app_*; do
 	if [ -f "$app/.disabled-app" ]; then
 		log "Skipping $app because of the existence of the .disabled-app file"
 	else
 		cd "$app" || exit 1
-		./build_*.sh $dev || logerror "Failed building $app."
+		./build_*.sh $appdev || logerror "Failed building $app."
 	fi
 done
 
 # build Tracim
 log "building the Tracim frontend"
-yarn workspace tracim run buildwithextvendors && loggood "success" || logerror "Could not build the Tracim frontend."
+yarn workspace tracim run buildwithextvendors$dev && loggood "success" || logerror "Could not build the Tracim frontend."
 
 loggood "-- frontend build successful."

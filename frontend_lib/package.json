@@ -4,8 +4,9 @@
   "main": "dist/tracim_frontend_lib.lib.js",
   "scripts": {
     "mockapi": "node jsonserver/server.js",
-    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.tracim.config.js --watch --colors --inline --hot --progress",
+    "servdev": "NODE_ENV=development SERVDEV=true webpack-dev-server --config webpack.tracim.config.js --watch --colors --inline --hot --progress",
     "buildtracimlib": "build && buildwithextvendors",
+    "buildtracimlib-dev": "build-dev && buildwithextvendors-dev",
     "build-translation": "node i18next.scanner.js",
     "build": "./build-script.sh",
     "build-dev": "./build-script.sh dev",

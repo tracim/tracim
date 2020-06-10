@@ -9,7 +9,7 @@ const PnpWebpackPlugin = require('pnp-webpack-plugin')
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
-    lib: isProduction ? './src/index.js' : './src/index.dev.js',
+    lib: process.env.SERVDEV !== 'true' ? './src/index.js' : './src/index.dev.js',
     test_utils: './test/index.js',
     style: glob.sync('./src/**/*.styl')
   },
@@ -17,9 +17,9 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'tracim_frontend_lib.[name].js' : 'tracim_frontend_lib.[name].dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'tracim_frontend_lib' : undefined,
-    libraryTarget: isProduction ? 'umd' : undefined,
-    umdNamedDefine: isProduction ? true : undefined
+    library: 'tracim_frontend_lib',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
   optimization: {
     namedModules: true
