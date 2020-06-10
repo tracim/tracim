@@ -14,12 +14,14 @@ describe('<MemberList />', () => {
       id: 1,
       role: 'workspace-manager',
       doNotify: true,
-      publicName: 'randomPublicName1'
+      publicName: 'randomPublicName1',
+      username: 'randomUserame1'
     }, {
       id: 0,
       role: 'content-manager',
       doNotify: true,
-      publicName: 'randomPublicName2'
+      publicName: 'randomPublicName2',
+      username: 'randomUserame2'
     }],
     roleList: [{
       slug: 'workspace-manager'
@@ -44,7 +46,13 @@ describe('<MemberList />', () => {
 
     it('should display the publicName of each member in memberList', () => {
       for (let i = 0; i < props.memberList.length; i++) {
-        expect(wrapper.find('div.memberlist__list__item__info__name').at(i)).to.text().equal(props.memberList[i].publicName)
+        expect(wrapper.find('div.memberlist__list__item__info__firstLine__name').at(i)).to.text().equal(props.memberList[i].publicName)
+      }
+    })
+
+    it('should display the username of each member in memberList', () => {
+      for (let i = 0; i < props.memberList.length; i++) {
+        expect(wrapper.find('div.memberlist__list__item__info__username').at(i)).to.text().equal(`@${props.memberList[i].username}`)
       }
     })
 

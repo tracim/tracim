@@ -24,7 +24,7 @@ class AccountController(Controller):
     @hapic.input_path(PathSuffixSchema())
     def account_route_get(self, context, request: TracimRequest, hapic_data: HapicData):
         """
-        Convenient route allowing to use PUT /api/v2/users/{user_id}/* endpoint with authenticated user
+        Convenient route allowing to use PUT /api/users/{user_id}/* endpoint with authenticated user
         without directly giving a user id.
         This route generates an HTTP 307 response with the right URL
         """
@@ -38,7 +38,7 @@ class AccountController(Controller):
     @hapic.input_path(PathSuffixSchema())
     def account_route_put(self, context, request: TracimRequest, hapic_data: HapicData):
         """
-        Convenient route allowing to use PUT /api/v2/users/{user_id}/* endpoint with authenticated user
+        Convenient route allowing to use PUT /api/users/{user_id}/* endpoint with authenticated user
         without giving directly user id.
         This route generate a HTTP 307 with the right url
         """

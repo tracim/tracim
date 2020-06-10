@@ -1,9 +1,6 @@
 import pytest
 import transaction
 
-from tracim_backend.lib.core.event import EventBuilder
-from tracim_backend.lib.core.plugins import init_plugin_manager
-from tracim_backend.lib.crud_hook.caller import DatabaseCrudHookCaller
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
@@ -14,10 +11,6 @@ class TestEventBuilder:
     def test_unit__on_modified_user__is_deleted(
         self, user_api_factory, session, app_config, event_helper
     ) -> None:
-        manager = init_plugin_manager(app_config)
-        DatabaseCrudHookCaller(session, manager)
-        manager.register(EventBuilder(app_config))
-
         uapi = user_api_factory.get()
         user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
 
@@ -43,10 +36,6 @@ class TestEventBuilder:
         event_helper,
         content_type_list,
     ) -> None:
-        manager = init_plugin_manager(app_config)
-        DatabaseCrudHookCaller(session, manager)
-        manager.register(EventBuilder(app_config))
-
         capi = content_api_factory.get()
         wapi = workspace_api_factory.get()
         workspace = wapi.create_workspace("test workspace", save_now=True)
