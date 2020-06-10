@@ -38,7 +38,7 @@
   "Password": "Mot de passe",
   "Create the user": "Créer l'utilisateur",
   "Create a user": "Créer un utilisateur",
-  "Please enter a name, a password, select a profile, and at least one between username or email": "Veuillez saisir un nom, un mot de passe, sélectionner un profil, et au moins un identifiant ou un email",
+  "Please enter a name, an email, a password and select a profile": "Veuillez saisir un nom, un email, un mot de passe et sélectionner un profil",
   "Please set a password": "Veuillez définir un mot de passe",
   "Full name": "Nom complet",
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Le nom complet doit comporter au moins {{minimumCharactersPublicName}} caractères",

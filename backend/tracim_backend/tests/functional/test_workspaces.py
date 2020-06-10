@@ -572,6 +572,8 @@ class TestWorkspaceEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace.deleted"
         assert last_event.workspace == workspace
+        assert last_event.author
+        assert last_event.client_token is None
 
     def test_api__delete_workspace__ok_200__manager_workspace_manager(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
@@ -1279,6 +1281,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert last_event.author == author
         user = web_testapp.get("/api/users/2", status=200).json_body
         assert last_event.user == user
+        assert last_event.client_token is None
 
         res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
         assert len(res) == 2
@@ -1821,6 +1824,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert last_event.author == author
         user_dict = web_testapp.get("/api/users/{}".format(user.user_id), status=200).json_body
         assert last_event.user == user_dict
+        assert last_event.client_token is None
 
         # after
         roles = web_testapp.get(

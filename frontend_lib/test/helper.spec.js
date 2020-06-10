@@ -3,6 +3,8 @@ import {
   generateLocalStorageContentId,
   convertBackslashNToBr,
   handleFetchResult,
+  hasNotAllowedCharacters,
+  hasSpaces,
   generateFetchResponse,
   parserStringToList,
   removeAtInUsername
@@ -117,6 +119,24 @@ describe('helper.js', () => {
     })
     it('should return the username empty when username is empty', () => {
       expect(removeAtInUsername('')).to.eq('')
+    })
+  })
+
+  describe('the hasNotAllowedCharacters() function', () => {
+    it('should return false if name has only allowed characters', () => {
+      expect(hasNotAllowedCharacters('g00dUsername')).to.eq(false)
+    })
+    it('should return true if name has not allowed characters', () => {
+      expect(hasNotAllowedCharacters('b@dU$ername')).to.eq(true)
+    })
+  })
+
+  describe('the hasSpaces() function', () => {
+    it('should return false if name has no spaces', () => {
+      expect(hasSpaces('g00dUsername')).to.eq(false)
+    })
+    it('should return true if name has spaces', () => {
+      expect(hasSpaces('bad Username')).to.eq(true)
     })
   })
 })

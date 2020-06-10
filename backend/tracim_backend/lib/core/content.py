@@ -18,7 +18,6 @@ from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.attributes import QueryableAttribute
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
 import transaction
 
@@ -72,6 +71,7 @@ from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
 
@@ -146,7 +146,7 @@ class ContentApi(object):
 
     def __init__(
         self,
-        session: Session,
+        session: TracimSession,
         current_user: typing.Optional[User],
         config: CFG,
         show_archived: bool = False,
@@ -158,6 +158,7 @@ class ContentApi(object):
         disable_user_workspaces_filter: bool = False,
         namespaces_filter: typing.Optional[typing.List[ContentNamespaces]] = None,
     ) -> None:
+        session.assert_event_mecanism()
         self._session = session
         self._user = current_user
         self._config = config
@@ -1631,7 +1632,7 @@ class ContentApi(object):
         for rev, is_current_rev in content.get_tree_revisions_advanced():
 
             if rev.content_id == content.content_id:
-                related_content = new_content
+                related_content = new_content  # type: Content
                 related_parent = new_parent
             else:
                 # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
@@ -1639,7 +1640,7 @@ class ContentApi(object):
                 if rev.content_id not in new_content_children:
                     new_content_children[rev.content_id] = Content()
                     original_content_children[rev.content_id] = rev.node
-                related_content = new_content_children[rev.content_id]  # type: Content
+                related_content = new_content_children[rev.content_id]
                 if rev.parent_id == content.content_id:
                     related_parent = new_content
                 else:
@@ -1647,8 +1648,7 @@ class ContentApi(object):
             # INFO - G.M - 2019-04-30 - copy of revision itself.
             cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
             cpy_rev.node = related_content
-            if is_current_rev:
-                related_content.current_revision = cpy_rev
+            related_content.current_revision = cpy_rev
             self._session.add(related_content)
             self._session.flush()
         return AddCopyRevisionsResult(

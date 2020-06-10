@@ -1,8 +1,8 @@
-describe('Author and avatar ar shown in timeline', () => {
+describe('Author and avatar are shown in the timeline', () => {
   beforeEach(() => {
     cy.resetDB()
     cy.setupBaseDB()
-    let title = 'A title'
+    const title = 'A title'
     cy.loginAs('users').as('user')
     cy.fixture('baseWorkspace').as('workspace')
       .then((workspace) => {
@@ -15,12 +15,11 @@ describe('Author and avatar ar shown in timeline', () => {
       })
   })
 
-
   afterEach(() => {
     cy.cancelXHR()
   })
 
-  it('Author is shown in timeline after creation', function () {
+  it('Author is shown in the timeline after creation', function () {
     cy.loginAs('users')
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_1]').within(() => {
@@ -28,7 +27,7 @@ describe('Author and avatar ar shown in timeline', () => {
     })
   })
 
-  it('Author is shown in timeline after update content', function () {
+  it('Author is shown in the timeline after update content', function () {
     cy.updateHtmlDocument(
       this.document.content_id,
       this.document.workspace_id,
@@ -42,7 +41,7 @@ describe('Author and avatar ar shown in timeline', () => {
     })
   })
 
-  it('Author is shown in timeline after changing status', function () {
+  it('Author is shown in the timeline after changing status', function () {
     cy.changeHtmlDocumentStatus(
       this.document.content_id,
       this.document.workspace_id,
@@ -55,7 +54,7 @@ describe('Author and avatar ar shown in timeline', () => {
     })
   })
 
-  it('User is shown in timeline after update content (not author)', function () {
+  it('User is shown in the timeline after update content (not author)', function () {
     cy.logout()
     cy.loginAs('administrators')
     cy.updateHtmlDocument(
@@ -70,7 +69,7 @@ describe('Author and avatar ar shown in timeline', () => {
     })
   })
 
-  it('User is shown in timeline after changing status (not author)', function () {
+  it('User is shown in the timeline after changing status (not author)', function () {
     cy.logout()
     cy.loginAs('administrators')
     cy.changeHtmlDocumentStatus(

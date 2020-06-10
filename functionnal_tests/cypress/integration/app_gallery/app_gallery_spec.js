@@ -38,18 +38,16 @@ describe('App Gallery', function () {
         .then(newContent => createdFiles.file1.id = newContent.content_id)
 
       cy.createFile(createdFiles.file2.fullFilename, createdFiles.file2.contentType, createdFiles.file2.title, workspace.workspace_id)
-        .then(newContent => createdFiles.file2.id  = newContent.content_id)
+        .then(newContent => createdFiles.file2.id = newContent.content_id)
 
       cy.createFile(createdFiles.file3.fullFilename, createdFiles.file3.contentType, createdFiles.file3.title, workspace.workspace_id)
         .then(newContent => createdFiles.file3.id = newContent.content_id)
-
 
       cy.createFolder(folder1.label, workspaceId).then(f => {
         folder1 = f
         cy.createFile(createdFiles.file4.fullFilename, createdFiles.file4.contentType, createdFiles.file4.title, workspace.workspace_id, folder1.content_id)
           .then(newContent => createdFiles.file4.id = newContent.content_id)
       })
-
     })
   })
 
@@ -90,10 +88,10 @@ describe('App Gallery', function () {
         pageName: PAGES.CONTENTS,
         params: { workspaceId }
       })
-      cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: folder1.content_id }})
+      cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: folder1.content_id } })
         .find('.extandedaction__button')
         .click()
-      cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: folder1.content_id }})
+      cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: folder1.content_id } })
         .find('[data-cy=extended_action_gallery]')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
@@ -137,7 +135,7 @@ describe('App Gallery', function () {
       cy.get('.sidebar__expand')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`[data-cy=gallery__action__button__auto__play]`)
+        .get('[data-cy=gallery__action__button__auto__play]')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file2.title}']`)
@@ -161,16 +159,16 @@ describe('App Gallery', function () {
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']`)
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`button.gallery__action__button__rotation__left`)
+        .get('button.gallery__action__button__rotation__left')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}'].rotate270`)
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.carousel__item__preview__content__image > img`).then(($img) => {
+        .get('.carousel__item__preview__content__image > img').then(($img) => {
           cy.window().then(win => {
             cy.getTag({ selectorName: s.GALLERY_FRAME })
-              .get(`.carousel__item__preview__content__image`).then(($imgContainer) => {
+              .get('.carousel__item__preview__content__image').then(($imgContainer) => {
                 cy.wrap($img[0].getBoundingClientRect().height).should('eq',
                   $imgContainer[0].clientHeight - (
                     parseFloat(win.getComputedStyle($imgContainer[0]).paddingTop) +
@@ -192,7 +190,7 @@ describe('App Gallery', function () {
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']`)
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`button.gallery__action__button__rotation__right`)
+        .get('button.gallery__action__button__rotation__right')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}'].rotate90`)
@@ -219,11 +217,11 @@ describe('App Gallery', function () {
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']:visible`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`[data-cy=gallery__action__button__lightbox__fullscreen]`)
+        .get('[data-cy=gallery__action__button__lightbox__fullscreen]')
         .click()
       // INFO - GM - 2020-01-14 we check only if the div exist here to test if fullscreen mode is activated because cypress don't render it properly
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.fullscreen.fullscreen-enabled`)
+        .get('.fullscreen.fullscreen-enabled')
     })
     it('should hide arrows when the autoPlay is enabled', () => {
       cy.visitPage({
@@ -234,13 +232,13 @@ describe('App Gallery', function () {
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']:visible`)
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`[data-cy=gallery__action__button__lightbox__auto__play]`)
+        .get('[data-cy=gallery__action__button__lightbox__auto__play]')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.ril-next-button.ril__navButtons`)
+        .get('.ril-next-button.ril__navButtons')
         .should('be.not.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.ril-prev-button.ril__navButtons`)
+        .get('.ril-prev-button.ril__navButtons')
         .should('be.not.visible')
     })
     it('should be responsive on mobile', () => {
@@ -253,21 +251,20 @@ describe('App Gallery', function () {
         .click()
       cy.viewport('iphone-4') // INFO - GM - 2020/03/05 - 320x480, smallest common screen which is used these days (Iphone SE)
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`[data-cy=gallery__action__button__lightbox__auto__play]`)
+        .get('[data-cy=gallery__action__button__lightbox__auto__play]')
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`[data-cy=gallery__action__button__lightbox__fullscreen]`)
+        .get('[data-cy=gallery__action__button__lightbox__fullscreen]')
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.gallery__action__button__lightbox__rotation__right`)
+        .get('.gallery__action__button__lightbox__rotation__right')
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`[data-cy=gallery__action__button__lightbox__rotation__left]`)
+        .get('[data-cy=gallery__action__button__lightbox__rotation__left]')
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.gallery__action__button__lightbox__openRawContent`)
+        .get('.gallery__action__button__lightbox__openRawContent')
         .should('be.visible')
-
     })
   })
 
@@ -281,26 +278,26 @@ describe('App Gallery', function () {
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']`)
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`[data-cy=gallery__action__button__delete]`)
+        .get('[data-cy=gallery__action__button__delete]')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`.gallery__delete__file__popup`)
+        .get('.gallery__delete__file__popup')
         .should('be.visible')
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`[data-cy=gallery__delete__file__popup__body__btn__delete]`)
+        .get('[data-cy=gallery__delete__file__popup__body__btn__delete]')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get(`.carousel__item__preview__content__image > img[alt='${createdFiles.file1.title}']`)
         .should('be.not.visible')
     })
-    it(`should no display the delete button if user don't have right to delete file`, () => {
+    it('should no display the delete button if user don\'t have right to delete file', () => {
       cy.loginAs('users')
       cy.visitPage({
         pageName: PAGES.GALLERY,
         params: { workspaceId }
       })
       cy.getTag({ selectorName: s.GALLERY_FRAME })
-        .get(`[data-cy=gallery__action__button__delete]`)
+        .get('[data-cy=gallery__action__button__delete]')
         .should('be.not.visible')
     })
   })

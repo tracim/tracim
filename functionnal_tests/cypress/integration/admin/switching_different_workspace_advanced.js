@@ -57,7 +57,7 @@ describe('Switching between workspaces advanced', () => {
         .first()
         .click()
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME})
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('.wsContentGeneric__header.workspace_advanced__header')
         .should('be.visible')
     })

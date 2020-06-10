@@ -359,7 +359,7 @@ export class Dashboard extends React.Component {
       newMember: {
         ...prev.newMember,
         id: knownMember.user_id,
-        personalData: knownMember.public_name,
+        personalData: knownMember.username,
         avatarUrl: knownMember.avatar_url,
         isEmail: false
       },
@@ -388,12 +388,7 @@ export class Dashboard extends React.Component {
       return false
     }
 
-    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.personalData)
-
-    if (!props.system.config.email_notification_activated && !newMemberInKnownMemberList) {
-      props.dispatch(newFlashMessage(props.t('Unknown user'), 'warning'))
-      return false
-    }
+    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.user_id === state.newMember.id)
 
     if (state.newMember.id === '' && newMemberInKnownMemberList) { // this is to force sending the id of the user to the api if he exists
       this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
@@ -401,9 +396,8 @@ export class Dashboard extends React.Component {
 
     const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      publicName: state.newMember.isEmail ? '' : state.newMember.personalData,
       email: state.newMember.isEmail ? state.newMember.personalData : '',
-      username: newMemberInKnownMemberList.user_username,
+      username: state.newMember.isEmail ? '' : state.newMember.personalData,
       role: state.newMember.role
     }))
 
@@ -411,7 +405,7 @@ export class Dashboard extends React.Component {
       newMember: {
         id: '',
         avatarUrl: '',
-        nameOrEmail: '',
+        personalData: '',
         role: '',
         isEmail: false
       },

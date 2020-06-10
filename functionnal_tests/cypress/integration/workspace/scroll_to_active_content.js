@@ -1,5 +1,5 @@
-import {PAGES as p} from '../../support/urls_commands'
-import {SELECTORS as s} from '../../support/generic_selector_commands'
+import { PAGES as p } from '../../support/urls_commands'
+import { SELECTORS as s } from '../../support/generic_selector_commands'
 
 describe('Scroll to active content when refreshing the page', () => {
   let workspaceId
@@ -27,7 +27,7 @@ describe('Scroll to active content when refreshing the page', () => {
 
   beforeEach(function () {
     cy.loginAs('administrators')
-    cy.visitPage({pageName: p.CONTENTS, params: {workspaceId: workspaceId}})
+    cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: workspaceId } })
   })
 
   afterEach(function () {
@@ -37,17 +37,17 @@ describe('Scroll to active content when refreshing the page', () => {
   describe('Open a content', () => {
     describe('Open a file', () => {
       it('should scroll to file when refreshing the page', () => {
-        cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + nbContent}})
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: contentTitle + nbContent } })
           .find('.content__item')
           .click()
 
         cy.reload()
 
-        cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + nbContent}})
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: contentTitle + nbContent } })
           .find('.content__item')
           .should('be.visible')
 
-        cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + 0}})
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: contentTitle + 0 } })
           .find('.content__item')
           .should('be.not.visible')
       })
@@ -73,21 +73,21 @@ describe('Scroll to active content when refreshing the page', () => {
 
     describe('Open a file when a folder is open', () => {
       it('should scroll to file and not folder when refreshing the page', () => {
-        cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: firstFolder.content_id}})
+        cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: firstFolder.content_id } })
           .find('.folder__header__name')
           .click()
 
-        cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + nbContent}})
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: contentTitle + nbContent } })
           .find('.content__item')
           .click()
 
         cy.reload()
 
-        cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: contentTitle + nbContent}})
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: contentTitle + nbContent } })
           .find('.content__item')
           .should('be.visible')
 
-        cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: firstFolder.content_id}})
+        cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: firstFolder.content_id } })
           .find('.folder__header__name')
           .should('be.not.visible')
       })

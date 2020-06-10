@@ -37,10 +37,9 @@ describe('recentactivity in dashboard page', function () {
 
     it('should show the activity and a button to see more', function () {
       cy.get('.recentactivity__list').scrollIntoView()
-      cy.getTag({selectorName: s.RECENT_ACTIVITY_IN_LIST, attrs: {title: threadTitle}})
+      cy.getTag({ selectorName: s.RECENT_ACTIVITY_IN_LIST, attrs: { title: threadTitle } })
         .should('be.visible')
       cy.get('.recentactivity .recentactivity__list button.recentactivity__more__btn').should('be.visible')
     })
   })
-
 })

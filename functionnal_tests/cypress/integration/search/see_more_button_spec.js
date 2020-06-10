@@ -13,7 +13,7 @@ const htmlDocTitle9 = 'HtmlDocForSearch9'
 const htmlDocTitle10 = 'HtmlDocForSearch10'
 
 const searchInput = '[data-cy=search__text]'
-const seeMoreButton= '.searchResult__btnSeeMore button'
+const seeMoreButton = '.searchResult__btnSeeMore button'
 
 let workspaceId
 
@@ -40,7 +40,7 @@ describe('Searching keywords', () => {
 
   beforeEach(function () {
     cy.loginAs('users')
-    cy.visitPage({pageName: PAGES.HOME})
+    cy.visitPage({ pageName: PAGES.HOME })
   })
 
   describe('that match more than 10 contents', () => {
@@ -68,7 +68,7 @@ describe('Searching keywords', () => {
         const deleted = '0'
         const archived = '0'
         const contentTypes = 'html-document%2Cfile%2Cthread%2Cfolder%2Ccomment'
-        cy.visitPage({pageName: PAGES.SEARCH, params: {searchedKeywords: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes}})
+        cy.visitPage({ pageName: PAGES.SEARCH, params: { searchedKeywords: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes } })
 
         cy.get('[data-cy=content__item]').its('length').should('eq', 5)
 
