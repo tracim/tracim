@@ -32,7 +32,7 @@ module.exports = {
     //   'Access-Control-Allow-Origin': '*'
     // }
   },
-  devtool: isProduction ? false : 'cheap-module-source-map',
+  devtool: isProduction ? false : 'eval-cheap-module-source-map',
   performance: {
     hints: false
   },

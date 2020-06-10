@@ -29,7 +29,7 @@ module.exports = {
     },
     historyApiFallback: true
   },
-  devtool: isProduction ? false : 'cheap-module-source-map',
+  devtool: isProduction ? false : 'eval-cheap-module-source-map',
   performance: {
     hints: false
   },
