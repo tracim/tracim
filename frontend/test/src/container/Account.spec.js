@@ -6,6 +6,7 @@ import { translateMock } from '../../hocMock/translate.js'
 import { expect } from 'chai'
 import { Account as AccountWithoutHOC } from '../../../src/container/Account.jsx'
 import sinon from 'sinon'
+import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import { user, userFromApi } from '../../hocMock/redux/user/user.js'
 import { appList } from '../../hocMock/redux/appList/appList.js'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList.js'
@@ -106,6 +107,23 @@ describe('In <Account />', () => {
         })
       })
     })
+
+    describe('eventType sharedspace member', () => {
+      const tlmData = {
+        author: userFromApi,
+        member: { do_notify: true, role: 'workspace-manager' },
+        user: userFromApi,
+        workspace: firstWorkspaceFromApi
+      }
+
+      describe('handleMemberModified', () => {
+        accountInstance.handleMemberModified(tlmData)
+
+        it('should call this.props.dispatch(updateUserWorkspaceSubscriptionNotif())', () => {
+          expect(updateUserWorkspaceSubscriptionNotifCallBack.called).to.equal(true)
+        })
+      })
+    })
   })
 
   describe('its internal function', () => {
@@ -115,7 +133,6 @@ describe('In <Account />', () => {
       restoreHistoryCallBack([
         setWorkspaceListMemberListCallBack,
         newFlashMessageWarningCallBack,
-        updateUserWorkspaceSubscriptionNotifCallBack,
         updateUserAgendaUrlCallBack,
         setBreadcrumbsCallBack,
         newFlashMessageInfoCallBack
@@ -131,14 +148,6 @@ describe('In <Account />', () => {
     })
 
     describe('handleChangeSubscriptionNotif', () => {
-      it('should call updateUserWorkspaceSubscriptionNotifCallBack', (done) => {
-        mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
-        accountInstance.handleChangeSubscriptionNotif(1, 'activate').then(() => {
-          expect(updateUserWorkspaceSubscriptionNotifCallBack.called).to.equal(true)
-          restoreHistoryCallBack([updateUserWorkspaceSubscriptionNotifCallBack])
-        }).then(done, done)
-      })
-
       it('should call newFlashMessageWarningCallBack with invalid workspaceId', (done) => {
         mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
 

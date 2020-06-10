@@ -40,6 +40,7 @@ import {
   PAGE,
   COOKIE_FRONTEND
 } from '../util/helper.js'
+import { serializeUser } from '../reducer/user.js'
 
 const qs = require('query-string')
 
@@ -220,7 +221,7 @@ class Login extends React.Component {
 
   setDefaultUserLang = async loggedUser => {
     const { props } = this
-    const fetchPutUserLang = await props.dispatch(putUserLang({ ...loggedUser, userId: loggedUser.user_id }, props.user.lang))
+    const fetchPutUserLang = await props.dispatch(putUserLang(serializeUser(loggedUser), props.user.lang))
     switch (fetchPutUserLang.status) {
       case 200: break
       default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))

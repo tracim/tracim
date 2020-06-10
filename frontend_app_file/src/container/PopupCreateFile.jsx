@@ -54,7 +54,7 @@ class PopupCreateFile extends React.Component {
 
     if (
       data.content.workspace_id !== state.workspaceId ||
-      state.loggedUser.user_id !== data.content.author.user_id ||
+      state.loggedUser.userId !== data.content.author.user_id ||
       !state.fileToUploadList.some(f => f.name === data.content.filename)
     ) return
 

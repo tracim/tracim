@@ -27,6 +27,22 @@ export const serializeUser = u => ({
   username: u.username
 })
 
+export const unserializeUser = u => ({
+  user_id: u.userId,
+  logged: u.logged,
+  auth_type: u.authType,
+  timezone: u.timezone,
+  profile: u.profile,
+  email: u.email,
+  is_active: u.isActive,
+  avatar_url: u.avatarUrl,
+  created: u.created,
+  public_name: u.publicName,
+  lang: u.lang,
+  agendaUrl: u.agendaUrl,
+  username: u.username
+})
+
 export const defaultUser = {
   userId: -1,
   logged: null, // null avoid to be redirected to /login while whoami ep has not responded yet
@@ -46,11 +62,7 @@ export const defaultUser = {
 export default function user (state = defaultUser, action) {
   switch (action.type) {
     case `${SET}/${USER_CONNECTED}`:
-      return {
-        ...state,
-        ...serializeUser(action.user),
-        lang: serializeUser(action.user).lang || state.lang
-      }
+      return serializeUser({ ...unserializeUser(state), ...action.user })
 
     case `${SET}/${USER_DISCONNECTED}`:
       return { ...state, lang: state.lang, logged: false }
@@ -59,12 +71,7 @@ export default function user (state = defaultUser, action) {
       return { ...state, lang: action.lang }
 
     case `${UPDATE}/${USER}`:
-      return {
-        ...state,
-        ...serializeUser(action.newUser),
-        agendaUrl: serializeUser(action.newUser).agendaUrl || state.agendaUrl,
-        logged: serializeUser(action.newUser).logged || state.logged
-      }
+      return serializeUser({ ...unserializeUser(state), ...action.newUser })
 
     case `${UPDATE}/${USER_USERNAME}`:
       return { ...state, username: action.newUsername }

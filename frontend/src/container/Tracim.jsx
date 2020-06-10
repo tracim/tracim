@@ -54,6 +54,7 @@ import {
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
+import { serializeUser } from '../reducer/user.js'
 
 export class Tracim extends React.Component {
   constructor (props) {
@@ -222,7 +223,7 @@ export class Tracim extends React.Component {
 
   setDefaultUserLang = async loggedUser => {
     const { props } = this
-    const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
+    const fetchPutUserLang = await props.dispatch(putUserLang(serializeUser(loggedUser), props.user.lang))
     switch (fetchPutUserLang.status) {
       case 200: break
       default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))

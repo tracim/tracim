@@ -90,7 +90,8 @@ export class Account extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
     ])
   }
 
@@ -105,6 +106,12 @@ export class Account extends React.Component {
     const { props } = this
     if (props.user.userId !== data.user.user_id) return
     props.dispatch(updateUser(data.user))
+  }
+
+  handleMemberModified = data => {
+    const { props } = this
+    if (props.user.userId !== data.user.user_id) return
+    props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, data.workspace.workspace_id, data.member.do_notify))
   }
 
   componentDidMount () {
@@ -297,9 +304,8 @@ export class Account extends React.Component {
     const { props } = this
 
     const fetchPutUserWorkspaceDoNotify = await props.dispatch(putMyselfWorkspaceDoNotify(workspaceId, doNotify))
-    switch (fetchPutUserWorkspaceDoNotify.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, workspaceId, doNotify)); break // TODO ?
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    if (fetchPutUserWorkspaceDoNotify.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
 

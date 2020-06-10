@@ -21,13 +21,13 @@ describe('<Thread />', () => {
     i18n: {},
     content: contentThread,
     loggedUser: {
-      user_id: 1
+      userId: 1
     },
     t: key => key
   }
 
   mockGetThreadContent200(debug.config.apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.thread)
-  mockPutMyselfThreadRead200(debug.config.apiUrl, props.loggedUser.user_id, contentThread.thread.workspace_id, contentThread.thread.content_id)
+  mockPutMyselfThreadRead200(debug.config.apiUrl, props.loggedUser.userId, contentThread.thread.workspace_id, contentThread.thread.content_id)
   mockGetThreadComment200(debug.config.apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.commentList)
   mockGetThreadRevision200(debug.config.apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.revisionList)
 

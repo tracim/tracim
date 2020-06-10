@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import userReducer, { serializeUser, defaultUser } from '../../../src/reducer/user.js'
+import userReducer, { serializeUser, unserializeUser, defaultUser } from '../../../src/reducer/user.js'
 import {
   SET,
   setUserConnected,
@@ -17,10 +17,11 @@ import {
   USER_USERNAME
 } from '../../../src/action-creator.sync'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
+import { user as globalManager } from '../../hocMock/redux/user/user.js'
 
 describe('user reducer', () => {
   describe('serializers', () => {
-    describe('serializeWorkspace()', () => {
+    describe('serializeUser()', () => {
       const user = serializeUser(globalManagerFromApi)
       it('should return an object (in camelCase)', () => {
         expect(user).to.deep.equal({
@@ -37,6 +38,27 @@ describe('user reducer', () => {
           lang: globalManagerFromApi.lang,
           agendaUrl: globalManagerFromApi.agendaUrl,
           username: globalManagerFromApi.username
+        })
+      })
+    })
+
+    describe('unserializeUser()', () => {
+      const user = unserializeUser(globalManager)
+      it('should return an object (in snake_case)', () => {
+        expect(user).to.deep.equal({
+          agendaUrl: globalManager.agendaUrl,
+          auth_type: globalManager.authType,
+          avatar_url: globalManager.avatarUrl,
+          created: globalManager.created,
+          email: globalManager.email,
+          is_active: globalManager.isActive,
+          lang: globalManager.lang,
+          logged: globalManager.logged,
+          profile: globalManager.profile,
+          public_name: globalManager.publicName,
+          timezone: globalManager.timezone,
+          user_id: globalManager.userId,
+          username: globalManager.username
         })
       })
     })
