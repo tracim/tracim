@@ -13,7 +13,8 @@ import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_SUB_TYPE as TLM_ST
+  TLM_SUB_TYPE as TLM_ST,
+  setupCommonRequestHeaders
 } from 'tracim_frontend_lib'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -212,8 +213,7 @@ class PopupCreateFile extends React.Component {
       xhr.upload.addEventListener('progress', e => this.uploadInProgress(e, file), false)
 
       xhr.open('POST', `${state.config.apiUrl}/workspaces/${state.workspaceId}/files`, true)
-
-      xhr.setRequestHeader('Accept', 'application/json')
+      setupCommonRequestHeaders(xhr)
       xhr.withCredentials = true
 
       xhr.onerror = () => reject(new Error())

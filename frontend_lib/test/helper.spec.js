@@ -8,8 +8,12 @@ import {
   generateFetchResponse,
   parserStringToList,
   removeAtInUsername,
-  FETCH_CONFIG
+  FETCH_CONFIG,
+  COMMON_REQUEST_HEADERS,
+  setupCommonRequestHeaders
 } from '../src/helper.js'
+
+import sinon from 'sinon'
 
 describe('helper.js', () => {
   describe('generateLocalStorageContentId()', () => {
@@ -144,12 +148,20 @@ describe('helper.js', () => {
   describe('FETCH_CONFIG object', () => {
     it('should include tracim client token header', () => {
       expect('X-Tracim-ClientToken' in FETCH_CONFIG.headers).to.eq(true)
-      expect(typeof FETCH_CONFIG.headers['X-Tracim-ClientToken']).to.eq('string')
+      expect(FETCH_CONFIG.headers['X-Tracim-ClientToken']).to.be.a('string')
     })
 
     it('should store the client token in window session', () => {
       expect(window.sessionStorage.getItem('tracimClientToken')).to.eq(FETCH_CONFIG.headers['X-Tracim-ClientToken'])
     })
+  })
 
+  describe('setupCommonRequestHeaders() function', () => {
+    it('should add COMMON_REQUEST_HEADERS object in xhr', () => {
+      const xhr = new sinon.FakeXMLHttpRequest()
+      xhr.open('GET', 'http://localhost')
+      setupCommonRequestHeaders(xhr)
+      expect(xhr.requestHeaders).to.deep.eq(COMMON_REQUEST_HEADERS)
+    })
   })
 })

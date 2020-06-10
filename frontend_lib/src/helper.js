@@ -247,11 +247,21 @@ const getOrCreateSessionClientToken = () => {
   return token
 }
 
+export const COMMON_REQUEST_HEADERS = {
+  'Accept': 'application/json',
+  'X-Tracim-ClientToken': getOrCreateSessionClientToken()
+}
+
 export const FETCH_CONFIG = {
   headers: {
-    'Accept': 'application/json',
+    ...COMMON_REQUEST_HEADERS,
     'Content-Type': 'application/json',
-    'X-Tracim-ClientToken': getOrCreateSessionClientToken()
+  }
+}
+
+export const setupCommonRequestHeaders = (xhr) => {
+  for (const [key, value] of Object.entries(COMMON_REQUEST_HEADERS)) {
+    xhr.setRequestHeader(key, value)
   }
 }
 
