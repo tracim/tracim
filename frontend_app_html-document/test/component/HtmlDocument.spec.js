@@ -33,7 +33,12 @@ const props = {
   onClickRestoreArchived: () => {},
   onClickRestoreDeleted: () => {},
   onClickShowDraft: () => {},
-  t: () => {}
+  t: (s, opts) => {
+    for (const p in opts) {
+      s = s.replace('{{' + p + '}}', opts[p])
+    }
+    return s
+  }
 }
 
 describe('<HtmlDocument />', () => {

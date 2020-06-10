@@ -2,7 +2,6 @@
 import typing
 
 from sqlalchemy.orm import Query
-from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
@@ -14,6 +13,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
 
@@ -21,11 +21,12 @@ __author__ = "damien"
 class RoleApi(object):
     def __init__(
         self,
-        session: Session,
+        session: TracimSession,
         current_user: typing.Optional[User],
         config: CFG,
         show_disabled_user: bool = True,
     ) -> None:
+        session.assert_event_mecanism()
         self._session = session
         self._user = current_user
         self._config = config

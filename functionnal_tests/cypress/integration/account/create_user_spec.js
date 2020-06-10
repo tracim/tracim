@@ -2,6 +2,7 @@ import { PAGES as p } from '../../support/urls_commands'
 
 const publicName = 'new_public_name'
 const username = 'new_username'
+const anotherUsername = 'another_new_username'
 const email = 'new.email@tracim.fr'
 const correctPwd = '123456'
 
@@ -33,21 +34,13 @@ describe('When "Create new user" at Administration', () => {
     cy.get('[data-cy=adminUser__adduser__form__submit]').should('be.disabled')
   })
 
-  it('should disable submit button if missing email and username', () => {
-    cy.get('[data-cy=adminUser__adduser__button]').click()
-    cy.get('[data-cy=adduser_name]').type(publicName)
-    cy.get('[data-cy=adduser_password]').type(correctPwd)
-    cy.get('[data-cy=profile__list__item__administrators]').click()
-    cy.get('[data-cy=adminUser__adduser__form__submit]').should('be.disabled')
-  })
-
-  it('should enable submit button if missing just the email', () => {
+  it('should disable submit button if missing email', () => {
     cy.get('[data-cy=adminUser__adduser__button]').click()
     cy.get('[data-cy=adduser_name]').type(publicName)
     cy.get('[data-cy=adduser_username]').type(username)
     cy.get('[data-cy=adduser_password]').type(correctPwd)
     cy.get('[data-cy=profile__list__item__administrators]').click()
-    cy.get('[data-cy=adminUser__adduser__form__submit]').should('be.enabled')
+    cy.get('[data-cy=adminUser__adduser__form__submit]').should('be.disabled')
   })
 
   it('should enable submit button if missing just the username', () => {
@@ -98,37 +91,31 @@ describe('When "Create new user" at Administration', () => {
     cy.get('.flashmessage').contains('Full name must be at least 3 characters')
   })
 
-  it('should show error message if username is too short', () => {
+  it('should disable submit button if username is too short', () => {
     cy.get('[data-cy=adminUser__adduser__button]').click()
     cy.get('[data-cy=adduser_name]').type(publicName)
     cy.get('[data-cy=adduser_username]').type(errShortUsername)
     cy.get('[data-cy=adduser_email]').type(email)
     cy.get('[data-cy=adduser_password]').type(correctPwd)
-    cy.get('[data-cy=profile__list__item__administrators]').click()
-    cy.get('[data-cy=adminUser__adduser__form__submit]').click()
-    cy.get('.flashmessage').contains('Username must be at least 3 characters')
+    cy.get('[data-cy=adminUser__adduser__form__submit]').should('be.disabled')
   })
 
-  it('should show error message if username has a whitespace', () => {
+  it('should disable submit button if username has a whitespace', () => {
     cy.get('[data-cy=adminUser__adduser__button]').click()
     cy.get('[data-cy=adduser_name]').type(publicName)
     cy.get('[data-cy=adduser_username]').type(errSpaceUsername)
     cy.get('[data-cy=adduser_email]').type(email)
     cy.get('[data-cy=adduser_password]').type(correctPwd)
-    cy.get('[data-cy=profile__list__item__administrators]').click()
-    cy.get('[data-cy=adminUser__adduser__form__submit]').click()
-    cy.get('.flashmessage').contains("Username can't contain any whitespace")
+    cy.get('[data-cy=adminUser__adduser__form__submit]').should('be.disabled')
   })
 
-  it('should show error message if username has not alloew characters', () => {
+  it('should disable submit button if username has not allowed characters', () => {
     cy.get('[data-cy=adminUser__adduser__button]').click()
     cy.get('[data-cy=adduser_name]').type(publicName)
     cy.get('[data-cy=adduser_username]').type(errNotAllowedCharsUsername)
     cy.get('[data-cy=adduser_email]').type(email)
     cy.get('[data-cy=adduser_password]').type(correctPwd)
-    cy.get('[data-cy=profile__list__item__administrators]').click()
-    cy.get('[data-cy=adminUser__adduser__form__submit]').click()
-    cy.get('.flashmessage').contains('Your username is incorrect, the allowed characters are azAZ09-_')
+    cy.get('[data-cy=adminUser__adduser__form__submit]').should('be.disabled')
   })
 
   it('should show error message if email is out of standard', () => {
@@ -162,7 +149,7 @@ describe('When "Create new user" at Administration', () => {
     cy.get('[data-cy=adminUser__adduser__button]').click()
     cy.get('[data-cy=adminUser__adduser__form]')
     cy.get('[data-cy=adduser_name]').type(publicName)
-    cy.get('[data-cy=adduser_username]').type(username)
+    cy.get('[data-cy=adduser_username]').type(anotherUsername)
     cy.get('[data-cy=adduser_email]').type(email)
     cy.get('[data-cy=adduser_password]').type(correctPwd)
     cy.get('[data-cy=profile__list__item__administrators]').click()

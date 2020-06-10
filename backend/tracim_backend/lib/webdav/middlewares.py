@@ -24,7 +24,7 @@ from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_scoped_session_factory
-from tracim_backend.models.setup_models import get_tm_session
+from tracim_backend.models.setup_models import create_dbsession_for_context
 
 
 class TracimWsgiDavDebugFilter(BaseMiddleware):
@@ -269,14 +269,17 @@ class TracimEnv(BaseMiddleware):
         # TODO - G.M - 18-05-2018 - This code should not create trouble
         # with thread and database, this should be verify.
         # see https://github.com/tracim/tracim_backend/issues/62
-        tm = transaction.manager
-        session = get_tm_session(self.session_factory, tm)
         registry = get_current_registry()
         registry.ldap_connector = None
         if AuthType.LDAP in self.app_config.AUTH_TYPES:
             registry = self.setup_ldap(registry, self.app_config)
         environ["tracim_registry"] = registry
-        environ["tracim_context"] = WebdavTracimContext(environ, self.app_config, session)
+        tracim_context = WebdavTracimContext(environ, self.app_config, self.plugin_manager)
+        session = create_dbsession_for_context(
+            self.session_factory, transaction.manager, tracim_context
+        )
+        tracim_context.dbsession = session
+        environ["tracim_context"] = tracim_context
         try:
             app = self._application(environ, start_response)
         except Exception as exc:
@@ -284,7 +287,7 @@ class TracimEnv(BaseMiddleware):
             raise exc
         finally:
             transaction.commit()
-            session.close()
+            tracim_context.cleanup()
         return app
 
     def setup_ldap(self, registry: Registry, app_config: CFG):
