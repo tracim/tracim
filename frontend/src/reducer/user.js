@@ -62,6 +62,8 @@ export const defaultUser = {
 export default function user (state = defaultUser, action) {
   switch (action.type) {
     case `${SET}/${USER_CONNECTED}`:
+      // INFO - 2020-06-10 - GB - We need to do this because when action.user goes through the serializeUser
+      // the properties that it doesn't have are set as undefined and overwrite all the properties of state
       return serializeUser({ ...unserializeUser(state), ...action.user })
 
     case `${SET}/${USER_DISCONNECTED}`:
