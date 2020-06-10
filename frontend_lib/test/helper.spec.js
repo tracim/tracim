@@ -158,7 +158,7 @@ describe('helper.js', () => {
       username: undefined
     }
     const serializedObj = serialize(objectToSerialize, propertyMap)
-    it('should return objectToSerialize serialized according propertyMap', () => {
+    it('should return objectToSerialize serialized according to propertyMap', () => {
       expect(serializedObj).to.deep.equal({
         userId: objectToSerialize.user_id,
         email: objectToSerialize.email,
