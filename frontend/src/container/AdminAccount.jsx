@@ -17,7 +17,8 @@ import {
   buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername
+  removeAtInUsername,
+  serialize
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -43,7 +44,7 @@ import {
   MINIMUM_CHARACTERS_USERNAME
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
-import { serializeUser } from '../reducer/user.js'
+import { serializeUserProps } from '../reducer/user.js'
 
 class Account extends React.Component {
   constructor (props) {
@@ -146,8 +147,7 @@ class Account extends React.Component {
           userToEdit: {
             ...prev.userToEdit,
             allowedSpace: fetchGetUser.json.allowed_space,
-            isDeleted: fetchGetUser.json.is_deleted,
-            ...serializeUser({ ...fetchGetUser.json, agenda_url: '', logged: false })
+            ...serialize(fetchGetUser.json, serializeUserProps)
           },
           subComponentMenu: prev.subComponentMenu
             .filter(menu => editableUserAuthTypeList.includes(fetchGetUser.json.auth_type) ? true : menu.name !== 'password')

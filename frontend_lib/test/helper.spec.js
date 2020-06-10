@@ -139,4 +139,33 @@ describe('helper.js', () => {
       expect(hasSpaces('bad Username')).to.eq(true)
     })
   })
+
+  describe('the serialize(objectToSerialize, propertyMap) function', () => {
+    const propertyMap = {
+      user_id: 'userId',
+      email: 'email',
+      avatar_url: 'avatarUrl',
+      public_name: 'publicName',
+      lang: 'lang',
+      username: 'username'
+    }
+    const objectToSerialize = {
+      avatar_url: undefined,
+      email: null,
+      user_id: 0,
+      public_name: 'a_name',
+      lang: 'pt',
+      username: ''
+    }
+    serializedObj = serialize(objectToSerialize, propertyMap)
+    it('should return objectToSerialize serialized according propertyMap', () => {
+      expect(serializedObj).to.deep.equal({
+        userId: objectToSerialize.user_id,
+        email: objectToSerialize.email,
+        publicName: objectToSerialize.public_name,
+        lang: objectToSerialize.lang,
+        username: objectToSerialize.username
+      })
+    })
+  })
 })

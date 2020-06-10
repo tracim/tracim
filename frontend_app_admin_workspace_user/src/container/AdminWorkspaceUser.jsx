@@ -19,8 +19,7 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   debug,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
-  MINIMUM_CHARACTERS_USERNAME,
-  serializeUserList
+  MINIMUM_CHARACTERS_USERNAME
 } from '../helper.js'
 import {
   deleteWorkspace,
@@ -204,7 +203,7 @@ class AdminWorkspaceUser extends React.Component {
         this.setState(prev => ({
           content: {
             ...prev.content,
-            userList: serializeUserList(fetchUserDetailList.map(fu => fu.body))
+            userList: fetchUserDetailList.map(fu => fu.body)
           }
         }))
         break

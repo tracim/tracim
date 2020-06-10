@@ -179,19 +179,3 @@ const FIELD_PROPERTIES = {
     FORMAT: []
   }
 }
-
-export const serializeUserList = list => list.map(user => ({
-  allowedSpace: user.allowed_space,
-  authType: user.auth_type,
-  avatarUrl: user.avatar_url,
-  created: user.created,
-  email: user.email,
-  isActive: user.is_active,
-  isDeleted: user.is_deleted,
-  lang: user.lang,
-  profile: user.profile,
-  publicName: user.public_name,
-  timezone: user.timezone,
-  userId: user.user_id,
-  username: user.username
-}))

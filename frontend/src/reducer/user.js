@@ -9,39 +9,24 @@ import {
   USER_AGENDA_URL
 } from '../action-creator.sync.js'
 import { getBrowserLang } from '../util/helper.js'
-import { PROFILE } from 'tracim_frontend_lib'
+import { PROFILE, serialize } from 'tracim_frontend_lib'
 
-export const serializeUser = u => ({
-  userId: u.user_id,
-  logged: u.logged,
-  authType: u.auth_type,
-  timezone: u.timezone,
-  profile: u.profile,
-  email: u.email,
-  isActive: u.is_active,
-  avatarUrl: u.avatar_url,
-  created: u.created,
-  publicName: u.public_name,
-  lang: u.lang,
-  agendaUrl: u.agendaUrl,
-  username: u.username
-})
-
-export const unserializeUser = u => ({
-  user_id: u.userId,
-  logged: u.logged,
-  auth_type: u.authType,
-  timezone: u.timezone,
-  profile: u.profile,
-  email: u.email,
-  is_active: u.isActive,
-  avatar_url: u.avatarUrl,
-  created: u.created,
-  public_name: u.publicName,
-  lang: u.lang,
-  agendaUrl: u.agendaUrl,
-  username: u.username
-})
+export const serializeUserProps = {
+  user_id: 'userId',
+  logged: 'logged',
+  auth_type: 'authType',
+  timezone: 'timezone',
+  profile: 'profile',
+  email: 'email',
+  is_active: 'isActive',
+  avatar_url: 'avatarUrl',
+  created: 'created',
+  public_name: 'publicName',
+  lang: 'lang',
+  agendaUrl: 'agendaUrl',
+  username: 'username',
+  isDeleted: 'is_deleted'
+}
 
 export const defaultUser = {
   userId: -1,
@@ -62,9 +47,7 @@ export const defaultUser = {
 export default function user (state = defaultUser, action) {
   switch (action.type) {
     case `${SET}/${USER_CONNECTED}`:
-      // INFO - 2020-06-10 - GB - We need to do this because when action.user goes through the serializeUser
-      // the properties that it doesn't have are set as undefined and overwrite all the properties of state
-      return serializeUser({ ...unserializeUser(state), ...action.user })
+      return { ...state, ...serialize(action.user, serializeUserProps) }
 
     case `${SET}/${USER_DISCONNECTED}`:
       return { ...state, lang: state.lang, logged: false }
@@ -73,7 +56,7 @@ export default function user (state = defaultUser, action) {
       return { ...state, lang: action.lang }
 
     case `${UPDATE}/${USER}`:
-      return serializeUser({ ...unserializeUser(state), ...action.newUser })
+      return { ...state, ...serialize(action.newUser, serializeUserProps) }
 
     case `${UPDATE}/${USER_USERNAME}`:
       return { ...state, username: action.newUsername }

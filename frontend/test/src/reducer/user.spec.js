@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import userReducer, { serializeUser, unserializeUser, defaultUser } from '../../../src/reducer/user.js'
+import userReducer, { serializeUserProps, defaultUser } from '../../../src/reducer/user.js'
 import {
   SET,
   setUserConnected,
@@ -17,53 +17,9 @@ import {
   USER_USERNAME
 } from '../../../src/action-creator.sync'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
-import { user as globalManager } from '../../hocMock/redux/user/user.js'
+import { serialize } from 'tracim_frontend_lib'
 
 describe('user reducer', () => {
-  describe('serializers', () => {
-    describe('serializeUser()', () => {
-      const user = serializeUser(globalManagerFromApi)
-      it('should return an object (in camelCase)', () => {
-        expect(user).to.deep.equal({
-          userId: globalManagerFromApi.user_id,
-          logged: globalManagerFromApi.logged,
-          authType: globalManagerFromApi.auth_type,
-          timezone: globalManagerFromApi.timezone,
-          profile: globalManagerFromApi.profile,
-          email: globalManagerFromApi.email,
-          isActive: globalManagerFromApi.is_active,
-          avatarUrl: globalManagerFromApi.avatar_url,
-          created: globalManagerFromApi.created,
-          publicName: globalManagerFromApi.public_name,
-          lang: globalManagerFromApi.lang,
-          agendaUrl: globalManagerFromApi.agendaUrl,
-          username: globalManagerFromApi.username
-        })
-      })
-    })
-
-    describe('unserializeUser()', () => {
-      const user = unserializeUser(globalManager)
-      it('should return an object (in snake_case)', () => {
-        expect(user).to.deep.equal({
-          agendaUrl: globalManager.agendaUrl,
-          auth_type: globalManager.authType,
-          avatar_url: globalManager.avatarUrl,
-          created: globalManager.created,
-          email: globalManager.email,
-          is_active: globalManager.isActive,
-          lang: globalManager.lang,
-          logged: globalManager.logged,
-          profile: globalManager.profile,
-          public_name: globalManager.publicName,
-          timezone: globalManager.timezone,
-          user_id: globalManager.userId,
-          username: globalManager.username
-        })
-      })
-    })
-  })
-
   it('should return the default state', () => {
     expect(userReducer(undefined, {})).to.deep.equal(defaultUser)
   })
@@ -72,7 +28,7 @@ describe('user reducer', () => {
     expect(
       userReducer(defaultUser, updateUser({ ...globalManagerFromApi, public_name: 'newPublicName' }))
     ).to.deep.equal({
-      ...serializeUser(globalManagerFromApi),
+      ...serialize(globalManagerFromApi, serializeUserProps),
       publicName: 'newPublicName'
     })
   })
@@ -117,7 +73,7 @@ describe('user reducer', () => {
     expect(
       userReducer(defaultUser, setUserConnected({ ...globalManagerFromApi, logged: true }))
     ).to.deep.equal({
-      ...serializeUser(globalManagerFromApi),
+      ...serialize(globalManagerFromApi, serializeUserProps),
       logged: true
     })
   })
