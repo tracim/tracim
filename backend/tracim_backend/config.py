@@ -369,6 +369,8 @@ class CFG(object):
         self.SESSION__REISSUE_TIME = int(self.get_raw_config("session.reissue_time", "120"))
         default_session_data_dir = self.here_macro_replace("%(here)s/sessions_data")
         default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_lock")
+        self.SESSION__TYPE = self.get_raw_config("session.type", "file")
+        self.SESSION__URL = self.get_raw_config("session.url")
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
@@ -752,9 +754,20 @@ class CFG(object):
         Check config for global stuff
         """
         self.check_mandatory_param("SQLALCHEMY__URL", self.SQLALCHEMY__URL)
-        self.check_mandatory_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR)
-        self.check_directory_path_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True)
-
+        self.check_mandatory_param("SESSION__TYPE", self.SESSION__TYPE)
+        if self.SESSION__TYPE == "file":
+            self.check_mandatory_param(
+                "SESSION__DATA_DIR", self.SESSION__DATA_DIR, when_str="if session type is file"
+            )
+            self.check_directory_path_param(
+                "SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True
+            )
+        elif self.SESSION__TYPE in ["ext:database", "ext:mongodb", "ext:redis", "ext:memcached"]:
+            self.check_mandatory_param(
+                "SESSION__URL",
+                self.SESSION__URL,
+                when_str="if session type is {}".format(self.SESSION__TYPE),
+            )
         self.check_mandatory_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR)
         self.check_directory_path_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR, writable=True)
         # INFO - G.M - 2019-04-03 - check color file validity
