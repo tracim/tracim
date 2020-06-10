@@ -7,7 +7,8 @@ import {
   hasSpaces,
   generateFetchResponse,
   parserStringToList,
-  removeAtInUsername
+  removeAtInUsername,
+  FETCH_CONFIG
 } from '../src/helper.js'
 
 describe('helper.js', () => {
@@ -138,5 +139,17 @@ describe('helper.js', () => {
     it('should return true if name has spaces', () => {
       expect(hasSpaces('bad Username')).to.eq(true)
     })
+  })
+
+  describe('FETCH_CONFIG object', () => {
+    it('should include tracim client token header', () => {
+      expect('X-Tracim-ClientToken' in FETCH_CONFIG.headers).to.eq(true)
+      expect(typeof FETCH_CONFIG.headers['X-Tracim-ClientToken']).to.eq('string')
+    })
+
+    it('should store the client token in window session', () => {
+      expect(window.sessionStorage.getItem('tracimClientToken')).to.eq(FETCH_CONFIG.headers['X-Tracim-ClientToken'])
+    })
+
   })
 })

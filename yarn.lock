@@ -1406,6 +1406,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/keyv@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "@types/keyv@npm:3.1.1"
+  dependencies:
+    "@types/node": "*"
+  checksum: 2/3aaf557d5b82e733d5a17b7f55af5d6be953363c3a594f006d64265790fe87c301c6e1400c0b6b1cf72add50a0ceddc25afb8231ab8302a2e5b6ebfbfac30e5d
+  languageName: node
+  linkType: hard
+
 "@types/minimatch@npm:*":
   version: 3.0.3
   resolution: "@types/minimatch@npm:3.0.3"
@@ -1441,6 +1450,15 @@ __metadata:
     "@types/prop-types": "*"
     csstype: ^2.2.0
   checksum: 2/e802a234f18d91c7f97cfd7b974049beed729ef45962d9c38f9f7a81d14f62a527657813a80d776e19f178d07e3c45b191e91626521216f8c58364e992c88cb4
+  languageName: node
+  linkType: hard
+
+"@types/responselike@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@types/responselike@npm:1.0.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: 2/e6e6613c800aeda63e2331e753e8d21df1a2c9aa7a4bc71ed792a848e4811fc96e609759089355314a2318c76eff1f161499cd242044838ab1e6f56e463ebb9c
   languageName: node
   linkType: hard
 
@@ -5672,6 +5690,27 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"fsevents@patch:fsevents@^1.2.7#builtin<compat/fsevents>":
+  version: 1.2.12
+  resolution: "fsevents@patch:fsevents@npm%3A1.2.12#builtin<compat/fsevents>::version=1.2.12&hash=495457"
+  dependencies:
+    bindings: ^1.5.0
+    nan: ^2.12.1
+    node-gyp: latest
+    node-pre-gyp: "*"
+  checksum: 2/181d9f88933413ce7653288b743abae38bb12d4327552698dcfa4663583933f79e63e8ce0ec7987ca087e0c49add8f05e735d17ada20bd406403fa603ded93c2
+  languageName: node
+  linkType: hard
+
+"fsevents@patch:fsevents@~2.1.1#builtin<compat/fsevents>":
+  version: 2.1.2
+  resolution: "fsevents@patch:fsevents@npm%3A2.1.2#builtin<compat/fsevents>::version=2.1.2&hash=495457"
+  dependencies:
+    node-gyp: latest
+  checksum: 2/6fb6ae0c1e5aca68fec6c0bf119d0dc9a1d653af60925c7ec69868f0ac68fa6930eeb769745030ecb560e00c144c74068da62bb77a000cc7dc263963ba4e2d7f
+  languageName: node
+  linkType: hard
+
 fsevents@~2.1.1:
   version: 2.1.2
   resolution: "fsevents@npm:2.1.2"
@@ -8850,6 +8889,18 @@ fsevents@~2.1.1:
   languageName: node
   linkType: hard
 
+"nock@npm:^12.0.3":
+  version: 12.0.3
+  resolution: "nock@npm:12.0.3"
+  dependencies:
+    debug: ^4.1.0
+    json-stringify-safe: ^5.0.1
+    lodash: ^4.17.13
+    propagate: ^2.0.0
+  checksum: 2/135b0be475ffd94b5cb1043e3d2de9061084d83c16e295c787eacf671682bf57c41df121efb17eb7bd4e8f5ef54008989d622e352a9ad57f5cacfdfd28b46894
+  languageName: node
+  linkType: hard
+
 "node-environment-flags@npm:1.0.6":
   version: 1.0.6
   resolution: "node-environment-flags@npm:1.0.6"
@@ -11178,6 +11229,15 @@ fsevents@~2.1.1:
   languageName: node
   linkType: hard
 
+"resolve@patch:resolve@^1.10.0#builtin<compat/resolve>, resolve@patch:resolve@^1.10.1#builtin<compat/resolve>, resolve@patch:resolve@^1.11.0#builtin<compat/resolve>, resolve@patch:resolve@^1.12.0#builtin<compat/resolve>, resolve@patch:resolve@^1.13.1#builtin<compat/resolve>, resolve@patch:resolve@^1.3.2#builtin<compat/resolve>":
+  version: 1.15.1
+  resolution: "resolve@patch:resolve@npm%3A1.15.1#builtin<compat/resolve>::version=1.15.1&hash=e7677c"
+  dependencies:
+    path-parse: ^1.0.6
+  checksum: 2/fe7e72ddef33d5c157991b824ba2d439cafcd386cb4b26d86c32e77fea442bdd9a93c6cdd93ab90f87a29449008df64b53a8310dd89ebe88ea87fb5db09c03aa
+  languageName: node
+  linkType: hard
+
 "responselike@npm:^1.0.2":
   version: 1.0.2
   resolution: "responselike@npm:1.0.2"
@@ -13288,6 +13348,7 @@ fsevents@~2.1.1:
     ignore-styles: ^5.0.1
     jsdom: ^15.1.1
     mocha: ^7.1.1
+    nock: ^12.0.3
     pnp-webpack-plugin: ^1.6.4
     prop-types: ^15.7.2
     react: ^16.13.1
@@ -13467,6 +13528,7 @@ fsevents@~2.1.1:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     url-loader: ^2.0.1
+    uuid: ^8.1.0
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
     webpack-dev-server: ^3.10.3
@@ -13871,6 +13933,15 @@ fsevents@~2.1.1:
   bin:
     uuid: ./bin/uuid
   checksum: 2/1ce3f37e214d6d0dc94a6a9663a0365013ace66bc3fd5b203e6f5d2eeb978aaee1192367222386345d30b4c6a447928c501121aa84c637724bf105ef57284949
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "uuid@npm:8.1.0"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 2/e212e1e9dcf38baf070b6a892653e3504cf6ec2baf9d830d844ba4e4411af28b0937e94c631fb093fa1d72dd85166856f0fb5e4bd79bbcfeca021b80fa18e9a8
   languageName: node
   linkType: hard
 

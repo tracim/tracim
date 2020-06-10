@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
@@ -236,10 +237,21 @@ export const generateRandomPassword = () => {
   return randomPassword
 }
 
+const getOrCreateSessionClientToken = () => {
+  const clientTokenKey = 'tracimClientToken'
+  let token = window.sessionStorage.getItem(clientTokenKey)
+  if (token === null) {
+    token = uuidv4()
+    window.sessionStorage.setItem(clientTokenKey, token)
+  }
+  return token
+}
+
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'X-Tracim-ClientToken': getOrCreateSessionClientToken()
   }
 }
 
