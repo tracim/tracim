@@ -12,11 +12,7 @@ import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList.j
 import {
   BREADCRUMBS,
   SET,
-  UPDATE,
-  USER,
   USER_AGENDA_URL,
-  USER_WORKSPACE_DO_NOTIFY,
-  WORKSPACE_LIST_MEMBER,
   ADD,
   FLASH_MESSAGE,
   REMOVE
@@ -34,25 +30,19 @@ import {
   mockPutMyselfPassword403
 } from '../../apiMock'
 // TODO update tests
-describe('In <Account />', () => {
-  const setWorkspaceListMemberListCallBack = sinon.spy()
-  const newFlashMessageWarningCallBack = sinon.spy()
-  const updateUserCallBack = sinon.spy()
-  const updateUserWorkspaceSubscriptionNotifCallBack = sinon.spy()
-  const updateUserAgendaUrlCallBack = sinon.spy()
-  const setBreadcrumbsCallBack = sinon.spy()
+describe('In <Account /> at AdminAccount.jsx', () => {
   const newFlashMessageInfoCallBack = sinon.spy()
+  const newFlashMessageWarningCallBack = sinon.spy()
+  const setBreadcrumbsCallBack = sinon.spy()
+  const updateUserAgendaUrlCallBack = sinon.spy()
 
   const dispatchMock = (params) => {
     if (isFunction(params)) return params(dispatchMock)
 
     const { type } = params
     switch (type) {
-      case `${UPDATE}/${USER}`: updateUserCallBack(); break
-      case `${SET}/${USER_AGENDA_URL}`: updateUserAgendaUrlCallBack(); break
-      case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`: updateUserWorkspaceSubscriptionNotifCallBack(); break
-      case `${SET}/${WORKSPACE_LIST_MEMBER}`: setWorkspaceListMemberListCallBack(); break
       case `${SET}/${BREADCRUMBS}`: setBreadcrumbsCallBack(); break
+      case `${SET}/${USER_AGENDA_URL}`: updateUserAgendaUrlCallBack(); break
       case `${ADD}/${FLASH_MESSAGE}`:
         if (params.msg.type === 'warning') {
           newFlashMessageWarningCallBack()
@@ -93,16 +83,45 @@ describe('In <Account />', () => {
 
   describe('TLM handlers', () => {
     describe('eventType user', () => {
-      const tlmData = {
-        author: userFromApi,
-        user: userFromApi
-      }
-
       describe('handleUserModified', () => {
-        adminAccountInstance.handleUserModified(tlmData)
+        it('should update the public name', () => {
+          const tlmData = {
+            author: userFromApi,
+            user: { ...userFromApi, public_name: 'new_public_name' }
+          } // putUserPublicName
+          adminAccountInstance.handleUserModified(tlmData)
+          expect(adminAccountInstance.state('userToEdit').public_name).to.equal(tlmData.user.public_name)
+        })
 
-        it('should call this.props.dispatch(updateUser())', () => {
-          expect(updateUserCallBack.called).to.equal(true)
+        it('should update the username', () => {
+          const tlmData = {
+            author: userFromApi,
+            user: { ...userFromApi, username: 'new_username' }
+          } // putUserUsername
+          adminAccountInstance.handleUserModified(tlmData)
+          expect(adminAccountInstance.state('userToEdit').username).to.equal(tlmData.user.username)
+        })
+
+        it('should update the email', () => {
+          const tlmData = {
+            author: userFromApi,
+            user: { ...userFromApi, email: 'new_email' }
+          } // putUserEmail
+          adminAccountInstance.handleUserModified(tlmData)
+          expect(adminAccountInstance.state('userToEdit').email).to.equal(tlmData.user.email)
+        })
+      })
+    })
+
+    describe('eventType sharedspace member', () => {
+      describe('handleMemberModified', () => {
+        it("should update member's notifications", () => {
+          // this.setState(prev => ({
+          //   userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === data.workspace.workspace_id
+          //     ? { ...ws, memberList: ws.memberList.map(u => u.id === state.userToEdit.user_id ? { ...u, doNotify: data.member.do_notify } : u) }
+          //     : ws
+          //   )
+          // }))
         })
       })
     })
@@ -113,12 +132,10 @@ describe('In <Account />', () => {
 
     beforeEach(() => {
       restoreHistoryCallBack([
-        setWorkspaceListMemberListCallBack,
+        newFlashMessageInfoCallBack,
         newFlashMessageWarningCallBack,
-        updateUserWorkspaceSubscriptionNotifCallBack,
-        updateUserAgendaUrlCallBack,
         setBreadcrumbsCallBack,
-        newFlashMessageInfoCallBack
+        updateUserAgendaUrlCallBack
       ])
     })
 
@@ -131,14 +148,6 @@ describe('In <Account />', () => {
     })
 
     describe('handleChangeSubscriptionNotif', () => {
-      it('should call updateUserWorkspaceSubscriptionNotifCallBack', (done) => {
-        mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
-        adminAccountInstance.handleChangeSubscriptionNotif(1, 'activate').then(() => {
-          expect(updateUserWorkspaceSubscriptionNotifCallBack.called).to.equal(true)
-          restoreHistoryCallBack([updateUserWorkspaceSubscriptionNotifCallBack])
-        }).then(done, done)
-      })
-
       it('should call newFlashMessageWarningCallBack with invalid workspaceId', (done) => {
         mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
 
@@ -175,14 +184,6 @@ describe('In <Account />', () => {
       })
     })
 
-    describe('loadWorkspaceListMemberList', () => {
-      it('should call setWorkspaceListMemberListCallBack', (done) => {
-        adminAccountInstance.loadWorkspaceListMemberList().then(() => {
-          expect(setWorkspaceListMemberListCallBack.called).to.equal(true)
-        }).then(done, done)
-      })
-    })
-
     describe('buildBreadcrumbs', () => {
       it('should call setBreadcrumbsCallBack', () => {
         adminAccountInstance.buildBreadcrumbs()
@@ -191,3 +192,9 @@ describe('In <Account />', () => {
     })
   })
 })
+
+// getUserDetail
+// getUserWorkspaceList
+// getUserWorkspaceListMemberList
+// handleClickSubComponentMenuItem
+// handleChangeUsername
