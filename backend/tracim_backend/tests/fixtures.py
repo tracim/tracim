@@ -2,10 +2,10 @@ import logging
 import os
 from os.path import basename
 from os.path import dirname
-from unittest import mock
 import shutil
 import subprocess
 import typing
+from unittest import mock
 
 from depot.manager import DepotManager
 import plaster
