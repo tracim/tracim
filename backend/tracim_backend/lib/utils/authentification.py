@@ -150,7 +150,7 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
             return None
         # recreate session if need renew
         if not request.session.new:
-            now = datetime.datetime.now()
+            now = datetime.datetime.utcnow()
             last_access_datetime = datetime.datetime.utcfromtimestamp(request.session.last_accessed)
             reissue_limit = last_access_datetime + datetime.timedelta(seconds=self._reissue_time)
             if now > reissue_limit:

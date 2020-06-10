@@ -2081,7 +2081,7 @@ class ContentApi(object):
         #    (ie parent_id is content_id of current content)
 
         if not read_datetime:
-            read_datetime = datetime.datetime.now()
+            read_datetime = datetime.datetime.utcnow()
 
         viewed_revisions = (
             self._session.query(ContentRevisionRO)
