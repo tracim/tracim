@@ -109,11 +109,6 @@ class TestLivesMessages(object):
         )
         assert update_user_request.status_code == 200
         client_events = client.events()
-        # The first message is the user.created of the base fixture which is picked-up
-        # by the worker as the job is saved in redis
-        event1 = next(client_events)
-        result = json.loads(event1.data)
-        assert result["event_type"] == "user.created"
         event1 = next(client_events)
         response.close()
         result = json.loads(event1.data)

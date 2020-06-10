@@ -2,6 +2,7 @@ import logging
 import os
 from os.path import basename
 from os.path import dirname
+from unittest import mock
 import shutil
 import subprocess
 import typing
@@ -198,13 +199,20 @@ def migration_engine(engine):
 
 
 @pytest.fixture
-def session(engine, session_factory, app_config, test_logger):
+def session(request, engine, session_factory, app_config, test_logger):
     class TracimTestContext(TracimContext):
         def __init__(self, app_config) -> None:
             super().__init__()
             self._app_config = app_config
             self._plugin_manager = create_plugin_manager()
-            self._plugin_manager.register(EventBuilder(app_config))
+            if getattr(request, "param", {}).get("mock_event_builder", True):
+                # mocking event builder in order to avoid
+                # requiring a working pushpin instance for every test
+                event_builder = mock.MagicMock(spec=EventBuilder)
+                event_builder.__name__ = EventBuilder.__name__
+            else:
+                event_builder = EventBuilder(app_config)
+            self._plugin_manager.register(event_builder)
             self._dbsession = create_dbsession_for_context(
                 session_factory, transaction.manager, self
             )
