@@ -9,31 +9,42 @@ import ThumbnailPreview from './ThumbnailPreview.jsx'
 import CarouselArrow from './CarouselArrow'
 import { DIRECTION } from '../helper'
 
-export class Carousel extends React.Component {
+class TracimSlider extends Slider {
   constructor (props) {
     super(props)
 
-    this.state = {
-      oldPosition: props.fileSelected,
-      thumbnailSlider: null,
-      mainSlider: null
+    const origInnerSliderRefHandler = this.innerSliderRefHandler
+    this.innerSliderRefHandler = (ref) => {
+      origInnerSliderRefHandler(ref)
+      if (this.props.displayedPictureIndex) {
+        this.innerSlider.slickGoTo(this.props.displayedPictureIndex)
+      }
     }
   }
 
-  componentDidMount () {
-    this.setState({
-      mainSlider: this.mainSlider,
-      thumbnailSlider: this.thumbnailSlider
-    })
+  setDisplayedPictureIndex = index => {
+    if (this.innerSlider) {
+      this.innerSlider.slickGoTo(index)
+    }
+  }
+}
+
+export class Carousel extends React.Component {
+  componentDidUpdate () {
+    this.setPositionFor('main', this.props.displayedPictureIndex)
+    this.setPositionFor('thumbnails', this.props.displayedPictureIndex)
   }
 
-  onMainSliderPositionChange (newPosition) {
-    this.setState({ oldPosition: newPosition })
-    this.props.onCarouselPositionChange(newPosition)
+  setPositionFor (component, position) {
+    this.components[component] && this.components[component].setDisplayedPictureIndex(position)
+  }
+
+  onPositionChange = (newIndex) => {
+    this.props.onCarouselPositionChange(newIndex)
   }
 
   render () {
-    const { props, state } = this
+    const { props } = this
 
     if (props.slides.length === 0) {
       return props.isWorkspaceRoot
@@ -41,28 +52,20 @@ export class Carousel extends React.Component {
         : <div className='gallery__noContent'>{props.t("There isn't any previewable content at that folder's root.")}</div>
     }
 
-    if (this.mainSlider && state.oldPosition !== props.fileSelected) {
-      if (this.state.oldPosition === props.slides.length - 1 && props.fileSelected === 0) {
-        this.mainSlider.slickNext()
-      } else if (this.state.oldPosition === 0 && props.fileSelected === props.slides.length - 1) {
-        this.mainSlider.slickPrev()
-      } else {
-        this.mainSlider.slickGoTo(props.fileSelected)
-      }
-    }
+    this.components = {}
 
     const mainSliderProps = {
-      asNavFor: this.state.thumbnailSlider,
-      ref: slider => (this.mainSlider = slider),
+      ref: slider => { this.components.main = slider },
       infinite: true,
       speed: props.disableAnimation ? 0 : 300,
       slidesToShow: 1,
       slidesToScroll: 1,
       centerMode: false,
-      initialSlide: props.fileSelected,
+      initialSlide: 0,
       swipe: false,
       arrows: !props.disableAnimation && !props.autoPlay,
-      afterChange: this.onMainSliderPositionChange.bind(this),
+      afterChange: this.onPositionChange,
+      beforeChange: (oldIndex, newIndex) => this.setPositionFor('thumbnails', newIndex),
       lazyLoad: props.autoPlay ? 'progressive' : 'ondemand',
       centerPadding: '0px',
       className: 'carousel__main',
@@ -71,11 +74,12 @@ export class Carousel extends React.Component {
     }
 
     const thumbnailSliderProps = {
-      asNavFor: this.state.mainSlider,
-      ref: slider => (this.thumbnailSlider = slider),
+      ref: r => { this.components.thumbnails = r },
       slidesToShow: props.slides.length > 6 ? 7 : props.slides.length,
       focusOnSelect: !props.autoPlay,
-      initialSlide: props.fileSelected,
+      initialSlide: 0,
+      beforeChange: (oldIndex, newIndex) => this.setPositionFor('main', newIndex),
+      afterChange: this.onPositionChange,
       swipe: false,
       lazyLoad: 'progressive',
       centerPadding: '0px',
@@ -100,32 +104,29 @@ export class Carousel extends React.Component {
 
     return (
       <>
-        <Slider
-          {...mainSliderProps}
-        >
+        <TracimSlider {...mainSliderProps}>
           {props.slides.map((slide, index) => (
             <MainPreview
               previewSrc={slide.src}
               index={index}
               onClickShowImageRaw={props.onClickShowImageRaw}
               rotationAngle={slide.rotationAngle}
-              key={`mainPreview_${index}`}
+              key={slide.src}
               fileName={slide.fileName}
             />
           ))}
-        </Slider>
-        <Slider
-          {...thumbnailSliderProps}
-        >
+        </TracimSlider>
+        <TracimSlider {...thumbnailSliderProps}>
           {props.slides.map((slide, i) => (
             <ThumbnailPreview
               previewSrc={slide.previewUrlForThumbnail}
               rotationAngle={slide.rotationAngle}
-              key={`thumbnailPreview_${i}`}
+              onClickShowImageRaw={props.onClickShowImageRaw}
+              key={slide.src}
               fileName={slide.fileName}
             />
           ))}
-        </Slider>
+        </TracimSlider>
       </>
     )
   }
@@ -136,7 +137,7 @@ export default translate()(Carousel)
 Carousel.propTypes = {
   slides: PropTypes.array.isRequired,
   onClickShowImageRaw: PropTypes.func.isRequired,
-  fileSelected: PropTypes.number.isRequired,
+  displayedPictureIndex: PropTypes.number.isRequired,
   onFileDeleted: PropTypes.func.isRequired,
   disableAnimation: PropTypes.bool,
   isWorkspaceRoot: PropTypes.bool
@@ -148,6 +149,6 @@ Carousel.defaultProps = {
   onClickShowImageRaw: () => {},
   onFileDeleted: () => {},
   disableAnimation: false,
-  fileSelected: 0,
+  displayedPictureIndex: 0,
   isWorkspaceRoot: true
 }

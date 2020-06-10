@@ -59,7 +59,6 @@ export class Gallery extends React.Component {
         folderParentIdList: []
       },
       imagesPreviews: [],
-      fileCurrentPage: 1,
       displayedPictureIndex: 0,
       autoPlay: null,
       fullscreen: false,
@@ -255,8 +254,11 @@ export class Gallery extends React.Component {
 
     const displayedPictureId = this.displayedPictureId()
 
-    const displayedPictureIndex = imagesPreviews.findIndex(
-      image => image.contentId === displayedPictureId
+    const displayedPictureIndex = Math.max(
+      0,
+      displayedPictureId
+        ? imagesPreviews.findIndex(image => image.contentId === displayedPictureId)
+        : 0
     )
 
     this.setState({ imagesPreviews, displayedPictureIndex })
@@ -745,11 +747,11 @@ export class Gallery extends React.Component {
   }
 
   // INFO - 2020-06-09 - RJ this function returns undefined if there is no current picture
-  displayedPicture () {
+  displayedPicture = () => {
     return this.state.imagesPreviews[this.state.displayedPictureIndex]
   }
 
-  displayedPictureId () {
+  displayedPictureId = () => {
     return (this.displayedPicture() || { contentId: -1 }).contentId
   }
 
@@ -811,7 +813,7 @@ export class Gallery extends React.Component {
             {(state.imagesPreviewsLoaded
               ? (
                 <Carousel
-                  fileSelected={state.displayedPictureIndex}
+                  displayedPictureIndex={state.displayedPictureIndex}
                   slides={state.imagesPreviews}
                   onCarouselPositionChange={this.handleCarouselPositionChange}
                   onClickShowImageRaw={this.handleClickShowImageRaw}
