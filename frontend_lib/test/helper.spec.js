@@ -7,7 +7,8 @@ import {
   hasSpaces,
   generateFetchResponse,
   parserStringToList,
-  removeAtInUsername
+  removeAtInUsername,
+  serialize
 } from '../src/helper.js'
 
 describe('helper.js', () => {
@@ -150,14 +151,13 @@ describe('helper.js', () => {
       username: 'username'
     }
     const objectToSerialize = {
-      avatar_url: undefined,
       email: null,
       user_id: 0,
-      public_name: 'a_name',
+      public_name: '',
       lang: 'pt',
-      username: ''
+      username: undefined
     }
-    serializedObj = serialize(objectToSerialize, propertyMap)
+    const serializedObj = serialize(objectToSerialize, propertyMap)
     it('should return objectToSerialize serialized according propertyMap', () => {
       expect(serializedObj).to.deep.equal({
         userId: objectToSerialize.user_id,
