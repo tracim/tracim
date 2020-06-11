@@ -24,6 +24,7 @@ import {
 } from '../../hocMock/helper'
 import { mount } from 'enzyme'
 import {
+  mockGetUser200,
   mockGetUserCalendar200,
   mockPutUserWorkspaceDoNotify204,
   mockPutUserPassword204,
@@ -97,7 +98,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
             user: { ...userFromApi, public_name: 'new_public_name' }
           }
           adminAccountInstance.handleUserModified(tlmData)
-          expect(addminAccontWrapper.state().userToEdit.public_name).to.equal(tlmData.user.public_name)
+          expect(addminAccontWrapper.state().userToEdit.publicName).to.equal(tlmData.user.public_name)
         })
 
         it('should update the username', () => {
@@ -105,7 +106,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
             author: userFromApi,
             user: {
               ...userFromApi,
-              public_name: addminAccontWrapper.state().userToEdit.public_name,
+              public_name: addminAccontWrapper.state().userToEdit.publicName,
               username: 'new_username'
             }
           }
@@ -118,7 +119,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
             author: userFromApi,
             user: {
               ...userFromApi,
-              public_name: addminAccontWrapper.state().userToEdit.public_name,
+              public_name: addminAccontWrapper.state().userToEdit.publicName,
               username: addminAccontWrapper.state().userToEdit.username,
               email: 'new_email'
             }
@@ -201,7 +202,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
     })
 
     describe('loadAgendaUrl', () => {
-      it('should call updateUserAgendaUrlCallBack', (done) => {
+      it('should update agendaUrl from userToEdit state', (done) => {
         const agendaUrl = 'agenda'
         mockGetUserCalendar200(FETCH_CONFIG.apiUrl, addminAccontWrapper.state().userToEditId, agendaUrl)
         adminAccountInstance.loadAgendaUrl().then(() => {
@@ -216,11 +217,27 @@ describe('In <Account /> at AdminAccount.jsx', () => {
         expect(setBreadcrumbsCallBack.called).to.equal(true)
       })
     })
+
+    describe('getUserDetail', () => {
+      it("should update userToEdit state with user's details", (done) => {
+        mockGetUser200(FETCH_CONFIG.apiUrl, addminAccontWrapper.state().userToEditId, userFromApi)
+        adminAccountInstance.getUserDetail().then(() => {
+          expect(addminAccontWrapper.state().userToEdit).to.deep.equal({
+            allowedSpace: undefined,
+            isUsernameValid: true,
+            usernameInvalidMsg: '',
+            ...user
+          })
+        }).then(done, done)
+      })
+    })
+
+    describe('handleChangeUsername', () => {
+      it("should set isUsernameValid state to false if username isn't valid", (done) => {
+        adminAccountInstance.handleChangeUsername('A').then(() => {
+          expect(addminAccontWrapper.state().userToEdit.isUsernameValid).to.equal(false)
+        }).then(done, done)
+      })
+    })
   })
 })
-
-// getUserDetail
-// getUserWorkspaceList
-// getUserWorkspaceListMemberList
-// handleClickSubComponentMenuItem
-// handleChangeUsername
