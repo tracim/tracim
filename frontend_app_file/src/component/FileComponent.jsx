@@ -22,7 +22,7 @@ export class FileComponent extends React.Component {
     const { props } = this
 
     if (prevProps.previewVideo && !props.previewVideo) this.unLoadVideoPlayer()
-    else if (!prevProps.previewVideo && props.previewVideo)this.loadVideoPlayer(props.downloadRawUrl, props.mimeType)
+    else if (!prevProps.previewVideo && props.previewVideo) this.loadVideoPlayer(props.downloadRawUrl, props.mimeType)
   }
 
   loadVideoPlayer (videoUrl, videoMimeType) {
