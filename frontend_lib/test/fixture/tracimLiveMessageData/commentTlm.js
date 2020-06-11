@@ -1,5 +1,7 @@
 import { author } from '../author.js'
 
+// DEPRECATED ? - CH - 2020-06-10 - there is a duplicate in frontend_lib/test/fixture/tracimLiveMessage
+// this one seems unused
 export const commentTlm = {
   is_editable: true,
   content_id: 1,

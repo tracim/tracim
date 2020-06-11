@@ -68,10 +68,8 @@ export class CollaborativeEditionFrame extends React.Component {
     window.removeEventListener('message', this.handleIframeIsClosing)
   }
 
-  setHeadTitle = async (contentName) => {
+  setHeadTitle = async (contentName, workspaceLabel) => {
     const { state } = this
-
-    const workspaceLabel = await this.loadWorkspaceLabel()
 
     if (state.config && state.config.system && state.config.system.config) {
       GLOBAL_dispatchEvent({
@@ -120,11 +118,7 @@ export class CollaborativeEditionFrame extends React.Component {
     const response = await handleFetchResult(request)
     switch (response.apiResponse.status) {
       case 200:
-        this.setState({
-          content: {
-            ...response.body
-          }
-        })
+        this.setState({ content: { ...response.body } })
         this.setHeadTitle(response.body.label)
         break
       case 400:
@@ -228,9 +222,7 @@ export class CollaborativeEditionFrame extends React.Component {
     }
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.REDIRECT,
-      data: {
-        url: url
-      }
+      data: { url: url }
     })
   }
 
