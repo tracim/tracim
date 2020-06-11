@@ -1,5 +1,39 @@
 const nock = require('nock')
 
+const mockPutUserPublicName200 = (apiUrl, userId, newPublicName, timezone, lang) => {
+  return nock(apiUrl)
+    .put(`${apiUrl}/users/${userId}`, {
+      public_name: newPublicName,
+      timezone: timezone,
+      lang: lang
+    })
+    .reply(200, {
+      public_name: newPublicName
+    })
+}
+
+const mockPutUserUsername200 = (apiUrl, userId, newUsername, checkPassword) => {
+  return nock(apiUrl)
+    .put(`${apiUrl}/users/${userId}/username`, {
+      username: newUsername,
+      loggedin_user_password: checkPassword
+    })
+    .reply(200, {
+      username: newUsername
+    })
+}
+
+const mockPutUserEmail200 = (apiUrl, userId, newEmail, checkPassword) => {
+  return nock(apiUrl)
+    .put(`${apiUrl}/users/${userId}/email`, {
+      email: newEmail,
+      loggedin_user_password: checkPassword
+    })
+    .reply(200, {
+      email: newEmail
+    })
+}
+
 const mockPutMyselfName200 = (apiUrl, newName, timezone, lang) => {
   return nock(apiUrl)
     .put('/users/me', {
@@ -21,6 +55,18 @@ const mockPutMyselfEmail200 = (apiUrl, newEmail, checkPassword) => {
     .reply(200, {
       email: newEmail
     })
+}
+
+const mockPutUserPassword204 = (apiUrl, userId, oldPassword) => {
+  return nock(apiUrl)
+    .put(`${apiUrl}/users/${userId}/password`, body => body.loggedin_user_password === oldPassword)
+    .reply(204)
+}
+
+const mockPutUserPassword403 = (apiUrl, userId, oldPassword) => {
+  return nock(apiUrl)
+    .put(`${apiUrl}/users/${userId}/password`, body => body.loggedin_user_password !== oldPassword)
+    .reply(403)
 }
 
 const mockPutMyselfPassword204 = (apiUrl, oldPassword) => {
@@ -45,6 +91,24 @@ const mockGetLoggedUserCalendar200 = (apiUrl) => {
         with_credentials: false
       }]
     )
+}
+
+const mockGetUserCalendar200 = (apiUrl, userId) => {
+  return nock(apiUrl)
+    .get(`${apiUrl}/users/${userId}/agenda`)
+    .reply(200,
+      [{
+        agenda_type: 'workspace',
+        agenda_url: 'string',
+        with_credentials: false
+      }]
+    )
+}
+
+const mockPutUserWorkspaceDoNotify204 = (apiUrl, userId, workspaceId, doNotify) => {
+  return nock(apiUrl)
+    .put(`${apiUrl}/users/${userId}/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`)
+    .reply(204)
 }
 
 const mockMyselfWorkspaceDoNotify204 = (apiUrl, workspaceId, doNotify) => {
@@ -97,9 +161,16 @@ export {
   mockGetAppList200,
   mockGetConfig200,
   mockMyselfWorkspaceDoNotify204,
+  mockPutUserWorkspaceDoNotify204,
   mockPutMyselfName200,
+  mockPutUserPublicName200,
+  mockPutUserUsername200,
   mockPutMyselfEmail200,
+  mockPutUserEmail200,
   mockPutMyselfPassword204,
   mockPutMyselfPassword403,
-  mockGetLoggedUserCalendar200
+  mockPutUserPassword204,
+  mockPutUserPassword403,
+  mockGetLoggedUserCalendar200,
+  mockGetUserCalendar200
 }

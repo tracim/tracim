@@ -24,10 +24,13 @@ import {
 } from '../../hocMock/helper'
 import { mount } from 'enzyme'
 import {
-  mockGetLoggedUserCalendar200,
-  mockMyselfWorkspaceDoNotify204,
-  mockPutMyselfPassword204,
-  mockPutMyselfPassword403
+  mockGetUserCalendar200,
+  mockPutUserWorkspaceDoNotify204,
+  mockPutUserPassword204,
+  mockPutUserPassword403
+  // mockPutUserPublicName200,
+  // mockPutUserUsername200,
+  // mockPutUserEmail200
 } from '../../apiMock'
 // TODO update tests
 describe('In <Account /> at AdminAccount.jsx', () => {
@@ -75,11 +78,14 @@ describe('In <Account /> at AdminAccount.jsx', () => {
     registerLiveMessageHandlerList: () => { }
   }
 
+  const password = 'randomPassword'
+
   const AdminAccountWithHOC1 = withRouterMock(translateMock()(AdminAccountWithoutHOC))
   const AdminAccountWithHOC2 = () => <Provider store={store}><AdminAccountWithHOC1 {...props} /></Provider>
 
   const wrapper = mount(<AdminAccountWithHOC2 {...props} />)
-  const adminAccountInstance = wrapper.find(AdminAccountWithoutHOC).instance()
+  const addminAccontWrapper = wrapper.find(AdminAccountWithoutHOC)
+  const adminAccountInstance = addminAccontWrapper.instance()
 
   describe('TLM handlers', () => {
     describe('eventType user', () => {
@@ -88,27 +94,27 @@ describe('In <Account /> at AdminAccount.jsx', () => {
           const tlmData = {
             author: userFromApi,
             user: { ...userFromApi, public_name: 'new_public_name' }
-          } // putUserPublicName
+          }
           adminAccountInstance.handleUserModified(tlmData)
-          expect(adminAccountInstance.state('userToEdit').public_name).to.equal(tlmData.user.public_name)
+          expect(addminAccontWrapper.state().userToEdit.public_name).to.equal(tlmData.user.public_name)
         })
 
         it('should update the username', () => {
           const tlmData = {
             author: userFromApi,
             user: { ...userFromApi, username: 'new_username' }
-          } // putUserUsername
+          }
           adminAccountInstance.handleUserModified(tlmData)
-          expect(adminAccountInstance.state('userToEdit').username).to.equal(tlmData.user.username)
+          expect(addminAccontWrapper.state().userToEdit.username).to.equal(tlmData.user.username)
         })
 
         it('should update the email', () => {
           const tlmData = {
             author: userFromApi,
             user: { ...userFromApi, email: 'new_email' }
-          } // putUserEmail
+          }
           adminAccountInstance.handleUserModified(tlmData)
-          expect(adminAccountInstance.state('userToEdit').email).to.equal(tlmData.user.email)
+          expect(addminAccontWrapper.state().userToEdit.email).to.equal(tlmData.user.email)
         })
       })
     })
@@ -149,7 +155,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
 
     describe('handleChangeSubscriptionNotif', () => {
       it('should call newFlashMessageWarningCallBack with invalid workspaceId', (done) => {
-        mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
+        mockPutUserWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, props.user.user_id, 1, true)
 
         adminAccountInstance.handleChangeSubscriptionNotif(0, 'activate').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
@@ -159,15 +165,15 @@ describe('In <Account /> at AdminAccount.jsx', () => {
     })
 
     describe('handleSubmitPassword', () => {
-      it('should call newFlashMessageInfoCallBack with valid password', (done) => {
-        mockPutMyselfPassword204(FETCH_CONFIG.apiUrl, 'randomOldPassword')
+      it(`should call newFlashMessageInfoCallBack with valid password`, (done) => {
+        mockPutUserPassword204(FETCH_CONFIG.apiUrl, props.user.user_id,'randomOldPassword')
         adminAccountInstance.handleSubmitPassword('randomOldPassword', 'randomPassWord', 'randomPassWord').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
         }).then(done, done)
       })
 
       it('should call newFlashMessageWarningCallBack with invalid oldPassword', (done) => {
-        mockPutMyselfPassword403(FETCH_CONFIG.apiUrl, invalidPassword)
+        mockPutUserPassword403(FETCH_CONFIG.apiUrl, props.user.user_id, invalidPassword)
         adminAccountInstance.handleSubmitPassword(invalidPassword, 'randomPassWord', 'randomPassWord').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
           expect(newFlashMessageInfoCallBack.called).to.equal(false)
@@ -177,9 +183,9 @@ describe('In <Account /> at AdminAccount.jsx', () => {
 
     describe('loadAgendaUrl', () => {
       it('should call updateUserAgendaUrlCallBack', (done) => {
-        mockGetLoggedUserCalendar200(FETCH_CONFIG.apiUrl)
+        const userCalendar = mockGetUserCalendar200(FETCH_CONFIG.apiUrl, props.user.user_id)
         adminAccountInstance.loadAgendaUrl().then(() => {
-          expect(updateUserAgendaUrlCallBack.called).to.equal(true)
+          expect(addminAccontWrapper.state().userToEdit.agendaUrl).to.equal(userCalendar.agenda_url)
         }).then(done, done)
       })
     })
