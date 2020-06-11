@@ -162,7 +162,7 @@ class AdminWorkspaceUser extends React.Component {
   loadWorkspaceContent = async () => {
     const { props, state } = this
 
-    const fetchWorkspaceList = getWorkspaceList(state.loggedUser, state.config.apiUrl)
+    const fetchWorkspaceList = getWorkspaceList(state.config.apiUrl)
     const workspaceList = await handleFetchResult(await fetchWorkspaceList)
 
     switch (workspaceList.apiResponse.status) {
@@ -282,7 +282,7 @@ class AdminWorkspaceUser extends React.Component {
   handleUpdateProfile = async (userId, newProfile) => {
     const { props, state } = this
 
-    const endPoint = userId === state.loggedUser.user_id ? putMyselfProfile : putUserProfile
+    const endPoint = userId === state.loggedUser.userId ? putMyselfProfile : putUserProfile
     const toggleManager = await handleFetchResult(await endPoint(state.config.apiUrl, userId, newProfile))
     switch (toggleManager.status) {
       case 204: this.loadUserContent(); break
@@ -448,7 +448,7 @@ class AdminWorkspaceUser extends React.Component {
         {state.config.type === 'user' && (
           <AdminUser
             userList={state.content.userList}
-            loggedUserId={state.loggedUser.user_id}
+            loggedUserId={state.loggedUser.userId}
             emailNotifActivated={state.config.system.config.email_notification_activated}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}

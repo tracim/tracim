@@ -7,7 +7,8 @@ import {
   hasSpaces,
   generateFetchResponse,
   parserStringToList,
-  removeAtInUsername
+  removeAtInUsername,
+  serialize
 } from '../src/helper.js'
 
 describe('helper.js', () => {
@@ -137,6 +138,34 @@ describe('helper.js', () => {
     })
     it('should return true if name has spaces', () => {
       expect(hasSpaces('bad Username')).to.eq(true)
+    })
+  })
+
+  describe('the serialize(objectToSerialize, propertyMap) function', () => {
+    const propertyMap = {
+      user_id: 'userId',
+      email: 'email',
+      avatar_url: 'avatarUrl',
+      public_name: 'publicName',
+      lang: 'lang',
+      username: 'username'
+    }
+    const objectToSerialize = {
+      email: null,
+      user_id: 0,
+      public_name: '',
+      lang: 'pt',
+      username: undefined
+    }
+    const serializedObj = serialize(objectToSerialize, propertyMap)
+    it('should return objectToSerialize serialized according to propertyMap', () => {
+      expect(serializedObj).to.deep.equal({
+        userId: objectToSerialize.user_id,
+        email: objectToSerialize.email,
+        publicName: objectToSerialize.public_name,
+        lang: objectToSerialize.lang,
+        username: objectToSerialize.username
+      })
     })
   })
 })

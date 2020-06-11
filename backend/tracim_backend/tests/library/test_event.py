@@ -7,6 +7,7 @@ from tracim_backend.tests.fixtures import *  # noqa F403,F401
 
 
 @pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("session", [{"mock_event_builder": False}], indirect=True)
 class TestEventBuilder:
     def test_unit__on_modified_user__is_deleted(
         self, user_api_factory, session, app_config, event_helper

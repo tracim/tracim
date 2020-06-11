@@ -7,7 +7,7 @@ import { PROFILE } from 'tracim_frontend_lib'
 describe('<UserInfo />', () => {
   const props = {
     user: {
-      public_name: 'randomPublicName',
+      publicName: 'randomPublicName',
       username: 'randomUsername',
       email: 'randomEmail',
       profile: 'administrators'
@@ -18,7 +18,7 @@ describe('<UserInfo />', () => {
 
   describe('static design', () => {
     it('should display the publicName of the user in a div', () =>
-      expect(wrapper.find('div.userinfo__name')).to.text().contains(props.user.public_name)
+      expect(wrapper.find('div.userinfo__name')).to.text().contains(props.user.publicName)
     )
 
     it('should display the username of the user in a div', () =>

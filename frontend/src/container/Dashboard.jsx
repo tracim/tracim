@@ -12,7 +12,6 @@ import {
   PageContent,
   convertBackslashNToBr,
   BREADCRUMBS_TYPE,
-  CONTENT_TYPE,
   CUSTOM_EVENT,
   ROLE,
   ROLE_LIST,
@@ -200,7 +199,7 @@ export class Dashboard extends React.Component {
   loadWorkspaceDetail = async () => {
     const { props } = this
 
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, props.match.params.idws))
+    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.match.params.idws))
     switch (fetchWorkspaceDetail.status) {
       case 200:
         props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
@@ -394,7 +393,7 @@ export class Dashboard extends React.Component {
       this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
-    const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
+    const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.curWs.id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
       email: state.newMember.isEmail ? state.newMember.personalData : '',
       username: state.newMember.isEmail ? '' : state.newMember.personalData,
@@ -448,7 +447,7 @@ export class Dashboard extends React.Component {
   handleClickRemoveMember = async memberId => {
     const { props } = this
 
-    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.user, props.curWs.id, memberId))
+    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.curWs.id, memberId))
     switch (fetchWorkspaceRemoveMember.status) {
       case 204:
         props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
@@ -470,7 +469,7 @@ export class Dashboard extends React.Component {
           creationLabel: ''
         },
         props.user,
-        findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE_LIST),
+        findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST),
         { ...props.curWs, workspace_id: props.curWs.id }
       )
     } else {
@@ -484,7 +483,7 @@ export class Dashboard extends React.Component {
     const { props } = this
     const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.curWs.id, true))
     switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, true)); break
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.curWs.id, true)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
@@ -493,7 +492,7 @@ export class Dashboard extends React.Component {
     const { props } = this
     const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.curWs.id, false))
     switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, false)); break
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.curWs.id, false)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
@@ -501,7 +500,7 @@ export class Dashboard extends React.Component {
   render () {
     const { props, state } = this
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE_LIST)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST)
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326

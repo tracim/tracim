@@ -12,6 +12,8 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 def create_events_and_messages(session) -> tracim_event.Event:
     messages = []
     with transaction.manager:
+        # remove messages created by the base fixture
+        session.query(tracim_event.Message).delete()
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.CREATED,

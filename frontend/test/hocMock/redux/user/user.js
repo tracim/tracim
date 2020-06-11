@@ -1,4 +1,6 @@
+import { serializeUserProps } from '../../../../src/reducer/user.js'
 import { globalManagerFromApi } from '../../../fixture/user/globalManagerFromApi.js'
-// TODO update after merge https://github.com/tracim/tracim/pull/3150
+import { serialize } from 'tracim_frontend_lib'
+
 export const userFromApi = globalManagerFromApi
-export const user = globalManagerFromApi
+export const user = serialize(globalManagerFromApi, serializeUserProps)
