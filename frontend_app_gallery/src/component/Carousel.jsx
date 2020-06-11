@@ -1,35 +1,20 @@
 import React from 'react'
-import Slider from 'react-slick'
 import { translate } from 'react-i18next'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
+import TracimSlider from './TracimSlider.jsx'
 import MainPreview from './MainPreview.jsx'
 import PropTypes from 'prop-types'
 import ThumbnailPreview from './ThumbnailPreview.jsx'
 import CarouselArrow from './CarouselArrow'
 import { DIRECTION } from '../helper'
 
-class TracimSlider extends Slider {
+export class Carousel extends React.Component {
   constructor (props) {
     super(props)
-
-    const origInnerSliderRefHandler = this.innerSliderRefHandler
-    this.innerSliderRefHandler = (ref) => {
-      origInnerSliderRefHandler(ref)
-      if (this.props.displayedPictureIndex) {
-        this.innerSlider.slickGoTo(this.props.displayedPictureIndex)
-      }
-    }
+    this.components = {}
   }
 
-  setDisplayedPictureIndex = index => {
-    if (this.innerSlider) {
-      this.innerSlider.slickGoTo(index)
-    }
-  }
-}
-
-export class Carousel extends React.Component {
   componentDidUpdate () {
     this.setPositionFor('main', this.props.displayedPictureIndex)
     this.setPositionFor('thumbnails', this.props.displayedPictureIndex)
@@ -51,8 +36,6 @@ export class Carousel extends React.Component {
         ? <div className='gallery__noContent'>{props.t("There isn't any previewable content at that shared space's root.")}</div>
         : <div className='gallery__noContent'>{props.t("There isn't any previewable content at that folder's root.")}</div>
     }
-
-    this.components = {}
 
     const mainSliderProps = {
       ref: slider => { this.components.main = slider },

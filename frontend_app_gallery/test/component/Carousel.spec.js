@@ -2,7 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { Carousel as CarouselWithoutHOC } from '../../src/component/Carousel.jsx'
-import Slider from 'react-slick'
+import TracimSlider from '../../src/component/TracimSlider.jsx'
 import sinon from 'sinon'
 
 describe('<Carousel />', () => {
@@ -24,9 +24,9 @@ describe('<Carousel />', () => {
   describe('static design', () => {
     describe('lazyloading behavior', () => {
       it('lazyLoading should change behavior according to autoplay', () => {
-        expect(wrapper.find(Slider).first().dive().props().lazyLoad).to.equal('ondemand')
+        expect(wrapper.find(TracimSlider).first().dive().props().lazyLoad).to.equal('ondemand')
         wrapper.setProps({ autoPlay: true })
-        expect(wrapper.find(Slider).first().dive().props().lazyLoad).to.equal('progressive')
+        expect(wrapper.find(TracimSlider).first().dive().props().lazyLoad).to.equal('progressive')
         wrapper.setProps({ autoPlay: false })
       })
     })
@@ -46,12 +46,11 @@ describe('<Carousel />', () => {
   })
 
   describe('function tests', () => {
-    describe('onMainSliderPositionChange()', () => {
-      it('should call the props callback and change the state oldPosition', () => {
+    describe('onPositionChange()', () => {
+      it('should call the props callback', () => {
         const newPosition = 1
-        wrapper.instance().onMainSliderPositionChange(newPosition)
+        wrapper.instance().onPositionChange(newPosition)
         expect(onCarouselPositionChange.called).to.be.true
-        expect(wrapper.state().oldPosition).to.equal(newPosition)
       })
     })
   })
