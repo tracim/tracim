@@ -136,7 +136,6 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
         # this means this policy is not the correct one. Explictly not checking
         # this avoid issue in some database because int is expected not string.
         if not isinstance(request.unauthenticated_userid, int):
-            request.session.delete()
             return None
         try:
             user = self._get_user_api(request).get_one(user_id=request.unauthenticated_userid)
@@ -144,7 +143,6 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
             user = None
         # do not allow invalid_user + ask for cleanup of session cookie
         if not user or not user.is_active or user.is_deleted:
-            request.session.delete()
             return None
         return user
 

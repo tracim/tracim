@@ -814,7 +814,6 @@ class TestSessionEndpointWithCookieAuthToken(object):
         # after too much time, session_id should be revoked
         with freeze_time("2000-01-01 00:10:00"):
             res = web_testapp.get("/api/auth/whoami", params=params, status=401)
-            assert "Set-Cookie" in res.headers
 
     @pytest.mark.skip("Do no work because of issue somewhere between freezegun, webtest and beaker")
     def test_api__test_cookie_auth_token__ok__renew(self, web_testapp):
@@ -876,7 +875,6 @@ class TestSessionEndpointWithCookieAuthToken(object):
         # after too much time, session_id should be revoked
         with freeze_time("2000-01-01 00:10:01"):
             res = web_testapp.get("/api/auth/whoami", params=params, status=401)
-            assert "Set-Cookie" in res.headers
 
     def test_api__test_cookie_auth_token__ok__revocation_case(self, web_testapp):
         with freeze_time("1999-12-31 23:59:59"):
@@ -898,7 +896,6 @@ class TestSessionEndpointWithCookieAuthToken(object):
 
         with freeze_time("2000-01-01 00:00:02"):
             res = web_testapp.get("/api/auth/whoami", status=401)
-            assert "Set-Cookie" in res.headers
             assert isinstance(res.json, dict)
             assert "code" in res.json.keys()
             assert res.json_body["code"] is None
