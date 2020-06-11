@@ -12,17 +12,6 @@ const mockPutMyselfName200 = (apiUrl, newName, timezone, lang) => {
     })
 }
 
-const mockPutMyselfEmail200 = (apiUrl, newEmail, checkPassword) => {
-  return nock(apiUrl)
-    .put('/users/me/email', {
-      email: newEmail,
-      loggedin_user_password: checkPassword
-    })
-    .reply(200, {
-      email: newEmail
-    })
-}
-
 const mockPutMyselfPassword204 = (apiUrl, oldPassword) => {
   return nock(apiUrl)
     .put('/users/me/password', body => body.loggedin_user_password === oldPassword)
@@ -98,7 +87,6 @@ export {
   mockGetConfig200,
   mockMyselfWorkspaceDoNotify204,
   mockPutMyselfName200,
-  mockPutMyselfEmail200,
   mockPutMyselfPassword204,
   mockPutMyselfPassword403,
   mockGetLoggedUserCalendar200

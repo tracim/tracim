@@ -1,6 +1,6 @@
 import { FETCH_CONFIG } from 'tracim_frontend_lib'
 
-export const getWorkspaceList = (user, apiUrl) =>
+export const getWorkspaceList = (apiUrl) =>
   fetch(`${apiUrl}/workspaces`, {
     credentials: 'include',
     headers: {

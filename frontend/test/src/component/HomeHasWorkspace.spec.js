@@ -6,15 +6,15 @@ import { HomeHasWorkspace as HomeHasWorkspaceWithoutHOC } from '../../../src/com
 describe('<HomeHasWorkspace />', () => {
   const props = {
     user: {
-      public_name: 'randomPublicName'
+      publicName: 'randomPublicName'
     }
   }
 
   const wrapper = shallow(<HomeHasWorkspaceWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
-    it(`should display the publicName: ${props.user.public_name} in a div`, () =>
-      expect(wrapper.find('div.homepagecard__user__publicname')).to.text().equal(props.user.public_name)
+    it(`should display the publicName: ${props.user.publicName} in a div`, () =>
+      expect(wrapper.find('div.homepagecard__user__publicname')).to.text().equal(props.user.publicName)
     )
   })
 })

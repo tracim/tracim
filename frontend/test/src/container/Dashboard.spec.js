@@ -8,7 +8,7 @@ import { firstWorkspace, firstWorkspaceFromApi } from '../../fixture/workspace/f
 import { contentFromApi } from '../../fixture/content/content.js'
 import { appList } from '../../hocMock/redux/appList/appList.js'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
-import { user } from '../../hocMock/redux/user/user'
+import { user, userFromApi } from '../../hocMock/redux/user/user'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { translateMock } from '../../hocMock/translate.js'
 import { isFunction } from '../../hocMock/helper.js'
@@ -132,7 +132,7 @@ describe('<Dashboard />', () => {
 
     describe('eventType workspace_role', () => {
       const tlmData = {
-        user: user,
+        user: userFromApi,
         workspace: firstWorkspaceFromApi,
         role: ROLE.contributor.slug
       }

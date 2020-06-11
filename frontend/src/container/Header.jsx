@@ -51,7 +51,7 @@ class Header extends React.Component {
   handleChangeLang = async langId => {
     const { props } = this
 
-    if (props.user.user_id === -1) {
+    if (props.user.userId === -1) {
       Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
       i18n.changeLanguage(langId)
       props.dispatch(setUserLang(langId))

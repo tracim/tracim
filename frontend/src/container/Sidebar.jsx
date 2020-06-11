@@ -111,7 +111,7 @@ export class Sidebar extends React.Component {
                   {workspaceList.map(ws =>
                     <WorkspaceListItem
                       workspaceId={ws.id}
-                      userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.user_id, ws.memberList, ROLE_LIST)}
+                      userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.userId, ws.memberList, ROLE_LIST)}
                       label={ws.label}
                       allowedAppList={ws.sidebarEntry}
                       activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
