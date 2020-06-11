@@ -1,20 +1,20 @@
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
-console.log('isProduction : ', isProduction)
+const isServDev = process.env.SERVDEV === 'true'
 
 const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {
   mode: isProduction ? 'production' : 'development',
-  entry: process.env.SERVDEV !== 'true'
+  entry: !isServDev
     ? './src/index.js' // only one instance of babel-polyfill is allowed
     : ['./src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'folder.app.js' : 'folder.app.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'appFolderAdvanced' : undefined,
+    library: !isServDev ? 'appFolderAdvanced' : undefined,
     libraryTarget: isProduction ? 'var' : undefined
   },
   devServer: {

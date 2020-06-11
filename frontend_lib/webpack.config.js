@@ -17,7 +17,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'tracim_frontend_lib.[name].js' : 'tracim_frontend_lib.[name].dev.js',
     pathinfo: !isProduction,
-    library: 'tracim_frontend_lib',
+    library: process.env.SERVDEV !== 'true' ? ['tracim_frontend_lib', '[name]'] : undefined,
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
@@ -50,7 +50,11 @@ module.exports = {
     //   'Access-Control-Allow-Origin': '*'
     // }
   },
-  devtool: isProduction ? false : 'eval-cheap-module-source-map',
+
+  devtool: false,
+  // RJ - 2020-06-11 - source maps disabled for frontend_lib for now,
+  // they cause a lot of warnings in the browser's console
+
   module: {
     rules: [
       isProduction
