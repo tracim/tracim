@@ -16,6 +16,8 @@ class DatabaseCrudHookCaller:
     def __init__(self, session: TracimSession, plugin_manager: PluginManager) -> None:
         assert session.context
         self._plugin_manager = plugin_manager
+        # calling hooks after flush allows to get database-generated
+        # values (primary key...) in the objects
         event.listen(session, "after_flush", self._call_hooks)
 
     def _call_hooks(self, session: TracimSession, flush_context: UOWTransaction,) -> None:
