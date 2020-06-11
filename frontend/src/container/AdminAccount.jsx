@@ -100,7 +100,7 @@ export class Account extends React.Component {
   // TLM Handler
   handleUserModified = data => {
     const { state } = this
-    if (state.userToEditId !== data.user.user_id) return
+    if (Number(state.userToEditId) !== data.user.user_id) return
     if (state.userToEdit.public_name !== data.user.public_name) {
       this.setState(prev => ({ userToEdit: { ...prev.userToEdit, public_name: data.user.public_name } }))
       return
@@ -113,12 +113,11 @@ export class Account extends React.Component {
   }
 
   handleMemberModified = data => {
-    console.log('test')
     const { state } = this
-    if (state.userToEditId !== data.user.user_id) return
+    if (Number(state.userToEditId) !== data.user.user_id) return
     this.setState(prev => ({
-      userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === data.workspace.workspace_id
-        ? { ...ws, memberList: ws.memberList.map(u => u.id === state.userToEdit.user_id ? { ...u, doNotify: data.member.do_notify } : u) }
+      userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.id === data.workspace.workspace_id
+        ? { ...ws, memberList: ws.memberList.map(u => u.id === Number(state.userToEditId) ? { ...u, doNotify: data.member.do_notify } : u) }
         : ws
       )
     }))
@@ -396,7 +395,7 @@ export class Account extends React.Component {
   handleSubmitPassword = async (oldPassword, newPassword, newPassword2) => {
     const { props, state } = this
 
-    const fetchPutUserPassword = await props.dispatch(putUserPassword(state.userToEdit, oldPassword, newPassword, newPassword2))
+    const fetchPutUserPassword = await props.dispatch(putUserPassword(state.userToEditId, oldPassword, newPassword, newPassword2))
     switch (fetchPutUserPassword.status) {
       case 204: props.dispatch(newFlashMessage(props.t('Password has been changed'), 'info')); return true
       case 403: props.dispatch(newFlashMessage(props.t("Wrong administrator's password"), 'warning')); return false

@@ -375,9 +375,9 @@ export const putMyselfPassword = (oldPassword, newPassword, newPassword2) => dis
   })
 }
 
-export const putUserPassword = (user, oldPassword, newPassword, newPassword2) => dispatch => {
+export const putUserPassword = (userId, oldPassword, newPassword, newPassword2) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/password`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/password`,
     param: {
       credentials: 'include',
       headers: {
