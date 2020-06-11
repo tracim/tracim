@@ -5,6 +5,6 @@ delete module.exports.performance.hints
 Object.assign(module.exports.output, {
   libraryTarget: 'var',
   library: 'tracim_frontend_[name]', // this allows tracim_frontend_lib.tracim.style.js not to rewrite the tracim_frontend_lib global object
-  filename: module.exports.mode === 'production' ? 'tracim_frontend_lib.tracim.[name].js' : 'tracim_frontend_lib.[name].tracim.dev.js',
+  filename: module.exports.mode === 'production' ? 'tracim_frontend_lib.tracim.[name].js' : 'tracim_frontend_lib.tracim.[name].dev.js',
   umdNamedDefine: undefined
 })

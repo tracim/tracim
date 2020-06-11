@@ -16,10 +16,12 @@ function logerror {
 
 
 dev=""
+devext=""
 if [ "$1" = "-d" ]; then
     dev="-dev"
+    devext=".dev"
 fi
 
 cd "$(dirname "$0")"
 yarn run build$dev || logerror "Failed to build the vendor bundle"
-cp dist/tracim_frontend_vendors.js ../frontend/dist/app/tracim_frontend_vendors.js  || logerror "Failed to copy the vendor bundle"
+cp dist/tracim_frontend_vendors$devext.js ../frontend/dist/app/tracim_frontend_vendors.js  || logerror "Failed to copy the vendor bundle"

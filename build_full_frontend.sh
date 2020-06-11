@@ -17,8 +17,10 @@ if [ -z "${LINTING+x}" ]; then
 fi
 
 dev=""
+appdev=""
 if [ "$1" = "-d" ]; then
-    dev="-d"
+    dev="-dev"
+    appdev="-d"
 fi
 
 log() {
@@ -35,12 +37,12 @@ logerror() {
 }
 
 build_tracim_lib() {
-    yarn workspace tracim_frontend_lib run build && loggood "Built tracim_frontend_lib for unit tests" || logerror "Could not build tracim_frontend_lib"
+    yarn workspace tracim_frontend_lib run build$dev && loggood "Built tracim_frontend_lib for unit tests" || logerror "Could not build tracim_frontend_lib"
 }
 
 build_frontend() {
     log "Building the frontend"
-    yarn workspace tracim run buildwithextvendors || logerror "Could not build the frontend"
+    yarn workspace tracim run buildwithextvendors$dev || logerror "Could not build the frontend"
 }
 
 parallel_build_lib() {
@@ -62,17 +64,17 @@ wait_for_lib_build_to_end() {
 build_vendors() {
     # Tracim vendors
     log "Building tracim_frontend_vendors"
-    frontend_vendors//build_vendors.sh && loggood "Built tracim_frontend_vendors successfully" || logerror "Could not build tracim_frontend_vendors"
+    frontend_vendors/build_vendors.sh $appdev && loggood "Built tracim_frontend_vendors successfully" || logerror "Could not build tracim_frontend_vendors"
 }
 
 build_lib_using_externals() {
     # Tracim Lib for the browsers
     log "Building tracim_frontend_lib for Tracim"
-    yarn workspace tracim_frontend_lib run buildwithextvendors && loggood "Built tracim_frontend_lib for Tracim successfully" || logerror "Failed to build tracim_frontend_lib for Tracim"
+    yarn workspace tracim_frontend_lib run buildwithextvendors$dev && loggood "Built tracim_frontend_lib for Tracim successfully" || logerror "Failed to build tracim_frontend_lib for Tracim"
 }
 
 build_app() {
-    "$1"/build_*.sh $dev || logerror "Failed building $1."
+    "$1"/build_*.sh $appdev || logerror "Failed building $1."
 }
 
 build_app_with_success() {

@@ -17,8 +17,10 @@ fi
 shift
 
 dev=""
+devext=""
 if [ "$1" = "-d" ]; then
     dev="-dev"
+    devext=".dev"
 fi
 
 if ! pwd | grep frontend_app | grep "$APP_NAME" > /dev/null; then
@@ -31,7 +33,7 @@ fi
 
 yarn run buildwithextvendors$dev || logerror "Build failed"
 
-cp dist/$APP_NAME.app.js ../frontend/dist/app || logerror "Failed copying the app"
+cp dist/$APP_NAME.app$devext.js ../frontend/dist/app/$APP_NAME.app.js || logerror "Failed copying the app"
 
 for lang in en fr pt; do
     if [ -f "i18next.scanner/${lang}/translation.json" ]; then

@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "mockapi": "node jsonserver/server.js",
-    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.tracim.config.js --watch --colors --inline --hot --progress",
+    "servdev": "NODE_ENV=development SERVDEV=true webpack-dev-server --config webpack.tracim.config.js --watch --colors --inline --hot --progress",
     "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9890 -- webpack-dev-server --watch --colors --inline --hot --progress",
-    "build": "NODE_ENV=production webpack-cli -p",
-    "buildwithextvendors": "NODE_ENV=production webpack-cli -p --config webpack.tracim.config.js",
-    "build-dev": "NODE_ENV=production webpack-cli",
-    "buildwithextvendors-dev": "NODE_ENV=production webpack-cli --config webpack.tracim.config.js",
+    "build": "NODE_ENV=production webpack-cli",
+    "buildwithextvendors": "NODE_ENV=production webpack-cli --config webpack.tracim.config.js",
+    "build-dev": "NODE_ENV=development webpack-cli",
+    "buildwithextvendors-dev": "NODE_ENV=development webpack-cli --config webpack.tracim.config.js",
     "build-translation": "node i18next.scanner.js",
     "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
