@@ -20,7 +20,7 @@ describe('helper.js', () => {
       })
     })
 
-    describe('if the mime type does not starts with "video/"', () => {
+    describe('if the mime type does not start with "video/"', () => {
       it('should return false for "image/png"', () => {
         const mimeType = 'image/png'
         expect(isVideoMimeTypeAndIsAllowed(mimeType, [])).to.equal(false)
