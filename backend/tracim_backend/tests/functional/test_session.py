@@ -758,7 +758,6 @@ class TestWhoamiEndpointWithRemoteHeader(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.skip("Test using sleep, to be runned manually")
 @pytest.mark.parametrize(
     "config_section", [{"name": "functional_test_with_cookie_realtime"}], indirect=True
 )
@@ -769,32 +768,32 @@ class TestSessionEndpointWithCookieAuthTokenRealtime(object):
         assert "Set-Cookie" in res.headers
         assert "session_key" in web_testapp.cookies
         user_session_key = web_testapp.cookies["session_key"]
-        sleep(5)
+        sleep(0.3)
         res = web_testapp.get("/api/auth/whoami", status=200)
         assert "Set-Cookie" not in res.headers
         assert "session_key" in web_testapp.cookies
         assert web_testapp.cookies["session_key"] == user_session_key
-        sleep(5)
+        sleep(0.3)
         res = web_testapp.get("/api/auth/whoami", status=200)
         assert "Set-Cookie" not in res.headers
         assert "session_key" in web_testapp.cookies
         assert web_testapp.cookies["session_key"] == user_session_key
-        sleep(5)
+        sleep(0.3)
         res = web_testapp.get("/api/auth/whoami", status=200)
         assert "Set-Cookie" not in res.headers
         assert "session_key" in web_testapp.cookies
         assert web_testapp.cookies["session_key"] == user_session_key
-        sleep(5)
+        sleep(0.3)
         res = web_testapp.get("/api/auth/whoami", status=200)
         assert "Set-Cookie" not in res.headers
         assert "session_key" in web_testapp.cookies
         assert web_testapp.cookies["session_key"] == user_session_key
-        sleep(5)
+        sleep(0.3)
         res = web_testapp.get("/api/auth/whoami", status=200)
         assert "Set-Cookie" not in res.headers
         assert "session_key" in web_testapp.cookies
         assert web_testapp.cookies["session_key"] == user_session_key
-        sleep(11)
+        sleep(1)
         res = web_testapp.get("/api/auth/whoami", params=params, status=401)
         assert "Set-Cookie" in res.headers
 
@@ -814,26 +813,6 @@ class TestSessionEndpointWithCookieAuthToken(object):
         # after too much time, session_id should be revoked
         with freeze_time("2000-01-01 00:10:00"):
             res = web_testapp.get("/api/auth/whoami", params=params, status=401)
-
-    @pytest.mark.skip("Do no work because of issue somewhere between freezegun, webtest and beaker")
-    def test_api__test_cookie_auth_token__ok__renew(self, web_testapp):
-        with freeze_time("1999-12-31 23:59:59"):
-            params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
-            res = web_testapp.post_json("/api/auth/login", params=params, status=200)
-            assert "Set-Cookie" in res.headers
-            assert "session_key" in web_testapp.cookies
-            user_session_key = web_testapp.cookies["session_key"]
-        # after too much time, session_id should be revoked
-        with freeze_time("2000-01-01 00:07:00"):
-            res = web_testapp.get("/api/auth/whoami", status=200)
-            assert "Set-Cookie" not in res.headers
-            assert "session_key" in web_testapp.cookies
-            assert web_testapp.cookies["session_key"] == user_session_key
-        with freeze_time("2000-01-01 00:15:00"):
-            res = web_testapp.get("/api/auth/whoami", status=200)
-            assert "Set-Cookie" not in res.headers
-            assert "session_key" in web_testapp.cookies
-            assert web_testapp.cookies["session_key"] == user_session_key
 
     def test_api__test_cookie_auth_token__ok__change_email_dont_break_cookie(
         self, web_testapp, admin_user
