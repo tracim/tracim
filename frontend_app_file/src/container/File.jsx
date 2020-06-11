@@ -38,7 +38,7 @@ import {
   FILE_PREVIEW_STATE,
   sortTimelineByDate
 } from 'tracim_frontend_lib'
-import { PAGE, ALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
+import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
@@ -869,7 +869,7 @@ export class File extends React.Component {
                 </button>
               )}
 
-              {ALLOWED_VIDEO_MIME_TYPE_LIST.includes(state.content.mimetype) && (
+              {isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST) && (
                 <GenericButton
                   customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
                   customColor={state.config.hexcolor}
