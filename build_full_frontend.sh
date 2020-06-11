@@ -64,7 +64,10 @@ wait_for_lib_build_to_end() {
 build_vendors() {
     # Tracim vendors
     log "Building tracim_frontend_vendors"
-    frontend_vendors/build_vendors.sh $appdev && loggood "Built tracim_frontend_vendors successfully" || logerror "Could not build tracim_frontend_vendors"
+    frontend_vendors/build_vendors.sh && loggood "Built tracim_frontend_vendors successfully" || logerror "Could not build tracim_frontend_vendors"
+    # RJ - 2020-06-11 - we do not build the vendors in development mode by default
+    # even if -d was passed to this script, since it produce a huge file that is slow to load in the browser.
+    # If you ever need to debug something in the vendors, go to the frontend_vendors directory and run ./build_vendors.sh -d
 }
 
 build_lib_using_externals() {
