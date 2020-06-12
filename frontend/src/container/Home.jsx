@@ -16,7 +16,10 @@ import {
   CardPopup,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername
+  removeAtInUsername,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   getUsernameAvailability,
@@ -36,7 +39,6 @@ export class Home extends React.Component {
   constructor (props) {
     super(props)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
     this.state = {
       hidePopupCheckbox: false,
       newUsername: '',
@@ -45,15 +47,25 @@ export class Home extends React.Component {
       usernamePopup: false,
       usernameInvalidMsg: ''
     }
+
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+    ])
   }
 
-  customEventReducer = ({ detail: { type } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.setHeadTitle()
-        break
-    }
+  // TLM Handler
+  handleUserModified = data => {
+    const { props } = this
+    if (props.user.userId !== data.user.user_id) return
+    props.dispatch(updateUserUsername(data.user.username))
   }
+
+  // Custom Event Handler
+  handleAllAppChangeLanguage = () => this.setHeadTitle()
 
   handleClickCreateWorkspace = e => {
     e.preventDefault()
@@ -106,7 +118,6 @@ export class Home extends React.Component {
       const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, state.password))
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(updateUserUsername(username))
           props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
           break
         case 400:
@@ -311,4 +322,4 @@ export class Home extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
-export default connect(mapStateToProps)(withRouter(appFactory(translate()(Home))))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Home)))))

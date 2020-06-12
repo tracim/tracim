@@ -372,7 +372,7 @@ class Account extends React.Component {
   handleSubmitPassword = async (oldPassword, newPassword, newPassword2) => {
     const { props, state } = this
 
-    const fetchPutUserPassword = await props.dispatch(putUserPassword(state.userToEdit, oldPassword, newPassword, newPassword2))
+    const fetchPutUserPassword = await props.dispatch(putUserPassword(state.userToEditId, oldPassword, newPassword, newPassword2))
     switch (fetchPutUserPassword.status) {
       case 204: props.dispatch(newFlashMessage(props.t('Password has been changed'), 'info')); return true
       case 403: props.dispatch(newFlashMessage(props.t("Wrong administrator's password"), 'warning')); return false
