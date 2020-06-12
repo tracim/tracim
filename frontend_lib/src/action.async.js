@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import { FETCH_CONFIG } from './helper.js'
 
 export const putEditContent = (apiUrl, workspaceId, contentId, appSlug, newTitle, newContent, propertiesToAddToBody) => {
