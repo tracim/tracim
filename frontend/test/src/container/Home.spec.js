@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow, mount } from 'enzyme'
+import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
 import configureMockStore from 'redux-mock-store'
 import { withRouterMock } from '../../hocMock/withRouter'
@@ -47,9 +47,9 @@ describe('<Home />', () => {
   }
 
   const HomeWithHOC1 = withRouterMock(translateMock()(HomeWithoutHOC))
-  const HomeWithHOC2 = ({ system }) => <Provider store={store}><HomeWithHOC1 {...props} system={system} /></Provider>
+  const HomeWithHOC2 = ({ sys }) => <Provider store={store}><HomeWithHOC1 {...props} system={sys} /></Provider>
 
-  const wrapper = mount(<HomeWithHOC2 {...props} system={props.system} />)
+  const wrapper = mount(<HomeWithHOC2 {...props} sys={props.system} />)
   const homeWrapper = wrapper.find(HomeWithoutHOC)
   const homeInstance = homeWrapper.instance()
 
@@ -74,11 +74,9 @@ describe('<Home />', () => {
     )
 
     it('should not render if workspaceList is not loaded', () => {
-      // wrapper.setProps({ children: (<HomeWithoutHOC {...props} system={{ ...props.system, workspaceListLoaded: false }} />) })
-      const wrapperTest = shallow(<HomeWithoutHOC {...props} />)
-      wrapperTest.setProps({ system: { ...props.system, workspaceListLoaded: false } })
-      expect(wrapperTest.find('div.tracim__content').length).equal(0)
-      wrapperTest.setProps({ system: props.system })
+      wrapper.setProps({ sys: { ...props.system, workspaceListLoaded: false } })
+      expect(wrapper.find('div.tracim__content').length).equal(0)
+      wrapper.setProps({ sys: props.system })
     })
   })
 
