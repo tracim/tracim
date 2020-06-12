@@ -11,31 +11,30 @@ export const FileUploadList = (props) => {
       <div className='file__upload__title font-weight-bold'>
         {props.fileToUploadList.length > 0
           ? title
-          : props.t('You have not yet chosen any files to upload.')
-        }
+          : props.t('You have not yet chosen any files to upload.')}
       </div>
 
       <div className='file__upload__list'>
-      {props.fileToUploadList.map((file) =>
-        <div className='file__upload__list__item' key={file.name}>
-          <i className='fa fa-fw fa-file-o m-1' />
-          <div className='file__upload__list__item__label'>
-            {file.name} ({displayFileSize(file.size)})
-          </div>
+        {props.fileToUploadList.map((file) =>
+          <div className='file__upload__list__item' key={file.name}>
+            <i className='fa fa-fw fa-file-o m-1' />
+            <div className='file__upload__list__item__label'>
+              {file.name} ({displayFileSize(file.size)})
+            </div>
 
-          <button
-            className='iconBtn primaryColorFontHover'
-            onClick={() => props.onDeleteFile(file)}
-            title={props.t('Delete')}
-            disabled={props.deleteFileDisabled}
-            data-cy='file__upload__list__item__delete'
-          >
-            <i className='fa fa-fw fa-trash-o' />
-          </button>
-          {file.errorMessage && (
-            <i title={file.errorMessage} className='file__upload__list__item__error fa fa-fw fa-exclamation-triangle'/>
-          )}
-        </div>
+            <button
+              className='iconBtn primaryColorFontHover'
+              onClick={() => props.onDeleteFile(file)}
+              title={props.t('Delete')}
+              disabled={props.deleteFileDisabled}
+              data-cy='file__upload__list__item__delete'
+            >
+              <i className='fa fa-fw fa-trash-o' />
+            </button>
+            {file.errorMessage && (
+              <i title={file.errorMessage} className='file__upload__list__item__error fa fa-fw fa-exclamation-triangle' />
+            )}
+          </div>
         )}
       </div>
     </div>

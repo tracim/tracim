@@ -10,7 +10,7 @@ import { ROLE } from '../../helper.js'
 class ShareLink extends React.Component {
   // INFO - GB - 2019-07-16 - Algorithm based on https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
   handleCopyToClipboard = () => {
-    let tmp = document.createElement('textarea')
+    const tmp = document.createElement('textarea')
     document.body.appendChild(tmp)
     tmp.value = this.props.link
     tmp.select()
@@ -24,16 +24,17 @@ class ShareLink extends React.Component {
     return (
       <div className='shareLink'>
         <div className='shareLink__icon'>
-          { props.isProtected
-            ? <ComposedIcon
-              mainIcon='link'
-              smallIcon='lock'
-              // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
-              // https://github.com/tracim/tracim/issues/2098
-              smallIconStyle={{ color: '#252525' }}
-            />
-            : <i className='shareLink__icon__unprotected fa fa-fw fa-link' />
-          }
+          {props.isProtected
+            ? (
+              <ComposedIcon
+                mainIcon='link'
+                smallIcon='lock'
+                // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
+                // https://github.com/tracim/tracim/issues/2098
+                smallIconStyle={{ color: '#252525' }}
+              />
+            )
+            : <i className='shareLink__icon__unprotected fa fa-fw fa-link' />}
         </div>
         <div className='shareLink__linkInfos'>
           <div className='shareLink__linkInfos__email'>
@@ -76,8 +77,7 @@ class ShareLink extends React.Component {
             data-cy='deleteShareLink'
           >
             <i className='fa fa-fw fa-trash-o' />
-          </button>
-        }
+          </button>}
       </div>
     )
   }

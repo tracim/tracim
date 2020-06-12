@@ -8,7 +8,7 @@ const ListItemWrapper = props => {
   return (
     <div
       className={
-        classnames('content', { 'item-last': props.isLast, 'read': props.read }, props.customClass)
+        classnames('content', { 'item-last': props.isLast, read: props.read }, props.customClass)
       }
       title={props.label}
       id={props.id}

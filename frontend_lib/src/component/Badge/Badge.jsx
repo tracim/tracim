@@ -9,7 +9,7 @@ const Badge = props =>
     className={classnames('badge', props.customClass)}
     style={{ ...props.style }}
   >
-    { props.text }
+    {props.text}
   </span>
 
 Badge.propTypes = {

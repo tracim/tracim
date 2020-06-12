@@ -11,14 +11,15 @@ const Comment = props => {
   return (
     <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
       <div className={classnames(`${props.customClass}`, 'comment', {
-        'sent': props.fromMe,
-        'received': !props.fromMe
-      })}>
+        sent: props.fromMe,
+        received: !props.fromMe
+      })}
+      >
         <div
           className={classnames(`${props.customClass}__body`, 'comment__body')}
           style={props.fromMe ? styleSent : {}}
         >
-          <Avatar width={'44px'} publicName={props.author} />
+          <Avatar width='44px' publicName={props.author} />
 
           <div className='comment__body__content'>
             <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>

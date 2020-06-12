@@ -46,7 +46,7 @@ export const NewMemberForm = props => {
                     key={u.user_id}
                   >
                     <div className='autocomplete__item__avatar'>
-                      <Avatar publicName={u.public_name} width={'44px'} />
+                      <Avatar publicName={u.public_name} width='44px' />
                     </div>
 
                     <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
@@ -93,8 +93,7 @@ export const NewMemberForm = props => {
                         </div>
                       </div>
                     </div>
-                  )
-              }
+                  )}
             </div>
           )}
 

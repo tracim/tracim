@@ -1,3 +1,6 @@
+/* eslint-env browser */
+/* global globalThis, tinymce, GLOBAL_dispatchEvent */
+
 import React from 'react'
 import i18n from './i18n.js'
 import {
@@ -31,7 +34,7 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
-    setApiUrl = url => this.apiUrl = url
+    setApiUrl = url => { this.apiUrl = url }
 
     sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.ADD_FLASH_MSG,
@@ -236,7 +239,7 @@ export function appContentFactory (WrappedComponent) {
               delay: undefined
             }
           })
-        break
+          break
       }
 
       return response

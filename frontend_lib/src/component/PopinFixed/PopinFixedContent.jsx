@@ -22,14 +22,15 @@ class PopinFixedContent extends React.Component {
         <div className={classnames(
           'wsContentGeneric__content',
           `${this.props.customClass}__content`,
-          { 'rightPartOpen': this.state.rightPartOpen, 'rightPartClose': !this.state.rightPartOpen }
-        )}>
+          { rightPartOpen: this.state.rightPartOpen, rightPartClose: !this.state.rightPartOpen }
+        )}
+        >
           <div className={classnames('wsContentGeneric__content__left', `${this.props.customClass}__content__left`)}>
             {this.props.children[0]}
           </div>
 
           {React.cloneElement(this.props.children[1], {
-            toggleRightPart: this.handleToggleRightPart,
+            handleToggleRightPart: this.handleToggleRightPart,
             rightPartOpen: this.state.rightPartOpen
           })}
         </div>

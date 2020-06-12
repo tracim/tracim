@@ -56,8 +56,7 @@ class Timeline extends React.Component {
         {props.showTitle &&
           <div className='timeline__title'>
             {props.t('Timeline')}
-          </div>
-        }
+          </div>}
         <div className='timeline__warning'>
           {props.isDeprecated && !props.isArchived && !props.isDeleted && (
             <DisplayState
@@ -150,7 +149,7 @@ class Timeline extends React.Component {
                   )}
                   onClick={props.onClickWysiwygBtn}
                   disabled={props.disableComment}
-                  key={'timeline__comment__advancedtext'}
+                  key='timeline__comment__advancedtext'
                 >
                   {props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
                 </button>
@@ -169,11 +168,12 @@ class Timeline extends React.Component {
                       backgroundColor: color(props.customColor).darken(0.15).hex()
                     }
                   }}
-                  key={'timeline__comment__send'}
+                  key='timeline__comment__send'
                 >
                   {props.t('Send')}
                   <div
-                    className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}>
+                    className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}
+                  >
                     <i className='fa fa-paper-plane-o' />
                   </div>
                 </button>

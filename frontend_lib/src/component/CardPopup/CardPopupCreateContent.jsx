@@ -55,8 +55,7 @@ class PopupCreateContent extends React.Component {
                     onKeyDown={this.handleInputKeyDown}
                     autoFocus
                   />
-                )
-              }
+                )}
               <div className='createcontent__form__button'>
                 <button
                   type='button' // do neither remove this nor set it to 'submit' otherwise clicking the btn will submit the form and reload the page

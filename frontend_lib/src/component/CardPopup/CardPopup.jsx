@@ -16,11 +16,10 @@ const CardPopup = props => {
         {props.hideCloseBtn === false &&
           <div className='cardPopup__close' onClick={props.onClose}>
             <i className='fa fa-times' />
-          </div>
-        }
+          </div>}
 
         <div className='cardPopup__body'>
-          { props.children }
+          {props.children}
         </div>
       </div>
     </div>

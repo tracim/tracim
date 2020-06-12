@@ -19,11 +19,11 @@ export const SelectStatus = props => {
         style={{ color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent' }}
         disabled={props.disabled}
       >
-        <span className={classnames('selectStatus__dropdownbtn__label', { 'selectStatus__mobileVersion': props.mobileVersion })} >
+        <span className={classnames('selectStatus__dropdownbtn__label', { selectStatus__mobileVersion: props.mobileVersion })}>
           {props.t('Status')}:
         </span>
 
-        <span className={classnames({ 'selectStatus__mobileVersion': props.mobileVersion })}>
+        <span className={classnames({ selectStatus__mobileVersion: props.mobileVersion })}>
           {props.selectedStatus ? props.t(props.selectedStatus.label) : ''}
         </span>
 
