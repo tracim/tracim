@@ -12,6 +12,12 @@ const mockPutMyselfName200 = (apiUrl, newName, timezone, lang) => {
     })
 }
 
+const mockPostUserLogout204 = (apiUrl) => {
+  return nock(apiUrl)
+    .post('/auth/logout')
+    .reply(204)
+}
+
 const mockPutMyselfPassword204 = (apiUrl, oldPassword) => {
   return nock(apiUrl)
     .put('/users/me/password', body => body.loggedin_user_password === oldPassword)
@@ -86,6 +92,7 @@ export {
   mockGetAppList200,
   mockGetConfig200,
   mockMyselfWorkspaceDoNotify204,
+  mockPostUserLogout204,
   mockPutMyselfName200,
   mockPutMyselfPassword204,
   mockPutMyselfPassword403,

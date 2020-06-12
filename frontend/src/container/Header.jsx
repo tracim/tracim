@@ -33,12 +33,29 @@ import { Link } from 'react-router-dom'
 import {
   PROFILE,
   ComposedIcon,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TracimComponent
 } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 
-class Header extends React.Component {
+export class Header extends React.Component {
+  constructor (props) {
+    super(props)
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+    ])
+  }
+
+  handleUserModified = data => {
+    const { props } = this
+    if (props.user.userId !== data.user.user_id) return
+    props.dispatch(setUserLang(data.user.lang))
+  }
+
   componentDidMount () {
     this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', {})
     i18n.changeLanguage(this.props.user.lang)
@@ -64,7 +81,6 @@ class Header extends React.Component {
       case 200:
         i18n.changeLanguage(langId)
         Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
-        props.dispatch(setUserLang(langId))
         props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, langId)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
@@ -188,4 +204,4 @@ class Header extends React.Component {
 }
 
 const mapStateToProps = ({ searchResult, lang, user, system, appList, tlmManager }) => ({ searchResult, lang, user, system, appList, tlmManager })
-export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))
+export default withRouter(connect(mapStateToProps)(translate()(appFactory(TracimComponent(Header)))))
