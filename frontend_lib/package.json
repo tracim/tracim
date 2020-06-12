@@ -80,7 +80,13 @@
     "whatwg-fetch": "^3.0.0"
   },
   "standard": {
-    "globals": ["globalThis", "tinymce", "GLOBAL_dispatchEvent", "fetch", "localStorage"],
+    "globals": [
+      "globalThis",
+      "tinymce",
+      "GLOBAL_dispatchEvent",
+      "fetch",
+      "localStorage"
+    ],
     "parser": "babel-eslint",
     "ignore": []
   },
