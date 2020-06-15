@@ -13,11 +13,6 @@ import {
 const color = require('color')
 
 export class FileComponent extends React.Component {
-  constructor (props) {
-    super(props)
-    this.videoPlayerRef = React.createRef()
-  }
-
   componentDidUpdate (prevProps) {
     const { props } = this
 
@@ -26,20 +21,47 @@ export class FileComponent extends React.Component {
   }
 
   loadVideoPlayer (videoUrl, videoMimeType) {
-    const video = document.createElement('video')
-    video.controls = true
-    video.preload = 'metadata'
-
     const source = document.createElement('source')
     source.src = videoUrl
     source.type = videoMimeType
 
+    const video = document.createElement('video')
+    video.controls = true
+    video.preload = 'metadata'
+
     video.appendChild(source)
-    this.videoPlayerRef.current.appendChild(video)
+
+    const videoWrapper = document.createElement('div')
+    videoWrapper.id = 'videoWrapperDiv'
+    videoWrapper.className = 'file__previewVideo open'
+    videoWrapper.onclick = (e) => {
+      this.props.onClickClosePreviewVideo(e)
+    }
+
+    videoWrapper.appendChild(video)
+
+    if (video.canPlayType(videoMimeType) === '') {
+      const warningMsg = document.createElement('div')
+      warningMsg.innerHTML = `
+        <div class='file__previewVideo__error'>
+          ${this.props.t('Note: Your browser might not be able to read this file.')}
+          <br />
+          ${this.props.t('In that case, you can download the video and try opening it manually.')}
+          <br />
+          ${this.props.t('To download the video, click on download button.')}
+          <i class='fa fa-download'></i>
+        </div>
+      `
+      videoWrapper.appendChild(warningMsg)
+    }
+
+    const body = document.getElementsByTagName('body')[0]
+    body.appendChild(videoWrapper)
   }
 
   unLoadVideoPlayer () {
-    this.videoPlayerRef.current.innerHTML = ''
+    const videoWrapper = document.getElementById('videoWrapperDiv')
+    videoWrapper.remove()
   }
 
   render () {
@@ -94,13 +116,6 @@ export class FileComponent extends React.Component {
             onClickNextPage={props.onClickNextPage}
           />
         )}
-
-        <div
-          className={classnames('file__previewVideo', props.previewVideo ? 'open' : '')}
-          style={{ display: props.previewVideo ? 'flex' : 'none' }}
-          onClick={props.onClickClosePreviewVideo}
-          ref={this.videoPlayerRef}
-        />
 
         {props.mode === APP_FEATURE_MODE.EDIT && (
           <div className='file__contentpage__dropzone'>
