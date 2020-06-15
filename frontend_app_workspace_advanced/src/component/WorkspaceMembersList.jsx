@@ -94,7 +94,7 @@ export const WorkspaceMembersList = props => {
                   </div>
                 </div>
 
-                {(m.user_id !== props.loggedUser.user_id
+                {(m.user_id !== props.loggedUser.userId
                   ? (
                     <div
                       className='workspace_advanced__userlist__list__item__delete'

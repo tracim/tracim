@@ -22,7 +22,7 @@ describe('<Timeline />', () => {
     customClass: 'randomCustomClass',
     customColor: 'red',
     loggedUser: {
-      id: 'randomIdLogin',
+      userId: 'randomIdLogin',
       name: 'randomNameLogin',
       userRoleIdInWorkspace: ROLE.contentManager.id
     },

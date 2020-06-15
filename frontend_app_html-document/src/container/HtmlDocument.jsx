@@ -101,7 +101,7 @@ export class HtmlDocument extends React.Component {
         ...data.content
       },
       editionAuthor: data.author.public_name,
-      keepEditingWarning: (prev.mode === APP_FEATURE_MODE.EDIT && prev.loggedUser.user_id !== data.author.user_id),
+      keepEditingWarning: (prev.mode === APP_FEATURE_MODE.EDIT && prev.loggedUser.userId !== data.author.user_id),
       rawContentBeforeEdit: data.content.raw_content,
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
     }))
