@@ -30,6 +30,7 @@ import {
   buildTracimLiveMessageEventType,
   sortTimelineByDate,
   removeAtInUsername,
+  setupCommonRequestHeaders,
   serialize
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
@@ -182,5 +183,6 @@ export {
   CONTENT_TYPE,
   buildTracimLiveMessageEventType,
   sortTimelineByDate,
+  setupCommonRequestHeaders,
   serialize
 }

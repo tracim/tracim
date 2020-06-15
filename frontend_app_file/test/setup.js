@@ -14,7 +14,8 @@ if (!global.window && !global.document) {
       win.scrollTo = () => {}
     },
     pretendToBeVisual: false,
-    userAgent: 'mocha'
+    userAgent: 'mocha',
+    url: 'http://localhost'
   })
 
   global.window = window
@@ -23,6 +24,10 @@ if (!global.window && !global.document) {
   global.GLOBAL_dispatchEvent = () => {}
   global.localStorage = {
     getItem: () => {}
+  }
+  const nodeCrypto = require('crypto')
+  global.crypto = {
+    getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }
   }
 }
 
