@@ -58,12 +58,12 @@ export class Gallery extends React.Component {
         fileName: '',
         folderParentIdList: []
       },
-      imagesPreviews: [],
+      imagePreviewList: [],
       displayedPictureIndex: 0,
       autoPlay: null,
       fullscreen: false,
       displayPopupDelete: false,
-      imagesPreviewsLoaded: false,
+      imagePreviewListLoaded: false,
       breadcrumbsLoaded: false
     }
 
@@ -72,7 +72,6 @@ export class Gallery extends React.Component {
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     props.registerCustomEventHandlerList([
-      { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
@@ -89,154 +88,78 @@ export class Gallery extends React.Component {
   // TLM Handlers
 
   // NOTE - RJ - 2020-06-10
-  //
-  // We are going to update the list of pictures as well as the currently
-  // displayed picture according to the live messages we receive.
-  // A first approach was to just reload the list of pictures from the server
-  // to ensure that we are always consistent with the list the backend sends.
-  // However, this did not end well.
-  //
-  // If several pictures are uploaded / modified in a short time, the list of
-  // pictures was downloaded several times before the state of the component
-  // had time to change even once, leading to crashes and weird behavior.
-  // Even if it worked, this would be an easy but inefficient way of handling
-  // updates.
-  //
-  // Imagine a folder with 1000 pictures. Are we handling this list again and
-  // again if 10 pictures are added? Come on, what was I thinking.
-  //
-  // So we are applying the harder but more correct approach: updating the list
-  // using the TLM.
-  //
-  // We still want to ensure consistency with what would be displayed if we
-  // downloaded the list of pictures from the backend though.
-  //
-  // This list built there at the time of writing this comment:
-  //
-  //    backend/tracim_backend/views/core_api/workspace_controller.py
-  //
-  // In the workspace_content method of the WorkspaceController class
-  // we can see that the contents of a folder is **sorted by label**.
-  //
-  // That's what we are going to do.
-  //
-  // This is bad news though: if we are currently watching a picture that is
-  // renamed, it will move in the list.
-  //
-  // What is the correct behavior?
-  //  1) Not changing the current picture index if a picture is renamed.
-  //     This will not change the position, but this will make the currently
-  //     picture change "out of nowhere"
-  //  2) Changing the position does not has this downside, but the user might
-  //     lose track of its picture browsing session.
-  //
-  // Since anything could happen with the list of pictures anyway (imagine
-  // someone taking the time to sort their Tracim folder and renaming random
-  // pictures for instance). We cannot really avoid the downsides of 2) anyway.
-  // We will at least free the user from liberal image jumping.
-  //
-  // I hope that I convinced you, and myself, that the thereafter implemented
-  // solution, 2), is the superior solution.
-  //
-  // We are not done yet though. As you may know, sorting is a rabbit hole.
-  // You may know that sorting depends on a lot of things like the
-  // charset and the locale. How does the backend sorts strings here?
-  //
-  // This is defined by the order_by_properties attribute, used in
-  // method _get_all_query of the ContentApi class defined in:
-  //
-  //    backend/tracim_backend/lib/core/content.py
-  //
-  // There, we can see that this property is used to build an ORDER BY SQL
-  // clause. So how does SQL sort? Here is the relevent documentation for
-  // PostgreSQL: https://www.postgresql.org/docs/current/locale.html
-  // Long story short, this is configurable using LC_COLLATE.
-  // This means we need to get this piece of information from the backend, which
-  // we probably don't have yet.
-  //
-  // In Javascript, we have String.localeCompare method to sort strings.
-  //
-  //    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
-  //
-  // It takes an optional locale parameter to use the right sorting algorithm.
-  // We have two choices:
-  //  1) leave it blank. The exact sorting is implementation-defined.
-  //  2) we pick an arbitrary value (like English).
-  //
-  // For now:
-  //  - we will not specify the locale. Any value is incorrect anyway. We can
-  //    hope that visitors and the serveur are set to the same locale so this
-  //    will work by chance in many cases.
-  //  - this will cause discrepancies between the backend and the frontend if
-  //    it's not the case and people use accents or other funny characters.
-  //  - we will mark this as a FIXME add an issue to the bugtracker.
+  // a comment about the handling of live messages here:
+  // https://github.com/tracim/tracim/issues/3107#issuecomment-643994410
 
-  liveMessageNotRelevant = data => (
-    Number(data.content.workspace_id) !== Number(this.state.config.appConfig.workspaceId) ||
-    Number(data.content.parent_id) !== Number(this.state.folderId)
-  )
+  liveMessageNotRelevant (data, state) {
+    return Number(data.content.workspace_id) !== Number(state.config.appConfig.workspaceId) ||
+    Number(data.content.parent_id) !== Number(state.folderId)
+  }
 
   handleContentCreatedOrUndeleted = data => {
-    if (this.liveMessageNotRelevant(data)) return
+    if (this.liveMessageNotRelevant(data, this.state)) return
 
     const preview = this.buildPreview(data.content)
     if (preview) {
-      this.setNewPicturesPreviews([preview, ...this.state.imagesPreviews])
+      this.setNewPicturesPreviews([preview, ...this.state.imagePreviewList].sort(this.sortPreviews))
     }
   }
 
   handleContentModified = data => {
-    if (this.liveMessageNotRelevant(data)) return
-
     const { state } = this
+    if (this.liveMessageNotRelevant(data, state)) return
 
+    // RJ - 2020-06-15 - NOTE
     // We need to reorder the list because the label of the file could have changed.
     // We could test whether this is the case, but handling only one case is
     // probably better.
 
-    const imagePreviews = state.imagesPreviews.filter(
+    const imagePreviewList = state.imagePreviewList.filter(
       image => image.contentId !== data.content.content_id
     )
 
     const preview = this.buildPreview(data.content)
     if (preview) {
-      // unlikely, but a picture could be replaced by a file of another type
+      // RJ - 2020-06-15 - NOTE
+      // Unlikely, but a picture could be replaced by a file of another type
       // hence the check.
-      imagePreviews.push(preview)
+      imagePreviewList.push(preview)
     }
 
-    this.setNewPicturesPreviews(imagePreviews)
+    this.setNewPicturesPreviews(imagePreviewList.sort(this.sortPreviews))
   }
 
   handleContentDeleted = data => {
-    if (this.liveMessageNotRelevant(data)) return
-
     const { state } = this
+    if (this.liveMessageNotRelevant(data, state)) return
 
     let displayedPictureIndex = state.displayedPictureIndex
-    let imagesPreviews = state.imagesPreviews
+    let imagePreviewList = state.imagePreviewList
 
-    const deletedIndex = state.imagesPreviews.findIndex(
-      image => image.contentId === data.content.content_id
-    )
+    let deletedIndex = -1
+
+    imagePreviewList = state.imagePreviewList.filter((image, i) => {
+      const isDeletedImage = image.contentId === data.content.content_id
+      if (isDeletedImage) deletedIndex = i
+      return !isDeletedImage
+    })
 
     if (deletedIndex !== -1) {
-      imagesPreviews = state.imagesPreviews.slice(0, deletedIndex).concat(
-        state.imagesPreviews.slice(deletedIndex + 1)
-      )
-
       // We set the new current index
       if (deletedIndex < state.displayedPictureIndex) {
+        // RJ - 2020-06-15 - NOTE
         // if the currently displayed picture is after the deleted image
         // we have to fix its index. The current picture's new index is
         // decremented.
         displayedPictureIndex--
       } else if (deletedIndex === state.displayedPictureIndex) {
+        // RJ - 2020-06-15 - NOTE
         // if the currently displayed picture is the one being deleted
         // we show the next picture, which index is the now the one of the
         // deleted picture.
 
-        if (state.displayedPictureIndex >= imagesPreviews.length) {
+        if (state.displayedPictureIndex >= imagePreviewList.length) {
+          // RJ - 2020-06-15 - NOTE
           // if this picture does not exist, though, we take the previous one.
           // if no there are no pictures left, we take 0, which is the default
           // value of displayedPictureIndex.
@@ -245,34 +168,24 @@ export class Gallery extends React.Component {
       }
     }
 
-    this.setState({ imagesPreviews, displayedPictureIndex })
+    this.setState({ imagePreviewList, displayedPictureIndex })
   }
 
-  setNewPicturesPreviews = imagesPreviews => {
-    // WARNING: modifies its parameter in the following line
-    imagesPreviews.sort((img1, img2) => img1.label.localeCompare(img2.label))
+  sortPreviews (img1, img2) {
+    return img1.label.localeCompare(img2.label)
+  }
 
+  setNewPicturesPreviews (imagePreviewList) {
     const displayedPictureId = this.displayedPictureId()
 
     const displayedPictureIndex = Math.max(
       0,
       displayedPictureId
-        ? imagesPreviews.findIndex(image => image.contentId === displayedPictureId)
+        ? imagePreviewList.findIndex(image => image.contentId === displayedPictureId)
         : 0
     )
 
-    this.setState({ imagesPreviews, displayedPictureIndex })
-  }
-
-  handleShowApp = data => {
-    console.log('%c<Gallery> Custom event', 'color: #28a745', data)
-    const newFolderId = qs.parse(data.config.history.location.search).folder_ids
-    if (data.config.appConfig.workspaceId !== this.state.config.appConfig.workspaceId || newFolderId !== this.state.folderId) {
-      this.setState({
-        config: data.config,
-        folderId: newFolderId
-      })
-    }
+    this.setState({ imagePreviewList, displayedPictureIndex })
   }
 
   handleAllAppChangeLanguage = data => {
@@ -304,13 +217,13 @@ export class Gallery extends React.Component {
     console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || prevState.folderId !== state.folderId) {
-      this.setState({ imagesPreviewsLoaded: false, imagesPreviews: [] })
+      this.setState({ imagePreviewListLoaded: false, imagePreviewList: [] })
       this.loadGalleryList(state.config.appConfig.workspaceId, state.folderId)
       const contentDetail = await this.loadContentDetails()
       this.buildBreadcrumbs(contentDetail.workspaceLabel, contentDetail.folderDetail, false)
     } else if (
-      (prevState.imagesPreviews[prevState.displayedPictureIndex] || {}).fileName !== (this.displayedPicture() || {}).fileName ||
-      prevState.imagesPreviewsLoaded === !state.imagesPreviewsLoaded ||
+      (prevState.imagePreviewList[prevState.displayedPictureIndex] || {}).fileName !== (this.displayedPicture() || {}).fileName ||
+      prevState.imagePreviewListLoaded === !state.imagePreviewListLoaded ||
       prevState.breadcrumbsLoaded === !state.breadcrumbsLoaded
     ) {
       this.buildBreadcrumbs(state.workspaceLabel, state.folderDetail, true)
@@ -352,7 +265,7 @@ export class Gallery extends React.Component {
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
-    if (includeFile && state.imagesPreviews && state.imagesPreviews.length > 0) {
+    if (includeFile && state.imagePreviewList && state.imagePreviewList.length > 0) {
       breadcrumbsList.push({
         link: (
           <Link
@@ -431,15 +344,15 @@ export class Gallery extends React.Component {
 
     switch (fetchContentList.apiResponse.status) {
       case 200: {
-        const imagesPreviews = await this.loadPreviews(
+        const imagePreviewList = await this.loadPreviewList(
           fetchContentList.body
             .filter(c => c.content_type === 'file')
             .map(c => c.content_id)
         )
 
         this.setState({
-          imagesPreviews,
-          imagesPreviewsLoaded: true
+          imagePreviewList,
+          imagePreviewListLoaded: true
         })
 
         break
@@ -511,7 +424,7 @@ export class Gallery extends React.Component {
     }
   }
 
-  loadPreviews = async (imageContentIds) => {
+  loadPreviewList = async (imageContentIds) => {
     return (await Promise.all(imageContentIds.map(async (contentId) => {
       const fetchFileContent = await handleFetchResult(
         await getFileContent(
@@ -584,8 +497,8 @@ export class Gallery extends React.Component {
 
     let nextPageNumber = previousNext === DIRECTION.LEFT ? state.displayedPictureIndex - 1 : state.displayedPictureIndex + 1
 
-    if (previousNext === DIRECTION.RIGHT && state.displayedPictureIndex === state.imagesPreviews.length - 1) nextPageNumber = 0
-    if (previousNext === DIRECTION.LEFT && state.displayedPictureIndex === 0) nextPageNumber = state.imagesPreviews.length - 1
+    if (previousNext === DIRECTION.RIGHT && state.displayedPictureIndex === state.imagePreviewList.length - 1) nextPageNumber = 0
+    if (previousNext === DIRECTION.LEFT && state.displayedPictureIndex === 0) nextPageNumber = state.imagePreviewList.length - 1
 
     this.setState({
       displayedPictureIndex: nextPageNumber
@@ -595,19 +508,19 @@ export class Gallery extends React.Component {
   getPreviousImageUrl = () => {
     const { state } = this
 
-    if (state.imagesPreviews.length <= 1) return
+    if (state.imagePreviewList.length <= 1) return
 
-    if (state.displayedPictureIndex === 0) return state.imagesPreviews[state.imagesPreviews.length - 1].lightBoxUrlList[0]
-    return state.imagesPreviews[state.displayedPictureIndex - 1].lightBoxUrlList[0]
+    if (state.displayedPictureIndex === 0) return state.imagePreviewList[state.imagePreviewList.length - 1].lightBoxUrlList[0]
+    return state.imagePreviewList[state.displayedPictureIndex - 1].lightBoxUrlList[0]
   }
 
   getNextImageUrl = () => {
     const { state } = this
 
-    if (state.imagesPreviews.length <= 1) return
+    if (state.imagePreviewList.length <= 1) return
 
-    if (state.displayedPictureIndex === state.imagesPreviews.length - 1) return state.imagesPreviews[0].lightBoxUrlList[0]
-    return state.imagesPreviews[state.displayedPictureIndex + 1].lightBoxUrlList[0]
+    if (state.displayedPictureIndex === state.imagePreviewList.length - 1) return state.imagePreviewList[0].lightBoxUrlList[0]
+    return state.imagePreviewList[state.displayedPictureIndex + 1].lightBoxUrlList[0]
   }
 
   handleCarouselPositionChange = (pictureIndex) => {
@@ -616,7 +529,7 @@ export class Gallery extends React.Component {
   }
 
   handleOpenDeleteFilePopup = () => {
-    if (this.state.imagesPreviews.length) {
+    if (this.state.imagePreviewList.length) {
       this.setState({
         displayPopupDelete: true
       })
@@ -637,7 +550,7 @@ export class Gallery extends React.Component {
     const putResult = await putFileIsDeleted(
       state.config.apiUrl,
       state.config.appConfig.workspaceId,
-      state.imagesPreviews[filePosition].contentId
+      state.imagePreviewList[filePosition].contentId
     )
 
     switch (putResult.status) {
@@ -681,13 +594,13 @@ export class Gallery extends React.Component {
   rotateImg (pictureId, direction) {
     const { state } = this
 
-    if (pictureId < 0 || pictureId >= state.imagesPreviews.length || !direction) return
+    if (pictureId < 0 || pictureId >= state.imagePreviewList.length || !direction) return
 
-    if (!state.imagesPreviews[pictureId]) return
+    if (!state.imagePreviewList[pictureId]) return
 
-    const imagesPreviews = state.imagesPreviews
+    const imagePreviewList = state.imagePreviewList
     let rotationAngle = 0
-    switch (imagesPreviews[pictureId].rotationAngle) {
+    switch (imagePreviewList[pictureId].rotationAngle) {
       case (0):
         rotationAngle = direction === DIRECTION.RIGHT ? 90 : 270
         break
@@ -702,14 +615,14 @@ export class Gallery extends React.Component {
         break
       default:
     }
-    imagesPreviews[pictureId].rotationAngle = rotationAngle
-    this.setState({ imagesPreviews })
+    imagePreviewList[pictureId].rotationAngle = rotationAngle
+    this.setState({ imagePreviewList })
   }
 
   getRawFileUrlSelectedFile () {
     const { state } = this
 
-    if (state.imagesPreviews.length === 0 || !this.displayedPicture()) return
+    if (state.imagePreviewList.length === 0 || !this.displayedPicture()) return
 
     return this.displayedPicture().rawFileUrl
   }
@@ -748,7 +661,7 @@ export class Gallery extends React.Component {
 
   // INFO - 2020-06-09 - RJ this function returns undefined if there is no current picture
   displayedPicture = () => {
-    return this.state.imagesPreviews[this.state.displayedPictureIndex]
+    return this.state.imagePreviewList[this.state.displayedPictureIndex]
   }
 
   displayedPictureId = () => {
@@ -810,11 +723,11 @@ export class Gallery extends React.Component {
               )}
             </div>
 
-            {(state.imagesPreviewsLoaded
+            {(state.imagePreviewListLoaded
               ? (
                 <Carousel
                   displayedPictureIndex={state.displayedPictureIndex}
-                  slides={state.imagesPreviews}
+                  slides={state.imagePreviewList}
                   onCarouselPositionChange={this.handleCarouselPositionChange}
                   onClickShowImageRaw={this.handleClickShowImageRaw}
                   disableAnimation={state.displayLightbox}

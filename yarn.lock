@@ -3,13 +3,14 @@
 
 __metadata:
   version: 4
+  cacheKey: 4
 
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.8.3":
   version: 7.8.3
   resolution: "@babel/code-frame@npm:7.8.3"
   dependencies:
     "@babel/highlight": ^7.8.3
-  checksum: 2/0552a3e3667ad5af3bbffd537a7d177f321af3ff416522a9e9c7c671b9fc5d7f5eb6847e676e8de7a7362819e9670d9fe684e95d1c98adad0c0a0763c096955e
+  checksum: 0552a3e3667ad5af3bbffd537a7d177f321af3ff416522a9e9c7c671b9fc5d7f5eb6847e676e8de7a7362819e9670d9fe684e95d1c98adad0c0a0763c096955e
   languageName: node
   linkType: hard
 

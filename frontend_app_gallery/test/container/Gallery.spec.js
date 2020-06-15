@@ -41,9 +41,11 @@ describe('<Gallery />', () => {
     t: key => key
   }
 
+  const wrapper = shallow(<Gallery {...props} />)
+
   const stateMock = {
     displayedPictureIndex: 1,
-    imagesPreviews: pictures.map(picture => ({
+    imagePreviewList: pictures.map(picture => ({
       src: picture.filename,
       label: picture.label,
       contentId: picture.content_id,
@@ -55,31 +57,29 @@ describe('<Gallery />', () => {
     }))
   }
 
-  const wrapper = shallow(<Gallery {...props} />)
-
   describe('TLM handlers', () => {
     describe('handleContentDeleted', () => {
-      describe('delete a picture', () => {
+      describe('after deleting a picture', () => {
         it('should not be in the picture list anymore', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentDeleted({content: pictures[1]})
-          expect(wrapper.state().imagesPreviews.every(image => image.contentId !== pictures[1].content_id))
-          expect(wrapper.state().imagesPreviews.length).to.equal(stateMock.imagesPreviews.length - 1)
+          expect(wrapper.state().imagePreviewList.every(image => image.contentId !== pictures[1].content_id))
+          expect(wrapper.state().imagePreviewList.length).to.equal(stateMock.imagePreviewList.length - 1)
         })
 
-        it('should go to the next picture', () => {
+        it('should go to the next picture when the current picture is deleted', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentDeleted({content: pictures[1]})
           expect(wrapper.state().displayedPictureIndex).to.equal(1)
         })
 
-        it('should stay at the same picture', () => {
+        it('should stay at the same index if the current picture is before the deleted picture', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentDeleted({ content: pictures[0] })
           expect(wrapper.state().displayedPictureIndex).to.equal(0)
         })
 
-        it('should go to the previous picture', () => {
+        it('should go to the previous picture if the last picture is deleted and this was the current picture', () => {
           wrapper.setState({ ...stateMock, displayedPictureIndex: 2 })
           wrapper.instance().handleContentDeleted({ content: pictures[2] })
           expect(wrapper.state().displayedPictureIndex).to.equal(1)
@@ -88,58 +88,58 @@ describe('<Gallery />', () => {
         it('should ignore files from other folders', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentDeleted({ content: { ...pictures[0], parent_id: folderId + 1 } })
-          expect(wrapper.state().imagesPreviews.length).to.equal(stateMock.imagesPreviews.length)
+          expect(wrapper.state().imagePreviewList.length).to.equal(stateMock.imagePreviewList.length)
         })
 
         it('should ignore files from other workspaces', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentDeleted({ content: { ...pictures[0], workspace_id: 2 } })
-          expect(wrapper.state().imagesPreviews.length).to.equal(stateMock.imagesPreviews.length)
+          expect(wrapper.state().imagePreviewList.length).to.equal(stateMock.imagePreviewList.length)
         })
       })
     })
 
     describe('handleContentModified', () => {
-      describe('modify the current picture', () => {
-        it('should not keep the old label in the picture list anymore and but the new one, yes after rename', () => {
+      describe('modifying the current picture', () => {
+        it('should not keep the old label in the picture list anymore but the new one, yes after rename', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ content: { ...pictures[1], label: 'betterversion' } })
-          expect(wrapper.state().imagesPreviews.every(image => image.label !== pictures[1].label))
-          expect(wrapper.state().imagesPreviews.some(image => image.label === 'betterversion'))
+          expect(wrapper.state().imagePreviewList.every(image => image.label !== pictures[1].label))
+          expect(wrapper.state().imagePreviewList.some(image => image.label === 'betterversion'))
         })
 
-        it('should be sorted', () => {
+        it('should keep the picture list sorted', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ content: { ...pictures[1], label: 'betterversion' } })
-          let sortedImagesPreviews = wrapper.state().imagesPreviews.slice()
+          let sortedImagesPreviews = [... wrapper.state().imagePreviewList]
           sortedImagesPreviews.sort((a, b) => (a.label.localeCompare(b.label)))
-          expect(sortedImagesPreviews).to.be.deep.equal(wrapper.state().imagesPreviews)
+          expect(sortedImagesPreviews).to.be.deep.equal(wrapper.state().imagePreviewList)
         })
 
         it('should stay at the same picture if the displayed picture is not touched', () => {
           wrapper.setState({ ...stateMock, displayedPictureIndex: 2 })
           wrapper.instance().handleContentModified({ content: pictures[1] })
-          expect(wrapper.state().imagesPreviews[wrapper.state().displayedPictureIndex].label).to.equal(pictures[2].label)
+          expect(wrapper.state().imagePreviewList[wrapper.state().displayedPictureIndex].label).to.equal(pictures[2].label)
 
           wrapper.setState({ ...stateMock, displayedPictureIndex: 0 })
           wrapper.instance().handleContentModified({ content: pictures[1] })
-          expect(wrapper.state().imagesPreviews[wrapper.state().displayedPictureIndex].label).to.equal(pictures[0].label)
+          expect(wrapper.state().imagePreviewList[wrapper.state().displayedPictureIndex].label).to.equal(pictures[0].label)
 
           wrapper.setState({ ...stateMock, displayedPictureIndex: 1 })
           wrapper.instance().handleContentModified({ content: pictures[0] })
-          expect(wrapper.state().imagesPreviews[wrapper.state().displayedPictureIndex].label).to.equal(pictures[1].label)
+          expect(wrapper.state().imagePreviewList[wrapper.state().displayedPictureIndex].label).to.equal(pictures[1].label)
         })
 
         it('should ignore files from other folders', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ content: { ...pictures[0], label: 'NotRelevant', parent_id: folderId + 1 } })
-          expect(wrapper.state().imagesPreviews.every(image => image.label !== 'NotRelevant'))
+          expect(wrapper.state().imagePreviewList.every(image => image.label !== 'NotRelevant'))
         })
 
         it('should ignore files from other workspaces', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ content: { ...pictures[0], label: 'NotRelevant', workspace_id: 2 } })
-          expect(wrapper.state().imagesPreviews.every(image => image.label !== 'NotRelevant'))
+          expect(wrapper.state().imagePreviewList.every(image => image.label !== 'NotRelevant'))
         })
       })
     })
