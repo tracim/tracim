@@ -20,13 +20,13 @@ describe('helper.js', () => {
       })
     })
 
-    describe('if the mime type does not starts with "video/"', () => {
+    describe('if the mime type does not start with "video/"', () => {
       it('should return false for "image/png"', () => {
         const mimeType = 'image/png'
         expect(isVideoMimeTypeAndIsAllowed(mimeType, [])).to.equal(false)
       })
 
-      it('should return false for "image/png" if mime type is in disallowed list', () => {
+      it('should return false for "image/png" if mime types is in disallowed list', () => {
         const mimeType = 'image/png'
         expect(isVideoMimeTypeAndIsAllowed(mimeType, [mimeType])).to.equal(false)
       })
