@@ -26,6 +26,7 @@ from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.event import Event
 
 
 class TracimContext(ABC):
@@ -50,6 +51,16 @@ class TracimContext(ABC):
         self._candidate_content_type = None
         # Client token, useful to permit link between request and TLM response
         self._client_token = None  # type: typing.Optional[str]
+        # Pending events: have been created but are commited to the DB
+        self._pending_events = []  # type: typing.List[Event]
+
+    @property
+    def pending_events(self) -> typing.List[Event]:
+        return self._pending_events
+
+    @pending_events.setter
+    def pending_events(self, events: typing.List[Event]) -> None:
+        self._pending_events = events
 
     # INFO - G.M - 2018-12-03 - Useful property of Tracim Context
     def set_user(self, user: User):

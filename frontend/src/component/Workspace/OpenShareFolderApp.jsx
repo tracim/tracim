@@ -43,7 +43,7 @@ export class OpenShareFolderApp extends React.Component {
       renderAppFeature(
         shareConfig,
         user,
-        findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE_LIST),
+        findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST),
         contentToOpen
       )
       this.props.onUpdateAppOpenedType(contentToOpen.type)

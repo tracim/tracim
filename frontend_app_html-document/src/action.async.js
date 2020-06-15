@@ -55,7 +55,7 @@ export const postHtmlDocContent = (apiUrl, workspaceId, folderId, contentType, n
   })
 
 export const putHtmlDocRead = (user, apiUrl, workspaceId, contentId) => {
-  return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${workspaceId}/contents/${contentId}/read`, {
+  return fetch(`${apiUrl}/users/${user.userId}/workspaces/${workspaceId}/contents/${contentId}/read`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

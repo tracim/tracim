@@ -21,7 +21,7 @@ import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import { LiveMessageManager } from '../util/LiveMessageManager.js'
-import { buildHeadTitle, CUSTOM_EVENT, PROFILE } from 'tracim_frontend_lib'
+import { buildHeadTitle, CUSTOM_EVENT, PROFILE, serialize } from 'tracim_frontend_lib'
 import {
   PAGE,
   COOKIE_FRONTEND,
@@ -54,6 +54,7 @@ import {
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
+import { serializeUserProps } from '../reducer/user.js'
 
 export class Tracim extends React.Component {
   constructor (props) {
@@ -222,7 +223,7 @@ export class Tracim extends React.Component {
 
   setDefaultUserLang = async loggedUser => {
     const { props } = this
-    const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
+    const fetchPutUserLang = await props.dispatch(putUserLang(serialize(loggedUser, serializeUserProps), props.user.lang))
     switch (fetchPutUserLang.status) {
       case 200: break
       default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))

@@ -17,16 +17,17 @@ import {
   buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername
+  removeAtInUsername,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
-  updateUserPublicName,
-  updateUserEmail,
-  updateUserWorkspaceSubscriptionNotif,
+  updateUser,
   updateUserAgendaUrl,
-  updateUserUsername,
+  updateUserWorkspaceSubscriptionNotif,
   setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
@@ -69,7 +70,7 @@ export class Account extends React.Component {
       active: false,
       label: 'Password',
       translationKey: props.t('Password'),
-      display: editableUserAuthTypeList.includes(props.user.auth_type) // allow pw change only for users in tracim's db (eg. not from ldap)
+      display: editableUserAuthTypeList.includes(props.user.authType) // allow pw change only for users in tracim's db (eg. not from ldap)
     }, {
       name: 'agenda',
       active: false,
@@ -84,16 +85,33 @@ export class Account extends React.Component {
       usernameInvalidMsg: ''
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        this.setHeadTitle()
-        break
-    }
+  // Custom Event Handler
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
+  }
+
+  // TLM Handlers
+  handleUserModified = data => {
+    const { props } = this
+    if (props.user.userId !== data.user.user_id) return
+    props.dispatch(updateUser(data.user))
+  }
+
+  handleMemberModified = data => {
+    const { props } = this
+    if (props.user.userId !== data.user.user_id) return
+    props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, data.workspace.workspace_id, data.member.do_notify))
   }
 
   componentDidMount () {
@@ -182,7 +200,6 @@ export class Account extends React.Component {
       const fetchPutPublicName = await props.dispatch(putMyselfName(props.user, newPublicName))
       switch (fetchPutPublicName.status) {
         case 200:
-          props.dispatch(updateUserPublicName(newPublicName))
           if (newEmail === '' && newUsername === '') {
             props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
             return true
@@ -202,7 +219,6 @@ export class Account extends React.Component {
 
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(updateUserUsername(username))
           if (newEmail === '') {
             if (newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your username and your name has been changed'), 'info'))
             else props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
@@ -234,7 +250,6 @@ export class Account extends React.Component {
       const fetchPutUserEmail = await props.dispatch(putMyselfEmail(newEmail, checkPassword))
       switch (fetchPutUserEmail.status) {
         case 200:
-          props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
           if (newUsername !== '' || newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your personal data has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
           return true
@@ -289,9 +304,8 @@ export class Account extends React.Component {
     const { props } = this
 
     const fetchPutUserWorkspaceDoNotify = await props.dispatch(putMyselfWorkspaceDoNotify(workspaceId, doNotify))
-    switch (fetchPutUserWorkspaceDoNotify.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, workspaceId, doNotify)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    if (fetchPutUserWorkspaceDoNotify.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
 
@@ -349,7 +363,7 @@ export class Account extends React.Component {
                       case 'personalData':
                         return (
                           <PersonalData
-                            userAuthType={props.user.auth_type}
+                            userAuthType={props.user.authType}
                             onClickSubmit={this.handleSubmitPersonalData}
                             onChangeUsername={this.handleChangeUsername}
                             isUsernameValid={state.isUsernameValid}
@@ -360,7 +374,7 @@ export class Account extends React.Component {
                       case 'notification':
                         return (
                           <Notification
-                            userLoggedId={props.user.user_id}
+                            userLoggedId={props.user.userId}
                             workspaceList={props.workspaceList}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                           />
@@ -394,4 +408,4 @@ export class Account extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
   breadcrumbs, user, workspaceList, timezone, system, appList
 })
-export default connect(mapStateToProps)(translate()(Account))
+export default connect(mapStateToProps)(translate()(TracimComponent(Account)))

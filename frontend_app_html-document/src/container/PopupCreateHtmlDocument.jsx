@@ -47,7 +47,7 @@ class PopupCreateHtmlDocument extends React.Component {
   handleContentCreated = data => {
     const { state } = this
     if (Number(data.content.parent_id) !== Number(state.folderId) ||
-      state.loggedUser.user_id !== data.author.user_id ||
+      state.loggedUser.userId !== data.author.user_id ||
       state.newContentName !== data.content.label
     ) return
 

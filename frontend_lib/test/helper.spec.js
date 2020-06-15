@@ -10,7 +10,8 @@ import {
   removeAtInUsername,
   FETCH_CONFIG,
   COMMON_REQUEST_HEADERS,
-  setupCommonRequestHeaders
+  setupCommonRequestHeaders,
+  serialize
 } from '../src/helper.js'
 
 import sinon from 'sinon'
@@ -162,6 +163,34 @@ describe('helper.js', () => {
       xhr.open('GET', 'http://localhost')
       setupCommonRequestHeaders(xhr)
       expect(xhr.requestHeaders).to.deep.eq(COMMON_REQUEST_HEADERS)
+    })
+  })
+
+  describe('the serialize(objectToSerialize, propertyMap) function', () => {
+    const propertyMap = {
+      user_id: 'userId',
+      email: 'email',
+      avatar_url: 'avatarUrl',
+      public_name: 'publicName',
+      lang: 'lang',
+      username: 'username'
+    }
+    const objectToSerialize = {
+      email: null,
+      user_id: 0,
+      public_name: '',
+      lang: 'pt',
+      username: undefined
+    }
+    const serializedObj = serialize(objectToSerialize, propertyMap)
+    it('should return objectToSerialize serialized according to propertyMap', () => {
+      expect(serializedObj).to.deep.equal({
+        userId: objectToSerialize.user_id,
+        email: objectToSerialize.email,
+        publicName: objectToSerialize.public_name,
+        lang: objectToSerialize.lang,
+        username: objectToSerialize.username
+      })
     })
   })
 })

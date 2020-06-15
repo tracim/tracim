@@ -371,3 +371,11 @@ export const removeAtInUsername = (username) => {
 export const hasNotAllowedCharacters = name => !(/^[A-Za-z0-9_-]*$/.test(name))
 
 export const hasSpaces = name => /\s/.test(name)
+
+export const serialize = (objectToSerialize, propertyMap) => {
+  return Object.fromEntries(
+    Object.entries(objectToSerialize)
+      .map(([key, value]) => [propertyMap[key], value])
+      .filter(([key, value]) => key !== undefined)
+  )
+}
