@@ -69,7 +69,7 @@ export class AdminWorkspaceUser extends React.Component {
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage },
-      { name: CUSTOM_EVENT.SHOW_APP, handler: this.handleShowApp },
+      { name: CUSTOM_EVENT.SHOW_APP(param.config.slug), handler: this.handleShowApp }
     ])
 
     props.registerLiveMessageHandlerList([
@@ -84,8 +84,8 @@ export class AdminWorkspaceUser extends React.Component {
     ])
   }
 
-  handleAllAppChangeLanguage = ({ detail: { type, data } }) => {
-    console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(data.config.slug), data)
     this.setState(prev => ({
       loggedUser: {
         ...prev.loggedUser,
@@ -96,7 +96,7 @@ export class AdminWorkspaceUser extends React.Component {
     this.updateTitleAndBreadcrumbs()
   }
 
-  handleShowApp = ({ detail: { type, data } }) => {
+  handleShowApp = data => {
     this.setState({ config: data.config })
   }
 
@@ -166,15 +166,15 @@ export class AdminWorkspaceUser extends React.Component {
             handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, ws.workspace_id))
           )
         )
-        
+
         this.setState(prev => ({
           content: {
             ...prev.content,
             workspaceList: workspaceList.body.map(ws => ({
               ...ws,
               memberList: (fetchWorkspaceListMemberList.find(
-                fws => fws.body.length>0 && fws.body[0].workspace_id === ws.workspace_id
-                ) || { body: [] }).body
+                fws => fws.body.length > 0 && fws.body[0].workspace_id === ws.workspace_id
+              ) || { body: [] }).body
             }))
           }
         }))
@@ -401,7 +401,7 @@ export class AdminWorkspaceUser extends React.Component {
 
     const endPoint = userId === state.loggedUser.user_id ? putMyselfProfile : putUserProfile
     const toggleManager = await handleFetchResult(await endPoint(state.config.apiUrl, userId, newProfile))
-    if (toggleManager.status != 204) {
+    if (toggleManager.status !== 204) {
       this.sendGlobalFlashMsg(props.t('Error while saving new profile'), 'warning')
     }
   }
