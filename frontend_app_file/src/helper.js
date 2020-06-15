@@ -9,7 +9,7 @@ export const PAGE = {
 }
 
 export const DISALLOWED_VIDEO_MIME_TYPE_LIST = [
-  // INFO - CH - 2020-06-11 - put mime type that you don't handle here
+  // INFO - CH - 2020-06-11 - put mime types that you don't handle here
   // example 'video/webm',
 ]
 
