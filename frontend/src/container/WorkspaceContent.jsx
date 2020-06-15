@@ -76,7 +76,7 @@ export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
   availableStatuses: contentType[0].availableStatuses
 })
 
-class WorkspaceContent extends React.Component {
+export class WorkspaceContent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
