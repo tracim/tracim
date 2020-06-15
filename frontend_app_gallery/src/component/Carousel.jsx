@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
-import TracimSlider from './TracimSlider.jsx'
+import GallerySlider from './GallerySlider.jsx'
 import MainPreview from './MainPreview.jsx'
 import PropTypes from 'prop-types'
 import ThumbnailPreview from './ThumbnailPreview.jsx'
@@ -87,7 +87,7 @@ export class Carousel extends React.Component {
 
     return (
       <>
-        <TracimSlider {...mainSliderProps}>
+        <GallerySlider {...mainSliderProps}>
           {props.slides.map((slide, index) => (
             <MainPreview
               previewSrc={slide.src}
@@ -98,8 +98,8 @@ export class Carousel extends React.Component {
               fileName={slide.fileName}
             />
           ))}
-        </TracimSlider>
-        <TracimSlider {...thumbnailSliderProps}>
+        </GallerySlider>
+        <GallerySlider {...thumbnailSliderProps}>
           {props.slides.map((slide, i) => (
             <ThumbnailPreview
               previewSrc={slide.previewUrlForThumbnail}
@@ -109,7 +109,7 @@ export class Carousel extends React.Component {
               fileName={slide.fileName}
             />
           ))}
-        </TracimSlider>
+        </GallerySlider>
       </>
     )
   }

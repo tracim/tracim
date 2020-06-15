@@ -1,6 +1,6 @@
 import Slider from 'react-slick'
 
-export default class TracimSlider extends Slider {
+export default class GallerySlider extends Slider {
   constructor (props) {
     super(props)
 
