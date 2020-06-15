@@ -16,7 +16,8 @@ import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
   setUserLang,
-  setUserDisconnected
+  setUserDisconnected,
+  updateUser
 } from '../action-creator.sync.js'
 import {
   postUserLogout,
@@ -53,7 +54,9 @@ export class Header extends React.Component {
   handleUserModified = data => {
     const { props } = this
     if (props.user.userId !== data.user.user_id) return
-    props.dispatch(setUserLang(data.user.lang))
+
+    if (props.user.lang !== data.user.lang) props.dispatch(setUserLang(data.user.lang))
+    else props.dispatch(updateUser(data.user))
   }
 
   componentDidMount () {

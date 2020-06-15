@@ -6,6 +6,7 @@ import { user, userFromApi } from '../../hocMock/redux/user/user.js'
 import { appList } from '../../hocMock/redux/appList/appList.js'
 import {
   SET,
+  UPDATE,
   USER,
   USER_DISCONNECTED
 } from '../../../src/action-creator.sync.js'
@@ -15,13 +16,12 @@ import {
   isFunction
 } from '../../hocMock/helper'
 import { shallow } from 'enzyme'
-import {
-  mockPostUserLogout204
-} from '../../apiMock'
+import { mockPostUserLogout204 } from '../../apiMock'
 
 describe('In <Header />', () => {
   const setUserDisconnectedCallBack = sinon.spy()
   const setUserLangCallBack = sinon.spy()
+  const updateUserCallBack = sinon.spy()
 
   const dispatchMock = (params) => {
     if (isFunction(params)) return params(dispatchMock)
@@ -30,6 +30,7 @@ describe('In <Header />', () => {
     switch (type) {
       case `${SET}/${USER_DISCONNECTED}`: setUserDisconnectedCallBack(); break
       case `${SET}/${USER}/Lang`: setUserLangCallBack(); break
+      case `${UPDATE}/${USER}`: updateUserCallBack(); break
     }
     return params
   }
@@ -67,14 +68,23 @@ describe('In <Header />', () => {
 
   describe('TLM handlers', () => {
     describe('eventType user', () => {
-      const tlmData = {
-        author: userFromApi,
-        user: userFromApi
-      }
       describe('handleUserModified', () => {
-        headerInstance.handleUserModified(tlmData)
-        it('should call this.props.dispatch(updateUser())', () => {
+        it('should call this.props.dispatch(setUserLang()) if the language is changed', () => {
+          const tlmData = {
+            author: userFromApi,
+            user: { ...userFromApi, lang: 'pt' }
+          }
+          headerInstance.handleUserModified(tlmData)
           expect(setUserLangCallBack.called).to.equal(true)
+        })
+
+        it('should call this.props.dispatch(updateUser()) if another data is changed', () => {
+          const tlmData = {
+            author: userFromApi,
+            user: { ...userFromApi, public_name: 'newPublicName' }
+          }
+          headerInstance.handleUserModified(tlmData)
+          expect(updateUserCallBack.called).to.equal(true)
         })
       })
     })

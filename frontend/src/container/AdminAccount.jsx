@@ -120,11 +120,14 @@ export class Account extends React.Component {
     this.setState(prev => ({
       userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => (
         ws.id === data.workspace.workspace_id
-          ? { ...ws, memberList: ws.memberList.map(member => (
+          ? {
+            ...ws,
+            memberList: ws.memberList.map(member => (
               member.id === Number(state.userToEditId)
                 ? { ...member, doNotify: data.member.do_notify }
                 : member
-          ))}
+            ))
+          }
           : ws
       ))
     }))
