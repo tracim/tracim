@@ -50,10 +50,10 @@ const AdminWorkspace = props =>
             {(props.workspaceList.length > 0
               ? props.workspaceList/* .sort((a, b) => a.workspace_id > b.workspace_id) */.map(ws => (
                 <tr className='adminWorkspace__workspaceTable__tr' key={ws.slug}>
-                  <td className='table__id'>{ws.workspace_id}</td>
+                  <td className='table__id'>{ws.id}</td>
                   <td
                     className='table__sharedSpace adminWorkspace__workspaceTable__tr__td-link primaryColorFontHover'
-                    onClick={() => props.onClickWorkspace(ws.workspace_id)}
+                    onClick={() => props.onClickWorkspace(ws.id)}
                   >
                     {ws.label}
                   </td>
@@ -72,7 +72,7 @@ const AdminWorkspace = props =>
                       <button
                         type='button'
                         className='adminWorkspace__table__delete__icon btn iconBtn primaryColorFont primaryColorFontDarkenHover mr-3'
-                        onClick={() => props.onClickDeleteWorkspace(ws.workspace_id)}
+                        onClick={() => props.onClickDeleteWorkspace(ws.id)}
                       >
                         <i className='fa fa-fw fa-trash-o' />
                       </button>

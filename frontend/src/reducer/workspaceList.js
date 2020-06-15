@@ -1,33 +1,40 @@
 import {
-  ADD, REMOVE,
+  ADD,
+  REMOVE,
   SET,
   UPDATE,
   USER_WORKSPACE_DO_NOTIFY,
   WORKSPACE_LIST,
   WORKSPACE_LIST_MEMBER, WORKSPACE_MEMBER
 } from '../action-creator.sync.js'
+import { serialize } from 'tracim_frontend_lib'
+import { serializeSidebarEntryProps } from './currentWorkspace.js'
+
+export const serializeWorkspaceListProps = {
+  agenda_enabled: 'agendaEnabled',
+  isOpenInSidebar: 'isOpenInSidebar',
+  is_deleted: 'isDeleted',
+  label: 'label',
+  public_download_enabled: 'downloadEnabled',
+  public_upload_enabled: 'uploadEnabled',
+  sidebar_entries: 'sidebarEntryList',
+  slug: 'slug',
+  workspace_id: 'id',
+  description: 'description',
+  memberList: 'memberList'
+}
 
 export function workspaceList (state = [], action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_LIST}`:
       return action.workspaceList.map(ws => ({
-        id: ws.workspace_id,
-        label: ws.label,
-        slug: ws.slug,
-        // description: ws.description, // not returned by /api/users/:idUser/workspaces
-        sidebarEntry: ws.sidebar_entries.map(sbe => ({
-          slug: sbe.slug,
-          route: sbe.route,
-          faIcon: sbe.fa_icon,
-          hexcolor: sbe.hexcolor,
-          label: sbe.label
-        })),
-        isOpenInSidebar: ws.isOpenInSidebar,
-        agendaEnabled: ws.agenda_enabled,
-        uploadEnabled: ws.public_upload_enabled,
-        downloadEnabled: ws.public_download_enabled,
+        ...serialize(ws, serializeWorkspaceListProps),
+        sidebarEntryList: ws.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
         memberList: []
       }))
+
+    case `${REMOVE}/${WORKSPACE_LIST}`:
+      return action.workspaceList.filter(ws => ws.id !== action.workspaceId)
 
     case `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`:
       return state.map(ws => ({ ...ws, isOpenInSidebar: ws.id === action.workspaceId ? action.isOpenInSidebar : ws.isOpenInSidebar }))

@@ -8,13 +8,22 @@ import { translateMock } from '../../hocMock/translate.js'
 import { Home as HomeWithoutHOC } from '../../../src/container/Home.jsx'
 import sinon from 'sinon'
 import { user, userFromApi } from '../../hocMock/redux/user/user.js'
+import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
 import { isFunction } from '../../hocMock/helper'
-import { UPDATE, USER_USERNAME } from '../../../src/action-creator.sync.js'
+import {
+  REMOVE,
+  SET,
+  UPDATE,
+  USER_USERNAME,
+  WORKSPACE_LIST
+} from '../../../src/action-creator.sync.js'
 
 describe('<Home />', () => {
   const renderAppPopupCreationCallBack = sinon.spy()
   const updateUserUsernameCallBack = sinon.spy()
+  const setWorkspaceListCallBack = sinon.spy()
+  const removeFromWorkspaceListCallBack = sinon.spy()
 
   const dispatchMock = (params) => {
     if (isFunction(params)) return params(dispatchMock)
@@ -22,6 +31,8 @@ describe('<Home />', () => {
     const { type } = params
     switch (type) {
       case `${UPDATE}/${USER_USERNAME}`: updateUserUsernameCallBack(); break
+      case `${SET}/${WORKSPACE_LIST}`: setWorkspaceListCallBack(); break
+      case `${REMOVE}/${WORKSPACE_LIST}`: removeFromWorkspaceListCallBack(); break
     }
     return params
   }
@@ -31,7 +42,7 @@ describe('<Home />', () => {
 
   const props = {
     user: user,
-    workspaceList: workspaceList.workspaceList,
+    workspaceList: [],
     system: {
       workspaceListLoaded: true,
       config: {
@@ -47,9 +58,9 @@ describe('<Home />', () => {
   }
 
   const HomeWithHOC1 = withRouterMock(translateMock()(HomeWithoutHOC))
-  const HomeWithHOC2 = ({ sys }) => <Provider store={store}><HomeWithHOC1 {...props} system={sys} /></Provider>
+  const HomeWithHOC2 = ({ system, workspaceList }) => <Provider store={store}><HomeWithHOC1 {...props} system={system} workspaceList={workspaceList} /></Provider>
 
-  const wrapper = mount(<HomeWithHOC2 {...props} sys={props.system} />)
+  const wrapper = mount(<HomeWithHOC2 {...props} system={props.system} workspaceList={props.workspaceList} />)
   const homeWrapper = wrapper.find(HomeWithoutHOC)
   const homeInstance = homeWrapper.instance()
 
@@ -66,6 +77,27 @@ describe('<Home />', () => {
         })
       })
     })
+
+    describe('eventType sharespace member', () => {
+      const tlmData = {
+        author: userFromApi,
+        user: userFromApi,
+        workspace: firstWorkspaceFromApi
+      }
+      describe('handleWorkspaceMemberCreated', () => {
+        homeInstance.handleWorkspaceMemberCreated(tlmData)
+        it('should call this.props.dispatch(setWorkspaceList())', () => {
+          expect(setWorkspaceListCallBack.called).to.equal(true)
+        })
+      })
+      describe('handleWorkspaceMemberDeleted', () => {
+        wrapper.setProps({ workspaceList: workspaceList.workspaceList })
+        homeInstance.handleWorkspaceMemberDeleted(tlmData)
+        it('should call this.props.dispatch(removeFromWorkspaceList())', () => {
+          expect(removeFromWorkspaceListCallBack.called).to.equal(true)
+        })
+      })
+    })
   })
 
   describe('static design', () => {
@@ -74,9 +106,9 @@ describe('<Home />', () => {
     )
 
     it('should not render if workspaceList is not loaded', () => {
-      wrapper.setProps({ sys: { ...props.system, workspaceListLoaded: false } })
+      wrapper.setProps({ system: { ...props.system, workspaceListLoaded: false } })
       expect(wrapper.find('div.tracim__content').length).equal(0)
-      wrapper.setProps({ sys: props.system })
+      wrapper.setProps({ system: props.system })
     })
   })
 

@@ -27,6 +27,8 @@ import {
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
+  removeFromWorkspaceList,
+  setWorkspaceList,
   updateUserUsername
 } from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
@@ -53,7 +55,9 @@ export class Home extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceMemberCreated },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceMemberDeleted }
     ])
   }
 
@@ -62,6 +66,20 @@ export class Home extends React.Component {
     const { props } = this
     if (props.user.userId !== data.user.user_id) return
     props.dispatch(updateUserUsername(data.user.username))
+  }
+
+  handleWorkspaceMemberCreated = data => {
+    const { props } = this
+    if (props.user.userId !== data.user.user_id) return
+    if (props.workspaceList.length === 0) props.dispatch(setWorkspaceList([data.workspace]))
+  }
+
+  handleWorkspaceMemberDeleted = data => {
+    const { props } = this
+    if (props.user.userId !== data.user.user_id) return
+    if (props.workspaceList.length === 1) {
+      props.dispatch(removeFromWorkspaceList(props.workspaceList, data.workspace.workspace_id))
+    }
   }
 
   // Custom Event Handler

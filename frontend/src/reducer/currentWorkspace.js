@@ -16,6 +16,7 @@ import {
   WORKSPACE_CONTENT
 } from '../action-creator.sync.js'
 import { serializeContent } from './workspaceContentList.js'
+import { serialize } from 'tracim_frontend_lib'
 
 const defaultWorkspace = {
   id: 0,
@@ -44,14 +45,12 @@ export const serializeWorkspace = ws => {
   }
 }
 
-export const serializeSidebarEntry = sbe => {
-  return {
-    slug: sbe.slug,
-    route: sbe.route,
-    faIcon: sbe.fa_icon,
-    hexcolor: sbe.hexcolor,
-    label: sbe.label
-  }
+export const serializeSidebarEntryProps = {
+  slug: 'slug',
+  route: 'route',
+  fa_icon: 'faIcon',
+  hexcolor: 'hexcolor',
+  label: 'label'
 }
 
 export const serializeMember = m => {
@@ -70,7 +69,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         ...serializeWorkspace(action.workspaceDetail),
-        sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serializeSidebarEntry(sbe))
+        sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
       }
 
     case `${SET}/${WORKSPACE_MEMBER_LIST}`:

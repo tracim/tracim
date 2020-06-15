@@ -25,7 +25,7 @@ export const serializeUserProps = {
   lang: 'lang',
   agendaUrl: 'agendaUrl',
   username: 'username',
-  isDeleted: 'is_deleted'
+  is_deleted: 'isDeleted'
 }
 
 export const defaultUser = {
