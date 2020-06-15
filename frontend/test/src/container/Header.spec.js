@@ -49,9 +49,7 @@ describe('In <Header />', () => {
       }
     },
     location: {
-      pathname: {
-        startsWith: () => {}
-      }
+      pathname: 'path'
     },
     history: {
       push: () => {}
