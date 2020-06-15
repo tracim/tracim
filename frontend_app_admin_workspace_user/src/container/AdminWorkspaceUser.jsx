@@ -256,19 +256,15 @@ export class AdminWorkspaceUser extends React.Component {
 
   handleClosePopupDeleteWorkspace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
 
-  handleWorkspaceCreated = async (message) => {
+  handleWorkspaceCreated = (message) => {
     const { state } = this
 
     const workspace = message.workspace
-    const memberList = await handleFetchResult(
-      await getWorkspaceMemberList(
-        state.config.apiUrl, workspace.workspace_id
-      )
-    ).body || []
-
     const newWorkspaceList = state.content.workspaceList.slice()
     // The list is ordered by id and a newly created workspace has a greater id than all others
-    newWorkspaceList.push({ ...workspace, memberList: memberList })
+    // Initialize member list as empty since the shared space member created message will handle
+    // adding the initial user.
+    newWorkspaceList.push({ ...workspace, memberList: [] })
 
     this.setState(prev => ({
       content: {
@@ -287,6 +283,7 @@ export class AdminWorkspaceUser extends React.Component {
 
     if (workspaceIndex === -1) {
       // We do not have this workspace in our list...
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       return
     }
     const memberList = workspaceList[workspaceIndex].memberList
@@ -316,6 +313,7 @@ export class AdminWorkspaceUser extends React.Component {
 
     if (workspaceIndex === -1) {
       // We do not have this workspace in our list...
+      console.log(`<AdminWorkspaceUser>: workspace id ${message.workspace.workspace_id} not found`)
       return
     }
 
@@ -339,6 +337,7 @@ export class AdminWorkspaceUser extends React.Component {
 
     if (workspaceIndex === -1) {
       // We do not have this workspace in our list...
+      console.log(`<AdminWorkspaceUser>: workspace id ${message.workspace.workspace_id} not found`)
       return
     }
 
@@ -365,6 +364,7 @@ export class AdminWorkspaceUser extends React.Component {
     const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.workspace.workspace_id)
 
     if (workspaceIndex === -1) {
+      console.log(`<AdminWorkspaceUser>: workspace id ${message.workspace.workspace_id} not found`)
       // We do not have this workspace in our list...
       return
     }
@@ -487,6 +487,7 @@ export class AdminWorkspaceUser extends React.Component {
     const userIndex = userList.findIndex(u => u.user_id === user.user_id)
 
     if (userIndex === -1) {
+      console.log(`<AdminWorkspaceUser>: user id ${user.user_id} not found`)
       // We do not have this user in our list...
       return
     }
