@@ -102,6 +102,31 @@ Alternatively, under root:
 
 You can add "-d" to build_full_frontend.sh to disable obfuscation and reduce build time.
 
+### Install and run pushpin for UI updates
+
+Tracim relies on [pushpin](https://pushpin.org/docs/about/) for UI updates, so you need to setup pushpin.
+
+#### For development purpose
+
+If you are in development environnement, the recommended way is to use docker,
+you should follow this documentation : [Live message setup for dev env](/backend/doc/live_message_setup.md)
+
+#### For production usage
+
+You should install pushpin, for example in debian/ubuntu:
+
+    sudo apt install pushpin
+
+and configure it to proxy tracim (by default tracim web run on port 6543):
+
+    echo "* localhost:6543" | sudo tee /etc/pushpin/routes
+
+and after this change you need to restart your pushpin service:
+
+    sudo systemctl restart pushpin
+
+more info about installation are available in [Backend README](backend/README.md).
+
 ### Run Tracim
 
 Tracim is composed of multiples services, some are web wsgi applications and others
@@ -138,11 +163,15 @@ You can run some Tracim daemons too if you want those features:
     # email fetcher (if email reply is enabled)
     python3 daemons/mail_fetcher.py &
 
-You can now head to
-[http://127.0.0.1:6543](http://127.0.0.1:6543) and login with the admin account:
+You can now head to (if pushpin is correctly configured and use default port 7999)
+[http://127.0.0.1:7999](http://127.0.0.1:7999) and login with the admin account:
 
  * user: `admin@admin.admin`
  * password: `admin@admin.admin`
+
+:warning: If this does not work, you can try to access [http://127.0.0.1:6543](http://127.0.0.1:6543). If it works, the issue is related to the configuration of pushpin.
+
+:warning: Using tracim without pushpin will mean no live message leading to unrefreshed frontend information.
 
 
 #### More documentation about running Tracim and Tracim services
@@ -180,7 +209,7 @@ If you need to run Cypress with an external server of Tracim, modify "baseurl" i
 
 You must change the apiUrl property in `frontend/configEnv.json` to:
 
-    http://localhost:1337/api/v2
+    http://localhost:1337/api
 
 Then rebuild the frontend:
 

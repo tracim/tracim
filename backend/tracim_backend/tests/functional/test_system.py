@@ -8,14 +8,14 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
 """
-Tests for /api/v2/system subpath endpoints.
+Tests for /api/system subpath endpoints.
 """
 
 
 @pytest.mark.usefixtures("base_fixture")
 class TestApplicationEndpoint(object):
     """
-    Tests for /api/v2/system/applications
+    Tests for /api/system/applications
     """
 
     def test_api__get_applications__ok_200__nominal_case(
@@ -25,7 +25,7 @@ class TestApplicationEndpoint(object):
         Get applications list with a registered user.
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/system/applications", status=200)
+        res = web_testapp.get("/api/system/applications", status=200)
         res = res.json_body
         app_api = application_api_factory.get()
         applications_in_context = [
@@ -45,7 +45,7 @@ class TestApplicationEndpoint(object):
         Get applications list with an unregistered user (bad auth)
         """
         web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
-        res = web_testapp.get("/api/v2/system/applications", status=401)
+        res = web_testapp.get("/api/system/applications", status=401)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] is None
@@ -56,7 +56,7 @@ class TestApplicationEndpoint(object):
 @pytest.mark.usefixtures("base_fixture")
 class TestContentsTypesEndpoint(object):
     """
-    Tests for /api/v2/system/content_types
+    Tests for /api/system/content_types
     """
 
     def test_api__get_content_types__ok_200__nominal_case(
@@ -66,7 +66,7 @@ class TestContentsTypesEndpoint(object):
         Get system content_types list with a registered user.
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/system/content_types", status=200)
+        res = web_testapp.get("/api/system/content_types", status=200)
         res = res.json_body
         assert len(res) == len(content_type_list.endpoint_allowed_types())
         content_types = content_type_list.endpoint_allowed_types()
@@ -99,7 +99,7 @@ class TestContentsTypesEndpoint(object):
         Get system content_types list with an unregistered user (bad auth)
         """
         web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
-        res = web_testapp.get("/api/v2/system/content_types", status=401)
+        res = web_testapp.get("/api/system/content_types", status=401)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] is None
@@ -110,7 +110,7 @@ class TestContentsTypesEndpoint(object):
 @pytest.mark.usefixtures("base_fixture")
 class TestTimezonesEndpoint(object):
     """
-    Tests for /api/v2/system/timezones
+    Tests for /api/system/timezones
     """
 
     def test_api__get_timezones__ok_200__nominal_case(self, web_testapp):
@@ -118,7 +118,7 @@ class TestTimezonesEndpoint(object):
         Get alls timezones list with a registered user.
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/system/timezones", status=200)
+        res = web_testapp.get("/api/system/timezones", status=200)
         timezones = res.json_body
         timezones_list = get_timezones_list()
         assert len(timezones) == len(timezones_list)
@@ -131,7 +131,7 @@ class TestTimezonesEndpoint(object):
         Get availables timezones list with an unregistered user (bad auth)
         """
         web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
-        res = web_testapp.get("/api/v2/system/timezones", status=401)
+        res = web_testapp.get("/api/system/timezones", status=401)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] is None
@@ -142,7 +142,7 @@ class TestTimezonesEndpoint(object):
 @pytest.mark.usefixtures("base_fixture")
 class TestAboutEndpoint(object):
     """
-    Tests for /api/v2/system/about
+    Tests for /api/system/about
     """
 
     def test_api__get_about__ok_200__nominal_case(self, web_testapp):
@@ -150,7 +150,7 @@ class TestAboutEndpoint(object):
         Get information about Tracim
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/system/about", status=200)
+        res = web_testapp.get("/api/system/about", status=200)
         assert res.json_body["name"] == "Tracim"
         assert res.json_body["version"]
         assert res.json_body["datetime"]
@@ -161,7 +161,7 @@ class TestAboutEndpoint(object):
         Get information about Tracim with unregistered user
         """
         web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
-        res = web_testapp.get("/api/v2/system/about", status=401)
+        res = web_testapp.get("/api/system/about", status=401)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert "message" in res.json.keys()
@@ -171,7 +171,7 @@ class TestAboutEndpoint(object):
 @pytest.mark.usefixtures("test_fixture")
 class TestUsernameAvailabilitiesEndpoint(object):
     """
-    Tests for /api/v2/system/username-availability
+    Tests for /api/system/username-availability
     """
 
     @pytest.mark.parametrize(
@@ -183,7 +183,7 @@ class TestUsernameAvailabilitiesEndpoint(object):
     ) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/system/username-availability?username={}".format(username), status=200
+            "/api/system/username-availability?username={}".format(username), status=200
         )
         assert res.json["available"] == is_available
 
@@ -192,7 +192,7 @@ class TestUsernameAvailabilitiesEndpoint(object):
 @pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
 class TestConfigEndpointCollabora(object):
     """
-    Tests for /api/v2/system/config
+    Tests for /api/system/config
     """
 
     @patch("requests.get")
@@ -215,7 +215,7 @@ class TestConfigEndpointCollabora(object):
             </net-zone>
         </wopi-discovery>
         """
-        res = web_testapp.get("/api/v2/system/config", status=200)
+        res = web_testapp.get("/api/system/config", status=200)
         assert res.json_body["collaborative_document_edition"]
         result = res.json_body
         assert result["collaborative_document_edition"]["software"] == "collabora"
@@ -236,7 +236,7 @@ class TestConfigEndpointCollabora(object):
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestConfigEndpoint(object):
     """
-    Tests for /api/v2/system/config
+    Tests for /api/system/config
     """
 
     def test_api__get_config__ok_200__nominal_case(self, web_testapp):
@@ -244,7 +244,7 @@ class TestConfigEndpoint(object):
         Get some config info about tracim
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/system/config", status=200)
+        res = web_testapp.get("/api/system/config", status=200)
         assert res.json_body["email_notification_activated"] is False
         assert res.json_body["new_user_invitation_do_notify"] is True
         assert res.json_body["webdav_enabled"] is False
@@ -261,7 +261,7 @@ class TestConfigEndpoint(object):
         Get some config info about tracim with an unregistered user (bad auth)
         """
         web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
-        res = web_testapp.get("/api/v2/system/config", status=401)
+        res = web_testapp.get("/api/system/config", status=401)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert "message" in res.json.keys()
@@ -275,7 +275,7 @@ class TestErrorCodeEndpoint(object):
             "Basic",
             ("admCollaborativeDocumentEditionFactoryin@admin.admin", "admin@admin.admin"),
         )
-        res = web_testapp.get("/api/v2/system/error_codes", status=200)
+        res = web_testapp.get("/api/system/error_codes", status=200)
         # check if all error_codes are available by checking number of item
         # received
         assert len(res.json_body) == len(list(map(int, ErrorCode)))

@@ -73,7 +73,7 @@ class TestSimpleSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
@@ -136,7 +136,7 @@ class TestSimpleSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
@@ -223,7 +223,7 @@ class TestSimpleSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
@@ -317,7 +317,7 @@ class TestSimpleSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
@@ -391,7 +391,7 @@ class TestSimpleSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string, "size": 1, "page_nb": 1}
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
@@ -400,7 +400,7 @@ class TestSimpleSearch(object):
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
         params = {"search_string": search_string, "size": 1, "page_nb": 2}
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
@@ -437,7 +437,7 @@ class TestSimpleSearch(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/v2/search/content".format(), status=200)
+        res = web_testapp.get("/api/search/content".format(), status=200)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 0
@@ -497,7 +497,7 @@ class TestSimpleSearch(object):
         # get all
         params = {"search_string": "stringtosearch"}
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 4
@@ -506,7 +506,7 @@ class TestSimpleSearch(object):
 
         params = {"search_string": "stringtosearch", "content_types": "html-document"}
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 2
@@ -517,7 +517,7 @@ class TestSimpleSearch(object):
 
         params = {"search_string": "stringtosearch", "content_types": "html-document,thread"}
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 3
@@ -529,7 +529,7 @@ class TestSimpleSearch(object):
 
         params = {"search_string": "stringtosearch", "content_types": "folder"}
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
@@ -602,7 +602,7 @@ class TestSimpleSearch(object):
             "show_active": 1,
         }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 4
@@ -612,7 +612,7 @@ class TestSimpleSearch(object):
         # get only active
         params = {"search_string": "stringtosearch"}
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         default_search_result = res.json_body
         assert default_search_result
         assert default_search_result["total_hits"] == 2
@@ -628,7 +628,7 @@ class TestSimpleSearch(object):
             "show_archived": 0,
         }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         only_active_search_result = res.json_body
         assert only_active_search_result == default_search_result
 
@@ -639,7 +639,7 @@ class TestSimpleSearch(object):
             "show_archived": 0,
         }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 3
@@ -656,7 +656,7 @@ class TestSimpleSearch(object):
             "show_archived": 1,
         }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1

@@ -148,11 +148,11 @@ describe('Add a member at dashboard', () => {
           .contains(sharedSpaceManager)
           .click()
         cy.contains('Validate').click()
-        cy.get('[data-cy=flashmessage]').contains('Unknown user')
+        cy.get('[data-cy=flashmessage]').contains('This user already is in the workspace')
       })
   })
 
-  it('should not allow to add a member twice using the same username', () => {
+  it('should not allow adding a member twice using the same username', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.username)

@@ -4,6 +4,7 @@ from os.path import dirname
 import re
 import typing
 
+from pluggy import PluginManager
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from wsgidav.dav_provider import DAVProvider
@@ -13,7 +14,6 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import NotAuthenticated
-from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.content import ContentRevisionRO
@@ -30,12 +30,15 @@ from tracim_backend.models.data import Workspace
 
 
 class WebdavTracimContext(TracimContext):
-    def __init__(self, environ: typing.Dict[str, typing.Any], app_config: CFG, session: Session):
+    def __init__(
+        self, environ: typing.Dict[str, typing.Any], app_config: CFG, plugin_manager: PluginManager,
+    ):
         super().__init__()
         self.environ = environ
         self._candidate_parent_content = None
         self._app_config = app_config
-        self._session = session
+        self._session = None
+        self._plugin_manager = plugin_manager
 
     def set_path(self, path: str):
         self.path = path
@@ -46,20 +49,29 @@ class WebdavTracimContext(TracimContext):
 
     @property
     def dbsession(self) -> Session:
+        assert self._session
         return self._session
+
+    @dbsession.setter
+    def dbsession(self, session: Session) -> None:
+        self._session = session
 
     @property
     def app_config(self) -> CFG:
         return self._app_config
 
     @property
+    def plugin_manager(self) -> PluginManager:
+        return self._plugin_manager
+
+    @property
     def current_user(self):
         """
         Current authenticated user if exist
         """
-        return self._generate_if_none(
-            self._current_user, self._get_user, self._get_current_webdav_username
-        )
+        if not self._current_user:
+            self.set_user(self._get_user(self._get_current_webdav_username))
+        return self._current_user
 
     def _get_user(self, get_webdav_username: typing.Callable):
         login = get_webdav_username()
@@ -67,11 +79,8 @@ class WebdavTracimContext(TracimContext):
         return uapi.get_one_by_login(login)
 
     def _get_current_webdav_username(self) -> str:
-        try:
-            if not self.environ["http_authenticator.username"]:
-                raise UserNotFoundInTracimRequest("No current user has been found in the context")
-        except UserNotFoundInTracimRequest as exc:
-            raise NotAuthenticated("User not found") from exc
+        if not self.environ.get("http_authenticator.username"):
+            raise NotAuthenticated("User not found")
         return self.environ["http_authenticator.username"]
 
     @property

@@ -42,7 +42,7 @@ export const postThreadContent = (apiUrl, workspaceId, folderId, contentType, ne
   })
 
 export const putThreadRead = (user, apiUrl, workspaceId, contentId) => {
-  return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${workspaceId}/contents/${contentId}/read`, {
+  return fetch(`${apiUrl}/users/${user.userId}/workspaces/${workspaceId}/contents/${contentId}/read`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

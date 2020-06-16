@@ -43,7 +43,11 @@ context('Add file(s) with PopupCreateFile', function () {
 
   describe('Adds multiples files to a workspace', () => {
     describe('add 2 files not added yet', () => {
-      it('should update the workspace content list with the newly added files', () => {
+      it('should update the workspace content list with the newly added files', function () {
+        // TODO - GM - 2020/06/02 - Add this test when WorkspaceContent support TLM
+        // https://github.com/tracim/tracim/issues/2850
+        this.skip()
+
         const fileName1 = 'png_exemple2'
         const fileName2 = 'pdf_exemple2'
 
@@ -64,7 +68,11 @@ context('Add file(s) with PopupCreateFile', function () {
     })
 
     describe('add 2 files with one already added', () => {
-      it('should update the workspace content list with the newly added file without closing the popup in order to display the failed upload', () => {
+      it('should update the workspace content list with the newly added file without closing the popup in order to display the failed upload', function () {
+        // TODO - GM - 2020/06/02 - Add this test when WorkspaceContent support TLM
+        // https://github.com/tracim/tracim/issues/2850
+        this.skip()
+
         const fileName1 = 'png_exemple3'
         const fileName2 = 'pdf_exemple3'
 
@@ -88,7 +96,11 @@ context('Add file(s) with PopupCreateFile', function () {
     })
 
     describe('add 2 files and a third one deleted right before validating the form', () => {
-      it('should be able to delete a file before validating the form', () => {
+      it('should be able to delete a file before validating the form', function () {
+        // TODO - GM - 2020/06/02 - Add this test when WorkspaceContent support TLM
+        // https://github.com/tracim/tracim/issues/2850
+        this.skip()
+
         const fileName1 = 'png_exemple4'
         const fileName2 = 'pdf_exemple4'
         const fileName3 = 'png_exemple4_1'

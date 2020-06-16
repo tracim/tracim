@@ -13,14 +13,16 @@ export class LiveMessageManager {
     this.eventSource = null
   }
 
-  openLiveMessageConnection (userId) {
+  openLiveMessageConnection (userId, host = null) {
     if (this.status !== LIVE_MESSAGE_STATUS.CLOSE) {
       console.error('LiveMessage already connected.')
       return false
     }
 
+    const url = host || FETCH_CONFIG.apiUrl
+
     this.eventSource = new globalThis.EventSource(
-      `${FETCH_CONFIG.apiUrl}/users/${userId}/live_messages`,
+      `${url}/users/${userId}/live_messages`,
       { withCredentials: true }
     )
     this.status = LIVE_MESSAGE_STATUS.PENDING

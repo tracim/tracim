@@ -263,7 +263,7 @@ class SearchResult extends React.Component {
                       label={searchItem.label}
                       path={`${searchItem.workspace.label} > ${this.getPath(searchItem.parents)}${this.getContentName(searchItem)}`}
                       lastModificationAuthor={searchItem.last_modifier.public_name}
-                      lastModificationTime={displayDistanceDate(searchItem.modified, this.props.user.lang)}
+                      lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
                       lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
                       fileExtension={searchItem.file_extension}
                       faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.content_type)).faIcon : null}

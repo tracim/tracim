@@ -221,7 +221,7 @@ class WorkspaceContent extends React.Component {
   loadWorkspaceDetail = async () => {
     const { props } = this
 
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, props.match.params.idws))
+    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.match.params.idws))
     switch (fetchWorkspaceDetail.status) {
       case 200:
         props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
@@ -513,7 +513,7 @@ class WorkspaceContent extends React.Component {
     // INFO - CH - 2019-06-14 - Check user is allowed to drop in the different destination workspace
     if (source.workspaceId !== destination.workspaceId) {
       const destinationMemberList = props.workspaceList.find(ws => ws.id === destination.workspaceId).memberList
-      const userRoleIdInDestination = findUserRoleIdInWorkspace(props.user.user_id, destinationMemberList, ROLE_LIST)
+      const userRoleIdInDestination = findUserRoleIdInWorkspace(props.user.userId, destinationMemberList, ROLE_LIST)
 
       if (userRoleIdInDestination < ROLE.contentManager.id) {
         props.dispatch(newFlashMessage(props.t('Insufficient rights'), 'danger'))
@@ -551,7 +551,7 @@ class WorkspaceContent extends React.Component {
 
   handleSetFolderRead = async folderId => {
     const { props, state } = this
-    const fetchSetFolderRead = await props.dispatch(putFolderRead(props.user.user_id, state.workspaceIdInUrl, folderId))
+    const fetchSetFolderRead = await props.dispatch(putFolderRead(props.user.userId, state.workspaceIdInUrl, folderId))
     switch (fetchSetFolderRead.status) {
       case 204: props.dispatch(setWorkspaceContentRead(folderId)); break
       default: console.log(`Error while setting folder ${folderId} read status. fetchSetFolderRead: `, fetchSetFolderRead)
@@ -676,7 +676,7 @@ class WorkspaceContent extends React.Component {
       .filter(c => c.parentId === null)
       .sort(sortWorkspaceContents)
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE_LIST)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST)
 
     const createContentAvailableApp = [
       ...contentType

@@ -9,7 +9,6 @@ const emptyPhrase = 'No upload link has been created yet'
 let workspaceId
 
 describe('Open the share folder advanced', () => {
-
   beforeEach(function () {
     cy.resetDB()
     cy.setupBaseDB()
@@ -17,8 +16,8 @@ describe('Open the share folder advanced', () => {
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
-    }).then( promise => {
-      cy.visitPage({pageName: PAGES.SHARE_FOLDER, params: {workspaceId: workspaceId}})
+    }).then(promise => {
+      cy.visitPage({ pageName: PAGES.SHARE_FOLDER, params: { workspaceId: workspaceId } })
     })
   })
 
@@ -34,20 +33,20 @@ describe('Open the share folder advanced', () => {
     cy.get('.share_folder_advanced__content__empty').contains(emptyPhrase).should('be.visible')
   })
 
-  describe('and clicking on the New button',() => {
+  describe('and clicking on the New button', () => {
     beforeEach(function () {
       cy.get('[data-cy=share_folder_advanced__content__btnupload]').should('be.visible').click()
     })
-    it('Should redirect to new share page',() => {
+    it('Should redirect to new share page', () => {
       cy.get('.newUpload').contains('New public upload link').should('be.visible')
     })
 
-    it('Clicking on the Cancel button, hould redirect to share page',() => {
+    it('Clicking on the Cancel button, hould redirect to share page', () => {
       cy.get('.newUpload__btnCancel').should('be.visible').click()
       cy.get('.share_folder_advanced__content').contains('Public upload links').should('be.visible')
     })
 
-    it('clicking on delete, should delete the share link',() => {
+    it('clicking on delete, should delete the share link', () => {
       // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
       cy.wait(1000)
       cy.get('.newUpload__email__input').should('be.visible').type('email@email.email')

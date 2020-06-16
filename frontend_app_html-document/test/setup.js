@@ -3,6 +3,7 @@ import chai from 'chai'
 import Enzyme from 'enzyme'
 import chaiEnzyme from 'chai-enzyme'
 import Adapter from 'enzyme-adapter-react-16'
+import sinon from 'sinon'
 
 process.env.NODE_ENV = 'test'
 
@@ -13,13 +14,29 @@ if (!global.window && !global.document) {
       win.scrollTo = () => {}
     },
     pretendToBeVisual: false,
-    userAgent: 'mocha'
+    userAgent: 'mocha',
+    url: 'http://localhost'
   })
 
   global.window = window
   global.document = window.document
   global.navigator = window.navigator
+  global.GLOBAL_dispatchEvent = () => {}
+  global.localStorage = {
+    getItem: () => {}
+  }
+  global.globalThis = {
+    tinymce: {
+      remove: () => {}
+    },
+    wysiwyg: () => {}
+  }
+  const nodeCrypto = require('crypto')
+  global.crypto = {
+    getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }
+  }
 }
 
 Enzyme.configure({ adapter: new Adapter() })
 chai.use(chaiEnzyme())
+sinon.stub(console, 'log')

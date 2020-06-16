@@ -5,6 +5,7 @@ from os.path import dirname
 import shutil
 import subprocess
 import typing
+from unittest import mock
 
 from depot.manager import DepotManager
 import plaster
@@ -27,12 +28,15 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
+from tracim_backend.lib.core.event import EventBuilder
+from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
+from tracim_backend.models.setup_models import create_dbsession_for_context
 from tracim_backend.models.setup_models import get_session_factory
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
@@ -70,7 +74,7 @@ def pushpin(tracim_webserver, tmp_path_factory):
         try:
             requests.get("http://localhost:7999")
             break
-        except ConnectionError:
+        except requests.exceptions.ConnectionError:
             pass
     yield compose
     compose.down()
@@ -188,11 +192,6 @@ def session_factory(engine):
 
 
 @pytest.fixture
-def empty_session(session_factory):
-    return get_tm_session(session_factory, transaction.manager)
-
-
-@pytest.fixture
 def migration_engine(engine):
     yield engine
     sql = text("DROP TABLE IF EXISTS migrate_version;")
@@ -200,8 +199,43 @@ def migration_engine(engine):
 
 
 @pytest.fixture
-def session(empty_session, engine, app_config, test_logger):
-    dbsession = empty_session
+def session(request, engine, session_factory, app_config, test_logger):
+    class TracimTestContext(TracimContext):
+        def __init__(self, app_config) -> None:
+            super().__init__()
+            self._app_config = app_config
+            self._plugin_manager = create_plugin_manager()
+            if getattr(request, "param", {}).get("mock_event_builder", True):
+                # mocking event builder in order to avoid
+                # requiring a working pushpin instance for every test
+                event_builder = mock.MagicMock(spec=EventBuilder)
+                event_builder.__name__ = EventBuilder.__name__
+            else:
+                event_builder = EventBuilder(app_config)
+            self._plugin_manager.register(event_builder)
+            self._dbsession = create_dbsession_for_context(
+                session_factory, transaction.manager, self
+            )
+            self._dbsession.set_context(self)
+            self._current_user = None
+
+        @property
+        def dbsession(self):
+            return self._dbsession
+
+        @property
+        def plugin_manager(self):
+            return self._plugin_manager
+
+        @property
+        def current_user(self):
+            return self._current_user
+
+        @property
+        def app_config(self):
+            return self._app_config
+
+    context = TracimTestContext(app_config)
     from tracim_backend.models.meta import DeclarativeBase
 
     with transaction.manager:
@@ -211,11 +245,11 @@ def session(empty_session, engine, app_config, test_logger):
         except Exception as e:
             transaction.abort()
             raise e
-    yield dbsession
+    yield context.dbsession
     from tracim_backend.models.meta import DeclarativeBase
 
-    dbsession.rollback()
-    dbsession.close_all()
+    context.dbsession.rollback()
+    context.dbsession.close_all()
     transaction.abort()
     DeclarativeBase.metadata.drop_all(engine)
 
