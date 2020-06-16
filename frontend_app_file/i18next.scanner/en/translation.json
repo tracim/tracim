@@ -57,8 +57,8 @@
   "Play video": "Play video",
   "In that case, you can download the video and try opening it manually.": "In that case, you can download the video and try opening it manually.",
   "To download the video, click on download button.": "To download the video, click on download button.",
-  "Note: Your browser seems to not be able to read this file.": "Note: Your browser seems to not be able to read this file.",
-"File has been updated": "File has been updated",
+  "Note: Your browser might not be able to read this file.": "Note: Your browser might not be able to read this file.",
+   "File has been updated": "File has been updated",
   "File has been deleted": "File has been deleted",
   "File has been restored": "File has been restored",
   "The file has been updated, it can't be edited anymore": "The file has been updated, it can't be edited anymore"
