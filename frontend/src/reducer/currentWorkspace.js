@@ -80,6 +80,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${ADD}/${WORKSPACE_MEMBER}`:
+      if (state.id !== action.workspace.workspace_id) return state
       return {
         ...state,
         memberList: [
@@ -89,6 +90,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${UPDATE}/${WORKSPACE_MEMBER}`:
+      if (state.id !== action.workspace.workspace_id) return state
       return {
         ...state,
         memberList: state.memberList.map(m => m.id === action.member.user.user_id
@@ -98,6 +100,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${REMOVE}/${WORKSPACE_MEMBER}`:
+      if (state.id !== action.workspace.workspace_id) return state
       return {
         ...state,
         memberList: state.memberList.filter(m => m.id !== action.memberId)
