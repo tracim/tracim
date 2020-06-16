@@ -534,7 +534,7 @@ export class Gallery extends React.Component {
         displayPopupDelete: true
       })
     } else {
-      this.sendGlobalFlashMessage(this.props.t('There isn’t any picture to delete.'))
+      this.sendGlobalFlashMessage(this.props.t("There isn't any picture to delete."))
     }
   }
 
