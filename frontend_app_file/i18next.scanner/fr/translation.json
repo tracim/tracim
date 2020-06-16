@@ -57,5 +57,5 @@
   "Play video": "Lire la vidéo",
   "In that case, you can download the video and try opening it manually.": "Dans ce cas, vous pouvez télécharger la vidéo et essayer de la lire manuellement",
   "To download the video, click on download button.": "Pour la télécharger, cliquez sur le bouton de téléchargement.",
-  "Note: Your browser seems to not be able to read this file.": "Remarque : Votre navigateur ne semble pas pouvoir lire ce fichier."
+  "Note: Your browser might not be able to read this file.": "Remarque: Votre navigateur peut ne pas pouvoir lire le fichier."
 }
