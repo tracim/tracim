@@ -16,7 +16,8 @@ if (!global.window && !global.document) {
       win.scrollTo = () => {}
     },
     pretendToBeVisual: false,
-    userAgent: 'mocha'
+    userAgent: 'mocha',
+    url: 'http://localhost'
   })
 
   global.CustomEvent = window.CustomEvent
@@ -24,6 +25,11 @@ if (!global.window && !global.document) {
   global.document = window.document
   global.navigator = window.navigator
   global.GLOBAL_dispatchEvent = () => {}
+
+  const nodeCrypto = require('crypto')
+  global.crypto = {
+    getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }
+  }
 }
 
 Enzyme.configure({ adapter: new Adapter() })
