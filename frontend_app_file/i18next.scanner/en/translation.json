@@ -55,5 +55,7 @@
   "New file": "New file",
   "Preview loading...": "Preview loading...",
   "Play video": "Play video",
-  "Unfortunately, your browser can't play the video.": "Unfortunately, your browser can't play the video."
+  "Note: Your browser might not be able to read this file.": "Note: Your browser might not be able to read this file.",
+  "In that case, you can download the video and try opening it manually.": "In that case, you can download the video and try opening it manually.",
+  "To download the video, click on download button.": "To download the video, click on download button."
 }

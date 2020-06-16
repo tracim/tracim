@@ -55,5 +55,7 @@
   "New file": "Nouveau fichier",
   "Preview loading...": "Chargement de l'aperçu ...",
   "Play video": "Lire la vidéo",
-  "Unfortunately, your browser can't play the video.": "Malheureusement, votre navigateur ne peut pas lire la vidéo"
+  "Note: Your browser might not be able to read this file.": "Remarque : Votre navigateur peut ne pas pouvoir lire le fichier.",
+  "In that case, you can download the video and try opening it manually.": "Dans ce cas, vous pouvez télécharger la vidéo et essayer de la lire manuellement",
+  "To download the video, click on download button.": "Pour la télécharger, cliquez sur le bouton de téléchargement."
 }
