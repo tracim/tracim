@@ -71,8 +71,8 @@ debian_install() {
     install_yarn_package=""
 
     log "Checking whether Yarn is installed…"
-    if yarn -v > /dev/null 2>&1; then
-        loggood "Yarn $(yarn -v) is installed."
+    if which yarn > /dev/null 2>&1; then
+        loggood "Yarn is installed."
     else
         log "Yarn is not installed. Adding its repository."
 
@@ -120,17 +120,35 @@ debian_install() {
     fi
 }
 
+yarn_expected_version() {
+    min_yarn2_rc_version=34
+    # RJ - 2020-06-12 - NOTE: Yarn 2.0.0-rc.33 and earlier had issues related
+    # to rewritting the checksums of the whole yarn.lock by prefixing them
+    # with 2/ or 3/. We could not find anything about this issue on the web.
+    case "$1" in 2.*)
+        [ "$(printf "$1" | awk -F'rc.' '{print $2}')" -ge "$min_yarn2_rc_version" ];
+        return $?;;
+    esac
+    return 1
+}
+
 setup_yarn() {
-    if ! yarn -v | grep '^2\.' > /dev/null; then
-        log "Setting up yarn (yarn policies set-version berry)"
-        yarn policies set-version berry && \
-            loggood "Yarn is correctly set up." || \
-            logerror "Failed to set up yarn."
+    yarn_version="$(yarn -v)"
+
+    if ! yarn_expected_version "$yarn_version" ; then
+        log "You have Yarn $yarn_version. Setting up Yarn 2 to the last version."
+        case "$yarn_version" in
+            2.*) yarn set version latest ;;
+            *) yarn policies set-version berry ;;
+        esac
+
+        yarn_version="$(yarn -v)"
+        if ! yarn_expected_version "$yarn_version" ; then
+            logerror "We expected Yarn 2 ≥ 2.0.0-rc.33, we got $yarn_version."
+        fi
     fi
 
-    if ! yarn -v | grep '^2\.' > /dev/null; then
-        logerror "We expected Yarn 2, we got $(yarn --version)."
-    fi
+    loggood "Yarn version: $yarn_version"
 
     if ! grep -F 'nodeLinker: node-modules' .yarnrc.yml > /dev/null; then
         log "Setting yarn nodeLinker to node-modules mode."
@@ -139,13 +157,13 @@ setup_yarn() {
 }
 
 setup_config() {
-    log "Checking if configEnv.json exist.."
+    log "Checking whether configEnv.json exists.."
 
     if [ ! -f frontend/configEnv.json ]; then
         log "cp frontend/configEnv.json.sample frontend/configEnv.json ..."
         cp frontend/configEnv.json.sample frontend/configEnv.json && \
             loggood "ok" || \
-            logerror "Failed copying the configuration."
+            logerror "Failed to copy the configuration."
     else
         log "configEnv.json already exists."
     fi
