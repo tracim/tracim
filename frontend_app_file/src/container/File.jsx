@@ -171,6 +171,7 @@ export class File extends React.Component {
         {
           ...data.content,
           created_raw: data.content.created,
+          created: displayDistanceDate(data.content.created, this.state.loggedUser.lang),
           timelineType: data.content.content_type
         }
       ])
