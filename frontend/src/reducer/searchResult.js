@@ -44,32 +44,26 @@ const defaultResult = {
   resultsList: []
 }
 
-function uniqueResults (allResults) {
-  return uniqBy(allResults, 'contentId')
-}
-
 export default function searchResult (state = defaultResult, action) {
+  let newResultList, uniqueResultList
   switch (action.type) {
     case `${SET}/${SEARCH_RESULTS_LIST}`:
-      return {
-        ...state,
-        resultsList: uniqueResults((action.newSearchResultsList).map(item => serialize(item, serializeSearchItemProps)))
-      }
+      newResultList = action.newSearchResultsList.map(item => serialize(item, serializeSearchItemProps))
+      uniqueResultList = uniqBy(newResultList, 'contentId')
+      return { ...state, resultsList: uniqueResultList }
 
     case `${UPDATE}/${SEARCH_RESULTS_LIST}`:
-      return {
-        ...state,
-        resultsList: uniqueResults((state.resultsList).map(item => item.contentId === action.searchResultItem.content_id
-          ? { ...item, ...serialize(action.searchResultItem, serializeSearchItemProps) }
-          : item
-        ))
-      }
+      newResultList = state.resultsList.map(item => item.contentId === action.searchResultItem.content_id
+        ? { ...item, ...serialize(action.searchResultItem, serializeSearchItemProps) }
+        : item
+      )
+      uniqueResultList = uniqBy(newResultList, 'contentId')
+      return { ...state, resultsList: uniqueResultList }
 
     case `${APPEND}/${SEARCH_RESULTS_LIST}`:
-      return {
-        ...state,
-        resultsList: uniqueResults([...state.resultsList, ...((action.newSearchResultsList).map(item => serialize(item, serializeSearchItemProps)))])
-      }
+      newResultList = action.appendSearchResultsList.map(item => serialize(item, serializeSearchItemProps))
+      uniqueResultList = uniqBy([...state.resultsList, ...newResultList], 'contentId')
+      return { ...state, resultsList: uniqueResultList }
 
     case `${SET}/${SEARCHED_KEYWORDS}`:
       return { ...state, searchedKeywords: action.searchedKeywords }
