@@ -44,7 +44,7 @@ export class FileComponent extends React.Component {
       const warningMsg = document.createElement('div')
       warningMsg.innerHTML = `
         <div class='file__previewVideo__error'>
-          ${this.props.t('Note: Your browser might not be able to read this file.')}
+          ${this.props.t('Note: Your browser seems to not be able to read this file.')}
           <br />
           ${this.props.t('In that case, you can download the video and try opening it manually.')}
           <br />
