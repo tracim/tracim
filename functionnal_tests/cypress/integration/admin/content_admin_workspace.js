@@ -43,15 +43,12 @@ describe('content :: admin > workspace', function () {
   })
   it('checks workspace modified TLM', function() {
     cy.request('PUT', 'api/workspaces/1', { label: 'Modified workspace', description: ''})
-    cy.wait(500)
-    cy.get('.adminWorkspace__workspaceTable tbody tr:first td:nth-child(2)').contains('Modified workspace')
+    cy.contains('.adminWorkspace__workspaceTable tbody tr:first td:nth-child(2)', 'Modified w')
   })
   it('checks workspace added and deleted TLM', function() {
     cy.request('POST', 'api/workspaces', { label: 'A new workspace', description: ''})
-    cy.wait(500)
-    cy.get('.adminWorkspace__workspaceTable tbody').find('tr').its('length').should('eq', 2)
+    cy.get('.adminWorkspace__workspaceTable tbody tr').should('have.length', 2)
     cy.request('PUT', 'api/workspaces/2/trashed')
-    cy.wait(500)
-    cy.get('.adminWorkspace__workspaceTable tbody').find('tr').its('length').should('eq', 1)
+    cy.get('.adminWorkspace__workspaceTable tbody tr').should('have.length', 1)
   })
 })

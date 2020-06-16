@@ -85,7 +85,8 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleAllAppChangeLanguage = data => {
-    console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(data.config.slug), data)
+    const { state } = this
+    console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), state)
     this.setState(prev => ({
       loggedUser: {
         ...prev.loggedUser,
