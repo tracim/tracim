@@ -1,5 +1,5 @@
 import i18n, { getBrowserLang } from './i18n.js'
-import { PROFILE_LIST, ROLE } from 'tracim_frontend_lib'
+import { PROFILE_LIST, ROLE, FETCH_CONFIG as LIB_FETCH_CONFIG } from 'tracim_frontend_lib'
 
 const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-test.json') : require('../../configEnv.json')
 
@@ -16,10 +16,7 @@ export const history = require('history').createBrowserHistory()
 export { getBrowserLang }
 
 export const FETCH_CONFIG = {
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  },
+  headers: LIB_FETCH_CONFIG.headers,
   apiUrl: configEnv.apiUrl
 }
 

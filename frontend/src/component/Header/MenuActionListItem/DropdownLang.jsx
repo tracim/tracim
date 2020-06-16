@@ -24,6 +24,7 @@ const DropdownLang = props => {
           {props.langList.filter(l => l.id !== props.langActiveId).map(l =>
             <div
               className='dropdownlang__dropdown__subdropdown__link primaryColorBgActive dropdown-item'
+              data-cy={l.id}
               onClick={() => props.onChangeLang(l.id)}
               key={l.id}
             >

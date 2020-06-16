@@ -59,6 +59,7 @@ export const serializeMember = m => {
   return {
     id: m.user.user_id,
     publicName: m.user.public_name,
+    username: m.user.username,
     role: m.role,
     doNotify: m.do_notify || false
   }

@@ -13,10 +13,11 @@ process.env.NODE_ENV = 'test'
 if (!global.window && !global.document) {
   const { window } = new JSDOM('<!doctype html><html><body></body></html>', {
     beforeParse (win) {
-      win.scrollTo = () => {}
+      win.scrollTo = () => { }
     },
     pretendToBeVisual: false,
-    userAgent: 'mocha'
+    userAgent: 'mocha',
+    url: 'http://localhost'
   })
 
   global.CustomEvent = window.CustomEvent

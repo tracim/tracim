@@ -32,7 +32,7 @@ describe('<WorkspaceMembersList />', () => {
       slug: 'content-manager'
     }],
     loggedUser: {
-      user_id: 1
+      userId: 1
     },
     userRoleIdInWorkspace: ROLE.workspaceManager.id,
     displayFormNewMember: false,

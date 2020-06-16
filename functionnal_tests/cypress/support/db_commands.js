@@ -1,7 +1,7 @@
 const userFixtures = {
-  'administrators': 'defaultAdmin',
+  administrators: 'defaultAdmin',
   'trusted-users': '',
-  'users': 'baseUser'
+  users: 'baseUser'
 }
 
 function makeRandomString (length = 5) {
@@ -25,9 +25,9 @@ Cypress.Commands.add('addUserToWorkspace', (userId, workspaceId, role = 'contrib
 
 Cypress.Commands.add('execAsAdmin', (user, callback) => {
   cy.logout()
-  cy.loginAs('administrators').then( () => {
+  cy.loginAs('administrators').then(() => {
     return callback().then(res => cy.log(res.email))
-  }).then( (result) => {
+  }).then((result) => {
     cy.logout()
     cy.login(user)
   })
@@ -67,7 +67,7 @@ Cypress.Commands.add('createRandomUser', (profile = 'users') => {
     .then(response => {
       response.body.password = '8QLa$<w'
       return response.body
-  })
+    })
 })
 
 Cypress.Commands.add('createUser', (fixturePath = 'baseUser') => {
@@ -251,7 +251,7 @@ Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspa
   return cy.fixture(fixturePath, 'base64')
     .then(fixture => Cypress.Blob.base64StringToBlob(fixture, fixtureMime))
     .then(blob => {
-      let form = new FormData()
+      const form = new FormData()
 
       form.set('files', blob, fileTitle)
       if (parentId) form.set('parent_id', parentId)
@@ -266,7 +266,7 @@ Cypress.Commands.add('updateFile', (fixturePath, fixtureMime, workspaceId, conte
   return cy.fixture(fixturePath, 'base64')
     .then(fixture => Cypress.Blob.base64StringToBlob(fixture, fixtureMime))
     .then(blob => {
-      let form = new FormData()
+      const form = new FormData()
 
       form.set('files', blob, fileTitle)
 

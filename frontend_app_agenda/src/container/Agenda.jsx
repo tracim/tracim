@@ -169,7 +169,7 @@ class Agenda extends React.Component {
       loggedUserRole: workspaceListMemberList
         .find(ws => ws.workspaceId === agenda.workspace_id)
         .memberList
-        .find(user => user.user_id === state.loggedUser.user_id)
+        .find(user => user.user_id === state.loggedUser.userId)
         .role
     }))
 

@@ -85,7 +85,6 @@ describe('<HtmlDocument />', () => {
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData2.content.content_id)
 
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 2].content_id).to.equal(tlmData1.content.content_id)
-
           })
         })
       })

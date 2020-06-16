@@ -38,7 +38,7 @@
   "Password": "Password",
   "Create the user": "Create the user",
   "Create a user": "Create a user",
-  "Please enter a name, a password, select a profile, and at least one between username or email": "Please enter a name, a password, select a profile, and at least one between username or email",
+  "Please enter a name, an email, a password and select a profile": "Please enter a name, an email, a password and select a profile",
   "Please set a password": "Please set a password",
   "Full name": "Full name",
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Full name must be at least {{minimumCharactersPublicName}} characters",

@@ -23,6 +23,7 @@ from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -141,6 +142,7 @@ class WedavEnvironFactory(object):
         self.session = session
         self.app_config = app_config
         self.admin_user = admin_user
+        self.plugin_manager = create_plugin_manager()
 
     def get(self, user: typing.Optional[User] = None) -> typing.Dict[str, typing.Any]:
 
@@ -151,8 +153,9 @@ class WedavEnvironFactory(object):
             "tracim_user": user,
         }
         tracim_context = WebdavTracimContext(
-            app_config=self.app_config, session=self.session, environ=environ
+            app_config=self.app_config, environ=environ, plugin_manager=self.plugin_manager
         )
+        tracim_context.dbsession = self.session
         environ["tracim_context"] = tracim_context
         return environ
 

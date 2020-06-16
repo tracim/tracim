@@ -36,7 +36,8 @@ import {
   APP_FEATURE_MODE,
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
-  sortTimelineByDate
+  sortTimelineByDate,
+  setupCommonRequestHeaders
 } from 'tracim_frontend_lib'
 import { PAGE } from '../helper.js'
 import { debug } from '../debug.js'
@@ -526,7 +527,7 @@ export class File extends React.Component {
 
     // FIXME - b.l - refactor urls
     xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
-    xhr.setRequestHeader('Accept', 'application/json')
+    setupCommonRequestHeaders(xhr)
     xhr.withCredentials = true
 
     xhr.onreadystatechange = () => {

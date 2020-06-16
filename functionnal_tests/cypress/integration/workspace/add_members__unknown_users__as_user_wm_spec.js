@@ -53,7 +53,7 @@ context('Unknown users', function () {
       .contains(sharedSpaceManager)
       .click()
     cy.contains('Validate').click()
-    cy.get('[data-cy=flashmessage]').contains('Unknown user')
+    cy.get('[data-cy=flashmessage]').contains('Member added')
   })
 
   it('adds an unknown user to workspace using username', function () {
@@ -66,6 +66,6 @@ context('Unknown users', function () {
       .contains(sharedSpaceManager)
       .click()
     cy.contains('Validate').click()
-    cy.get('[data-cy=flashmessage]').contains('Unknown user')
+    cy.get('[data-cy=flashmessage]').contains('Member added')
   })
 })

@@ -54,7 +54,7 @@ export const HtmlDocument = props => {
             msg={props.t('You have a pending draft')}
             btnType='link'
             icon='hand-o-right'
-            btnLabel={props.t('resume writing')}
+            btnLabel={props.t('Resume writing')}
             onClickBtn={props.onClickShowDraft}
           />
         )}
@@ -62,11 +62,16 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
             <div className='html-document__contentpage__textnote__version'>
-              version n°
-              <div dangerouslySetInnerHTML={{ __html: props.mode === APP_FEATURE_MODE.VIEW ? props.lastVersion : props.version }} />
+              {props.t(
+                'Version #{{versionNumber}}', {
+                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW
+                    ? props.lastVersion
+                    : props.version
+                }
+              )}
               {props.mode === APP_FEATURE_MODE.REVISION && (
                 <div className='html-document__contentpage__textnote__lastversion outlineTextBtn'>
-                  ({props.t('latest version :')} {props.lastVersion})
+                  ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
                 </div>
               )}
             </div>
