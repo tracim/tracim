@@ -86,7 +86,7 @@ export class AdminWorkspaceUser extends React.Component {
 
   handleAllAppChangeLanguage = data => {
     const { state } = this
-    console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), state)
+    console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, state)
     this.setState(prev => ({
       loggedUser: {
         ...prev.loggedUser,
@@ -98,6 +98,8 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleShowApp = data => {
+    const { state } = this
+    console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
     this.setState({ config: data.config })
   }
 
@@ -259,12 +261,13 @@ export class AdminWorkspaceUser extends React.Component {
 
   handleWorkspaceCreated = (message) => {
     const { state } = this
-
     const workspace = message.workspace
     const newWorkspaceList = state.content.workspaceList.slice()
-    // The list is ordered by id and a newly created workspace has a greater id than all others
-    // Initialize member list as empty since the shared space member created message will handle
-    // adding the initial user.
+    /* INFO SG 2020-06-15:
+     *  - the list is ordered by id and a newly created workspace has a greater id than all others.
+     *  - initialize member list as empty since the shared space member created message will handle
+     *    adding the initial user.
+     */
     newWorkspaceList.push({ ...workspace, memberList: [] })
 
     this.setState(prev => ({
