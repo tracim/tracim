@@ -200,6 +200,56 @@ The authentication is done with a login, which is either the user's email addres
 - set `email.required` to `False`, or
 - create the user with both an username and an email address and then authenticate using the LDAP/Remote Auth.
 
+### Tracim session storage
+Tracim uses a session by user, which work with cookie
+This session store:
+
+- the id of the user
+- the session creation datetime
+- the last-access to session datetime.
+
+Sessions are implemented with [Beaker](https://beaker.readthedocs.io/en/latest/configuration.html) and can be stored in several back-ends: files (the default), redis, mongodb, memcached, sql databases…
+Tracim is actively used and tested with 2 session back-ends: files and redis.
+
+We suggest to use redis backend for production as this is a tested backend which will not created file to disk and store session with a time limit,
+which mean no manual upkeep needed to remove expired session.
+
+#### Configuration
+
+A relevant configuration for file backend (default):
+
+    # note: basic_setup.sessions_data_root_dir parameter should exist and be a real path
+    session.type = file
+    session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
+
+A relevant configuration for redis backend:
+
+    session.type = ext:redis
+    session.url = redis://localhost:6379/0
+
+Generic configuration (needed for all backend):
+
+    # note: basic_setup.sessions_data_root_dir parameter should exist and be a real path
+    session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
+    session.key = session_key
+    session.secret = %(basic_setup.session_secret)s
+    session.save_accessed_time = True
+    session.cookie_expires = 604800
+    session.timeout = 604800
+    session.cookie_on_exception = True
+
+for other beaker backend, read [beaker documentation](https://beaker.readthedocs.io/en/latest/configuration.html) for more information.
+
+#### Upkeep file back-end
+
+When this back-end is used, the session's file are [not deleted automatically](https://beaker.readthedocs.io/en/latest/sessions.html#removing-expired-old-sessions).
+ To avoid keeping expired session files you should run :
+
+    find . -type f -mtime +10 -print -exec rm {} \;
+
+regularly (for example by using a cron job), which will delete file which have not been modified since 10 days.
+You should use this command in both session data and session lock dirs.
+
 
 ### LDAP Authentication
 

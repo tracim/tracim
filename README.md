@@ -182,13 +182,8 @@ To mitigate this, you could remove file older than 10 day with :
 
 You should use this command in both session data and session lock dirs.
 
-Another way to solve this issue is to set session to use another backend(we do support all beaker backend).
-We suggest to use redis backend, which will not created file to disk:
-
-    session.type = ext:redis
-    session.url = redis://localhost:6379/0
-
-read [beaker documentation](https://beaker.readthedocs.io/en/latest/configuration.html) for more information about sessions.
+Another way to solve this issue is to set session to use another backend(we do support all beaker backend),
+see [session](/backend/doc/setting.md) documentation for more information.
 
 #### More documentation about running Tracim and Tracim services
 
