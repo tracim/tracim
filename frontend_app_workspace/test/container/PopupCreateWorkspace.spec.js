@@ -28,7 +28,7 @@ describe('<PopupCreateWorkspace />', () => {
         it('should update the state correctly with the new lang', () => {
           expect(wrapper.state('loggedUser').lang).to.equal('pt')
         })
-        it('should update the state loggedUser without overwrite the previous state', () => {
+        it('should update the state loggedUser without overwriting the previous state', () => {
           expect(wrapper.state('loggedUser').userId).to.equal(props.loggedUser.userId)
         })
       })
