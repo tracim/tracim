@@ -28,8 +28,10 @@ import {
 } from '../action.async.js'
 
 const filterSubContentTypes = (list) => {
-  // comments cannot be made on a folder, so remove them
-  // from the possible content types
+  /* INFO - SG - 2020-06-18
+   * Comments cannot be made on a folder, so remove them
+   * from the possible content types
+   */
   return list.filter(ct => ct.slug !== 'comment')
 }
 
