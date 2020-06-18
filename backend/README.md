@@ -358,10 +358,6 @@ Install the required versions:
 
     pip install -r requirements-static-tests.txt
 
-Install required versions:
-
-    pip install -r requirements-static-tests.txt
-
 Run mypy checks:
 
     mypy --ignore-missing-imports --disallow-untyped-defs tracim_backend
