@@ -4,13 +4,16 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
+  buildHeadTitle,
   handleFetchResult,
   PageContent,
   PageTitle,
   PageWrapper,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -32,50 +35,86 @@ class Agenda extends React.Component {
       userWorkspaceList: [],
       userWorkspaceListLoaded: false,
       breadcrumbsList: [],
-      appMounted: false
+      appMounted: false,
+      hasUpdate: false // TODO GIULIA
     }
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleSharedspaceModified }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    const { state, props } = this
-
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-        console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
-        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
-          this.setState({ config: data.config })
-        }
-        break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        this.buildBreadcrumbs()
-        this.setHeadTitle(state.config.appConfig.workspaceId !== null
-          ? `${props.t('Agenda')} · ${state.content.workspaceLabel}`
-          : props.t('My agendas')
-        )
-        this.agendaIframe.contentWindow.location.reload()
-        break
-      default:
-        break
+  // Custom Event Handlers
+  handleShowApp = data => {
+    console.log('%c<Agenda> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(this.state.config.slug), data)
+    if (data.config.appConfig.workspaceId !== this.state.config.appConfig.workspaceId) {
+      this.setState({ config: data.config })
     }
+  }
+
+  handleAllAppChangeLanguage = data => {
+    const { props, state } = this
+    console.log('%c<Agenda> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+
+    this.setState(prev => ({
+      loggedUser: {
+        ...prev.loggedUser,
+        lang: data
+      }
+    }))
+    i18n.changeLanguage(data)
+    this.buildBreadcrumbs()
+    this.setHeadTitle(state.config.appConfig.workspaceId !== null
+      ? `${props.t('Agenda')} · ${state.content.workspaceLabel}`
+      : props.t('My agendas')
+    )
+    this.agendaIframe.contentWindow.location.reload()
+  }
+
+  // TLM Handlers
+  handleUserModified = data => {
+    if (this.state.loggedUser.userId !== data.user.user_id) return
+    this.setState(prev => ({
+      loggedUser: {
+        ...prev.loggedUser,
+        authType: data.user.auth_type,
+        avatarUrl: data.user.avatar_url,
+        email: data.user.email,
+        isActive: data.user.is_active,
+        profile: data.user.profile,
+        publicName: data.user.public_name,
+        timezone: data.user.timezone,
+        username: data.user.username,
+      },
+      hasUpdate: true
+    }))
+  }
+
+  handleSharedspaceModified = data => {
+    const { state } = this
+    if (!state.userWorkspaceList.find(workspace => workspace.workspace_id === data.workspace.workspace_id)) return
+
+    this.setState({
+      content: {
+        workspaceLabel: data.workspace.label
+      },
+      hasUpdate: state.userWorkspaceList.length === 1
+    })
+    if(state.userWorkspaceList.length !== 1) this.buildBreadcrumbs()
   }
 
   async componentDidMount () {
     const { state, props } = this
-
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
 
     this.loadAgendaList(state.config.appConfig.workspaceId)
@@ -89,7 +128,6 @@ class Agenda extends React.Component {
 
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
-
     console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
@@ -98,11 +136,6 @@ class Agenda extends React.Component {
       this.buildBreadcrumbs()
       this.agendaIframe.contentWindow.location.reload()
     }
-  }
-
-  componentWillUnmount () {
-    console.log('%c<Agenda> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   setHeadTitle = (title) => {
@@ -294,4 +327,4 @@ class Agenda extends React.Component {
   }
 }
 
-export default translate()(Agenda)
+export default translate()(TracimComponent(Agenda))
