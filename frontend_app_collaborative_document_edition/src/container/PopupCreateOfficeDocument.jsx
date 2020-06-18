@@ -72,12 +72,7 @@ export class PopupCreateCollaborativeDocument extends React.Component {
   }
 
   handleContentFileCreated = data => {
-    console.log('in   handleContentFileCreated ')
     const { state } = this
-
-    console.log(data.content.parent_id, state.folderId)
-    console.log(state.loggedUser.user_id, data.author.user_id)
-    console.log(state.newContentName, data.content.label)
 
     if (Number(data.content.parent_id) !== Number(state.folderId) ||
       state.loggedUser.user_id !== data.author.user_id ||
