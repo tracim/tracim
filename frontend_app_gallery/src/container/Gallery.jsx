@@ -79,7 +79,8 @@ export class Gallery extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrUndeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrUndeleted },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified }
     ])
 
     this.lightboxRotation = new LightboxRotation()
@@ -94,6 +95,13 @@ export class Gallery extends React.Component {
   liveMessageNotRelevant (data, state) {
     return Number(data.content.workspace_id) !== Number(state.config.appConfig.workspaceId) ||
     Number(data.content.parent_id) !== Number(state.folderId)
+  }
+
+  handleWorkspaceModified = data => {
+    const { state } = this
+    if (Number(data.workspace.workspace_id) !== Number(state.config.appConfig.workspaceId)) return
+    this.setState({ workspaceLabel: data.workspace.label })
+    this.updateBreadcrumbsAndTitle()
   }
 
   handleContentCreatedOrUndeleted = data => {
@@ -188,6 +196,12 @@ export class Gallery extends React.Component {
     this.setState({ imagePreviewList, displayedPictureIndex })
   }
 
+  updateBreadcrumbsAndTitle = () => {
+    const { state, props } = this
+    this.buildBreadcrumbs(state.workspaceLabel, state.folderDetail, false)
+    if (state.workspaceLabel) this.setHeadTitle(`${props.t('Gallery')} · ${state.workspaceLabel}`)
+  }
+
   handleAllAppChangeLanguage = data => {
     console.log('%c<Gallery> Custom event', 'color: #28a745', data)
     this.setState(prev => ({
@@ -197,8 +211,7 @@ export class Gallery extends React.Component {
       }
     }))
     i18n.changeLanguage(data)
-    this.buildBreadcrumbs()
-    if (this.state.workspaceLabel) this.setHeadTitle(`${this.props.t('Gallery')} · ${this.state.workspaceLabel}`)
+    this.updateBreadcrumbsAndTitle()
   }
 
   async componentDidMount () {

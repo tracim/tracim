@@ -143,5 +143,21 @@ describe('<Gallery />', () => {
         })
       })
     })
+
+    describe('handleWorkspaceModified', () => {
+      it("should update the gallery's title", () => {
+        const newWorkspaceLabel = 'Workspace name changed'
+        wrapper.setState(stateMock)
+        wrapper.instance().handleWorkspaceModified({ workspace: { workspace_id: 0, label: newWorkspaceLabel } })
+        expect(wrapper.state().workspaceLabel).to.be.equal(newWorkspaceLabel)
+      })
+
+      it("should NOT change the gallery's title if the modified workspace is not the one displayed", () => {
+        const newWorkspaceLabel = 'This is not my workspace'
+        wrapper.setState(stateMock)
+        wrapper.instance().handleWorkspaceModified({ workspace: { workspace_id: 2, label: newWorkspaceLabel } })
+        expect(wrapper.state().workspaceLabel).to.be.not.equal(newWorkspaceLabel)
+      })
+    })
   })
 })
