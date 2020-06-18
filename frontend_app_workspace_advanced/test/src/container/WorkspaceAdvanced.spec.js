@@ -13,12 +13,6 @@ import { debug } from '../../../src/debug.js'
 describe('<WorkspaceAdvanced />', () => {
   const props = {
     setApiUrl: () => { },
-    // loggedUser: {
-    //   userId: 1
-    // },
-    // content: {
-    //   workspace: workspace
-    // },
     i18n: {},
     registerCustomEventHandlerList: () => { },
     registerLiveMessageHandlerList: () => { },
