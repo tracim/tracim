@@ -14,7 +14,7 @@ const mockGetWorkspaceDetail200 = (apiUrl, workspaceId, workspaceDetail) => {
 
 const mockGetWorkspaceMember200 = (apiUrl, workspaceId, showDisabledUser, workspaceMember) => {
   return nock(apiUrl)
-    .put(`/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`)
+    .get(`/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`)
     .reply(200, workspaceMember)
 }
 
