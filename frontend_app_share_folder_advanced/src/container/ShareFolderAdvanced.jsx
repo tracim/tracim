@@ -66,15 +66,15 @@ export class ShareFolderAdvanced extends React.Component {
   // Custom Event Handlers
   handleShowApp = data => {
     const { props, state } = this
-    console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP, data)
+    console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
 
     props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), () => {})
     this.setHeadTitle()
   }
 
   handleHideApp = data => {
-    const { props } = this
-    console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP, data)
+    const { props, state } = this
+    console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP(state.config.slug), data)
 
     props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
   }
