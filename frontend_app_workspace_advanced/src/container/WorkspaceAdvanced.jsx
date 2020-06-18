@@ -78,7 +78,6 @@ export class WorkspaceAdvanced extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceDeleted },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted }
@@ -115,14 +114,9 @@ export class WorkspaceAdvanced extends React.Component {
     }))
   }
 
-  handleWorkspaceDeleted = data => {
-    if (data.workspace.workspace_id !== this.state.content.workspace_id) return
-    // TODO this.handleClickBtnCloseApp()
-  }
-
   handleMemberCreated = data => {
     if (data.workspace.workspace_id !== this.state.content.workspace_id) return
-    console.log(this.state)
+
     this.setState(prev => ({
       content: {
         ...prev.content,
@@ -233,7 +227,6 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    // GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
   handleSaveEditLabel = async newLabel => {
