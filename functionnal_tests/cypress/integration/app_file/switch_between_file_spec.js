@@ -62,7 +62,7 @@ describe('App File', () => {
         cy.get('[data-cy="popinFixed"]')
           .should('not.be.visible')
 
-        const contentFile1Getter = formatTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: fileTitle_1}})
+        const contentFile1Getter = formatTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileTitle_1 } })
         cy.get(contentFile1Getter)
           .click()
 
@@ -72,7 +72,7 @@ describe('App File', () => {
         cy.get('[data-cy="appFileLastVersionBtn"]')
           .should('be.not.visible')
 
-        cy.get(formatTag({selectorName: s.SIDEBAR_ARROW}))
+        cy.get(formatTag({ selectorName: s.SIDEBAR_ARROW }))
           .click()
 
         cy.get('.breadcrumbs__item a')

@@ -3,10 +3,18 @@ import {
   generateLocalStorageContentId,
   convertBackslashNToBr,
   handleFetchResult,
+  hasNotAllowedCharacters,
+  hasSpaces,
   generateFetchResponse,
   parserStringToList,
-  removeAtInUsername
+  removeAtInUsername,
+  FETCH_CONFIG,
+  COMMON_REQUEST_HEADERS,
+  setupCommonRequestHeaders,
+  serialize
 } from '../src/helper.js'
+
+import sinon from 'sinon'
 
 describe('helper.js', () => {
   describe('generateLocalStorageContentId()', () => {
@@ -117,6 +125,72 @@ describe('helper.js', () => {
     })
     it('should return the username empty when username is empty', () => {
       expect(removeAtInUsername('')).to.eq('')
+    })
+  })
+
+  describe('the hasNotAllowedCharacters() function', () => {
+    it('should return false if name has only allowed characters', () => {
+      expect(hasNotAllowedCharacters('g00dUsername')).to.eq(false)
+    })
+    it('should return true if name has not allowed characters', () => {
+      expect(hasNotAllowedCharacters('b@dU$ername')).to.eq(true)
+    })
+  })
+
+  describe('the hasSpaces() function', () => {
+    it('should return false if name has no spaces', () => {
+      expect(hasSpaces('g00dUsername')).to.eq(false)
+    })
+    it('should return true if name has spaces', () => {
+      expect(hasSpaces('bad Username')).to.eq(true)
+    })
+  })
+
+  describe('FETCH_CONFIG object', () => {
+    it('should include tracim client token header', () => {
+      expect('X-Tracim-ClientToken' in FETCH_CONFIG.headers).to.eq(true)
+      expect(FETCH_CONFIG.headers['X-Tracim-ClientToken']).to.be.a('string')
+    })
+
+    it('should store the client token in window session', () => {
+      expect(window.sessionStorage.getItem('tracimClientToken')).to.eq(FETCH_CONFIG.headers['X-Tracim-ClientToken'])
+    })
+  })
+
+  describe('setupCommonRequestHeaders() function', () => {
+    it('should add COMMON_REQUEST_HEADERS object in xhr', () => {
+      const xhr = new sinon.FakeXMLHttpRequest()
+      xhr.open('GET', 'http://localhost')
+      setupCommonRequestHeaders(xhr)
+      expect(xhr.requestHeaders).to.deep.eq(COMMON_REQUEST_HEADERS)
+    })
+  })
+
+  describe('the serialize(objectToSerialize, propertyMap) function', () => {
+    const propertyMap = {
+      user_id: 'userId',
+      email: 'email',
+      avatar_url: 'avatarUrl',
+      public_name: 'publicName',
+      lang: 'lang',
+      username: 'username'
+    }
+    const objectToSerialize = {
+      email: null,
+      user_id: 0,
+      public_name: '',
+      lang: 'pt',
+      username: undefined
+    }
+    const serializedObj = serialize(objectToSerialize, propertyMap)
+    it('should return objectToSerialize serialized according to propertyMap', () => {
+      expect(serializedObj).to.deep.equal({
+        userId: objectToSerialize.user_id,
+        email: objectToSerialize.email,
+        publicName: objectToSerialize.public_name,
+        lang: objectToSerialize.lang,
+        username: objectToSerialize.username
+      })
     })
   })
 })

@@ -36,7 +36,6 @@ describe('Login after a disconnection ', function () {
       .find('[data-cy=adminlink__user__link]')
       .click()
 
-
     cy.getTag({ selectorName: s.ADMIN_USER_PAGE })
       .find('.adminUser__adduser__button')
       .click()

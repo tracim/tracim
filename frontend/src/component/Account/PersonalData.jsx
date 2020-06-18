@@ -78,17 +78,17 @@ export class PersonalData extends React.Component {
               className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-3 mt-sm-0'
               type='text'
               data-cy='personaldata__form__txtinput__username'
-              placeholder={props.t('New @username')}
+              placeholder={props.t('New username')}
               value={state.newUsername}
               onChange={this.handleChangeUserName}
             />
-            {!props.newUsernameAvailability && (
+            {!props.isUsernameValid && (
               <div className='personaldata__form__txtinput__msgerror'>
                 <i className='personaldata__form__txtinput__msgerror__icon fa fa-times' />
-                {props.t('This username is not available')}
+                {props.usernameInvalidMsg}
               </div>
             )}
-            {state.newUsername !== '' && props.newUsernameAvailability && (
+            {props.isUsernameValid && (
               <div className='personaldata__form__txtinput__msginfo'>
                 {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
               </div>
@@ -138,7 +138,7 @@ export class PersonalData extends React.Component {
             type='button'
             className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={this.handleClickSubmit}
-            disabled={!props.newUsernameAvailability}
+            disabled={!props.isUsernameValid}
           >
             {props.t('Validate')}
           </button>
@@ -152,12 +152,12 @@ PersonalData.propTypes = {
   userAuthType: PropTypes.string,
   onClickSubmit: PropTypes.func,
   onChangeUsername: PropTypes.func,
-  newUsernameAvailability: PropTypes.bool,
+  isUsernameValid: PropTypes.bool,
   displayAdminInfo: PropTypes.bool
 }
 
 PersonalData.defaultProps = {
-  newUsernameAvailability: true,
+  isUsernameValid: true,
   userAuthType: '',
   onClickSubmit: () => {},
   onChangeUsername: () => {},

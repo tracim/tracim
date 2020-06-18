@@ -12,17 +12,17 @@ describe('<PersonnalData />', () => {
     onClickSubmit: onClickSubmitCallBack,
     displayAdminInfo: false,
     userAuthType: 'randomUserAuthType',
-    newUsernameAvailability: true,
+    isUsernameValid: true,
     onChangeUsername: onChangeUsernameCallBack
   }
 
   const wrapper = shallow(<PersonalDataWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
-    it('should show an error message when the username is not available', () => {
-      wrapper.setProps({ newUsernameAvailability: false })
+    it('should show an error message when the username is not valid', () => {
+      wrapper.setProps({ isUsernameValid: false })
       expect(wrapper.find('.personaldata__form__txtinput__msgerror').length).to.equal(1)
-      wrapper.setProps({ newUsernameAvailability: props.newUsernameAvailability })
+      wrapper.setProps({ isUsernameValid: props.isUsernameValid })
     })
   })
 

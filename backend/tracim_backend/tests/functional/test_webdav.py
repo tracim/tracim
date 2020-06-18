@@ -637,6 +637,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         content_type_list,
         session,
         webdav_testapp,
+        event_helper,
     ) -> None:
 
         uapi = user_api_factory.get()
@@ -728,6 +729,9 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             },
             status=201,
         )
+        event = event_helper.last_event
+        assert event.event_type == "content.modified.file"
+        assert event.fields["author"]
         # verify move
         webdav_testapp.get(
             "/{}/{}/{}".format(

@@ -8,6 +8,8 @@ import {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
+  hasNotAllowedCharacters,
+  hasSpaces,
   BREADCRUMBS_TYPE,
   ROLE,
   ROLE_LIST,
@@ -27,7 +29,9 @@ import {
   CONTENT_TYPE,
   buildTracimLiveMessageEventType,
   sortTimelineByDate,
-  removeAtInUsername
+  removeAtInUsername,
+  setupCommonRequestHeaders,
+  serialize
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -118,6 +122,8 @@ export {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
+  hasNotAllowedCharacters,
+  hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
   removeExtensionOfFilename,
@@ -176,5 +182,7 @@ export {
   RadioBtnGroup,
   CONTENT_TYPE,
   buildTracimLiveMessageEventType,
-  sortTimelineByDate
+  sortTimelineByDate,
+  setupCommonRequestHeaders,
+  serialize
 }

@@ -30,9 +30,9 @@ describe('App Interface (the mechanism to open and close apps)', () => {
   })
 
   describe('Switching between 2 different apps feature', () => {
-    const contentHtmlDocGetter = formatTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: htmlDocTitle}})
-    const contentThreadGetter = formatTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: threadTitle}})
-    const contentFileGetter = formatTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: fileTitle}})
+    const contentHtmlDocGetter = formatTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: htmlDocTitle } })
+    const contentThreadGetter = formatTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: threadTitle } })
+    const contentFileGetter = formatTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileTitle } })
 
     beforeEach(function () {
       cy.loginAs('administrators')

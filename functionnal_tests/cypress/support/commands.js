@@ -2,11 +2,10 @@ import 'cypress-wait-until'
 import 'cypress-file-upload'
 
 const userFixtures = {
-  'administrators': 'defaultAdmin',
+  administrators: 'defaultAdmin',
   'trusted-users': '',
-  'users': 'baseUser'
+  users: 'baseUser'
 }
-
 
 let LOGIN_URL = '/api/auth/login'
 
@@ -23,8 +22,8 @@ Cypress.Commands.add('login', (user, role) => {
     method: 'POST',
     url: LOGIN_URL,
     body: {
-      'email': user.email,
-      'password': user.password
+      email: user.email,
+      password: user.password
     }
   }).then(response => {
     cy.waitUntil(() => cy.getCookie('session_key').then(cookie => {
@@ -95,7 +94,7 @@ Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZon
       {
         subjectType: 'drag-n-drop',
         subjectNature: 'dom'
-      },
+      }
     )
   })
 
@@ -163,4 +162,13 @@ Cypress.Commands.add('cleanSessionCookies', () => {
 
 Cypress.Commands.add('cancelXHR', () => {
   cy.visit('/api/doc/')
+})
+
+Cypress.Commands.add('changeLanguage', (langCode) => {
+  cy.get('#headerDropdownMenuButton')
+    .click()
+
+  cy.get('.dropdownlang__dropdown__subdropdown')
+    .find('[data-cy="' + langCode + '"]')
+    .click()
 })

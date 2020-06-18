@@ -35,7 +35,7 @@ export const HomeNoWorkspace = props =>
         data-cy='homepagecard__btn'
         onClick={props.onClickCreateWorkspace}
       >
-        {props.t('create a shared space')}
+        {props.t('Create a shared space')}
       </button>
     )}
 
