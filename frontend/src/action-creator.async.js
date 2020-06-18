@@ -505,10 +505,9 @@ export const getWorkspaceMemberList = (workspaceId, showDisabledUser = false) =>
   })
 }
 
-export const getContent = (workspaceId, contentId, contentType) => dispatch => {
+export const getContent = (workspaceId, contentId) => dispatch => {
   return fetchWrapper({
-    // @FIXME - Côme - 2018/11/06 - find better solution for the -s in string bellow
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents/${contentId}`,
     param: {
       credentials: 'include',
       headers: {

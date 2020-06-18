@@ -4,68 +4,98 @@ import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_SUB_TYPE as TLM_ST,
+  TLM_SUB_TYPE as TLM_ST
 } from 'tracim_frontend_lib'
 import {
   addWorkspaceContentList,
   addWorkspaceMember,
+  deleteWorkspaceContentList,
   removeWorkspaceMember,
   removeWorkspaceReadStatus,
+  unDeleteWorkspaceContentList,
   updateWorkspaceContentList,
+  updateWorkspaceDetail,
   updateWorkspaceMember
 } from '../action-creator.sync.js'
+import { getContent } from '../action-creator.async.js'
 
+// INFO - CH - 2020-06-16 - this file is a component that render null because that way, it can uses the TracimComponent
+// HOC like apps would do. It also allow to use connect() from redux which adds the props dispatch().
 export class ReduxTlmDispatcher extends React.Component {
   constructor (props) {
     super(props)
 
     props.registerLiveMessageHandlerList([
+      // Workspace
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+
+      // Role
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted },
+
+      // content created
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreatedComment },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
+
+      // content modified
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified }
-      // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
-      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleContentDeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
+
+      // content deleted
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
+
+      // content restored
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentUnDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUnDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUnDeleted }
     ])
   }
 
+  handleWorkspaceModified = data => {
+    this.props.dispatch(updateWorkspaceDetail(data.workspace))
+  }
+
   handleMemberCreated = data => {
-    this.props.dispatch(addWorkspaceMember(data.user, data.workspace, data.member))
+    this.props.dispatch(addWorkspaceMember(data.user, data.workspace.workspace_id, data.member))
   }
 
   handleMemberModified = data => {
-    this.props.dispatch(updateWorkspaceMember(data.user, data.workspace, data.member))
+    this.props.dispatch(updateWorkspaceMember(data.user, data.workspace.workspace_id, data.member))
   }
 
   handleMemberDeleted = data => {
-    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
-    this.props.dispatch(removeWorkspaceMember(data.user.user_id, data.workspace))
-    // above update currentWorkspace. Todo: update workspaceList
+    this.props.dispatch(removeWorkspaceMember(data.user.user_id, data.workspace.workspace_id))
   }
 
   handleContentCreated = data => {
-    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
-    this.props.dispatch(addWorkspaceContentList([data.content]))
-    // above update currentWorkspace. Todo: update workspaceList
+    this.props.dispatch(addWorkspaceContentList([data.content], data.workspace.workspace_id))
   }
 
-  handleContentCreatedComment = data => {
-    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
-    this.props.dispatch(removeWorkspaceReadStatus(data.content.parent_id))
-    // above update currentWorkspace. Todo: update workspaceList
+  handleContentCommentCreated = async data => {
+    const commentParentId = data.content.parent_id
+    const response = await this.props.dispatch(getContent(data.workspace.workspace_id, commentParentId))
+
+    if (response.status !== 200) return
+
+    this.props.dispatch(removeWorkspaceReadStatus(response.json, data.workspace.workspace_id))
   }
 
   handleContentModified = data => {
-    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
-    this.props.dispatch(updateWorkspaceContentList([data.content]))
-    // above update currentWorkspace. Todo: update workspaceList
+    this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace.workspace_id))
+  }
+
+  handleContentDeleted = data => {
+    this.props.dispatch(deleteWorkspaceContentList([data.content], data.workspace.workspace_id))
+  }
+
+  handleContentUnDeleted = data => {
+    this.props.dispatch(unDeleteWorkspaceContentList([data.content], data.workspace.workspace_id))
   }
 
   render () {
@@ -73,5 +103,5 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 }
 
-const mapStateToProps = ({ currentWorkspace }) => { currentWorkspace }
+const mapStateToProps = ({ workspaceContentList }) => ({ workspaceContentList })
 export default connect(mapStateToProps)(TracimComponent(ReduxTlmDispatcher))
