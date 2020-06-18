@@ -27,6 +27,12 @@ import {
   putFolder
 } from '../action.async.js'
 
+const filterSubContentTypes = (list) => {
+  // comments cannot be made on a folder, so remove them
+  // from the possible content types
+  return list.filter(ct => ct.slug !== 'comment')
+}
+
 export class FolderAdvanced extends React.Component {
   constructor (props) {
     super(props)
@@ -64,10 +70,6 @@ export class FolderAdvanced extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleFolderChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleFolderChanged }
     ])
-  }
-
-  static filterSubContentTypes (list) {
-    return list.filter(ct => ct.slug !== 'comment')
   }
 
   handleAllAppChangeLanguage = async data => {
@@ -157,7 +159,7 @@ export class FolderAdvanced extends React.Component {
     }
 
     switch (fetchContentTypeList.apiResponse.status) {
-      case 200: this.setState({ tracimContentTypeList: FolderAdvanced.filterSubContentTypes(fetchContentTypeList.body) }); break
+      case 200: this.setState({ tracimContentTypeList: filterSubContentTypes(fetchContentTypeList.body) }); break
       default: this.sendGlobalFlashMessage(props.t("Error while loading Tracim's content type list"), 'warning')
     }
   }

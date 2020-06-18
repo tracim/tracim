@@ -62,7 +62,7 @@ describe('<FolderAdvanced />', () => {
           wrapper.instance().handleFolderChanged(tlmData)
         })
 
-        it('should update the component\'s folder', () => {
+        it("should update the component's folder", () => {
           expect(wrapper.state('content')).to.equal(tlmData.content)
         })
 
@@ -86,7 +86,7 @@ describe('<FolderAdvanced />', () => {
           wrapper.instance().handleFolderChanged(tlmData)
         })
 
-        it('should NOT update the component\'s folder', () => {
+        it("should NOT update the component's folder", () => {
           expect(wrapper.state('content')).to.not.equal(tlmData.content)
         })
         it('should NOT update the head title', () => {
