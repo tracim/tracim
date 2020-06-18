@@ -37,6 +37,7 @@ import {
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
   sortTimelineByDate,
+  addRevisionFromTLM,
   setupCommonRequestHeaders
 } from 'tracim_frontend_lib'
 import { PAGE } from '../helper.js'
@@ -158,7 +159,8 @@ export class File extends React.Component {
         lightboxUrlList: (new Array(data.content.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
           buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, pageNb, 1920, 1080)
         )
-      }
+      },
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
     }))
   }
 
@@ -169,6 +171,7 @@ export class File extends React.Component {
         {
           ...data.content,
           created_raw: data.content.created,
+          created: displayDistanceDate(data.content.created, this.state.loggedUser.lang),
           timelineType: data.content.content_type
         }
       ])
@@ -186,10 +189,10 @@ export class File extends React.Component {
       ({
         content: {
           ...prev.content,
-          ...data.content,
-          is_deleted: true
+          ...data.content
         },
-        mode: APP_FEATURE_MODE.VIEW
+        mode: APP_FEATURE_MODE.VIEW,
+        timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
       })
     )
   }
@@ -200,16 +203,13 @@ export class File extends React.Component {
 
     this.sendGlobalFlashMessage(props.t('File has been restored'), 'info')
 
-    this.setState(prev =>
-      ({
-        content:
-          {
-            ...prev.content,
-            ...data.content,
-            is_deleted: false
-          }
-      })
-    )
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...data.content
+      },
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
+    }))
   }
 
   async componentDidMount () {
