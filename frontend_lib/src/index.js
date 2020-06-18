@@ -29,7 +29,9 @@ import {
   CONTENT_TYPE,
   buildTracimLiveMessageEventType,
   sortTimelineByDate,
-  removeAtInUsername
+  removeAtInUsername,
+  setupCommonRequestHeaders,
+  serialize
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -180,5 +182,7 @@ export {
   RadioBtnGroup,
   CONTENT_TYPE,
   buildTracimLiveMessageEventType,
-  sortTimelineByDate
+  sortTimelineByDate,
+  setupCommonRequestHeaders,
+  serialize
 }

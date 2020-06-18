@@ -5,6 +5,7 @@ from os.path import dirname
 import shutil
 import subprocess
 import typing
+from unittest import mock
 
 from depot.manager import DepotManager
 import plaster
@@ -73,7 +74,7 @@ def pushpin(tracim_webserver, tmp_path_factory):
         try:
             requests.get("http://localhost:7999")
             break
-        except ConnectionError:
+        except requests.exceptions.ConnectionError:
             pass
     yield compose
     compose.down()
@@ -198,17 +199,24 @@ def migration_engine(engine):
 
 
 @pytest.fixture
-def session(engine, session_factory, app_config, test_logger):
+def session(request, engine, session_factory, app_config, test_logger):
     class TracimTestContext(TracimContext):
         def __init__(self, app_config) -> None:
             super().__init__()
             self._app_config = app_config
             self._plugin_manager = create_plugin_manager()
+            if getattr(request, "param", {}).get("mock_event_builder", True):
+                # mocking event builder in order to avoid
+                # requiring a working pushpin instance for every test
+                event_builder = mock.MagicMock(spec=EventBuilder)
+                event_builder.__name__ = EventBuilder.__name__
+            else:
+                event_builder = EventBuilder(app_config)
+            self._plugin_manager.register(event_builder)
             self._dbsession = create_dbsession_for_context(
                 session_factory, transaction.manager, self
             )
             self._dbsession.set_context(self)
-            self._plugin_manager.register(EventBuilder(app_config))
             self._current_user = None
 
         @property

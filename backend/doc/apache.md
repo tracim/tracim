@@ -9,7 +9,7 @@ Install the Apache server and uWSGI:
 
 ### Configuration ###
 
-Create a file named `/etc/apache2/sites-available/tracim.conf` containing: 
+Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
 
     <VirtualHost *:80>
         ServerName [domain_name]
@@ -60,9 +60,9 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
 
 You need to replace `[domain_name]` by your domain and [TRACIM_PATH] by your path of Tracim installation.
 
-You need also to make changes in [TRACIM_PATH]/backend/development.ini on line `basic_setup.website_base_url =  http://localhost:6543`:
+You need also to make changes in [TRACIM_PATH]/backend/development.ini on line `basic_setup.website_base_url =  http://localhost:7999`:
   - replace `localhost` by your domain
-  - replace `6543` by `80` (if you don't want to use port 80, you need to change listen port also in apache configuration)
+  - replace `7999` by `80` (if you don't want to use port 80, you need to change listen port also in apache configuration)
 
 If you want to used browser cache policy, an exemple is visible [here](https://github.com/tracim/tracim/blob/develop/tools_docker/Debian_Uwsgi/apache2.conf.sample).
 :warning: This line `RequestHeader edit "If-None-Match" '^"((.*)-(gzip|br))"$' '"$1", "$2"'` is make to solved apache2 issue visible [here](https://bz.apache.org/bugzilla/show_bug.cgi?id=45023#c26)
@@ -126,7 +126,7 @@ Load needed proxy modules:
 Restart `Apache` configuration:
 
     sudo systemctl restart apache2.service
-    
+
 **Important**
 In case you have some permission problem, check if `www-data` can access to folder of tracim.
 

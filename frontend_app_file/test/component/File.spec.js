@@ -117,7 +117,8 @@ describe('<File />', () => {
             content: {
               ...contentFile.file,
               filename: 'newName.jpeg'
-            }
+            },
+            author: contentFile.file.author
           }
 
           before(() => {
@@ -127,6 +128,9 @@ describe('<File />', () => {
           it('should be updated with the content modified', () => {
             expect(wrapper.state('content').filename).to.equal(tlmData.content.filename)
           })
+          it('should have the new revision in the timeline', () => {
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].filename).to.equal(tlmData.content.filename)
+          })
         })
 
         describe('Modify the description of the current content', () => {
@@ -134,7 +138,8 @@ describe('<File />', () => {
             content: {
               ...contentFile.file,
               raw_content: 'new random description'
-            }
+            },
+            author: contentFile.file.author
           }
 
           before(() => {
@@ -143,6 +148,9 @@ describe('<File />', () => {
 
           it('should be updated with the content modified', () => {
             expect(wrapper.state('content').raw_content).to.equal(tlmData.content.raw_content)
+          })
+          it('should have the new revision in the timeline', () => {
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].raw_content).to.equal(tlmData.content.raw_content)
           })
         })
 
@@ -160,7 +168,8 @@ describe('<File />', () => {
               page_nb: 3,
               modified: '2020-05-20T12:15:57Z',
               mimetype: 'image/jpeg'
-            }
+            },
+            author: contentFile.file.author
           }
 
           before(() => {
@@ -208,7 +217,11 @@ describe('<File />', () => {
       describe('handleContentDeleted', () => {
         describe('Delete the current content', () => {
           const tlmData = {
-            content: contentFile.file
+            content: {
+              ...contentFile.file,
+              is_deleted: true
+            },
+            author: contentFile.file.author
           }
 
           before(() => {
@@ -225,13 +238,17 @@ describe('<File />', () => {
           it('should be in view mode', () => {
             expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.VIEW)
           })
+          it('should have the new revision in the timeline', () => {
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].is_deleted).to.equal(true)
+          })
         })
 
         describe('Delete a content which is not the current one', () => {
           const tlmData = {
             content: {
               ...contentFile.file,
-              content_id: contentFile.file.content_id + 1
+              content_id: contentFile.file.content_id + 1,
+              is_deleted: true
             }
           }
 
@@ -247,7 +264,11 @@ describe('<File />', () => {
       describe('handleContentRestored', () => {
         describe('Restore the current content', () => {
           const tlmData = {
-            content: contentFile.file
+            content: {
+              ...contentFile.file,
+              is_deleted: false
+            },
+            author: contentFile.file.author
           }
 
           before(() => {
@@ -262,13 +283,17 @@ describe('<File />', () => {
           it('should be restored correctly', () => {
             expect(wrapper.state('content').is_deleted).to.equal(false)
           })
+          it('should have the new revision in the timeline', () => {
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].is_deleted).to.equal(false)
+          })
         })
 
         describe('Restore a content which is not the current one', () => {
           const tlmData = {
             content: {
               ...contentFile.file,
-              content_id: contentFile.file.content_id + 1
+              content_id: contentFile.file.content_id + 1,
+              is_deleted: false
             }
           }
 

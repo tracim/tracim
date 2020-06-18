@@ -1479,7 +1479,7 @@ class TestGuestDownloadShareEndpoints(object):
         content_share = content_shares[0]
         transaction.commit()
         web_testapp.post_json(
-            "/api/public/guest-download/{share_token}/toto.txt".format(
+            "/api/public/guest-download/{share_token}/check".format(
                 share_token=content_share.share_token
             ),
             status=403,

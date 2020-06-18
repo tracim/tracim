@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
@@ -236,10 +237,31 @@ export const generateRandomPassword = () => {
   return randomPassword
 }
 
+const getOrCreateSessionClientToken = () => {
+  const clientTokenKey = 'tracimClientToken'
+  let token = window.sessionStorage.getItem(clientTokenKey)
+  if (token === null) {
+    token = uuidv4()
+    window.sessionStorage.setItem(clientTokenKey, token)
+  }
+  return token
+}
+
+export const COMMON_REQUEST_HEADERS = {
+  'Accept': 'application/json',
+  'X-Tracim-ClientToken': getOrCreateSessionClientToken()
+}
+
 export const FETCH_CONFIG = {
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
+    ...COMMON_REQUEST_HEADERS,
+    'Content-Type': 'application/json',
+  }
+}
+
+export const setupCommonRequestHeaders = (xhr) => {
+  for (const [key, value] of Object.entries(COMMON_REQUEST_HEADERS)) {
+    xhr.setRequestHeader(key, value)
   }
 }
 
@@ -349,3 +371,11 @@ export const removeAtInUsername = (username) => {
 export const hasNotAllowedCharacters = name => !(/^[A-Za-z0-9_-]*$/.test(name))
 
 export const hasSpaces = name => /\s/.test(name)
+
+export const serialize = (objectToSerialize, propertyMap) => {
+  return Object.fromEntries(
+    Object.entries(objectToSerialize)
+      .map(([key, value]) => [propertyMap[key], value])
+      .filter(([key, value]) => key !== undefined)
+  )
+}

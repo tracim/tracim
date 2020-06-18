@@ -209,7 +209,7 @@ in` development.ini.sample`
 :warning: By default, python warning are disabled. To enable warning please set
 `PYTHONWARNINGS` env var, for example `export PYTHONWARNINGS=default` .
 
-Run the Tracim backend web API:
+Run the Tracim backend web API (doesn't include live messages):
 
     pserve development.ini
 
@@ -220,6 +220,7 @@ Run the WsgiDAV server:
 Run the CalDAV server:
 
     tracimcli caldav start
+
 
 Running Tracim Backend Daemon
 ---------------
@@ -297,6 +298,14 @@ Run with (supervisord.conf should be provided, see [supervisord.conf default_pat
 
     supervisord
 
+
+Running Pushpin Service
+---------------
+
+For a working Tracim instance, you need to setup pushpin as proxy for tracim web service.
+
+See [main readme](../README.md)  section _Install and run pushpin for UI updates_
+
 ## Run Tests and Others Checks ##
 
 ### Run Tests ###
@@ -343,9 +352,9 @@ Run your project's tests:
 
     pytest
 
-### Lints and Others Checks ###
+### Linting and Other Checks ###
 
-Install required versions:
+Install the required versions:
 
     pip install -r requirements-static-tests.txt
 

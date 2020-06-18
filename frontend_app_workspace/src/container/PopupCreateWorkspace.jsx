@@ -4,7 +4,8 @@ import {
   CardPopupCreateContent,
   handleFetchResult,
   addAllResourceI18n,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { postWorkspace } from '../action.async.js'
 import i18n from '../i18n.js'
@@ -29,7 +30,7 @@ const debug = {
     }
   },
   loggedUser: {
-    id: 5,
+    userId: 5,
     username: 'Smoi',
     firstname: 'Côme',
     lastname: 'Stoilenom',
@@ -40,7 +41,7 @@ const debug = {
   folderId: null
 }
 
-class PopupCreateWorkspace extends React.Component {
+export class PopupCreateWorkspace extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -54,26 +55,21 @@ class PopupCreateWorkspace extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
-  componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
-  }
-
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<PopupCreateWorkspace> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        break
-    }
+  // Custom Event Handlers
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<PopupCreateWorkspace> Custom event', CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, data)
+    this.setState(prev => ({
+      loggedUser: {
+        ...prev.loggedUser,
+        lang: data
+      }
+    }))
+    i18n.changeLanguage(data)
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -134,4 +130,4 @@ class PopupCreateWorkspace extends React.Component {
   }
 }
 
-export default translate()(PopupCreateWorkspace)
+export default translate()(TracimComponent(PopupCreateWorkspace))

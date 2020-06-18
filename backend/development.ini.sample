@@ -29,7 +29,9 @@
 
 ## global info (need for email and links)
 basic_setup.website_title = Tracim
-basic_setup.website_base_url = http://localhost:6543
+# public address of tracim known by tracim (pushpin proxy-address)
+basic_setup.website_base_url = http://localhost:7999
+# listened host:port of tracim web
 basic_setup.listen = localhost:6543
 ## storage path/connection
 basic_setup.sqlalchemy_url = sqlite:///%(here)s/tracim.sqlite
