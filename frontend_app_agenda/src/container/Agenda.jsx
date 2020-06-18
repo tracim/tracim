@@ -36,7 +36,7 @@ class Agenda extends React.Component {
       userWorkspaceListLoaded: false,
       breadcrumbsList: [],
       appMounted: false,
-      hasUpdate: false // TODO GIULIA
+      hasUpdated: false
     }
 
     // i18n has been init, add resources from frontend
@@ -83,7 +83,9 @@ class Agenda extends React.Component {
 
   // TLM Handlers
   handleUserModified = data => {
-    if (this.state.loggedUser.userId !== data.user.user_id) return
+    const { state } = this
+    if (state.loggedUser.userId !== data.user.user_id) return
+
     this.setState(prev => ({
       loggedUser: {
         ...prev.loggedUser,
@@ -96,7 +98,8 @@ class Agenda extends React.Component {
         timezone: data.user.timezone,
         username: data.user.username,
       },
-      hasUpdate: true
+      // INFO - GB - 2020-06-18 - Just show the message in "My agendas" page and if it's not the language that changes (handled by custom event)
+      hasUpdated: state.userWorkspaceList.length !== 1 && state.loggedUser.lang === data.user.lang
     }))
   }
 
@@ -108,9 +111,9 @@ class Agenda extends React.Component {
       content: {
         workspaceLabel: data.workspace.label
       },
-      hasUpdate: state.userWorkspaceList.length === 1
+      hasUpdated: state.userWorkspaceList.length !== 1 // INFO - GB - 2020-06-18 - Just show the message in "My agendas" page
     })
-    if(state.userWorkspaceList.length !== 1) this.buildBreadcrumbs()
+    if(state.userWorkspaceList.length === 1) this.buildBreadcrumbs()
   }
 
   async componentDidMount () {
@@ -136,6 +139,11 @@ class Agenda extends React.Component {
       this.buildBreadcrumbs()
       this.agendaIframe.contentWindow.location.reload()
     }
+  }
+
+  handleClickRefresh = () => {
+    this.setState({ hasUpdated: false })
+    this.agendaIframe.contentWindow.location.reload()
   }
 
   setHeadTitle = (title) => {
@@ -311,6 +319,20 @@ class Agenda extends React.Component {
           icon='calendar'
           breadcrumbsList={state.breadcrumbsList}
         />
+          <div className='agendaPage__updateMsg'>
+          {state.hasUpdated &&
+            <div>
+              <i className='fa fa-exclamation-triangle' />
+              {props.t('Some information has been changed.')}
+              <button
+                className='agendaPage__updateMsg__button'
+                onClick={this.handleClickRefresh}
+              >
+                {props.t('Refresh?')}
+              </button>
+            </div>
+          }
+          </div>
 
         <PageContent parentClass='agendaPage'>
           <iframe
