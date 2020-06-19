@@ -15,13 +15,13 @@ requires = [
     'zope.sqlalchemy',
     'alembic',
     # API
-    'hapic[marshmallow]==0.77',
+    'hapic[marshmallow]>=0.83',
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
     # in hapic, apispec-marshmallow-advanced==0.3
     # and hapic==0.73 aren't compatible
     'apispec-marshmallow-advanced>=0.4'
-    'apispec==1.1.0',
-    'marshmallow <3.0.0a1,>2.0.0',
+    'apispec==2.0.2',
+    'marshmallow <3.0.0a1,>=2.21.0',
     # CLI
     'cliff',
     # Webdav

@@ -3,7 +3,7 @@ import { defaultDebug } from 'tracim_frontend_lib'
 export const debug = {
   config: {
     ...defaultDebug.config,
-    apiUrl: '',
+    apiUrl: 'http://localhost',
     slug: 'share_folder',
     faIcon: 'share-alt',
     hexcolor: '#414548',
