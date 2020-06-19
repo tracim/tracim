@@ -13,7 +13,8 @@ import {
   USER_WORKSPACE_DO_NOTIFY,
   FOLDER_READ,
   WORKSPACE_AGENDA_URL,
-  WORKSPACE_CONTENT
+  WORKSPACE_CONTENT,
+  RESTORE
 } from '../action-creator.sync.js'
 import { serializeContent } from './workspaceContentList.js'
 
@@ -73,6 +74,18 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serializeSidebarEntry(sbe))
       }
 
+    // INFO - CH - 2020-06-18 - only difference with SET/WORKSPACE_DETAIL is the if (state.id !== action.workspace.workspace_id
+    // because this action is called by the TLM handler.
+    // The SET is used to force a new workspace
+    // The UPDATE is to update the same workspace
+    case `${UPDATE}/${WORKSPACE_DETAIL}`:
+      if (state.id !== action.workspaceDetail.workspace_id) return state
+      return {
+        ...state,
+        ...serializeWorkspace(action.workspaceDetail),
+        sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serializeSidebarEntry(sbe))
+      }
+
     case `${SET}/${WORKSPACE_MEMBER_LIST}`:
       return {
         ...state,
@@ -80,6 +93,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${ADD}/${WORKSPACE_MEMBER}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: [
@@ -89,6 +103,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${UPDATE}/${WORKSPACE_MEMBER}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: state.memberList.map(m => m.id === action.member.user.user_id
@@ -98,6 +113,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${REMOVE}/${WORKSPACE_MEMBER}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: state.memberList.filter(m => m.id !== action.memberId)
@@ -119,6 +135,8 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${ADD}/${WORKSPACE_CONTENT}`:
+    case `${RESTORE}/${WORKSPACE_CONTENT}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         recentActivityList: [
@@ -128,6 +146,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${UPDATE}/${WORKSPACE_CONTENT}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         recentActivityList: uniqBy(
@@ -143,9 +162,10 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${REMOVE}/${WORKSPACE_CONTENT}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
-        recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.id))
+        recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id))
       }
 
     case `${SET}/${WORKSPACE_READ_STATUS_LIST}`:
@@ -157,12 +177,13 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${REMOVE}/${WORKSPACE_READ_STATUS}`: // INFO - CH - 20200529 - this means "set content as unread"
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
-        contentReadStatusList: state.contentReadStatusList.filter(id => id !== action.unreadId),
+        contentReadStatusList: state.contentReadStatusList.filter(id => id !== action.unreadContent.content_id),
         recentActivityList: [
-          state.recentActivityList.find(content => content.id === action.unreadId),
-          ...state.recentActivityList.filter(content => content.id !== action.unreadId)
+          serializeContent(action.unreadContent),
+          ...state.recentActivityList.filter(content => content.id !== action.unreadContent.content_id)
         ]
       }
 
