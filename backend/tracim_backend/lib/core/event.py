@@ -40,15 +40,14 @@ from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
-from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import CommentSchema
+from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
-
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
@@ -395,7 +394,7 @@ class BaseLiveMessageBuilder(abc.ABC):
             elif event.entity_type == EntityType.WORKSPACE:
                 receiver_ids = self._get_workspace_event_receiver_ids(event, session)
             elif event.entity_type == EntityType.CONTENT:
-                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+                receiver_ids = self._get_content_event_receiver_ids(event, session)
             elif event.entity_type == EntityType.WORKSPACE_MEMBER:
                 receiver_ids = self._get_workspace_event_receiver_ids(event, session)
 
@@ -428,6 +427,13 @@ class BaseLiveMessageBuilder(abc.ABC):
         role_api = RoleApi(current_user=None, session=session, config=self._config)
         workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
         return set(administrators + workspace_members)
+
+    def _get_content_event_receiver_ids(
+        self, event: Event, session: TracimSession,
+    ) -> typing.Set[int]:
+        role_api = RoleApi(current_user=None, session=session, config=self._config)
+        workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
+        return set(workspace_members)
 
 
 class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
