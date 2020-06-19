@@ -160,7 +160,7 @@ export class Gallery extends React.Component {
     let deletedIndex = -1
 
     imagePreviewList = state.imagePreviewList.filter((image, i) => {
-      const isDeletedImage = image.contentId === data.content.content_id
+      const isDeletedImage = Number(image.contentId) === Number(data.content.content_id)
       if (isDeletedImage) deletedIndex = i
       return !isDeletedImage
     })
@@ -216,6 +216,7 @@ export class Gallery extends React.Component {
   }
 
   handleAllAppChangeLanguage = data => {
+    const { state } = this
     console.log('%c<Gallery> Custom event', 'color: #28a745', data)
     this.setState(prev => ({
       loggedUser: {
