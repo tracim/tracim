@@ -109,7 +109,7 @@ describe('reducer currentWorkspace.js', () => {
           ...initialState,
           ...serializeWorkspace(firstWorkspaceFromApiWithEditedLabel),
           label: newLabel,
-          sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serializeSidebarEntry(sbe))
+          sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
         })
       })
     })

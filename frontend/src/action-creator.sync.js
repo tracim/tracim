@@ -40,7 +40,6 @@ export const USER_KNOWN_MEMBER_LIST = `${USER_KNOWN_MEMBER}/List`
 export const updateUser = newUser => ({ type: `${UPDATE}/${USER}`, newUser })
 export const USER_PUBLIC_NAME = `${USER}/PublicName`
 export const USER_USERNAME = `${USER}/Username`
-export const updateUserUsername = newUsername => ({ type: `${UPDATE}/${USER_USERNAME}`, newUsername })
 export const USER_EMAIL = `${USER}/Email`
 export const USER_PASSWORD = `${USER}/Password`
 export const USER_AGENDA_URL = `${USER}/Agenda`
@@ -81,7 +80,6 @@ export const WORKSPACE_CONTENT_MOVE = `${MOVE}/${WORKSPACE_CONTENT}`
 export const moveWorkspaceContent = (source, destination) => ({ type: `${MOVE}/${WORKSPACE_CONTENT}`, source, destination })
 
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
-export const removeFromWorkspaceList = (workspaceList, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_LIST}`, workspaceList, workspaceId })
 export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
 export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
 

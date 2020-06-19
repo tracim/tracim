@@ -33,9 +33,6 @@ export function workspaceList (state = [], action) {
         memberList: []
       }))
 
-    case `${REMOVE}/${WORKSPACE_LIST}`:
-      return action.workspaceList.filter(ws => ws.id !== action.workspaceId)
-
     case `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`:
       return state.map(ws => ({ ...ws, isOpenInSidebar: ws.id === action.workspaceId ? action.isOpenInSidebar : ws.isOpenInSidebar }))
 

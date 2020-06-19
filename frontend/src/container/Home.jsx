@@ -17,20 +17,13 @@ import {
   hasNotAllowedCharacters,
   hasSpaces,
   removeAtInUsername,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
   getUsernameAvailability,
   putUserUsername
 } from '../action-creator.async.js'
-import {
-  newFlashMessage,
-  removeFromWorkspaceList,
-  setWorkspaceList,
-  updateUserUsername
-} from '../action-creator.sync.js'
+import { newFlashMessage } from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -53,36 +46,8 @@ export class Home extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
-
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceMemberCreated },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceMemberDeleted }
-    ])
   }
 
-  // TLM Handler
-  handleUserModified = data => {
-    const { props } = this
-    if (props.user.userId !== data.user.user_id) return
-    props.dispatch(updateUserUsername(data.user.username))
-  }
-
-  handleWorkspaceMemberCreated = data => {
-    const { props } = this
-    if (props.user.userId !== data.user.user_id) return
-    if (props.workspaceList.length === 0) props.dispatch(setWorkspaceList([data.workspace]))
-  }
-
-  handleWorkspaceMemberDeleted = data => {
-    const { props } = this
-    if (props.user.userId !== data.user.user_id) return
-    if (props.workspaceList.length === 1) {
-      props.dispatch(removeFromWorkspaceList(props.workspaceList, data.workspace.workspace_id))
-    }
-  }
-
-  // Custom Event Handler
   handleAllAppChangeLanguage = () => this.setHeadTitle()
 
   handleClickCreateWorkspace = e => {

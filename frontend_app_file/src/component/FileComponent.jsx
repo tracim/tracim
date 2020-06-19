@@ -68,10 +68,12 @@ export class FileComponent extends React.Component {
   render () {
     const { props } = this
     return (
-      <div className={classnames(
-        'file__contentpage__statewrapper',
-        { 'displayState': props.isArchived || props.isDeleted || props.isDeprecated }
-      )}>
+      <div
+        className={classnames(
+          'file__contentpage__statewrapper',
+          { displayState: props.isArchived || props.isDeleted || props.isDeprecated }
+        )}
+      >
         <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
 
         {props.isArchived && (

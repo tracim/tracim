@@ -5,7 +5,6 @@ import {
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_LANG,
-  USER_USERNAME,
   USER_AGENDA_URL
 } from '../action-creator.sync.js'
 import { getBrowserLang } from '../util/helper.js'
@@ -56,10 +55,8 @@ export default function user (state = defaultUser, action) {
       return { ...state, lang: action.lang }
 
     case `${UPDATE}/${USER}`:
+      if (action.newUser.user_id !== state.userId) return state
       return { ...state, ...serialize(action.newUser, serializeUserProps) }
-
-    case `${UPDATE}/${USER_USERNAME}`:
-      return { ...state, username: action.newUsername }
 
     case `${SET}/${USER_AGENDA_URL}`:
       return { ...state, agendaUrl: action.newAgendaUrl }

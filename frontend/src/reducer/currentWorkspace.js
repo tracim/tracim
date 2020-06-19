@@ -82,7 +82,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         ...serializeWorkspace(action.workspaceDetail),
-        sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serializeSidebarEntry(sbe))
+        sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
       }
 
     case `${SET}/${WORKSPACE_MEMBER_LIST}`:
