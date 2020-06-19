@@ -22,7 +22,7 @@ import {
   getWorkspaceMemberList
 } from '../action.async.js'
 
-class Agenda extends React.Component {
+export class Agenda extends React.Component {
   constructor (props) {
     super(props)
 
@@ -96,7 +96,7 @@ class Agenda extends React.Component {
         profile: data.user.profile,
         publicName: data.user.public_name,
         timezone: data.user.timezone,
-        username: data.user.username,
+        username: data.user.username
       },
       // INFO - GB - 2020-06-18 - Just show the message in "My agendas" page and if it's not the language that changes (handled by custom event)
       hasUpdated: state.userWorkspaceList.length !== 1 && state.loggedUser.lang === data.user.lang
@@ -113,7 +113,7 @@ class Agenda extends React.Component {
       },
       hasUpdated: state.userWorkspaceList.length !== 1 // INFO - GB - 2020-06-18 - Just show the message in "My agendas" page
     })
-    if(state.userWorkspaceList.length === 1) this.buildBreadcrumbs()
+    if (state.userWorkspaceList.length === 1) this.buildBreadcrumbs()
   }
 
   async componentDidMount () {
@@ -319,8 +319,8 @@ class Agenda extends React.Component {
           icon='calendar'
           breadcrumbsList={state.breadcrumbsList}
         />
-          <div className='agendaPage__updateMsg'>
-          {state.hasUpdated &&
+        <div className='agendaPage__updateMsg'>
+          {state.hasUpdated && (
             <div>
               <i className='fa fa-exclamation-triangle' />
               {props.t('Some information has been changed.')}
@@ -331,8 +331,8 @@ class Agenda extends React.Component {
                 {props.t('Refresh?')}
               </button>
             </div>
-          }
-          </div>
+          )}
+        </div>
 
         <PageContent parentClass='agendaPage'>
           <iframe
