@@ -104,9 +104,27 @@ describe('App Folder Advanced', function () {
         .find('.folderAdvanced__header__title')
         .should('contain', folder2.label)
     })
+
+    it('should update itself if the folder is modified', () => {
+      cy.loginAs('administrators')
+      cy.visitPage({ pageName: PAGES.EDIT_FOLDER, params: { workspaceId: workspaceId, folderId: folder1.content_id } })
+      cy.request(
+        'PUT',
+        `api/workspaces/${workspaceId}/folders/${folder1.content_id}`,
+        { label: 'Modified folder', sub_content_types: ['html-document'], raw_content: '' }
+      )
+      cy.get('.folder_advanced__content__form__type > .checked').its('length').should('eq', 1)
+    })
+
+    it('should show the "folder is deleted" box if the folder is deleted', () => {
+      cy.loginAs('administrators')
+      cy.visitPage({ pageName: PAGES.EDIT_FOLDER, params: { workspaceId: workspaceId, folderId: folder1.content_id } })
+      cy.request('PUT', `api/workspaces/${workspaceId}/contents/${folder1.content_id}/trashed`)
+      cy.get('.folder_advanced__content__state').should('be.visible')
+    })
   })
 
-  describe('Role persmissions test', () => {
+  describe('Role permissions test', () => {
     let userReader
 
     before(() => {
@@ -122,11 +140,11 @@ describe('App Folder Advanced', function () {
       cy.login(userReader)
       cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
 
-      cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: folder1.content_id } })
+      cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: folder2.content_id } })
         .find('[data-cy="extended_action"]')
         .click()
 
-      cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: folder1.content_id } })
+      cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: folder2.content_id } })
         .find('[data-cy="extended_action_edit"]')
         .should('be.not.visible')
     })

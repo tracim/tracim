@@ -2,10 +2,14 @@ import { author } from './fixture/author.js'
 import { commentList } from './fixture/contentCommentList.js'
 import { commentTlm } from './fixture/tracimLiveMessage/commentTlm.js'
 import { revisionList } from './fixture/contentRevisionList.js'
+import { user } from './fixture/user.js'
+import { workspace } from './fixture/workspace.js'
 
 export {
   author,
   commentList,
   commentTlm,
-  revisionList
+  revisionList,
+  user,
+  workspace
 }

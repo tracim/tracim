@@ -118,18 +118,16 @@ export class Account extends React.Component {
     const { state } = this
     if (Number(state.userToEditId) !== data.user.user_id) return
     this.setState(prev => ({
-      userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => (
-        ws.id === data.workspace.workspace_id
-          ? {
-            ...ws,
-            memberList: ws.memberList.map(member => (
-              member.id === Number(state.userToEditId)
-                ? { ...member, doNotify: data.member.do_notify }
-                : member
-            ))
-          }
-          : ws
-      ))
+      userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.id === data.workspace.workspace_id
+        ? {
+          ...ws,
+          memberList: ws.memberList.map(member => member.id === Number(state.userToEditId)
+            ? { ...member, doNotify: data.member.do_notify }
+            : member
+          )
+        }
+        : ws
+      )
     }))
   }
 
