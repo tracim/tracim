@@ -7,9 +7,6 @@ import {
   RadioBtnGroup,
   buildHeadTitle,
   CUSTOM_EVENT,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
@@ -53,10 +50,6 @@ export class PopupCreateCollaborativeDocument extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
-
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentFileCreated }
-    ])
   }
 
   componentDidMount () {
@@ -65,28 +58,10 @@ export class PopupCreateCollaborativeDocument extends React.Component {
   }
 
   handleAllAppChangeLanguage = data => {
-    console.log('%c<PopupCreateHtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, data)
+    console.log('%c<PopupCreateOfficeDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
     this.setHeadTitle()
-  }
-
-  handleContentFileCreated = data => {
-    const { state } = this
-
-    if (Number(data.content.parent_id) !== Number(state.folderId) ||
-      state.loggedUser.user_id !== data.author.user_id ||
-      state.newContentName !== data.content.label
-    ) return
-
-    this.handleClose()
-
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.REDIRECT,
-      data: {
-        url: state.config.PAGE.WORKSPACE.CONTENT_EDITION(data.workspace.workspace_id, data.content.content_id)
-      }
-    })
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -143,7 +118,11 @@ export class PopupCreateCollaborativeDocument extends React.Component {
 
     switch (response.apiResponse.status) {
       case 200:
-        console.log('callback 200 postCollaborativeDocumentFromTemplate')
+        this.handleClose()
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.REDIRECT,
+          data: { url: PAGE.WORKSPACE.CONTENT_EDITION(response.body.workspace_id, response.body.content_id) }
+        })
         break
       case 400:
         switch (response.body.code) {
