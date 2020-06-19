@@ -114,7 +114,7 @@ export class Gallery extends React.Component {
     const { state } = this
     if (Number(data.workspace.workspace_id) !== Number(state.config.appConfig.workspaceId)) return
     this.setState({ workspaceLabel: data.workspace.label })
-    this.updateBreadcrumbsAndTitle()
+    this.updateBreadcrumbsAndTitle(data.workspace.label, state.folderDetail)
   }
 
   handleContentCreatedOrUndeleted = data => {
@@ -209,10 +209,10 @@ export class Gallery extends React.Component {
     this.setState({ imagePreviewList, displayedPictureIndex })
   }
 
-  updateBreadcrumbsAndTitle = () => {
-    const { state, props } = this
-    this.buildBreadcrumbs(state.workspaceLabel, state.folderDetail, false)
-    if (state.workspaceLabel) this.setHeadTitle(`${props.t('Gallery')} · ${state.workspaceLabel}`)
+  updateBreadcrumbsAndTitle = (workspaceLabel, folderDetail) => {
+    const { props } = this
+    this.buildBreadcrumbs(workspaceLabel, folderDetail, false)
+    if (workspaceLabel) this.setHeadTitle(`${props.t('Gallery')} · ${workspaceLabel}`)
   }
 
   handleAllAppChangeLanguage = data => {
@@ -224,7 +224,7 @@ export class Gallery extends React.Component {
       }
     }))
     i18n.changeLanguage(data)
-    this.updateBreadcrumbsAndTitle()
+    this.updateBreadcrumbsAndTitle(state.workspaceLabel, state.folderDetail)
   }
 
   async componentDidMount () {
