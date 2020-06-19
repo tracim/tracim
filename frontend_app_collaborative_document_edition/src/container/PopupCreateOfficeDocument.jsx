@@ -108,6 +108,8 @@ export class PopupCreateCollaborativeDocument extends React.Component {
 
   handleValidate = async () => {
     const { state, props } = this
+    const { PAGE } = this.props.data.config
+
     const templateName = getTemplateFromFileType(state.software, state.selectedOption.value, state.availableTemplates)
     const filename = state.newContentName + getExtensionFromFileType(state.software, state.selectedOption.value)
     const request = postCollaborativeDocumentFromTemplate(
@@ -135,7 +137,7 @@ export class PopupCreateCollaborativeDocument extends React.Component {
     }
   }
 
-  getAvaibleTemplates = async () => {
+  getAvailableTemplates = async () => {
     const { state } = this
     const request = getCollaborativeDocumentTemplates(state.config.apiUrl, state.workspaceId)
     const response = await handleFetchResult(await request)
@@ -146,7 +148,7 @@ export class PopupCreateCollaborativeDocument extends React.Component {
   }
 
   setDocumentOptions = async () => {
-    const availableTemplates = await this.getAvaibleTemplates()
+    const availableTemplates = await this.getAvailableTemplates()
     const software = this.state.config.system.config.collaborative_document_edition.software
     const availableFileTypes = getAvaibleFileTypes(software, availableTemplates)
     this.setState({
