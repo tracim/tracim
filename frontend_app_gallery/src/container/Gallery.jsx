@@ -72,7 +72,8 @@ export class Gallery extends React.Component {
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     props.registerCustomEventHandlerList([
-      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage },
+      { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp }
     ])
 
     props.registerLiveMessageHandlerList([
@@ -95,6 +96,18 @@ export class Gallery extends React.Component {
   liveMessageNotRelevant (data, state) {
     return Number(data.content.workspace_id) !== Number(state.config.appConfig.workspaceId) ||
     Number(data.content.parent_id) !== Number(state.folderId)
+  }
+
+  handleShowApp = data => {
+    const { state } = this
+    console.log('%c<Gallery> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
+    const newFolderId = qs.parse(data.config.history.location.search).folder_ids
+    if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || newFolderId !== state.folderId) {
+      this.setState({
+        config: data.config,
+        folderId: newFolderId
+      })
+    }
   }
 
   handleWorkspaceModified = data => {
