@@ -1,5 +1,12 @@
 
 
+## 2.7.5 / 2020-06-16
+
+### New Features
+
+- Allow playing video files inside Tracim (experimental)
+
+
 ## 2.7.4 / 2020-05-13
 
 ### Fixed Issues

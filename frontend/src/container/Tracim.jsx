@@ -21,7 +21,7 @@ import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import { LiveMessageManager } from '../util/LiveMessageManager.js'
-import { buildHeadTitle, CUSTOM_EVENT, PROFILE, serialize } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, PROFILE, serialize } from 'tracim_frontend_lib'
 import {
   PAGE,
   COOKIE_FRONTEND,
@@ -31,7 +31,6 @@ import {
 import {
   getConfig,
   getAppList,
-  getLiveMessage,
   getContentTypeList,
   getUserIsConnected,
   getMyselfWorkspaceList,
@@ -55,6 +54,7 @@ import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
+import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 
 export class Tracim extends React.Component {
   constructor (props) {
@@ -99,7 +99,7 @@ export class Tracim extends React.Component {
         break
       case CUSTOM_EVENT.SET_HEAD_TITLE:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        document.title = buildHeadTitle([data.title, 'Tracim'])
+        document.title = data.title
         break
     }
   }
@@ -124,7 +124,6 @@ export class Tracim extends React.Component {
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
 
         this.loadAppConfig()
-        this.loadLiveMessage()
         this.loadWorkspaceList()
 
         this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id)
@@ -166,21 +165,6 @@ export class Tracim extends React.Component {
 
     const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
-  }
-
-  loadLiveMessage = async () => {
-    const { props } = this
-    const response = await props.dispatch(getLiveMessage())
-
-    switch (response.status) {
-      case 200:
-        console.log('got live messages already sent')
-        break
-      default:
-        // props.dispatch(newFlashMessage(('Error while getting live messages'), 'error'))
-        console.log('error while getting live message')
-        break
-    }
   }
 
   loadWorkspaceList = async (openInSidebarId = undefined) => {
@@ -259,6 +243,7 @@ export class Tracim extends React.Component {
           onRemoveFlashMessage={this.handleRemoveFlashMessage}
           t={props.t}
         />
+        <ReduxTlmDispatcher />
 
         <div className='sidebarpagecontainer'>
           <Route render={() => <Sidebar />} />

@@ -6,7 +6,6 @@ import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_SUB_TYPE as TLM_ST,
   PageWrapper,
   PageTitle,
   PageContent,
@@ -38,16 +37,9 @@ import {
   setWorkspaceRecentActivityList,
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
-  updateWorkspaceMember,
-  removeWorkspaceMember,
   updateUserWorkspaceSubscriptionNotif,
   setWorkspaceAgendaUrl,
-  setBreadcrumbs,
-  addWorkspaceMember,
-  addWorkspaceContentList,
-  updateWorkspaceContentList,
-  removeWorkspaceReadStatus
-  // deleteWorkspaceContentList // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
 import { PAGE, findUserRoleIdInWorkspace } from '../util/helper.js'
@@ -90,25 +82,10 @@ export class Dashboard extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreatedComment },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentModified }
-      // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
-      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleContentDeleted }
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified }
     ])
   }
 
-  // CustomEvent handlers
   handleRefreshDashboardMemberList = () => this.loadMemberList()
 
   handleAllAppChangeLanguage = () => {
@@ -116,48 +93,11 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
   }
 
-  // LiveMessage handlers
   handleWorkspaceModified = data => {
     if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(setWorkspaceDetail(data.workspace))
     this.setHeadTitle()
+    this.buildBreadcrumbs()
   }
-
-  handleMemberCreated = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(addWorkspaceMember(data.user, data.workspace, data.member))
-  }
-
-  handleMemberModified = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(updateWorkspaceMember(data.user, data.workspace, data.member))
-  }
-
-  handleMemberDeleted = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(removeWorkspaceMember(data.user.user_id, data.workspace))
-  }
-
-  handleContentCreated = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(addWorkspaceContentList([data.content]))
-  }
-
-  handleContentCreatedComment = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(removeWorkspaceReadStatus(data.content.parent_id))
-  }
-
-  handleContentModified = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(updateWorkspaceContentList([data.content]))
-  }
-
-  // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
-  // handleContentDeleted = data => {
-  //   if (this.props.curWs.id !== data.workspace.workspace_id) return
-  //   this.props.dispatch(deleteWorkspaceContentList([data.content]))
-  // }
 
   async componentDidMount () {
     this.setHeadTitle()
@@ -269,7 +209,13 @@ export class Dashboard extends React.Component {
     if (props.system.config.instance_name) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Dashboard'), props.system.config.instance_name]) }
+        data: {
+          title: buildHeadTitle([
+            props.t('Dashboard'),
+            props.curWs.label,
+            props.system.config.instance_name
+          ])
+        }
       })
     }
   }

@@ -564,7 +564,7 @@ export class WorkspaceContent extends React.Component {
 
     if (!props.workspaceContentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
+      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json, props.currentWorkspace))
     }
 
     if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceShareFolderContentList.some(c => c.parentId === folderId)) {
