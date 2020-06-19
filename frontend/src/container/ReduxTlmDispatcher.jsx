@@ -13,6 +13,7 @@ import {
   removeWorkspaceMember,
   removeWorkspaceReadStatus,
   unDeleteWorkspaceContentList,
+  updateSearchResultList,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
   updateWorkspaceMember
@@ -88,10 +89,12 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleContentModified = data => {
     this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace.workspace_id))
+    this.props.dispatch(updateSearchResultList(data.content))
   }
 
   handleContentDeleted = data => {
     this.props.dispatch(deleteWorkspaceContentList([data.content], data.workspace.workspace_id))
+    this.props.dispatch(updateSearchResultList(data.content))
   }
 
   handleContentUnDeleted = data => {

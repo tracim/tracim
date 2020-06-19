@@ -4,27 +4,19 @@ import { expect } from 'chai'
 import { SearchResult as SearchResultWithoutHOC } from '../../../src/container/SearchResult.jsx'
 import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user.js'
-import { contentFromApi } from '../../fixture/content/content.js'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 import { searchResult } from '../../hocMock/redux/searchResult/searchResult.js'
-import {
-  BREADCRUMBS,
-  SEARCH_RESULTS_LIST,
-  SET,
-  UPDATE
-} from '../../../src/action-creator.sync.js'
+import { BREADCRUMBS, SET } from '../../../src/action-creator.sync.js'
 import { isFunction } from '../../hocMock/helper'
 import { shallow } from 'enzyme'
 
 describe('In <SearchResult />', () => {
-  const updateSearchResultListCallBack = sinon.spy()
   const setBreadcrumbsCallBack = sinon.spy()
 
   const dispatchMock = (params) => {
     if (isFunction(params)) return params(dispatchMock)
     const { type } = params
     switch (type) {
-      case `${UPDATE}/${SEARCH_RESULTS_LIST}`: updateSearchResultListCallBack(); break
       case `${SET}/${BREADCRUMBS}`: setBreadcrumbsCallBack(); break
     }
     return params
@@ -42,27 +34,12 @@ describe('In <SearchResult />', () => {
     },
     t: key => key,
     dispatch: dispatchMock,
-    registerCustomEventHandlerList: () => { },
-    registerLiveMessageHandlerList: () => { }
+    registerCustomEventHandlerList: () => { }
   }
 
   const SearchResultWithHOC = withRouterMock(SearchResultWithoutHOC)
   const wrapper = shallow(<SearchResultWithHOC {...props} />).dive()
   const searchResultInstance = wrapper.instance()
-
-  describe('TLM handlers', () => {
-    describe('eventType content', () => {
-      const tlmData = {
-        content: contentFromApi
-      }
-      describe('handleContentModifiedOrDeleted', () => {
-        searchResultInstance.handleContentModifiedOrDeleted(tlmData.content)
-        it('should call this.props.dispatch(updateUser())', () => {
-          expect(updateSearchResultListCallBack.called).to.equal(true)
-        })
-      })
-    })
-  })
 
   describe('its internal function', () => {
     describe('hasMoreResults', () => {
@@ -102,7 +79,7 @@ describe('In <SearchResult />', () => {
         const parentList = [
           {
             label: 'first'
-          },{
+          }, {
             label: 'second'
           }
         ]

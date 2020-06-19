@@ -12,9 +12,6 @@ import {
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
@@ -29,8 +26,7 @@ import {
   setSearchResultsList,
   setNumberResultsByPage,
   setSearchedKeywords,
-  setBreadcrumbs,
-  updateSearchResultList
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import { getSearchedKeywords } from '../action-creator.async.js'
 
@@ -48,29 +44,12 @@ export class SearchResult extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
-
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModifiedOrDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModifiedOrDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentModifiedOrDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModifiedOrDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModifiedOrDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModifiedOrDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentModifiedOrDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModifiedOrDeleted }
-    ])
   }
 
-  // Custom Event Handler
   handleAllAppChangeLanguage = data => {
     console.log('%c<Search> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
     this.setHeadTitle()
     this.buildBreadcrumbs()
-  }
-
-  // TLM Handler
-  handleContentModifiedOrDeleted = data => {
-    this.props.dispatch(updateSearchResultList(data.content))
   }
 
   parseUrl () {
