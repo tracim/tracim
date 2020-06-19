@@ -16,8 +16,7 @@ import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
   setUserLang,
-  setUserDisconnected,
-  updateUser
+  setUserDisconnected
 } from '../action-creator.sync.js'
 import {
   postUserLogout,
@@ -34,31 +33,12 @@ import { Link } from 'react-router-dom'
 import {
   PROFILE,
   ComposedIcon,
-  CUSTOM_EVENT,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TracimComponent
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 
 export class Header extends React.Component {
-  constructor (props) {
-    super(props)
-
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
-    ])
-  }
-
-  handleUserModified = data => {
-    const { props } = this
-    if (props.user.userId !== data.user.user_id) return
-
-    if (props.user.lang !== data.user.lang) props.dispatch(setUserLang(data.user.lang))
-    else props.dispatch(updateUser(data.user))
-  }
-
   componentDidMount () {
     this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', {})
     i18n.changeLanguage(this.props.user.lang)
@@ -207,4 +187,4 @@ export class Header extends React.Component {
 }
 
 const mapStateToProps = ({ searchResult, lang, user, system, appList, tlmManager }) => ({ searchResult, lang, user, system, appList, tlmManager })
-export default withRouter(connect(mapStateToProps)(translate()(appFactory(TracimComponent(Header)))))
+export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

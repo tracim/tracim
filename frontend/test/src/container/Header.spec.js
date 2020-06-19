@@ -2,11 +2,10 @@ import React from 'react'
 import { expect } from 'chai'
 import { Header as HeaderWithoutHOC } from '../../../src/container/Header.jsx'
 import sinon from 'sinon'
-import { user, userFromApi } from '../../hocMock/redux/user/user.js'
+import { user } from '../../hocMock/redux/user/user.js'
 import { appList } from '../../hocMock/redux/appList/appList.js'
 import {
   SET,
-  UPDATE,
   USER,
   USER_DISCONNECTED
 } from '../../../src/action-creator.sync.js'
@@ -21,7 +20,6 @@ import { mockPostUserLogout204 } from '../../apiMock'
 describe('In <Header />', () => {
   const setUserDisconnectedCallBack = sinon.spy()
   const setUserLangCallBack = sinon.spy()
-  const updateUserCallBack = sinon.spy()
 
   const dispatchMock = (params) => {
     if (isFunction(params)) return params(dispatchMock)
@@ -30,7 +28,6 @@ describe('In <Header />', () => {
     switch (type) {
       case `${SET}/${USER_DISCONNECTED}`: setUserDisconnectedCallBack(); break
       case `${SET}/${USER}/Lang`: setUserLangCallBack(); break
-      case `${UPDATE}/${USER}`: updateUserCallBack(); break
     }
     return params
   }
@@ -63,30 +60,6 @@ describe('In <Header />', () => {
 
   const wrapper = shallow(<HeaderWithoutHOC {...props} />)
   const headerInstance = wrapper.instance()
-
-  describe('TLM handlers', () => {
-    describe('eventType user', () => {
-      describe('handleUserModified', () => {
-        it('should call this.props.dispatch(setUserLang()) if the language is changed', () => {
-          const tlmData = {
-            author: userFromApi,
-            user: { ...userFromApi, lang: 'pt' }
-          }
-          headerInstance.handleUserModified(tlmData)
-          expect(setUserLangCallBack.called).to.equal(true)
-        })
-
-        it('should call this.props.dispatch(updateUser()) if another data is changed', () => {
-          const tlmData = {
-            author: userFromApi,
-            user: { ...userFromApi, public_name: 'newPublicName' }
-          }
-          headerInstance.handleUserModified(tlmData)
-          expect(updateUserCallBack.called).to.equal(true)
-        })
-      })
-    })
-  })
 
   describe('its internal function', () => {
     beforeEach(() => {
