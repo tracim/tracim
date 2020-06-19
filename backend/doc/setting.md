@@ -211,8 +211,7 @@ This session store:
 Sessions are implemented with [Beaker](https://beaker.readthedocs.io/en/latest/configuration.html) and can be stored in several back-ends: files (the default), redis, mongodb, memcached, sql databases…
 Tracim is actively used and tested with 2 session back-ends: files and redis.
 
-We suggest to use redis backend for production as this is a tested backend which will not created file to disk and store session with a time limit,
-which mean no manual upkeep needed to remove expired session.
+The recommended session back-end for production is redis as it avoids having to manage deletion of expired session files. If you choose to use the file back-end please read the "File back-end upkeep" section below.```
 
 #### Configuration
 
@@ -238,9 +237,9 @@ Generic configuration (needed for all backend):
     session.timeout = 604800
     session.cookie_on_exception = True
 
-for other beaker backend, read [beaker documentation](https://beaker.readthedocs.io/en/latest/configuration.html) for more information.
+for other beaker backends, read [beaker documentation](https://beaker.readthedocs.io/en/latest/configuration.html) for more information.
 
-#### Upkeep file back-end
+#### File back-end upkeep
 
 When this back-end is used, the session's file are [not deleted automatically](https://beaker.readthedocs.io/en/latest/sessions.html#removing-expired-old-sessions).
  To avoid keeping expired session files you should run :
