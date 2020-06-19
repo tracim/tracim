@@ -25,6 +25,7 @@ import {
   UPDATE,
   updateUserWorkspaceSubscriptionNotif,
   updateWorkspaceContentList,
+  updateWorkspaceDetail,
   updateWorkspaceMember,
   USER_WORKSPACE_DO_NOTIFY,
   WORKSPACE_AGENDA_URL,
@@ -94,6 +95,25 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
+    describe(`${UPDATE}/${WORKSPACE_DETAIL}`, () => {
+      const newLabel = 'label after edition'
+      const firstWorkspaceFromApiWithEditedLabel = {
+        ...firstWorkspaceFromApi,
+        workspace_id: initialState.id,
+        label: newLabel
+      }
+      const rez = currentWorkspace(initialState, updateWorkspaceDetail(firstWorkspaceFromApiWithEditedLabel))
+
+      it('should return a workspace object with the edited label', () => {
+        expect(rez).to.deep.equal({
+          ...initialState,
+          ...serializeWorkspace(firstWorkspaceFromApiWithEditedLabel),
+          label: newLabel,
+          sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serializeSidebarEntry(sbe))
+        })
+      })
+    })
+
     describe(`${SET}/${WORKSPACE_MEMBER_LIST}`, () => {
       const rez = currentWorkspace(initialState, setWorkspaceMemberList([globalManagerAsMemberFromApi]))
 
@@ -116,7 +136,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithMember = { ...initialState, memberList: [randomMember] }
       const rez = currentWorkspace(
         initialStateWithMember,
-        addWorkspaceMember(globalManagerFromApi, {}, { role: ROLE.workspaceManager.slug, do_notify: true })
+        addWorkspaceMember(globalManagerFromApi, initialState.id, { role: ROLE.workspaceManager.slug, do_notify: true })
       )
 
       it('should return a workspace object with the new member', () => {
@@ -134,7 +154,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
       const rez = currentWorkspace(
         initialStateWithMember,
-        updateWorkspaceMember(globalManagerFromApi, {}, { role: ROLE.contributor.slug, do_notify: true })
+        updateWorkspaceMember(globalManagerFromApi, initialState.id, { role: ROLE.contributor.slug, do_notify: true })
       )
       it('should return a workspace object with the member global manager as contributor', () => {
         expect(rez).to.deep.equal({
@@ -151,7 +171,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
       const rez = currentWorkspace(
         initialStateWithMember,
-        removeWorkspaceMember(globalManagerAsMember.id, {})
+        removeWorkspaceMember(globalManagerAsMember.id, initialState.id)
       )
       it('should return a workspace object with an empty member list', () => {
         expect(rez).to.deep.equal({
@@ -218,7 +238,7 @@ describe('reducer currentWorkspace.js', () => {
           serializeContent({ ...contentFromApi, content_id: 42, label: 'content for test' })
         ]
       }
-      const rez = currentWorkspace(initialStateWithRecentActivity, addWorkspaceContentList([contentFromApi]))
+      const rez = currentWorkspace(initialStateWithRecentActivity, addWorkspaceContentList([contentFromApi], initialState.id))
       it('should return a workspace object with a recent activity list with the added content at the beginning', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithRecentActivity,
@@ -238,7 +258,7 @@ describe('reducer currentWorkspace.js', () => {
         ],
         contentReadStatusList: [1, 2, contentFromApi.content_id]
       }
-      const rez = currentWorkspace(initialStateWithRecentActivity, updateWorkspaceContentList([contentFromApi]))
+      const rez = currentWorkspace(initialStateWithRecentActivity, updateWorkspaceContentList([contentFromApi], initialState.id))
       it('should return a workspace object with a recent activity list with only one element updated', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithRecentActivity,
@@ -259,7 +279,7 @@ describe('reducer currentWorkspace.js', () => {
       }
       const rez = currentWorkspace(
         initialStateWithRecentActivity,
-        deleteWorkspaceContentList([serializeContent(contentFromApi)])
+        deleteWorkspaceContentList([contentFromApi], initialState.id)
       )
       it('should return a workspace object with an empty recent activity list', () => {
         expect(rez).to.deep.equal({
@@ -294,7 +314,7 @@ describe('reducer currentWorkspace.js', () => {
         contentReadStatusList: [100, 101, contentFromApi.content_id],
         recentActivityList: [serializeContent(contentFromApi)]
       }
-      const rez = currentWorkspace(initialStateWithReadStatusList, removeWorkspaceReadStatus(contentFromApi.content_id))
+      const rez = currentWorkspace(initialStateWithReadStatusList, removeWorkspaceReadStatus(contentFromApi, initialState.id))
       it('should return a workspace with a read status list not containing the content id that we removed', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithReadStatusList,
@@ -320,7 +340,7 @@ describe('reducer currentWorkspace.js', () => {
             serializeContent(anotherContent2)
           ]
         }
-        const rez = currentWorkspace(initialStateWithReadStatusList2, removeWorkspaceReadStatus(anotherContent2.content_id))
+        const rez = currentWorkspace(initialStateWithReadStatusList2, removeWorkspaceReadStatus(anotherContent2, initialState.id))
         it('should put the unread content at the first position in recentActivityList', () => {
           expect(rez).to.deep.equal({
             ...initialStateWithReadStatusList2,

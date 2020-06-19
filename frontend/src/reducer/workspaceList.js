@@ -64,7 +64,8 @@ export function workspaceList (state = [], action) {
       )
 
     case `${ADD}/${WORKSPACE_MEMBER}`:
-      return state.map(ws => ws.id === action.workspace.workspace_id
+      if (!state.some(ws => ws.id === action.workspaceId)) return state
+      return state.map(ws => ws.id === action.workspaceId
         ? {
           ...ws,
           memberList: [
@@ -82,7 +83,8 @@ export function workspaceList (state = [], action) {
       )
 
     case `${UPDATE}/${WORKSPACE_MEMBER}`:
-      return state.map(ws => ws.id === action.workspace.workspace_id
+      if (!state.some(ws => ws.id === action.workspaceId)) return state
+      return state.map(ws => ws.id === action.workspaceId
         ? {
           ...ws,
           memberList: ws.memberList.map(m => m.id === action.member.user_id
@@ -94,7 +96,8 @@ export function workspaceList (state = [], action) {
       )
 
     case `${REMOVE}/${WORKSPACE_MEMBER}`:
-      return state.map(ws => ws.id === action.workspace.workspace_id
+      if (!state.some(ws => ws.id === action.workspaceId)) return state
+      return state.map(ws => ws.id === action.workspaceId
         ? {
           ...ws,
           memberList: ws.memberList.filter(m => m.id !== action.memberId)
