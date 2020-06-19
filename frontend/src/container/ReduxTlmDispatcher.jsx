@@ -4,7 +4,7 @@ import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_SUB_TYPE as TLM_ST
+  TLM_SUB_TYPE as TLM_ST, CONTENT_TYPE
 } from 'tracim_frontend_lib'
 import {
   addWorkspaceContentList,
@@ -15,9 +15,14 @@ import {
   unDeleteWorkspaceContentList,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
-  updateWorkspaceMember
+  updateWorkspaceMember,
+  addWorkspaceShareFolderContentList,
+  updateWorkspaceShareFolderContentList,
+  deleteWorkspaceShareFolderContentList,
+  unDeleteWorkspaceShareFolderContentList
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
+import { SHARE_FOLDER_ID } from '../util/helper'
 
 // INFO - CH - 2020-06-16 - this file is a component that render null because that way, it can uses the TracimComponent
 // HOC like apps would do. It also allow to use connect() from redux which adds the props dispatch().
@@ -38,22 +43,26 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
 
       // content modified
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentModified },
 
       // content deleted
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentDeleted },
 
       // content restored
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentUnDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUnDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUnDeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUnDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentUnDeleted }
     ])
   }
 
@@ -74,7 +83,17 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentCreated = data => {
-    this.props.dispatch(addWorkspaceContentList([data.content], data.workspace.workspace_id))
+    if (data.content.content_namespace === 'upload') {
+      this.props.dispatch(addWorkspaceShareFolderContentList(
+        [{
+          ...data.content,
+          parent_id: data.content.content_type === CONTENT_TYPE.FOLDER ? SHARE_FOLDER_ID : data.content.parent_id
+        }],
+        data.workspace.workspace_id
+      ))
+    } else {
+      this.props.dispatch(addWorkspaceContentList([data.content], data.workspace.workspace_id))
+    }
   }
 
   handleContentCommentCreated = async data => {
@@ -87,15 +106,33 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentModified = data => {
-    this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace.workspace_id))
+    if (data.content.content_namespace === 'upload') {
+      this.props.dispatch(updateWorkspaceShareFolderContentList(
+        [{
+          ...data.content,
+          parent_id: data.content.content_type === CONTENT_TYPE.FOLDER ? SHARE_FOLDER_ID : data.content.parent_id
+        }],
+        data.workspace.workspace_id
+      ))
+    } else {
+      this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace.workspace_id))
+    }
   }
 
   handleContentDeleted = data => {
-    this.props.dispatch(deleteWorkspaceContentList([data.content], data.workspace.workspace_id))
+    if (data.content.content_namespace === 'upload') {
+      this.props.dispatch(deleteWorkspaceShareFolderContentList([data.content], data.workspace.workspace_id))
+    } else {
+      this.props.dispatch(deleteWorkspaceContentList([data.content], data.workspace.workspace_id))
+    }
   }
 
   handleContentUnDeleted = data => {
-    this.props.dispatch(unDeleteWorkspaceContentList([data.content], data.workspace.workspace_id))
+    if (data.content.content_namespace === 'upload') {
+      this.props.dispatch(unDeleteWorkspaceShareFolderContentList([data.content], data.workspace.workspace_id))
+    } else {
+      this.props.dispatch(unDeleteWorkspaceContentList([data.content], data.workspace.workspace_id))
+    }
   }
 
   render () {

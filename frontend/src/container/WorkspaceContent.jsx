@@ -28,10 +28,7 @@ import {
   CONTENT_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
-  TracimComponent,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_SUB_TYPE as TLM_ST
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -58,12 +55,7 @@ import {
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  setWorkspaceDetail,
-  removeWorkspaceReadStatus,
-  updateWorkspaceContentList,
-  updateWorkspaceShareFolderContentList,
-  setWorkspaceContentShareFolderDeleted,
-  setWorkspaceContentDeleted
+  setWorkspaceDetail
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -98,27 +90,6 @@ export class WorkspaceContent extends React.Component {
       { name: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, handler: this.handleHidePopupCreateContent },
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
-
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreatedComment },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreated }
-    ])
   }
 
   // CustomEvent handlers
@@ -146,7 +117,7 @@ export class WorkspaceContent extends React.Component {
   updateUrlTitleBreadcrumbs = () => {
     const { state, props } = this
 
-    const contentFolderPath = props.workspaceContentList.filter(c => c.isOpen).map(c => c.id)
+    const contentFolderPath = props.workspaceContentList.contentList.filter(c => c.isOpen).map(c => c.id)
     const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
 
     const newUrlSearch = {
@@ -164,55 +135,6 @@ export class WorkspaceContent extends React.Component {
   handleAllAppChangeLanguage = () => {
     this.buildBreadcrumbs()
     if (!this.state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(this.props.location.search).type))
-  }
-
-  // LiveMessage handlers
-  handleWorkspaceModified = data => {
-    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
-    this.props.dispatch(setWorkspaceDetail(data.workspace))
-    this.setHeadTitle()
-  }
-
-  handleContentCreated = data => {
-    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
-    if (data.content.content_namespace === 'upload') {
-      this.props.dispatch(addWorkspaceShareFolderContentList([
-        {
-          ...data.content,
-          parent_id: data.content.content_type === CONTENT_TYPE.FOLDER ? SHARE_FOLDER_ID : data.content.parent_id
-        }
-      ]))
-    } else {
-      this.props.dispatch(addWorkspaceContentList([data.content]))
-    }
-  }
-
-  handleContentCreatedComment = data => {
-    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
-    this.props.dispatch(removeWorkspaceReadStatus(data.content.parent_id))
-  }
-
-  handleContentModified = data => {
-    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
-    if (data.content.content_namespace === 'upload') {
-      this.props.dispatch(updateWorkspaceShareFolderContentList([
-        {
-          ...data.content,
-          parent_id: data.content.content_type === CONTENT_TYPE.FOLDER ? SHARE_FOLDER_ID : data.content.parent_id
-        }
-      ]))
-    } else {
-      this.props.dispatch(updateWorkspaceContentList([data.content]))
-    }
-  }
-
-  handleContentDeleted = data => {
-    if (this.props.currentWorkspace.id !== data.workspace.workspace_id) return
-    if (data.content.content_namespace === 'upload') {
-      this.props.dispatch(setWorkspaceContentShareFolderDeleted(data.workspace.workspace_id, data.content.content_id))
-    } else {
-      this.props.dispatch(setWorkspaceContentDeleted(data.workspace.workspace_id, data.content.content_id))
-    }
   }
 
   async componentDidMount () {
@@ -252,6 +174,7 @@ export class WorkspaceContent extends React.Component {
 
     if (prevProps.system.config.instance_name !== props.system.config.instance_name || prevProps.currentWorkspace.label !== props.currentWorkspace.label || prevFilter !== currentFilter) {
       this.setHeadTitle(this.getFilterName(currentFilter))
+      this.buildBreadcrumbs()
     }
 
     // INFO - GM - 2020/03/03 - hide opened app if the current url is /contents
@@ -393,7 +316,7 @@ export class WorkspaceContent extends React.Component {
           ...folderIdInUrl,
           ...fetchContentList.json.filter(c => c.parent_id !== null).map(c => c.parent_id)
         ]
-        props.dispatch(setWorkspaceContentList(fetchContentList.json, folderToOpen))
+        props.dispatch(setWorkspaceContentList(fetchContentList.json, folderToOpen, parseInt(workspaceId)))
         break
       }
       case 400:
@@ -535,7 +458,7 @@ export class WorkspaceContent extends React.Component {
     const { props, state } = this
 
     const folderOpen = folderId
-      ? (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
+      ? (props.workspaceContentList.contentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
       : false
 
     const urlSearch = qs.parse(props.location.search)
@@ -558,18 +481,18 @@ export class WorkspaceContent extends React.Component {
 
   handleToggleFolderOpen = async folderId => {
     const { props, state } = this
-    const folder = props.workspaceContentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.find(c => c.id === folderId)
+    const folder = props.workspaceContentList.contentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.contentList.find(c => c.id === folderId)
 
-    props.dispatch(toggleFolderOpen(folderId))
+    props.dispatch(toggleFolderOpen(folderId, state.workspaceIdInUrl))
 
-    if (!props.workspaceContentList.some(c => c.parentId === folderId)) {
+    if (!props.workspaceContentList.contentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json, props.currentWorkspace))
+      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json, state.workspaceIdInUrl))
     }
 
-    if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceShareFolderContentList.some(c => c.parentId === folderId)) {
+    if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceShareFolderContentList.contentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceShareFolderContentList(fetchContentList.json))
+      if (fetchContentList.status === 200) props.dispatch(addWorkspaceShareFolderContentList(fetchContentList.json, state.workspaceIdInUrl))
     }
   }
 
@@ -589,8 +512,8 @@ export class WorkspaceContent extends React.Component {
 
     // INFO - CH - 2019-06-14 - Check that not moving a folder into one of its sub folder
     if (source.workspaceId === destination.workspaceId && destination.parentId !== 0) {
-      const destinationContent = props.workspaceContentList.find(c => c.id === destination.contentId)
-      const parentIdList = this.getContentParentList(destinationContent, props.workspaceContentList)
+      const destinationContent = props.workspaceContentList.contentList.find(c => c.id === destination.contentId)
+      const parentIdList = this.getContentParentList(destinationContent, props.workspaceContentList.contentList)
 
       if (parentIdList.includes(source.contentId)) return
     }
@@ -682,7 +605,7 @@ export class WorkspaceContent extends React.Component {
           ? { ...file, parent_id: SHARE_FOLDER_ID }
           : file
         )
-        props.dispatch(setWorkspaceShareFolderContentList(publicSharedContentList, folderIdToOpen))
+        props.dispatch(setWorkspaceShareFolderContentList(publicSharedContentList, folderIdToOpen, parseInt(workspaceId)))
         return true
       }
       default:
@@ -741,8 +664,12 @@ export class WorkspaceContent extends React.Component {
   }
 
   render () {
-    const { breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t, appList } = this.props
+    const { breadcrumbs, user, currentWorkspace, workspaceShareFolderContentList, contentType, location, t, appList } = this.props
     const { state, props } = this
+
+    const workspaceContentList = props.workspaceContentList && props.workspaceContentList.contentList
+      ? props.workspaceContentList.contentList
+      : []
 
     const urlFilter = qs.parse(location.search).type
 
@@ -843,7 +770,7 @@ export class WorkspaceContent extends React.Component {
                     onClickCreateContent={this.handleClickCreateContent}
                     onSetFolderRead={this.handleSetFolderRead}
                     userRoleIdInWorkspace={userRoleIdInWorkspace}
-                    shareFolderContentList={workspaceShareFolderContentList}
+                    shareFolderContentList={workspaceShareFolderContentList.contentList}
                     onClickExtendedAction={{
                       edit: this.handleClickEditContentItem,
                       download: this.handleClickDownloadContentItem,

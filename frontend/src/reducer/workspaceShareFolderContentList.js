@@ -4,58 +4,93 @@ import {
   WORKSPACE,
   FOLDER,
   UPDATE,
-  WORKSPACE_CONTENT_SHARE_FOLDER, ADD, WORKSPACE_CONTENT_SHARE_FOLDER_ARCHIVED, WORKSPACE_CONTENT_SHARE_FOLDER_DELETED
+  WORKSPACE_CONTENT_SHARE_FOLDER, ADD,
+  WORKSPACE_CONTENT_SHARE_FOLDER_ARCHIVED,
+  WORKSPACE_CONTENT_SHARE_FOLDER_DELETED,
+  REMOVE,
+  RESTORE
 } from '../action-creator.sync.js'
 import { serializeContent } from './workspaceContentList.js'
 
-export default function workspaceShareFolderContentList (state = [], action) {
+export default function workspaceShareFolderContentList (state = {}, action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER}`:
-      return action.workspaceShareFolderContentList.map(c => ({
-        ...serializeContent(c),
-        isOpen: action.folderIdToOpenList.includes(c.content_id)
-      }))
+      return {
+        workspaceId: action.workspaceId,
+        contentList: action.workspaceShareFolderContentList.map(c => ({
+          ...serializeContent(c),
+          isOpen: action.folderIdToOpenList.includes(c.content_id)
+        }))
+      }
 
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
-      return state.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
+      }
 
+    case `${RESTORE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`:
     case `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`: {
+      if (state.workspaceId !== action.workspaceId) return state
       const parentIdList = [
-        ...state.filter(c => c.parentId),
+        ...state.contentList.filter(c => c.parentId),
         ...action.workspaceShareFolderContentList.filter(c => c.parentId)
       ]
 
-      return [
-        ...state,
-        ...action.workspaceShareFolderContentList.map(c => ({
-          ...serializeContent(c),
-          isOpen: parentIdList.includes(c.content_id)
-        }))
-      ]
+      return {
+        workspaceId: state.workspaceId,
+        contentList: [
+          ...state.contentList,
+          ...action.workspaceShareFolderContentList.map(c => ({
+            ...serializeContent(c),
+            isOpen: parentIdList.includes(c.content_id)
+          }))
+        ]
+      }
     }
 
     case `${UPDATE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`: {
+      if (state.workspaceId !== action.workspaceId) return state
       const parentIdList = [
-        ...state.filter(c => c.parentId),
+        ...state.contentList.filter(c => c.parentId),
         ...action.workspaceShareFolderContentList.filter(c => c.parentId)
       ]
-      return [
-        ...state.filter(c => !action.workspaceShareFolderContentList.some(wc => wc.content_id === c.id)),
-        ...action.workspaceShareFolderContentList.map(c => ({
-          ...serializeContent(c),
-          isOpen: parentIdList.includes(c.content_id)
-        }))
-      ]
+      return {
+        workspaceId: state.workspaceId,
+        contentList: [
+          ...state.contentList.filter(c => !action.workspaceShareFolderContentList.some(wc => wc.content_id === c.id)),
+          ...action.workspaceShareFolderContentList.map(c => ({
+            ...serializeContent(c),
+            isOpen: parentIdList.includes(c.content_id)
+          }))
+        ]
+      }
     }
 
     case `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER_ARCHIVED}`:
-      return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
-        ? { ...wsc, isArchived: true }
-        : wsc
-      )
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
+          ? { ...wsc, isArchived: true }
+          : wsc
+        )
+      }
 
     case `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER_DELETED}`:
-      return state.filter(wsc => wsc.id !== action.contentId)
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.filter(wsc => wsc.id !== action.contentId)
+      }
+
+    case `${REMOVE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`:
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.filter(c => !action.workspaceShareFolderContentList.some(cc => c.id === cc.content_id))
+      }
 
     default:
       return state

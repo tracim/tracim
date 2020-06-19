@@ -53,16 +53,18 @@ export const SHARE_FOLDER = 'SHARE_FOLDER'
 export const WORKSPACE_CONTENT_SHARE_FOLDER = `${WORKSPACE_CONTENT}/${SHARE_FOLDER}`
 export const PATH = 'Path'
 export const WORKSPACE_CONTENT_PATH = `${WORKSPACE_CONTENT}/${PATH}`
-export const setWorkspaceContentList = (workspaceContentList, folderIdToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, folderIdToOpenList })
-export const setWorkspaceShareFolderContentList = (workspaceShareFolderContentList, folderIdToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, folderIdToOpenList })
+export const setWorkspaceContentList = (workspaceContentList, folderIdToOpenList, workspaceId) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, folderIdToOpenList, workspaceId })
+export const setWorkspaceShareFolderContentList = (workspaceShareFolderContentList, folderIdToOpenList, workspaceId) => ({ type: `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, folderIdToOpenList, workspaceId })
 
 export const addWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${ADD}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
 export const updateWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${UPDATE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
 export const deleteWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
 export const unDeleteWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${RESTORE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
 
-export const addWorkspaceShareFolderContentList = workspaceShareFolderContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList })
-export const updateWorkspaceShareFolderContentList = workspaceShareFolderContentList => ({ type: `${UPDATE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList })
+export const addWorkspaceShareFolderContentList = (workspaceShareFolderContentList, workspaceId) => ({ type: `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, workspaceId })
+export const updateWorkspaceShareFolderContentList = (workspaceShareFolderContentList, workspaceId) => ({ type: `${UPDATE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, workspaceId })
+export const deleteWorkspaceShareFolderContentList = (workspaceShareFolderContentList, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, workspaceId })
+export const unDeleteWorkspaceShareFolderContentList = (workspaceShareFolderContentList, workspaceId) => ({ type: `${RESTORE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, workspaceId })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
@@ -127,7 +129,7 @@ export const setWorkspaceAgendaUrl = agendaUrl => ({ type: `${SET}/${WORKSPACE_A
 
 export const FOLDER = 'Folder'
 export const READ = 'Read'
-export const toggleFolderOpen = folderId => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, folderId })
+export const toggleFolderOpen = (folderId, workspaceId) => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, folderId, workspaceId })
 export const FOLDER_READ = `${FOLDER}/${READ}`
 export const setWorkspaceContentRead = folderId => ({ type: `${SET}/${FOLDER_READ}`, folderId })
 

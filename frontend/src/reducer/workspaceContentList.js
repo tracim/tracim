@@ -7,7 +7,8 @@ import {
   WORKSPACE_CONTENT,
   FOLDER,
   WORKSPACE_CONTENT_ARCHIVED,
-  WORKSPACE_CONTENT_DELETED
+  WORKSPACE_CONTENT_DELETED,
+  REMOVE, RESTORE
 } from '../action-creator.sync.js'
 
 export const serializeContent = c => ({
@@ -29,53 +30,84 @@ export const serializeContent = c => ({
   created: c.created
 })
 
-export default function workspaceContentList (state = [], action) {
+export default function workspaceContentList (state = {}, action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_CONTENT}`:
-      return action.workspaceContentList.map(c => ({
-        ...serializeContent(c),
-        isOpen: action.folderIdToOpenList.includes(c.content_id)
-      }))
+      return {
+        workspaceId: action.workspaceId,
+        contentList: action.workspaceContentList.map(c => ({
+          ...serializeContent(c),
+          isOpen: action.folderIdToOpenList.includes(c.content_id)
+        }))
+      }
 
+    case `${RESTORE}/${WORKSPACE_CONTENT}`:
     case `${ADD}/${WORKSPACE_CONTENT}`: {
+      if (state.workspaceId !== action.workspaceId) return state
       const parentIdList = [
-        ...state.filter(c => c.parentId),
+        ...state.contentList.filter(c => c.parentId),
         ...action.workspaceContentList.filter(c => c.parentId)
       ]
-      return [
-        ...state,
-        ...action.workspaceContentList.map(c => ({
-          ...serializeContent(c),
-          isOpen: parentIdList.includes(c.content_id)
-        }))
-      ]
+      return {
+        workspaceId: state.workspaceId,
+        contentList: [
+          ...state.contentList,
+          ...action.workspaceContentList.map(c => ({
+            ...serializeContent(c),
+            isOpen: parentIdList.includes(c.content_id)
+          }))
+        ]
+      }
     }
 
     case `${UPDATE}/${WORKSPACE_CONTENT}`: {
+      if (state.workspaceId !== action.workspaceId) return state
       const parentIdList = [
-        ...state.filter(c => c.parentId),
+        ...state.contentList.filter(c => c.parentId),
         ...action.workspaceContentList.filter(c => c.parentId)
       ]
-      return [
-        ...state.filter(c => !action.workspaceContentList.some(wc => wc.content_id === c.id)),
-        ...action.workspaceContentList.map(c => ({
-          ...serializeContent(c),
-          isOpen: parentIdList.includes(c.content_id)
-        }))
-      ]
+      return {
+        workspaceId: state.workspaceId,
+        contentList: [
+          ...state.contentList.filter(c => !action.workspaceContentList.some(wc => wc.content_id === c.id)),
+          ...action.workspaceContentList.map(c => ({
+            ...serializeContent(c),
+            isOpen: parentIdList.includes(c.content_id)
+          }))
+        ]
+      }
     }
 
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
-      return state.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
+      }
 
     case `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`:
-      return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
-        ? { ...wsc, isArchived: true }
-        : wsc
-      )
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
+          ? { ...wsc, isArchived: true }
+          : wsc
+        )
+      }
 
     case `${SET}/${WORKSPACE_CONTENT_DELETED}`:
-      return state.filter(wsc => wsc.id !== action.contentId)
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.filter(wsc => wsc.id !== action.contentId)
+      }
+
+    case `${REMOVE}/${WORKSPACE_CONTENT}`:
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id))
+      }
 
     default:
       return state
