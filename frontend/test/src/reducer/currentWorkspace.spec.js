@@ -35,7 +35,11 @@ import {
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
-  WORKSPACE_RECENT_ACTIVITY_LIST
+  WORKSPACE_RECENT_ACTIVITY_LIST,
+  addWorkspaceShareFolderContentList,
+  deleteWorkspaceShareFolderContentList,
+  updateWorkspaceShareFolderContentList,
+  WORKSPACE_CONTENT_SHARE_FOLDER
 } from '../../../src/action-creator.sync.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import { appListAsSidebarEntry } from '../../hocMock/redux/appList/appListAsSidebarEntry.js'
@@ -44,6 +48,7 @@ import { ROLE } from 'tracim_frontend_lib'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { contentFromApi } from '../../fixture/content/content.js'
 import { serializeContent } from '../../../src/reducer/workspaceContentList.js'
+import { CONTENT_NAMESPACE } from '../../../src/util/helper'
 
 describe('reducer currentWorkspace.js', () => {
   describe('serializers', () => {
@@ -294,6 +299,70 @@ describe('reducer currentWorkspace.js', () => {
       const rez = currentWorkspace(
         initialStateWithRecentActivity,
         deleteWorkspaceContentList([contentFromApi], initialState.id)
+      )
+      it('should return a workspace object with an empty recent activity list', () => {
+        expect(rez).to.deep.equal({
+          ...initialStateWithRecentActivity,
+          recentActivityList: []
+        })
+      })
+    })
+
+    describe(`${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, () => {
+      const contentShareFolder = { ...contentFromApi, content_namespace: CONTENT_NAMESPACE.UPLOAD }
+
+      const initialStateWithRecentActivity = {
+        ...initialState,
+        recentActivityList: [
+          serializeContent({ ...contentShareFolder, content_id: 42, label: 'content for test' })
+        ]
+      }
+      const rez = currentWorkspace(initialStateWithRecentActivity, addWorkspaceShareFolderContentList([contentShareFolder], initialState.id))
+      it('should return a workspace object with a recent activity list with the added content at the beginning', () => {
+        expect(rez).to.deep.equal({
+          ...initialStateWithRecentActivity,
+          recentActivityList: [
+            serializeContent(contentShareFolder),
+            ...initialStateWithRecentActivity.recentActivityList
+          ]
+        })
+      })
+    })
+
+    describe(`${UPDATE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, () => {
+      const contentShareFolder = { ...contentFromApi, content_namespace: CONTENT_NAMESPACE.UPLOAD }
+
+      const initialStateWithRecentActivity = {
+        ...initialState,
+        recentActivityList: [
+          serializeContent({ ...contentShareFolder, label: 'content for test' })
+        ],
+        contentReadStatusList: [1, 2, contentShareFolder.content_id]
+      }
+      const rez = currentWorkspace(initialStateWithRecentActivity, updateWorkspaceShareFolderContentList([contentShareFolder], initialState.id))
+      it('should return a workspace object with a recent activity list with only one element updated', () => {
+        expect(rez).to.deep.equal({
+          ...initialStateWithRecentActivity,
+          recentActivityList: [
+            serializeContent(contentShareFolder)
+          ],
+          contentReadStatusList: [1, 2]
+        })
+      })
+    })
+
+    describe(`${REMOVE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, () => {
+      const contentShareFolder = { ...contentFromApi, content_namespace: CONTENT_NAMESPACE.UPLOAD }
+
+      const initialStateWithRecentActivity = {
+        ...initialState,
+        recentActivityList: [
+          serializeContent({ ...contentShareFolder, content_namespace: CONTENT_NAMESPACE.UPLOAD })
+        ]
+      }
+      const rez = currentWorkspace(
+        initialStateWithRecentActivity,
+        deleteWorkspaceShareFolderContentList([{ ...contentShareFolder, content_namespace: CONTENT_NAMESPACE.UPLOAD }], initialState.id)
       )
       it('should return a workspace object with an empty recent activity list', () => {
         expect(rez).to.deep.equal({

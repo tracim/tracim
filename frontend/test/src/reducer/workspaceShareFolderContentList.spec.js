@@ -11,10 +11,8 @@ import {
   SET
 } from '../../../src/action-creator.sync.js'
 import { contentFromApi } from '../../fixture/content/content.js'
-import { serializeContent } from '../../../src/reducer/workspaceContentList.js'
+import workspaceContentList, { serializeContent } from '../../../src/reducer/workspaceContentList.js'
 import workspaceShareFolderContentList from '../../../src/reducer/workspaceShareFolderContentList.js'
-import workspaceContentList from '../../../src/reducer/workspaceContentList'
-import { addWorkspaceContentList } from '../../../src/action-creator.sync'
 
 describe('reducer workspaceShareFolderContentList.js', () => {
   describe('actions', () => {

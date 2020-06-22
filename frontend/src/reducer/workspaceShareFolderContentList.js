@@ -12,7 +12,12 @@ import {
 } from '../action-creator.sync.js'
 import { serializeContent } from './workspaceContentList.js'
 
-export default function workspaceShareFolderContentList (state = {}, action) {
+const defaultWorkspaceShareFolderContentList = {
+  workspaceId: 0,
+  contentList: []
+}
+
+export default function workspaceShareFolderContentList (state = defaultWorkspaceShareFolderContentList, action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER}`:
       return {

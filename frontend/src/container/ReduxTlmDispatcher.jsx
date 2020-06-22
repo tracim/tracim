@@ -22,7 +22,7 @@ import {
   unDeleteWorkspaceShareFolderContentList
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
-import { SHARE_FOLDER_ID } from '../util/helper'
+import { CONTENT_NAMESPACE, SHARE_FOLDER_ID } from '../util/helper'
 
 // INFO - CH - 2020-06-16 - this file is a component that render null because that way, it can uses the TracimComponent
 // HOC like apps would do. It also allow to use connect() from redux which adds the props dispatch().
@@ -83,7 +83,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentCreated = data => {
-    if (data.content.content_namespace === 'upload') {
+    if (data.content.content_namespace === CONTENT_NAMESPACE.UPLOAD) {
       this.props.dispatch(addWorkspaceShareFolderContentList(
         [{
           ...data.content,
@@ -106,7 +106,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentModified = data => {
-    if (data.content.content_namespace === 'upload') {
+    if (data.content.content_namespace === CONTENT_NAMESPACE.UPLOAD) {
       this.props.dispatch(updateWorkspaceShareFolderContentList(
         [{
           ...data.content,
@@ -120,7 +120,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentDeleted = data => {
-    if (data.content.content_namespace === 'upload') {
+    if (data.content.content_namespace === CONTENT_NAMESPACE.UPLOAD) {
       this.props.dispatch(deleteWorkspaceShareFolderContentList([data.content], data.workspace.workspace_id))
     } else {
       this.props.dispatch(deleteWorkspaceContentList([data.content], data.workspace.workspace_id))
@@ -128,7 +128,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentUnDeleted = data => {
-    if (data.content.content_namespace === 'upload') {
+    if (data.content.content_namespace === CONTENT_NAMESPACE.UPLOAD) {
       this.props.dispatch(unDeleteWorkspaceShareFolderContentList([data.content], data.workspace.workspace_id))
     } else {
       this.props.dispatch(unDeleteWorkspaceContentList([data.content], data.workspace.workspace_id))

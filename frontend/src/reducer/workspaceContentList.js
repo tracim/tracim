@@ -30,7 +30,12 @@ export const serializeContent = c => ({
   created: c.created
 })
 
-export default function workspaceContentList (state = {}, action) {
+const defaultWorkspaceContentList = {
+  workspaceId: 0,
+  contentList: []
+}
+
+export default function workspaceContentList (state = defaultWorkspaceContentList, action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_CONTENT}`:
       return {
