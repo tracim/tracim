@@ -36,6 +36,7 @@ describe('<Agenda />', () => {
       describe('handleUserModified', () => {
         it('should update loggedUser state', () => {
           const tlmData = {
+            author: user,
             user: {
               ...user,
               public_name: 'newPublicName'
@@ -51,6 +52,7 @@ describe('<Agenda />', () => {
       describe('handleSharedspaceModified', () => {
         it('should update workspaceLabel state', () => {
           const tlmData = {
+            author: user,
             workspace: {
               ...workspace,
               label: 'newWorkspaceLabel'

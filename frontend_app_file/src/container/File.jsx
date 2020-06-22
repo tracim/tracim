@@ -151,6 +151,7 @@ export class File extends React.Component {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
+    const filenameNoExtension = removeExtensionOfFilename(data.content.filename)
     const newContentObject = {
       ...state.content,
       ...data.content,
@@ -160,7 +161,6 @@ export class File extends React.Component {
       )
     }
 
-    const filenameNoExtension = removeExtensionOfFilename(data.content.filename)
     if (state.loggedUser.userId === data.author.user_id) this.setHeadTitle(filenameNoExtension)
     this.setState(prev => ({
       content: prev.loggedUser.userId === data.author.user_id ? newContentObject : prev.content,
