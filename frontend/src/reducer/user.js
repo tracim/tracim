@@ -50,12 +50,13 @@ export default function user (state = defaultUser, action) {
       return { ...state, ...serialize(action.user, serializeUserProps) }
 
     case `${SET}/${USER_DISCONNECTED}`:
-      return { ...state, lang: state.lang, logged: false }
+      return { ...defaultUser, lang: state.lang, logged: false }
 
     case `${SET}/${USER_LANG}`:
       return { ...state, lang: action.lang }
 
     case `${UPDATE}/${USER}`:
+      if (action.newUser.user_id !== state.userId) return state
       return { ...state, ...serialize(action.newUser, serializeUserProps) }
 
     case `${UPDATE}/${USER_USERNAME}`:
