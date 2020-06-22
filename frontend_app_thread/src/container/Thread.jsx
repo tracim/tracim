@@ -19,6 +19,7 @@ import {
   CUSTOM_EVENT,
   buildHeadTitle,
   addRevisionFromTLM,
+  RefreshWarningMessage,
   sortTimelineByDate,
   displayDistanceDate,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -48,6 +49,7 @@ export class Thread extends React.Component {
       content: param.content,
       timeline: [],
       newComment: '',
+      newContent: {},
       timelineWysiwyg: false,
       externalTranslationList: [
         props.t('Thread'),
@@ -55,7 +57,9 @@ export class Thread extends React.Component {
         props.t('thread'),
         props.t('threads'),
         props.t('Start a topic')
-      ]
+      ],
+      hasUpdated: false,
+      editionAuthor: ''
     }
 
     // i18n has been init, add resources from frontend
@@ -112,7 +116,10 @@ export class Thread extends React.Component {
     if (data.content.content_id !== this.state.content.content_id) return
 
     this.setState(prev => ({
-      content: { ...prev.content, ...data.content },
+      content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
+      newContent: { ...prev.content, ...data.content },
+      editionAuthor: data.author.public_name,
+      hasUpdated: prev.loggedUser.userId !== data.author.user_id,
       timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang)
     }))
   }
@@ -300,6 +307,16 @@ export class Thread extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
+  handleClickRefresh = () => {
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...prev.newContent
+      },
+      hasUpdated: false
+    }))
+  }
+
   render () {
     const { state } = this
 
@@ -325,6 +342,13 @@ export class Thread extends React.Component {
           i18n={i18n}
         >
           <div className='justify-content-end'>
+            {state.hasUpdated && (
+              <RefreshWarningMessage
+                editionAuthor={state.editionAuthor}
+                onClickRefresh={this.handleClickRefresh}
+              />
+            )}
+
             {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
               <SelectStatus
                 selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}

@@ -11,6 +11,7 @@ import {
   PageWrapper,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
+  RefreshWarningMessage,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent
@@ -36,6 +37,7 @@ export class Agenda extends React.Component {
       userWorkspaceListLoaded: false,
       breadcrumbsList: [],
       appMounted: false,
+      editionAuthor: '',
       hasUpdated: false
     }
 
@@ -98,6 +100,7 @@ export class Agenda extends React.Component {
         timezone: data.user.timezone,
         username: data.user.username
       },
+      editionAuthor: data.author.public_name,
       // INFO - GB - 2020-06-18 - Just show the warning message if there have been any changes in "My agendas" page and if it's not the language that changes (handled by custom event)
       // state.userWorkspaceList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.userWorkspaceList.length is always 1 (there is only the workspace in the list)
       // and there is no need to show the warning in these agendas because there is no data that can be changed visible.
@@ -113,6 +116,7 @@ export class Agenda extends React.Component {
       content: {
         workspaceLabel: data.workspace.label
       },
+      editionAuthor: data.author.public_name,
       // INFO - GB - 2020-06-18 - Just show the warning message if there have been any changes in "My agendas" page
       // state.userWorkspaceList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.userWorkspaceList.length is always 1 (there is only the workspace in the list)
       // and there is no need to show the warning in these agendas because there is no data that can be changed visible.
@@ -324,20 +328,13 @@ export class Agenda extends React.Component {
           icon='calendar'
           breadcrumbsList={state.breadcrumbsList}
         />
-        <div className='agendaPage__updateMsg'>
-          {state.hasUpdated && (
-            <div>
-              <i className='fa fa-exclamation-triangle' />
-              {props.t('Some information has been changed.')}
-              <button
-                className='agendaPage__updateMsg__button'
-                onClick={this.handleClickRefresh}
-              >
-                {props.t('Refresh?')}
-              </button>
-            </div>
-          )}
-        </div>
+
+        {state.hasUpdated && (
+          <RefreshWarningMessage
+            editionAuthor={state.editionAuthor}
+            onClickRefresh={this.handleClickRefresh}
+          />
+        )}
 
         <PageContent parentClass='agendaPage'>
           <iframe

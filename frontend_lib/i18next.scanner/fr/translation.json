@@ -81,5 +81,8 @@
   "Access to shared spaces where user is member": "Accès aux espaces partagés où l'utilisateur est membre",
   "Trusted user + create users, administration of instance": "Utilisateur de confiance + créer des utilisateurs, administration d'instance",
   "User + create shared spaces, add members in shared spaces": "Utilisateur + créer des espaces partagés, ajouter des membres dans les espaces partagés",
-  "Shared space manager": "Responsable"
+  "Shared space manager": "Responsable",
+  "Refresh?": "Rafraîchir ?",
+  "If you refresh, you will lose the current changes": "Si vous vous rafraîchissez, vous perdrez les modifications actuelles",
+  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}"
 }

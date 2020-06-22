@@ -75,6 +75,7 @@ import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
 import SelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
+import RefreshWarningMessage from './component/RefreshWarningMessage/RefreshWarningMessage.jsx'
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
@@ -182,6 +183,7 @@ export {
   RadioBtnGroup,
   CONTENT_TYPE,
   buildTracimLiveMessageEventType,
+  RefreshWarningMessage,
   sortTimelineByDate,
   setupCommonRequestHeaders,
   serialize

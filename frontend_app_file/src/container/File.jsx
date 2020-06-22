@@ -76,6 +76,7 @@ export class File extends React.Component {
         props.t('Upload files')
       ],
       newComment: '',
+      newContent: {},
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
@@ -88,7 +89,9 @@ export class File extends React.Component {
       shareEmails: '',
       sharePassword: '',
       shareLinkList: [],
-      previewVideo: false
+      previewVideo: false,
+      hasUpdated: false,
+      editionAuthor: ''
     }
     this.refContentLeftTop = React.createRef()
 
@@ -145,22 +148,25 @@ export class File extends React.Component {
   }
 
   handleContentModified = (data) => {
-    const { state, props } = this
+    const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
-    this.sendGlobalFlashMessage(props.t('File has been updated'), 'info')
+    const newContentObject = {
+      ...state.content,
+      ...data.content,
+      previewUrl: buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, 1, 500, 500),
+      lightboxUrlList: (new Array(data.content.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
+        buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, pageNb, 1920, 1080)
+      )
+    }
 
     const filenameNoExtension = removeExtensionOfFilename(data.content.filename)
-    this.setHeadTitle(filenameNoExtension)
+    if (state.loggedUser.userId === data.author.user_id) this.setHeadTitle(filenameNoExtension)
     this.setState(prev => ({
-      content: {
-        ...prev.content,
-        ...data.content,
-        previewUrl: buildFilePreviewUrl(prev.config.apiUrl, prev.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, 1, 500, 500),
-        lightboxUrlList: (new Array(data.content.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
-          buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, pageNb, 1920, 1080)
-        )
-      },
+      content: prev.loggedUser.userId === data.author.user_id ? newContentObject : prev.content,
+      newContent: newContentObject,
+      editionAuthor: data.author.public_name,
+      hasUpdated: prev.loggedUser.userId !== data.author.user_id,
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
     }))
   }
@@ -680,6 +686,18 @@ export class File extends React.Component {
     }
   }
 
+  handleClickRefresh = () => {
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...prev.newContent
+      },
+      hasUpdated: false
+    }))
+    const filenameNoExtension = removeExtensionOfFilename(this.state.newContent.filename)
+    this.setHeadTitle(filenameNoExtension)
+  }
+
   getDownloadBaseUrl = (apiUrl, content, mode) => {
     const urlRevisionPart = mode === APP_FEATURE_MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
     // FIXME - b.l - refactor urls
@@ -943,6 +961,9 @@ export class File extends React.Component {
             previewVideo={state.previewVideo}
             onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
             ref={this.refContentLeftTop}
+            hasUpdated={state.hasUpdated}
+            onClickRefresh={this.handleClickRefresh}
+            editionAuthor={state.editionAuthor}
           />
 
           <PopinFixedRightPart

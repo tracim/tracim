@@ -81,5 +81,8 @@
   "Trusted user": "Trusted user",
   "User + create shared spaces, add members in shared spaces": "User + create shared spaces, add members in shared spaces",
   "User": "User",
-  "Access to shared spaces where user is member": "Access to shared spaces where user is member"
+  "Access to shared spaces where user is member": "Access to shared spaces where user is member",
+  "Refresh?": "Refresh?",
+  "If you refresh, you will lose the current changes": "If you refresh, you will lose the current changes",
+  "The content has been modified by {{author}}": "The content has been modified by {{author}}"
 }
