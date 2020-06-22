@@ -13,6 +13,7 @@ import {
   removeWorkspaceMember,
   removeWorkspaceReadStatus,
   unDeleteWorkspaceContentList,
+  updateUser,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
   updateWorkspaceMember,
@@ -57,7 +58,10 @@ export class ReduxTlmDispatcher extends React.Component {
       // content restored
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentUnDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUnDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUnDeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUnDeleted },
+
+      // User
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
 
@@ -104,6 +108,10 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleContentUnDeleted = data => {
     this.props.dispatch(unDeleteWorkspaceContentList([data.content], data.workspace.workspace_id))
+  }
+
+  handleUserModified = data => {
+    this.props.dispatch(updateUser(data.user))
   }
 
   render () {

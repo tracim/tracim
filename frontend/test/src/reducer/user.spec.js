@@ -26,7 +26,10 @@ describe('user reducer', () => {
 
   it(`should handle ${UPDATE}/${USER}`, () => {
     expect(
-      userReducer(defaultUser, updateUser({ ...globalManagerFromApi, public_name: 'newPublicName' }))
+      userReducer(
+        { ...defaultUser, userId: globalManagerFromApi.user_id },
+        updateUser({ ...globalManagerFromApi, public_name: 'newPublicName' })
+      )
     ).to.deep.equal({
       ...serialize(globalManagerFromApi, serializeUserProps),
       publicName: 'newPublicName'
