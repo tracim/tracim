@@ -90,7 +90,7 @@ export class Tracim extends React.Component {
     this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
   }
 
-  handleRefreshWorkspaceList = data => {
+  handleRefreshWorkspaceList = async data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data)
     await this.loadWorkspaceList(data.openInSidebarId ? data.openInSidebarId : undefined)
     if (data.openInSidebarId && document.getElementById(data.openInSidebarId)) document.getElementById(data.openInSidebarId).scrollIntoView()
@@ -101,7 +101,7 @@ export class Tracim extends React.Component {
     if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
   }
 
-  handleRefreshWorkspaceListThenRedirect = data => { // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
+  handleRefreshWorkspaceListThenRedirect = async data => { // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
     await this.loadWorkspaceList()
     this.props.history.push(data.url)
   }
