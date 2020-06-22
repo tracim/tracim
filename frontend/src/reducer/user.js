@@ -56,6 +56,7 @@ export default function user (state = defaultUser, action) {
       return { ...state, lang: action.lang }
 
     case `${UPDATE}/${USER}`:
+      if (state.userId !== action.newUser.user_id) return state
       return { ...state, ...serialize(action.newUser, serializeUserProps) }
 
     case `${UPDATE}/${USER_USERNAME}`:
