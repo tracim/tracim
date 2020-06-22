@@ -16,8 +16,7 @@ import {
   updateUser,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
-  updateWorkspaceMember,
-  updateUser
+  updateWorkspaceMember
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
 
