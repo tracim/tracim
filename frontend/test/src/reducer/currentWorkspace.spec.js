@@ -44,11 +44,11 @@ import {
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import { appListAsSidebarEntry } from '../../hocMock/redux/appList/appListAsSidebarEntry.js'
 import { globalManagerAsMember, globalManagerAsMemberFromApi } from '../../fixture/user/globalManagerAsMember.js'
-import { ROLE } from 'tracim_frontend_lib'
+import { ROLE, serialize } from 'tracim_frontend_lib'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { contentFromApi } from '../../fixture/content/content.js'
-import { serializeContent } from '../../../src/reducer/workspaceContentList.js'
 import { CONTENT_NAMESPACE } from '../../../src/util/helper'
+import { serializeContentProps } from '../../../src/reducer/workspaceContentList'
 
 describe('reducer currentWorkspace.js', () => {
   describe('serializers', () => {
@@ -226,7 +226,7 @@ describe('reducer currentWorkspace.js', () => {
       it('should return a workspace object with a recent activity list with only the added content', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithRecentActivity,
-          recentActivityList: [serializeContent(contentFromApi)]
+          recentActivityList: [serialize(contentFromApi, serializeContentProps)]
         })
       })
     })
@@ -235,7 +235,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithRecentActivity = {
         ...initialState,
         recentActivityList: [
-          serializeContent({ ...contentFromApi, content_id: 42, label: 'content for test' })
+          serialize({ ...contentFromApi, content_id: 42, label: 'content for test' }, serializeContentProps)
         ]
       }
       const rez = currentWorkspace(initialStateWithRecentActivity, appendWorkspaceRecentActivityList([contentFromApi]))
@@ -244,7 +244,7 @@ describe('reducer currentWorkspace.js', () => {
           ...initialStateWithRecentActivity,
           recentActivityList: [
             ...initialStateWithRecentActivity.recentActivityList,
-            serializeContent(contentFromApi)
+            serialize(contentFromApi, serializeContentProps)
           ]
         })
       })
@@ -254,7 +254,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithRecentActivity = {
         ...initialState,
         recentActivityList: [
-          serializeContent({ ...contentFromApi, content_id: 42, label: 'content for test' })
+          serialize({ ...contentFromApi, content_id: 42, label: 'content for test' }, serializeContentProps)
         ]
       }
       const rez = currentWorkspace(initialStateWithRecentActivity, addWorkspaceContentList([contentFromApi], initialState.id))
@@ -262,7 +262,7 @@ describe('reducer currentWorkspace.js', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithRecentActivity,
           recentActivityList: [
-            serializeContent(contentFromApi),
+            serialize(contentFromApi, serializeContentProps),
             ...initialStateWithRecentActivity.recentActivityList
           ]
         })
@@ -273,7 +273,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithRecentActivity = {
         ...initialState,
         recentActivityList: [
-          serializeContent({ ...contentFromApi, label: 'content for test' })
+          serialize({ ...contentFromApi, label: 'content for test' }, serializeContentProps)
         ],
         contentReadStatusList: [1, 2, contentFromApi.content_id]
       }
@@ -282,7 +282,7 @@ describe('reducer currentWorkspace.js', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithRecentActivity,
           recentActivityList: [
-            serializeContent(contentFromApi)
+            serialize(contentFromApi, serializeContentProps)
           ],
           contentReadStatusList: [1, 2]
         })
@@ -293,7 +293,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithRecentActivity = {
         ...initialState,
         recentActivityList: [
-          serializeContent(contentFromApi)
+          serialize(contentFromApi, serializeContentProps)
         ]
       }
       const rez = currentWorkspace(
@@ -314,7 +314,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithRecentActivity = {
         ...initialState,
         recentActivityList: [
-          serializeContent({ ...contentShareFolder, content_id: 42, label: 'content for test' })
+          serialize({ ...contentShareFolder, content_id: 42, label: 'content for test' }, serializeContentProps)
         ]
       }
       const rez = currentWorkspace(initialStateWithRecentActivity, addWorkspaceShareFolderContentList([contentShareFolder], initialState.id))
@@ -322,7 +322,7 @@ describe('reducer currentWorkspace.js', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithRecentActivity,
           recentActivityList: [
-            serializeContent(contentShareFolder),
+            serialize(contentShareFolder, serializeContentProps),
             ...initialStateWithRecentActivity.recentActivityList
           ]
         })
@@ -335,7 +335,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithRecentActivity = {
         ...initialState,
         recentActivityList: [
-          serializeContent({ ...contentShareFolder, label: 'content for test' })
+          serialize({ ...contentShareFolder, label: 'content for test' }, serializeContentProps)
         ],
         contentReadStatusList: [1, 2, contentShareFolder.content_id]
       }
@@ -344,7 +344,7 @@ describe('reducer currentWorkspace.js', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithRecentActivity,
           recentActivityList: [
-            serializeContent(contentShareFolder)
+            serialize(contentShareFolder, serializeContentProps)
           ],
           contentReadStatusList: [1, 2]
         })
@@ -357,7 +357,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithRecentActivity = {
         ...initialState,
         recentActivityList: [
-          serializeContent({ ...contentShareFolder, content_namespace: CONTENT_NAMESPACE.UPLOAD })
+          serialize({ ...contentShareFolder, content_namespace: CONTENT_NAMESPACE.UPLOAD }, serializeContentProps)
         ]
       }
       const rez = currentWorkspace(
@@ -395,14 +395,14 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithReadStatusList = {
         ...initialState,
         contentReadStatusList: [100, 101, contentFromApi.content_id],
-        recentActivityList: [serializeContent(contentFromApi)]
+        recentActivityList: [serialize(contentFromApi, serializeContentProps)]
       }
       const rez = currentWorkspace(initialStateWithReadStatusList, removeWorkspaceReadStatus(contentFromApi, initialState.id))
       it('should return a workspace with a read status list not containing the content id that we removed', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithReadStatusList,
           contentReadStatusList: [100, 101],
-          recentActivityList: [serializeContent(contentFromApi)]
+          recentActivityList: [serialize(contentFromApi, serializeContentProps)]
         })
       })
 
@@ -418,9 +418,9 @@ describe('reducer currentWorkspace.js', () => {
         const initialStateWithReadStatusList2 = {
           ...initialStateWithReadStatusList,
           recentActivityList: [
-            serializeContent(contentFromApi),
-            serializeContent(anotherContent),
-            serializeContent(anotherContent2)
+            serialize(contentFromApi, serializeContentProps),
+            serialize(anotherContent, serializeContentProps),
+            serialize(anotherContent2, serializeContentProps)
           ]
         }
         const rez = currentWorkspace(initialStateWithReadStatusList2, removeWorkspaceReadStatus(anotherContent2, initialState.id))
@@ -428,9 +428,9 @@ describe('reducer currentWorkspace.js', () => {
           expect(rez).to.deep.equal({
             ...initialStateWithReadStatusList2,
             recentActivityList: [
-              serializeContent(anotherContent2),
-              serializeContent(contentFromApi),
-              serializeContent(anotherContent)
+              serialize(anotherContent2, serializeContentProps),
+              serialize(contentFromApi, serializeContentProps),
+              serialize(anotherContent, serializeContentProps)
             ]
           })
         })

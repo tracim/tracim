@@ -17,7 +17,8 @@ import {
   RESTORE,
   WORKSPACE_CONTENT_SHARE_FOLDER
 } from '../action-creator.sync.js'
-import { serializeContent } from './workspaceContentList.js'
+import { serialize } from 'tracim_frontend_lib'
+import { serializeContentProps } from './workspaceContentList.js'
 
 const defaultWorkspace = {
   id: 0,
@@ -123,7 +124,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
     case `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
       return {
         ...state,
-        recentActivityList: action.workspaceRecentActivityList.map(ra => serializeContent(ra))
+        recentActivityList: action.workspaceRecentActivityList.map(ra => serialize(ra, serializeContentProps))
       }
 
     case `${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
@@ -131,7 +132,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         recentActivityList: [
           ...state.recentActivityList,
-          ...action.workspaceRecentActivityList.map(ra => serializeContent(ra))
+          ...action.workspaceRecentActivityList.map(ra => serialize(ra, serializeContentProps))
         ]
       }
 
@@ -141,7 +142,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         recentActivityList: [
-          ...action.workspaceContentList.map(c => serializeContent(c)),
+          ...action.workspaceContentList.map(c => serialize(c, serializeContentProps)),
           ...state.recentActivityList
         ]
       }
@@ -152,7 +153,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         recentActivityList: uniqBy(
           [ // INFO - CH - 2020-05-18 - always put the updated element at the beginning. Then remove duplicates
-            ...action.workspaceContentList.map(c => serializeContent(c)),
+            ...action.workspaceContentList.map(c => serialize(c, serializeContentProps)),
             ...state.recentActivityList
           ],
           'id'
@@ -174,7 +175,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         recentActivityList: [
-          ...action.workspaceShareFolderContentList.map(c => serializeContent(c)),
+          ...action.workspaceShareFolderContentList.map(c => serialize(c, serializeContentProps)),
           ...state.recentActivityList
         ]
       }
@@ -190,7 +191,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         recentActivityList: uniqBy(
           [ // INFO - CH - 2020-05-18 - always put the updated element at the beginning. Then remove duplicates
-            ...action.workspaceShareFolderContentList.map(c => serializeContent(c)),
+            ...action.workspaceShareFolderContentList.map(c => serialize(c, serializeContentProps)),
             ...state.recentActivityList
           ],
           'id'
@@ -214,7 +215,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         contentReadStatusList: state.contentReadStatusList.filter(id => id !== action.unreadContent.content_id),
         recentActivityList: [
-          serializeContent(action.unreadContent),
+          serialize(action.unreadContent, serializeContentProps),
           ...state.recentActivityList.filter(content => content.id !== action.unreadContent.content_id)
         ]
       }

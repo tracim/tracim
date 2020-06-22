@@ -10,7 +10,8 @@ import {
   REMOVE,
   RESTORE
 } from '../action-creator.sync.js'
-import { serializeContent } from './workspaceContentList.js'
+import { serialize } from 'tracim_frontend_lib'
+import { serializeContentProps } from './workspaceContentList'
 
 const defaultWorkspaceShareFolderContentList = {
   workspaceId: 0,
@@ -23,7 +24,7 @@ export default function workspaceShareFolderContentList (state = defaultWorkspac
       return {
         workspaceId: action.workspaceId,
         contentList: action.workspaceShareFolderContentList.map(c => ({
-          ...serializeContent(c),
+          ...serialize(c, serializeContentProps),
           isOpen: action.folderIdToOpenList.includes(c.content_id)
         }))
       }
@@ -48,7 +49,7 @@ export default function workspaceShareFolderContentList (state = defaultWorkspac
         contentList: [
           ...state.contentList,
           ...action.workspaceShareFolderContentList.map(c => ({
-            ...serializeContent(c),
+            ...serialize(c, serializeContentProps),
             isOpen: parentIdList.includes(c.content_id)
           }))
         ]
@@ -66,7 +67,7 @@ export default function workspaceShareFolderContentList (state = defaultWorkspac
         contentList: [
           ...state.contentList.filter(c => !action.workspaceShareFolderContentList.some(wc => wc.content_id === c.id)),
           ...action.workspaceShareFolderContentList.map(c => ({
-            ...serializeContent(c),
+            ...serialize(c, serializeContentProps),
             isOpen: parentIdList.includes(c.content_id)
           }))
         ]

@@ -1,4 +1,5 @@
-import { serializeContent } from '../../../src/reducer/workspaceContentList.js'
+import { serializeContentProps } from '../../../src/reducer/workspaceContentList.js'
+import { serialize } from 'tracim_frontend_lib'
 
 export const contentFromApi = {
   slug: 'test-content-html',
@@ -16,6 +17,7 @@ export const contentFromApi = {
   show_in_ui: true,
   file_extension: '.document.html',
   is_deleted: false,
+  isOpen: false,
   filename: 'test_content_html.document.html',
   raw_content: '',
   last_modifier: {
@@ -35,4 +37,4 @@ export const contentFromApi = {
   content_id: 12
 }
 
-export const content = serializeContent(contentFromApi)
+export const content = serialize(contentFromApi, serializeContentProps)

@@ -11,8 +11,9 @@ import {
   SET
 } from '../../../src/action-creator.sync.js'
 import { contentFromApi } from '../../fixture/content/content.js'
-import workspaceContentList, { serializeContent } from '../../../src/reducer/workspaceContentList.js'
+import workspaceContentList, { serializeContentProps } from '../../../src/reducer/workspaceContentList.js'
 import workspaceShareFolderContentList from '../../../src/reducer/workspaceShareFolderContentList.js'
+import { serialize } from 'tracim_frontend_lib'
 
 describe('reducer workspaceShareFolderContentList.js', () => {
   describe('actions', () => {
@@ -29,7 +30,7 @@ describe('reducer workspaceShareFolderContentList.js', () => {
         expect(rez).to.deep.equal({
           workspaceId: 1,
           contentList: [
-            serializeContent(contentFromApi)
+            serialize(contentFromApi, serializeContentProps)
           ]
         })
       })
@@ -39,7 +40,7 @@ describe('reducer workspaceShareFolderContentList.js', () => {
       const initialStateWithContentList = {
         ...initialState,
         contentList: [
-          serializeContent({ ...contentFromApi, content_id: 42, label: 'content for test' })
+          serialize({ ...contentFromApi, content_id: 42, label: 'content for test' }, serializeContentProps)
         ]
       }
       const rez = workspaceShareFolderContentList(initialStateWithContentList, addWorkspaceShareFolderContentList([contentFromApi], initialState.workspaceId))
@@ -48,7 +49,7 @@ describe('reducer workspaceShareFolderContentList.js', () => {
           ...initialStateWithContentList,
           contentList: [
             ...initialStateWithContentList.contentList,
-            serializeContent(contentFromApi)
+            serialize(contentFromApi, serializeContentProps)
           ]
         })
       })
@@ -57,7 +58,7 @@ describe('reducer workspaceShareFolderContentList.js', () => {
         const initialStateWithContentList = {
           ...initialState,
           contentList: [
-            serializeContent({ ...contentFromApi })
+            serialize({ ...contentFromApi }, serializeContentProps)
           ]
         }
         const rez = workspaceContentList(
@@ -74,7 +75,7 @@ describe('reducer workspaceShareFolderContentList.js', () => {
       const initialStateWithContentList = {
         ...initialState,
         contentList: [
-          serializeContent({ ...contentFromApi, label: 'content for test' })
+          serialize({ ...contentFromApi, label: 'content for test' }, serializeContentProps)
         ]
       }
       const rez = workspaceShareFolderContentList(initialStateWithContentList, updateWorkspaceShareFolderContentList([contentFromApi], initialState.workspaceId))
@@ -82,7 +83,7 @@ describe('reducer workspaceShareFolderContentList.js', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithContentList,
           contentList: [
-            serializeContent(contentFromApi)
+            serialize(contentFromApi, serializeContentProps)
           ]
         })
       })
@@ -91,7 +92,7 @@ describe('reducer workspaceShareFolderContentList.js', () => {
         const initialStateWithContentList = {
           ...initialState,
           contentList: [
-            serializeContent({ ...contentFromApi })
+            serialize({ ...contentFromApi }, serializeContentProps)
           ]
         }
         const rez = workspaceContentList(
@@ -108,7 +109,7 @@ describe('reducer workspaceShareFolderContentList.js', () => {
       const initialStateWithContentList = {
         ...initialState,
         contentList: [
-          serializeContent(contentFromApi)
+          serialize(contentFromApi, serializeContentProps)
         ]
       }
       const rez = workspaceShareFolderContentList(
@@ -126,7 +127,7 @@ describe('reducer workspaceShareFolderContentList.js', () => {
         const initialStateWithContentList = {
           ...initialState,
           contentList: [
-            serializeContent({ ...contentFromApi })
+            serialize({ ...contentFromApi }, serializeContentProps)
           ]
         }
         const rez = workspaceContentList(

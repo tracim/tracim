@@ -10,25 +10,26 @@ import {
   WORKSPACE_CONTENT_DELETED,
   REMOVE, RESTORE
 } from '../action-creator.sync.js'
+import { serialize } from 'tracim_frontend_lib'
 
-export const serializeContent = c => ({
-  id: c.content_id,
-  label: c.label,
-  slug: c.slug,
-  type: c.content_type,
-  fileName: c.filename,
-  fileExtension: c.file_extension,
-  workspaceId: c.workspace_id,
-  isArchived: c.is_archived,
-  parentId: c.parent_id,
-  isDeleted: c.is_deleted,
-  showInUi: c.show_in_ui,
-  statusSlug: c.status,
-  subContentTypeList: c.sub_content_types,
-  isOpen: c.isOpen ? c.isOpen : false, // only useful for folder
-  activedShares: c.actives_shares,
-  created: c.created
-})
+export const serializeContentProps = {
+  content_id: 'id',
+  label: 'label',
+  slug: 'slug',
+  content_type: 'type',
+  filename: 'fileName',
+  file_extension: 'fileExtension',
+  workspace_id: 'workspaceId',
+  is_archived: 'isArchived',
+  parent_id: 'parentId',
+  is_deleted: 'isDeleted',
+  show_in_ui: 'showInUi',
+  status: 'statusSlug',
+  sub_content_types: 'subContentTypeList',
+  isOpen: 'isOpen',
+  actives_shares: 'activedShares',
+  created: 'created'
+}
 
 const defaultWorkspaceContentList = {
   workspaceId: 0,
@@ -41,7 +42,7 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
       return {
         workspaceId: action.workspaceId,
         contentList: action.workspaceContentList.map(c => ({
-          ...serializeContent(c),
+          ...serialize(c, serializeContentProps),
           isOpen: action.folderIdToOpenList.includes(c.content_id)
         }))
       }
@@ -58,7 +59,7 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
         contentList: [
           ...state.contentList,
           ...action.workspaceContentList.map(c => ({
-            ...serializeContent(c),
+            ...serialize(c, serializeContentProps),
             isOpen: parentIdList.includes(c.content_id)
           }))
         ]
@@ -76,7 +77,7 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
         contentList: [
           ...state.contentList.filter(c => !action.workspaceContentList.some(wc => wc.content_id === c.id)),
           ...action.workspaceContentList.map(c => ({
-            ...serializeContent(c),
+            ...serialize(c, serializeContentProps),
             isOpen: parentIdList.includes(c.content_id)
           }))
         ]

@@ -11,7 +11,8 @@ import {
   SET
 } from '../../../src/action-creator.sync.js'
 import { contentFromApi } from '../../fixture/content/content.js'
-import workspaceContentList, { serializeContent } from '../../../src/reducer/workspaceContentList.js'
+import workspaceContentList, { serializeContentProps } from '../../../src/reducer/workspaceContentList.js'
+import { serialize } from 'tracim_frontend_lib'
 
 describe('reducer workspaceContentList.js', () => {
   describe('actions', () => {
@@ -28,7 +29,7 @@ describe('reducer workspaceContentList.js', () => {
         expect(rez).to.deep.equal({
           workspaceId: 1,
           contentList: [
-            serializeContent(contentFromApi)
+            serialize(contentFromApi, serializeContentProps)
           ]
         })
       })
@@ -38,7 +39,7 @@ describe('reducer workspaceContentList.js', () => {
       const initialStateWithContentList = {
         ...initialState,
         contentList: [
-          serializeContent({ ...contentFromApi, content_id: 42, label: 'content for test' })
+          serialize({ ...contentFromApi, content_id: 42, label: 'content for test' }, serializeContentProps)
         ]
       }
       const rez = workspaceContentList(
@@ -51,7 +52,7 @@ describe('reducer workspaceContentList.js', () => {
           ...initialStateWithContentList,
           contentList: [
             ...initialStateWithContentList.contentList,
-            serializeContent(contentFromApi)
+            serialize(contentFromApi, serializeContentProps)
           ]
         })
       })
@@ -60,7 +61,7 @@ describe('reducer workspaceContentList.js', () => {
         const initialStateWithContentList = {
           ...initialState,
           contentList: [
-            serializeContent({ ...contentFromApi })
+            serialize({ ...contentFromApi }, serializeContentProps)
           ]
         }
         const rez = workspaceContentList(
@@ -77,7 +78,7 @@ describe('reducer workspaceContentList.js', () => {
       const initialStateWithContentList = {
         ...initialState,
         contentList: [
-          serializeContent({ ...contentFromApi, label: 'content for test' })
+          serialize({ ...contentFromApi, label: 'content for test' }, serializeContentProps)
         ]
       }
       const rez = workspaceContentList(
@@ -88,7 +89,7 @@ describe('reducer workspaceContentList.js', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithContentList,
           contentList: [
-            serializeContent(contentFromApi)
+            serialize(contentFromApi, serializeContentProps)
           ]
         })
       })
@@ -97,7 +98,7 @@ describe('reducer workspaceContentList.js', () => {
         const initialStateWithContentList = {
           ...initialState,
           contentList: [
-            serializeContent({ ...contentFromApi })
+            serialize({ ...contentFromApi }, serializeContentProps)
           ]
         }
         const rez = workspaceContentList(
@@ -114,7 +115,7 @@ describe('reducer workspaceContentList.js', () => {
       const initialStateWithContentList = {
         ...initialState,
         contentList: [
-          serializeContent(contentFromApi)
+          serialize(contentFromApi, serializeContentProps)
         ]
       }
       const rez = workspaceContentList(
@@ -132,7 +133,7 @@ describe('reducer workspaceContentList.js', () => {
         const initialStateWithContentList = {
           ...initialState,
           contentList: [
-            serializeContent({ ...contentFromApi })
+            serialize({ ...contentFromApi }, serializeContentProps)
           ]
         }
         const rez = workspaceContentList(
