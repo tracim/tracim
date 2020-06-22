@@ -11,6 +11,7 @@ import {
   REMOVE, RESTORE
 } from '../action-creator.sync.js'
 import { serialize } from 'tracim_frontend_lib'
+import { CONTENT_NAMESPACE } from '../util/helper'
 
 export const serializeContentProps = {
   content_id: 'id',
@@ -49,7 +50,10 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
 
     case `${RESTORE}/${WORKSPACE_CONTENT}`:
     case `${ADD}/${WORKSPACE_CONTENT}`: {
-      if (state.workspaceId !== action.workspaceId) return state
+      if (
+        state.workspaceId !== action.workspaceId ||
+        !action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)
+      ) return state
       const parentIdList = [
         ...state.contentList.filter(c => c.parentId),
         ...action.workspaceContentList.filter(c => c.parentId)
@@ -58,16 +62,21 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
         workspaceId: state.workspaceId,
         contentList: [
           ...state.contentList,
-          ...action.workspaceContentList.map(c => ({
-            ...serialize(c, serializeContentProps),
-            isOpen: parentIdList.includes(c.content_id)
-          }))
+          ...action.workspaceContentList
+            .filter(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)
+            .map(c => ({
+              ...serialize(c, serializeContentProps),
+              isOpen: parentIdList.includes(c.content_id)
+            }))
         ]
       }
     }
 
     case `${UPDATE}/${WORKSPACE_CONTENT}`: {
-      if (state.workspaceId !== action.workspaceId) return state
+      if (
+        state.workspaceId !== action.workspaceId ||
+        !action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)
+      ) return state
       const parentIdList = [
         ...state.contentList.filter(c => c.parentId),
         ...action.workspaceContentList.filter(c => c.parentId)
@@ -76,10 +85,12 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
         workspaceId: state.workspaceId,
         contentList: [
           ...state.contentList.filter(c => !action.workspaceContentList.some(wc => wc.content_id === c.id)),
-          ...action.workspaceContentList.map(c => ({
-            ...serialize(c, serializeContentProps),
-            isOpen: parentIdList.includes(c.content_id)
-          }))
+          ...action.workspaceContentList
+            .filter(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)
+            .map(c => ({
+              ...serialize(c, serializeContentProps),
+              isOpen: parentIdList.includes(c.content_id)
+            }))
         ]
       }
     }
@@ -109,7 +120,10 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
       }
 
     case `${REMOVE}/${WORKSPACE_CONTENT}`:
-      if (state.workspaceId !== action.workspaceId) return state
+      if (
+        state.workspaceId !== action.workspaceId ||
+        !action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)
+      ) return state
       return {
         workspaceId: state.workspaceId,
         contentList: state.contentList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id))

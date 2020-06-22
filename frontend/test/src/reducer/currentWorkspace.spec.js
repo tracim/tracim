@@ -36,9 +36,6 @@ import {
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_RECENT_ACTIVITY_LIST,
-  addWorkspaceShareFolderContentList,
-  deleteWorkspaceShareFolderContentList,
-  updateWorkspaceShareFolderContentList,
   WORKSPACE_CONTENT_SHARE_FOLDER
 } from '../../../src/action-creator.sync.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
@@ -317,7 +314,7 @@ describe('reducer currentWorkspace.js', () => {
           serialize({ ...contentShareFolder, content_id: 42, label: 'content for test' }, serializeContentProps)
         ]
       }
-      const rez = currentWorkspace(initialStateWithRecentActivity, addWorkspaceShareFolderContentList([contentShareFolder], initialState.id))
+      const rez = currentWorkspace(initialStateWithRecentActivity, addWorkspaceContentList([contentShareFolder], initialState.id))
       it('should return a workspace object with a recent activity list with the added content at the beginning', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithRecentActivity,
@@ -339,7 +336,7 @@ describe('reducer currentWorkspace.js', () => {
         ],
         contentReadStatusList: [1, 2, contentShareFolder.content_id]
       }
-      const rez = currentWorkspace(initialStateWithRecentActivity, updateWorkspaceShareFolderContentList([contentShareFolder], initialState.id))
+      const rez = currentWorkspace(initialStateWithRecentActivity, updateWorkspaceContentList([contentShareFolder], initialState.id))
       it('should return a workspace object with a recent activity list with only one element updated', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithRecentActivity,
@@ -362,7 +359,7 @@ describe('reducer currentWorkspace.js', () => {
       }
       const rez = currentWorkspace(
         initialStateWithRecentActivity,
-        deleteWorkspaceShareFolderContentList([{ ...contentShareFolder, content_namespace: CONTENT_NAMESPACE.UPLOAD }], initialState.id)
+        deleteWorkspaceContentList([{ ...contentShareFolder, content_namespace: CONTENT_NAMESPACE.UPLOAD }], initialState.id)
       )
       it('should return a workspace object with an empty recent activity list', () => {
         expect(rez).to.deep.equal({

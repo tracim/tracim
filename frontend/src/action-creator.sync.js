@@ -61,10 +61,6 @@ export const updateWorkspaceContentList = (workspaceContentList, workspaceId) =>
 export const deleteWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
 export const unDeleteWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${RESTORE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
 
-export const addWorkspaceShareFolderContentList = (workspaceShareFolderContentList, workspaceId) => ({ type: `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, workspaceId })
-export const updateWorkspaceShareFolderContentList = (workspaceShareFolderContentList, workspaceId) => ({ type: `${UPDATE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, workspaceId })
-export const deleteWorkspaceShareFolderContentList = (workspaceShareFolderContentList, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, workspaceId })
-export const unDeleteWorkspaceShareFolderContentList = (workspaceShareFolderContentList, workspaceId) => ({ type: `${RESTORE}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, workspaceId })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`

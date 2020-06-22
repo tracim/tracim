@@ -48,7 +48,6 @@ import {
   setWorkspaceContentList,
   addWorkspaceContentList,
   setWorkspaceShareFolderContentList,
-  addWorkspaceShareFolderContentList,
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
   toggleFolderOpen,
@@ -492,7 +491,7 @@ export class WorkspaceContent extends React.Component {
 
     if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceShareFolderContentList.contentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceShareFolderContentList(fetchContentList.json, state.workspaceIdInUrl))
+      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json, state.workspaceIdInUrl))
     }
   }
 

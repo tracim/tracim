@@ -13,6 +13,7 @@ import {
 import { contentFromApi } from '../../fixture/content/content.js'
 import workspaceContentList, { serializeContentProps } from '../../../src/reducer/workspaceContentList.js'
 import { serialize } from 'tracim_frontend_lib'
+import { CONTENT_NAMESPACE } from '../../../src/util/helper'
 
 describe('reducer workspaceContentList.js', () => {
   describe('actions', () => {
@@ -72,6 +73,22 @@ describe('reducer workspaceContentList.js', () => {
           expect(rez).to.deep.equal(initialStateWithContentList)
         })
       })
+
+      describe('calling the reducer with the wrong content_namespace', () => {
+        const initialStateWithContentList = {
+          ...initialState,
+          contentList: [
+            serialize({ ...contentFromApi }, serializeContentProps)
+          ]
+        }
+        const rez = workspaceContentList(
+          initialStateWithContentList,
+          addWorkspaceContentList([{ ...contentFromApi, content_namespace: CONTENT_NAMESPACE.UPLOAD }], initialState.workspaceId + 1)
+        )
+        it('should return the initial state', () => {
+          expect(rez).to.deep.equal(initialStateWithContentList)
+        })
+      })
     })
 
     describe(`${UPDATE}/${WORKSPACE_CONTENT}`, () => {
@@ -104,6 +121,22 @@ describe('reducer workspaceContentList.js', () => {
         const rez = workspaceContentList(
           initialStateWithContentList,
           updateWorkspaceContentList([contentFromApi], initialState.workspaceId + 1)
+        )
+        it('should return the initial state', () => {
+          expect(rez).to.deep.equal(initialStateWithContentList)
+        })
+      })
+
+      describe('calling the reducer with the wrong content_namespace', () => {
+        const initialStateWithContentList = {
+          ...initialState,
+          contentList: [
+            serialize({ ...contentFromApi }, serializeContentProps)
+          ]
+        }
+        const rez = workspaceContentList(
+          initialStateWithContentList,
+          updateWorkspaceContentList([{ ...contentFromApi, content_namespace: CONTENT_NAMESPACE.UPLOAD }], initialState.workspaceId + 1)
         )
         it('should return the initial state', () => {
           expect(rez).to.deep.equal(initialStateWithContentList)
