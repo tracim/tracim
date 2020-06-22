@@ -1,11 +1,13 @@
 import {
-  SET,
   APPEND,
+  REMOVE,
   SEARCH_RESULTS_LIST,
   SEARCHED_KEYWORDS,
   SEARCH_RESULTS_BY_PAGE,
   SEARCH_CURRENT_PAGE,
-  UPDATE
+  SET,
+  UPDATE,
+  WORKSPACE_CONTENT
 } from '../action-creator.sync.js'
 import { uniqBy } from 'lodash'
 import { serialize } from 'tracim_frontend_lib'
@@ -52,9 +54,10 @@ export default function searchResult (state = defaultResult, action) {
       uniqueResultList = uniqBy(newResultList, 'contentId')
       return { ...state, resultsList: uniqueResultList }
 
-    case `${UPDATE}/${SEARCH_RESULTS_LIST}`:
-      newResultList = state.resultsList.map(item => item.contentId === action.searchResultItem.content_id
-        ? { ...item, ...serialize(action.searchResultItem, serializeSearchItemProps) }
+    case `${REMOVE}/${WORKSPACE_CONTENT}`:
+    case `${UPDATE}/${WORKSPACE_CONTENT}`:
+      newResultList = state.resultsList.map(item => item.contentId === action.workspaceContentList[0].content_id
+        ? { ...item, ...serialize(action.workspaceContentList[0], serializeSearchItemProps) }
         : item
       )
       uniqueResultList = uniqBy(newResultList, 'contentId')
