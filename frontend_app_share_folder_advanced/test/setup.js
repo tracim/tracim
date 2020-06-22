@@ -31,6 +31,7 @@ if (!global.window && !global.document) {
   global.crypto = {
     getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }
   }
+  global.GLOBAL_dispatchEvent = () => {}
 }
 
 Enzyme.configure({adapter: new Adapter()})
