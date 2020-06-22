@@ -876,7 +876,7 @@ export class File extends React.Component {
                   customColor={state.config.hexcolor}
                   label={props.t('Play video')}
                   onClick={() => this.setState({ previewVideo: true })}
-                  faIcon={'play'}
+                  faIcon='play'
                   style={{ marginLeft: '5px' }}
                 />
               )}

@@ -16,16 +16,14 @@ import {
   CardPopup,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername
+  removeAtInUsername,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   getUsernameAvailability,
   putUserUsername
 } from '../action-creator.async.js'
-import {
-  newFlashMessage,
-  updateUserUsername
-} from '../action-creator.sync.js'
+import { newFlashMessage } from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -36,7 +34,6 @@ export class Home extends React.Component {
   constructor (props) {
     super(props)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
     this.state = {
       hidePopupCheckbox: false,
       newUsername: '',
@@ -45,15 +42,13 @@ export class Home extends React.Component {
       usernamePopup: false,
       usernameInvalidMsg: ''
     }
+
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
-  customEventReducer = ({ detail: { type } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.setHeadTitle()
-        break
-    }
-  }
+  handleAllAppChangeLanguage = () => this.setHeadTitle()
 
   handleClickCreateWorkspace = e => {
     e.preventDefault()
@@ -106,7 +101,6 @@ export class Home extends React.Component {
       const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, state.password))
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(updateUserUsername(username))
           props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
           break
         case 400:
@@ -311,4 +305,4 @@ export class Home extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
-export default connect(mapStateToProps)(withRouter(appFactory(translate()(Home))))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Home)))))

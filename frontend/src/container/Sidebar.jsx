@@ -113,7 +113,7 @@ export class Sidebar extends React.Component {
                       workspaceId={ws.id}
                       userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.userId, ws.memberList, ROLE_LIST)}
                       label={ws.label}
-                      allowedAppList={ws.sidebarEntry}
+                      allowedAppList={ws.sidebarEntryList}
                       activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
                       isOpenInSidebar={ws.isOpenInSidebar}
                       onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}

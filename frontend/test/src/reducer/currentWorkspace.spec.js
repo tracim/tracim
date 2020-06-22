@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import currentWorkspace, {
   serializeMember,
-  serializeSidebarEntry,
+  serializeSidebarEntryProps,
   serializeWorkspace
 } from '../../../src/reducer/currentWorkspace.js'
 import {
@@ -38,9 +38,8 @@ import {
   WORKSPACE_RECENT_ACTIVITY_LIST
 } from '../../../src/action-creator.sync.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
-import { appListAsSidebarEntry } from '../../hocMock/redux/appList/appListAsSidebarEntry.js'
 import { globalManagerAsMember, globalManagerAsMemberFromApi } from '../../fixture/user/globalManagerAsMember.js'
-import { ROLE } from 'tracim_frontend_lib'
+import { ROLE, serialize } from 'tracim_frontend_lib'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { contentFromApi } from '../../fixture/content/content.js'
 import { serializeContent } from '../../../src/reducer/workspaceContentList.js'
@@ -58,19 +57,6 @@ describe('reducer currentWorkspace.js', () => {
           agendaEnabled: firstWorkspaceFromApi.agenda_enabled,
           downloadEnabled: firstWorkspaceFromApi.public_download_enabled,
           uploadEnabled: firstWorkspaceFromApi.public_upload_enabled
-        })
-      })
-    })
-
-    describe('serializeSidebarEntry()', () => {
-      const rez = serializeSidebarEntry(appListAsSidebarEntry)
-      it('should return an object (in camelCase)', () => {
-        expect(rez).to.deep.equal({
-          slug: appListAsSidebarEntry.slug,
-          route: appListAsSidebarEntry.route,
-          faIcon: appListAsSidebarEntry.fa_icon,
-          hexcolor: appListAsSidebarEntry.hexcolor,
-          label: appListAsSidebarEntry.label
         })
       })
     })
@@ -104,7 +90,7 @@ describe('reducer currentWorkspace.js', () => {
         expect(rez).to.deep.equal({
           ...initialState,
           ...serializeWorkspace(firstWorkspaceFromApi),
-          sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serializeSidebarEntry(sbe))
+          sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
         })
       })
     })
@@ -123,7 +109,7 @@ describe('reducer currentWorkspace.js', () => {
           ...initialState,
           ...serializeWorkspace(firstWorkspaceFromApiWithEditedLabel),
           label: newLabel,
-          sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serializeSidebarEntry(sbe))
+          sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
         })
       })
     })
