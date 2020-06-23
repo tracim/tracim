@@ -57,10 +57,20 @@ export default function searchResult (state = defaultResult, action) {
 
     case `${REMOVE}/${WORKSPACE_CONTENT}`:
     case `${UPDATE}/${WORKSPACE_CONTENT}`:
-      newResultList = state.resultsList.map(item => item.contentId === action.workspaceContentList[0].content_id
-        ? { ...item, ...serialize(action.workspaceContentList[0], serializeSearchItemProps) }
-        : item
-      )
+      newResultList = state.resultsList.map(item => {
+        if (item.contentId === action.workspaceContentList[0].content_id) {
+          return { ...item, ...serialize(action.workspaceContentList[0], serializeSearchItemProps) }
+        } else {
+          if (item.parents.find(p => p.content_id === action.workspaceContentList[0].content_id)) {
+            return {
+              ...item,
+              parents: item.parents.map(p => p.content_id === action.workspaceContentList[0].content_id ? action.workspaceContentList[0] : p)
+            }
+          } else {
+            return item
+          }
+        }
+      })
       uniqueResultList = uniqBy(newResultList, 'contentId')
       return { ...state, resultsList: uniqueResultList }
 
