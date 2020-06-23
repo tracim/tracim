@@ -234,10 +234,8 @@ class UserApi(object):
         return query.all()
 
     def _get_user_ids_in_same_workspace(self, user_id: int):
-        user_workspaces_id_query = (
-            self._session.query(UserRoleInWorkspace.workspace_id)
-            .distinct(UserRoleInWorkspace.workspace_id)
-            .filter(UserRoleInWorkspace.user_id == user_id)
+        user_workspaces_id_query = self._session.query(UserRoleInWorkspace.workspace_id).filter(
+            UserRoleInWorkspace.user_id == user_id
         )
         users_in_workspaces = (
             self._session.query(UserRoleInWorkspace.user_id)
