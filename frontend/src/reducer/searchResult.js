@@ -57,20 +57,21 @@ export default function searchResult (state = defaultResult, action) {
 
     case `${REMOVE}/${WORKSPACE_CONTENT}`:
     case `${UPDATE}/${WORKSPACE_CONTENT}`:
-      newResultList = state.resultsList.map(item => {
-        if (item.contentId === action.workspaceContentList[0].content_id) {
-          return { ...item, ...serialize(action.workspaceContentList[0], serializeSearchItemProps) }
+      newResultList = []
+      state.resultsList.forEach(searchResultItem => action.workspaceContentList.forEach(content => {
+        // INFO - GB - 2020-06-23 - Update if one of the content received in the action is the content at the resultList
+        if (searchResultItem.contentId === content.content_id) {
+          newResultList = [...newResultList, { ...searchResultItem, ...serialize(content, serializeSearchItemProps) }]
         } else {
-          if (item.parents.find(p => p.content_id === action.workspaceContentList[0].content_id)) {
-            return {
-              ...item,
-              parents: item.parents.map(p => p.content_id === action.workspaceContentList[0].content_id ? action.workspaceContentList[0] : p)
-            }
-          } else {
-            return item
-          }
+          // INFO - GB - 2020-06-23 - Or update if it's one of the content's parents
+          if (searchResultItem.parents.some(parent => parent.content_id === content.content_id)) {
+            newResultList = [...newResultList, {
+              ...searchResultItem,
+              parents: searchResultItem.parents.map(parent => parent.content_id === content.content_id ? content : parent)
+            }]
+          } else newResultList = [...newResultList, searchResultItem]
         }
-      })
+      }))
       uniqueResultList = uniqBy(newResultList, 'contentId')
       return { ...state, resultsList: uniqueResultList }
 
