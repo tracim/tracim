@@ -6,6 +6,7 @@ import typing
 from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
 from sqlalchemy import null
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
@@ -389,14 +390,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         with self.context() as context:
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
-            if event.entity_type == EntityType.USER:
-                receiver_ids = self._get_user_event_receiver_ids(event, session)
-            elif event.entity_type == EntityType.WORKSPACE:
-                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
-            elif event.entity_type == EntityType.CONTENT:
-                receiver_ids = self._get_content_event_receiver_ids(event, session)
-            elif event.entity_type == EntityType.WORKSPACE_MEMBER:
-                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+            receiver_ids = self._get_receiver_ids(session, event)
 
             messages = [
                 Message(
@@ -411,6 +405,17 @@ class BaseLiveMessageBuilder(abc.ABC):
             live_message_lib = LiveMessagesLib(self._config)
             for message in messages:
                 live_message_lib.publish_message_to_user(message)
+
+    def _get_receiver_ids(self, session: Session, event: Event):
+        if event.entity_type == EntityType.USER:
+            receiver_ids = self._get_user_event_receiver_ids(event, session)
+        elif event.entity_type == EntityType.WORKSPACE:
+            receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+        elif event.entity_type == EntityType.CONTENT:
+            receiver_ids = self._get_content_event_receiver_ids(event, session)
+        elif event.entity_type == EntityType.WORKSPACE_MEMBER:
+            receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+        return receiver_ids
 
     def _get_user_event_receiver_ids(self, event: Event, session: TracimSession) -> typing.Set[int]:
         user_api = UserApi(current_user=None, session=session, config=self._config)
