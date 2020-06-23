@@ -8,5 +8,6 @@
   "Agenda": "Agenda",
   "Some agenda could not be loaded": "Impossível de carregar alguma agenda",
   "Home": "Início",
-  "My agendas": "Minhas agendas"
+  "My agendas": "Minhas agendas",
+  "Some information was modified by {{author}}": "Algumas informações foram modificadas por {{author}}"
 }

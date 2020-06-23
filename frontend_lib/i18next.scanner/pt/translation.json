@@ -81,5 +81,7 @@
   "User": "Utilizador",
   "Access to shared spaces where user is member": "Acesso a espaços partilhados onde o utilizador é membro",
   "Simple edition": "Edição simples",
-  "Advanced edition": "Edição avançada"
+  "Advanced edition": "Edição avançada",
+  "Refresh?": "Actualizar?",
+  "If you refresh, you will lose the current changes": "Se você atualizar, você perderá as mudanças atuais"
 }

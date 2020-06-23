@@ -9,11 +9,14 @@ export const debug = {
     faIcon: 'file-text-o',
     hexcolor: '#7d4e24',
     type: 'user', // 'user' or 'workspace'
-    translation: { en: {}, fr: {} },
-    apiUrl: 'http://localhost:6543/api',
+    translation: { en: {}, fr: {}, pt: {} },
+    apiUrl: 'http://localhost',
     apiHeader: {
       Accept: 'application/json',
       'Content-Type': 'application/json'
+    },
+    appConfig: {
+      workspaceId: 1
     },
     system: {
       config: {

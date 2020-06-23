@@ -64,9 +64,10 @@ export class HtmlDocument extends React.Component {
       rawContentBeforeEdit: '',
       timeline: [],
       newComment: '',
+      newContent: {},
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
-      keepEditingWarning: false,
+      hasUpdated: false,
       editionAuthor: ''
     }
 
@@ -96,12 +97,10 @@ export class HtmlDocument extends React.Component {
 
     this.setState(prev => ({
       ...prev,
-      content: {
-        ...prev.content,
-        ...data.content
-      },
+      content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
+      newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
-      keepEditingWarning: (prev.mode === APP_FEATURE_MODE.EDIT && prev.loggedUser.userId !== data.author.user_id),
+      hasUpdated: prev.loggedUser.userId !== data.author.user_id,
       rawContentBeforeEdit: data.content.raw_content,
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
     }))
@@ -514,10 +513,11 @@ export class HtmlDocument extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
+        ...prev.newContent,
         raw_content: prev.rawContentBeforeEdit
       },
       mode: APP_FEATURE_MODE.VIEW,
-      keepEditingWarning: false
+      hasUpdated: false
     }))
   }
 
@@ -621,7 +621,7 @@ export class HtmlDocument extends React.Component {
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
-            keepEditingWarning={state.keepEditingWarning}
+            hasUpdated={state.hasUpdated}
             onClickRefresh={this.handleClickRefresh}
             editionAuthor={state.editionAuthor}
           />
