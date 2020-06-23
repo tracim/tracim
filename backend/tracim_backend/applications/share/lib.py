@@ -60,7 +60,7 @@ class ShareLib(object):
         do_notify: bool = False,
     ) -> typing.List[ContentShare]:
         content_shares = []
-        created = datetime.utcnow()
+        created = datetime.now()
         share_group_uuid = str(uuid.uuid4())
         for email in emails:
             content_share = ContentShare(
@@ -172,7 +172,7 @@ class ShareLib(object):
 
     def disable_content_share(self, content: Content, share_id: int) -> ContentShare:
         content_share_to_disable = self.get_content_share(content, share_id)
-        content_share_to_disable.disabled = datetime.utcnow()
+        content_share_to_disable.disabled = datetime.now()
         content_share_to_disable.enabled = False
         self.save(content_share=content_share_to_disable)
         return content_share_to_disable
