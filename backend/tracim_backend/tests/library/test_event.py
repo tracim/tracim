@@ -134,8 +134,7 @@ class TestEventReceiver:
 
         receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(session, event)
         assert event_initiator.user_id in receivers_ids
-        # TODO: NEED clarification
-        # assert same_workspace_user.user_id in receivers_ids
+        assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
         assert admin_user.user_id in receivers_ids
 

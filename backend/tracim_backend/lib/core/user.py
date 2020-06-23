@@ -226,25 +226,35 @@ class UserApi(object):
         # should show only user in same workspace as user
         assert not (filter_results and not self._user)
         if filter_results and self._user and self._user.profile.id <= Profile.USER.id:
-            user_workspaces_id_query = (
-                self._session.query(UserRoleInWorkspace.workspace_id)
-                .distinct(UserRoleInWorkspace.workspace_id)
-                .filter(UserRoleInWorkspace.user_id == self._user.user_id)
-            )
-            users_in_workspaces = (
-                self._session.query(UserRoleInWorkspace.user_id)
-                .distinct(UserRoleInWorkspace.user_id)
-                .filter(UserRoleInWorkspace.workspace_id.in_(user_workspaces_id_query.subquery()))
-                .subquery()
-            )
+            users_in_workspaces = self._get_user_ids_in_same_workspace(self._user.user_id)
             query = query.filter(User.user_id.in_(users_in_workspaces))
         if exclude_user_ids:
             query = query.filter(~User.user_id.in_(exclude_user_ids))
         query = query.limit(nb_elem)
         return query.all()
 
-    # Check methods
+    def _get_user_ids_in_same_workspace(self, user_id: int):
+        user_workspaces_id_query = (
+            self._session.query(UserRoleInWorkspace.workspace_id)
+            .distinct(UserRoleInWorkspace.workspace_id)
+            .filter(UserRoleInWorkspace.user_id == user_id)
+        )
+        users_in_workspaces = (
+            self._session.query(UserRoleInWorkspace.user_id)
+            .distinct(UserRoleInWorkspace.user_id)
+            .filter(UserRoleInWorkspace.workspace_id.in_(user_workspaces_id_query.subquery()))
+            .subquery()
+        )
+        return users_in_workspaces
 
+    def get_users_ids_in_same_workpaces(self, user_id: int):
+        query = self._apply_base_filters(self._session.query(User.user_id))
+        users_in_workspaces = self._get_user_ids_in_same_workspace(user_id=user_id)
+        query = query.filter(User.user_id.in_(users_in_workspaces))
+        result = query.all()
+        return [item[0] for item in result]
+
+    # Check methods
     def user_with_email_exists(self, email: str) -> bool:
         try:
             self.get_one_by_email(email)

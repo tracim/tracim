@@ -418,10 +418,14 @@ class BaseLiveMessageBuilder(abc.ABC):
         return receiver_ids
 
     def _get_user_event_receiver_ids(self, event: Event, session: TracimSession) -> typing.Set[int]:
-        user_api = UserApi(current_user=None, session=session, config=self._config)
-        receiver_ids = set(user_api.get_user_ids_from_profile(Profile.ADMIN))
+        user_api = UserApi(current_user=event.user, session=session, config=self._config)
+        receiver_ids = user_api.get_user_ids_from_profile(Profile.ADMIN)
         if event.user:
-            receiver_ids.add(event.user["user_id"])
+            receiver_ids.append(event.user["user_id"])
+            same_workspaces_user_ids = user_api.get_users_ids_in_same_workpaces(
+                event.user["user_id"]
+            )
+            receiver_ids = set(receiver_ids + same_workspaces_user_ids)
         return receiver_ids
 
     def _get_workspace_event_receiver_ids(
