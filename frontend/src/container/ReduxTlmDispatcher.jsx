@@ -16,7 +16,8 @@ import {
   updateUser,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
-  updateWorkspaceMember
+  updateWorkspaceMember,
+  addWorkspaceReadStatus
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
 
@@ -91,10 +92,16 @@ export class ReduxTlmDispatcher extends React.Component {
     if (response.status !== 200) return
 
     this.props.dispatch(removeWorkspaceReadStatus(response.json, data.workspace.workspace_id))
+    if (data.author.user_id === this.props.user.userId) {
+      this.props.dispatch(addWorkspaceReadStatus(data.content, data.workspace.workspace_id))
+    }
   }
 
   handleContentModified = data => {
     this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace.workspace_id))
+    if (data.author.user_id === this.props.user.userId) {
+      this.props.dispatch(addWorkspaceReadStatus(data.content, data.workspace.workspace_id))
+    }
   }
 
   handleContentDeleted = data => {
@@ -114,5 +121,5 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 }
 
-const mapStateToProps = ({ workspaceContentList }) => ({ workspaceContentList })
+const mapStateToProps = ({ workspaceContentList, user }) => ({ workspaceContentList, user })
 export default connect(mapStateToProps)(TracimComponent(ReduxTlmDispatcher))
