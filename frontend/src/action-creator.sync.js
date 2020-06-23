@@ -117,6 +117,7 @@ export const appendWorkspaceRecentActivityList = workspaceRecentActivityList => 
 export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
 export const setWorkspaceReadStatusList = workspaceReadStatusList => ({ type: `${SET}/${WORKSPACE_READ_STATUS_LIST}`, workspaceReadStatusList })
+export const addWorkspaceReadStatus = (content, workspaceId) => ({ type: `${ADD}/${WORKSPACE_READ_STATUS_LIST}`, content, workspaceId })
 export const removeWorkspaceReadStatus = (unreadContent, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_READ_STATUS}`, unreadContent, workspaceId })
 
 export const WORKSPACE_AGENDA_URL = `${WORKSPACE}/AgendaUrl`

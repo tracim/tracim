@@ -28,7 +28,10 @@ import {
   CONTENT_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
-  TracimComponent
+  TracimComponent,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_SUB_TYPE as TLM_ST
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -54,7 +57,8 @@ import {
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  setWorkspaceDetail
+  setWorkspaceDetail,
+  addWorkspaceReadStatus
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -89,6 +93,14 @@ export class WorkspaceContent extends React.Component {
       { name: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, handler: this.handleHidePopupCreateContent },
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated }
+    ])
   }
 
   // CustomEvent handlers
@@ -111,6 +123,18 @@ export class WorkspaceContent extends React.Component {
   handleHidePopupCreateContent = data => {
     console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, data, this.state.workspaceIdInUrl)
     this.updateUrlTitleBreadcrumbs()
+  }
+
+  handleContentModified = data => {
+    if (data.author.user_id === this.props.user.userId) {
+      this.props.dispatch(addWorkspaceReadStatus(data.content, data.workspace.workspace_id))
+    }
+  }
+
+  handleContentCommentCreated = data => {
+    if (data.author.user_id === this.props.user.userId) {
+      this.props.dispatch(addWorkspaceReadStatus(data.content, data.workspace.workspace_id))
+    }
   }
 
   updateUrlTitleBreadcrumbs = () => {

@@ -175,6 +175,16 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           .map(content => content.content_id)
       }
 
+    case `${ADD}/${WORKSPACE_READ_STATUS_LIST}`:
+      if (state.id !== action.workspaceId) return state
+      return {
+        ...state,
+        contentReadStatusList: [
+          ...state.contentReadStatusList,
+          action.content.content_id
+        ]
+      }
+
     case `${REMOVE}/${WORKSPACE_READ_STATUS}`: // INFO - CH - 20200529 - this means "set content as unread"
       if (state.id !== action.workspaceId) return state
       return {

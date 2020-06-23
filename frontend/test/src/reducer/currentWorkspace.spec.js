@@ -27,6 +27,7 @@ import {
   updateWorkspaceContentList,
   updateWorkspaceDetail,
   updateWorkspaceMember,
+  addWorkspaceReadStatus,
   USER_WORKSPACE_DO_NOTIFY,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
@@ -370,6 +371,20 @@ describe('reducer currentWorkspace.js', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithReadStatusList,
           contentReadStatusList: [1, 3]
+        })
+      })
+    })
+
+    describe(`${ADD}/${WORKSPACE_READ_STATUS_LIST}`, () => {
+      const initialStateWithReadStatusList = {
+        ...initialState,
+        contentReadStatusList: [100, 101]
+      }
+      const rez = currentWorkspace(initialStateWithReadStatusList, addWorkspaceReadStatus({ content_id: 2 }, initialState.id))
+      it('should return a workspace object with the contentReadStatusList correctly updated', () => {
+        expect(rez).to.deep.equal({
+          ...initialStateWithReadStatusList,
+          contentReadStatusList: [100, 101, 2]
         })
       })
     })
