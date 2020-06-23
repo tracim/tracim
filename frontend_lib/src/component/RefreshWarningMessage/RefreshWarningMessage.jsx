@@ -19,11 +19,6 @@ const RefreshWarningMessage = props => (
 export default translate()(RefreshWarningMessage)
 
 RefreshWarningMessage.propTypes = {
-  editionAuthor: PropTypes.string,
-  onClickRefresh: PropTypes.func
-}
-
-RefreshWarningMessage.defaultState = {
-  editionAuthor: '',
-  onClickRefresh: () => { }
+  editionAuthor: PropTypes.string.isRequired,
+  onClickRefresh: PropTypes.func.isRequired
 }
