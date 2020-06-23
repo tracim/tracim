@@ -6,8 +6,7 @@ import { translateMock } from '../../hocMock/translate.js'
 import { expect } from 'chai'
 import { Account as AccountWithoutHOC } from '../../../src/container/Account.jsx'
 import sinon from 'sinon'
-import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
-import { user, userFromApi } from '../../hocMock/redux/user/user.js'
+import { user } from '../../hocMock/redux/user/user.js'
 import { appList } from '../../hocMock/redux/appList/appList.js'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList.js'
 import {
@@ -91,40 +90,6 @@ describe('In <Account />', () => {
 
   const wrapper = mount(<AccountWithHOC2 {...props} />)
   const accountInstance = wrapper.find(AccountWithoutHOC).instance()
-
-  describe('TLM handlers', () => {
-    describe('eventType user', () => {
-      const tlmData = {
-        author: userFromApi,
-        user: userFromApi
-      }
-
-      describe('handleUserModified', () => {
-        accountInstance.handleUserModified(tlmData)
-
-        it('should call this.props.dispatch(updateUser())', () => {
-          expect(updateUserCallBack.called).to.equal(true)
-        })
-      })
-    })
-
-    describe('eventType sharedspace member', () => {
-      const tlmData = {
-        author: userFromApi,
-        member: { do_notify: true, role: 'workspace-manager' },
-        user: userFromApi,
-        workspace: firstWorkspaceFromApi
-      }
-
-      describe('handleMemberModified', () => {
-        accountInstance.handleMemberModified(tlmData)
-
-        it('should call this.props.dispatch(updateUserWorkspaceSubscriptionNotif())', () => {
-          expect(updateUserWorkspaceSubscriptionNotifCallBack.called).to.equal(true)
-        })
-      })
-    })
-  })
 
   describe('its internal function', () => {
     const invalidPassword = '0'
