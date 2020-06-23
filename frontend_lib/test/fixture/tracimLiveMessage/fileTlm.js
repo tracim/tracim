@@ -1,5 +1,5 @@
 import { author } from '../author.js'
-import { CONTENT_TYPE } from '../../../src'
+import { CONTENT_TYPE } from '../../../src/helper.js'
 
 export const fileTlm = {
   author,
