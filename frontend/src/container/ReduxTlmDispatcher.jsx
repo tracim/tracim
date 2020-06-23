@@ -27,6 +27,9 @@ export class ReduxTlmDispatcher extends React.Component {
     super(props)
 
     props.registerLiveMessageHandlerList([
+      // User
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
+
       // Workspace
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
 
@@ -59,6 +62,10 @@ export class ReduxTlmDispatcher extends React.Component {
       // User
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
+  }
+
+  handleUserModified = data => {
+    this.props.dispatch(updateUser(data.user))
   }
 
   handleWorkspaceModified = data => {

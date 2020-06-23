@@ -18,16 +18,12 @@ import {
   hasNotAllowedCharacters,
   hasSpaces,
   removeAtInUsername,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
-  updateUser,
   updateUserAgendaUrl,
-  updateUserWorkspaceSubscriptionNotif,
   setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
@@ -88,30 +84,12 @@ export class Account extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
-
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
-    ])
   }
 
   // Custom Event Handler
   handleAllAppChangeLanguage = () => {
     this.buildBreadcrumbs()
     this.setHeadTitle()
-  }
-
-  // TLM Handlers
-  handleUserModified = data => {
-    const { props } = this
-    if (props.user.userId !== data.user.user_id) return
-    props.dispatch(updateUser(data.user))
-  }
-
-  handleMemberModified = data => {
-    const { props } = this
-    if (props.user.userId !== data.user.user_id) return
-    props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, data.workspace.workspace_id, data.member.do_notify))
   }
 
   componentDidMount () {

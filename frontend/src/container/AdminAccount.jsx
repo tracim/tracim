@@ -111,7 +111,11 @@ export class Account extends React.Component {
       this.setState(prev => ({ userToEdit: { ...prev.userToEdit, username: data.user.username } }))
       return
     }
-    if (state.userToEdit.email !== data.user.email) this.setState(prev => ({ userToEdit: { ...prev.userToEdit, email: data.user.email } }))
+    if (state.userToEdit.email !== data.user.email) {
+      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, email: data.user.email } }))
+      return
+    }
+    if (state.userToEdit.profile !== data.user.profile) this.setState(prev => ({ userToEdit: { ...prev.userToEdit, profile: data.user.profile } }))
   }
 
   handleMemberModified = data => {
@@ -145,11 +149,14 @@ export class Account extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  componentDidUpdate (prevProps) {
-    const { props } = this
+  componentDidUpdate (prevProps, prevState) {
+    const { props, state } = this
 
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
       this.setHeadTitle()
+    }
+    if (state.userToEdit.publicName !== prevState.userToEdit.publicName) {
+      this.buildBreadcrumbs()
     }
   }
 
