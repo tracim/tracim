@@ -16,9 +16,12 @@ import {
   setSearchResultsList,
   UPDATE,
   updateWorkspaceContentList,
-  WORKSPACE_CONTENT
+  updateWorkspaceDetail,
+  WORKSPACE_CONTENT,
+  WORKSPACE_DETAIL
 } from '../../../src/action-creator.sync.js'
 import { serialize } from 'tracim_frontend_lib'
+import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 
 describe('reducer searchResult.js', () => {
   describe('actions', () => {
@@ -30,11 +33,15 @@ describe('reducer searchResult.js', () => {
     }
     const content = {
       contentId: 1,
-      label: 'label'
+      label: 'label',
+      workspace: firstWorkspaceFromApi,
+      workspaceId: 1
     }
     const contentFromApi = {
       content_id: 1,
-      label: 'label'
+      label: 'label',
+      workspace: firstWorkspaceFromApi,
+      workspace_id: 1
     }
 
     it('should return the initial state when no action given', () => {
@@ -112,6 +119,18 @@ describe('reducer searchResult.js', () => {
       const rez = searchResult(initialState, setCurrentNumberPage(5))
       it('should return a content object with the current number of pages', () => {
         expect(rez).to.deep.equal({ ...initialState, currentNumberPage: 5 })
+      })
+    })
+
+    describe(`${UPDATE}/${WORKSPACE_DETAIL}`, () => {
+      const oldState = { ...initialState, resultsList: [content] }
+      const rez = searchResult(oldState, updateWorkspaceDetail({ ...contentFromApi.workspace, label: 'newName' }))
+
+      it('should return a content list with the list appended in the old one', () => {
+        expect(rez).to.deep.equal({
+          ...oldState,
+          resultsList: [{ ...content, workspace: { ...content.workspace, label: 'newName' } }]
+        })
       })
     })
   })

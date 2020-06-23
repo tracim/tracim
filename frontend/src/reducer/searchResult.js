@@ -7,7 +7,8 @@ import {
   SEARCH_CURRENT_PAGE,
   SET,
   UPDATE,
-  WORKSPACE_CONTENT
+  WORKSPACE_CONTENT,
+  WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
 import { uniqBy } from 'lodash'
 import { serialize } from 'tracim_frontend_lib'
@@ -76,6 +77,14 @@ export default function searchResult (state = defaultResult, action) {
 
     case `${SET}/${SEARCH_CURRENT_PAGE}`:
       return { ...state, currentNumberPage: action.currentNumberPage }
+
+    case `${UPDATE}/${WORKSPACE_DETAIL}`:
+      newResultList = state.resultsList.map(item =>
+        action.workspaceDetail.workspace_id === item.workspaceId
+          ? { ...item, workspace: { ...item.workspace, label: action.workspaceDetail.label } }
+          : item
+      )
+      return { ...state, resultsList: newResultList }
 
     default:
       return state
