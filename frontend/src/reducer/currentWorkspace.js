@@ -16,7 +16,7 @@ import {
   WORKSPACE_CONTENT,
   RESTORE
 } from '../action-creator.sync.js'
-import { serializeContent } from './workspaceContentList.js'
+import { serializeContentProps } from './workspaceContentList.js'
 import { serialize } from 'tracim_frontend_lib'
 
 const defaultWorkspace = {
