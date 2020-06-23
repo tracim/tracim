@@ -40,7 +40,7 @@ export const HtmlDocument = props => {
 
       {props.hasUpdated && (
         <RefreshWarningMessage
-          editionAuthor={props.editionAuthor}
+          warningText={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
           onClickRefresh={props.onClickRefresh}
         />
       )}

@@ -8,5 +8,6 @@
   "Error while creating thread": "Erreur lors de la création de la discussion",
   "Thread": "Discussion",
   "thread": "discussion",
-  "threads": "discussions"
+  "threads": "discussions",
+  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}"
 }

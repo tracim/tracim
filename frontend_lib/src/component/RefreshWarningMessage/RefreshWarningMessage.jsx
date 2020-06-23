@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 const RefreshWarningMessage = props => (
   <div className='refreshWarningMessage'>
     <i className='fa fa-exclamation-triangle' />
-    {props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
+    {props.warningText}
     <button
       className='refreshWarningMessage__button'
       onClick={props.onClickRefresh}
@@ -19,6 +19,6 @@ const RefreshWarningMessage = props => (
 export default translate()(RefreshWarningMessage)
 
 RefreshWarningMessage.propTypes = {
-  editionAuthor: PropTypes.string.isRequired,
+  warningText: PropTypes.string.isRequired,
   onClickRefresh: PropTypes.func.isRequired
 }
