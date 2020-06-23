@@ -188,14 +188,18 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 
 ### pyramid_beaker parameters ###
 
-# "File" storage config :
 session.type = file
+# needed for "file" storage config :
 ; session.data_dir = %(here)s/sessions_data
 session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
+# needed for many session storage type, but not for file (leave as empty for file)
+session.url =
+
 ## "Redis" storage config sample:
 # session.type = ext:redis
 # note: redis db name are integer (by default 16 database are available from 0 to 15 db)
 # session.url = redis://localhost:6379/0
+
 ; session.lock_dir = %(here)s/sessions_data
 session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 session.key = session_key
