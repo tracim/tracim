@@ -263,6 +263,7 @@
   "Email address or username": "Email address or username",
   "Invalid credentials": "Invalid credentials",
   "Please type your password in order to change your email and/or username. (For security reasons)": "Please type your password in order to change your email and/or username. (For security reasons)",
+  "Please confirm your password:": "Please confirm your password:",
   "Unknown email or username": "Unknown email or username",
   "This username is not linked to any email, please contact an administrator to reset your password": "This username is not linked to any email, please contact an administrator to reset your password",
   "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?"

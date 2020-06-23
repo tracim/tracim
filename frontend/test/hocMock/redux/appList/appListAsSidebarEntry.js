@@ -3,7 +3,8 @@ import { file } from '../../../fixture/app/file.js'
 import { htmlDocument } from '../../../fixture/app/htmlDocument.js'
 import { thread } from '../../../fixture/app/thread.js'
 import { agenda } from '../../../fixture/app/agenda.js'
-import { serializeSidebarEntry } from '../../../../src/reducer/currentWorkspace.js'
+import { serializeSidebarEntryProps } from '../../../../src/reducer/currentWorkspace.js'
+import { serialize } from 'tracim_frontend_lib'
 
 export const sidebarEntryDashboardFromApi = {
   slug: 'dashboard',
@@ -20,8 +21,8 @@ export const sidebarEntryAllContentFromApi = {
   label: 'All Contents'
 }
 export const appListAsSidebarEntry = workspaceId => [
-  serializeSidebarEntry(sidebarEntryDashboardFromApi),
-  serializeSidebarEntry(sidebarEntryAllContentFromApi),
+  serialize(sidebarEntryDashboardFromApi, serializeSidebarEntryProps),
+  serialize(sidebarEntryAllContentFromApi, serializeSidebarEntryProps),
   ...appList
     .filter(app => [htmlDocument.slug, thread.slug, file.slug, agenda.slug].includes(app.slug))
     .map(({ slug, faIcon, hexcolor, label }) => ({

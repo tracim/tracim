@@ -19,7 +19,8 @@ describe('<Home />', () => {
       }
     },
     canCreateWorkspace: true,
-    renderAppPopupCreation: renderAppPopupCreationCallBack
+    renderAppPopupCreation: renderAppPopupCreationCallBack,
+    registerCustomEventHandlerList: () => {}
   }
 
   const wrapper = shallow(
