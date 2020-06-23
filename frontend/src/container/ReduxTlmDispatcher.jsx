@@ -86,15 +86,13 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentCommentCreated = async data => {
+    if (data.author.user_id === this.props.user.userId) return
     const commentParentId = data.content.parent_id
     const response = await this.props.dispatch(getContent(data.workspace.workspace_id, commentParentId))
 
     if (response.status !== 200) return
 
     this.props.dispatch(removeWorkspaceReadStatus(response.json, data.workspace.workspace_id))
-    if (data.author.user_id === this.props.user.userId) {
-      this.props.dispatch(addWorkspaceReadStatus(data.content, data.workspace.workspace_id))
-    }
   }
 
   handleContentModified = data => {
