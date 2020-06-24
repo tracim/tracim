@@ -113,3 +113,8 @@ export const sortWorkspaceContents = (a, b) => {
   if (b.label > a.label) return -1
   return 0
 }
+
+export const CONTENT_NAMESPACE = {
+  CONTENT: 'content',
+  UPLOAD: 'upload'
+}

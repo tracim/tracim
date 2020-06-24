@@ -16,7 +16,8 @@ import {
   updateUser,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
-  updateWorkspaceMember
+  updateWorkspaceMember,
+  addWorkspaceReadStatus
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
 
@@ -42,17 +43,20 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
 
       // Content modified
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentModified },
 
       // Content deleted
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentDeleted },
 
       // Content restored
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentUnDeleted },
@@ -89,6 +93,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentCommentCreated = async data => {
+    if (data.author.user_id === this.props.user.userId) return
     const commentParentId = data.content.parent_id
     const response = await this.props.dispatch(getContent(data.workspace.workspace_id, commentParentId))
 
@@ -99,6 +104,9 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleContentModified = data => {
     this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace.workspace_id))
+    if (data.author.user_id === this.props.user.userId) {
+      this.props.dispatch(addWorkspaceReadStatus(data.content, data.workspace.workspace_id))
+    }
   }
 
   handleContentDeleted = data => {
@@ -118,5 +126,5 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 }
 
-const mapStateToProps = ({ workspaceContentList }) => ({ workspaceContentList })
+const mapStateToProps = ({ workspaceContentList, user }) => ({ workspaceContentList, user })
 export default connect(mapStateToProps)(TracimComponent(ReduxTlmDispatcher))
