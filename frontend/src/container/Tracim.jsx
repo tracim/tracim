@@ -71,7 +71,6 @@ export class Tracim extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.REDIRECT, handler: this.handleRedirect },
       { name: CUSTOM_EVENT.ADD_FLASH_MSG, handler: this.handleAddFlashMessage },
-      { name: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, handler: this.handleRefreshWorkspaceList },
       { name: CUSTOM_EVENT.DISCONNECTED_FROM_API, handler: this.handleDisconnectedFromApi },
       { name: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST_THEN_REDIRECT, handler: this.handleRefreshWorkspaceListThenRedirect },
       { name: CUSTOM_EVENT.SET_BREADCRUMBS, handler: this.handleSetBreadcrumbs },
@@ -88,12 +87,6 @@ export class Tracim extends React.Component {
   handleAddFlashMessage = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.ADD_FLASH_MSG, data)
     this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
-  }
-
-  handleRefreshWorkspaceList = async data => {
-    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data)
-    await this.loadWorkspaceList(data.openInSidebarId ? data.openInSidebarId : undefined)
-    if (data.openInSidebarId && document.getElementById(data.openInSidebarId)) document.getElementById(data.openInSidebarId).scrollIntoView()
   }
 
   handleDisconnectedFromApi = data => {
