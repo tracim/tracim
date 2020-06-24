@@ -28,9 +28,11 @@ describe('workspaceList reducer', () => {
       }
     ]
 
+    const serializedFirstWorkspaceFromApi = serialize(firstWorkspaceFromApi, serializeWorkspaceListProps)
+
     it('should return the initial state when no action given', () => {
       const rez = workspaceList(initialState, { type: 'nothing that will match', action: {} })
-      expect(rez).to.deep.equal([...initialState])
+      expect(rez).to.deep.equal(initialState)
     })
 
     describe(`${SET}/${WORKSPACE_LIST}`, () => {
@@ -39,7 +41,7 @@ describe('workspaceList reducer', () => {
       it('should return a workspace list with the new list', () => {
         expect(rez).to.deep.equal([
           {
-            ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
+            ...serializedFirstWorkspaceFromApi,
             sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
             memberList: []
           }
@@ -54,7 +56,7 @@ describe('workspaceList reducer', () => {
         expect(rez).to.deep.equal([
           ...initialState,
           {
-            ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
+            ...serializedFirstWorkspaceFromApi,
             sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
             memberList: []
           }
@@ -63,16 +65,16 @@ describe('workspaceList reducer', () => {
     })
 
     describe(`${REMOVE}/${WORKSPACE_LIST}`, () => {
-      const rez = workspaceList([...initialState, serialize(firstWorkspaceFromApi, serializeWorkspaceListProps)], removeWorkspace(firstWorkspaceFromApi))
+      const rez = workspaceList([...initialState, serializedFirstWorkspaceFromApi], removeWorkspace(firstWorkspaceFromApi))
 
       it('should return a empty workspace list', () => {
-        expect(rez).to.deep.equal([...initialState])
+        expect(rez).to.deep.equal(initialState)
       })
     })
 
     describe(`${UPDATE}/${WORKSPACE_DETAIL}`, () => {
       const rez = workspaceList(
-        [...initialState, serialize(firstWorkspaceFromApi, serializeWorkspaceListProps)],
+        [...initialState, serializedFirstWorkspaceFromApi],
         updateWorkspaceDetail({ ...firstWorkspaceFromApi, label: 'labelChanged' })
       )
 
@@ -80,7 +82,7 @@ describe('workspaceList reducer', () => {
         expect(rez).to.deep.equal([
           ...initialState,
           {
-            ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
+            ...serializedFirstWorkspaceFromApi,
             label: 'labelChanged',
             sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
           }
@@ -89,21 +91,22 @@ describe('workspaceList reducer', () => {
     })
 
     describe(`${ADD}/${WORKSPACE_MEMBER}`, () => {
-      const rez = workspaceList([
-        ...initialState,
-        {
-          ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
-          memberList: []
-        }
-      ],
-      addWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { ...globalManagerFromApi, do_notify: true, role: ROLE.workspaceManager })
+      const rez = workspaceList(
+        [
+          ...initialState,
+          {
+            ...serializedFirstWorkspaceFromApi,
+            memberList: []
+          }
+        ],
+        addWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { ...globalManagerFromApi, do_notify: true, role: ROLE.workspaceManager })
       )
 
       it('should return a workspace list with the member correctly added in the right workspace', () => {
         expect(rez).to.deep.equal([
           ...initialState,
           {
-            ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
+            ...serializedFirstWorkspaceFromApi,
             memberList: [{
               ...serializeMember({
                 user: globalManagerFromApi,
@@ -117,27 +120,28 @@ describe('workspaceList reducer', () => {
     })
 
     describe(`${UPDATE}/${WORKSPACE_MEMBER}`, () => {
-      const rez = workspaceList([
-        ...initialState,
-        {
-          ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
-          memberList: [{
-            ...serializeMember({
-              user: globalManagerFromApi,
-              do_notify: true,
-              role: ROLE.workspaceManager
-            })
-          }]
-        }
-      ],
-      updateWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { ...globalManagerFromApi, do_notify: false, role: ROLE.contributor })
+      const rez = workspaceList(
+        [
+          ...initialState,
+          {
+            ...serializedFirstWorkspaceFromApi,
+            memberList: [{
+              ...serializeMember({
+                user: globalManagerFromApi,
+                do_notify: true,
+                role: ROLE.workspaceManager
+              })
+            }]
+          }
+        ],
+        updateWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { ...globalManagerFromApi, do_notify: false, role: ROLE.contributor })
       )
 
       it('should return a workspace list with the member correctly updated in the right workspace', () => {
         expect(rez).to.deep.equal([
           ...initialState,
           {
-            ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
+            ...serializedFirstWorkspaceFromApi,
             memberList: [{
               ...serializeMember({
                 user: globalManagerFromApi,
@@ -151,27 +155,28 @@ describe('workspaceList reducer', () => {
     })
 
     describe(`${REMOVE}/${WORKSPACE_MEMBER}`, () => {
-      const rez = workspaceList([
-        ...initialState,
-        {
-          ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
-          memberList: [{
-            ...serializeMember({
-              user: globalManagerFromApi,
-              do_notify: true,
-              role: ROLE.workspaceManager
-            })
-          }]
-        }
-      ],
-      removeWorkspaceMember(globalManagerFromApi.user_id, firstWorkspaceFromApi.workspace_id)
+      const rez = workspaceList(
+        [
+          ...initialState,
+          {
+            ...serializedFirstWorkspaceFromApi,
+            memberList: [{
+              ...serializeMember({
+                user: globalManagerFromApi,
+                do_notify: true,
+                role: ROLE.workspaceManager
+              })
+            }]
+          }
+        ],
+        removeWorkspaceMember(globalManagerFromApi.user_id, firstWorkspaceFromApi.workspace_id)
       )
 
       it('should return a workspace list without the member removed in the right workspace', () => {
         expect(rez).to.deep.equal([
           ...initialState,
           {
-            ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
+            ...serializedFirstWorkspaceFromApi,
             memberList: []
           }
         ])
@@ -179,22 +184,23 @@ describe('workspaceList reducer', () => {
     })
 
     describe(`${SET}/${WORKSPACE_MEMBER}`, () => {
-      const rez = workspaceList([
-        {
-          ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
-          memberList: []
-        }
-      ],
-      setWorkspaceListMemberList([{
-        ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
-        workspaceId: firstWorkspaceFromApi.workspace_id,
-        memberList: [{ user: globalManagerFromApi, do_notify: false, role: ROLE.contributor }]
-      }]))
+      const serializedFirstWorkspace = {
+        ...serializedFirstWorkspaceFromApi,
+        memberList: []
+      }
+      const rez = workspaceList(
+        [serializedFirstWorkspace],
+        setWorkspaceListMemberList([{
+          ...serializedFirstWorkspace,
+          workspaceId: firstWorkspaceFromApi.workspace_id,
+          memberList: [{ user: globalManagerFromApi, do_notify: false, role: ROLE.contributor }]
+        }])
+      )
 
       it('should return a workspace list with the memberList correctly added in the right workspace', () => {
         expect(rez).to.deep.equal([
           {
-            ...serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
+            ...serializedFirstWorkspaceFromApi,
             memberList: [{
               ...serializeMember({
                 user: globalManagerFromApi,

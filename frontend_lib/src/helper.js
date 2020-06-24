@@ -372,6 +372,8 @@ export const hasNotAllowedCharacters = name => !(/^[A-Za-z0-9_-]*$/.test(name))
 
 export const hasSpaces = name => /\s/.test(name)
 
+// FIXME - GM - 2020-06-24 - This function doesn't handle nested object, it need to be improved
+// https://github.com/tracim/tracim/issues/3229
 export const serialize = (objectToSerialize, propertyMap) => {
   return Object.fromEntries(
     Object.entries(objectToSerialize)
