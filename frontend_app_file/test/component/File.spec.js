@@ -16,10 +16,10 @@ import { commentTlm } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_ut
 
 describe('<File />', () => {
   const props = {
-    setApiUrl: () => {},
+    setApiUrl: () => { },
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    registerLiveMessageHandlerList: () => {},
-    registerCustomEventHandlerList: () => {},
+    registerLiveMessageHandlerList: () => { },
+    registerCustomEventHandlerList: () => { },
     i18n: {},
     content: contentFile,
     t: key => key
@@ -37,57 +37,23 @@ describe('<File />', () => {
     describe('eventType content', () => {
       describe('handleContentCreated', () => {
         describe('Create a new comment', () => {
-          const tlmData = {
-            author: {
-              avatar_url: null,
-              public_name: 'Global manager',
-              user_id: 1
-            },
-            content: {
-              ...commentTlm,
-              parent_id: contentFile.file.content_id,
-              content_id: 9
-            }
-          }
-
-          before(() => {
-            wrapper.instance().handleContentCommentCreated(tlmData)
-          })
-
           it('should have the new comment in the Timeline', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData.content.content_id)
-          })
-        })
-
-        describe('Create 2 comments received in the wrong time order', () => {
-          const tlmData1 = {
-            content: {
-              ...commentTlm,
-              parent_id: contentFile.file.content_id,
-              content_id: 10,
-              created: '2020-05-22T14:02:02Z'
+            const tlmData = {
+              author: {
+                avatar_url: null,
+                public_name: 'Global manager',
+                user_id: 1
+              },
+              content: {
+                ...commentTlm,
+                parent_id: contentFile.file.content_id,
+                content_id: 9
+              }
             }
-          }
+            wrapper.instance().handleContentCommentCreated(tlmData)
 
-          const tlmData2 = {
-            content: {
-              ...commentTlm,
-              parent_id: contentFile.file.content_id,
-              content_id: 11,
-              created: '2020-05-22T14:02:05Z'
-            }
-          }
-
-          before(function () {
-            wrapper.instance().handleContentCommentCreated(tlmData2)
-            wrapper.instance().handleContentCommentCreated(tlmData1)
-          })
-
-          it('should have correctly order the timeline with the last comment created at the end', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData2.content.content_id)
-          })
-          it('should have correctly order the timeline with the second last comment created not at the end', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 2].content_id).to.equal(tlmData1.content.content_id)
+            const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.content.content_id))
+            expect(hasComment).to.equal(true)
           })
         })
 
@@ -169,6 +135,7 @@ describe('<File />', () => {
               modified: '2020-05-20T12:15:57Z',
               mimetype: 'image/jpeg'
             },
+            user: contentFile.file.author,
             author: contentFile.file.author
           }
 
@@ -177,22 +144,22 @@ describe('<File />', () => {
           })
 
           it('should have the new filename', () => {
-            expect(wrapper.state('content').filename).to.equal(tlmData.content.filename)
+            expect(wrapper.state('newContent').filename).to.equal(tlmData.content.filename)
           })
           it('should have the new size', () => {
-            expect(wrapper.state('content').size).to.equal(tlmData.content.size)
+            expect(wrapper.state('newContent').size).to.equal(tlmData.content.size)
           })
           it('should have the new created date', () => {
-            expect(wrapper.state('content').created).to.equal(tlmData.content.created)
+            expect(wrapper.state('newContent').created).to.equal(tlmData.content.created)
           })
           it('should have the new page_nb', () => {
-            expect(wrapper.state('content').page_nb).to.equal(tlmData.content.page_nb)
+            expect(wrapper.state('newContent').page_nb).to.equal(tlmData.content.page_nb)
           })
           it('should have build the new previewUrl', () => {
-            expect(wrapper.state('content').previewUrl).to.equal('http://localhost:1337/workspaces/0/files/0/revisions/137/preview/jpg/500x500/New File.jpg?page=1')
+            expect(wrapper.state('newContent').previewUrl).to.equal('http://localhost:1337/workspaces/0/files/0/revisions/137/preview/jpg/500x500/New File.jpg?page=1')
           })
           it('should have 3 preview pages', () => {
-            expect(wrapper.state('content').lightboxUrlList.length).to.equal(3)
+            expect(wrapper.state('newContent').lightboxUrlList.length).to.equal(3)
           })
         })
 

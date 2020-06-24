@@ -11,7 +11,8 @@
     "buildwindoz": "set NODE_ENV=production&& webpack-cli -p",
     "build-devwindoz": "set NODE_ENV=production&& webpack-cli",
     "build-translation": "node i18next.scanner.js",
-    "test": "NODE_ENV=test mocha --config test/.mocharc.js"
+    "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js",
+    "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
   "license": "ISC",
@@ -60,8 +61,9 @@
     "isomorphic-fetch": "^2.2.1",
     "jsdom": "^15.1.1",
     "mocha": "^7.1.1",
-    "nock": "^11.7.2",
+    "nock": "^12.0.3",
     "pnp-webpack-plugin": "^1.6.4",
+    "sinon": "^9.0.2",
     "standard": "^14.3.3",
     "standard-loader": "^7.0.0",
     "style-loader": "^0.23.1",

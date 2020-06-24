@@ -1,9 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  TextAreaApp,
+  APP_FEATURE_MODE,
   DisplayState,
-  APP_FEATURE_MODE
+  RefreshWarningMessage,
+  TextAreaApp
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
@@ -37,14 +38,10 @@ export const HtmlDocument = props => {
         />
       )}
 
-      {props.keepEditingWarning && (
-        <DisplayState
-          msg={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
-          btnType='button'
-          icon='repeat'
-          btnLabel={props.t('Refresh')}
-          onClickBtn={props.onClickRefresh}
-          tooltip={props.t('If you refresh, you will lose the current changes')}
+      {props.hasUpdated && (
+        <RefreshWarningMessage
+          warningText={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
+          onClickRefresh={props.onClickRefresh}
         />
       )}
 

@@ -16,7 +16,7 @@ import {
   WORKSPACE_CONTENT,
   RESTORE
 } from '../action-creator.sync.js'
-import { serializeContent } from './workspaceContentList.js'
+import { serializeContentProps } from './workspaceContentList.js'
 import { serialize } from 'tracim_frontend_lib'
 
 const defaultWorkspace = {
@@ -121,7 +121,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
     case `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
       return {
         ...state,
-        recentActivityList: action.workspaceRecentActivityList.map(ra => serializeContent(ra))
+        recentActivityList: action.workspaceRecentActivityList.map(ra => serialize(ra, serializeContentProps))
       }
 
     case `${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
@@ -129,7 +129,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         recentActivityList: [
           ...state.recentActivityList,
-          ...action.workspaceRecentActivityList.map(ra => serializeContent(ra))
+          ...action.workspaceRecentActivityList.map(ra => serialize(ra, serializeContentProps))
         ]
       }
 
@@ -139,7 +139,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         recentActivityList: [
-          ...action.workspaceContentList.map(c => serializeContent(c)),
+          ...action.workspaceContentList.map(c => serialize(c, serializeContentProps)),
           ...state.recentActivityList
         ]
       }
@@ -150,7 +150,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         recentActivityList: uniqBy(
           [ // INFO - CH - 2020-05-18 - always put the updated element at the beginning. Then remove duplicates
-            ...action.workspaceContentList.map(c => serializeContent(c)),
+            ...action.workspaceContentList.map(c => serialize(c, serializeContentProps)),
             ...state.recentActivityList
           ],
           'id'
@@ -175,13 +175,23 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           .map(content => content.content_id)
       }
 
+    case `${ADD}/${WORKSPACE_READ_STATUS_LIST}`:
+      if (state.id !== action.workspaceId) return state
+      return {
+        ...state,
+        contentReadStatusList: [
+          ...state.contentReadStatusList,
+          action.content.content_id
+        ]
+      }
+
     case `${REMOVE}/${WORKSPACE_READ_STATUS}`: // INFO - CH - 20200529 - this means "set content as unread"
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
         contentReadStatusList: state.contentReadStatusList.filter(id => id !== action.unreadContent.content_id),
         recentActivityList: [
-          serializeContent(action.unreadContent),
+          serialize(action.unreadContent, serializeContentProps),
           ...state.recentActivityList.filter(content => content.id !== action.unreadContent.content_id)
         ]
       }

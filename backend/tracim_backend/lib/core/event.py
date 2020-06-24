@@ -6,6 +6,7 @@ import typing
 from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
 from sqlalchemy import null
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
@@ -40,15 +41,14 @@ from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
-from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import CommentSchema
+from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
-
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
@@ -390,14 +390,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         with self.context() as context:
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
-            if event.entity_type == EntityType.USER:
-                receiver_ids = self._get_user_event_receiver_ids(event, session)
-            elif event.entity_type == EntityType.WORKSPACE:
-                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
-            elif event.entity_type == EntityType.CONTENT:
-                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
-            elif event.entity_type == EntityType.WORKSPACE_MEMBER:
-                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+            receiver_ids = self._get_receiver_ids(session, event)
 
             messages = [
                 Message(
@@ -413,11 +406,26 @@ class BaseLiveMessageBuilder(abc.ABC):
             for message in messages:
                 live_message_lib.publish_message_to_user(message)
 
+    def _get_receiver_ids(self, session: Session, event: Event):
+        if event.entity_type == EntityType.USER:
+            receiver_ids = self._get_user_event_receiver_ids(event, session)
+        elif event.entity_type == EntityType.WORKSPACE:
+            receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+        elif event.entity_type == EntityType.CONTENT:
+            receiver_ids = self._get_content_event_receiver_ids(event, session)
+        elif event.entity_type == EntityType.WORKSPACE_MEMBER:
+            receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+        return receiver_ids
+
     def _get_user_event_receiver_ids(self, event: Event, session: TracimSession) -> typing.Set[int]:
-        user_api = UserApi(current_user=None, session=session, config=self._config)
-        receiver_ids = set(user_api.get_user_ids_from_profile(Profile.ADMIN))
+        user_api = UserApi(current_user=event.user, session=session, config=self._config)
+        receiver_ids = user_api.get_user_ids_from_profile(Profile.ADMIN)
         if event.user:
-            receiver_ids.add(event.user["user_id"])
+            receiver_ids.append(event.user["user_id"])
+            same_workspaces_user_ids = user_api.get_users_ids_in_same_workpaces(
+                event.user["user_id"]
+            )
+            receiver_ids = set(receiver_ids + same_workspaces_user_ids)
         return receiver_ids
 
     def _get_workspace_event_receiver_ids(
@@ -428,6 +436,13 @@ class BaseLiveMessageBuilder(abc.ABC):
         role_api = RoleApi(current_user=None, session=session, config=self._config)
         workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
         return set(administrators + workspace_members)
+
+    def _get_content_event_receiver_ids(
+        self, event: Event, session: TracimSession,
+    ) -> typing.Set[int]:
+        role_api = RoleApi(current_user=None, session=session, config=self._config)
+        workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
+        return set(workspace_members)
 
 
 class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):

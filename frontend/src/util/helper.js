@@ -114,6 +114,11 @@ export const sortWorkspaceContents = (a, b) => {
   return 0
 }
 
+export const CONTENT_NAMESPACE = {
+  CONTENT: 'content',
+  UPLOAD: 'upload'
+}
+
 export const sortWorkspaceList = (a, b) => {
   if (a.label > b.label) return 1
   if (b.label > a.label) return -1

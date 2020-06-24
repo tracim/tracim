@@ -61,5 +61,6 @@
   "File has been updated": "O ficheiro foi actualizado",
   "File has been deleted": "O ficheiro foi eliminado",
   "File has been restored": "O ficheiro foi restaurado",
-  "The file has been updated, it can't be edited anymore": "O ficheiro foi actualizado, já não pode ser editado"
+  "The file has been updated, it can't be edited anymore": "O ficheiro foi actualizado, já não pode ser editado",
+  "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}"
 }
