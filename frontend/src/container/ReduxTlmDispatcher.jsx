@@ -16,7 +16,9 @@ import {
   updateUser,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
-  updateWorkspaceMember
+  updateWorkspaceMember,
+  addWorkspaceList,
+  removeWorkspace
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
 
@@ -29,6 +31,8 @@ export class ReduxTlmDispatcher extends React.Component {
     props.registerLiveMessageHandlerList([
       // Workspace
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceCreated },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceDeleted },
 
       // Role
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
@@ -59,6 +63,14 @@ export class ReduxTlmDispatcher extends React.Component {
       // User
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
+  }
+
+  handleWorkspaceCreated = data => {
+    this.props.dispatch(addWorkspaceList([data.workspace]))
+  }
+
+  handleWorkspaceDeleted = data => {
+    this.props.dispatch(removeWorkspace(data.workspace))
   }
 
   handleWorkspaceModified = data => {

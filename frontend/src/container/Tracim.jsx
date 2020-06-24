@@ -76,11 +76,6 @@ export class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
         break
-      case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST:
-        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        await this.loadWorkspaceList(data.openInSidebarId ? data.openInSidebarId : undefined)
-        if (data.openInSidebarId && document.getElementById(data.openInSidebarId)) document.getElementById(data.openInSidebarId).scrollIntoView()
-        break
       case CUSTOM_EVENT.DISCONNECTED_FROM_API:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`

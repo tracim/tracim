@@ -113,3 +113,9 @@ export const sortWorkspaceContents = (a, b) => {
   if (b.label > a.label) return -1
   return 0
 }
+
+export const sortWorkspaceList = (a, b) => {
+  if (a.label > b.label) return 1
+  if (b.label > a.label) return -1
+  return 0
+}

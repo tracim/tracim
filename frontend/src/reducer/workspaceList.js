@@ -5,10 +5,13 @@ import {
   UPDATE,
   USER_WORKSPACE_DO_NOTIFY,
   WORKSPACE_LIST,
-  WORKSPACE_LIST_MEMBER, WORKSPACE_MEMBER
+  WORKSPACE_LIST_MEMBER,
+  WORKSPACE_MEMBER,
+  WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
 import { serialize } from 'tracim_frontend_lib'
 import { serializeSidebarEntryProps } from './currentWorkspace.js'
+import { sortWorkspaceList } from '../util/helper'
 
 export const serializeWorkspaceListProps = {
   agenda_enabled: 'agendaEnabled',
@@ -32,6 +35,19 @@ export function workspaceList (state = [], action) {
         sidebarEntryList: ws.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
         memberList: []
       }))
+
+    case `${ADD}/${WORKSPACE_LIST}`:
+      return [
+        ...state,
+        ...action.workspaceList.map(ws => ({
+          ...serialize(ws, serializeWorkspaceListProps),
+          sidebarEntryList: ws.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
+          memberList: []
+        }))
+      ].sort(sortWorkspaceList)
+
+    case `${REMOVE}/${WORKSPACE_LIST}`:
+      return state.filter(ws => ws.id !== action.workspace.workspace_id)
 
     case `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`:
       return state.map(ws => ({ ...ws, isOpenInSidebar: ws.id === action.workspaceId ? action.isOpenInSidebar : ws.isOpenInSidebar }))
@@ -98,6 +114,17 @@ export function workspaceList (state = [], action) {
         ? {
           ...ws,
           memberList: ws.memberList.filter(m => m.id !== action.memberId)
+        }
+        : ws
+      )
+
+    case `${UPDATE}/${WORKSPACE_DETAIL}`:
+      if (!state.some(ws => ws.id === action.workspaceDetail.workspace_id)) return state
+      return state.map(ws => ws.id === action.workspaceDetail.workspace_id
+        ? {
+          ...ws,
+          ...serialize(action.workspaceDetail, serializeWorkspaceListProps),
+          sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
         }
         : ws
       )

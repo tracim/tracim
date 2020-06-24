@@ -98,7 +98,7 @@ export class PopupCreateWorkspace extends React.Component {
     switch (fetchSaveNewWorkspace.apiResponse.status) {
       case 200:
         this.handleClose()
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: { openInSidebarId: fetchSaveNewWorkspace.body.workspace_id } })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.OPEN_WORKSPACE_IN_SIDEBAR, data: { openInSidebarId: fetchSaveNewWorkspace.body.workspace_id } })
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: `/ui/workspaces/${fetchSaveNewWorkspace.body.workspace_id}/dashboard` } })
         break
       case 400:

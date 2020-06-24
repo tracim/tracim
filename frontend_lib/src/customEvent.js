@@ -14,7 +14,7 @@ export const CUSTOM_EVENT = {
   REFRESH_CONTENT_LIST: 'refreshContentList',
   REFRESH_DASHBOARD_MEMBER_LIST: 'refreshDashboardMemberList',
   REFRESH_WORKSPACE_DETAIL: 'refreshWorkspaceDetail',
-  REFRESH_WORKSPACE_LIST: 'refreshWorkspaceList',
+  OPEN_WORKSPACE_IN_SIDEBAR: 'openWorkspaceInSidebar',
   REFRESH_WORKSPACE_LIST_THEN_REDIRECT: 'refreshWorkspaceList_then_redirect',
   RELOAD_CONTENT: type => `${type}_reloadContent`,
   RELOAD_APP_FEATURE_DATA: type => `${type}_reloadAppFeatureData`,
