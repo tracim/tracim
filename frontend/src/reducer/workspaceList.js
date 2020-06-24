@@ -10,7 +10,7 @@ import {
   WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
 import { serialize } from 'tracim_frontend_lib'
-import { serializeSidebarEntryProps } from './currentWorkspace.js'
+import { serializeSidebarEntryProps, serializeMember } from './currentWorkspace.js'
 import { sortWorkspaceList } from '../util/helper'
 
 export const serializeWorkspaceListProps = {
@@ -39,11 +39,13 @@ export function workspaceList (state = [], action) {
     case `${ADD}/${WORKSPACE_LIST}`:
       return [
         ...state,
-        ...action.workspaceList.map(ws => ({
-          ...serialize(ws, serializeWorkspaceListProps),
-          sidebarEntryList: ws.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
-          memberList: []
-        }))
+        ...action.workspaceList
+          .filter(w => !state.some(s => s.id === w.workspace_id))
+          .map(ws => ({
+            ...serialize(ws, serializeWorkspaceListProps),
+            sidebarEntryList: ws.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
+            memberList: []
+          }))
       ].sort(sortWorkspaceList)
 
     case `${REMOVE}/${WORKSPACE_LIST}`:
@@ -55,13 +57,7 @@ export function workspaceList (state = [], action) {
     case `${SET}/${WORKSPACE_LIST_MEMBER}`:
       return state.map(ws => ({
         ...ws,
-        memberList: action.workspaceListMemberList.find(wlml => wlml.workspaceId === ws.id).memberList.map(m => ({
-          id: m.user_id,
-          publicName: m.user.public_name,
-          role: m.role,
-          isActive: m.is_active,
-          doNotify: m.do_notify
-        }))
+        memberList: action.workspaceListMemberList.find(wlml => wlml.workspaceId === ws.id).memberList.map(m => (serializeMember(m)))
       }))
 
     case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`:
@@ -83,13 +79,7 @@ export function workspaceList (state = [], action) {
           ...ws,
           memberList: [
             ...ws.memberList,
-            {
-              id: action.newMember.user_id,
-              publicName: action.newMember.public_name,
-              role: action.role,
-              isActive: action.newMember.is_active,
-              doNotify: action.newMember.do_notify
-            }
+            serializeMember(action.newMember)
           ]
         }
         : ws
@@ -101,7 +91,7 @@ export function workspaceList (state = [], action) {
         ? {
           ...ws,
           memberList: ws.memberList.map(m => m.id === action.member.user_id
-            ? { ...m, id: action.member.user_id, ...action.member, role: action.role }
+            ? { ...m, ...serializeMember(action.member) }
             : m
           )
         }
@@ -127,7 +117,7 @@ export function workspaceList (state = [], action) {
           sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
         }
         : ws
-      )
+      ).sort(sortWorkspaceList)
 
     default:
       return state

@@ -7,9 +7,7 @@ import { isMobile } from 'react-device-detect'
 import appFactory from '../util/appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
-  setWorkspaceListIsOpenInSidebar,
-  removeWorkspace,
-  addWorkspaceList
+  setWorkspaceListIsOpenInSidebar
 } from '../action-creator.sync.js'
 import {
   PAGE,
@@ -23,9 +21,7 @@ import {
   CUSTOM_EVENT,
   ROLE_LIST,
   PROFILE,
-  TracimComponent,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET
+  TracimComponent
 } from 'tracim_frontend_lib'
 
 export class Sidebar extends React.Component {
@@ -39,11 +35,6 @@ export class Sidebar extends React.Component {
       { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleShowCreateWorkspacePopup },
       { name: CUSTOM_EVENT.OPEN_WORKSPACE_IN_SIDEBAR, handler: this.handleOpenWorkspaceInSidebar }
     ])
-
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated }
-    ])
   }
 
   // Custom Event Handler
@@ -54,15 +45,6 @@ export class Sidebar extends React.Component {
   handleOpenWorkspaceInSidebar = data => {
     this.props.dispatch(setWorkspaceListIsOpenInSidebar(data.openInSidebarId, true))
     if (data.openInSidebarId && document.getElementById(data.openInSidebarId)) document.getElementById(data.openInSidebarId).scrollIntoView()
-  }
-
-  // TLM handler
-  handleMemberDeleted = data => {
-    if (this.props.user.user_id === data.user.userId) this.props.dispatch(removeWorkspace(data.workspace))
-  }
-
-  handleMemberCreated = data => {
-    if (this.props.user.user_id === data.user.userId) this.props.dispatch(addWorkspaceList([data.workspace]))
   }
 
   componentDidMount () {

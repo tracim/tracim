@@ -19,7 +19,7 @@ import {
   updateWorkspaceMember,
   addWorkspaceList,
   removeWorkspace,
-  updateWorkspaceMember
+  addWorkspaceReadStatus
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
 
@@ -35,7 +35,6 @@ export class ReduxTlmDispatcher extends React.Component {
 
       // Workspace
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceCreated },
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceDeleted },
 
       // Role
@@ -72,10 +71,6 @@ export class ReduxTlmDispatcher extends React.Component {
     ])
   }
 
-  handleWorkspaceCreated = data => {
-    this.props.dispatch(addWorkspaceList([data.workspace]))
-  }
-
   handleWorkspaceDeleted = data => {
     this.props.dispatch(removeWorkspace(data.workspace))
   }
@@ -89,6 +84,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleMemberCreated = data => {
+    if (this.props.user.userId === data.user.user_id) this.props.dispatch(addWorkspaceList([data.workspace]))
     this.props.dispatch(addWorkspaceMember(data.user, data.workspace.workspace_id, data.member))
   }
 
@@ -98,6 +94,7 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleMemberDeleted = data => {
     this.props.dispatch(removeWorkspaceMember(data.user.user_id, data.workspace.workspace_id))
+    if (this.props.user.userId === data.user.user_id) this.props.dispatch(removeWorkspace(data.workspace))
   }
 
   handleContentCreated = data => {
