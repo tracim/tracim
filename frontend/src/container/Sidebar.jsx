@@ -25,7 +25,8 @@ import {
   PROFILE,
   TracimComponent,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET
+  TLM_ENTITY_TYPE as TLM_ET,
+  getOrCreateSessionClientToken
 } from 'tracim_frontend_lib'
 
 export class Sidebar extends React.Component {
@@ -63,7 +64,9 @@ export class Sidebar extends React.Component {
 
       // INFO - CH - 2020-06-25 - if logged used is author of the TLM and the new role is for him, it means the logged
       // user created a new workspace
-      if (loggedUserId === tlmAuthor.user_id) {
+      // the clientToken is to avoid redirecting the eventually opened other browser's tabs
+      const clientToken = getOrCreateSessionClientToken()
+      if (loggedUserId === tlmAuthor.user_id && clientToken === tlmFieldObject.client_token) {
         props.dispatch(setWorkspaceListIsOpenInSidebar(tlmWorkspace.workspace_id, true))
         if (tlmWorkspace.workspace_id && document.getElementById(tlmWorkspace.workspace_id)) {
           document.getElementById(tlmWorkspace.workspace_id).scrollIntoView()
