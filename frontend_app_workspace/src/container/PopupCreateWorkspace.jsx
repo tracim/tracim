@@ -96,11 +96,7 @@ export class PopupCreateWorkspace extends React.Component {
     const fetchSaveNewWorkspace = await handleFetchResult(await postWorkspace(state.config.apiUrl, state.newWorkspaceName))
 
     switch (fetchSaveNewWorkspace.apiResponse.status) {
-      case 200:
-        this.handleClose()
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.OPEN_WORKSPACE_IN_SIDEBAR, data: { openInSidebarId: fetchSaveNewWorkspace.body.workspace_id } })
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: `/ui/workspaces/${fetchSaveNewWorkspace.body.workspace_id}/dashboard` } })
-        break
+      case 200: this.handleClose(); break
       case 400:
         switch (fetchSaveNewWorkspace.body.code) {
           case 3007: this.sendGlobalFlashMessage(props.t('A shared space with that name already exists')); break
