@@ -7,6 +7,8 @@ import { isMobile } from 'react-device-detect'
 import appFactory from '../util/appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
+  addWorkspaceList,
+  addWorkspaceMember,
   setWorkspaceListIsOpenInSidebar
 } from '../action-creator.sync.js'
 import {
@@ -21,7 +23,10 @@ import {
   CUSTOM_EVENT,
   ROLE_LIST,
   PROFILE,
-  TracimComponent
+  TracimComponent,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  getOrCreateSessionClientToken
 } from 'tracim_frontend_lib'
 
 export class Sidebar extends React.Component {
@@ -32,8 +37,11 @@ export class Sidebar extends React.Component {
     }
 
     props.registerCustomEventHandlerList([
-      { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleShowCreateWorkspacePopup },
-      { name: CUSTOM_EVENT.OPEN_WORKSPACE_IN_SIDEBAR, handler: this.handleOpenWorkspaceInSidebar }
+      { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleShowCreateWorkspacePopup }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleTlmMemberCreated }
     ])
   }
 
@@ -42,9 +50,30 @@ export class Sidebar extends React.Component {
     this.handleClickNewWorkspace()
   }
 
-  handleOpenWorkspaceInSidebar = data => {
-    this.props.dispatch(setWorkspaceListIsOpenInSidebar(data.openInSidebarId, true))
-    if (data.openInSidebarId && document.getElementById(data.openInSidebarId)) document.getElementById(data.openInSidebarId).scrollIntoView()
+  handleTlmMemberCreated = tlmFieldObject => {
+    const { props } = this
+
+    const tlmUser = tlmFieldObject.user
+    const tlmAuthor = tlmFieldObject.author
+    const tlmWorkspace = tlmFieldObject.workspace
+    const loggedUserId = props.user.userId
+
+    if (loggedUserId === tlmUser.user_id) {
+      props.dispatch(addWorkspaceList([tlmWorkspace]))
+      props.dispatch(addWorkspaceMember(tlmUser, tlmWorkspace.workspace_id, tlmFieldObject.member))
+
+      // INFO - CH - 2020-06-25 - if logged used is author of the TLM and the new role is for him, it means the logged
+      // user created a new workspace
+      // the clientToken is to avoid redirecting the eventually opened other browser's tabs
+      const clientToken = getOrCreateSessionClientToken()
+      if (loggedUserId === tlmAuthor.user_id && clientToken === tlmFieldObject.client_token) {
+        props.dispatch(setWorkspaceListIsOpenInSidebar(tlmWorkspace.workspace_id, true))
+        if (tlmWorkspace.workspace_id && document.getElementById(tlmWorkspace.workspace_id)) {
+          document.getElementById(tlmWorkspace.workspace_id).scrollIntoView()
+        }
+        props.history.push(PAGE.WORKSPACE.DASHBOARD(tlmWorkspace.workspace_id))
+      }
+    }
   }
 
   componentDidMount () {

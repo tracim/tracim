@@ -220,7 +220,7 @@ export const APP_FEATURE_MODE = {
   REVISION: 'revision'
 }
 
-// INFO - GB - 2019-07-05 - This password generetor function was based on
+// INFO - GB - 2019-07-05 - This password generator function was based on
 // https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
 export const generateRandomPassword = () => {
   let password = []
@@ -237,7 +237,7 @@ export const generateRandomPassword = () => {
   return randomPassword
 }
 
-const getOrCreateSessionClientToken = () => {
+export const getOrCreateSessionClientToken = () => {
   const clientTokenKey = 'tracimClientToken'
   let token = window.sessionStorage.getItem(clientTokenKey)
   if (token === null) {

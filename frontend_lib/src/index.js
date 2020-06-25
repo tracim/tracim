@@ -31,7 +31,8 @@ import {
   sortTimelineByDate,
   removeAtInUsername,
   setupCommonRequestHeaders,
-  serialize
+  serialize,
+  getOrCreateSessionClientToken
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -186,5 +187,6 @@ export {
   RefreshWarningMessage,
   sortTimelineByDate,
   setupCommonRequestHeaders,
-  serialize
+  serialize,
+  getOrCreateSessionClientToken
 }

@@ -17,7 +17,6 @@ import {
   updateWorkspaceContentList,
   updateWorkspaceDetail,
   updateWorkspaceMember,
-  addWorkspaceList,
   removeWorkspace,
   addWorkspaceReadStatus
 } from '../action-creator.sync.js'
@@ -75,16 +74,11 @@ export class ReduxTlmDispatcher extends React.Component {
     this.props.dispatch(removeWorkspace(data.workspace))
   }
 
-  handleUserModified = data => {
-    this.props.dispatch(updateUser(data.user))
-  }
-
   handleWorkspaceModified = data => {
     this.props.dispatch(updateWorkspaceDetail(data.workspace))
   }
 
   handleMemberCreated = data => {
-    if (this.props.user.userId === data.user.user_id) this.props.dispatch(addWorkspaceList([data.workspace]))
     this.props.dispatch(addWorkspaceMember(data.user, data.workspace.workspace_id, data.member))
   }
 
