@@ -118,10 +118,10 @@ export function appContentFactory (WrappedComponent) {
             switch (response.body.code) {
               case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
               case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
-              default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+              default: this.sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
             }
             break
-          default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+          default: this.sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
         }
       }
       return response
