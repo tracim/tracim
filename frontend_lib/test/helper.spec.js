@@ -11,7 +11,8 @@ import {
   FETCH_CONFIG,
   COMMON_REQUEST_HEADERS,
   setupCommonRequestHeaders,
-  serialize
+  serialize,
+  addRevisionFromTLM
 } from '../src/helper.js'
 
 import sinon from 'sinon'
@@ -191,6 +192,56 @@ describe('helper.js', () => {
         lang: objectToSerialize.lang,
         username: objectToSerialize.username
       })
+    })
+  })
+
+  describe('the addRevisionFromTLM function', () => {
+    const author = {
+      public_name: 'Foo',
+      avatar_url: null,
+      user_id: 1
+
+    }
+    const message = {
+      author: author,
+      content: {
+        modified: '2020-05-23T12:00:01',
+        current_revision_id: 2,
+        current_revision_type: 'MODIFICATION'
+      }
+    }
+
+    var timeline = [
+      {
+        author: author,
+        commentList: [],
+        comment_ids: [],
+        created: 'One minute ago',
+        created_raw: '2020-05-23T12:00:01',
+        number: 1,
+        revision_id: 1,
+        revision_type: 'CREATION',
+        timelineType: 'revision'
+      },
+      {
+        author: author,
+        commentList: [],
+        comment_ids: [],
+        created: 'One minute ago',
+        created_raw: '2020-05-23T12:00:01',
+        number: 0,
+        revision_id: 1,
+        revision_type: 'CREATION',
+        timelineType: 'comment'
+      }
+    ]
+    timeline = addRevisionFromTLM(message, timeline, 'en')
+    const lastRevisionObject = timeline[timeline.length - 1]
+    it('should add a new revision object to the end of the given list', () => {
+      expect(lastRevisionObject.revision_id).to.be.equal(2)
+    })
+    it('should set a revision number to revision count + 1', () => {
+      expect(lastRevisionObject.number).to.be.equal(2)
     })
   })
 })
