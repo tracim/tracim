@@ -163,7 +163,7 @@ export function appContentFactory (WrappedComponent) {
               this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break
             case 2044:
-              this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this document before any change'))
+              this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
             default:
               this.sendGlobalFlashMessage(i18n.t('Error while saving new comment'))
               break

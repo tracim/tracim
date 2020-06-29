@@ -92,5 +92,5 @@
   "Refresh?": "Refresh?",
   "If you refresh, you will lose the current changes": "If you refresh, you will lose the current changes",
   "You can't send an empty comment": "You can't send an empty comment",
-  "You must change the status or restore this document before any change": "You must change the status or restore this document before any change"
+  "You must change the status or restore this content before any change": "You must change the status or restore this content before any change"
 }

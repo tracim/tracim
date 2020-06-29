@@ -92,5 +92,5 @@
   "Refresh?": "Rafraîchir ?",
   "If you refresh, you will lose the current changes": "Si vous vous rafraîchissez, vous perdrez les modifications actuelles",
   "You can't send an empty comment": "Vous ne pouvez pas envoyer un commentaire vide",
-  "You must change the status or restore this document before any change": "Vous devez changer le statut ou restaurer ce document avant de le modifier"
+  "You must change the status or restore this content before any change": "Vous devez changer le statut ou restaurer ce contenu avant de le modifier"
 }
