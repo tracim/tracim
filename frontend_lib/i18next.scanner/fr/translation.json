@@ -39,7 +39,7 @@
   "Error while deleting content": "Erreur lors de la suppression d'un contenu",
   "Error while restoring content": "Erreur lors de la restauration du contenu",
   "Error while saving new comment": "Erreur lors de l'enregistrement d'un nouveau commentaire",
-  "Error while saving new title": "Erreur lors de l'enregistrement d'un nouveau titre",
+  "Error while saving new title": "Erreur lors de l'enregistrement du nouveau titre",
   "This content is archived": "Ce contenu est archivé",
   "This content is deleted": "Ce contenu est supprimé",
   "Status changed to {{status}}": "Statut changé en {{status}}",
