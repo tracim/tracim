@@ -612,6 +612,10 @@ class UserController(Controller):
         Open the message stream for the given user.
         Tracim Live Message Events as ServerSide Event Stream
         """
+        stream_opened_event = ":Tracim Live Messages for user {}\n\nevent: stream-open\ndata:\n\n".format(
+            str(request.candidate_user.user_id)
+        )
+        escaped_keealive_event = "event: keep-alive\\ndata:\\n\\n"
         user_channel_name = "user_{}".format(request.candidate_user.user_id)
         headers = [
             # Here we ask push pin to keep the connection open
@@ -619,12 +623,15 @@ class UserController(Controller):
             # and register this connection on the given channel
             # multiple channels subscription is possible
             ("Grip-Channel", user_channel_name),
+            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keealive_event)),
             # content type for SSE
             ("Content-Type", "text/event-stream"),
             # do not cache the events
             ("Cache-Control", "no-cache"),
         ]
-        return Response(headerlist=headers, charset="utf-8", status_code=200)
+        return Response(
+            headerlist=headers, charset="utf-8", status_code=200, body=stream_opened_event
+        )
 
     def bind(self, configurator: Configurator) -> None:
         """
