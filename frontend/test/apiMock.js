@@ -117,6 +117,18 @@ const mockGetUser200 = (apiUrl, userId, userDetail) => {
     .reply(200, userDetail)
 }
 
+const mockPutContentItemMove200 = (apiUrl, source) => {
+  return nock(apiUrl)
+    .put(`/workspaces/${source.workspaceId}/contents/${source.contentId}/move`)
+    .reply(200, {})
+}
+
+const mockPutContentItemMove400 = (apiUrl, source) => {
+  return nock(apiUrl)
+    .put(`/workspaces/${source.workspaceId}/contents/${source.contentId}/move`)
+    .reply(400, {})
+}
+
 const mockPutUserWorkspaceDoNotify204 = (apiUrl, userId, workspaceId, doNotify) => {
   return nock(apiUrl)
     .put(`/users/${userId}/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`)
@@ -174,6 +186,8 @@ export {
   mockGetConfig200,
   mockMyselfWorkspaceDoNotify204,
   mockPostUserLogout204,
+  mockPutContentItemMove200,
+  mockPutContentItemMove400,
   mockPutUserWorkspaceDoNotify204,
   mockPutMyselfName200,
   mockPutUserPublicName200,

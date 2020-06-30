@@ -529,21 +529,18 @@ export class WorkspaceContent extends React.Component {
     }
 
     const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
-    switch (fetchMoveContent.status) {
-      case 400:
-        switch (fetchMoveContent.json.code) {
-          case 3002:
-            props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'danger'))
-            break
-          case 2038:
-            props.dispatch(newFlashMessage(props.t("The destination folder doesn't allow this content type"), 'danger'))
-            break
-          default:
-            props.dispatch(newFlashMessage(props.t('Error while moving content'), 'danger'))
-            break
-        }
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while moving content'), 'danger'))
+    if (fetchMoveContent.status !== 200) {
+      switch (fetchMoveContent.json.code) {
+        case 3002:
+          props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'danger'))
+          break
+        case 2038:
+          props.dispatch(newFlashMessage(props.t("The destination folder doesn't allow this content type"), 'danger'))
+          break
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while moving content'), 'danger'))
+          break
+      }
     }
   }
 
