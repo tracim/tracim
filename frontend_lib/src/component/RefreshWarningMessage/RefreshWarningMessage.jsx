@@ -3,20 +3,19 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
 const RefreshWarningMessage = props => (
-  <div className='refreshWarningMessage'>
+  <button
+    className='refreshWarningMessage'
+    onClick={props.onClickRefresh}
+    title={props.tooltip}
+  >
     <i
       className='fa fa-repeat'
       onClick={props.onClickRefresh}
     />
-    {props.warningText}
-    <button
-      className='refreshWarningMessage__button'
-      onClick={props.onClickRefresh}
-      title={props.t('If you refresh, you will lose the current changes')}
-    >
+    <div className='refreshWarningMessage__text'>
       {props.t('Refresh?')}
-    </button>
-  </div>
+    </div>
+  </button>
 )
 
 export default translate()(RefreshWarningMessage)

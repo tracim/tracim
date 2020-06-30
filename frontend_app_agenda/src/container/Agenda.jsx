@@ -332,7 +332,7 @@ export class Agenda extends React.Component {
         <div className='agendaPage__warningMessage'>
           {state.hasUpdated && (
             <RefreshWarningMessage
-              warningText={props.t('Some information was modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+              tooltip={props.t('Some information was modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
               onClickRefresh={this.handleClickRefresh}
             />
           )}

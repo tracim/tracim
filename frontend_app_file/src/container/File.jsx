@@ -904,7 +904,7 @@ export class File extends React.Component {
             <div className='d-flex'>
               {state.hasUpdated && (
                 <RefreshWarningMessage
-                  warningText={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
                   onClickRefresh={this.handleClickRefresh}
                 />
               )}

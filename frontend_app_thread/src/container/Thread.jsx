@@ -344,7 +344,7 @@ export class Thread extends React.Component {
           <div className='justify-content-end'>
             {state.hasUpdated && (
               <RefreshWarningMessage
-                warningText={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
                 onClickRefresh={this.handleClickRefresh}
               />
             )}
