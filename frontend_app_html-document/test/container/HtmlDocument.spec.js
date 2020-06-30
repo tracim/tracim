@@ -191,4 +191,24 @@ describe('<HtmlDocument />', () => {
       })
     })
   })
+
+  describe('its internal functions', () => {
+    describe('handleClickRefresh', () => {
+      it('should update content state', () => {
+        wrapper.setState(prev => ({ newContent: { ...prev.content, label: 'New Name' } }))
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('content').label).to.deep.equal(wrapper.state('newContent').label)
+      })
+
+      it('should update mode state', () => {
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('mode')).to.deep.equal(APP_FEATURE_MODE.VIEW)
+      })
+
+      it('should update hasUpdated state', () => {
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('hasUpdated')).to.deep.equal(false)
+      })
+    })
+  })
 })

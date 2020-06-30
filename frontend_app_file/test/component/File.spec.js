@@ -276,4 +276,18 @@ describe('<File />', () => {
       })
     })
   })
+
+  describe('its internal functions', () => {
+    describe('handleClickRefresh', () => {
+      it('should update content state', () => {
+        wrapper.setState(prev => ({ newContent: { ...prev.content, filename: 'New Name' } }))
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('content')).to.deep.equal(wrapper.state('newContent'))
+      })
+      it('should update hasUpdated state', () => {
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('hasUpdated')).to.deep.equal(false)
+      })
+    })
+  })
 })

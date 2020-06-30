@@ -45,17 +45,24 @@ describe('<FolderAdvanced />', () => {
   mockGetSystemContentTypes200(apiUrl, [{ label: 'folder' }, { label: 'html-document' }]).persist()
   mockGetFolder200(apiUrl, folder.workspace_id, folder.content_id, folder).persist()
 
+  const wrapper = shallow(<FolderAdvanced {...props} />)
+
   describe('TLM Handlers', () => {
     describe('eventType content folder', () => {
       describe('handleFolderChanged (same folder)', () => {
         const tlmData = {
+          author: {
+            avatar_url: null,
+            public_name: 'Global manager',
+            user_id: 1
+          },
           content: {
             ...folder,
             label: 'Hello, world'
           }
         }
 
-        const wrapper = shallow(<FolderAdvanced {...props} />)
+        // const wrapper = shallow(<FolderAdvanced {...props} />)
 
         before(() => {
           dispatchEventSpy.resetHistory()
@@ -63,7 +70,7 @@ describe('<FolderAdvanced />', () => {
         })
 
         it("should update the component's folder", () => {
-          expect(wrapper.state('content')).to.equal(tlmData.content)
+          expect(wrapper.state('newContent')).to.deep.equal(tlmData.content)
         })
 
         it('should update the head title', () => {
@@ -73,13 +80,18 @@ describe('<FolderAdvanced />', () => {
 
       describe('handleFolderChanged (different folder)', () => {
         const tlmData = {
+          author: {
+            avatar_url: null,
+            public_name: 'Global manager',
+            user_id: 1
+          },
           content: {
             ...folder,
             content_id: 2
           }
         }
 
-        const wrapper = shallow(<FolderAdvanced {...props} />)
+        // const wrapper = shallow(<FolderAdvanced {...props} />)
 
         before(() => {
           dispatchEventSpy.resetHistory()
@@ -87,11 +99,26 @@ describe('<FolderAdvanced />', () => {
         })
 
         it("should NOT update the component's folder", () => {
-          expect(wrapper.state('content')).to.not.equal(tlmData.content)
+          expect(wrapper.state('newContent')).to.not.equal(tlmData.content)
         })
         it('should NOT update the head title', () => {
           expect(dispatchEventSpy.called).to.be.false
         })
+      })
+    })
+  })
+
+  describe('its internal functions', () => {
+    describe('handleClickRefresh', () => {
+      it('should update content state', () => {
+        wrapper.setState(prev => ({ newContent: { ...prev.content, label: 'New Name' } }))
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('content')).to.deep.equal(wrapper.state('newContent'))
+      })
+
+      it('should update hasUpdated state', () => {
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('hasUpdated')).to.deep.equal(false)
       })
     })
   })
