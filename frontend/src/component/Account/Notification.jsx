@@ -24,35 +24,37 @@ export const Notification = props =>
         <tbody>
           {(props.workspaceList.length > 0
             ? props.workspaceList.map(ws => {
-              const mySelf = ws.memberList.find(u => u.id === props.userLoggedId)
-              const myRole = ROLE_LIST.find(r => r.slug === mySelf.role)
-              return (
-                <tr key={`ws_${ws.id}`}>
-                  <td>
-                    <div className='notification__table__wksname'>
-                      {ws.label}
-                    </div>
-                  </td>
-
-                  <td>
-                    <div className='notification__table__role'>
-                      <div className='notification__table__role__icon'>
-                        <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{ color: myRole.hexcolor }} />
+              if (ws.memberList.length > 0) {
+                const mySelf = ws.memberList.find(u => u.id === props.userLoggedId)
+                const myRole = ROLE_LIST.find(r => r.slug === mySelf.role)
+                return (
+                  <tr key={`ws_${ws.id}`}>
+                    <td>
+                      <div className='notification__table__wksname'>
+                        {ws.label}
                       </div>
-                      <div className='notification__table__role__text d-none d-sm-flex'>
-                        {props.t(myRole.label)}
-                      </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <td>
-                    <BtnSwitch
-                      checked={mySelf.doNotify}
-                      onChange={() => props.onChangeSubscriptionNotif(ws.id, !mySelf.doNotify)}
-                    />
-                  </td>
-                </tr>
-              )
+                    <td>
+                      <div className='notification__table__role'>
+                        <div className='notification__table__role__icon'>
+                          <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{ color: myRole.hexcolor }} />
+                        </div>
+                        <div className='notification__table__role__text d-none d-sm-flex'>
+                          {props.t(myRole.label)}
+                        </div>
+                      </div>
+                    </td>
+
+                    <td>
+                      <BtnSwitch
+                        checked={mySelf.doNotify}
+                        onChange={() => props.onChangeSubscriptionNotif(ws.id, !mySelf.doNotify)}
+                      />
+                    </td>
+                  </tr>
+                )
+              }
             })
             : (
               <tr>
@@ -77,5 +79,5 @@ Notification.propTypes = {
 
 Notification.defaultProps = {
   workspaceList: [],
-  onChangeSubscriptionNotif: () => {}
+  onChangeSubscriptionNotif: () => { }
 }
