@@ -96,6 +96,7 @@ export class File extends React.Component {
       isLastTimelineItemCurrentToken: false
     }
     this.refContentLeftTop = React.createRef()
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -170,7 +171,7 @@ export class File extends React.Component {
       editionAuthor: data.author.public_name,
       hasUpdated: prev.loggedUser.userId !== data.author.user_id,
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -187,7 +188,7 @@ export class File extends React.Component {
       ])
       this.setState({
         timeline: sortedNewTimeLine,
-        isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+        isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
       })
     }
   }
@@ -206,7 +207,7 @@ export class File extends React.Component {
         },
         mode: APP_FEATURE_MODE.VIEW,
         timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
-        isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+        isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
       })
     )
   }
@@ -223,7 +224,7 @@ export class File extends React.Component {
         ...data.content
       },
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 

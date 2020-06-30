@@ -72,6 +72,7 @@ export class HtmlDocument extends React.Component {
       editionAuthor: '',
       isLastTimelineItemCurrentToken: false
     }
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -105,7 +106,7 @@ export class HtmlDocument extends React.Component {
       hasUpdated: prev.loggedUser.userId !== data.author.user_id,
       rawContentBeforeEdit: data.content.raw_content,
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -127,7 +128,7 @@ export class HtmlDocument extends React.Component {
 
     this.setState({
       timeline: sortedNewTimeline,
-      isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     })
   }
 
@@ -143,7 +144,7 @@ export class HtmlDocument extends React.Component {
         is_deleted: true
       },
       timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -159,7 +160,7 @@ export class HtmlDocument extends React.Component {
         is_deleted: false
       },
       timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 

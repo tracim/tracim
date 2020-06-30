@@ -63,6 +63,7 @@ export class Thread extends React.Component {
       editionAuthor: '',
       isLastTimelineItemCurrentToken: false
     }
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -123,7 +124,7 @@ export class Thread extends React.Component {
       editionAuthor: data.author.public_name,
       hasUpdated: prev.loggedUser.userId !== data.author.user_id,
       timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -138,12 +139,14 @@ export class Thread extends React.Component {
         ...data.content,
         created: displayDistanceDate(data.content.created, state.loggedUser.lang),
         created_raw: data.content.created,
-        timelineType: 'comment',
-        isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+        timelineType: 'comment'
       }
     ])
 
-    this.setState({ timeline: newTimelineSorted })
+    this.setState({
+      timeline: newTimelineSorted,
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+    })
   }
 
   handleContentDeleted = data => {
@@ -152,7 +155,7 @@ export class Thread extends React.Component {
     this.setState(prev => ({
       content: { ...prev.content, ...data.content, is_deleted: true },
       timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -162,7 +165,7 @@ export class Thread extends React.Component {
     this.setState(prev => ({
       content: { ...prev.content, ...data.content, is_deleted: false },
       timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === getOrCreateSessionClientToken()
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
