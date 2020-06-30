@@ -9,39 +9,49 @@ import i18n from '../../i18n.js'
 import DisplayState from '../DisplayState/DisplayState.jsx'
 import { ROLE } from '../../helper.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
+import { TracimComponent } from '../../tracimComponent.js'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
 
-class Timeline extends React.Component {
+export class Timeline extends React.Component {
   constructor (props) {
     super(props)
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    this.timelineContainerScrollHeight = 0
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<FrontendLib:Timeline> Custom event', 'color: #28a745', type, data)
-        i18n.changeLanguage(data)
-        break
-    }
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<FrontendLib:Timeline> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+    i18n.changeLanguage(data)
   }
 
   componentDidMount () {
+    this.timelineContainerScrollHeight = this.timelineContainer.scrollHeight
     this.scrollToBottom()
   }
 
   componentDidUpdate () {
     if (window.innerWidth < 1200) return
     this.props.shouldScrollToBottom && this.scrollToBottom()
+    if (this.timelineContainerScrollHeight !== this.timelineContainer.scrollHeight) {
+      this.timelineContainerScrollHeight = this.timelineContainer.scrollHeight
+    }
   }
 
-  componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  scrollToBottom = () => {
+    const { props } = this
+    // GM - INFO - 2020-06-30 - Check if the timeline scroll is at the bottom or if the new comment was created by the current session tokenId
+    if (
+      this.timelineContainer.scrollTop + this.timelineContainer.clientHeight === this.timelineContainerScrollHeight ||
+      (props.isLastTimelineItemCurrentToken && props.newComment === '')
+    ) {
+      this.timelineBottom.scrollIntoView({ behavior: 'instant' })
+    }
   }
-
-  scrollToBottom = () => this.timelineBottom.scrollIntoView({ behavior: 'instant' })
 
   render () {
     const { props } = this
@@ -87,7 +97,7 @@ class Timeline extends React.Component {
           )}
         </div>
 
-        <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}>
+        <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')} ref={el => { this.timelineContainer = el }}>
           {props.timelineData.map(content => {
             switch (content.timelineType) {
               case 'comment':
@@ -186,7 +196,7 @@ class Timeline extends React.Component {
   }
 }
 
-export default translate()(Radium(Timeline))
+export default translate()(Radium(TracimComponent(Timeline)))
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
@@ -202,6 +212,7 @@ Timeline.propTypes = {
   onClickRevisionBtn: PropTypes.func,
   allowClickOnRevision: PropTypes.bool,
   shouldScrollToBottom: PropTypes.bool,
+  isLastTimelineItemCurrentToken: PropTypes.bool,
   rightPartOpen: PropTypes.bool,
   isArchived: PropTypes.bool,
   onClickRestoreArchived: PropTypes.func,
@@ -225,6 +236,7 @@ Timeline.defaultProps = {
   onClickRevisionBtn: () => {},
   allowClickOnRevision: true,
   shouldScrollToBottom: true,
+  isLastTimelineItemCurrentToken: false,
   rightPartOpen: false,
   isArchived: false,
   isDeleted: false,
