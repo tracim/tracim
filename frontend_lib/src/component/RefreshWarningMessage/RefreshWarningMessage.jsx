@@ -4,7 +4,7 @@ import { translate } from 'react-i18next'
 
 const RefreshWarningMessage = props => (
   <div className='refreshWarningMessage'>
-    <i className='fa fa-exclamation-triangle' />
+    <i className='fa fa-repeat' />
     {props.warningText}
     <button
       className='refreshWarningMessage__button'

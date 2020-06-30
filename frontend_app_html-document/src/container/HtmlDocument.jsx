@@ -20,6 +20,7 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedRightPart,
+  RefreshWarningMessage,
   ROLE,
   SelectStatus,
   sortTimelineByDate,
@@ -573,6 +574,13 @@ export class HtmlDocument extends React.Component {
             </div>
 
             <div className='d-flex'>
+              {state.hasUpdated && (
+                <RefreshWarningMessage
+                  warningText={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  onClickRefresh={this.handleClickRefresh}
+                />
+              )}
+
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -621,9 +629,6 @@ export class HtmlDocument extends React.Component {
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
-            hasUpdated={state.hasUpdated}
-            onClickRefresh={this.handleClickRefresh}
-            editionAuthor={state.editionAuthor}
           />
 
           <PopinFixedRightPart

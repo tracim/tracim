@@ -38,6 +38,7 @@ import {
   FILE_PREVIEW_STATE,
   sortTimelineByDate,
   addRevisionFromTLM,
+  RefreshWarningMessage,
   setupCommonRequestHeaders
 } from 'tracim_frontend_lib'
 import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
@@ -901,6 +902,13 @@ export class File extends React.Component {
             </div>
 
             <div className='d-flex'>
+              {state.hasUpdated && (
+                <RefreshWarningMessage
+                  warningText={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  onClickRefresh={this.handleClickRefresh}
+                />
+              )}
+
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -961,9 +969,6 @@ export class File extends React.Component {
             previewVideo={state.previewVideo}
             onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
             ref={this.refContentLeftTop}
-            hasUpdated={state.hasUpdated}
-            onClickRefresh={this.handleClickRefresh}
-            editionAuthor={state.editionAuthor}
           />
 
           <PopinFixedRightPart
