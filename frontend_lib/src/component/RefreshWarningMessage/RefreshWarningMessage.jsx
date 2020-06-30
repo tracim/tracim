@@ -4,7 +4,10 @@ import { translate } from 'react-i18next'
 
 const RefreshWarningMessage = props => (
   <div className='refreshWarningMessage'>
-    <i className='fa fa-repeat' />
+    <i
+      className='fa fa-repeat'
+      onClick={props.onClickRefresh}
+    />
     {props.warningText}
     <button
       className='refreshWarningMessage__button'

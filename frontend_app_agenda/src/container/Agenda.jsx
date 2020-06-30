@@ -329,12 +329,14 @@ export class Agenda extends React.Component {
           breadcrumbsList={state.breadcrumbsList}
         />
 
-        {state.hasUpdated && (
-          <RefreshWarningMessage
-            warningText={props.t('Some information was modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-            onClickRefresh={this.handleClickRefresh}
-          />
-        )}
+        <div className='agendaPage__warningMessage'>
+          {state.hasUpdated && (
+            <RefreshWarningMessage
+              warningText={props.t('Some information was modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+              onClickRefresh={this.handleClickRefresh}
+            />
+          )}
+        </div>
 
         <PageContent parentClass='agendaPage'>
           <iframe
