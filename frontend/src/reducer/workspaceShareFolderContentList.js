@@ -65,10 +65,15 @@ export default function workspaceShareFolderContentList (state = defaultWorkspac
     }
 
     case `${UPDATE}/${WORKSPACE_CONTENT}`: {
-      if (
-        state.workspaceId !== action.workspaceId ||
-        !action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.UPLOAD)
-      ) return state
+      if (!action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.UPLOAD)) return state
+
+      if (state.workspaceId !== action.workspaceId) {
+        return {
+          workspaceId: state.workspaceId,
+          contentList: state.contentList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id))
+        }
+      }
+
       const parentIdList = [
         ...state.contentList.filter(c => c.parentId),
         ...action.workspaceContentList.filter(c => c.parentId)

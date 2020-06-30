@@ -145,7 +145,13 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${UPDATE}/${WORKSPACE_CONTENT}`:
-      if (state.id !== action.workspaceId) return state
+      if (state.id !== action.workspaceId) {
+        return {
+          ...state,
+          recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id)),
+          contentReadStatusList: state.contentReadStatusList.filter(contentId => !action.workspaceContentList.some(content => content.content_id === contentId))
+        }
+      }
       return {
         ...state,
         recentActivityList: uniqBy(
