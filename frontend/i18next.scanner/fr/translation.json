@@ -266,5 +266,6 @@
   "Please confirm your password:": "Veuillez confirmer votre mot de passe :",
   "Unknown email or username": "Adresse email ou identifiant inconnu",
   "This username is not linked to any email, please contact an administrator to reset your password": "Ce identifiant n'est lié à aucun e-mail, veuillez contacter un administrateur pour réinitialiser votre mot de passe",
-  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} est supérieur à 1MO, cela peut prendre du temps à téléverser. Voulez-vous continuer ?"
+  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} est supérieur à 1MO, cela peut prendre du temps à téléverser. Voulez-vous continuer ?",
+  "Tracim has a connection problem, please wait or reload the page if the problem persists": "Tracim rencontre un souci de connexion, merci de patienter ou d'actualiser la page si le problème persiste"
 }

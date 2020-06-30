@@ -5193,6 +5193,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eventsourcemock@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "eventsourcemock@npm:2.0.0"
+  checksum: e66fc5768cd38c3781836aa5c488df7208a71fd35b3baa8dcae51d1bc22ee8cc83d1d30a22e33a14b393da88f50e2e3be0cdab937e91206c1b0b1ecde2fa0809
+  languageName: node
+  linkType: hard
+
 "evp_bytestokey@npm:^1.0.0, evp_bytestokey@npm:^1.0.3":
   version: 1.0.3
   resolution: "evp_bytestokey@npm:1.0.3"
@@ -12703,6 +12710,7 @@ fsevents@^1.2.7:
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
+    eventsourcemock: ^2.0.0
     file-loader: ^6.0.0
     history: ^4.10.1
     i18next: 10.5.0

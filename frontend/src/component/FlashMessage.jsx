@@ -24,18 +24,19 @@ export const FlashMessage = props => {
   const dataType = dataTypeArray.find(t => t.id === props.flashMessage[0].type)
 
   return (
-    <div className='flashmessage' data-cy='flashmessage'>
+    <div className='flashmessage' data-cy='flashmessage' id={props.id}>
       {props.flashMessage.length > 0 && (
         <div className='flashmessage__container card'>
           <div className={classnames('flashmessage__container__header', `bg-${dataType.id}`)} />
 
           <div className='card-body nopadding'>
-            <div className='flashmessage__container__close'>
-              <div className='flashmessage__container__close__icon' onClick={() => props.onRemoveFlashMessage(props.flashMessage[0].message)}>
-                <i className='fa fa-times' />
+            {props.showCloseButton && (
+              <div className='flashmessage__container__close'>
+                <div className='flashmessage__container__close__icon' onClick={() => props.onRemoveFlashMessage(props.flashMessage[0].message)}>
+                  <i className='fa fa-times' />
+                </div>
               </div>
-            </div>
-
+            )}
             <div className='flashmessage__container__content'>
               <div className={classnames('flashmessage__container__content__icon', `text-${dataType.id}`)}>
                 <i className={classnames(`fa fa-${dataType.icon}`)} />
@@ -61,5 +62,12 @@ export const FlashMessage = props => {
 export default FlashMessage
 
 FlashMessage.propTypes = {
-  type: PropTypes.oneOf(['info', 'warning', 'danger'])
+  type: PropTypes.oneOf(['info', 'warning', 'danger']),
+  showCloseButton: PropTypes.bool,
+  id: PropTypes.string
+}
+
+FlashMessage.defaultProps = {
+  showCloseButton: true,
+  id: ''
 }
