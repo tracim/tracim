@@ -46,7 +46,7 @@ export class FolderAdvanced extends React.Component {
     this.state = {
       appName: 'folder',
       editionAuthor: '',
-      hasUpdated: false,
+      receivedUpdate: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -117,7 +117,7 @@ export class FolderAdvanced extends React.Component {
       content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
-      hasUpdated: prev.loggedUser.userId !== data.author.user_id
+      receivedUpdate: prev.loggedUser.userId !== data.author.user_id
     }))
     if (state.loggedUser.userId === data.author.user_id) this.setHeadTitle(data.content.label)
   }
@@ -269,7 +269,7 @@ export class FolderAdvanced extends React.Component {
         ...prev.content,
         ...prev.newContent
       },
-      hasUpdated: false
+      receivedUpdate: false
     }))
     this.setHeadTitle(this.state.newContent.label)
   }
@@ -295,7 +295,7 @@ export class FolderAdvanced extends React.Component {
         <PopinFixedOption>
           <div className='justify-content-end'>
             <div className='d-flex'>
-              {state.hasUpdated && (
+              {state.receivedUpdate && (
                 <RefreshWarningMessage
                   tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
                   onClickRefresh={this.handleClickRefresh}
