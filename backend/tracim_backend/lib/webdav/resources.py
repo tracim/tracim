@@ -758,6 +758,7 @@ class FileResource(DAVNonCollection):
     def getContent(self) -> typing.BinaryIO:
         return self.content.depot_file.file
 
+    @webdav_check_right(is_contributor)
     def beginWrite(self, contentType: str = None) -> FakeFileStream:
         try:
             self.content_api.check_upload_size(
