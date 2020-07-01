@@ -140,7 +140,7 @@ export class Home extends React.Component {
     this.setState({ newUsername: e.target.value })
     const username = removeAtInUsername(e.target.value)
 
-    if (username.length < MINIMUM_CHARACTERS_USERNAME) {
+    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
