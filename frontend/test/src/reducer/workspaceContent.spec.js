@@ -111,7 +111,7 @@ describe('reducer workspaceContentList.js', () => {
         })
       })
 
-      describe('calling the reducer with the wrong workspaceId', () => {
+      describe('move a content in a new workspace', () => {
         const initialStateWithContentList = {
           ...initialState,
           contentList: [
@@ -122,8 +122,11 @@ describe('reducer workspaceContentList.js', () => {
           initialStateWithContentList,
           updateWorkspaceContentList([contentFromApi], initialState.workspaceId + 1)
         )
-        it('should return the initial state', () => {
-          expect(rez).to.deep.equal(initialStateWithContentList)
+        it('should remove content in contentList', () => {
+          expect(rez).to.deep.equal({
+            ...initialStateWithContentList,
+            contentList: []
+          })
         })
       })
 
