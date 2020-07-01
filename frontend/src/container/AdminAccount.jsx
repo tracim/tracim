@@ -48,6 +48,7 @@ import {
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import { serializeUserProps } from '../reducer/user.js'
+import { serializeMember } from '../reducer/currentWorkspace.js'
 
 export class Account extends React.Component {
   constructor (props) {
@@ -261,13 +262,7 @@ export class Account extends React.Component {
         id: ws.workspace_id, // duplicate id to be able use <Notification /> easily
         memberList: workspaceListMemberList
           .find(wsm => ws.workspace_id === wsm.workspaceId).memberList
-          .map(m => ({
-            doNotify: m.do_notify,
-            id: m.user_id,
-            publicName: m.user.public_name,
-            role: m.role,
-            username: m.user.username
-          }))
+          .map(m => serializeMember(m))
       }))
     })
   }

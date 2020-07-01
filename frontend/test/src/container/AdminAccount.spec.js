@@ -31,7 +31,8 @@ import {
   mockPutUserPassword403,
   mockGetWorkspaceMemberList200
 } from '../../apiMock'
-import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace'
+import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
+import { serializeMember } from '../../../src/reducer/currentWorkspace.js'
 
 describe('In <Account /> at AdminAccount.jsx', () => {
   const newFlashMessageInfoCallBack = sinon.spy()
@@ -242,29 +243,21 @@ describe('In <Account /> at AdminAccount.jsx', () => {
     })
 
     describe('getUserWorkspaceListMemberList', () => {
-      it("should update userToEdit state with user's details", (done) => {
+      it("should update userToEditWorkspaceList state with workspace details", (done) => {
+        const member = {
+          do_notify: true,
+          user: { public_name: 'Global Manager', user_id: 1, username: 'TheAdmin' },
+          role: 'workspace-manager'
+        }
         mockGetWorkspaceMemberList200(
           FETCH_CONFIG.apiUrl,
           firstWorkspaceFromApi.workspace_id,
-          [{
-            do_notify: true,
-            user_id: 1,
-            user: { public_name: 'Global Manager', username: 'TheAdmin' },
-            role: 'workspace-manager'
-          }]
+          [member]
         )
         adminAccountInstance.getUserWorkspaceListMemberList([firstWorkspaceFromApi]).then(() => {
           const workspaceMemberList = addminAccontWrapper.state().userToEditWorkspaceList
             .find(ws => ws.id === firstWorkspaceFromApi.workspace_id).memberList
-          expect(workspaceMemberList).to.deep.equal([
-            {
-              doNotify: true,
-              id: 1,
-              publicName: 'Global Manager',
-              username: 'TheAdmin',
-              role: 'workspace-manager'
-            }
-          ])
+          expect(workspaceMemberList).to.deep.equal([serializeMember(member)])
         }).then(done, done)
       })
     })
