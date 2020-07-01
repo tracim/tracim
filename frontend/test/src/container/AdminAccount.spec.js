@@ -28,7 +28,8 @@ import {
   mockGetUserCalendar200,
   mockPutUserWorkspaceDoNotify204,
   mockPutUserPassword204,
-  mockPutUserPassword403
+  mockPutUserPassword403,
+  mockGetWorkspaceMemberList200
 } from '../../apiMock'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace'
 
@@ -236,6 +237,34 @@ describe('In <Account /> at AdminAccount.jsx', () => {
       it("should set isUsernameValid state to false if username isn't valid", (done) => {
         adminAccountInstance.handleChangeUsername('A').then(() => {
           expect(addminAccontWrapper.state().userToEdit.isUsernameValid).to.equal(false)
+        }).then(done, done)
+      })
+    })
+
+    describe('getUserWorkspaceListMemberList', () => {
+      it("should update userToEdit state with user's details", (done) => {
+        mockGetWorkspaceMemberList200(
+          FETCH_CONFIG.apiUrl,
+          firstWorkspaceFromApi.workspace_id,
+          [{
+            do_notify: true,
+            user_id: 1,
+            user: { public_name: 'Global Manager', username: 'TheAdmin' },
+            role: 'workspace-manager'
+          }]
+        )
+        adminAccountInstance.getUserWorkspaceListMemberList([firstWorkspaceFromApi]).then(() => {
+          const workspaceMemberList = addminAccontWrapper.state().userToEditWorkspaceList
+            .find(ws => ws.id === firstWorkspaceFromApi.workspace_id).memberList
+          expect(workspaceMemberList).to.deep.equal([
+            {
+              doNotify: true,
+              id: 1,
+              publicName: 'Global Manager',
+              username: 'TheAdmin',
+              role: 'workspace-manager'
+            }
+          ])
         }).then(done, done)
       })
     })
