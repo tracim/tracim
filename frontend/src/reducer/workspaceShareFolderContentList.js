@@ -1,3 +1,4 @@
+import { uniqBy } from 'lodash'
 import {
   SET,
   TOGGLE,
@@ -9,7 +10,8 @@ import {
   WORKSPACE_CONTENT_SHARE_FOLDER_DELETED,
   REMOVE,
   RESTORE,
-  WORKSPACE_CONTENT
+  WORKSPACE_CONTENT,
+  CONTENT
 } from '../action-creator.sync.js'
 import { serialize, CONTENT_TYPE } from 'tracim_frontend_lib'
 import { serializeContentProps } from './workspaceContentList'
@@ -44,23 +46,27 @@ export default function workspaceShareFolderContentList (state = defaultWorkspac
         state.workspaceId !== action.workspaceId ||
         !action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.UPLOAD)
       ) return state
+
       const parentIdList = [
         ...state.contentList.filter(c => c.parentId),
         ...action.workspaceContentList.filter(c => c.parentId)
       ]
 
+      const newContentList = [
+        ...state.contentList,
+        ...action.workspaceContentList
+          .filter(cc => cc.content_namespace === CONTENT_NAMESPACE.UPLOAD)
+          .map(c => ({
+            ...serialize(c, serializeContentProps),
+            parentId: c.content_type === CONTENT_TYPE.FOLDER ? SHARE_FOLDER_ID : c.parent_id,
+            isOpen: parentIdList.includes(c.content_id)
+          }))
+      ]
+      const newUniqueContentList = uniqBy(newContentList, 'id')
+
       return {
-        workspaceId: state.workspaceId,
-        contentList: [
-          ...state.contentList,
-          ...action.workspaceContentList
-            .filter(cc => cc.content_namespace === CONTENT_NAMESPACE.UPLOAD)
-            .map(c => ({
-              ...serialize(c, serializeContentProps),
-              parentId: c.content_type === CONTENT_TYPE.FOLDER ? SHARE_FOLDER_ID : c.parent_id,
-              isOpen: parentIdList.includes(c.content_id)
-            }))
-        ]
+        ...state,
+        contentList: newUniqueContentList
       }
     }
 
@@ -86,6 +92,25 @@ export default function workspaceShareFolderContentList (state = defaultWorkspac
         ]
       }
     }
+
+    case `${SET}/${WORKSPACE}/${FOLDER}/${CONTENT}`:
+      if (state.workspaceId !== action.workspaceId) return state
+
+      const contentListToAdd = action.contentList
+        .filter(c => c.content_namespace === CONTENT_NAMESPACE.UPLOAD)
+        .map(c => serialize(c, serializeContentProps))
+
+      // INFO - CH - 2020-07-01 - this process will keep the children of potential sub folders of action.folderId,
+      // we don't recursively remove them because it's a lot of process and it isn't required
+      const contentListFreeFromContentOfSameFolder = state.contentList.filter(c => c.parentId !== action.folderId)
+
+      return {
+        ...state,
+        contentList: [
+          ...contentListFreeFromContentOfSameFolder,
+          ...contentListToAdd
+        ]
+      }
 
     case `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER_ARCHIVED}`:
       if (state.workspaceId !== action.workspaceId) return state
