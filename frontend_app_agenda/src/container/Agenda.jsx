@@ -38,7 +38,7 @@ export class Agenda extends React.Component {
       breadcrumbsList: [],
       appMounted: false,
       editionAuthor: '',
-      receivedUpdate: false
+      showRefreshWarning: false
     }
 
     // i18n has been init, add resources from frontend
@@ -104,7 +104,7 @@ export class Agenda extends React.Component {
       // INFO - GB - 2020-06-18 - Just show the warning message if there have been any changes in "My agendas" page and if it's not the language that changes (handled by custom event)
       // state.userWorkspaceList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.userWorkspaceList.length is always 1 (there is only the workspace in the list)
       // and there is no need to show the warning in these agendas because there is no data that can be changed visible.
-      receivedUpdate: state.userWorkspaceList.length !== 1 && state.loggedUser.lang === data.user.lang
+      showRefreshWarning: state.userWorkspaceList.length !== 1 && state.loggedUser.lang === data.user.lang
     }))
   }
 
@@ -120,7 +120,7 @@ export class Agenda extends React.Component {
       // INFO - GB - 2020-06-18 - Just show the warning message if there have been any changes in "My agendas" page
       // state.userWorkspaceList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.userWorkspaceList.length is always 1 (there is only the workspace in the list)
       // and there is no need to show the warning in these agendas because there is no data that can be changed visible.
-      receivedUpdate: state.userWorkspaceList.length !== 1
+      showRefreshWarning: state.userWorkspaceList.length !== 1
     })
     if (state.userWorkspaceList.length === 1) this.buildBreadcrumbs()
   }
@@ -151,7 +151,7 @@ export class Agenda extends React.Component {
   }
 
   handleClickRefresh = () => {
-    this.setState({ receivedUpdate: false })
+    this.setState({ showRefreshWarning: false })
     this.agendaIframe.contentWindow.location.reload()
   }
 
@@ -330,7 +330,7 @@ export class Agenda extends React.Component {
         />
 
         <div className='agendaPage__warningMessage'>
-          {state.receivedUpdate && (
+          {state.showRefreshWarning && (
             <RefreshWarningMessage
               tooltip={props.t('Some information was modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
               onClickRefresh={this.handleClickRefresh}

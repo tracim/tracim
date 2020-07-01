@@ -260,9 +260,9 @@ describe('<Thread />', () => {
         expect(wrapper.state('content')).to.deep.equal(wrapper.state('newContent'))
       })
 
-      it('should update receivedUpdate state', () => {
+      it('should update showRefreshWarning state', () => {
         wrapper.instance().handleClickRefresh()
-        expect(wrapper.state('receivedUpdate')).to.deep.equal(false)
+        expect(wrapper.state('showRefreshWarning')).to.deep.equal(false)
       })
     })
   })

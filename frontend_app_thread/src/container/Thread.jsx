@@ -58,7 +58,7 @@ export class Thread extends React.Component {
         props.t('threads'),
         props.t('Start a topic')
       ],
-      receivedUpdate: false,
+      showRefreshWarning: false,
       editionAuthor: ''
     }
 
@@ -119,7 +119,7 @@ export class Thread extends React.Component {
       content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
-      receivedUpdate: prev.loggedUser.userId !== data.author.user_id,
+      showRefreshWarning: prev.loggedUser.userId !== data.author.user_id,
       timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang)
     }))
   }
@@ -313,7 +313,7 @@ export class Thread extends React.Component {
         ...prev.content,
         ...prev.newContent
       },
-      receivedUpdate: false
+      showRefreshWarning: false
     }))
   }
 
@@ -342,7 +342,7 @@ export class Thread extends React.Component {
           i18n={i18n}
         >
           <div className='justify-content-end'>
-            {state.receivedUpdate && (
+            {state.showRefreshWarning && (
               <RefreshWarningMessage
                 tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
                 onClickRefresh={this.handleClickRefresh}

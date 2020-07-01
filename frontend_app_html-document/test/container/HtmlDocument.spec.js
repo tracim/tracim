@@ -101,7 +101,7 @@ describe('<HtmlDocument />', () => {
             wrapper.setState({ mode: APP_FEATURE_MODE.EDIT })
             wrapper.instance().handleContentModified(tlmData)
 
-            expect(wrapper.state('receivedUpdate')).to.equal(true)
+            expect(wrapper.state('showRefreshWarning')).to.equal(true)
             expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.EDIT)
           })
         })
@@ -205,9 +205,9 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.state('mode')).to.deep.equal(APP_FEATURE_MODE.VIEW)
       })
 
-      it('should update receivedUpdate state', () => {
+      it('should update showRefreshWarning state', () => {
         wrapper.instance().handleClickRefresh()
-        expect(wrapper.state('receivedUpdate')).to.deep.equal(false)
+        expect(wrapper.state('showRefreshWarning')).to.deep.equal(false)
       })
     })
   })

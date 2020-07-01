@@ -68,7 +68,7 @@ export class HtmlDocument extends React.Component {
       newContent: {},
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
-      receivedUpdate: false,
+      showRefreshWarning: false,
       editionAuthor: ''
     }
 
@@ -101,7 +101,7 @@ export class HtmlDocument extends React.Component {
       content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
-      receivedUpdate: prev.loggedUser.userId !== data.author.user_id,
+      showRefreshWarning: prev.loggedUser.userId !== data.author.user_id,
       rawContentBeforeEdit: data.content.raw_content,
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
     }))
@@ -518,7 +518,7 @@ export class HtmlDocument extends React.Component {
         raw_content: prev.rawContentBeforeEdit
       },
       mode: APP_FEATURE_MODE.VIEW,
-      receivedUpdate: false
+      showRefreshWarning: false
     }))
   }
 
@@ -574,7 +574,7 @@ export class HtmlDocument extends React.Component {
             </div>
 
             <div className='d-flex'>
-              {state.receivedUpdate && (
+              {state.showRefreshWarning && (
                 <RefreshWarningMessage
                   tootlip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
                   onClickRefresh={this.handleClickRefresh}

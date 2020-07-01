@@ -91,7 +91,7 @@ export class File extends React.Component {
       sharePassword: '',
       shareLinkList: [],
       previewVideo: false,
-      receivedUpdate: false,
+      showRefreshWarning: false,
       editionAuthor: ''
     }
     this.refContentLeftTop = React.createRef()
@@ -167,7 +167,7 @@ export class File extends React.Component {
       content: prev.loggedUser.userId === data.author.user_id ? newContentObject : prev.content,
       newContent: newContentObject,
       editionAuthor: data.author.public_name,
-      receivedUpdate: prev.loggedUser.userId !== data.author.user_id,
+      showRefreshWarning: prev.loggedUser.userId !== data.author.user_id,
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
     }))
   }
@@ -693,7 +693,7 @@ export class File extends React.Component {
         ...prev.content,
         ...prev.newContent
       },
-      receivedUpdate: false
+      showRefreshWarning: false
     }))
     const filenameNoExtension = removeExtensionOfFilename(this.state.newContent.filename)
     this.setHeadTitle(filenameNoExtension)
@@ -902,7 +902,7 @@ export class File extends React.Component {
             </div>
 
             <div className='d-flex'>
-              {state.receivedUpdate && (
+              {state.showRefreshWarning && (
                 <RefreshWarningMessage
                   tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
                   onClickRefresh={this.handleClickRefresh}
