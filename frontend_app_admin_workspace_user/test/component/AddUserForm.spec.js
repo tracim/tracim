@@ -7,35 +7,41 @@ describe('<AddUserForm />', () => {
   const props = {
     emailNotifActivated: true,
     isEmailRequired: true,
-    isUsernameValid: false
+    isUsernameValid: true
   }
 
   const wrapper = shallow(<AddUserForm {...props} t={tradKey => tradKey} />)
 
   describe('its internal functions', () => {
     describe('isValidateButtonDisabled', () => {
+      beforeEach(function () {
+        wrapper.setState({
+          newUserEmail: 'newEmail',
+          newUserPassword: 'newPassword',
+          newUserUsername: 'newUsername',
+          newUserName: 'newName',
+          newUserProfile: 'newProfile'
+        })
+      })
+
       it('should return true if the email notification are activated, the email and the password are empty', () => {
-        wrapper.setState({ newUserEmail: '' })
-        wrapper.setState({ newUserPassword: '' })
-        wrapper.setState({ newUserName: '' })
-        wrapper.setState({ newUserProfile: '' })
-        wrapper.setState({ newUserUsername: '' })
+        wrapper.setState({ newUserPassword: '', newUserEmail: '' })
         expect(wrapper.instance().isValidateButtonDisabled()).to.equal(true)
       })
 
       it('should return true if the name or the profile are empty', () => {
-        wrapper.setProps({ emailNotifActivated: false })
-        expect(wrapper.instance().isValidateButtonDisabled()).to.equal(true)
-      })
-
-      it('should return true if the email notification are disactivated and the password are empty', () => {
-        wrapper.setState({ newUserName: 'newName' })
-        wrapper.setState({ newUserProfile: 'newProfile' })
+        wrapper.setState({ newUserName: '', newUserProfile: '' })
         expect(wrapper.instance().isValidateButtonDisabled()).to.equal(true)
       })
 
       it('should return true if the email is required and empty', () => {
-        wrapper.setState({ newUserPassword: 'newPassword' })
+        wrapper.setState({ newUserEmail: '' })
+        expect(wrapper.instance().isValidateButtonDisabled()).to.equal(true)
+      })
+
+      it('should return true if the email notification are deactivated and the password are empty', () => {
+        wrapper.setState({ newUserPassword: '' })
+        wrapper.setProps({ emailNotifActivated: false })
         expect(wrapper.instance().isValidateButtonDisabled()).to.equal(true)
       })
 
@@ -46,12 +52,11 @@ describe('<AddUserForm />', () => {
 
       it('should return true if the username is valid but empty and the email is empty', () => {
         wrapper.setProps({ isUsernameValid: true })
+        wrapper.setState({ newUserEmail: '' })
         expect(wrapper.instance().isValidateButtonDisabled()).to.equal(true)
       })
 
       it('should return false if all field required are filled with valid inputs', () => {
-        wrapper.setState({ newUserEmail: 'newEmail' })
-        wrapper.setState({ newUserUsername: 'newUsername' })
         expect(wrapper.instance().isValidateButtonDisabled()).to.equal(false)
       })
     })
