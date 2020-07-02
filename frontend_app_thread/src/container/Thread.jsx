@@ -230,7 +230,10 @@ export class Thread extends React.Component {
     const response = await handleFetchResult(
       await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     )
-    this.setState({ content: response.body })
+    this.setState({
+      content: response.body,
+      isLastTimelineItemCurrentToken: false
+    })
     this.setHeadTitle(response.body.label)
 
     await putThreadRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)

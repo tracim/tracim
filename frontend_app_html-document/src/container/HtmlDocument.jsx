@@ -348,7 +348,8 @@ export class HtmlDocument extends React.Component {
       },
       newComment: localStorageComment || '',
       rawContentBeforeEdit: resHtmlDocument.body.raw_content,
-      timeline: revisionWithComment
+      timeline: revisionWithComment,
+      isLastTimelineItemCurrentToken: false
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)

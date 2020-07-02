@@ -309,7 +309,8 @@ export class File extends React.Component {
               `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/revisions/${response.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
           },
-          mode: APP_FEATURE_MODE.VIEW
+          mode: APP_FEATURE_MODE.VIEW,
+          isLastTimelineItemCurrentToken: false
         })
         this.setHeadTitle(filenameNoExtension)
         break
