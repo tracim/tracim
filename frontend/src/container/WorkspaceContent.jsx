@@ -46,7 +46,7 @@ import {
 import {
   newFlashMessage,
   setWorkspaceContentList,
-  addWorkspaceContentList,
+  setWorkspaceFolderContentList,
   setWorkspaceShareFolderContentList,
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
@@ -475,23 +475,27 @@ export class WorkspaceContent extends React.Component {
 
     if (folderId && !folderOpen) this.handleToggleFolderOpen(folderId)
 
-    props.history.push(`${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`)
+    props.history.push(
+      `${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`
+    )
   }
 
   handleToggleFolderOpen = async folderId => {
     const { props, state } = this
     const folder = props.workspaceContentList.contentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.contentList.find(c => c.id === folderId)
 
+    const isFolderPreviousStateOpen = folder.isOpen
+
     props.dispatch(toggleFolderOpen(folderId, state.workspaceIdInUrl))
 
-    if (!props.workspaceContentList.contentList.some(c => c.parentId === folderId)) {
-      const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json, state.workspaceIdInUrl))
-    }
+    if (isFolderPreviousStateOpen) return
 
-    if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceShareFolderContentList.contentList.some(c => c.parentId === folderId)) {
-      const fetchContentList = await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json, state.workspaceIdInUrl))
+    const fetchContentList = folder.parentId === SHARE_FOLDER_ID
+      ? await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
+      : await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
+
+    if (fetchContentList.status === 200) {
+      props.dispatch(setWorkspaceFolderContentList(state.workspaceIdInUrl, folder.id, fetchContentList.json))
     }
   }
 

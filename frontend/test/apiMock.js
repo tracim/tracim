@@ -177,6 +177,12 @@ const mockGetWorkspaceMemberList200 = (apiUrl, workspaceId, memberList) => {
     .reply(200, memberList)
 }
 
+const mockGetFolderContentList200 = (apiUrl, workspaceId, folderIdList, resultContentList) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/contents?parent_ids=${folderIdList.join(',')}`)
+    .reply(200, resultContentList)
+}
+
 export {
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMemberList200,
@@ -200,5 +206,6 @@ export {
   mockPutUserPassword403,
   mockGetLoggedUserCalendar200,
   mockGetUserCalendar200,
-  mockGetUser200
+  mockGetUser200,
+  mockGetFolderContentList200
 }

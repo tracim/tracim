@@ -530,7 +530,7 @@ export const getFolderContentList = (workspaceId, folderIdList) => dispatch => {
       },
       method: 'GET'
     },
-    actionName: WORKSPACE,
+    actionName: FOLDER,
     dispatch
   })
 }
