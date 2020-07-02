@@ -71,7 +71,7 @@ export class AddUserForm extends React.Component {
     if (state.newUserName === '' || state.newUserProfile === '') return true
     if (!props.emailNotifActivated && state.newUserPassword === '') return true
     if (props.isEmailRequired && state.newUserEmail === '') return true
-    else return ((state.newUserUsername === '' || !props.isUsernameValid) && state.newUserEmail === '')
+    else return ((state.newUserUsername === '' && state.newUserEmail === '') || !props.isUsernameValid)
   }
 
   render () {
