@@ -484,11 +484,11 @@ export class WorkspaceContent extends React.Component {
     const { props, state } = this
     const folder = props.workspaceContentList.contentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.contentList.find(c => c.id === folderId)
 
-    const folderPreviousOpenState = folder.isOpen
+    const isFolderPreviousStateOpen = folder.isOpen
 
     props.dispatch(toggleFolderOpen(folderId, state.workspaceIdInUrl))
 
-    if (folderPreviousOpenState) return
+    if (isFolderPreviousStateOpen) return
 
     const fetchContentList = folder.parentId === SHARE_FOLDER_ID
       ? await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
