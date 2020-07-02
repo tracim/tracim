@@ -117,16 +117,7 @@ class EventBuilder:
             # to the RQ worker when it queries the database.
             commit_event = "after_commit"
 
-        def publish_pending_events_of_context(session, flush_context=None):
-            self._publish_events(context)
-
-        def clear_pending_events_of_context(session, previous_transaction):
-            context.pending_events = []
-
-        sqlalchemy_event.listen(db_session, commit_event, publish_pending_events_of_context)
-        sqlalchemy_event.listen(
-            db_session, "after_soft_rollback", clear_pending_events_of_context,
-        )
+        sqlalchemy_event.listen(db_session, commit_event, self._publish_pending_events_of_context)
 
     @staticmethod
     def _get_current_user(context: TracimContext) -> typing.Optional[User]:
@@ -329,6 +320,13 @@ class EventBuilder:
     def _add_event(self, event: Event, context: TracimContext) -> None:
         context.dbsession.add(event)
         context.pending_events.append(event)
+
+    def _publish_pending_events_of_context(
+        self, session: TracimSession, flush_context=None
+    ) -> None:
+        # NOTE SGD 2020-06-30: do no keep a reference on the context
+        # as this would lead to keep all of them in memory
+        self._publish_events(session.context)
 
     def _publish_events(self, context: TracimContext) -> None:
         if self._config.JOBS__PROCESSING_MODE == self._config.CST.ASYNC:

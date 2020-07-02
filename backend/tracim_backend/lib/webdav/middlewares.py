@@ -23,7 +23,7 @@ from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import get_engine
-from tracim_backend.models.setup_models import get_scoped_session_factory
+from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import create_dbsession_for_context
 
 
@@ -187,8 +187,8 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
 
         # Start response (if it hasn't been done yet)
         if first_yield:
-            # Success!
             start_response(
+                # Success!
                 sub_app_start_response.status,
                 sub_app_start_response.response_headers,
                 sub_app_start_response.exc_info,
@@ -263,7 +263,7 @@ class TracimEnv(BaseMiddleware):
         self.plugin_manager = create_plugin_manager()
         self.plugin_manager.register(EventBuilder(self.app_config))
         self.engine = get_engine(self.app_config)
-        self.session_factory = get_scoped_session_factory(self.engine)
+        self.session_factory = get_session_factory(self.engine)
 
     def __call__(self, environ, start_response):
         # TODO - G.M - 18-05-2018 - This code should not create trouble
@@ -281,14 +281,17 @@ class TracimEnv(BaseMiddleware):
         tracim_context.dbsession = session
         environ["tracim_context"] = tracim_context
         try:
-            app = self._application(environ, start_response)
-        except Exception as exc:
-            transaction.rollback()
-            raise exc
-        finally:
+            for chunk in self._application(environ, start_response):
+                yield chunk
             transaction.commit()
+        except Exception:
+            transaction.rollback()
+            raise
+        finally:
+            # NOTE SGD 2020-06-30: avoid circular reference between environment dict and context.
+            # This ensures the context will be deleted as soon as this function is exited
+            del environ["tracim_context"]
             tracim_context.cleanup()
-        return app
 
     def setup_ldap(self, registry: Registry, app_config: CFG):
         manager = ConnectionManager(
