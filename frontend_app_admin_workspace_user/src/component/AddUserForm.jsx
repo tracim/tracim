@@ -67,6 +67,7 @@ export class AddUserForm extends React.Component {
 
   isValidateButtonDisabled = () => {
     const { props, state } = this
+    if (props.emailNotifActivated && state.newUserEmail === '' && state.newUserPassword === '') return true
     if (state.newUserName === '' || state.newUserProfile === '') return true
     if (!props.emailNotifActivated && state.newUserPassword === '') return true
     if (props.isEmailRequired && state.newUserEmail === '') return true
@@ -160,23 +161,22 @@ export class AddUserForm extends React.Component {
             data-cy='adduser_email'
           />
 
-          {(!props.emailNotifActivated || state.newUserEmail === '') && (
-            <div>
-              <label className='userData__text' htmlFor='adduser_password'>
-                {props.t('Password')}
-              </label>
+          <div>
+            <label className='userData__text' htmlFor='adduser_password'>
+              {props.t('Password')}
+            </label>
 
-              <input
-                type='text'
-                className='userData__input form-control'
-                id='adduser_password'
-                placeholder={props.t('Password')}
-                value={state.newUserPassword}
-                onChange={this.handleChangeNewUserPassword}
-                data-cy='adduser_password'
-              />
-            </div>
-          )}
+            <input
+              type='text'
+              className='userData__input form-control'
+              id='adduser_password'
+              placeholder={props.t('Password')}
+              value={state.newUserPassword}
+              onChange={this.handleChangeNewUserPassword}
+              data-cy='adduser_password'
+            />
+          </div>
+
           {(props.emailNotifActivated && state.newUserEmail === '') && (
             <div className='userData__info'>
               <i className='fa fa-exclamation-triangle userData__info__icon' />
