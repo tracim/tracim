@@ -244,6 +244,7 @@
   "User administration": "User administration",
   "Username can't contain any whitespace": "Username can't contain any whitespace",
   "Username must be at least {{minimumCharactersUsername}} characters": "Username must be at least {{minimumCharactersUsername}} characters",
+  "Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters": "Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters",
   "Forgotten password": "Forgotten password",
   "Public upload": "Public upload",
   "Password reset": "Password reset",

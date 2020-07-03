@@ -7,6 +7,7 @@ import appFactory from '../util/appFactory.js'
 import {
   ALLOWED_CHARACTERS_USERNAME,
   COOKIE_FRONTEND,
+  MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   workspaceConfig
 } from '../util/helper.js'
@@ -106,7 +107,9 @@ export class Home extends React.Component {
         case 400:
           switch (fetchPutUsername.json.code) {
             case 2001:
-              props.dispatch(newFlashMessage(props.t('Password must be at least 6 characters'), 'warning'))
+              props.dispatch(newFlashMessage(
+                props.t('Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME }, { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
+              ))
               return false
             case 2062:
               props.dispatch(

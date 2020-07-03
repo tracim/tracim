@@ -21,6 +21,7 @@ import {
 import {
   ALLOWED_CHARACTERS_USERNAME,
   debug,
+  MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   MINIMUM_CHARACTERS_USERNAME
 } from '../helper.js'
@@ -452,7 +453,11 @@ export class AdminWorkspaceUser extends React.Component {
         return true
       case 400:
         switch (newUserResult.body.code) {
-          case 2001: this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning'); break
+          case 2001:
+            props.dispatch(newFlashMessage(
+              props.t('Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME }, { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
+            ))
+            break
           case 2062:
             this.sendGlobalFlashMsg(
               props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
