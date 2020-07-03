@@ -101,7 +101,7 @@ export class Home extends React.Component {
       const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, state.password))
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
+          props.dispatch(newFlashMessage(props.t('Your username has been set'), 'info'))
           break
         case 400:
           switch (fetchPutUsername.json.code) {
