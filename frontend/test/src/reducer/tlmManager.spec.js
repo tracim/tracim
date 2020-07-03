@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { SET, setLiveMessageManager, setLiveMessageManagerStatus, TLM_MANAGER, TLM_MANAGER_STATUS } from '../../../src/action-creator.sync.js'
-import tlm from '../../../src/reducer/tlmManager.js'
+import tlm from '../../../src/reducer/tlm.js'
 
 describe('reducer tlm.js', () => {
   describe('actions', () => {

@@ -24,7 +24,7 @@ export const FlashMessage = props => {
   const dataType = dataTypeArray.find(t => t.id === props.flashMessage[0].type)
 
   return (
-    <div className='flashmessage' data-cy='flashmessage' id={props.id}>
+    <div className={'flashmessage ' + props.className} data-cy='flashmessage'>
       {props.flashMessage.length > 0 && (
         <div className='flashmessage__container card'>
           <div className={classnames('flashmessage__container__header', `bg-${dataType.id}`)} />
@@ -64,10 +64,10 @@ export default FlashMessage
 FlashMessage.propTypes = {
   type: PropTypes.oneOf(['info', 'warning', 'danger']),
   showCloseButton: PropTypes.bool,
-  id: PropTypes.string
+  className: PropTypes.string
 }
 
 FlashMessage.defaultProps = {
   showCloseButton: true,
-  id: ''
+  className: ''
 }

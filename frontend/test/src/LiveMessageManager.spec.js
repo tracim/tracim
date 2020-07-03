@@ -19,7 +19,7 @@ describe('LiveMessageManager class', () => {
   const managers = []
 
   describe('the openLiveMessageConnection() method', () => {
-    const manager = new LiveMessageManager(2000, 100)
+    const manager = new LiveMessageManager(30000, 0)
     managers.push(manager)
     manager.openLiveMessageConnection(userId, apiUrl)
     const mockEventSource = manager.eventSource
@@ -37,7 +37,9 @@ describe('LiveMessageManager class', () => {
     it('should restart connection when an error is raised by EventSource', async () => {
       mockEventSource.emitError()
       expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.ERROR)
-      await new Promise(resolve => setTimeout(resolve, 150))
+      // NOTE SG 2020-07-03 - have to wait a small amount as reconnection
+      // is done via a setTimeout
+      await new Promise(resolve => setTimeout(resolve, 10))
       expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
     })
   })
@@ -59,17 +61,22 @@ describe('LiveMessageManager class', () => {
 
   describe('the heartbeat timer', () => {
     it('should restart connection when the heartbeat event is not received in time', async () => {
-      const timeout = 200
-      const { manager } = openedManager(timeout, 100)
+      const timeout = 10
+      const { manager } = openedManager(timeout, 0)
       managers.push(manager)
+      // NOTE SG 2020-07-03 - have to wait a small amount as heartbeat failure
+      // is done via a setTimeout
       await new Promise(resolve => setTimeout(resolve, 1.6 * timeout))
       expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
-      await new Promise(resolve => setTimeout(resolve, 150))
+      // NOTE SG 2020-07-03 - have to wait a small amount as reconnection
+      // is done via a setTimeout
+      await new Promise(resolve => setTimeout(resolve, 10))
       expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
     })
   })
 
   after(() => {
+    // NOTE SG 2020-07-03 - close all connections to clear timeouts so that mocha exits properly
     for (const manager of managers) {
       manager.closeLiveMessageConnection()
     }
