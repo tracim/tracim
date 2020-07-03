@@ -282,7 +282,7 @@ export class Tracim extends React.Component {
     return (
       <div className='tracim fullWidthFullHeight'>
         <Header />
-        {state.displayConnectionError &&
+        {state.displayConnectionError && (
           <FlashMessage
             id='connection_error'
             flashMessage={
@@ -293,7 +293,8 @@ export class Tracim extends React.Component {
             }
             showCloseButton={false}
             t={props.t}
-          />}
+          />
+        )}
         <FlashMessage
           flashMessage={props.flashMessage}
           onRemoveFlashMessage={this.handleRemoveFlashMessage}
