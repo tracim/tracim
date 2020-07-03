@@ -36,7 +36,9 @@ export class Timeline extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.shouldScrollToBottom && this.props.timelineData && prevProps.timelineData) this.scrollToBottom(prevProps.timelineData)
+    if (this.props.shouldScrollToBottom && this.props.timelineData && prevProps.timelineData) {
+      this.scrollToBottom(prevProps.timelineData)
+    }
     this.timelineContainerScrollHeight = this.timelineContainer.scrollHeight
   }
 
@@ -45,16 +47,23 @@ export class Timeline extends React.Component {
 
     if (props.timelineData.length === 0) return
 
+    const lastCurrentTimelineItem = props.timelineData[props.timelineData.length - 1]
     const isNewContent = prevTimeline.length > 0
-      ? this.getTimelineContentId(prevTimeline[prevTimeline.length - 1]) !== this.getTimelineContentId(props.timelineData[props.timelineData.length - 1])
+      ? this.getTimelineContentId(prevTimeline[prevTimeline.length - 1]) !== this.getTimelineContentId(lastCurrentTimelineItem)
       : false
-    const isScrollAtTheBottom = this.timelineContainer.scrollTop + this.timelineContainer.clientHeight === this.timelineContainerScrollHeight
 
-    // GM - INFO - 2020-06-30 - When width >= 1200: Check if the timeline scroll is at the bottom or if the new item was created by the current session tokenId or if the content_id has changed
-    // When width >= 1200: Check the if the new comment was created by the current session tokenId
+    const scrollPosition = this.timelineContainer.scrollTop + this.timelineContainer.clientHeight
+    const isScrollAtTheBottom = scrollPosition === this.timelineContainerScrollHeight
+
+    const isLastTimelineItemAddedFromCurrentToken = props.isLastTimelineItemCurrentToken && props.newComment === ''
+    const isLastTimelineItemTypeComment = props.timelineData[props.timelineData.length - 1].content_type === CONTENT_TYPE.COMMENT
+
+    // GM - INFO - 2020-06-30 - When width >= 1200: Check if the timeline scroll is at the bottom
+    // or if the new item was created by the current session tokenId or if the content_id has changed.
+    // When width >= 1200: Check the if the new comment was created by the current session tokenId.
     if (
-      (window.innerWidth >= 1200 && (isNewContent || isScrollAtTheBottom || (props.isLastTimelineItemCurrentToken && props.newComment === ''))) ||
-      (window.innerWidth < 1200 && props.isLastTimelineItemCurrentToken && props.newComment === '' && props.timelineData[props.timelineData.length - 1].content_type === CONTENT_TYPE.COMMENT)
+      (window.innerWidth >= 1200 && (isNewContent || isScrollAtTheBottom || isLastTimelineItemAddedFromCurrentToken)) ||
+      (window.innerWidth < 1200 && isLastTimelineItemAddedFromCurrentToken && isLastTimelineItemTypeComment)
     ) {
       const behavior = isScrollAtTheBottom && props.isLastTimelineItemCurrentToken ? 'smooth' : 'instant'
       this.timelineBottom.scrollIntoView({ behavior })
@@ -62,7 +71,8 @@ export class Timeline extends React.Component {
   }
 
   getTimelineContentId = (content) => {
-    return content ? content.timelineType === TIMELINE_TYPE.COMMENT ? content.parent_id : content.content_id : -1
+    if (!content) return -1
+    return content.timelineType === TIMELINE_TYPE.COMMENT ? content.parent_id : content.content_id
   }
 
   render () {
