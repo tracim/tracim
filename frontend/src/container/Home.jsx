@@ -271,17 +271,21 @@ export class Home extends React.Component {
                     </>
                   )}
 
-                  <div className='homepage__usernamePopup__body__checkbox'>
-                    <input
-                      className='homepage__usernamePopup__body__checkbox__input'
-                      type='checkbox'
-                      onChange={this.handleClickCheckbox}
-                    />
-                    {props.t('Never ask me again')}
-                  </div>
-                  <div className='homepage__usernamePopup__body__smallmsg'>
-                    ({props.t('you can always set your username in your account preferences')})
-                  </div>
+                  {this.state.newUsername === '' && (
+                    <div>
+                      <div className='homepage__usernamePopup__body__checkbox'>
+                        <input
+                          className='homepage__usernamePopup__body__checkbox__input'
+                          type='checkbox'
+                          onChange={this.handleClickCheckbox}
+                        />
+                        {props.t('Do not show this popup again')}
+                      </div>
+                      <div className='homepage__usernamePopup__body__smallmsg'>
+                        ({props.t('you can set your username on page My Account')})
+                      </div>
+                    </div>
+                  )}
 
                   <button
                     type='button'

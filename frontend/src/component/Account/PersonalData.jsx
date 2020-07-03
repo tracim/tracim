@@ -73,34 +73,27 @@ export class PersonalData extends React.Component {
             />
           </div>
 
-          <div className='d-flex align-items-center flex-wrap'>
-            <input
-              className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-3 mt-sm-0'
-              type='text'
-              data-cy='personaldata__form__txtinput__username'
-              placeholder={props.t('New username')}
-              value={state.newUsername}
-              onChange={this.handleChangeUserName}
-            />
+          <div className='d-flex flex-wrap'>
+            <div className='d-inline-flex flex-column justify-content-start'>
+              <input
+                className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-3 mt-sm-0'
+                type='text'
+                data-cy='personaldata__form__txtinput__username'
+                placeholder={props.t('New username')}
+                value={state.newUsername}
+                onChange={this.handleChangeUserName}
+              />
+              <div className='personaldata__form__txtinput__msginfo'>
+                {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
+              </div>
+            </div>
             {!props.isUsernameValid && (
               <div className='personaldata__form__txtinput__msgerror'>
                 <i className='personaldata__form__txtinput__msgerror__icon fa fa-times' />
                 {props.usernameInvalidMsg}
               </div>
             )}
-            {props.isUsernameValid && (
-              <div className='personaldata__form__txtinput__msginfo'>
-                {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
-              </div>
-            )}
           </div>
-
-          {state.newUsername !== '' && (
-            <div className='personaldata__form__txtinput__info'>
-              <i className='fa fa-exclamation-triangle personaldata__form__txtinput__info__icon' />
-              {props.t('Changing your username will not update the mentions using your current username.')}
-            </div>
-          )}
 
           {editableUserAuthTypeList.includes(props.userAuthType) && (
             <div className='d-flex align-items-center flex-wrap mb-4 mt-4'>
@@ -125,12 +118,6 @@ export class PersonalData extends React.Component {
                 onChange={this.handleChangeCheckPassword}
                 disabled={state.newEmail === '' && state.newUsername === ''}
               />
-              {props.displayAdminInfo && (
-                <div className='personaldata__form__txtinput__info'>
-                  <i className='personaldata__form__txtinput__info__icon fa fa-lightbulb-o' />
-                  {props.t('This edition requires your administrator password')}
-                </div>
-              )}
             </div>
           )}
 
