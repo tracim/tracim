@@ -109,8 +109,8 @@ export class File extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated }
     ])
   }
@@ -152,6 +152,7 @@ export class File extends React.Component {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     const filenameNoExtension = removeExtensionOfFilename(data.content.filename)
     const newContentObject = {
       ...state.content,
@@ -162,12 +163,12 @@ export class File extends React.Component {
       )
     }
 
-    if (state.loggedUser.userId === data.author.user_id) this.setHeadTitle(filenameNoExtension)
+    if (clientToken === data.client_token) this.setHeadTitle(filenameNoExtension)
     this.setState(prev => ({
-      content: prev.loggedUser.userId === data.author.user_id ? newContentObject : prev.content,
+      content: clientToken === data.client_token ? newContentObject : prev.content,
       newContent: newContentObject,
       editionAuthor: data.author.public_name,
-      showRefreshWarning: prev.loggedUser.userId !== data.author.user_id,
+      showRefreshWarning: clientToken !== data.client_token,
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
     }))
   }
@@ -187,37 +188,24 @@ export class File extends React.Component {
     }
   }
 
-  handleContentDeleted = data => {
-    const { state, props } = this
+  handleContentDeletedOrRestored = data => {
+    const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
-    this.sendGlobalFlashMessage(props.t('File has been deleted'), 'info')
-
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev =>
       ({
-        content: {
+        content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+        newContent: {
           ...prev.content,
           ...data.content
         },
-        mode: APP_FEATURE_MODE.VIEW,
+        editionAuthor: data.author.public_name,
+        showRefreshWarning: clientToken !== data.client_token,
+        mode: clientToken === data.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
         timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
       })
     )
-  }
-
-  handleContentRestored = data => {
-    const { state, props } = this
-    if (data.content.content_id !== state.content.content_id) return
-
-    this.sendGlobalFlashMessage(props.t('File has been restored'), 'info')
-
-    this.setState(prev => ({
-      content: {
-        ...prev.content,
-        ...data.content
-      },
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
-    }))
   }
 
   async componentDidMount () {
@@ -693,6 +681,7 @@ export class File extends React.Component {
         ...prev.content,
         ...prev.newContent
       },
+      mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
     }))
     const filenameNoExtension = removeExtensionOfFilename(this.state.newContent.filename)

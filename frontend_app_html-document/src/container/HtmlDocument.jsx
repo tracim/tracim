@@ -86,8 +86,8 @@ export class HtmlDocument extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore }
     ])
   }
 
@@ -96,12 +96,13 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
+      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
-      showRefreshWarning: prev.loggedUser.userId !== data.author.user_id,
+      showRefreshWarning: clientToken !== data.client_token,
       rawContentBeforeEdit: data.content.raw_content,
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
     }))
@@ -126,32 +127,17 @@ export class HtmlDocument extends React.Component {
     this.setState({ timeline: sortedNewTimeline })
   }
 
-  handleContentDeleted = data => {
+  handleContentDeletedOrRestore = data => {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: {
-        ...prev.content,
-        ...data.content,
-        is_deleted: true
-      },
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
-    }))
-  }
-
-  handleContentUndeleted = data => {
-    const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
-
-    this.setState(prev => ({
-      ...prev,
-      content: {
-        ...prev.content,
-        ...data.content,
-        is_deleted: false
-      },
+      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+      newContent: { ...prev.content, ...data.content },
+      editionAuthor: data.author.public_name,
+      showRefreshWarning: clientToken !== data.client_token,
       timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
     }))
   }

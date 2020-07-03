@@ -75,10 +75,10 @@ export class Thread extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged }
     ])
   }
 
@@ -112,14 +112,15 @@ export class Thread extends React.Component {
     this.loadTimeline()
   }
 
-  handleContentModified = data => {
+  handleContentChanged = data => {
     if (data.content.content_id !== this.state.content.content_id) return
 
+    const clientToken = this.state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
-      content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
+      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
-      showRefreshWarning: prev.loggedUser.userId !== data.author.user_id,
+      showRefreshWarning: clientToken !== data.client_token,
       timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang)
     }))
   }
@@ -140,24 +141,6 @@ export class Thread extends React.Component {
     ])
 
     this.setState({ timeline: newTimelineSorted })
-  }
-
-  handleContentDeleted = data => {
-    if (data.content.content_id !== this.state.content.content_id) return
-
-    this.setState(prev => ({
-      content: { ...prev.content, ...data.content, is_deleted: true },
-      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang)
-    }))
-  }
-
-  handleContentUndeleted = data => {
-    if (data.content.content_id !== this.state.content.content_id) return
-
-    this.setState(prev => ({
-      content: { ...prev.content, ...data.content, is_deleted: false },
-      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang)
-    }))
   }
 
   async componentDidMount () {

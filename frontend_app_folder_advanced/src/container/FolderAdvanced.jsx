@@ -113,13 +113,14 @@ export class FolderAdvanced extends React.Component {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
-      content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
+      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
-      showRefreshWarning: prev.loggedUser.userId !== data.author.user_id
+      showRefreshWarning: clientToken !== data.client_token
     }))
-    if (state.loggedUser.userId === data.author.user_id) this.setHeadTitle(data.content.label)
+    if (clientToken === data.client_token) this.setHeadTitle(data.content.label)
   }
 
   async componentDidMount () {
