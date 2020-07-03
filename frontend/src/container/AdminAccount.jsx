@@ -43,6 +43,7 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList,
   PAGE,
+  MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   MINIMUM_CHARACTERS_USERNAME
 } from '../util/helper.js'
@@ -311,6 +312,11 @@ export class Account extends React.Component {
           break
         case 400:
           switch (fetchPutUsername.json.code) {
+            case 2001:
+              props.dispatch(newFlashMessage(
+                props.t('Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
+              ))
+              break
             case 2062:
               props.dispatch(newFlashMessage(
                 props.t(

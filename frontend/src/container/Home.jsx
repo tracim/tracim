@@ -108,7 +108,9 @@ export class Home extends React.Component {
           switch (fetchPutUsername.json.code) {
             case 2001:
               props.dispatch(newFlashMessage(
-                props.t('Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME }, { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
+                props.t('Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters',
+                  { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }
+                ), 'warning'
               ))
               return false
             case 2062:

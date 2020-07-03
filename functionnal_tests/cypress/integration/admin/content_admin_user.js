@@ -87,9 +87,29 @@ describe("An admin seeing a user's profile", () => {
     })
 
     describe('Change username', () => {
-      const newUserName = 'newRandomUserName'
+      const newUserName = 'newRandomUsername'
+      const longNewUsername = 'aa'.repeat(200)
 
       it('should update the header with the new username', () => {
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+          .click()
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=personaldata__form__txtinput__username]')
+          .type(longNewUsername)
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__txtinput.checkPassword')
+          .type(defaultAdmin.password)
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.fa-exclamation-triangle.personaldata__form__txtinput__info__icon')
+          .should('be.visible')
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__button')
+          .click()
+        cy.get('.flashmessage').contains('Username must have between 3 and 255 characters')
+      })
+
+      it('should show error message when username is too long', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
           .click()
