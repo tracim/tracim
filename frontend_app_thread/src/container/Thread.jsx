@@ -25,7 +25,8 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent
+  TracimComponent,
+  getOrCreateSessionClientToken
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -59,8 +60,10 @@ export class Thread extends React.Component {
         props.t('Start a topic')
       ],
       showRefreshWarning: false,
-      editionAuthor: ''
+      editionAuthor: '',
+      isLastTimelineItemCurrentToken: false
     }
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -121,7 +124,8 @@ export class Thread extends React.Component {
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
-      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -140,7 +144,10 @@ export class Thread extends React.Component {
       }
     ])
 
-    this.setState({ timeline: newTimelineSorted })
+    this.setState({
+      timeline: newTimelineSorted,
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+    })
   }
 
   async componentDidMount () {
@@ -204,7 +211,10 @@ export class Thread extends React.Component {
     const response = await handleFetchResult(
       await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     )
-    this.setState({ content: response.body })
+    this.setState({
+      content: response.body,
+      isLastTimelineItemCurrentToken: false
+    })
     this.setHeadTitle(response.body.label)
 
     await putThreadRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
@@ -377,6 +387,7 @@ export class Thread extends React.Component {
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             showTitle={false}
+            isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           />
         </PopinFixedContent>
       </PopinFixed>

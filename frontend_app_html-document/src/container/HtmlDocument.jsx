@@ -13,6 +13,7 @@ import {
   CUSTOM_EVENT,
   displayDistanceDate,
   generateLocalStorageContentId,
+  getOrCreateSessionClientToken,
   handleFetchResult,
   NewVersionBtn,
   PopinFixed,
@@ -69,8 +70,10 @@ export class HtmlDocument extends React.Component {
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
-      editionAuthor: ''
+      editionAuthor: '',
+      isLastTimelineItemCurrentToken: false
     }
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -104,7 +107,8 @@ export class HtmlDocument extends React.Component {
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
       rawContentBeforeEdit: data.content.raw_content,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -124,7 +128,10 @@ export class HtmlDocument extends React.Component {
       ]
     )
 
-    this.setState({ timeline: sortedNewTimeline })
+    this.setState({
+      timeline: sortedNewTimeline,
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+    })
   }
 
   handleContentDeletedOrRestore = data => {
@@ -138,7 +145,8 @@ export class HtmlDocument extends React.Component {
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -326,7 +334,8 @@ export class HtmlDocument extends React.Component {
       },
       newComment: localStorageComment || '',
       rawContentBeforeEdit: resHtmlDocument.body.raw_content,
-      timeline: revisionWithComment
+      timeline: revisionWithComment,
+      isLastTimelineItemCurrentToken: false
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
@@ -639,6 +648,7 @@ export class HtmlDocument extends React.Component {
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+                  isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                 />
               )
             }]}

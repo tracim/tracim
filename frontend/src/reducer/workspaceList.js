@@ -90,7 +90,7 @@ export function workspaceList (state = [], action) {
       return state.map(ws => ws.id === action.workspaceId
         ? {
           ...ws,
-          memberList: ws.memberList.map(m => m.id === action.member.user_id
+          memberList: ws.memberList.map(m => m.id === action.member.user.user_id
             ? { ...m, ...serializeMember(action.member) }
             : m
           )

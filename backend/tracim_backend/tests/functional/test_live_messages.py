@@ -21,7 +21,7 @@ class TestLivesMessages(object):
             headers={"Accept": "text/event-stream"},
         )
         assert res.headers["Content-Type"] == "text/event-stream"
-        assert res.headers["Content-Length"] == "0"
+        assert res.headers["Content-Length"] == "60"
         assert res.headers["Grip-Hold"] == "stream"
         assert res.headers["Grip-Channel"] == "user_{}".format(admin_user.user_id)
         assert res.headers["Cache-Control"] == "no-cache"
@@ -46,8 +46,11 @@ class TestLivesMessages(object):
             headers=headers,
         )
         client = sseclient.SSEClient(response)
+        client_events = client.events()
+        # INFO - G.M - 2020-06-29 - Skip first event
+        next(client_events)
         LiveMessagesLib(config=app_config).publish_dict("user_1", {"test_message": "example"})
-        event1 = next(client.events())
+        event1 = next(client_events)
         response.close()
         assert json.loads(event1.data) == {"test_message": "example"}
         assert event1.event == "message"
@@ -65,6 +68,9 @@ class TestLivesMessages(object):
             headers=headers,
         )
         client = sseclient.SSEClient(response)
+        client_events = client.events()
+        # INFO - G.M - 2020-06-29 - Skip first event
+        next(client_events)
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
         update_user_request = requests.put(
             "http://localhost:7999/api/users/1",
@@ -72,7 +78,7 @@ class TestLivesMessages(object):
             json=params,
         )
         assert update_user_request.status_code == 200
-        event1 = next(client.events())
+        event1 = next(client_events)
         response.close()
         result = json.loads(event1.data)
         assert result["event_type"] == "user.modified"
@@ -101,6 +107,9 @@ class TestLivesMessages(object):
             headers=headers,
         )
         client = sseclient.SSEClient(response)
+        client_events = client.events()
+        # INFO - G.M - 2020-06-29 - Skip first event
+        next(client_events)
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
         update_user_request = requests.put(
             "http://localhost:7999/api/users/1",
@@ -108,7 +117,6 @@ class TestLivesMessages(object):
             json=params,
         )
         assert update_user_request.status_code == 200
-        client_events = client.events()
         event1 = next(client_events)
         response.close()
         result = json.loads(event1.data)

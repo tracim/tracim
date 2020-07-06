@@ -134,7 +134,7 @@ describe('workspaceList reducer', () => {
             }]
           }
         ],
-        updateWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { ...globalManagerFromApi, do_notify: false, role: ROLE.contributor })
+        updateWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { user: globalManagerFromApi, do_notify: false, role: ROLE.contributor })
       )
 
       it('should return a workspace list with the member correctly updated in the right workspace', () => {

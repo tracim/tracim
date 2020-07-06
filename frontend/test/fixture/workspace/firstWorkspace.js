@@ -19,15 +19,6 @@ export const firstWorkspace = {
   ...serializeWorkspace(firstWorkspaceFromApi),
   isOpenInSidebar: false,
   sidebarEntryList: appListAsSidebarEntry(1),
-  memberList: [globalManagerAsMember]
+  memberList: [globalManagerAsMember],
+  contentReadStatusList: []
 }
-// export const firstWorkspace = {
-//   id: 1,
-//   label: 'First workspace',
-//   slug: 'first-workspace',
-//   description: 'first workspace description',
-//   sidebarEntryList: appListAsSidebarEntry(1),
-//   isOpenInSidebar: false,
-//   agendaEnabled: true,
-//   memberList: [globalManagerAsMember]
-// }
