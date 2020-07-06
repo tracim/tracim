@@ -101,7 +101,7 @@ export class AddUserForm extends React.Component {
             type='text'
             className='userData__input form-control'
             id='adduser_username'
-            placeholder={props.t('@username')}
+            placeholder={props.t('Username')}
             value={state.newUserUsername}
             onChange={this.handleChangeNewUserUsername}
             data-cy='adduser_username'
