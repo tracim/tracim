@@ -403,6 +403,7 @@ export class File extends React.Component {
       await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
+      case 200: break
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
