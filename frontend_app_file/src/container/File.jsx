@@ -38,7 +38,8 @@ import {
   FILE_PREVIEW_STATE,
   sortTimelineByDate,
   addRevisionFromTLM,
-  setupCommonRequestHeaders
+  setupCommonRequestHeaders,
+  getOrCreateSessionClientToken
 } from 'tracim_frontend_lib'
 import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
@@ -91,9 +92,11 @@ export class File extends React.Component {
       shareLinkList: [],
       previewVideo: false,
       hasUpdated: false,
-      editionAuthor: ''
+      editionAuthor: '',
+      isLastTimelineItemCurrentToken: false
     }
     this.refContentLeftTop = React.createRef()
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -167,7 +170,8 @@ export class File extends React.Component {
       newContent: newContentObject,
       editionAuthor: data.author.public_name,
       hasUpdated: prev.loggedUser.userId !== data.author.user_id,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -182,7 +186,10 @@ export class File extends React.Component {
           timelineType: data.content.content_type
         }
       ])
-      this.setState({ timeline: sortedNewTimeLine })
+      this.setState({
+        timeline: sortedNewTimeLine,
+        isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+      })
     }
   }
 
@@ -199,7 +206,8 @@ export class File extends React.Component {
           ...data.content
         },
         mode: APP_FEATURE_MODE.VIEW,
-        timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
+        timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+        isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
       })
     )
   }
@@ -215,7 +223,8 @@ export class File extends React.Component {
         ...prev.content,
         ...data.content
       },
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -300,7 +309,8 @@ export class File extends React.Component {
               `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/revisions/${response.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
           },
-          mode: APP_FEATURE_MODE.VIEW
+          mode: APP_FEATURE_MODE.VIEW,
+          isLastTimelineItemCurrentToken: false
         })
         this.setHeadTitle(filenameNoExtension)
         break
@@ -761,6 +771,7 @@ export class File extends React.Component {
           onClickWysiwygBtn={this.handleToggleWysiwyg}
           onClickRevisionBtn={this.handleClickShowRevision}
           shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+          isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           key='Timeline'
         />
       )
