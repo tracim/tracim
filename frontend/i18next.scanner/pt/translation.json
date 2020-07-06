@@ -257,5 +257,6 @@
   "Unknown email or username": "E-mail ou identificador desconhecido",
   "This username is not linked to any email, please contact an administrator to reset your password": "Este identificador não está ligado a nenhum e-mail, por favor contacte um administrador para redefinir a sua palavra-passe",
   "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} é maior que 1MB, isto pode demorar algum tempo a carregar, quer continuar?",
-  "Your username": "O seu identificador"
+  "Your username": "Seu identificador",
+  "Your username has been set": "O seu identificador foi definido"
 }
