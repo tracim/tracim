@@ -1,6 +1,5 @@
 from abc import ABC
 from abc import abstractmethod
-import datetime
 import typing
 
 from pyramid.authentication import BasicAuthAuthenticationPolicy
@@ -126,9 +125,8 @@ class TracimBasicAuthAuthenticationPolicy(
 
 @implementer(IAuthenticationPolicy)
 class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAuthenticationPolicy):
-    def __init__(self, reissue_time: int, debug: bool = False):
+    def __init__(self, debug: bool = False):
         SessionAuthenticationPolicy.__init__(self, debug=debug, callback=None)
-        self._reissue_time = reissue_time
         self.callback = None
 
     def get_current_user(self, request: TracimRequest) -> typing.Optional[User]:
@@ -138,7 +136,6 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
         # this means this policy is not the correct one. Explictly not checking
         # this avoid issue in some database because int is expected not string.
         if not isinstance(request.unauthenticated_userid, int):
-            request.session.delete()
             return None
         try:
             user = self._get_user_api(request).get_one(user_id=request.unauthenticated_userid)
@@ -146,15 +143,7 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
             user = None
         # do not allow invalid_user + ask for cleanup of session cookie
         if not user or not user.is_active or user.is_deleted:
-            request.session.delete()
             return None
-        # recreate session if need renew
-        if not request.session.new:
-            now = datetime.datetime.now()
-            last_access_datetime = datetime.datetime.utcfromtimestamp(request.session.last_accessed)
-            reissue_limit = last_access_datetime + datetime.timedelta(seconds=self._reissue_time)
-            if now > reissue_limit:
-                request.session.regenerate_id()
         return user
 
     def forget(self, request: TracimRequest) -> typing.List[typing.Any]:

@@ -29,7 +29,7 @@ describe('<MemberList />', () => {
       slug: 'content-manager'
     }],
     loggedUser: {
-      user_id: 1
+      userId: 1
     },
     userRoleIdInWorkspace: ROLE.workspaceManager.id,
     displayNewMemberForm: false,

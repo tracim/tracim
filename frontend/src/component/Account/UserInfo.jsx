@@ -8,12 +8,12 @@ require('./UserInfo.styl')
 export const UserInfo = props =>
   <div className='userinfo mr-5 ml-5 mb-5' data-cy='userinfo'>
     <div className='userinfo__avatar' data-cy='userinfo__avatar'>
-      <Avatar publicName={props.user.public_name} width='100px' />
+      <Avatar publicName={props.user.publicName} width='100px' />
     </div>
 
     <div className='userinfo__wrapper'>
       <div className='userinfo__name primaryColorFont' data-cy='userinfo__name'>
-        {`${props.user.public_name}`}
+        {`${props.user.publicName}`}
       </div>
 
       {props.user.username && (

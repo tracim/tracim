@@ -1,4 +1,5 @@
 {
+  "A content with same name already exists": "Un contenu avec le même nom existe déjà",
   "Timeline": "Historique",
   "Restore": "Restaurer",
   "Simple edition": "Édition simple",
@@ -33,6 +34,12 @@
   "Search user...": "Rechercher un utilisateur...",
   "Unknown error, please inform an administrator": "Erreur inconnue, veuillez contacter un administrateur",
   "Error detail": "Détail de l'erreur",
+  "Error while archiving content": "Erreur lors de l'archivage d'un contenu",
+  "Error while changing status": "Erreur lors d'un changement de statut",
+  "Error while deleting content": "Erreur lors de la suppression d'un contenu",
+  "Error while restoring content": "Erreur lors de la restauration du contenu",
+  "Error while saving new comment": "Erreur lors de l'enregistrement d'un nouveau commentaire",
+  "Error while saving the title": "Erreur lors de l'enregistrement du nouveau titre",
   "This content is archived": "Ce contenu est archivé",
   "This content is deleted": "Ce contenu est supprimé",
   "Status changed to {{status}}": "Statut changé en {{status}}",
@@ -81,5 +88,9 @@
   "Access to shared spaces where user is member": "Accès aux espaces partagés où l'utilisateur est membre",
   "Trusted user + create users, administration of instance": "Utilisateur de confiance + créer des utilisateurs, administration d'instance",
   "User + create shared spaces, add members in shared spaces": "Utilisateur + créer des espaces partagés, ajouter des membres dans les espaces partagés",
-  "Shared space manager": "Responsable"
+  "Shared space manager": "Responsable",
+  "Refresh?": "Rafraîchir ?",
+  "If you refresh, you will lose the current changes": "Si vous rafraîchissez, vous perdrez les modifications actuelles",
+  "You can't send an empty comment": "Vous ne pouvez pas envoyer un commentaire vide",
+  "You must change the status or restore this content before any change": "Vous devez changer le statut ou restaurer ce contenu avant de le modifier"
 }

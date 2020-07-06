@@ -7,41 +7,73 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import DisplayState from '../DisplayState/DisplayState.jsx'
-import { ROLE } from '../../helper.js'
+import { ROLE, CONTENT_TYPE, TIMELINE_TYPE } from '../../helper.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
+import { TracimComponent } from '../../tracimComponent.js'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
 
-class Timeline extends React.Component {
+export class Timeline extends React.Component {
   constructor (props) {
     super(props)
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    this.timelineContainerScrollHeight = 0
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<FrontendLib:Timeline> Custom event', 'color: #28a745', type, data)
-        i18n.changeLanguage(data)
-        break
-    }
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<FrontendLib:Timeline> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+    i18n.changeLanguage(data)
   }
 
   componentDidMount () {
-    this.scrollToBottom()
-  }
-
-  componentDidUpdate () {
+    this.timelineContainerScrollHeight = this.timelineContainer.scrollHeight
     if (window.innerWidth < 1200) return
-    this.props.shouldScrollToBottom && this.scrollToBottom()
+    this.timelineBottom.scrollIntoView({ behavior: 'instant' })
   }
 
-  componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  componentDidUpdate (prevProps) {
+    if (this.props.shouldScrollToBottom && this.props.timelineData && prevProps.timelineData) {
+      this.scrollToBottom(prevProps.timelineData)
+    }
+    this.timelineContainerScrollHeight = this.timelineContainer.scrollHeight
   }
 
-  scrollToBottom = () => this.timelineBottom.scrollIntoView({ behavior: 'instant' })
+  scrollToBottom = (prevTimeline) => {
+    const { props } = this
+
+    if (props.timelineData.length === 0) return
+
+    const lastCurrentTimelineItem = props.timelineData[props.timelineData.length - 1]
+    const isNewContent = prevTimeline.length > 0
+      ? this.getTimelineContentId(prevTimeline[prevTimeline.length - 1]) !== this.getTimelineContentId(lastCurrentTimelineItem)
+      : false
+
+    const scrollPosition = this.timelineContainer.scrollTop + this.timelineContainer.clientHeight
+    const isScrollAtTheBottom = scrollPosition === this.timelineContainerScrollHeight
+
+    const isLastTimelineItemAddedFromCurrentToken = props.isLastTimelineItemCurrentToken && props.newComment === ''
+    const isLastTimelineItemTypeComment = props.timelineData[props.timelineData.length - 1].content_type === CONTENT_TYPE.COMMENT
+
+    // GM - INFO - 2020-06-30 - When width >= 1200: Check if the timeline scroll is at the bottom
+    // or if the new item was created by the current session tokenId or if the content_id has changed.
+    // When width >= 1200: Check the if the new comment was created by the current session tokenId.
+    if (
+      (window.innerWidth >= 1200 && (isNewContent || isScrollAtTheBottom || isLastTimelineItemAddedFromCurrentToken)) ||
+      (window.innerWidth < 1200 && isLastTimelineItemAddedFromCurrentToken && isLastTimelineItemTypeComment)
+    ) {
+      const behavior = isScrollAtTheBottom && props.isLastTimelineItemCurrentToken ? 'smooth' : 'instant'
+      this.timelineBottom.scrollIntoView({ behavior })
+    }
+  }
+
+  getTimelineContentId = (content) => {
+    if (!content) return -1
+    return content.timelineType === TIMELINE_TYPE.COMMENT ? content.parent_id : content.content_id
+  }
 
   render () {
     const { props } = this
@@ -87,7 +119,7 @@ class Timeline extends React.Component {
           )}
         </div>
 
-        <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}>
+        <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')} ref={el => { this.timelineContainer = el }}>
           {props.timelineData.map(content => {
             switch (content.timelineType) {
               case 'comment':
@@ -99,7 +131,7 @@ class Timeline extends React.Component {
                     createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
                     createdDistance={content.created}
                     text={content.raw_content}
-                    fromMe={props.loggedUser.user_id === content.author.user_id}
+                    fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}
                   />
                 )
@@ -186,7 +218,7 @@ class Timeline extends React.Component {
   }
 }
 
-export default translate()(Radium(Timeline))
+export default translate()(Radium(TracimComponent(Timeline)))
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
@@ -202,6 +234,7 @@ Timeline.propTypes = {
   onClickRevisionBtn: PropTypes.func,
   allowClickOnRevision: PropTypes.bool,
   shouldScrollToBottom: PropTypes.bool,
+  isLastTimelineItemCurrentToken: PropTypes.bool,
   rightPartOpen: PropTypes.bool,
   isArchived: PropTypes.bool,
   onClickRestoreArchived: PropTypes.func,
@@ -215,7 +248,7 @@ Timeline.defaultProps = {
   customClass: '',
   customColor: '',
   loggedUser: {
-    id: '',
+    userId: '',
     name: '',
     userRoleIdInWorkspace: ROLE.reader.id
   },
@@ -225,6 +258,7 @@ Timeline.defaultProps = {
   onClickRevisionBtn: () => {},
   allowClickOnRevision: true,
   shouldScrollToBottom: true,
+  isLastTimelineItemCurrentToken: false,
   rightPartOpen: false,
   isArchived: false,
   isDeleted: false,

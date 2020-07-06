@@ -38,7 +38,7 @@ import {
 
 const qs = require('query-string')
 
-class Header extends React.Component {
+export class Header extends React.Component {
   componentDidMount () {
     this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', {})
     i18n.changeLanguage(this.props.user.lang)
@@ -51,7 +51,7 @@ class Header extends React.Component {
   handleChangeLang = async langId => {
     const { props } = this
 
-    if (props.user.user_id === -1) {
+    if (props.user.userId === -1) {
       Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
       i18n.changeLanguage(langId)
       props.dispatch(setUserLang(langId))
@@ -64,7 +64,6 @@ class Header extends React.Component {
       case 200:
         i18n.changeLanguage(langId)
         Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
-        props.dispatch(setUserLang(langId))
         props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, langId)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break

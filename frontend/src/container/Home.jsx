@@ -16,16 +16,14 @@ import {
   CardPopup,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername
+  removeAtInUsername,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   getUsernameAvailability,
   putUserUsername
 } from '../action-creator.async.js'
-import {
-  newFlashMessage,
-  updateUserUsername
-} from '../action-creator.sync.js'
+import { newFlashMessage } from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -36,7 +34,6 @@ export class Home extends React.Component {
   constructor (props) {
     super(props)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
     this.state = {
       hidePopupCheckbox: false,
       newUsername: '',
@@ -45,15 +42,13 @@ export class Home extends React.Component {
       usernamePopup: false,
       usernameInvalidMsg: ''
     }
+
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
-  customEventReducer = ({ detail: { type } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.setHeadTitle()
-        break
-    }
-  }
+  handleAllAppChangeLanguage = () => this.setHeadTitle()
 
   handleClickCreateWorkspace = e => {
     e.preventDefault()
@@ -106,8 +101,7 @@ export class Home extends React.Component {
       const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, state.password))
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(updateUserUsername(username))
-          props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
+          props.dispatch(newFlashMessage(props.t('Your username has been set'), 'info'))
           break
         case 400:
           switch (fetchPutUsername.json.code) {
@@ -146,7 +140,7 @@ export class Home extends React.Component {
     this.setState({ newUsername: e.target.value })
     const username = removeAtInUsername(e.target.value)
 
-    if (username.length < MINIMUM_CHARACTERS_USERNAME) {
+    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
@@ -311,4 +305,4 @@ export class Home extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
-export default connect(mapStateToProps)(withRouter(appFactory(translate()(Home))))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Home)))))

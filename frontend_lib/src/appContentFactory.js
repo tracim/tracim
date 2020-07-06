@@ -118,10 +118,10 @@ export function appContentFactory (WrappedComponent) {
             switch (response.body.code) {
               case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
               case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
-              default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+              default: this.sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
             }
             break
-          default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+          default: this.sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
         }
       }
       return response
@@ -162,6 +162,8 @@ export function appContentFactory (WrappedComponent) {
             case 2003:
               this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break
+            case 2044:
+              this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
             default:
               this.sendGlobalFlashMessage(i18n.t('Error while saving new comment'))
               break
@@ -205,7 +207,7 @@ export function appContentFactory (WrappedComponent) {
           GLOBAL_dispatchEvent({
             type: CUSTOM_EVENT.ADD_FLASH_MSG,
             data: {
-              msg: i18n.t('Error while archiving document'),
+              msg: i18n.t('Error while archiving content'),
               type: 'warning',
               delay: undefined
             }
@@ -231,7 +233,7 @@ export function appContentFactory (WrappedComponent) {
           GLOBAL_dispatchEvent({
             type: CUSTOM_EVENT.ADD_FLASH_MSG,
             data: {
-              msg: i18n.t('Error while deleting document'),
+              msg: i18n.t('Error while deleting content'),
               type: 'warning',
               delay: undefined
             }
@@ -257,7 +259,7 @@ export function appContentFactory (WrappedComponent) {
         default: GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
-            msg: i18n.t('Error while restoring document'),
+            msg: i18n.t('Error while restoring content'),
             type: 'warning',
             delay: undefined
           }
@@ -278,7 +280,7 @@ export function appContentFactory (WrappedComponent) {
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
-            msg: i18n.t('Error while restoring document'),
+            msg: i18n.t('Error while restoring content'),
             type: 'warning',
             delay: undefined
           }

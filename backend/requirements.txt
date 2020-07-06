@@ -6,7 +6,7 @@
 #
 alembic==1.0.5            # via tracim_backend (setup.py)
 apispec-marshmallow-advanced==0.4  # via hapic, tracim_backend (setup.py)
-apispec==1.1.0            # via apispec-marshmallow-advanced, hapic
+apispec==2.0.2            # via apispec-marshmallow-advanced, hapic
 attrs==18.2.0             # via cmd2
 babel==2.6.0              # via tracim_backend (setup.py)
 beaker==1.10.0            # via pyramid-beaker, tracim_backend (setup.py)
@@ -35,7 +35,7 @@ future==0.18.2            # via ffmpeg-python
 gitdb==4.0.5              # via gitpython
 gitpython==3.1.2          # via tracim_backend (setup.py)
 gripcontrol==4.0.0        # via tracim_backend (setup.py)
-hapic[marshmallow]==0.77  # via tracim_backend (setup.py)
+hapic[marshmallow]==0.83  # via tracim_backend (setup.py)
 html2text==2020.1.16      # via tracim_backend (setup.py)
 humanize==0.5.1           # via tracim_backend (setup.py)
 hupper==1.4.2             # via pyramid
@@ -48,7 +48,7 @@ lxml==4.2.5               # via caldav, tracim_backend (setup.py)
 mako==1.0.7               # via alembic, pyramid-mako, tracim_backend (setup.py)
 markdown==3.0.1           # via tracim_backend (setup.py)
 markupsafe==1.1.0         # via mako
-marshmallow==2.16.3       # via apispec-marshmallow-advanced, hapic, tracim_backend (setup.py)
+marshmallow==2.21.0       # via apispec-marshmallow-advanced, hapic, tracim_backend (setup.py)
 more-itertools==7.2.0     # via zipp
 multidict==4.5.2          # via hapic
 packaging==18.0           # via preview-generator

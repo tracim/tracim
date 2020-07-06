@@ -13,6 +13,7 @@ import {
   CUSTOM_EVENT,
   displayDistanceDate,
   generateLocalStorageContentId,
+  getOrCreateSessionClientToken,
   handleFetchResult,
   NewVersionBtn,
   PopinFixed,
@@ -64,11 +65,14 @@ export class HtmlDocument extends React.Component {
       rawContentBeforeEdit: '',
       timeline: [],
       newComment: '',
+      newContent: {},
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
-      keepEditingWarning: false,
-      editionAuthor: ''
+      hasUpdated: false,
+      editionAuthor: '',
+      isLastTimelineItemCurrentToken: false
     }
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -96,14 +100,13 @@ export class HtmlDocument extends React.Component {
 
     this.setState(prev => ({
       ...prev,
-      content: {
-        ...prev.content,
-        ...data.content
-      },
+      content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
+      newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
-      keepEditingWarning: (prev.mode === APP_FEATURE_MODE.EDIT && prev.loggedUser.user_id !== data.author.user_id),
+      hasUpdated: prev.loggedUser.userId !== data.author.user_id,
       rawContentBeforeEdit: data.content.raw_content,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -123,7 +126,10 @@ export class HtmlDocument extends React.Component {
       ]
     )
 
-    this.setState({ timeline: sortedNewTimeline })
+    this.setState({
+      timeline: sortedNewTimeline,
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+    })
   }
 
   handleContentDeleted = data => {
@@ -137,7 +143,8 @@ export class HtmlDocument extends React.Component {
         ...data.content,
         is_deleted: true
       },
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -152,7 +159,8 @@ export class HtmlDocument extends React.Component {
         ...data.content,
         is_deleted: false
       },
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -340,7 +348,8 @@ export class HtmlDocument extends React.Component {
       },
       newComment: localStorageComment || '',
       rawContentBeforeEdit: resHtmlDocument.body.raw_content,
-      timeline: revisionWithComment
+      timeline: revisionWithComment,
+      isLastTimelineItemCurrentToken: false
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
@@ -514,10 +523,11 @@ export class HtmlDocument extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
+        ...prev.newContent,
         raw_content: prev.rawContentBeforeEdit
       },
       mode: APP_FEATURE_MODE.VIEW,
-      keepEditingWarning: false
+      hasUpdated: false
     }))
   }
 
@@ -621,7 +631,7 @@ export class HtmlDocument extends React.Component {
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
-            keepEditingWarning={state.keepEditingWarning}
+            hasUpdated={state.hasUpdated}
             onClickRefresh={this.handleClickRefresh}
             editionAuthor={state.editionAuthor}
           />
@@ -648,6 +658,7 @@ export class HtmlDocument extends React.Component {
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+                  isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                 />
               )
             }]}

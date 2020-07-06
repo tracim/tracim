@@ -21,7 +21,12 @@ import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import { LiveMessageManager } from '../util/LiveMessageManager.js'
-import { buildHeadTitle, CUSTOM_EVENT, PROFILE } from 'tracim_frontend_lib'
+import {
+  CUSTOM_EVENT,
+  PROFILE,
+  serialize,
+  TracimComponent
+} from 'tracim_frontend_lib'
 import {
   PAGE,
   COOKIE_FRONTEND,
@@ -31,7 +36,6 @@ import {
 import {
   getConfig,
   getAppList,
-  getLiveMessage,
   getContentTypeList,
   getUserIsConnected,
   getMyselfWorkspaceList,
@@ -54,6 +58,8 @@ import {
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
+import { serializeUserProps } from '../reducer/user.js'
+import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 
 export class Tracim extends React.Component {
   constructor (props) {
@@ -62,45 +68,50 @@ export class Tracim extends React.Component {
     this.liveMessageManager = new LiveMessageManager()
     props.dispatch(setLiveMessageManager(this.liveMessageManager))
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.REDIRECT, handler: this.handleRedirect },
+      { name: CUSTOM_EVENT.ADD_FLASH_MSG, handler: this.handleAddFlashMessage },
+      { name: CUSTOM_EVENT.DISCONNECTED_FROM_API, handler: this.handleDisconnectedFromApi },
+      { name: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST_THEN_REDIRECT, handler: this.handleRefreshWorkspaceListThenRedirect },
+      { name: CUSTOM_EVENT.SET_BREADCRUMBS, handler: this.handleSetBreadcrumbs },
+      { name: CUSTOM_EVENT.APPEND_BREADCRUMBS, handler: this.handleAppendBreadcrumbs },
+      { name: CUSTOM_EVENT.SET_HEAD_TITLE, handler: this.handleSetHeadTitle }
+    ])
   }
 
-  customEventReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.REDIRECT:
-        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        this.props.history.push(data.url)
-        break
-      case CUSTOM_EVENT.ADD_FLASH_MSG:
-        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
-        break
-      case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST:
-        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        await this.loadWorkspaceList(data.openInSidebarId ? data.openInSidebarId : undefined)
-        if (data.openInSidebarId && document.getElementById(data.openInSidebarId)) document.getElementById(data.openInSidebarId).scrollIntoView()
-        break
-      case CUSTOM_EVENT.DISCONNECTED_FROM_API:
-        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
-        break
-      case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST_THEN_REDIRECT: // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
-        await this.loadWorkspaceList()
-        this.props.history.push(data.url)
-        break
-      case CUSTOM_EVENT.SET_BREADCRUMBS:
-        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        this.props.dispatch(setBreadcrumbs(data.breadcrumbs))
-        break
-      case CUSTOM_EVENT.APPEND_BREADCRUMBS:
-        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        this.props.dispatch(appendBreadcrumbs(data.breadcrumbs))
-        break
-      case CUSTOM_EVENT.SET_HEAD_TITLE:
-        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        document.title = buildHeadTitle([data.title, 'Tracim'])
-        break
-    }
+  handleRedirect = data => {
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.REDIRECT, data)
+    this.props.history.push(data.url)
+  }
+
+  handleAddFlashMessage = data => {
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.ADD_FLASH_MSG, data)
+    this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
+  }
+
+  handleDisconnectedFromApi = data => {
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.DISCONNECTED_FROM_API, data)
+    if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
+  }
+
+  handleRefreshWorkspaceListThenRedirect = async data => { // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
+    await this.loadWorkspaceList()
+    this.props.history.push(data.url)
+  }
+
+  handleSetBreadcrumbs = data => {
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.SET_BREADCRUMBS, data)
+    this.props.dispatch(setBreadcrumbs(data.breadcrumbs))
+  }
+
+  handleAppendBreadcrumbs = data => {
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.APPEND_BREADCRUMBS, data)
+    this.props.dispatch(appendBreadcrumbs(data.breadcrumbs))
+  }
+
+  handleSetHeadTitle = data => {
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.SET_HEAD_TITLE, data)
+    document.title = data.title
   }
 
   async componentDidMount () {
@@ -123,7 +134,6 @@ export class Tracim extends React.Component {
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
 
         this.loadAppConfig()
-        this.loadLiveMessage()
         this.loadWorkspaceList()
 
         this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id)
@@ -136,7 +146,6 @@ export class Tracim extends React.Component {
 
   componentWillUnmount () {
     this.liveMessageManager.closeLiveMessageConnection()
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   loadAppConfig = async () => {
@@ -165,21 +174,6 @@ export class Tracim extends React.Component {
 
     const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
-  }
-
-  loadLiveMessage = async () => {
-    const { props } = this
-    const response = await props.dispatch(getLiveMessage())
-
-    switch (response.status) {
-      case 200:
-        console.log('got live messages already sent')
-        break
-      default:
-        // props.dispatch(newFlashMessage(('Error while getting live messages'), 'error'))
-        console.log('error while getting live message')
-        break
-    }
   }
 
   loadWorkspaceList = async (openInSidebarId = undefined) => {
@@ -222,7 +216,7 @@ export class Tracim extends React.Component {
 
   setDefaultUserLang = async loggedUser => {
     const { props } = this
-    const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
+    const fetchPutUserLang = await props.dispatch(putUserLang(serialize(loggedUser, serializeUserProps), props.user.lang))
     switch (fetchPutUserLang.status) {
       case 200: break
       default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
@@ -258,6 +252,7 @@ export class Tracim extends React.Component {
           onRemoveFlashMessage={this.handleRemoveFlashMessage}
           t={props.t}
         />
+        <ReduxTlmDispatcher />
 
         <div className='sidebarpagecontainer'>
           <Route render={() => <Sidebar />} />
@@ -358,4 +353,4 @@ export class Tracim extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system }) => ({
   breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system
 })
-export default withRouter(connect(mapStateToProps)(translate()(Tracim)))
+export default withRouter(connect(mapStateToProps)(translate()(TracimComponent(Tracim))))

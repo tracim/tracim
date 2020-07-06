@@ -10,6 +10,8 @@ from tracim_backend.models.event import Message
 from tracim_backend.views.core_api.schemas import LiveMessageSchema
 
 TLM_EVENT_NAME = "message"
+STREAM_OPENED_EVENT_NAME = "stream-opened"
+KEEPALIVE_EVENT_NAME = "keepalive"
 
 
 class JsonServerSideEvent(object):
