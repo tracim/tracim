@@ -208,7 +208,7 @@ export class Account extends React.Component {
           switch (fetchPutUsername.json.code) {
             case 2001:
               props.dispatch(newFlashMessage(
-                props.t('Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
+                props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
               ))
               break
             case 2062:

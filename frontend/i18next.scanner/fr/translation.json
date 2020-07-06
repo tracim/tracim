@@ -246,7 +246,7 @@
   "User administration": "Administration d'utilisateur",
   "Username can't contain any whitespace": "L'identifiant ne doit pas contenir d'espace",
   "Username must be at least {{minimumCharactersUsername}} characters": "L'identifiant doit faire au moins {{minimumCharactersUsername}} caractères",
-  "Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters": "L'identifiant doit avoir entre {{minimumCharactersUsername}} et {{maximumCharactersUsername}} caractères",
+  "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "L'identifiant doit avoir entre {{minimumCharactersUsername}} et {{maximumCharactersUsername}} caractères",
   "Forgotten password": "Mot de passe perdu",
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Le nom complet doit comporter au moins {{minimumCharactersPublicName}} caractères",
   "Public upload": "Téléversement publique",

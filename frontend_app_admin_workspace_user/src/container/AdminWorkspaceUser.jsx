@@ -455,7 +455,7 @@ export class AdminWorkspaceUser extends React.Component {
         switch (newUserResult.body.code) {
           case 2001:
             if (newUserResult.body.details.email) this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning')
-            if (newUserResult.body.details.username) this.sendGlobalFlashMsg(props.t('Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }))
+            if (newUserResult.body.details.username) this.sendGlobalFlashMsg(props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }))
             else this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
             break
           case 2062:

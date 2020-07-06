@@ -234,7 +234,7 @@
   "User administration": "Administração de utilizador",
   "Username can't contain any whitespace": "O identificador não pode conter nenhum espaço em branco",
   "Username must be at least {{minimumCharactersUsername}} characters": "O identificador deve ter pelo menos {{minimumCharactersUsername}} carateres",
-  "Username must have between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters": "O identificador deve ter entre {{minimumCharactersUsername}} e {{maximumCharactersUsername}} caracteres",
+  "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "O identificador deve ter entre {{minimumCharactersUsername}} e {{maximumCharactersUsername}} caracteres",
   "Forgotten password": "Palavra-passe esquecida",
   "Did you forget your password?": "Esqueceste-te da tua palavra-passe?",
   "Public download": "Download público",

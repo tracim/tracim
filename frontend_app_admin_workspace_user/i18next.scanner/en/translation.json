@@ -43,6 +43,7 @@
   "Full name": "Full name",
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Full name must be at least {{minimumCharactersPublicName}} characters",
   "Username must be at least {{minimumCharactersUsername}} characters": "Username must be at least {{minimumCharactersUsername}} characters",
+  "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long",
   "Username can't contain any whitespace": "Username can't contain any whitespace",
   "Email notification are disabled, please manually notify users of any change": "Email notification are disabled, please manually notify users of any change",
   "Error, invalid email address": "Error, invalid email address",
