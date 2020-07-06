@@ -11,7 +11,8 @@ import {
   IconButton,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   PAGE
@@ -31,7 +32,7 @@ import { getSearchedKeywords } from '../action-creator.async.js'
 
 const qs = require('query-string')
 
-class SearchResult extends React.Component {
+export class SearchResult extends React.Component {
   constructor (props) {
     super(props)
     // FIXME - GB - 2019-06-26 - this state is needed to know if there are still any results not sent from the backend
@@ -40,7 +41,15 @@ class SearchResult extends React.Component {
       totalHits: 0
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+  }
+
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<Search> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+    this.setHeadTitle()
+    this.buildBreadcrumbs()
   }
 
   parseUrl () {
@@ -58,24 +67,10 @@ class SearchResult extends React.Component {
     return searchObject
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<Search> Custom event', 'color: #28a745', type, data)
-        this.setHeadTitle()
-        this.buildBreadcrumbs()
-        break
-    }
-  }
-
   componentDidMount () {
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.loadSearchUrl()
-  }
-
-  componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   componentDidUpdate (prevProps) {
@@ -145,7 +140,7 @@ class SearchResult extends React.Component {
     let contentName = ''
 
     if (props.contentType.length > 1) {
-      contentName = content.content_type === props.contentType[1].slug ? content.filename : content.label
+      contentName = content.contentType === props.contentType[1].slug ? content.filename : content.label
     } else {
       props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
     }
@@ -255,22 +250,22 @@ class SearchResult extends React.Component {
                   <ListItemWrapper
                     label={searchItem.label}
                     read
-                    contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.content_type) : null}
+                    contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
                     isLast={index === props.searchResult.resultsList.length - 1}
-                    key={searchItem.content_id}
+                    key={searchItem.contentId}
                   >
                     <ContentItemSearch
                       label={searchItem.label}
                       path={`${searchItem.workspace.label} > ${this.getPath(searchItem.parents)}${this.getContentName(searchItem)}`}
-                      lastModificationAuthor={searchItem.last_modifier.public_name}
-                      lastModificationTime={displayDistanceDate(searchItem.modified, this.props.user.lang)}
+                      lastModificationAuthor={searchItem.lastModifier.public_name}
+                      lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
                       lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
-                      fileExtension={searchItem.file_extension}
-                      faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.content_type)).faIcon : null}
+                      fileExtension={searchItem.fileExtension}
+                      faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
                       statusSlug={searchItem.status}
-                      contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.content_type) : null}
-                      urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspace_id, searchItem.content_type, searchItem.content_id)}`}
-                      key={searchItem.content_id}
+                      contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
+                      urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
+                      key={searchItem.contentId}
                     />
                   </ListItemWrapper>
                 ))}
@@ -298,4 +293,4 @@ class SearchResult extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, searchResult, contentType, system, user }) => ({ breadcrumbs, searchResult, contentType, system, user })
-export default connect(mapStateToProps)(translate()(SearchResult))
+export default connect(mapStateToProps)(translate()(TracimComponent(SearchResult)))

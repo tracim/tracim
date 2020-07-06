@@ -46,7 +46,7 @@ DisplayState.propTypes = {
   tooltip: PropTypes.string
 }
 
-DisplayState.defaultState = {
+DisplayState.defaultProps = {
   msg: '',
   icon: '',
   btnLabel: '',

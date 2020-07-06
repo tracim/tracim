@@ -187,9 +187,19 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ### Session ###
 
 ### pyramid_beaker parameters ###
+
 session.type = file
+# needed for "file" storage config :
 ; session.data_dir = %(here)s/sessions_data
 session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
+# needed for many session storage type, but not for file (leave as empty for file)
+session.url =
+
+## "Redis" storage config sample:
+# session.type = ext:redis
+# note: redis db name are integer (by default 16 database are available from 0 to 15 db)
+# session.url = redis://localhost:6379/0
+
 ; session.lock_dir = %(here)s/sessions_data
 session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 session.key = session_key
@@ -199,8 +209,6 @@ session.save_accessed_time = True
 session.cookie_expires = 604800
 session.timeout = 604800
 session.cookie_on_exception = True
-## custom Tracim pyramid_beaker parameter
-; session.reissue_time = 120
 
 ####
 # AUTH
@@ -345,6 +353,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ## with async, please also configure redis below
 ; jobs.async.redis.host = localhost
 ; jobs.async.redis.port = 6379
+# note: redis db name are integer (by default 16 database are available from 0 to 15 db)
 ; jobs.async.redis.db = 0
 
 ####

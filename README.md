@@ -173,6 +173,17 @@ You can now head to (if pushpin is correctly configured and use default port 799
 
 :warning: Using tracim without pushpin will mean no live message leading to unrefreshed frontend information.
 
+### Upkeep
+
+If you use default "file" storage for session, new session file will be created but not removed, which mean lot of unneeded file.
+To mitigate this, you could remove file older than 8 day with :
+
+    find . -type f -mtime +8 -print -exec rm {} \;
+
+You should use this command in both session data and session lock dirs.
+
+Another way to solve this issue is to set session to use another backend(we do support all beaker backend),
+see [session](/backend/doc/setting.md) documentation for more information.
 
 #### More documentation about running Tracim and Tracim services
 

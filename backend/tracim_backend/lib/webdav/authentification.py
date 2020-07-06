@@ -44,7 +44,7 @@ class TracimDomainController(object):
         Called to check if for a given root, the username exists (though here we don't make difference between
         root as we're always starting at tracim's root
         """
-        session = environ["tracim_dbsession"]  # type: Session
+        session = environ["tracim_context"].dbsession  # type: Session
         api = UserApi(None, session, self.app_config)
         try:
             api.get_one_by_login(login=username)

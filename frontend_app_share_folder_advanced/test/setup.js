@@ -19,12 +19,19 @@ if (!global.window && !global.document) {
     },
     pretendToBeVisual: false,
     userAgent: 'mocha',
+    url: 'http://localhost'
   })
 
   global.window = window
   global.document = window.document
   global.navigator = window.navigator
   global.GLOBAL_primaryColor = GLOBAL_primaryColor.hex
+
+  const nodeCrypto = require('crypto')
+  global.crypto = {
+    getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }
+  }
+  global.GLOBAL_dispatchEvent = () => {}
 }
 
 Enzyme.configure({adapter: new Adapter()})

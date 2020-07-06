@@ -19,9 +19,14 @@ if (!global.window && !global.document) {
       win.scrollTo = () => {}
     },
     pretendToBeVisual: false,
-    userAgent: 'mocha'
+    userAgent: 'mocha',
+    url: 'http://localhost'
   })
 
+  const nodeCrypto = require('crypto')
+  global.crypto = {
+    getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }
+  }
   global.window = window
   global.document = window.document
   global.navigator = window.navigator

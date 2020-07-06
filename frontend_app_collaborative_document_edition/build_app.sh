@@ -28,6 +28,8 @@ if [ "$1" = "-d" ]; then
     devext=".dev"
 fi
 
+log "creating debug file"
+cp src/debug.js.sample src/debug.js
 log "building frontend_app_collaborative_document_edition"
 yarn run buildwithextvendors$dev && loggood "success" || logerror "some error"
 log "copying built file to frontend/"

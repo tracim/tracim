@@ -1,11 +1,7 @@
 import { timelineDebugData } from './timelineDebugData.js'
+import { FETCH_CONFIG as LIB_FETCH_CONFIG } from 'tracim_frontend_lib'
 
-export const FETCH_CONFIG = {
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  }
-}
+export const FETCH_CONFIG = LIB_FETCH_CONFIG
 
 export const MODE = {
   VIEW: 'view',

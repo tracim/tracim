@@ -25,11 +25,11 @@ export const MenuProfil = props => {
               display: 'inline-block',
               marginRight: '10px'
             }}
-            publicName={props.user.public_name}
+            publicName={props.user.publicName}
           />
 
           <div className='menuprofil__dropdown__name__text'>
-            {props.user.public_name}
+            {props.user.publicName}
           </div>
         </button>
 

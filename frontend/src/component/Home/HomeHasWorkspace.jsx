@@ -12,11 +12,11 @@ export const HomeHasWorkspace = props =>
 
     <div className='homepagecard__user'>
       <div className='homepagecard__user__avatar'>
-        <Avatar publicName={props.user.public_name} width='75px' />
+        <Avatar publicName={props.user.publicName} width='75px' />
       </div>
 
       <div className='homepagecard__user__publicname'>
-        {props.user.public_name}
+        {props.user.publicName}
       </div>
     </div>
 

@@ -1,6 +1,7 @@
 # coding=utf-8
 from hapic.data import HapicData
 from pyramid.config import Configurator
+from pyramid.security import forget
 from pyramid.security import remember
 from pyramid_ldap3 import get_ldap_connector
 
@@ -69,7 +70,7 @@ class SessionController(Controller):
         """
         Logs out current logged in user. This also trashes the associated session
         """
-        request.session.delete()
+        forget(request)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_ENDPOINTS])

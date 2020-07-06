@@ -1,69 +1,166 @@
+import { uniqBy } from 'lodash'
 import {
   SET,
   ADD,
+  UPDATE,
   TOGGLE,
   WORKSPACE,
   WORKSPACE_CONTENT,
   FOLDER,
   WORKSPACE_CONTENT_ARCHIVED,
-  WORKSPACE_CONTENT_DELETED
+  WORKSPACE_CONTENT_DELETED,
+  REMOVE,
+  RESTORE,
+  CONTENT
 } from '../action-creator.sync.js'
+import { serialize } from 'tracim_frontend_lib'
+import { CONTENT_NAMESPACE } from '../util/helper'
 
-export const serializeContent = c => ({
-  id: c.content_id,
-  label: c.label,
-  slug: c.slug,
-  type: c.content_type,
-  fileName: c.filename,
-  fileExtension: c.file_extension,
-  workspaceId: c.workspace_id,
-  isArchived: c.is_archived,
-  parentId: c.parent_id,
-  isDeleted: c.is_deleted,
-  showInUi: c.show_in_ui,
-  statusSlug: c.status,
-  subContentTypeList: c.sub_content_types,
-  isOpen: c.isOpen ? c.isOpen : false, // only useful for folder
-  activedShares: c.actives_shares,
-  created: c.created
-})
+export const serializeContentProps = {
+  content_id: 'id',
+  label: 'label',
+  slug: 'slug',
+  content_type: 'type',
+  filename: 'fileName',
+  file_extension: 'fileExtension',
+  workspace_id: 'workspaceId',
+  is_archived: 'isArchived',
+  parent_id: 'parentId',
+  is_deleted: 'isDeleted',
+  show_in_ui: 'showInUi',
+  status: 'statusSlug',
+  sub_content_types: 'subContentTypeList',
+  isOpen: 'isOpen',
+  actives_shares: 'activedShares',
+  created: 'created'
+}
 
-export default function workspaceContentList (state = [], action) {
+const defaultWorkspaceContentList = {
+  workspaceId: 0,
+  contentList: []
+}
+
+export default function workspaceContentList (state = defaultWorkspaceContentList, action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_CONTENT}`:
-      return action.workspaceContentList.map(c => ({
-        ...serializeContent(c),
-        isOpen: action.folderIdToOpenList.includes(c.content_id)
-      }))
+      return {
+        workspaceId: action.workspaceId,
+        contentList: action.workspaceContentList.map(c => ({
+          ...serialize(c, serializeContentProps),
+          isOpen: action.folderIdToOpenList.includes(c.content_id)
+        }))
+      }
 
+    case `${RESTORE}/${WORKSPACE_CONTENT}`:
     case `${ADD}/${WORKSPACE_CONTENT}`: {
+      if (
+        state.workspaceId !== action.workspaceId ||
+        !action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)
+      ) return state
+
       const parentIdList = [
-        ...state.filter(c => c.parentId),
+        ...state.contentList.filter(c => c.parentId),
         ...action.workspaceContentList.filter(c => c.parentId)
       ]
-      return [
-        ...state,
-        ...action.workspaceContentList.map(c => ({
-          ...serializeContent(c),
-          isOpen: parentIdList.includes(c.content_id)
-        }))
+
+      const newContentList = [
+        ...state.contentList,
+        ...action.workspaceContentList
+          .filter(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)
+          .map(c => ({
+            ...serialize(c, serializeContentProps),
+            isOpen: parentIdList.includes(c.content_id)
+          }))
       ]
+      const newUniqueContentList = uniqBy(newContentList, 'id')
+
+      return {
+        ...state,
+        contentList: newUniqueContentList
+      }
     }
 
+    case `${UPDATE}/${WORKSPACE_CONTENT}`: {
+      if (!action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)) return state
+
+      if (state.workspaceId !== action.workspaceId) {
+        return {
+          workspaceId: state.workspaceId,
+          contentList: state.contentList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id))
+        }
+      }
+
+      const parentIdList = [
+        ...state.contentList.filter(c => c.parentId),
+        ...action.workspaceContentList.filter(c => c.parentId)
+      ]
+
+      return {
+        workspaceId: state.workspaceId,
+        contentList: [
+          ...state.contentList.filter(c => !action.workspaceContentList.some(wc => wc.content_id === c.id)),
+          ...action.workspaceContentList
+            .filter(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)
+            .map(c => ({
+              ...serialize(c, serializeContentProps),
+              isOpen: parentIdList.includes(c.content_id)
+            }))
+        ]
+      }
+    }
+
+    case `${SET}/${WORKSPACE}/${FOLDER}/${CONTENT}`:
+      if (state.workspaceId !== action.workspaceId) return state
+
+      const contentListToAdd = action.contentList
+        .filter(c => c.content_namespace === CONTENT_NAMESPACE.CONTENT)
+        .map(c => serialize(c, serializeContentProps))
+
+      // INFO - CH - 2020-07-01 - this process will keep the children of potential sub folders of action.folderId,
+      // we don't recursively remove them because it's a lot of process and it isn't required
+      const contentListFreeFromContentOfSameFolder = state.contentList.filter(c => c.parentId !== action.folderId)
+
+      return {
+        ...state,
+        contentList: [
+          ...contentListFreeFromContentOfSameFolder,
+          ...contentListToAdd
+        ]
+      }
+
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
-      return state.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
+      }
 
     case `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`:
-      return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
-        ? { ...wsc, isArchived: true }
-        : wsc
-      )
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
+          ? { ...wsc, isArchived: true }
+          : wsc
+        )
+      }
 
     case `${SET}/${WORKSPACE_CONTENT_DELETED}`:
-      return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
-        ? { ...wsc, isDeleted: true }
-        : wsc
-      )
+      if (state.workspaceId !== action.workspaceId) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.filter(wsc => wsc.id !== action.contentId)
+      }
+
+    case `${REMOVE}/${WORKSPACE_CONTENT}`:
+      if (
+        state.workspaceId !== action.workspaceId ||
+        !action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)
+      ) return state
+      return {
+        workspaceId: state.workspaceId,
+        contentList: state.contentList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id))
+      }
 
     default:
       return state

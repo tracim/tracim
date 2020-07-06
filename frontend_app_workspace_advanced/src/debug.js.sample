@@ -1,6 +1,6 @@
 import { defaultDebug } from 'tracim_frontend_lib'
 
-const workspaceId = 0
+const workspaceId = 1
 
 const SIDEBAR = [{
   faIcon: 'home',
@@ -43,7 +43,7 @@ const SIDEBAR = [{
 export const debug = {
   config: {
     ...defaultDebug.config,
-    apiUrl: '',
+    apiUrl: 'http://localhost',
     slug: 'workspace_advanced',
     faIcon: 'bank',
     hexcolor: '#7d4e24',

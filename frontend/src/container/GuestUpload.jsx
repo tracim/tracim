@@ -10,7 +10,8 @@ import {
   CUSTOM_EVENT,
   ProgressBar,
   computeProgressionPercentage,
-  FILE_PREVIEW_STATE
+  FILE_PREVIEW_STATE,
+  setupCommonRequestHeaders
 } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
@@ -202,7 +203,7 @@ class GuestUpload extends React.Component {
     xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: this.UPLOAD_STATUS.AFTER_LOAD, percent: 0 } }), false)
 
     xhr.open('POST', `${FETCH_CONFIG.apiUrl}/public/guest-upload/${this.props.match.params.token}`, true)
-    xhr.setRequestHeader('Accept', 'application/json')
+    setupCommonRequestHeaders(xhr)
     xhr.withCredentials = true
 
     xhr.onreadystatechange = () => {
