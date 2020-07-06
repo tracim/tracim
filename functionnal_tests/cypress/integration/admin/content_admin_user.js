@@ -106,7 +106,7 @@ describe("An admin seeing a user's profile", () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('.personaldata__form__button')
           .click()
-        cy.get('.flashmessage').contains('Username must have between 3 and 255 characters')
+        cy.get('.flashmessage').contains('Username must be between 3 and 255 characters long')
       })
 
       it('should show error message when username is too long', () => {

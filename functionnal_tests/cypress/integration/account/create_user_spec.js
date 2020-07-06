@@ -127,7 +127,7 @@ describe('When "Create new user" at Administration', () => {
     cy.get('[data-cy=adduser_password]').type(correctPwd)
     cy.get('[data-cy=profile__list__item__administrators]').click()
     cy.get('[data-cy=adminUser__adduser__form__submit]').click()
-    cy.get('.flashmessage').contains('Username must have between 3 and 255 characters')
+    cy.get('.flashmessage').contains('Username must be between 3 and 255 characters long')
   })
 
   it('should show error message if email is out of standard', () => {
