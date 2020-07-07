@@ -29,13 +29,13 @@ export const NewMemberForm = props => {
             id='addmember'
             placeholder={props.t('Search user...')}
             data-cy='addmember'
-            value={props.personalData}
+            value={props.publicName}
             onChange={e => props.onChangePersonalData(e.target.value)}
             autoComplete='off'
             autoFocus
           />
 
-          {props.autoCompleteActive && props.personalData.length >= 2 && (
+          {props.autoCompleteActive && props.publicName.length >= 2 && (
             // Côme - 2018/10/18 - see https://github.com/tracim/tracim/issues/1021 for details about theses tests
             <div className='autocomplete primaryColorBorder'>
               {props.searchedKnownMemberList.length > 0
@@ -86,7 +86,7 @@ export const NewMemberForm = props => {
 
                       <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
                         <div className='autocomplete__item__name__unknownuser'>
-                          {props.personalData}
+                          {props.publicName}
                           <div className='autocomplete__item__name__unknownuser__msg'>
                             {props.t('I know this user exist')}
                           </div>
@@ -180,7 +180,7 @@ export default translate()(NewMemberForm)
 
 NewMemberForm.propTypes = {
   onClickCloseAddMemberBtn: PropTypes.func,
-  personalData: PropTypes.string,
+  publicName: PropTypes.string,
   searchedKnownMemberList: PropTypes.arrayOf(PropTypes.object),
   isEmail: PropTypes.bool,
   onClickAutoComplete: PropTypes.func,
@@ -198,7 +198,7 @@ NewMemberForm.propTypes = {
 }
 
 NewMemberForm.defaultProps = {
-  personalData: '',
+  publicName: '',
   searchedKnownMemberList: [],
   isEmail: false,
   userRoleIdInWorkspace: 0,

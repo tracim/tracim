@@ -10,7 +10,7 @@ ReactDOM.render(
   <div style={{ width: '1200px' }}>
     <NewMemberForm
       onClickCloseAddMemberBtn={() => {}}
-      personalData={'text'}
+      publicName={'text'}
       isEmail={false}
       onChangePersonalData={() => {}}
       searchedKnownMemberList={[]}
