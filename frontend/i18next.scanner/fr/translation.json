@@ -249,7 +249,6 @@
   "Username and name has been changed": "L'identifiant et le nom a été changé",
   "Username has been changed": "L'identifiant a été changé",
   "Personal data has been changed": "Les données personnelles ont été modifiées",
-  "@username": "@identifiant",
   "Invalid email or username": "Adresse email ou identifiant invalide",
   "Email address or username": "Adresse email ou identifiant",
   "Invalid credentials": "Identifiants invalide",
@@ -258,5 +257,6 @@
   "Unknown email or username": "Adresse email ou identifiant inconnu",
   "This username is not linked to any email, please contact an administrator to reset your password": "Ce identifiant n'est lié à aucun e-mail, veuillez contacter un administrateur pour réinitialiser votre mot de passe",
   "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} est supérieur à 1MO, cela peut prendre du temps à téléverser. Voulez-vous continuer ?",
+  "Your username": "Votre identifiant",
   "Your username has been set": "Votre identifiant a été défini"
 }

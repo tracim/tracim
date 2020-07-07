@@ -249,7 +249,6 @@
   "Username and name has been changed": "Username and name has been changed",
   "Username has been changed": "Username has been changed",
   "Personal data has been changed": "Personal data has been changed",
-  "@username": "@username",
   "Invalid email or username": "Invalid email or username",
   "Email address or username": "Email address or username",
   "Invalid credentials": "Invalid credentials",
@@ -258,5 +257,6 @@
   "Unknown email or username": "Unknown email or username",
   "This username is not linked to any email, please contact an administrator to reset your password": "This username is not linked to any email, please contact an administrator to reset your password",
   "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?",
+  "Your username": "Your username",
   "Your username has been set": "Your username has been set"
 }

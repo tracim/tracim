@@ -17,7 +17,6 @@ import {
   buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
@@ -192,8 +191,7 @@ export class Account extends React.Component {
     }
 
     if (newUsername !== '') {
-      const username = removeAtInUsername(newUsername)
-      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, checkPassword))
+      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, newUsername, checkPassword))
 
       switch (fetchPutUsername.status) {
         case 200:
@@ -239,9 +237,7 @@ export class Account extends React.Component {
   handleChangeUsername = async (newUsername) => {
     const { props } = this
 
-    const username = removeAtInUsername(newUsername)
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
@@ -249,7 +245,7 @@ export class Account extends React.Component {
       return
     }
 
-    if (hasSpaces(username)) {
+    if (hasSpaces(newUsername)) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t("Username can't contain any whitespace")
@@ -257,7 +253,7 @@ export class Account extends React.Component {
       return
     }
 
-    if (hasNotAllowedCharacters(username)) {
+    if (hasNotAllowedCharacters(newUsername)) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -265,7 +261,7 @@ export class Account extends React.Component {
       return
     }
 
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(newUsername))
 
     switch (fetchUsernameAvailability.status) {
       case 200:

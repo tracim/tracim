@@ -203,7 +203,7 @@ export class AdminUser extends React.Component {
                       </td>
 
                       <td>
-                        {u.username}
+                        {u.username && `@${u.username}`}
                       </td>
 
                       <td>{u.email}</td>

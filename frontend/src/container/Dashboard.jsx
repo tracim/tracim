@@ -295,8 +295,10 @@ export class Dashboard extends React.Component {
       autoCompleteClicked: false
     }))
 
-    if (removeAtInUsername(newPersonalData).length >= 2) {
-      await this.handleSearchUser(removeAtInUsername(newPersonalData))
+    const username = removeAtInUsername(newPersonalData)
+
+    if (username.length >= 2) {
+      await this.handleSearchUser(username)
       this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
