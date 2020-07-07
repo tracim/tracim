@@ -251,7 +251,7 @@ export class Account extends React.Component {
       return
     }
 
-    if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
+    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })

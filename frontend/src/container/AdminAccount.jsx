@@ -361,7 +361,7 @@ export class Account extends React.Component {
       return
     }
 
-    if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
+    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
       this.setState(prev => ({
         userToEdit: {
           ...prev.userToEdit,
