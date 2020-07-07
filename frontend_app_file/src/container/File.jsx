@@ -114,7 +114,8 @@ export class File extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
 
@@ -214,6 +215,15 @@ export class File extends React.Component {
         isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
       })
     )
+  }
+
+  handleUserModified = data => {
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.user.user_id
+      ? { ...timelineItem, author: data.user }
+      : timelineItem
+    )
+
+    this.setState({ timeline: newTimeline })
   }
 
   async componentDidMount () {
@@ -391,6 +401,7 @@ export class File extends React.Component {
       await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
+      case 200: break
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg

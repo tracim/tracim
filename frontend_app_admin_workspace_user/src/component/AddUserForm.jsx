@@ -3,8 +3,7 @@ import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import {
   CUSTOM_EVENT,
-  PROFILE_LIST,
-  removeAtInUsername
+  PROFILE_LIST
 } from 'tracim_frontend_lib'
 import { ALLOWED_CHARACTERS_USERNAME } from '../helper.js'
 
@@ -58,7 +57,7 @@ export class AddUserForm extends React.Component {
 
     props.onClickAddUser(
       state.newUserName,
-      removeAtInUsername(state.newUserUsername),
+      state.newUserUsername,
       state.newUserEmail,
       state.newUserProfile,
       state.newUserPassword
@@ -102,7 +101,7 @@ export class AddUserForm extends React.Component {
             type='text'
             className='userData__input form-control'
             id='adduser_username'
-            placeholder={props.t('@username')}
+            placeholder={props.t('Username')}
             value={state.newUserUsername}
             onChange={this.handleChangeNewUserUsername}
             data-cy='adduser_username'

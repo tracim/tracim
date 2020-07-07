@@ -9,7 +9,7 @@ import {
   mockPutMyselfThreadRead200
 } from '../apiMock.js'
 import { contentThread } from '../fixture/contentThread.js'
-import { commentTlm, author } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
+import { commentTlm, author, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 import { debug } from '../../src/debug.js'
 
 describe('<Thread />', () => {
@@ -250,6 +250,23 @@ describe('<Thread />', () => {
 
           it('should not update the state', () => {
             expect(wrapper.state('content').is_deleted).to.equal(true)
+          })
+        })
+      })
+    })
+
+    describe('eventType user', () => {
+      describe('handleUserModified', () => {
+        describe('If the user is the author of a revision or comment', () => {
+          it('should update the timeline with the data of the user', () => {
+            const tlmData = { user: { ...user, public_name: 'newName' } }
+            wrapper.instance().handleUserModified(tlmData)
+
+            const listPublicNameOfAuthor = wrapper.state('timeline')
+              .filter(timelineItem => timelineItem.author.user_id === tlmData.user.user_id)
+              .map(timelineItem => timelineItem.author.public_name)
+            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.user.public_name)
+            expect(isNewName).to.be.equal(true)
           })
         })
       })

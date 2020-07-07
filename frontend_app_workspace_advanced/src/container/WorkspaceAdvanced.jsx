@@ -14,7 +14,8 @@ import {
   PopinFixedOption,
   PopinFixedContent,
   PopinFixedRightPart,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -350,8 +351,10 @@ export class WorkspaceAdvanced extends React.Component {
       autoCompleteClicked: false
     }))
 
-    if (newPersonalData.length >= 2) {
-      await this.handleSearchUser(newPersonalData)
+    const username = removeAtInUsername(newPersonalData)
+
+    if (username.length >= 2) {
+      await this.handleSearchUser(username)
       this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
