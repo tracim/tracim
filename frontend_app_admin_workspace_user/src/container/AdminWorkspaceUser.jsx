@@ -670,4 +670,4 @@ export class AdminWorkspaceUser extends React.Component {
   }
 }
 
-export default translate()(Radium(TracimComponent(AdminWorkspaceUser)))
+export default translate()(TracimComponent(Radium(AdminWorkspaceUser)))
