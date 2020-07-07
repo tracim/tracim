@@ -360,7 +360,18 @@ export class Account extends React.Component {
         userToEdit: {
           ...prev.userToEdit,
           isUsernameValid: false,
-          usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+          usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+        }
+      }))
+      return
+    }
+
+    if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
+      this.setState(prev => ({
+        userToEdit: {
+          ...prev.userToEdit,
+          isUsernameValid: false,
+          usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
         }
       }))
       return
