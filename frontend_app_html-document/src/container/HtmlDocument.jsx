@@ -13,6 +13,7 @@ import {
   CUSTOM_EVENT,
   displayDistanceDate,
   generateLocalStorageContentId,
+  getOrCreateSessionClientToken,
   handleFetchResult,
   NewVersionBtn,
   PopinFixed,
@@ -68,8 +69,10 @@ export class HtmlDocument extends React.Component {
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
       hasUpdated: false,
-      editionAuthor: ''
+      editionAuthor: '',
+      isLastTimelineItemCurrentToken: false
     }
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -86,7 +89,8 @@ export class HtmlDocument extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUndeleted },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
 
@@ -102,7 +106,8 @@ export class HtmlDocument extends React.Component {
       editionAuthor: data.author.public_name,
       hasUpdated: prev.loggedUser.userId !== data.author.user_id,
       rawContentBeforeEdit: data.content.raw_content,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -122,7 +127,10 @@ export class HtmlDocument extends React.Component {
       ]
     )
 
-    this.setState({ timeline: sortedNewTimeline })
+    this.setState({
+      timeline: sortedNewTimeline,
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+    })
   }
 
   handleContentDeleted = data => {
@@ -136,7 +144,8 @@ export class HtmlDocument extends React.Component {
         ...data.content,
         is_deleted: true
       },
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -151,8 +160,18 @@ export class HtmlDocument extends React.Component {
         ...data.content,
         is_deleted: false
       },
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
+  }
+
+  handleUserModified = data => {
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.user.user_id
+      ? { ...timelineItem, author: data.user }
+      : timelineItem
+    )
+
+    this.setState({ timeline: newTimeline })
   }
 
   // Custom Event Handlers
@@ -339,7 +358,8 @@ export class HtmlDocument extends React.Component {
       },
       newComment: localStorageComment || '',
       rawContentBeforeEdit: resHtmlDocument.body.raw_content,
-      timeline: revisionWithComment
+      timeline: revisionWithComment,
+      isLastTimelineItemCurrentToken: false
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
@@ -648,6 +668,7 @@ export class HtmlDocument extends React.Component {
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+                  isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                 />
               )
             }]}

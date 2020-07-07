@@ -322,6 +322,11 @@ export const CONTENT_TYPE = {
   COMMENT: 'comment'
 }
 
+export const TIMELINE_TYPE = {
+  COMMENT: CONTENT_TYPE.COMMENT,
+  REVISION: 'revision'
+}
+
 export const sortTimelineByDate = (timeline) => {
   return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
 }

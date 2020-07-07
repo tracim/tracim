@@ -17,7 +17,6 @@ import {
   CardPopup,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
@@ -97,12 +96,10 @@ export class Home extends React.Component {
     if (state.newUsername === '') {
       Cookies.set(COOKIE_FRONTEND.HIDE_USERNAME_POPUP, this.state.hidePopupCheckbox, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
     } else {
-      const username = removeAtInUsername(state.newUsername)
-
-      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, state.password))
+      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, state.newUsername, state.password))
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
+          props.dispatch(newFlashMessage(props.t('Your username has been set'), 'info'))
           break
         case 400:
           switch (fetchPutUsername.json.code) {
@@ -143,7 +140,7 @@ export class Home extends React.Component {
     const { props } = this
 
     this.setState({ newUsername: e.target.value })
-    const username = removeAtInUsername(e.target.value)
+    const username = e.target.value
 
     if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
@@ -251,7 +248,7 @@ export class Home extends React.Component {
                   <input
                     className='homepage__usernamePopup__body__input form-control'
                     type='text'
-                    placeholder={props.t('@username')}
+                    placeholder={props.t('Your username')}
                     value={this.state.newUsername}
                     onChange={this.handleChangeNewUsername}
                     data-cy='usernamePopup_username'

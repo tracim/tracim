@@ -13,7 +13,6 @@ import {
   buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent
@@ -566,9 +565,7 @@ export class AdminWorkspaceUser extends React.Component {
   handleChangeUsername = async (newUsername) => {
     const { props, state } = this
 
-    const username = removeAtInUsername(newUsername)
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
@@ -584,7 +581,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    if (hasSpaces(username)) {
+    if (hasSpaces(newUsername)) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t("Username can't contain any whitespace")
@@ -592,7 +589,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    if (hasNotAllowedCharacters(username)) {
+    if (hasNotAllowedCharacters(newUsername)) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -600,7 +597,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, username))
+    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, newUsername))
 
     switch (fetchUsernameAvailability.apiResponse.status) {
       case 200:

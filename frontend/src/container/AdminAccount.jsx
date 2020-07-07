@@ -17,7 +17,6 @@ import {
   buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername,
   serialize,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -299,9 +298,7 @@ export class Account extends React.Component {
     }
 
     if (newUsername !== '') {
-      const username = removeAtInUsername(newUsername)
-
-      const fetchPutUsername = await props.dispatch(putUserUsername(state.userToEdit, username, checkPassword))
+      const fetchPutUsername = await props.dispatch(putUserUsername(state.userToEdit, newUsername, checkPassword))
       switch (fetchPutUsername.status) {
         case 200:
           if (newEmail === '') {
@@ -353,9 +350,7 @@ export class Account extends React.Component {
   handleChangeUsername = async (newUsername) => {
     const { props } = this
 
-    const username = removeAtInUsername(newUsername)
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState(prev => ({
         userToEdit: {
           ...prev.userToEdit,
@@ -377,7 +372,7 @@ export class Account extends React.Component {
       return
     }
 
-    if (hasSpaces(username)) {
+    if (hasSpaces(newUsername)) {
       this.setState(prev => ({
         userToEdit: {
           ...prev.userToEdit,
@@ -388,7 +383,7 @@ export class Account extends React.Component {
       return
     }
 
-    if (hasNotAllowedCharacters(username)) {
+    if (hasNotAllowedCharacters(newUsername)) {
       this.setState(prev => ({
         userToEdit: {
           ...prev.userToEdit,
@@ -399,7 +394,7 @@ export class Account extends React.Component {
       return
     }
 
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(newUsername))
 
     switch (fetchUsernameAvailability.status) {
       case 200:
