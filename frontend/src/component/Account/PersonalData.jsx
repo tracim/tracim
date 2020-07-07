@@ -64,7 +64,7 @@ export class PersonalData extends React.Component {
         <form className='personaldata__form'>
           <div className='d-flex align-items-center flex-wrap mb-4'>
             <input
-              className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-3 mt-sm-0'
+              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
               type='text'
               data-cy='personaldata__form__txtinput__fullname'
               placeholder={props.t('New full name')}
@@ -76,7 +76,7 @@ export class PersonalData extends React.Component {
           <div>
             <div>
               <input
-                className='personaldata__form__txtinput__username primaryColorBorderLighten form-control mt-3 mt-sm-0'
+                className='personaldata__form__txtinput primaryColorBorderLighten form-control'
                 type='text'
                 data-cy='personaldata__form__txtinput__username'
                 placeholder={props.t('New username')}
@@ -98,7 +98,7 @@ export class PersonalData extends React.Component {
           {editableUserAuthTypeList.includes(props.userAuthType) && (
             <div className='d-flex align-items-center flex-wrap mb-4 mt-4'>
               <input
-                className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control mt-3 mt-sm-0'
+                className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control'
                 type='email'
                 data-cy='personaldata__form__txtinput__email'
                 placeholder={props.t('New email')}
