@@ -54,6 +54,7 @@ export class WorkspaceAdvanced extends React.Component {
       newMember: {
         id: '',
         personalData: '',
+        publicName: '',
         role: '',
         avatarUrl: '',
         isEmail: false
@@ -346,6 +347,7 @@ export class WorkspaceAdvanced extends React.Component {
       newMember: {
         ...prev.newMember,
         personalData: newPersonalData,
+        publicName: newPersonalData,
         isEmail: this.isEmail(newPersonalData)
       },
       autoCompleteClicked: false
@@ -365,6 +367,7 @@ export class WorkspaceAdvanced extends React.Component {
         ...prev.newMember,
         id: knownMember.user_id,
         personalData: knownMember.username,
+        publicName: knownMember.public_name,
         avatarUrl: knownMember.avatar_url,
         isEmail: false
       },
@@ -428,6 +431,7 @@ export class WorkspaceAdvanced extends React.Component {
       newMember: {
         id: '',
         personalData: '',
+        publicName: '',
         role: '',
         avatarUrl: '',
         isEmail: false
@@ -538,7 +542,7 @@ export class WorkspaceAdvanced extends React.Component {
                     loggedUser={state.loggedUser}
                     onClickDeleteMember={this.handleClickDeleteMember}
                     onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-                    newMemberName={state.newMember.personalData}
+                    newMemberName={state.newMember.publicName}
                     isEmail={state.newMember.isEmail}
                     onChangeNewMemberName={this.handleChangeNewMemberName}
                     searchedKnownMemberList={state.searchedKnownMemberList}
