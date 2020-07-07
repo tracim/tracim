@@ -204,7 +204,7 @@ export class AdminUser extends React.Component {
                       </td>
 
                       <td className='adminUser__table__tr__td-text' title={u.username}>
-                        {u.username}
+                        {u.username && `@${u.username}`}
                       </td>
 
                       <td className='adminUser__table__tr__td-text' title={u.email}>
