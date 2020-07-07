@@ -109,7 +109,7 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
       }
     }
 
-    case `${SET}/${WORKSPACE}/${FOLDER}/${CONTENT}`:
+    case `${SET}/${WORKSPACE}/${FOLDER}/${CONTENT}`: {
       if (state.workspaceId !== action.workspaceId) return state
 
       const contentListToAdd = action.contentList
@@ -127,7 +127,7 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
           ...contentListToAdd
         ]
       }
-
+    }
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
       if (state.workspaceId !== action.workspaceId) return state
       return {

@@ -98,7 +98,7 @@ export default function workspaceShareFolderContentList (state = defaultWorkspac
       }
     }
 
-    case `${SET}/${WORKSPACE}/${FOLDER}/${CONTENT}`:
+    case `${SET}/${WORKSPACE}/${FOLDER}/${CONTENT}`: {
       if (state.workspaceId !== action.workspaceId) return state
 
       const contentListToAdd = action.contentList
@@ -116,6 +116,7 @@ export default function workspaceShareFolderContentList (state = defaultWorkspac
           ...contentListToAdd
         ]
       }
+    }
 
     case `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER_ARCHIVED}`:
       if (state.workspaceId !== action.workspaceId) return state
