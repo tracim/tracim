@@ -212,16 +212,8 @@ describe('Account page', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=personaldata__form__txtinput__username]')
           .type(longNewUsername)
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.personaldata__form__txtinput.checkPassword')
-          .type(baseUser.password)
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.personaldata__form__txtinput__info')
-          .should('be.visible')
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.personaldata__form__button')
-          .click()
-        cy.get('.flashmessage').contains('Username must be between 3 and 255 characters long')
+          cy.get('.personaldata__form__txtinput__msgerror')
+            .should('be.visible')
       })
 
       it('should show the allowed characters list', () => {
