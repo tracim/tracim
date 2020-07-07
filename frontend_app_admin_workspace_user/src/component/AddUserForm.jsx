@@ -97,11 +97,11 @@ export class AddUserForm extends React.Component {
             {props.t('Username')}
           </label>
 
-          <div className='d-flex flex-column justify-content-start'>
-            <div className='d-flex'>
+          <div>
+            <div>
               <input
                 type='text'
-                className='userData__input form-control primaryColorBorderLighten'
+                className='userData__input userData__input__username form-control primaryColorBorderLighten'
                 id='adduser_username'
                 placeholder={props.t('@username')}
                 value={state.newUserUsername}
@@ -109,10 +109,10 @@ export class AddUserForm extends React.Component {
                 data-cy='adduser_username'
               />
               {!props.isUsernameValid && state.newUserUsername !== '' && (
-                <div className='userData__input__username__errorMsg'>
+                <span className='userData__input__username__errorMsg'>
                   <i className='userData__input__username__errorIcon fa fa-times' />
                   {props.usernameInvalidMsg}
-                </div>
+                </span>
               )}
             </div>
             <div className='userData__input__username__errorInfo'>

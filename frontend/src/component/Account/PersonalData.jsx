@@ -73,26 +73,26 @@ export class PersonalData extends React.Component {
             />
           </div>
 
-          <div className='d-flex flex-wrap'>
-            <div className='d-inline-flex flex-column justify-content-start'>
+          <div>
+            <div>
               <input
-                className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-3 mt-sm-0'
+                className='personaldata__form__txtinput__username primaryColorBorderLighten form-control mt-3 mt-sm-0'
                 type='text'
                 data-cy='personaldata__form__txtinput__username'
                 placeholder={props.t('New username')}
                 value={state.newUsername}
                 onChange={this.handleChangeUserName}
               />
-              <div className='personaldata__form__txtinput__msginfo'>
-                {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
-              </div>
+              {!props.isUsernameValid && (
+                <span className='personaldata__form__txtinput__msgerror'>
+                  <i className='personaldata__form__txtinput__msgerror__icon fa fa-times' />
+                  {props.usernameInvalidMsg}
+                </span>
+              )}
             </div>
-            {!props.isUsernameValid && (
-              <div className='personaldata__form__txtinput__msgerror'>
-                <i className='personaldata__form__txtinput__msgerror__icon fa fa-times' />
-                {props.usernameInvalidMsg}
-              </div>
-            )}
+            <div className='personaldata__form__txtinput__msginfo'>
+                {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
+            </div>
           </div>
 
           {editableUserAuthTypeList.includes(props.userAuthType) && (
