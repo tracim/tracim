@@ -120,7 +120,7 @@ describe('<Thread />', () => {
         })
       })
 
-      describe('handleContentModified', () => {
+      describe('handleContentChanged', () => {
         describe('Modify the label of the current content', () => {
           const tlmData = {
             ...baseRevisionTlm,
@@ -131,11 +131,11 @@ describe('<Thread />', () => {
           }
 
           before(() => {
-            wrapper.instance().handleContentModified(tlmData)
+            wrapper.instance().handleContentChanged(tlmData)
           })
 
           it('should update the state label', () => {
-            expect(wrapper.state('content').label).to.equal(tlmData.content.label)
+            expect(wrapper.state('newContent').label).to.equal(tlmData.content.label)
           })
         })
 
@@ -149,11 +149,11 @@ describe('<Thread />', () => {
           }
 
           before(() => {
-            wrapper.instance().handleContentModified(tlmData)
+            wrapper.instance().handleContentChanged(tlmData)
           })
 
           it('should update the state "raw_content"', () => {
-            expect(wrapper.state('content').raw_content).to.equal(tlmData.content.raw_content)
+            expect(wrapper.state('newContent').raw_content).to.equal(tlmData.content.raw_content)
           })
         })
 
@@ -167,21 +167,22 @@ describe('<Thread />', () => {
           }
 
           before(() => {
-            wrapper.instance().handleContentModified(tlmData)
+            wrapper.instance().handleContentChanged(tlmData)
           })
 
           it('should not update the state', () => {
             expect(wrapper.state('content').content_id).to.not.equal(tlmData.content.content_id)
           })
         })
-      })
 
-      describe('handleContentDeleted', () => {
         describe('Delete the current content', () => {
-          const tlmData = baseRevisionTlm
+          const tlmData = {
+            ...baseRevisionTlm,
+            content: { ...baseRevisionTlm.content, is_deleted: true}
+          }
 
           before(() => {
-            wrapper.instance().handleContentDeleted(tlmData)
+            wrapper.instance().handleContentChanged(tlmData)
           })
 
           after(() => {
@@ -189,7 +190,7 @@ describe('<Thread />', () => {
           })
 
           it('should update the is_deleted property', () => {
-            expect(wrapper.state('content').is_deleted).to.equal(true)
+            expect(wrapper.state('newContent').is_deleted).to.equal(true)
           })
         })
 
@@ -198,27 +199,29 @@ describe('<Thread />', () => {
             ...baseRevisionTlm,
             content: {
               ...baseRevisionTlm.content,
-              content_id: contentThread.thread.content_id + 1
+              content_id: contentThread.thread.content_id + 1,
+              is_deleted: true
             }
           }
 
           before(() => {
-            wrapper.instance().handleContentDeleted(tlmData)
+            wrapper.instance().handleContentChanged(tlmData)
           })
 
           it('should not update the state', () => {
             expect(wrapper.state('content').is_deleted).to.equal(false)
           })
         })
-      })
 
-      describe('handleContentRestored', () => {
         describe('Restore the current content', () => {
-          const tlmData = baseRevisionTlm
+          const tlmData = {
+            ...baseRevisionTlm,
+            content: { ...baseRevisionTlm.content, is_deleted: false }
+          }
 
           before(() => {
             wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-            wrapper.instance().handleContentUndeleted(tlmData)
+            wrapper.instance().handleContentChanged(tlmData)
           })
 
           after(() => {
@@ -226,7 +229,7 @@ describe('<Thread />', () => {
           })
 
           it('should update the state is_deleted', () => {
-            expect(wrapper.state('content').is_deleted).to.equal(false)
+            expect(wrapper.state('newContent').is_deleted).to.equal(false)
           })
         })
 
@@ -235,13 +238,14 @@ describe('<Thread />', () => {
             ...baseRevisionTlm,
             content: {
               ...baseRevisionTlm.content,
-              content_id: contentThread.thread.content_id + 1
+              content_id: contentThread.thread.content_id + 1,
+              is_deleted: false
             }
           }
 
           before(() => {
             wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-            wrapper.instance().handleContentUndeleted(tlmData)
+            wrapper.instance().handleContentChanged(tlmData)
           })
 
           it('should not update the state', () => {
@@ -265,6 +269,21 @@ describe('<Thread />', () => {
             expect(isNewName).to.be.equal(true)
           })
         })
+      })
+    })
+  })
+
+  describe('its internal functions', () => {
+    describe('handleClickRefresh', () => {
+      it('should update content state', () => {
+        wrapper.setState(prev => ({ newContent: { ...prev.content, label: 'New Name' } }))
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('content')).to.deep.equal(wrapper.state('newContent'))
+      })
+
+      it('should update showRefreshWarning state', () => {
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('showRefreshWarning')).to.deep.equal(false)
       })
     })
   })

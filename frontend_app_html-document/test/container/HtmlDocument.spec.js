@@ -101,7 +101,7 @@ describe('<HtmlDocument />', () => {
             wrapper.setState({ mode: APP_FEATURE_MODE.EDIT })
             wrapper.instance().handleContentModified(tlmData)
 
-            expect(wrapper.state('hasUpdated')).to.equal(true)
+            expect(wrapper.state('showRefreshWarning')).to.equal(true)
             expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.EDIT)
           })
         })
@@ -122,11 +122,11 @@ describe('<HtmlDocument />', () => {
         })
       })
 
-      describe('handleContentDeleted', () => {
-        describe('delete the current content', () => {
+      describe('handleContentDeletedOrRestore', () => {
+        describe('when deleting the current content', () => {
           const tlmData = {
             author: contentHtmlDocument.htmlDocument.last_modifier,
-            content: contentHtmlDocument.htmlDocument
+            content: { ...contentHtmlDocument.htmlDocument, is_deleted: true }
           }
 
           after(() => {
@@ -134,31 +134,30 @@ describe('<HtmlDocument />', () => {
           })
 
           it('should be deleted correctly', () => {
-            wrapper.instance().handleContentDeleted(tlmData)
-            expect(wrapper.state('content').is_deleted).to.equal(true)
+            wrapper.instance().handleContentDeletedOrRestore(tlmData)
+            expect(wrapper.state('newContent').is_deleted).to.equal(true)
           })
         })
 
-        describe('delete a content which is not the current one', () => {
+        describe('when deleting a content which is not the current one', () => {
           const tlmData = {
             content: {
               ...contentHtmlDocument.htmlDocument,
-              content_id: contentHtmlDocument.htmlDocument.content_id + 1
+              content_id: contentHtmlDocument.htmlDocument.content_id + 1,
+              is_deleted: true
             }
           }
 
           it('should not be deleted', () => {
-            wrapper.instance().handleContentDeleted(tlmData)
+            wrapper.instance().handleContentDeletedOrRestore(tlmData)
             expect(wrapper.state('content').is_deleted).to.equal(false)
           })
         })
-      })
 
-      describe('handleContentUndeleted', () => {
-        describe('restore the current content', () => {
+        describe('when restoring the current content', () => {
           const tlmData = {
             author: contentHtmlDocument.htmlDocument.last_modifier,
-            content: contentHtmlDocument.htmlDocument
+            content: { ...contentHtmlDocument.htmlDocument, is_deleted: false }
           }
 
           after(() => {
@@ -167,9 +166,9 @@ describe('<HtmlDocument />', () => {
 
           it('should be restored correctly', () => {
             wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-            wrapper.instance().handleContentUndeleted(tlmData)
+            wrapper.instance().handleContentDeletedOrRestore(tlmData)
 
-            expect(wrapper.state('content').is_deleted).to.equal(false)
+            expect(wrapper.state('newContent').is_deleted).to.equal(false)
           })
         })
 
@@ -177,13 +176,14 @@ describe('<HtmlDocument />', () => {
           const tlmData = {
             content: {
               ...contentHtmlDocument.htmlDocument,
-              content_id: contentHtmlDocument.htmlDocument.content_id + 1
+              content_id: contentHtmlDocument.htmlDocument.content_id + 1,
+              is_deleted: false
             }
           }
 
           it('should not be restored', () => {
             wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-            wrapper.instance().handleContentUndeleted(tlmData)
+            wrapper.instance().handleContentDeletedOrRestore(tlmData)
 
             expect(wrapper.state('content').is_deleted).to.equal(true)
           })
@@ -205,6 +205,26 @@ describe('<HtmlDocument />', () => {
             expect(isNewName).to.be.equal(true)
           })
         })
+      })
+    })
+  })
+
+  describe('its internal functions', () => {
+    describe('handleClickRefresh', () => {
+      it('should update content state', () => {
+        wrapper.setState(prev => ({ newContent: { ...prev.content, label: 'New Name' } }))
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('content').label).to.deep.equal(wrapper.state('newContent').label)
+      })
+
+      it('should update mode state', () => {
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('mode')).to.deep.equal(APP_FEATURE_MODE.VIEW)
+      })
+
+      it('should update showRefreshWarning state', () => {
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('showRefreshWarning')).to.deep.equal(false)
       })
     })
   })

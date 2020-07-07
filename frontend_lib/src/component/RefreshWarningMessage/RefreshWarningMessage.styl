@@ -2,15 +2,24 @@
 
 .refreshWarningMessage
   color darkGrey
+  padding 5px 10px
+  background-color lightyellow
+  border 1px solid warningOrange
+  border-radius 5px
+  margin-right 5px
   display flex
-  justify-content flex-end
-  margin 10px 30px 0px
-  white-space nowrap
+  cursor pointer
   .fa
-    margin auto 5px
-  &__button
-    border none
-    background-color transparent
-    color darkGrey
+    align-self center
+    color warningOrange
+  &__text
+    margin-left 5px
     font-weight bold
-    cursor pointer
+    align-self center
+
+@media (max-width: max-lg)
+  .refreshWarningMessage
+    .fa
+      padding 5px
+    &__text
+      display none
