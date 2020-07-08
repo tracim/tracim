@@ -91,7 +91,7 @@ export class PersonalData extends React.Component {
               )}
             </div>
             <div className='personaldata__form__txtinput__msginfo'>
-                {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
+              {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
             </div>
           </div>
 

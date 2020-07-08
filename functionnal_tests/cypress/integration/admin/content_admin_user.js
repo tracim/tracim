@@ -44,7 +44,7 @@ describe("An admin seeing a user's profile", () => {
   })
 
   describe('Set a big username', () => {
-    it('should still shows the Administration column', () => {
+    it('should still show the Administration column', () => {
       const veryBigUsername = 'aa'.repeat(100)
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
@@ -56,15 +56,33 @@ describe("An admin seeing a user's profile", () => {
         .find('.personaldata__form__txtinput.checkPassword')
         .type(defaultAdmin.password)
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.fa-exclamation-triangle.personaldata__form__txtinput__info__icon')
-        .should('be.visible')
-      cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('.personaldata__form__button')
         .click()
       cy.get('[data-cy=adminlink__dropdown__btn]').click()
       cy.get('[data-cy=adminlink__user__link]').click()
       cy.get('.adminUser__table__tr__td-text')
       cy.get('th').last().contains('Administrator')
+    })
+  })
+
+  describe('Set a too small username', () => {
+    it('should show the error message and disable the form button', () => {
+      const smallUsername = 'aa'
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+        .click()
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('[data-cy=personaldata__form__txtinput__username]')
+        .type(smallUsername)
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('.personaldata__form__txtinput.checkPassword')
+        .type(defaultAdmin.password)
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('.personaldata__form__txtinput__msgerror')
+        .should('be.visible')
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('.personaldata__form__button')
+        .should('not.be.enabled')
     })
   })
 
@@ -124,9 +142,6 @@ describe("An admin seeing a user's profile", () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('.personaldata__form__txtinput.checkPassword')
           .type(defaultAdmin.password)
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.fa-exclamation-triangle.personaldata__form__txtinput__info__icon')
-          .should('be.visible')
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('.personaldata__form__button')
           .click()
