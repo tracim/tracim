@@ -80,21 +80,21 @@ export class MemberList extends React.Component {
                       </div>
 
                       <div className='memberlist__list__item__info'>
-                        <div className='memberlist__list__item__info__firstLine'>
-                          <div className='memberlist__list__item__info__firstLine__name'>
+                        <div className='memberlist__list__item__info__firstColumn'>
+                          <div className='memberlist__list__item__info__firstColumn__name'>
                             {m.publicName}
                           </div>
 
-                          <div className='memberlist__list__item__info__firstLine__role'>
-                            - {props.t(props.roleList.find(r => r.slug === m.role).label)}
-                          </div>
+                          {m.username && (
+                            <div className='memberlist__list__item__info__firstColumn__username'>
+                              @{m.username}
+                            </div>
+                          )}
                         </div>
 
-                        {m.username && (
-                          <div className='memberlist__list__item__info__username'>
-                            @{m.username}
-                          </div>
-                        )}
+                        <div className='memberlist__list__item__info__role'>
+                          - {props.t(props.roleList.find(r => r.slug === m.role).label)}
+                        </div>
                       </div>
 
                       {props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && m.id !== props.loggedUser.userId && (
