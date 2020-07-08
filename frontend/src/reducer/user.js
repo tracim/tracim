@@ -49,7 +49,7 @@ export default function user (state = defaultUser, action) {
       return {
         ...state,
         ...serialize(action.user, serializeUserProps),
-        lang: action.user.lang ? action.user.lang : state.lang
+        lang: action.user.lang || state.lang
       }
 
     case `${SET}/${USER_DISCONNECTED}`:
