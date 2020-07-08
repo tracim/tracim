@@ -25,6 +25,7 @@ export class LiveMessageManager {
     this.heartbeatFailureTimerId = -1
     this.heartBeatIntervalMs = heartBeatIntervalMs
     this.reconnectionIntervalMs = reconnectionIntervalMs
+    this.reconnectionTimerId = -1
     this.userId = null
     this.host = null
   }
@@ -79,14 +80,21 @@ export class LiveMessageManager {
     this.eventSource.close()
     console.log('%c.:. TLM Closed')
     this.stopHeartbeatFailureTimer()
+    if (this.reconnectionTimerId !== -1) {
+      globalThis.clearTimeout(this.reconnectionTimerId)
+      this.reconnectionTimerId = -1
+    }
     this.setStatus(LIVE_MESSAGE_STATUS.CLOSED)
     return true
   }
 
   restartLiveMessageConnection () {
-    globalThis.setTimeout(() => {
+    if (this.reconnectionTimerId >= 0) return
+
+    this.reconnectionTimerId = globalThis.setTimeout(() => {
       this.closeLiveMessageConnection()
       this.openLiveMessageConnection(this.userId, this.host)
+      this.reconnectionTimerId = -1
     }, this.reconnectionIntervalMs)
   }
 

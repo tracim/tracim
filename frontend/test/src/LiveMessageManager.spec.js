@@ -15,6 +15,17 @@ const openedManager = (heartbeatTimeOut, reconnectionInterval) => {
   return { manager, mockEventSource }
 }
 
+const waitForStatus = async (manager, status, timeout = 25) => {
+  // NOTE SG 2020-07-03 - have to wait a small amount as manager status changes
+  // can be done via a setTimeout
+  var retries = 10
+  while (manager.status !== status && retries > 0) {
+    await new Promise(resolve => setTimeout(resolve, timeout / 10))
+    retries--
+  }
+  return manager.status
+}
+
 describe('LiveMessageManager class', () => {
   const managers = []
 
@@ -37,10 +48,7 @@ describe('LiveMessageManager class', () => {
     it('should restart connection when an error is raised by EventSource', async () => {
       mockEventSource.emitError()
       expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.ERROR)
-      // NOTE SG 2020-07-03 - have to wait a small amount as reconnection
-      // is done via a setTimeout
-      await new Promise(resolve => setTimeout(resolve, 10))
-      expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
+      expect(await waitForStatus(manager, LIVE_MESSAGE_STATUS.PENDING)).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
     })
   })
 
@@ -63,14 +71,8 @@ describe('LiveMessageManager class', () => {
     it('should restart connection when the heartbeat event is not received in time', async () => {
       const { manager } = openedManager(2, 10)
       managers.push(manager)
-      // NOTE SG 2020-07-03 - have to wait a small amount as heartbeat failure
-      // is done via a setTimeout
-      await new Promise(resolve => setTimeout(resolve, 5))
-      expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
-      // NOTE SG 2020-07-03 - have to wait a small amount as reconnection
-      // is done via a setTimeout
-      await new Promise(resolve => setTimeout(resolve, 10))
-      expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
+      expect(await waitForStatus(manager, LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)).to.be.equal(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
+      expect(await waitForStatus(manager, LIVE_MESSAGE_STATUS.PENDING)).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
     })
   })
 
