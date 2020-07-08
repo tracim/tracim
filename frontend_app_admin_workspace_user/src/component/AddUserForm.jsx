@@ -98,23 +98,21 @@ export class AddUserForm extends React.Component {
           </label>
 
           <div>
-            <div>
-              <input
-                type='text'
-                className='userData__input userData__input__username form-control primaryColorBorderLighten'
-                id='adduser_username'
-                placeholder={props.t('@username')}
-                value={state.newUserUsername}
-                onChange={this.handleChangeNewUserUsername}
-                data-cy='adduser_username'
-              />
-              {!props.isUsernameValid && state.newUserUsername !== '' && (
-                <span className='userData__input__username__errorMsg'>
-                  <i className='userData__input__username__errorIcon fa fa-times' />
-                  {props.usernameInvalidMsg}
-                </span>
-              )}
-            </div>
+            <input
+              type='text'
+              className='userData__input userData__input__username form-control primaryColorBorderLighten'
+              id='adduser_username'
+              placeholder={props.t('@username')}
+              value={state.newUserUsername}
+              onChange={this.handleChangeNewUserUsername}
+              data-cy='adduser_username'
+            />
+            {!props.isUsernameValid && state.newUserUsername !== '' && (
+              <div className='userData__input__username__errorMsg'>
+                <i className='userData__input__username__errorIcon fa fa-times' />
+                {props.usernameInvalidMsg}
+              </div>
+            )}
             <div className='userData__input__username__errorInfo'>
               {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
             </div>
