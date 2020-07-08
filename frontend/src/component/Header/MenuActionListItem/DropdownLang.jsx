@@ -4,8 +4,7 @@ import PropTypes from 'prop-types'
 require('./DropdownLang.styl')
 
 const DropdownLang = props => {
-  // INFO - GB - 2020-06-08 - If the user doesn't have a language set yet (first connection of a new user), we set English as the default language
-  const activeLang = props.langList.find(l => l.id === props.langActiveId) || 'en'
+  const activeLang = props.langList.find(l => l.id === props.langActiveId)
   return (
     <li className='dropdownlang'>
       <div className='dropdownlang__dropdown dropdown'>
