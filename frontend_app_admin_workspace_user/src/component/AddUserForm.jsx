@@ -113,9 +113,11 @@ export class AddUserForm extends React.Component {
                 {props.usernameInvalidMsg}
               </div>
             )}
-            <div className='userData__input__username__errorInfo'>
-              {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
-            </div>
+            {(props.isUsernameValid || state.newUserUsername === '') && (
+              <div className='userData__input__username__errorInfo'>
+                {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
+              </div>
+            )}
           </div>
 
           <div className='userData__email'>

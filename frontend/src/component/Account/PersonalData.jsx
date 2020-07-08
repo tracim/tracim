@@ -88,9 +88,11 @@ export class PersonalData extends React.Component {
                 {props.usernameInvalidMsg}
               </div>
             )}
-            <div className='personaldata__form__txtinput__msginfo'>
-              {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
-            </div>
+            {props.isUsernameValid && (
+              <div className='personaldata__form__txtinput__msginfo'>
+                {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
+              </div>
+            )}
           </div>
 
           {editableUserAuthTypeList.includes(props.userAuthType) && (
