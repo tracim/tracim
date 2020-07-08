@@ -10,6 +10,7 @@ const errShortPwd = '123'
 const errLongPwd = '123'.repeat(200)
 const errPublicName = 'pn'
 const errShortUsername = 'un'
+const errLongUsername = 'aa'.repeat(200)
 const errSpaceUsername = 'new username'
 const errNotAllowedCharsUsername = 'usern@me!'
 const errEmail = 'err.email'
@@ -113,6 +114,15 @@ describe('When "Create new user" at Administration', () => {
     cy.get('[data-cy=adminUser__adduser__button]').click()
     cy.get('[data-cy=adduser_name]').type(publicName)
     cy.get('[data-cy=adduser_username]').type(errNotAllowedCharsUsername)
+    cy.get('[data-cy=adduser_email]').type(email)
+    cy.get('[data-cy=adduser_password]').type(correctPwd)
+    cy.get('[data-cy=adminUser__adduser__form__submit]').should('be.disabled')
+  })
+
+  it('should disable submit button if username is too long', () => {
+    cy.get('[data-cy=adminUser__adduser__button]').click()
+    cy.get('[data-cy=adduser_name]').type(publicName)
+    cy.get('[data-cy=adduser_username]').type(errLongUsername)
     cy.get('[data-cy=adduser_email]').type(email)
     cy.get('[data-cy=adduser_password]').type(correctPwd)
     cy.get('[data-cy=adminUser__adduser__form__submit]').should('be.disabled')

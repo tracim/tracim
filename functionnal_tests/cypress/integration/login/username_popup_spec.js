@@ -103,7 +103,7 @@ describe('Login', function () {
       cy.get(usernameInput).type(newUsername)
       cy.get(passwordInput).type(userWithoutUsername.password)
       cy.get(confirmButton).click()
-      cy.get('.flashmessage').contains('Your username has been changed')
+      cy.get('.flashmessage').contains('Your username has been set')
     })
 
     describe('if user choose "Never ask me again"', function () {

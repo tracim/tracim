@@ -13,6 +13,7 @@ import {
   CUSTOM_EVENT,
   displayDistanceDate,
   generateLocalStorageContentId,
+  getOrCreateSessionClientToken,
   handleFetchResult,
   NewVersionBtn,
   PopinFixed,
@@ -20,6 +21,7 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedRightPart,
+  RefreshWarningMessage,
   ROLE,
   SelectStatus,
   sortTimelineByDate,
@@ -67,9 +69,11 @@ export class HtmlDocument extends React.Component {
       newContent: {},
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
-      hasUpdated: false,
-      editionAuthor: ''
+      showRefreshWarning: false,
+      editionAuthor: '',
+      isLastTimelineItemCurrentToken: false
     }
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -85,8 +89,9 @@ export class HtmlDocument extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
 
@@ -95,14 +100,16 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
+      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
-      hasUpdated: prev.loggedUser.userId !== data.author.user_id,
+      showRefreshWarning: clientToken !== data.client_token,
       rawContentBeforeEdit: data.content.raw_content,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -122,37 +129,35 @@ export class HtmlDocument extends React.Component {
       ]
     )
 
-    this.setState({ timeline: sortedNewTimeline })
+    this.setState({
+      timeline: sortedNewTimeline,
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+    })
   }
 
-  handleContentDeleted = data => {
+  handleContentDeletedOrRestore = data => {
     const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: {
-        ...prev.content,
-        ...data.content,
-        is_deleted: true
-      },
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+      newContent: { ...prev.content, ...data.content },
+      editionAuthor: data.author.public_name,
+      showRefreshWarning: clientToken !== data.client_token,
+      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
-  handleContentUndeleted = data => {
-    const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
+  handleUserModified = data => {
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.user.user_id
+      ? { ...timelineItem, author: data.user }
+      : timelineItem
+    )
 
-    this.setState(prev => ({
-      ...prev,
-      content: {
-        ...prev.content,
-        ...data.content,
-        is_deleted: false
-      },
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
-    }))
+    this.setState({ timeline: newTimeline })
   }
 
   // Custom Event Handlers
@@ -339,7 +344,8 @@ export class HtmlDocument extends React.Component {
       },
       newComment: localStorageComment || '',
       rawContentBeforeEdit: resHtmlDocument.body.raw_content,
-      timeline: revisionWithComment
+      timeline: revisionWithComment,
+      isLastTimelineItemCurrentToken: false
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
@@ -517,7 +523,7 @@ export class HtmlDocument extends React.Component {
         raw_content: prev.rawContentBeforeEdit
       },
       mode: APP_FEATURE_MODE.VIEW,
-      hasUpdated: false
+      showRefreshWarning: false
     }))
   }
 
@@ -573,6 +579,13 @@ export class HtmlDocument extends React.Component {
             </div>
 
             <div className='d-flex'>
+              {state.showRefreshWarning && (
+                <RefreshWarningMessage
+                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  onClickRefresh={this.handleClickRefresh}
+                />
+              )}
+
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -621,9 +634,6 @@ export class HtmlDocument extends React.Component {
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
-            hasUpdated={state.hasUpdated}
-            onClickRefresh={this.handleClickRefresh}
-            editionAuthor={state.editionAuthor}
           />
 
           <PopinFixedRightPart
@@ -648,6 +658,7 @@ export class HtmlDocument extends React.Component {
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+                  isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                 />
               )
             }]}

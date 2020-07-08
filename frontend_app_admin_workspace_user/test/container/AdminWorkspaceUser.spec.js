@@ -44,7 +44,6 @@ describe('<AdminWorkspaceUser />', () => {
       mockGetWorkspaceMembers200(props.data.config.apiUrl, 1, []).persist()
 
       describe('handleWorkspaceCreated', () => {
-
         const workspace = {
           workspace_id: 5,
           label: 'A workspace',
@@ -69,7 +68,6 @@ describe('<AdminWorkspaceUser />', () => {
       })
 
       describe('handleWorkspaceModified', () => {
-
         const workspace = {
           workspace_id: 1,
           label: 'Hello, world',
@@ -91,7 +89,6 @@ describe('<AdminWorkspaceUser />', () => {
       })
 
       describe('handleWorkspaceDeleted', () => {
-
         const workspace = {
           workspace_id: 1,
           label: 'Hello, world',

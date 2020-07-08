@@ -322,6 +322,11 @@ export const CONTENT_TYPE = {
   COMMENT: 'comment'
 }
 
+export const TIMELINE_TYPE = {
+  COMMENT: CONTENT_TYPE.COMMENT,
+  REVISION: 'revision'
+}
+
 export const sortTimelineByDate = (timeline) => {
   return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
 }
@@ -338,6 +343,8 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
     ...revisionObject
   } = data.content
 
+  const revisionNumber = 1 + timeline.filter(tl => tl.timelineType === 'revision' ).length
+
   return [
     ...timeline,
     {
@@ -351,7 +358,7 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
       comment_ids: [],
       created: displayDistanceDate(data.content.modified, lang),
       created_raw: data.content.modified,
-      number: timeline.length + 1,
+      number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
       timelineType: 'revision'

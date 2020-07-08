@@ -43,6 +43,31 @@ describe("An admin seeing a user's profile", () => {
     })
   })
 
+  describe('Set a big username', () => {
+    it('should still shows the Administration column', () => {
+      const veryBigUsername = 'aa'.repeat(100)
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+        .click()
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('[data-cy=personaldata__form__txtinput__username]')
+        .type(veryBigUsername)
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('.personaldata__form__txtinput.checkPassword')
+        .type(defaultAdmin.password)
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('.fa-exclamation-triangle.personaldata__form__txtinput__info__icon')
+        .should('be.visible')
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('.personaldata__form__button')
+        .click()
+      cy.get('[data-cy=adminlink__dropdown__btn]').click()
+      cy.get('[data-cy=adminlink__user__link]').click()
+      cy.get('.adminUser__table__tr__td-text')
+      cy.get('th').last().contains('Administrator')
+    })
+  })
+
   describe('Changing his account preferences', () => {
     describe('Change full name', () => {
       it('should update the header with the new full name', () => {
@@ -87,7 +112,19 @@ describe("An admin seeing a user's profile", () => {
     })
 
     describe('Change username', () => {
-      const newUserName = 'newRandomUserName'
+      const newUserName = 'newRandomUsername'
+      const longNewUsername = 'aa'.repeat(200)
+
+      it('should show error message when username is too long', () => {
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+          .click()
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=personaldata__form__txtinput__username]')
+          .type(longNewUsername)
+        cy.get('.personaldata__form__txtinput__msgerror')
+          .should('be.visible')
+      })
 
       it('should update the header with the new username', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })

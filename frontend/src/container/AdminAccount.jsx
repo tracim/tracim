@@ -17,7 +17,6 @@ import {
   buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername,
   serialize,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -43,11 +42,13 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList,
   PAGE,
+  MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   MINIMUM_CHARACTERS_USERNAME
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import { serializeUserProps } from '../reducer/user.js'
+import { serializeMember } from '../reducer/currentWorkspace.js'
 
 export class Account extends React.Component {
   constructor (props) {
@@ -259,7 +260,9 @@ export class Account extends React.Component {
       userToEditWorkspaceList: wsList.map(ws => ({
         ...ws,
         id: ws.workspace_id, // duplicate id to be able use <Notification /> easily
-        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.workspaceId)
+        memberList: workspaceListMemberList
+          .find(wsm => ws.workspace_id === wsm.workspaceId).memberList
+          .map(m => serializeMember(m))
       }))
     })
   }
@@ -295,9 +298,7 @@ export class Account extends React.Component {
     }
 
     if (newUsername !== '') {
-      const username = removeAtInUsername(newUsername)
-
-      const fetchPutUsername = await props.dispatch(putUserUsername(state.userToEdit, username, checkPassword))
+      const fetchPutUsername = await props.dispatch(putUserUsername(state.userToEdit, newUsername, checkPassword))
       switch (fetchPutUsername.status) {
         case 200:
           if (newEmail === '') {
@@ -308,6 +309,11 @@ export class Account extends React.Component {
           break
         case 400:
           switch (fetchPutUsername.json.code) {
+            case 2001:
+              props.dispatch(newFlashMessage(
+                props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
+              ))
+              break
             case 2062:
               props.dispatch(newFlashMessage(
                 props.t(
@@ -344,20 +350,29 @@ export class Account extends React.Component {
   handleChangeUsername = async (newUsername) => {
     const { props } = this
 
-    const username = removeAtInUsername(newUsername)
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState(prev => ({
         userToEdit: {
           ...prev.userToEdit,
           isUsernameValid: false,
-          usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+          usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
         }
       }))
       return
     }
 
-    if (hasSpaces(username)) {
+    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
+      this.setState(prev => ({
+        userToEdit: {
+          ...prev.userToEdit,
+          isUsernameValid: false,
+          usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
+        }
+      }))
+      return
+    }
+
+    if (hasSpaces(newUsername)) {
       this.setState(prev => ({
         userToEdit: {
           ...prev.userToEdit,
@@ -368,7 +383,7 @@ export class Account extends React.Component {
       return
     }
 
-    if (hasNotAllowedCharacters(username)) {
+    if (hasNotAllowedCharacters(newUsername)) {
       this.setState(prev => ({
         userToEdit: {
           ...prev.userToEdit,
@@ -379,7 +394,7 @@ export class Account extends React.Component {
       return
     }
 
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(newUsername))
 
     switch (fetchUsernameAvailability.status) {
       case 200:

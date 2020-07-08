@@ -130,6 +130,8 @@ export const READ = 'Read'
 export const toggleFolderOpen = (folderId, workspaceId) => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, folderId, workspaceId })
 export const FOLDER_READ = `${FOLDER}/${READ}`
 export const setWorkspaceContentRead = folderId => ({ type: `${SET}/${FOLDER_READ}`, folderId })
+export const setWorkspaceFolderContentList = (workspaceId, folderId, contentList) =>
+  ({ type: `${SET}/${WORKSPACE}/${FOLDER}/${CONTENT}`, workspaceId, folderId, contentList })
 
 export const APP = 'App'
 export const APP_FEATURE = `${APP}Feature`

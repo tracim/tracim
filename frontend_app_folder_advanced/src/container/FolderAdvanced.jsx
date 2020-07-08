@@ -15,6 +15,7 @@ import {
   ROLE,
   buildHeadTitle,
   BREADCRUMBS_TYPE,
+  RefreshWarningMessage,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
@@ -44,6 +45,8 @@ export class FolderAdvanced extends React.Component {
 
     this.state = {
       appName: 'folder',
+      editionAuthor: '',
+      showRefreshWarning: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -106,11 +109,18 @@ export class FolderAdvanced extends React.Component {
     props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
   }
 
-  handleFolderChanged = message => {
+  handleFolderChanged = data => {
     const { state } = this
-    if (message.content.content_id !== state.content.content_id) return
-    this.setState({ content: message.content })
-    this.setHeadTitle(message.content.label)
+    if (data.content.content_id !== state.content.content_id) return
+
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+    this.setState(prev => ({
+      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+      newContent: { ...prev.content, ...data.content },
+      editionAuthor: data.author.public_name,
+      showRefreshWarning: clientToken !== data.client_token
+    }))
+    if (clientToken === data.client_token) this.setHeadTitle(data.content.label)
   }
 
   async componentDidMount () {
@@ -254,8 +264,19 @@ export class FolderAdvanced extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
+  handleClickRefresh = () => {
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...prev.newContent
+      },
+      showRefreshWarning: false
+    }))
+    this.setHeadTitle(this.state.newContent.label)
+  }
+
   render () {
-    const { state } = this
+    const { props, state } = this
 
     if (!state.isVisible) return null
 
@@ -275,6 +296,13 @@ export class FolderAdvanced extends React.Component {
         <PopinFixedOption>
           <div className='justify-content-end'>
             <div className='d-flex'>
+              {state.showRefreshWarning && (
+                <RefreshWarningMessage
+                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  onClickRefresh={this.handleClickRefresh}
+                />
+              )}
+
               {/* state.loggedUser.userRoleIdInWorkspace >= 2 &&
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}

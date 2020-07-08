@@ -271,6 +271,16 @@ describe('reducer currentWorkspace.js', () => {
           contentReadStatusList: [1, 2]
         })
       })
+      describe('move a content in a new workspace', () => {
+        const rez = currentWorkspace(initialStateWithRecentActivity, updateWorkspaceContentList([contentFromApi], initialState.id + 1))
+        it('should return a workspace object with an empty recent activity list', () => {
+          expect(rez).to.deep.equal({
+            ...initialStateWithRecentActivity,
+            recentActivityList: [],
+            contentReadStatusList: [1, 2]
+          })
+        })
+      })
     })
 
     describe(`${REMOVE}/${WORKSPACE_CONTENT}`, () => {

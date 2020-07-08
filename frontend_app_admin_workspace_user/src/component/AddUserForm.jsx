@@ -3,8 +3,7 @@ import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import {
   CUSTOM_EVENT,
-  PROFILE_LIST,
-  removeAtInUsername
+  PROFILE_LIST
 } from 'tracim_frontend_lib'
 import { ALLOWED_CHARACTERS_USERNAME } from '../helper.js'
 
@@ -58,7 +57,7 @@ export class AddUserForm extends React.Component {
 
     props.onClickAddUser(
       state.newUserName,
-      removeAtInUsername(state.newUserUsername),
+      state.newUserUsername,
       state.newUserEmail,
       state.newUserProfile,
       state.newUserPassword
@@ -67,10 +66,11 @@ export class AddUserForm extends React.Component {
 
   isValidateButtonDisabled = () => {
     const { props, state } = this
+    if (props.emailNotifActivated && state.newUserEmail === '' && state.newUserPassword === '') return true
     if (state.newUserName === '' || state.newUserProfile === '') return true
     if (!props.emailNotifActivated && state.newUserPassword === '') return true
     if (props.isEmailRequired && state.newUserEmail === '') return true
-    else return ((state.newUserUsername === '' || !props.isUsernameValid) && state.newUserEmail === '')
+    else return ((state.newUserUsername === '' && state.newUserEmail === '') || !props.isUsernameValid)
   }
 
   render () {
@@ -101,7 +101,7 @@ export class AddUserForm extends React.Component {
             type='text'
             className='userData__input form-control'
             id='adduser_username'
-            placeholder={props.t('@username')}
+            placeholder={props.t('Username')}
             value={state.newUserUsername}
             onChange={this.handleChangeNewUserUsername}
             data-cy='adduser_username'
@@ -160,23 +160,22 @@ export class AddUserForm extends React.Component {
             data-cy='adduser_email'
           />
 
-          {(!props.emailNotifActivated || state.newUserEmail === '') && (
-            <div>
-              <label className='userData__text' htmlFor='adduser_password'>
-                {props.t('Password')}
-              </label>
+          <div>
+            <label className='userData__text' htmlFor='adduser_password'>
+              {props.t('Password')}
+            </label>
 
-              <input
-                type='text'
-                className='userData__input form-control'
-                id='adduser_password'
-                placeholder={props.t('Password')}
-                value={state.newUserPassword}
-                onChange={this.handleChangeNewUserPassword}
-                data-cy='adduser_password'
-              />
-            </div>
-          )}
+            <input
+              type='text'
+              className='userData__input form-control'
+              id='adduser_password'
+              placeholder={props.t('Password')}
+              value={state.newUserPassword}
+              onChange={this.handleChangeNewUserPassword}
+              data-cy='adduser_password'
+            />
+          </div>
+
           {(props.emailNotifActivated && state.newUserEmail === '') && (
             <div className='userData__info'>
               <i className='fa fa-exclamation-triangle userData__info__icon' />

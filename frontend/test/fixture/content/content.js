@@ -38,3 +38,28 @@ export const contentFromApi = {
 }
 
 export const content = serialize(contentFromApi, serializeContentProps)
+
+export const contentFolder = {
+  parentId: null,
+  slug: 'move-destination',
+  workspaceId: 7,
+  type: 'folder',
+  showInUi: true,
+  id: 20,
+  isDeleted: false,
+  fileExtension: '',
+  created: '2020-07-01T08:35:29Z',
+  fileName: 'move destination',
+  statusSlug: 'open',
+  label: 'move destination',
+  activedShares: 0,
+  subContentTypeList: [
+    'thread',
+    'file',
+    'html-document',
+    'folder',
+    'comment'
+  ],
+  isArchived: false,
+  isOpen: true
+}

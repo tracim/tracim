@@ -12,7 +12,7 @@ import {
 import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import contentFile from '../fixture/content/contentFile.js'
 import { debug } from '../../src/debug.js'
-import { commentTlm } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
+import { commentTlm, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 
 describe('<File />', () => {
   const props = {
@@ -92,7 +92,7 @@ describe('<File />', () => {
           })
 
           it('should be updated with the content modified', () => {
-            expect(wrapper.state('content').filename).to.equal(tlmData.content.filename)
+            expect(wrapper.state('newContent').filename).to.equal(tlmData.content.filename)
           })
           it('should have the new revision in the timeline', () => {
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].filename).to.equal(tlmData.content.filename)
@@ -113,7 +113,7 @@ describe('<File />', () => {
           })
 
           it('should be updated with the content modified', () => {
-            expect(wrapper.state('content').raw_content).to.equal(tlmData.content.raw_content)
+            expect(wrapper.state('newContent').raw_content).to.equal(tlmData.content.raw_content)
           })
           it('should have the new revision in the timeline', () => {
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].raw_content).to.equal(tlmData.content.raw_content)
@@ -181,7 +181,7 @@ describe('<File />', () => {
           })
         })
       })
-      describe('handleContentDeleted', () => {
+      describe('handleContentDeletedOrRestored', () => {
         describe('Delete the current content', () => {
           const tlmData = {
             content: {
@@ -192,7 +192,7 @@ describe('<File />', () => {
           }
 
           before(() => {
-            wrapper.instance().handleContentDeleted(tlmData)
+            wrapper.instance().handleContentDeletedOrRestored(tlmData)
           })
 
           after(() => {
@@ -200,10 +200,7 @@ describe('<File />', () => {
           })
 
           it('should be deleted correctly', () => {
-            expect(wrapper.state('content').is_deleted).to.equal(true)
-          })
-          it('should be in view mode', () => {
-            expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.VIEW)
+            expect(wrapper.state('newContent').is_deleted).to.equal(true)
           })
           it('should have the new revision in the timeline', () => {
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].is_deleted).to.equal(true)
@@ -220,15 +217,14 @@ describe('<File />', () => {
           }
 
           before(() => {
-            wrapper.instance().handleContentDeleted(tlmData)
+            wrapper.instance().handleContentDeletedOrRestored(tlmData)
           })
 
           it('should not be deleted', () => {
             expect(wrapper.state('content').is_deleted).to.equal(false)
           })
         })
-      })
-      describe('handleContentRestored', () => {
+
         describe('Restore the current content', () => {
           const tlmData = {
             content: {
@@ -240,7 +236,7 @@ describe('<File />', () => {
 
           before(() => {
             wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-            wrapper.instance().handleContentRestored(tlmData)
+            wrapper.instance().handleContentDeletedOrRestored(tlmData)
           })
 
           after(() => {
@@ -248,7 +244,7 @@ describe('<File />', () => {
           })
 
           it('should be restored correctly', () => {
-            expect(wrapper.state('content').is_deleted).to.equal(false)
+            expect(wrapper.state('newContent').is_deleted).to.equal(false)
           })
           it('should have the new revision in the timeline', () => {
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].is_deleted).to.equal(false)
@@ -266,13 +262,47 @@ describe('<File />', () => {
 
           before(() => {
             wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-            wrapper.instance().handleContentRestored(tlmData)
+            wrapper.instance().handleContentDeletedOrRestored(tlmData)
           })
 
           it('should not be restored', () => {
             expect(wrapper.state('content').is_deleted).to.equal(true)
           })
         })
+      })
+    })
+
+    describe('eventType user', () => {
+      describe('handleUserModified', () => {
+        describe('If the user is the author of a revision or comment', () => {
+          it('should update the timeline with the data of the user', () => {
+            const tlmData = { user: { ...user, public_name: 'newName' } }
+            wrapper.instance().handleUserModified(tlmData)
+
+            const listPublicNameOfAuthor = wrapper.state('timeline')
+              .filter(timelineItem => timelineItem.author.user_id === tlmData.user.user_id)
+              .map(timelineItem => timelineItem.author.public_name)
+            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.user.public_name)
+            expect(isNewName).to.be.equal(true)
+          })
+        })
+      })
+    })
+  })
+
+  describe('its internal functions', () => {
+    describe('handleClickRefresh', () => {
+      it('should update content state', () => {
+        wrapper.setState(prev => ({ newContent: { ...prev.content, filename: 'New Name' } }))
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('content')).to.deep.equal(wrapper.state('newContent'))
+      })
+      it('should update showRefreshWarning state', () => {
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('showRefreshWarning')).to.deep.equal(false)
+      })
+      it('should be in view mode', () => {
+        expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.VIEW)
       })
     })
   })

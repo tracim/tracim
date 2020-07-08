@@ -28,9 +28,11 @@ import {
   mockGetUserCalendar200,
   mockPutUserWorkspaceDoNotify204,
   mockPutUserPassword204,
-  mockPutUserPassword403
+  mockPutUserPassword403,
+  mockGetWorkspaceMemberList200
 } from '../../apiMock'
-import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace'
+import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
+import { serializeMember } from '../../../src/reducer/currentWorkspace.js'
 
 describe('In <Account /> at AdminAccount.jsx', () => {
   const newFlashMessageInfoCallBack = sinon.spy()
@@ -233,9 +235,42 @@ describe('In <Account /> at AdminAccount.jsx', () => {
     })
 
     describe('handleChangeUsername', () => {
-      it("should set isUsernameValid state to false if username isn't valid", (done) => {
+      afterEach(() => {
+        addminAccontWrapper.setState({
+          userToEdit: {
+            ...addminAccontWrapper.state().userToEdit,
+            isUsernameValid: true
+          }
+        })
+      })
+      it("should set isUsernameValid state to false if username isn't long enough", (done) => {
         adminAccountInstance.handleChangeUsername('A').then(() => {
           expect(addminAccontWrapper.state().userToEdit.isUsernameValid).to.equal(false)
+        }).then(done, done)
+      })
+      it("should set isUsernameValid state to false if username has a '@' in it", (done) => {
+        adminAccountInstance.handleChangeUsername('@newUsername').then(() => {
+          expect(addminAccontWrapper.state().userToEdit.isUsernameValid).to.equal(false)
+        }).then(done, done)
+      })
+    })
+
+    describe('getUserWorkspaceListMemberList', () => {
+      it('should update userToEditWorkspaceList state with workspace details', (done) => {
+        const member = {
+          do_notify: true,
+          user: { public_name: 'Global Manager', user_id: 1, username: 'TheAdmin' },
+          role: 'workspace-manager'
+        }
+        mockGetWorkspaceMemberList200(
+          FETCH_CONFIG.apiUrl,
+          firstWorkspaceFromApi.workspace_id,
+          [member]
+        )
+        adminAccountInstance.getUserWorkspaceListMemberList([firstWorkspaceFromApi]).then(() => {
+          const workspaceMemberList = addminAccontWrapper.state().userToEditWorkspaceList
+            .find(ws => ws.id === firstWorkspaceFromApi.workspace_id).memberList
+          expect(workspaceMemberList).to.deep.equal([serializeMember(member)])
         }).then(done, done)
       })
     })

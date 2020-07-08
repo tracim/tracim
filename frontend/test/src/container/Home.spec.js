@@ -20,7 +20,7 @@ describe('<Home />', () => {
     },
     canCreateWorkspace: true,
     renderAppPopupCreation: renderAppPopupCreationCallBack,
-    registerCustomEventHandlerList: () => {}
+    registerCustomEventHandlerList: () => { }
   }
 
   const wrapper = shallow(
@@ -41,8 +41,43 @@ describe('<Home />', () => {
 
   describe('handler', () => {
     it('renderAppPopupCreationCallBack should be called when handleClickCreateWorkspace is called', () => {
-      wrapper.instance().handleClickCreateWorkspace({ preventDefault: () => {} })
+      wrapper.instance().handleClickCreateWorkspace({ preventDefault: () => { } })
       expect(renderAppPopupCreationCallBack.called).to.equal(true)
+    })
+  })
+
+  describe('its internal functions', () => {
+    describe('handleChangeNewUsername', () => {
+      afterEach(() => {
+        wrapper.instance().setState({
+          isUsernameValid: true
+        })
+      })
+
+      it('should have the isUsernameValid state as true if username is not set yet', () => {
+        wrapper.instance().handleChangeNewUsername({ target: { value: '' } })
+        expect(wrapper.state('isUsernameValid')).to.equal(true)
+      })
+
+      it('should have the isUsernameValid state as false if username is shorter than MINIMUM_CHARACTERS_USERNAME', () => {
+        wrapper.instance().handleChangeNewUsername({ target: { value: 'aa' } })
+        expect(wrapper.state('isUsernameValid')).to.equal(false)
+      })
+
+      it('should have the isUsernameValid state as false if username has a space', () => {
+        wrapper.instance().handleChangeNewUsername({ target: { value: 'user name' } })
+        expect(wrapper.state('isUsernameValid')).to.equal(false)
+      })
+
+      it('should have the isUsernameValid state as false if username has a not allowed character', () => {
+        wrapper.instance().handleChangeNewUsername({ target: { value: 'usern@me!' } })
+        expect(wrapper.state('isUsernameValid')).to.equal(false)
+      })
+
+      it('should have the isUsernameValid state as false if username start with @', () => {
+        wrapper.instance().handleChangeNewUsername({ target: { value: '@username' } })
+        expect(wrapper.state('isUsernameValid')).to.equal(false)
+      })
     })
   })
 })
