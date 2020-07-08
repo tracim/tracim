@@ -42,11 +42,11 @@ export const WorkspaceMembersList = props => {
                   <Avatar width='50px' publicName={m.user.public_name} />
                 </div>
 
-                <div className='workspace_advanced__userlist__list__item__name'>
+                <div className='workspace_advanced__userlist__list__item__name' title={m.user.public_name}>
                   {m.user.public_name}
 
                   {m.user.username && (
-                    <div className='workspace_advanced__userlist__list__item__name__username'>
+                    <div className='workspace_advanced__userlist__list__item__name__username' title={`@${m.user.username}`}>
                       @{m.user.username}
                     </div>
                   )}

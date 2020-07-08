@@ -81,12 +81,18 @@ export class MemberList extends React.Component {
 
                       <div className='memberlist__list__item__info'>
                         <div className='memberlist__list__item__info__firstColumn'>
-                          <div className='memberlist__list__item__info__firstColumn__name'>
+                          <div
+                            className='memberlist__list__item__info__firstColumn__name'
+                            title={m.publicName}
+                          >
                             {m.publicName}
                           </div>
 
                           {m.username && (
-                            <div className='memberlist__list__item__info__firstColumn__username'>
+                            <div
+                              className='memberlist__list__item__info__firstColumn__username'
+                              title={`@${m.username}`}
+                            >
                               @{m.username}
                             </div>
                           )}
