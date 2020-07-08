@@ -20,6 +20,7 @@ import {
 import {
   ALLOWED_CHARACTERS_USERNAME,
   debug,
+  MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   MINIMUM_CHARACTERS_USERNAME
 } from '../helper.js'
@@ -451,7 +452,11 @@ export class AdminWorkspaceUser extends React.Component {
         return true
       case 400:
         switch (newUserResult.body.code) {
-          case 2001: this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning'); break
+          case 2001:
+            if (newUserResult.body.details.email) this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning')
+            if (newUserResult.body.details.username) this.sendGlobalFlashMsg(props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }))
+            else this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
+            break
           case 2062:
             this.sendGlobalFlashMsg(
               props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -563,7 +568,15 @@ export class AdminWorkspaceUser extends React.Component {
     if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
       })
       return
     }

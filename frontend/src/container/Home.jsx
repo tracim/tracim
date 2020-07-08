@@ -7,6 +7,7 @@ import appFactory from '../util/appFactory.js'
 import {
   ALLOWED_CHARACTERS_USERNAME,
   COOKIE_FRONTEND,
+  MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   workspaceConfig
 } from '../util/helper.js'
@@ -103,7 +104,11 @@ export class Home extends React.Component {
         case 400:
           switch (fetchPutUsername.json.code) {
             case 2001:
-              props.dispatch(newFlashMessage(props.t('Password must be at least 6 characters'), 'warning'))
+              props.dispatch(newFlashMessage(
+                props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long',
+                  { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }
+                ), 'warning'
+              ))
               return false
             case 2062:
               props.dispatch(
@@ -140,7 +145,15 @@ export class Home extends React.Component {
     if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
       })
       return
     }

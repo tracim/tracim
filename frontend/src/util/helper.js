@@ -9,6 +9,7 @@ export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
 export const SHARE_FOLDER_ID = -1
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
 export const MINIMUM_CHARACTERS_USERNAME = 3
+export const MAXIMUM_CHARACTERS_USERNAME = 255
 
 export const history = require('history').createBrowserHistory()
 
