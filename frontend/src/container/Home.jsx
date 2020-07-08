@@ -248,9 +248,11 @@ export class Home extends React.Component {
                     </div>
                   )}
 
-                  <div className='homepage__usernamePopup__infoMsg'>
-                    {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
-                  </div>
+                  {this.state.isUsernameValid &p (
+                    <div className='homepage__usernamePopup__infoMsg'>
+                      {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
+                    </div>
+                  )}
 
                   {this.state.newUsername !== '' && (
                     <>
