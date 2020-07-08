@@ -61,12 +61,11 @@ describe('LiveMessageManager class', () => {
 
   describe('the heartbeat timer', () => {
     it('should restart connection when the heartbeat event is not received in time', async () => {
-      const timeout = 10
-      const { manager } = openedManager(timeout, 0)
+      const { manager } = openedManager(2, 10)
       managers.push(manager)
       // NOTE SG 2020-07-03 - have to wait a small amount as heartbeat failure
       // is done via a setTimeout
-      await new Promise(resolve => setTimeout(resolve, 1.6 * timeout))
+      await new Promise(resolve => setTimeout(resolve, 5))
       expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
       // NOTE SG 2020-07-03 - have to wait a small amount as reconnection
       // is done via a setTimeout
