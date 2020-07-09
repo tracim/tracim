@@ -77,7 +77,7 @@ export class AddUserForm extends React.Component {
     const { props, state } = this
 
     return (
-      <form className='adminUser__adduser__form' data-cy='adminUser__adduser__form'>
+      <form className='adminUser__adduser__form d-flex align-items-left flex-column' data-cy='adminUser__adduser__form'>
         <div className='adminUser__adduser__form__userData'>
           <label className='userData__text' htmlFor='adduser_name'>
             {props.t('Full name')}
@@ -85,7 +85,7 @@ export class AddUserForm extends React.Component {
 
           <input
             type='text'
-            className='userData__input form-control'
+            className='userData__input form-control primaryColorBorderLighten'
             id='adduser_name'
             placeholder={props.t('Full name')}
             value={state.newUserName}
@@ -97,27 +97,28 @@ export class AddUserForm extends React.Component {
             {props.t('Username')}
           </label>
 
-          <input
-            type='text'
-            className='userData__input form-control'
-            id='adduser_username'
-            placeholder={props.t('Username')}
-            value={state.newUserUsername}
-            onChange={this.handleChangeNewUserUsername}
-            data-cy='adduser_username'
-          />
-
-          {!props.isUsernameValid && state.newUserUsername !== '' && (
-            <div className='userData__input__username__errorMsg'>
-              <i className='userData__input__username__errorIcon fa fa-times' />
-              {props.usernameInvalidMsg}
-            </div>
-          )}
-          {props.isUsernameValid && (
-            <div className='userData__input__username__errorInfo'>
-              {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
-            </div>
-          )}
+          <div>
+            <input
+              type='text'
+              className='userData__input userData__input__username form-control primaryColorBorderLighten'
+              id='adduser_username'
+              placeholder={props.t('@username')}
+              value={state.newUserUsername}
+              onChange={this.handleChangeNewUserUsername}
+              data-cy='adduser_username'
+            />
+            {!props.isUsernameValid && state.newUserUsername !== '' && (
+              <div className='userData__input__username__errorMsg'>
+                <i className='userData__input__username__errorIcon fa fa-times' />
+                {props.usernameInvalidMsg}
+              </div>
+            )}
+            {(props.isUsernameValid || state.newUserUsername === '') && (
+              <div className='userData__input__username__errorInfo'>
+                {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
+              </div>
+            )}
+          </div>
 
           <div className='userData__email'>
             <label className='userData__text' htmlFor='adduser_email'>
@@ -152,7 +153,7 @@ export class AddUserForm extends React.Component {
 
           <input
             type='text'
-            className='userData__input form-control'
+            className='userData__input form-control primaryColorBorderLighten'
             id='adduser_email'
             placeholder={props.t('Email')}
             value={state.newUserEmail}
@@ -167,7 +168,7 @@ export class AddUserForm extends React.Component {
 
             <input
               type='text'
-              className='userData__input form-control'
+              className='userData__input form-control primaryColorBorderLighten'
               id='adduser_password'
               placeholder={props.t('Password')}
               value={state.newUserPassword}

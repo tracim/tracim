@@ -137,12 +137,6 @@ export class Password extends React.Component {
                 disabled={state.newPassword === '' && state.newPassword2 === ''}
               />
             )}
-            {props.displayAdminInfo && state.newPassword !== '' && (
-              <div className='personaldata__form__txtinput__info'>
-                <i className='personaldata__form__txtinput__info__icon fa fa-lightbulb-o' />
-                {props.t('This edition requires your administrator password')}
-              </div>
-            )}
           </div>
 
           <button
