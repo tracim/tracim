@@ -255,7 +255,7 @@ class Login extends React.Component {
                 parentClassName='loginpage__card__form__groupelogin'
                 customClass='mb-3 mt-4'
                 icon='fa-at'
-                type='email'
+                type='text'
                 placeHolder={props.t('Email address or username')}
                 invalidMsg={props.t('Invalid email or username')}
                 maxLength={512}
