@@ -21,6 +21,9 @@
         </IfModule>
     </Directory>
 
+    # This directive is needed for macOS webdav usage (at least)
+    # If we want to remove it we have to address this issue
+    # https://github.com/tracim/tracim/issues/3320
     SetEnv proxy-sendcl
 
     # Proxying Webdav
