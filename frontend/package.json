@@ -23,6 +23,7 @@
     "color": "^3.1.2",
     "core-js": "^3.6.4",
     "eslint-import-resolver-node": "^0.3.3",
+    "eventsourcemock": "^2.0.0",
     "history": "^4.10.1",
     "i18next": "10.5.0",
     "js-cookie": "^2.2.0",

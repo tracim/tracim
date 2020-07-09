@@ -167,3 +167,5 @@ export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEAR
 
 export const TLM_MANAGER = 'TracimLiveMessageManager'
 export const setLiveMessageManager = TLMManager => ({ type: `${SET}/${TLM_MANAGER}`, TLMManager })
+export const TLM_MANAGER_STATUS = 'TracimLiveMessageManagerStatus'
+export const setLiveMessageManagerStatus = status => ({ type: `${SET}/${TLM_MANAGER_STATUS}`, status })

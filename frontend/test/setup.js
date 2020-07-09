@@ -4,6 +4,7 @@ import Enzyme from 'enzyme'
 import chaiEnzyme from 'chai-enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import sinon from 'sinon'
+import EventSource from 'eventsourcemock'
 
 process.env.NODE_ENV = 'test'
 
@@ -32,6 +33,7 @@ if (!global.window && !global.document) {
   global.navigator = window.navigator
   global.GLOBAL_primaryColor = globalPrimaryColor.hex
   global.GLOBAL_dispatchEvent = () => {}
+  global.EventSource = EventSource
 }
 
 Enzyme.configure({ adapter: new Adapter() })

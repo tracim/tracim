@@ -20,7 +20,7 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
-import { LiveMessageManager } from '../util/LiveMessageManager.js'
+import { LiveMessageManager, LIVE_MESSAGE_STATUS } from '../util/LiveMessageManager.js'
 import {
   CUSTOM_EVENT,
   PROFILE,
@@ -53,7 +53,8 @@ import {
   setBreadcrumbs,
   appendBreadcrumbs,
   setWorkspaceListMemberList,
-  setLiveMessageManager
+  setLiveMessageManager,
+  setLiveMessageManagerStatus
 } from '../action-creator.sync.js'
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
@@ -61,9 +62,17 @@ import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 
+const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
+
 export class Tracim extends React.Component {
   constructor (props) {
     super(props)
+
+    this.state = {
+      firstTlmConnection: true,
+      displayConnectionError: false,
+      connectionErrorDisplayTimeoutId: -1
+    }
 
     this.liveMessageManager = new LiveMessageManager()
     props.dispatch(setLiveMessageManager(this.liveMessageManager))
@@ -75,7 +84,8 @@ export class Tracim extends React.Component {
       { name: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST_THEN_REDIRECT, handler: this.handleRefreshWorkspaceListThenRedirect },
       { name: CUSTOM_EVENT.SET_BREADCRUMBS, handler: this.handleSetBreadcrumbs },
       { name: CUSTOM_EVENT.APPEND_BREADCRUMBS, handler: this.handleAppendBreadcrumbs },
-      { name: CUSTOM_EVENT.SET_HEAD_TITLE, handler: this.handleSetHeadTitle }
+      { name: CUSTOM_EVENT.SET_HEAD_TITLE, handler: this.handleSetHeadTitle },
+      { name: CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, handler: this.handleTlmStatusChanged }
     ])
   }
 
@@ -92,6 +102,31 @@ export class Tracim extends React.Component {
   handleDisconnectedFromApi = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.DISCONNECTED_FROM_API, data)
     if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
+  }
+
+  handleTlmStatusChanged = (data) => {
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, data)
+    const { status } = data
+    this.props.dispatch(setLiveMessageManagerStatus(status))
+    if (status !== LIVE_MESSAGE_STATUS.OPENED) {
+      if (this.state.connectionErrorDisplayTimeoutId === -1) {
+        if (this.state.firstTlmConnection) this.displayConnectionError()
+        else {
+          const connectionErrorDisplayTimeoutId = globalThis.setTimeout(
+            this.displayConnectionError,
+            CONNECTION_MESSAGE_DISPLAY_DELAY_MS
+          )
+          this.setState({ connectionErrorDisplayTimeoutId })
+        }
+      }
+    } else {
+      globalThis.clearTimeout(this.state.connectionErrorDisplayTimeoutId)
+      this.setState({ connectionErrorDisplayTimeoutId: -1, displayConnectionError: false, firstTlmConnection: false })
+    }
+  }
+
+  displayConnectionError = () => {
+    this.setState({ displayConnectionError: true })
   }
 
   handleRefreshWorkspaceListThenRedirect = async data => { // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
@@ -226,7 +261,7 @@ export class Tracim extends React.Component {
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
     if (props.user.logged === null) return null // @TODO show loader
 
@@ -247,6 +282,19 @@ export class Tracim extends React.Component {
     return (
       <div className='tracim fullWidthFullHeight'>
         <Header />
+        {state.displayConnectionError && (
+          <FlashMessage
+            className='connection_error'
+            flashMessage={
+              [{
+                message: props.t('Tracim has a connection problem, please wait or reload the page if the problem persists'),
+                type: 'danger'
+              }]
+            }
+            showCloseButton={false}
+            t={props.t}
+          />
+        )}
         <FlashMessage
           flashMessage={props.flashMessage}
           onRemoveFlashMessage={this.handleRemoveFlashMessage}
@@ -350,7 +398,7 @@ export class Tracim extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system }) => ({
-  breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system
+const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, tlm }) => ({
+  breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, tlm
 })
 export default withRouter(connect(mapStateToProps)(translate()(TracimComponent(Tracim))))

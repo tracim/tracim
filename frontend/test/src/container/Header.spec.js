@@ -36,8 +36,11 @@ describe('In <Header />', () => {
     user: user,
     appList: appList,
     searchResult: {},
-    tlmManager: {
-      closeLiveMessageConnection: () => {}
+    tlm: {
+      manager: {
+        closeLiveMessageConnection: () => {}
+      },
+      status: 'open'
     },
     lang: [],
     system: {
