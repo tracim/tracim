@@ -49,11 +49,19 @@ export const NewMemberForm = props => {
                       <Avatar publicName={u.public_name} width={'44px'} />
                     </div>
 
-                    <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
+                    <div
+                      className='autocomplete__item__name'
+                      data-cy='autocomplete__item__name'
+                      title={u.public_name}
+                    >
                       {u.public_name}
 
                       {u.username && (
-                        <div className='autocomplete__item__name__username' data-cy='autocomplete__item__username'>
+                        <div
+                          className='autocomplete__item__name__username'
+                          data-cy='autocomplete__item__username'
+                          title={`@${u.username}`}
+                        >
                           @{u.username}
                         </div>
                       )}
