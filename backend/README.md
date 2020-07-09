@@ -174,7 +174,7 @@ You can also preset uWSGI config for Tracim by creating this kind of .ini file:
     threads = 4
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-And for WebDAV:
+For WebDAV:
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
@@ -182,9 +182,10 @@ And for WebDAV:
     chdir = <PATH>/tracim/backend/
     module = wsgi.webdav:application
     home = <PATH>/tracim/backend/env/
+    threads = 8
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-And for CalDAV:
+For CalDAV:
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]

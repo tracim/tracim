@@ -31,12 +31,11 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
         </Directory>
         SetEnv proxy-sendcl
 
-        # Setting Destination header from https to http in proxy
-        # is needed for working move/copy in webdav
-        RequestHeader edit Destination ^https http early
-
         # Proxying Webdav
         <Location /webdav>
+            # Setting Destination header from https to http in proxy
+            # is needed for working move/copy in webdav
+            RequestHeader edit Destination ^https http early
             # Preserving host is needed for working move/copy in webdav
             ProxyPreserveHost On
             ProxyPass http://127.0.0.1:3030/webdav
