@@ -25,7 +25,7 @@ describe('First login with a new user', function () {
     cy.get('[data-cy=adminUser__adduser__form__submit]').click()
     cy.get('[data-cy=menuprofil__dropdown__button]').click()
     cy.get('[data-cy=menuprofil__dropdown__logout__link]').click()
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD }).find('input[type=email]').type(email)
+    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD }).find('input[type=text]').type(email)
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD }).find('input[type=password]').type(password)
     cy.get('.loginpage__card__form__btnsubmit').click()
     cy.url().should('include', '/ui')
