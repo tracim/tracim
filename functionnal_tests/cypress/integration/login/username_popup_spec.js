@@ -53,7 +53,7 @@ describe('Login', function () {
   describe('if username is null', function () {
     beforeEach(() => {
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-        .find('input[type=email]')
+        .find('input[type=text]')
         .type(userWithoutUsername.email)
 
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
@@ -115,7 +115,7 @@ describe('Login', function () {
         cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-          .find('input[type=email]')
+          .find('input[type=text]')
           .type(userWithoutUsername.email)
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
@@ -134,7 +134,7 @@ describe('Login', function () {
   describe('if username is not null', function () {
     beforeEach(() => {
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-        .find('input[type=email]')
+        .find('input[type=text]')
         .type(userWithUsernameEmail)
 
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
