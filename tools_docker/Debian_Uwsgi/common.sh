@@ -66,6 +66,8 @@ if [ ! -f /etc/tracim/tracim_web.ini ]; then
 fi
 if [ ! -L /etc/uwsgi/apps-available/tracim_web.ini ]; then
     ln -s /etc/tracim/tracim_web.ini /etc/uwsgi/apps-available/tracim_web.ini
+    sed -i "s|^#workers = .*|workers = 4|g" /etc/tracim/tracim_web.ini
+    sed -i "s|^#threads = .*|threads = 4|g" /etc/tracim/tracim_web.ini
 fi
 if [ ! -L /etc/uwsgi/apps-enabled/tracim_web.ini ]; then
     ln -s /etc/uwsgi/apps-available/tracim_web.ini /etc/uwsgi/apps-enabled/tracim_web.ini

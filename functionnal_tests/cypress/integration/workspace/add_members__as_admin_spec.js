@@ -167,7 +167,7 @@ describe('Add a member at dashboard', () => {
         cy.get('[data-cy=memberlist__btnadd]').click()
         cy.get('[data-cy=addmember]').should('be.visible').type(user.public_name)
         cy.get('[data-cy=autocomplete__item__name]').should('be.visible')
-          .contains('I know this user exist')
+        cy.contains('[data-cy=autocomplete__item__name]', 'I know this user exist')
           .click()
         cy.get('[data-cy=memberlist]')
           .contains(sharedSpaceManager)
