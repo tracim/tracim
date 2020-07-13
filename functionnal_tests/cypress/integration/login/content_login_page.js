@@ -57,6 +57,12 @@ describe('Login page', function () {
       .find('.loginpage__card__form__pwforgot')
       .should('be.visible')
   })
+
+  it('should not display connection error message', () => {
+    cy.wait(5000)
+    cy.get('connection_error')
+    .should('not.exist')
+  })
 })
 // @philippe 08/08/2018 - Not implemented in Tracim_V2.0
 //

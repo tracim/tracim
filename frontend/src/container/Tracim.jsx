@@ -108,7 +108,7 @@ export class Tracim extends React.Component {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, data)
     const { status } = data
     this.props.dispatch(setLiveMessageManagerStatus(status))
-    if (status !== LIVE_MESSAGE_STATUS.OPENED) {
+    if (status !== LIVE_MESSAGE_STATUS.OPENED && status !== LIVE_MESSAGE_STATUS.CLOSED) {
       if (this.state.connectionErrorDisplayTimeoutId === -1) {
         if (this.state.firstTlmConnection) this.displayConnectionError()
         else {
