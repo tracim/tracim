@@ -24,14 +24,25 @@ def test_webdav_running(tracim):
 def test_caldav_running(tracim):
     assert tracim.socket("tcp://127.0.0.1:5232").is_listening
 
+def test_pushpin_running(tracim):
+    assert tracim.socket("tcp://127.0.0.1:7999").is_listening
+    assert tracim.socket("tcp://127.0.0.1:5561").is_listening
 
 def test_mail_notifier_running(tracim):
     tracim_mail_notifier = tracim.supervisor('tracim_mail_notifier')
     assert tracim_mail_notifier.is_running
 
 def test_mail_fetcher_is_running(tracim):
-    tracim_mail_notifier = tracim.supervisor('tracim_mail_fetcher')
-    assert tracim_mail_notifier.is_running
+    tracim_mail_fetcher = tracim.supervisor('tracim_mail_fetcher')
+    assert tracim_mail_fetcher.is_running
+
+def test_rq_worker_is_running(tracim):
+    tracim_rq_worker = tracim.supervisor('tracim_rq_worker')
+    assert tracim_rq_worker.is_running
+
+def test_xvfb_is_running(tracim):
+    xvfb = tracim.supervisor('xvfb')
+    assert xvfb.is_running
 
 def test_tracimcli_access(tracim, capsys):
     result = tracim.check_output('tracimcli dev parameters value -f -d -c /etc/tracim/development.ini')
@@ -124,7 +135,6 @@ def test_existing_packages(tracim):
     assert tracim.package('git').is_installed
     assert tracim.package('supervisor').is_installed
     assert tracim.package('redis-server').is_installed
-    assert tracim.package('mysql-client').is_installed
     assert tracim.package('imagemagick').is_installed
     assert tracim.package('ghostscript').is_installed
     assert tracim.package('xvfb').is_installed
