@@ -82,7 +82,8 @@ export class WorkspaceAdvanced extends React.Component {
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted }
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
 
@@ -162,6 +163,23 @@ export class WorkspaceAdvanced extends React.Component {
       content: {
         ...prev.content,
         memberList: prev.content.memberList.filter(m => m.user_id !== data.user.user_id)
+      }
+    }))
+  }
+
+  handleUserModified = data => {
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        memberList: prev.content.memberList.map(m => m.user_id === data.user.user_id
+          ? {
+            ...m,
+            user_id: data.user.user_id,
+            user: data.user,
+            is_active: data.user.is_active
+          }
+          : m
+        )
       }
     }))
   }
