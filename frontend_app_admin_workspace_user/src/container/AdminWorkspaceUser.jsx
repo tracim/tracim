@@ -346,7 +346,15 @@ export class AdminWorkspaceUser extends React.Component {
     }
 
     const newMemberList = workspaceList[workspaceIndex].memberList.slice()
-    newMemberList.push(message.member)
+    newMemberList.push({
+      user_id: message.user.user_id,
+      user: message.user,
+      workspace_id: message.workspace.workspace_id,
+      workspace: message.workspace,
+      do_notify: message.member.do_notify,
+      is_active: message.user.is_active,
+      role: message.member.role
+    })
     const newWorkspace = { ...message.workspace, memberList: newMemberList }
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
@@ -373,7 +381,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    const newMemberList = workspaceList[workspaceIndex].memberList.filter(m => m.user_id !== message.role.user_id)
+    const newMemberList = workspaceList[workspaceIndex].memberList.filter(m => m.user_id !== message.user.user_id)
     const newWorkspace = { ...message.workspace, memberList: newMemberList }
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
