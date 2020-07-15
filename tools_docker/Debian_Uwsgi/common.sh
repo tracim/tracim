@@ -16,6 +16,8 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|^basic_setup.preview_cache_dir = .*|basic_setup.preview_cache_dir = /var/tracim/data/preview|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = /var/tracim/data|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.api_key =.*|basic_setup.api_key = $KEY|g" /etc/tracim/development.ini
+    sed -i "s|^session.type = .*|session.type = ext:redis|g" /etc/tracim/development.ini
+    sed -i "s|^session.url =.*|session.url = redis://localhost:6379/0|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/development.ini
     sed -i "s|^; email.notification.content_update.template.html = .*|email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak|g" /etc/tracim/development.ini
     sed -i "s|^; email.notification.created_account.template.html = .*|email.notification.created_account.template.html = %(email.template_dir)s/created_account_body_html.mak|g" /etc/tracim/development.ini
@@ -64,6 +66,8 @@ if [ ! -f /etc/tracim/tracim_web.ini ]; then
 fi
 if [ ! -L /etc/uwsgi/apps-available/tracim_web.ini ]; then
     ln -s /etc/tracim/tracim_web.ini /etc/uwsgi/apps-available/tracim_web.ini
+    sed -i "s|^#workers = .*|workers = 4|g" /etc/tracim/tracim_web.ini
+    sed -i "s|^#threads = .*|threads = 4|g" /etc/tracim/tracim_web.ini
 fi
 if [ ! -L /etc/uwsgi/apps-enabled/tracim_web.ini ]; then
     ln -s /etc/uwsgi/apps-available/tracim_web.ini /etc/uwsgi/apps-enabled/tracim_web.ini

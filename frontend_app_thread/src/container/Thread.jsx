@@ -19,12 +19,14 @@ import {
   CUSTOM_EVENT,
   buildHeadTitle,
   addRevisionFromTLM,
+  RefreshWarningMessage,
   sortTimelineByDate,
   displayDistanceDate,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent
+  TracimComponent,
+  getOrCreateSessionClientToken
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -48,6 +50,7 @@ export class Thread extends React.Component {
       content: param.content,
       timeline: [],
       newComment: '',
+      newContent: {},
       timelineWysiwyg: false,
       externalTranslationList: [
         props.t('Thread'),
@@ -55,8 +58,12 @@ export class Thread extends React.Component {
         props.t('thread'),
         props.t('threads'),
         props.t('Start a topic')
-      ]
+      ],
+      showRefreshWarning: false,
+      editionAuthor: '',
+      isLastTimelineItemCurrentToken: false
     }
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -71,10 +78,11 @@ export class Thread extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
 
@@ -108,12 +116,17 @@ export class Thread extends React.Component {
     this.loadTimeline()
   }
 
-  handleContentModified = data => {
+  handleContentChanged = data => {
     if (data.content.content_id !== this.state.content.content_id) return
 
+    const clientToken = this.state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
-      content: { ...prev.content, ...data.content },
-      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang)
+      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+      newContent: { ...prev.content, ...data.content },
+      editionAuthor: data.author.public_name,
+      showRefreshWarning: clientToken !== data.client_token,
+      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -132,25 +145,19 @@ export class Thread extends React.Component {
       }
     ])
 
-    this.setState({ timeline: newTimelineSorted })
+    this.setState({
+      timeline: newTimelineSorted,
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+    })
   }
 
-  handleContentDeleted = data => {
-    if (data.content.content_id !== this.state.content.content_id) return
+  handleUserModified = data => {
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.user.user_id
+      ? { ...timelineItem, author: data.user }
+      : timelineItem
+    )
 
-    this.setState(prev => ({
-      content: { ...prev.content, ...data.content, is_deleted: true },
-      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang)
-    }))
-  }
-
-  handleContentUndeleted = data => {
-    if (data.content.content_id !== this.state.content.content_id) return
-
-    this.setState(prev => ({
-      content: { ...prev.content, ...data.content, is_deleted: false },
-      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang)
-    }))
+    this.setState({ timeline: newTimeline })
   }
 
   async componentDidMount () {
@@ -214,7 +221,10 @@ export class Thread extends React.Component {
     const response = await handleFetchResult(
       await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     )
-    this.setState({ content: response.body })
+    this.setState({
+      content: response.body,
+      isLastTimelineItemCurrentToken: false
+    })
     this.setHeadTitle(response.body.label)
 
     await putThreadRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
@@ -300,6 +310,16 @@ export class Thread extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
+  handleClickRefresh = () => {
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...prev.newContent
+      },
+      showRefreshWarning: false
+    }))
+  }
+
   render () {
     const { state } = this
 
@@ -325,6 +345,13 @@ export class Thread extends React.Component {
           i18n={i18n}
         >
           <div className='justify-content-end'>
+            {state.showRefreshWarning && (
+              <RefreshWarningMessage
+                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                onClickRefresh={this.handleClickRefresh}
+              />
+            )}
+
             {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
               <SelectStatus
                 selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -370,6 +397,7 @@ export class Thread extends React.Component {
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             showTitle={false}
+            isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           />
         </PopinFixedContent>
       </PopinFixed>

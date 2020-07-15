@@ -2,6 +2,8 @@ describe('delete a html-document content', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
+    cy.loginAs('administrators')
+    cy.createHtmlDocument('firstHtmlDoc', 1)
   })
 
   beforeEach(function () {
@@ -13,9 +15,6 @@ describe('delete a html-document content', function () {
   })
 
   it('should show the content as deleted and remove it from the content list', function () {
-    // TODO - GB - 2020-06-02 - This test fails because of a refactor that has not yet been done, but which is scheduled in ticket
-    // https://github.com/tracim/tracim/issues/3110
-    this.skip()
     cy.visit('/ui/workspaces/1/dashboard')
     cy.get('.dashboard__workspace__detail').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-file-text-o').should('be.visible')

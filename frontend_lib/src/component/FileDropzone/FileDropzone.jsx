@@ -71,7 +71,7 @@ FileDropzone.propTypes = {
   preview: PropTypes.string
 }
 
-FileDropzone.defaultState = {
+FileDropzone.defaultProps = {
   multipleFiles: false,
   preview: FILE_PREVIEW_STATE.NO_FILE,
   hexcolor: '',

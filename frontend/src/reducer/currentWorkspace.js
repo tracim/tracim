@@ -13,9 +13,11 @@ import {
   USER_WORKSPACE_DO_NOTIFY,
   FOLDER_READ,
   WORKSPACE_AGENDA_URL,
-  WORKSPACE_CONTENT
+  WORKSPACE_CONTENT,
+  RESTORE
 } from '../action-creator.sync.js'
-import { serializeContent } from './workspaceContentList.js'
+import { serializeContentProps } from './workspaceContentList.js'
+import { serialize } from 'tracim_frontend_lib'
 
 const defaultWorkspace = {
   id: 0,
@@ -44,14 +46,12 @@ export const serializeWorkspace = ws => {
   }
 }
 
-export const serializeSidebarEntry = sbe => {
-  return {
-    slug: sbe.slug,
-    route: sbe.route,
-    faIcon: sbe.fa_icon,
-    hexcolor: sbe.hexcolor,
-    label: sbe.label
-  }
+export const serializeSidebarEntryProps = {
+  slug: 'slug',
+  route: 'route',
+  fa_icon: 'faIcon',
+  hexcolor: 'hexcolor',
+  label: 'label'
 }
 
 export const serializeMember = m => {
@@ -70,7 +70,19 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         ...serializeWorkspace(action.workspaceDetail),
-        sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serializeSidebarEntry(sbe))
+        sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
+      }
+
+    // INFO - CH - 2020-06-18 - only difference with SET/WORKSPACE_DETAIL is the if (state.id !== action.workspace.workspace_id
+    // because this action is called by the TLM handler.
+    // The SET is used to force a new workspace
+    // The UPDATE is to update the same workspace
+    case `${UPDATE}/${WORKSPACE_DETAIL}`:
+      if (state.id !== action.workspaceDetail.workspace_id) return state
+      return {
+        ...state,
+        ...serializeWorkspace(action.workspaceDetail),
+        sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
       }
 
     case `${SET}/${WORKSPACE_MEMBER_LIST}`:
@@ -80,6 +92,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${ADD}/${WORKSPACE_MEMBER}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: [
@@ -89,6 +102,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${UPDATE}/${WORKSPACE_MEMBER}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: state.memberList.map(m => m.id === action.member.user.user_id
@@ -98,6 +112,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${REMOVE}/${WORKSPACE_MEMBER}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: state.memberList.filter(m => m.id !== action.memberId)
@@ -106,7 +121,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
     case `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
       return {
         ...state,
-        recentActivityList: action.workspaceRecentActivityList.map(ra => serializeContent(ra))
+        recentActivityList: action.workspaceRecentActivityList.map(ra => serialize(ra, serializeContentProps))
       }
 
     case `${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
@@ -114,25 +129,34 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         recentActivityList: [
           ...state.recentActivityList,
-          ...action.workspaceRecentActivityList.map(ra => serializeContent(ra))
+          ...action.workspaceRecentActivityList.map(ra => serialize(ra, serializeContentProps))
         ]
       }
 
     case `${ADD}/${WORKSPACE_CONTENT}`:
+    case `${RESTORE}/${WORKSPACE_CONTENT}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         recentActivityList: [
-          ...action.workspaceContentList.map(c => serializeContent(c)),
+          ...action.workspaceContentList.map(c => serialize(c, serializeContentProps)),
           ...state.recentActivityList
         ]
       }
 
     case `${UPDATE}/${WORKSPACE_CONTENT}`:
+      if (state.id !== action.workspaceId) {
+        return {
+          ...state,
+          recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id)),
+          contentReadStatusList: state.contentReadStatusList.filter(contentId => !action.workspaceContentList.some(content => content.content_id === contentId))
+        }
+      }
       return {
         ...state,
         recentActivityList: uniqBy(
           [ // INFO - CH - 2020-05-18 - always put the updated element at the beginning. Then remove duplicates
-            ...action.workspaceContentList.map(c => serializeContent(c)),
+            ...action.workspaceContentList.map(c => serialize(c, serializeContentProps)),
             ...state.recentActivityList
           ],
           'id'
@@ -143,9 +167,10 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${REMOVE}/${WORKSPACE_CONTENT}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
-        recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.id))
+        recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id))
       }
 
     case `${SET}/${WORKSPACE_READ_STATUS_LIST}`:
@@ -156,13 +181,24 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           .map(content => content.content_id)
       }
 
-    case `${REMOVE}/${WORKSPACE_READ_STATUS}`: // INFO - CH - 20200529 - this means "set content as unread"
+    case `${ADD}/${WORKSPACE_READ_STATUS_LIST}`:
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
-        contentReadStatusList: state.contentReadStatusList.filter(id => id !== action.unreadId),
+        contentReadStatusList: [
+          ...state.contentReadStatusList,
+          action.content.content_id
+        ]
+      }
+
+    case `${REMOVE}/${WORKSPACE_READ_STATUS}`: // INFO - CH - 20200529 - this means "set content as unread"
+      if (state.id !== action.workspaceId) return state
+      return {
+        ...state,
+        contentReadStatusList: state.contentReadStatusList.filter(id => id !== action.unreadContent.content_id),
         recentActivityList: [
-          state.recentActivityList.find(content => content.id === action.unreadId),
-          ...state.recentActivityList.filter(content => content.id !== action.unreadId)
+          serialize(action.unreadContent, serializeContentProps),
+          ...state.recentActivityList.filter(content => content.id !== action.unreadContent.content_id)
         ]
       }
 

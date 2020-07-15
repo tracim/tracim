@@ -16,7 +16,7 @@ describe('<NewMemberForm />', () => {
 
   const props = {
     onClickCloseAddMemberBtn: onClickCloseAddMemberBtnCallBack,
-    personalData: 'randomPersonalData',
+    publicName: 'randomPersonalData',
     searchedKnownMemberList: [
       { public_name: 'random', username: 'random', user_id: 1 },
       { public_name: 'Searched', username: 'Searched', user_id: 2 },
@@ -47,8 +47,8 @@ describe('<NewMemberForm />', () => {
   )
 
   describe('Static design', () => {
-    it(`text input should have the value: ${props.personalData}`, () => {
-      expect(wrapper.find('#addmember').prop('value')).to.equal(props.personalData)
+    it(`text input should have the value: ${props.publicName}`, () => {
+      expect(wrapper.find('#addmember').prop('value')).to.equal(props.publicName)
     })
 
     it(`should display ${props.roleList.length} roles`, () => {

@@ -25,11 +25,11 @@ export const MenuProfil = props => {
               display: 'inline-block',
               marginRight: '10px'
             }}
-            publicName={props.user.public_name}
+            publicName={props.user.publicName}
           />
 
           <div className='menuprofil__dropdown__name__text'>
-            {props.user.public_name}
+            {props.user.publicName}
           </div>
         </button>
 
@@ -43,7 +43,11 @@ export const MenuProfil = props => {
             {props.t('My Account')}
           </Link>
 
-          <div className='menuprofil__dropdown__setting__link primaryColorBgActive dropdown-item' onClick={props.onClickLogout}>
+          <div
+            className='menuprofil__dropdown__setting__link primaryColorBgActive dropdown-item'
+            onClick={props.onClickLogout}
+            data-cy='menuprofil__dropdown__logout__link'
+          >
             <i className='fa fa-fw fa-sign-out mr-2' />
             {props.t('Logout')}
           </div>

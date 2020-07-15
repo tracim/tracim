@@ -1,4 +1,5 @@
 import { author } from './author.js'
+import { TIMELINE_TYPE } from '../../src/helper.js'
 
 export const revisionList = [{
   sub_content_types: ['comment'],
@@ -21,7 +22,8 @@ export const revisionList = [{
   slug: 'test',
   revision_type: 'creation',
   status: 'open',
-  is_deleted: false
+  is_deleted: false,
+  timelineType: TIMELINE_TYPE.REVISION
 }, {
   sub_content_types: ['comment'],
   author: author,
@@ -43,5 +45,6 @@ export const revisionList = [{
   slug: 'test',
   revision_type: 'edition',
   status: 'open',
-  is_deleted: false
+  is_deleted: false,
+  timelineType: TIMELINE_TYPE.REVISION
 }]

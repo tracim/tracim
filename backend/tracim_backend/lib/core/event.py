@@ -3,9 +3,10 @@ import contextlib
 from datetime import datetime
 import typing
 
-from sqlalchemy import event
+from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
 from sqlalchemy import null
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
@@ -40,15 +41,14 @@ from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.tracim_session import TracimSession
-from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import CommentSchema
+from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
-
 
 _USER_FIELD = "user"
 _AUTHOR_FIELD = "author"
@@ -107,12 +107,17 @@ class EventBuilder:
 
     def __init__(self, config: CFG) -> None:
         self._config = config
-        self._current_user = None  # type: typing.Optional[User]
-        self._client_token = None  # type: typing.Optional[str]
 
     @hookimpl
     def on_context_session_created(self, db_session: TracimSession, context: TracimContext) -> None:
-        event.listen(db_session, "pending_to_persistent", self._publish_event)
+        commit_event = "after_flush"
+        if self._config.JOBS__PROCESSING_MODE == self._config.CST.ASYNC:
+            # We need after commit event when processing in async
+            # Otherwise we can't be sure that events will be visible
+            # to the RQ worker when it queries the database.
+            commit_event = "after_commit"
+
+        sqlalchemy_event.listen(db_session, commit_event, self._publish_pending_events_of_context)
 
     @staticmethod
     def _get_current_user(context: TracimContext) -> typing.Optional[User]:
@@ -142,18 +147,22 @@ class EventBuilder:
     def _create_user_event(
         self, operation: OperationType, user: User, context: TracimContext
     ) -> None:
+        current_user = self._get_current_user(context)
         user_api = UserApi(
-            self._get_current_user(context), context.dbsession, self._config, show_deleted=True
+            current_user=current_user,
+            session=context.dbsession,
+            config=self._config,
+            show_deleted=True,
         )
         fields = {
             _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(self._get_current_user(context))
+                user_api.get_user_with_context(current_user)
             ).data,
             _CLIENT_TOKEN_FIELD: context.client_token,
             _USER_FIELD: self._user_schema.dump(user_api.get_user_with_context(user)).data,
         }
         event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
-        context.dbsession.add(event)
+        self._add_event(event, context)
 
     # Workspace events
     @hookimpl
@@ -193,7 +202,7 @@ class EventBuilder:
             _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
-        context.dbsession.add(event)
+        self._add_event(event, context)
 
     # Content events
     @hookimpl
@@ -232,7 +241,7 @@ class EventBuilder:
             context.dbsession, self._get_current_user(context), self._config
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
-            workspace_api.get_one(content_in_context.workspace_id)
+            workspace_api.get_one(content_in_context.workspace.workspace_id)
         )
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         fields = {
@@ -249,7 +258,7 @@ class EventBuilder:
             fields=fields,
             entity_subtype=content.type,
         )
-        context.dbsession.add(event)
+        self._add_event(event, context)
 
     # UserRoleInWorkspace events
     @hookimpl
@@ -274,8 +283,15 @@ class EventBuilder:
         self, operation: OperationType, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
         current_user = self._get_current_user(context)
-        workspace_api = WorkspaceApi(context.dbsession, current_user, self._config)
-        workspace_in_context = workspace_api.get_workspace_with_context(role.workspace)
+        workspace_api = WorkspaceApi(
+            session=context.dbsession,
+            current_user=current_user,
+            config=self._config,
+            show_deleted=True,
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(
+            workspace_api.get_one(role.workspace_id)
+        )
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         role_api = RoleApi(
             current_user=current_user, session=context.dbsession, config=self._config
@@ -299,19 +315,38 @@ class EventBuilder:
             _MEMBER_FIELD: self._workspace_user_role_schema.dump(role_in_context).data,
         }
         event = Event(entity_type=EntityType.WORKSPACE_MEMBER, operation=operation, fields=fields)
-        context.dbsession.add(event)
+        self._add_event(event, context)
 
-    def _publish_event(self, session: TracimSession, instance: object) -> None:
-        if not isinstance(instance, Event):
-            return
-        event = typing.cast(Event, instance)
+    def _add_event(self, event: Event, context: TracimContext) -> None:
+        context.dbsession.add(event)
+        context.pending_events.append(event)
+
+    def _publish_pending_events_of_context(
+        self, session: TracimSession, flush_context=None
+    ) -> None:
+        # NOTE SGD 2020-06-30: do no keep a reference on the context
+        # as this would lead to keep all of them in memory
+        self._publish_events(session.context)
+
+    def _publish_events(self, context: TracimContext) -> None:
         if self._config.JOBS__PROCESSING_MODE == self._config.CST.ASYNC:
             message_builder = AsyncLiveMessageBuilder(
-                context=session.context
+                context=context
             )  # type: BaseLiveMessageBuilder
         else:
-            message_builder = SyncLiveMessageBuilder(context=session.context)
-        message_builder.publish_messages_for_event(event.event_id)
+            message_builder = SyncLiveMessageBuilder(context=context)
+
+        # We only publish events that have an event_id from the DB.
+        # we can have `new` events here as we add events in the session
+        # in a `after_flush` sqlalchemy event and `_publish_events` is also
+        # called during the same `after_flush` event (when PROCESSING_MODE is `sync`).
+        new_events = []
+        for event in context.pending_events:
+            if event.event_id:
+                message_builder.publish_messages_for_event(event.event_id)
+            else:
+                new_events.append(event)
+        context.pending_events = new_events
 
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
@@ -353,14 +388,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         with self.context() as context:
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
-            if event.entity_type == EntityType.USER:
-                receiver_ids = self._get_user_event_receiver_ids(event, session)
-            elif event.entity_type == EntityType.WORKSPACE:
-                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
-            elif event.entity_type == EntityType.CONTENT:
-                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
-            elif event.entity_type == EntityType.WORKSPACE_MEMBER:
-                receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+            receiver_ids = self._get_receiver_ids(session, event)
 
             messages = [
                 Message(
@@ -376,11 +404,26 @@ class BaseLiveMessageBuilder(abc.ABC):
             for message in messages:
                 live_message_lib.publish_message_to_user(message)
 
+    def _get_receiver_ids(self, session: Session, event: Event):
+        if event.entity_type == EntityType.USER:
+            receiver_ids = self._get_user_event_receiver_ids(event, session)
+        elif event.entity_type == EntityType.WORKSPACE:
+            receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+        elif event.entity_type == EntityType.CONTENT:
+            receiver_ids = self._get_content_event_receiver_ids(event, session)
+        elif event.entity_type == EntityType.WORKSPACE_MEMBER:
+            receiver_ids = self._get_workspace_event_receiver_ids(event, session)
+        return receiver_ids
+
     def _get_user_event_receiver_ids(self, event: Event, session: TracimSession) -> typing.Set[int]:
-        user_api = UserApi(current_user=None, session=session, config=self._config)
-        receiver_ids = set(user_api.get_user_ids_from_profile(Profile.ADMIN))
+        user_api = UserApi(current_user=event.user, session=session, config=self._config)
+        receiver_ids = user_api.get_user_ids_from_profile(Profile.ADMIN)
         if event.user:
-            receiver_ids.add(event.user["user_id"])
+            receiver_ids.append(event.user["user_id"])
+            same_workspaces_user_ids = user_api.get_users_ids_in_same_workpaces(
+                event.user["user_id"]
+            )
+            receiver_ids = set(receiver_ids + same_workspaces_user_ids)
         return receiver_ids
 
     def _get_workspace_event_receiver_ids(
@@ -391,6 +434,13 @@ class BaseLiveMessageBuilder(abc.ABC):
         role_api = RoleApi(current_user=None, session=session, config=self._config)
         workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
         return set(administrators + workspace_members)
+
+    def _get_content_event_receiver_ids(
+        self, event: Event, session: TracimSession,
+    ) -> typing.Set[int]:
+        role_api = RoleApi(current_user=None, session=session, config=self._config)
+        workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
+        return set(workspace_members)
 
 
 class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
@@ -407,7 +457,10 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
     def publish_messages_for_event(self, event_id: int) -> None:
         redis_connection = get_redis_connection(self._config)
         queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
-        logger.debug(self, "publish event {} to RQ queue {}".format(event, RQ_QUEUE_NAME))
+        logger.debug(
+            self,
+            "publish event(id={}) asynchronously to RQ queue {}".format(event_id, RQ_QUEUE_NAME),
+        )
         queue.enqueue(self._publish_messages_for_event, event_id)
 
 
@@ -423,5 +476,5 @@ class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
         yield self._context
 
     def publish_messages_for_event(self, event_id: int) -> None:
-        logger.debug(self, "publish event {} synchronously".format(event))
+        logger.debug(self, "publish event(id={}) synchronously".format(event_id))
         self._publish_messages_for_event(event_id)

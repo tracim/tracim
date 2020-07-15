@@ -6,18 +6,21 @@ import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
   CardPopup,
-  handleFetchResult,
   BREADCRUMBS_TYPE,
+  handleFetchResult,
   ROLE,
   CUSTOM_EVENT,
   buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   ALLOWED_CHARACTERS_USERNAME,
   debug,
+  MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   MINIMUM_CHARACTERS_USERNAME
 } from '../helper.js'
@@ -40,7 +43,7 @@ import AdminUser from '../component/AdminUser.jsx'
 const color = require('color')
 require('../css/index.styl')
 
-class AdminWorkspaceUser extends React.Component {
+export class AdminWorkspaceUser extends React.Component {
   constructor (props) {
     super(props)
 
@@ -64,79 +67,73 @@ class AdminWorkspaceUser extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage },
+      { name: CUSTOM_EVENT.SHOW_APP(param.config.slug), handler: this.handleShowApp }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceCreated },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceMemberCreated },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceMemberDeleted },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCreated },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.DELETED, handler: this.handleUserDeleted }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    const { props } = this
+  handleAllAppChangeLanguage = data => {
+    const { state } = this
+    console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, state)
+    this.setState(prev => ({
+      loggedUser: {
+        ...prev.loggedUser,
+        lang: data
+      }
+    }))
+    i18n.changeLanguage(data)
+    this.updateTitleAndBreadcrumbs()
+  }
 
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(this.state.config.slug):
-        console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
-        this.setState({ config: data.config })
-        break
-      case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST:
-        console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
-        this.loadWorkspaceContent()
-        break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        if (this.state.config.type === 'workspace') {
-          this.setHeadTitle(props.t('Shared space management'))
-          this.loadWorkspaceContent()
-        } else if (this.state.config.type === 'user') {
-          this.setHeadTitle(props.t('User account management'))
-          this.loadUserContent()
-        }
-        this.buildBreadcrumbs()
-        break
-      default:
-        break
+  handleShowApp = data => {
+    const { state } = this
+    console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
+    this.setState({ config: data.config })
+  }
+
+  updateTitleAndBreadcrumbs = () => {
+    const { props } = this
+    if (this.state.config.type === 'workspace') {
+      this.setHeadTitle(props.t('Shared space management'))
+    } else if (this.state.config.type === 'user') {
+      this.setHeadTitle(props.t('User account management'))
+    }
+    this.buildBreadcrumbs()
+  }
+
+  refreshAll = async () => {
+    this.updateTitleAndBreadcrumbs()
+    if (this.state.config.type === 'workspace') {
+      await this.loadWorkspaceContent()
+    } else if (this.state.config.type === 'user') {
+      await this.loadUserContent()
     }
   }
 
   async componentDidMount () {
-    const { props } = this
-
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
-
-    if (this.state.config.type === 'workspace') {
-      this.setHeadTitle(props.t('Shared space management'))
-      await this.loadWorkspaceContent()
-    } else if (this.state.config.type === 'user') {
-      this.setHeadTitle(props.t('User account management'))
-      await this.loadUserContent()
-    }
-
-    this.buildBreadcrumbs()
+    await this.refreshAll()
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    const { state, props } = this
+  async componentDidUpdate (prevProps, prevState) {
+    const { state } = this
 
-    console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`)
     if (prevState.config.type !== state.config.type) {
-      if (this.state.config.type === 'workspace') {
-        this.setHeadTitle(props.t('Shared space management'))
-        this.loadWorkspaceContent()
-      } else if (this.state.config.type === 'user') {
-        this.setHeadTitle(props.t('User account management'))
-        this.loadUserContent()
-      }
-      this.buildBreadcrumbs()
+      await this.refreshAll()
     }
-  }
-
-  componentWillUnmount () {
-    console.log('%c<AdminWorkspaceUser> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({
@@ -162,7 +159,7 @@ class AdminWorkspaceUser extends React.Component {
   loadWorkspaceContent = async () => {
     const { props, state } = this
 
-    const fetchWorkspaceList = getWorkspaceList(state.loggedUser, state.config.apiUrl)
+    const fetchWorkspaceList = getWorkspaceList(state.config.apiUrl)
     const workspaceList = await handleFetchResult(await fetchWorkspaceList)
 
     switch (workspaceList.apiResponse.status) {
@@ -178,7 +175,9 @@ class AdminWorkspaceUser extends React.Component {
             ...prev.content,
             workspaceList: workspaceList.body.map(ws => ({
               ...ws,
-              memberList: (fetchWorkspaceListMemberList.find(fws => fws.body[0].workspace_id === ws.workspace_id) || { body: [] }).body
+              memberList: (fetchWorkspaceListMemberList.find(
+                fws => fws.body.length > 0 && fws.body[0].workspace_id === ws.workspace_id
+              ) || { body: [] }).body
             }))
           }
         }))
@@ -247,15 +246,8 @@ class AdminWorkspaceUser extends React.Component {
     const { props, state } = this
 
     const deleteWorkspaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
-    switch (deleteWorkspaceResponse.status) {
-      case 204:
-        this.loadWorkspaceContent()
-        GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST,
-          data: {}
-        })
-        break
-      default: this.sendGlobalFlashMsg(props.t('Error while deleting shared space'), 'warning')
+    if (deleteWorkspaceResponse.status !== 204) {
+      this.sendGlobalFlashMsg(props.t('Error while deleting shared space'), 'warning')
     }
     this.handleClosePopupDeleteWorkspace()
   }
@@ -267,26 +259,154 @@ class AdminWorkspaceUser extends React.Component {
 
   handleClosePopupDeleteWorkspace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
 
+  handleWorkspaceCreated = (message) => {
+    const { state } = this
+    const workspace = message.workspace
+    const newWorkspaceList = state.content.workspaceList.slice()
+    /* INFO SG 2020-06-15:
+     *  - the list is ordered by id and a newly created workspace has a greater id than all others.
+     *  - initialize member list as empty since the shared space member created message will handle
+     *    adding the initial user.
+     */
+    newWorkspaceList.push({ ...workspace, memberList: [] })
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        workspaceList: newWorkspaceList
+      }
+    }))
+  }
+
+  handleWorkspaceModified = (message) => {
+    const { state } = this
+
+    const workspace = message.workspace
+    const workspaceList = state.content.workspaceList
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
+
+    if (workspaceIndex === -1) {
+      // We do not have this workspace in our list...
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
+      return
+    }
+    const memberList = workspaceList[workspaceIndex].memberList
+
+    const workspaceWithMemberList = {
+      ...workspace,
+      memberList: memberList
+    }
+
+    const newWorkspaceList = [
+      ...workspaceList.slice(0, workspaceIndex),
+      workspaceWithMemberList,
+      ...workspaceList.slice(workspaceIndex + 1)
+    ]
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        workspaceList: newWorkspaceList
+      }
+    }))
+  }
+
+  handleWorkspaceDeleted = (message) => {
+    const { state } = this
+    const workspaceList = state.content.workspaceList
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.workspace.workspace_id)
+
+    if (workspaceIndex === -1) {
+      // We do not have this workspace in our list...
+      console.log(`<AdminWorkspaceUser>: workspace id ${message.workspace.workspace_id} not found`)
+      return
+    }
+
+    const newWorkspaceList = [
+      ...workspaceList.slice(0, workspaceIndex),
+      ...workspaceList.slice(workspaceIndex + 1)
+    ]
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        workspaceList: newWorkspaceList
+      }
+    }))
+  }
+
+  handleWorkspaceMemberCreated = (message) => {
+    const { state } = this
+
+    const workspaceList = state.content.workspaceList
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.workspace.workspace_id)
+
+    if (workspaceIndex === -1) {
+      // We do not have this workspace in our list...
+      console.log(`<AdminWorkspaceUser>: workspace id ${message.workspace.workspace_id} not found`)
+      return
+    }
+
+    const newMemberList = workspaceList[workspaceIndex].memberList.slice()
+    newMemberList.push(message.member)
+    const newWorkspace = { ...message.workspace, memberList: newMemberList }
+    const newWorkspaceList = [
+      ...workspaceList.slice(0, workspaceIndex),
+      newWorkspace,
+      ...workspaceList.slice(workspaceIndex + 1)
+    ]
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        workspaceList: newWorkspaceList
+      }
+    }))
+  }
+
+  handleWorkspaceMemberDeleted = (message) => {
+    const { state } = this
+
+    const workspaceList = state.content.workspaceList
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.workspace.workspace_id)
+
+    if (workspaceIndex === -1) {
+      console.log(`<AdminWorkspaceUser>: workspace id ${message.workspace.workspace_id} not found`)
+      // We do not have this workspace in our list...
+      return
+    }
+
+    const newMemberList = workspaceList[workspaceIndex].memberList.filter(m => m.user_id !== message.role.user_id)
+    const newWorkspace = { ...message.workspace, memberList: newMemberList }
+    const newWorkspaceList = [
+      ...workspaceList.slice(0, workspaceIndex),
+      newWorkspace,
+      ...workspaceList.slice(workspaceIndex + 1)
+    ]
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        workspaceList: newWorkspaceList
+      }
+    }))
+  }
+
   handleToggleUser = async (userId, toggle) => {
     const { props, state } = this
 
     const activateOrDelete = toggle ? putUserEnable : putUserDisable
 
     const toggleUser = await handleFetchResult(await activateOrDelete(state.config.apiUrl, userId))
-    switch (toggleUser.status) {
-      case 204: this.loadUserContent(); break
-      default: this.sendGlobalFlashMsg(props.t('Error while enabling or disabling user'), 'warning')
+
+    if (toggleUser.status !== 204) {
+      this.sendGlobalFlashMsg(props.t('Error while enabling or disabling user'), 'warning')
     }
   }
 
   handleUpdateProfile = async (userId, newProfile) => {
     const { props, state } = this
 
-    const endPoint = userId === state.loggedUser.user_id ? putMyselfProfile : putUserProfile
+    const endPoint = userId === state.loggedUser.userId ? putMyselfProfile : putUserProfile
     const toggleManager = await handleFetchResult(await endPoint(state.config.apiUrl, userId, newProfile))
-    switch (toggleManager.status) {
-      case 204: this.loadUserContent(); break
-      default: this.sendGlobalFlashMsg(props.t('Error while saving new profile'), 'warning')
+    if (toggleManager.status !== 204) {
+      this.sendGlobalFlashMsg(props.t('Error while saving new profile'), 'warning')
     }
   }
 
@@ -323,7 +443,6 @@ class AdminWorkspaceUser extends React.Component {
 
     switch (newUserResult.apiResponse.status) {
       case 200:
-        this.loadUserContent()
         this.sendGlobalFlashMsg(
           state.config.system.config.email_notification_activated
             ? props.t('User created and email sent')
@@ -333,7 +452,11 @@ class AdminWorkspaceUser extends React.Component {
         return true
       case 400:
         switch (newUserResult.body.code) {
-          case 2001: this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning'); break
+          case 2001:
+            if (newUserResult.body.details.email) this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning')
+            if (newUserResult.body.details.username) this.sendGlobalFlashMsg(props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }))
+            else this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
+            break
           case 2062:
             this.sendGlobalFlashMsg(
               props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -347,6 +470,61 @@ class AdminWorkspaceUser extends React.Component {
         this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
         return false
     }
+  }
+
+  handleUserCreated = (message) => {
+    const { state } = this
+
+    const user = message.user
+    const newUserList = state.content.userList.slice()
+    newUserList.push(user)
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        userList: newUserList
+      }
+    }))
+  }
+
+  handleUserModified = (message) => {
+    const { state } = this
+
+    const user = message.user
+    const userList = state.content.userList
+    const userIndex = userList.findIndex(u => u.user_id === user.user_id)
+
+    if (userIndex === -1) {
+      console.log(`<AdminWorkspaceUser>: user id ${user.user_id} not found`)
+      // We do not have this user in our list...
+      return
+    }
+
+    const newuserList = [
+      ...userList.slice(0, userIndex),
+      user,
+      ...userList.slice(userIndex + 1)
+    ]
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        userList: newuserList
+      }
+    }))
+  }
+
+  handleUserDeleted = (message) => {
+    const { state } = this
+
+    const user = message.user
+    const userList = state.content.userList
+    const newUserList = userList.filter(u => u.user_id !== user.user_id)
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        userList: newUserList
+      }
+    }))
   }
 
   handleClickWorkspace = workspaceId => {
@@ -387,17 +565,23 @@ class AdminWorkspaceUser extends React.Component {
   handleChangeUsername = async (newUsername) => {
     const { props, state } = this
 
-    const username = removeAtInUsername(newUsername)
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
       })
       return
     }
 
-    if (hasSpaces(username)) {
+    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (hasSpaces(newUsername)) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t("Username can't contain any whitespace")
@@ -405,7 +589,7 @@ class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    if (hasNotAllowedCharacters(username)) {
+    if (hasNotAllowedCharacters(newUsername)) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -413,7 +597,7 @@ class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, username))
+    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, newUsername))
 
     switch (fetchUsernameAvailability.apiResponse.status) {
       case 200:
@@ -448,7 +632,7 @@ class AdminWorkspaceUser extends React.Component {
         {state.config.type === 'user' && (
           <AdminUser
             userList={state.content.userList}
-            loggedUserId={state.loggedUser.user_id}
+            loggedUserId={state.loggedUser.userId}
             emailNotifActivated={state.config.system.config.email_notification_activated}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
@@ -499,4 +683,4 @@ class AdminWorkspaceUser extends React.Component {
   }
 }
 
-export default translate()(Radium(AdminWorkspaceUser))
+export default translate()(TracimComponent(Radium(AdminWorkspaceUser)))

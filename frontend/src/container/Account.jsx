@@ -17,16 +17,12 @@ import {
   buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
-  updateUserPublicName,
-  updateUserEmail,
-  updateUserWorkspaceSubscriptionNotif,
   updateUserAgendaUrl,
-  updateUserUsername,
   setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
@@ -43,6 +39,7 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList,
   PAGE,
+  MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   MINIMUM_CHARACTERS_USERNAME
 } from '../util/helper.js'
@@ -69,7 +66,7 @@ export class Account extends React.Component {
       active: false,
       label: 'Password',
       translationKey: props.t('Password'),
-      display: editableUserAuthTypeList.includes(props.user.auth_type) // allow pw change only for users in tracim's db (eg. not from ldap)
+      display: editableUserAuthTypeList.includes(props.user.authType) // allow pw change only for users in tracim's db (eg. not from ldap)
     }, {
       name: 'agenda',
       active: false,
@@ -84,16 +81,15 @@ export class Account extends React.Component {
       usernameInvalidMsg: ''
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        this.setHeadTitle()
-        break
-    }
+  // Custom Event Handler
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
   }
 
   componentDidMount () {
@@ -182,7 +178,6 @@ export class Account extends React.Component {
       const fetchPutPublicName = await props.dispatch(putMyselfName(props.user, newPublicName))
       switch (fetchPutPublicName.status) {
         case 200:
-          props.dispatch(updateUserPublicName(newPublicName))
           if (newEmail === '' && newUsername === '') {
             props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
             return true
@@ -197,12 +192,10 @@ export class Account extends React.Component {
     }
 
     if (newUsername !== '') {
-      const username = removeAtInUsername(newUsername)
-      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, checkPassword))
+      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, newUsername, checkPassword))
 
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(updateUserUsername(username))
           if (newEmail === '') {
             if (newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your username and your name has been changed'), 'info'))
             else props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
@@ -211,6 +204,11 @@ export class Account extends React.Component {
           break
         case 400:
           switch (fetchPutUsername.json.code) {
+            case 2001:
+              props.dispatch(newFlashMessage(
+                props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
+              ))
+              break
             case 2062:
               props.dispatch(newFlashMessage(
                 props.t(
@@ -234,7 +232,6 @@ export class Account extends React.Component {
       const fetchPutUserEmail = await props.dispatch(putMyselfEmail(newEmail, checkPassword))
       switch (fetchPutUserEmail.status) {
         case 200:
-          props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
           if (newUsername !== '' || newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your personal data has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
           return true
@@ -246,17 +243,23 @@ export class Account extends React.Component {
   handleChangeUsername = async (newUsername) => {
     const { props } = this
 
-    const username = removeAtInUsername(newUsername)
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
       })
       return
     }
 
-    if (hasSpaces(username)) {
+    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (hasSpaces(newUsername)) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t("Username can't contain any whitespace")
@@ -264,7 +267,7 @@ export class Account extends React.Component {
       return
     }
 
-    if (hasNotAllowedCharacters(username)) {
+    if (hasNotAllowedCharacters(newUsername)) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -272,7 +275,7 @@ export class Account extends React.Component {
       return
     }
 
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(newUsername))
 
     switch (fetchUsernameAvailability.status) {
       case 200:
@@ -289,9 +292,8 @@ export class Account extends React.Component {
     const { props } = this
 
     const fetchPutUserWorkspaceDoNotify = await props.dispatch(putMyselfWorkspaceDoNotify(workspaceId, doNotify))
-    switch (fetchPutUserWorkspaceDoNotify.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, workspaceId, doNotify)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    if (fetchPutUserWorkspaceDoNotify.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
 
@@ -349,7 +351,7 @@ export class Account extends React.Component {
                       case 'personalData':
                         return (
                           <PersonalData
-                            userAuthType={props.user.auth_type}
+                            userAuthType={props.user.authType}
                             onClickSubmit={this.handleSubmitPersonalData}
                             onChangeUsername={this.handleChangeUsername}
                             isUsernameValid={state.isUsernameValid}
@@ -360,7 +362,7 @@ export class Account extends React.Component {
                       case 'notification':
                         return (
                           <Notification
-                            userLoggedId={props.user.user_id}
+                            userLoggedId={props.user.userId}
                             workspaceList={props.workspaceList}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                           />
@@ -394,4 +396,4 @@ export class Account extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
   breadcrumbs, user, workspaceList, timezone, system, appList
 })
-export default connect(mapStateToProps)(translate()(Account))
+export default connect(mapStateToProps)(translate()(TracimComponent(Account)))

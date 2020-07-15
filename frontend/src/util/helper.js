@@ -1,5 +1,5 @@
 import i18n, { getBrowserLang } from './i18n.js'
-import { PROFILE_LIST, ROLE } from 'tracim_frontend_lib'
+import { PROFILE_LIST, ROLE, FETCH_CONFIG as LIB_FETCH_CONFIG } from 'tracim_frontend_lib'
 
 const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-test.json') : require('../../configEnv.json')
 
@@ -9,6 +9,7 @@ export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
 export const SHARE_FOLDER_ID = -1
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
 export const MINIMUM_CHARACTERS_USERNAME = 3
+export const MAXIMUM_CHARACTERS_USERNAME = 255
 
 export const history = require('history').createBrowserHistory()
 
@@ -16,10 +17,7 @@ export const history = require('history').createBrowserHistory()
 export { getBrowserLang }
 
 export const FETCH_CONFIG = {
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  },
+  headers: LIB_FETCH_CONFIG.headers,
   apiUrl: configEnv.apiUrl
 }
 
@@ -112,6 +110,17 @@ export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'
 export const sortWorkspaceContents = (a, b) => {
   if (a.type === 'folder' && b.type !== 'folder') return -1
   if (b.type === 'folder' && a.type !== 'folder') return 1
+  if (a.label > b.label) return 1
+  if (b.label > a.label) return -1
+  return 0
+}
+
+export const CONTENT_NAMESPACE = {
+  CONTENT: 'content',
+  UPLOAD: 'upload'
+}
+
+export const sortWorkspaceList = (a, b) => {
   if (a.label > b.label) return 1
   if (b.label > a.label) return -1
   return 0

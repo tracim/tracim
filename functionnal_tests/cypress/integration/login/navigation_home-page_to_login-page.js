@@ -16,11 +16,11 @@ describe('Login page', function () {
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=email]')
+      .find('input[type=text]')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=email]')
+      .find('input[type=text]')
       .type(defaultAdmin.email)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
@@ -51,11 +51,11 @@ describe('Login page', function () {
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=email]')
+      .find('input[type=text]')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=email]')
+      .find('input[type=text]')
       .type(defaultAdmin.username)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })

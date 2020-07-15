@@ -181,7 +181,8 @@ describe('Account page', () => {
       })
     })
     describe('Change username', () => {
-      const newUserName = 'newRandomUserName'
+      const newUserName = 'newRandomUsername'
+      const longNewUsername = 'aa'.repeat(200)
 
       it('should update the header with the new username', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
@@ -194,7 +195,7 @@ describe('Account page', () => {
           .find('.personaldata__form__txtinput.checkPassword')
           .type(baseUser.password)
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('.personaldata__form__txtinput__info')
+          .find('.personaldata__form__txtinput__msginfo')
           .should('be.visible')
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('.personaldata__form__button')
@@ -202,6 +203,17 @@ describe('Account page', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=userinfo__username]')
           .contains(newUserName)
+      })
+
+      it('should show an error message when new username is too long', () => {
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+          .click()
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=personaldata__form__txtinput__username]')
+          .type(longNewUsername)
+          cy.get('.personaldata__form__txtinput__msgerror')
+            .should('be.visible')
       })
 
       it('should show the allowed characters list', () => {
@@ -215,5 +227,27 @@ describe('Account page', () => {
           .should('be.visible')
       })
     })
+
+    describe('Set a too small username', () => {
+      it('should show the error message and disable the form button', () => {
+        const smallUsername = 'aa'
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+          .click()
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=personaldata__form__txtinput__username]')
+          .type(smallUsername)
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__txtinput.checkPassword')
+          .type(baseUser.password)
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__txtinput__msgerror')
+          .should('be.visible')
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('.personaldata__form__button')
+          .should('not.be.enabled')
+      })
+    })
+
   })
 })

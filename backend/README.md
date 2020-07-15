@@ -170,9 +170,11 @@ You can also preset uWSGI config for Tracim by creating this kind of .ini file:
     chdir = <PATH>/tracim/backend/
     module = wsgi.web:application
     home = <PATH>/tracim/backend/env/
+    workers = 4
+    threads = 4
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-And for WebDAV:
+For WebDAV:
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
@@ -180,9 +182,10 @@ And for WebDAV:
     chdir = <PATH>/tracim/backend/
     module = wsgi.webdav:application
     home = <PATH>/tracim/backend/env/
+    threads = 8
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-And for CalDAV:
+For CalDAV:
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
@@ -190,6 +193,7 @@ And for CalDAV:
     chdir = <PATH>/tracim/backend/
     module = wsgi.caldav:application
     home = <PATH>/tracim/backend/env/
+    threads = 8
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
 You can then run the process this way:
@@ -352,9 +356,9 @@ Run your project's tests:
 
     pytest
 
-### Lints and Others Checks ###
+### Linting and Other Checks ###
 
-Install required versions:
+Install the required versions:
 
     pip install -r requirements-static-tests.txt
 

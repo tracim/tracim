@@ -196,17 +196,20 @@ export class AdminUser extends React.Component {
 
                       <td
                         className='adminUser__table__tr__td-link primaryColorFont'
+                        title={u.public_name}
                       >
                         <Link to={`/ui/admin/user/${u.user_id}`}>
                           {u.public_name}
                         </Link>
                       </td>
 
-                      <td>
-                        {u.username}
+                      <td className='adminUser__table__tr__td-text' title={u.username}>
+                        {u.username && `@${u.username}`}
                       </td>
 
-                      <td>{u.email}</td>
+                      <td className='adminUser__table__tr__td-text' title={u.email}>
+                        {u.email}
+                      </td>
 
                       <td>
                         <BtnSwitch

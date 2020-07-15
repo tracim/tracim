@@ -12,14 +12,14 @@ import {
 import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import contentFile from '../fixture/content/contentFile.js'
 import { debug } from '../../src/debug.js'
-import { commentTlm } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
+import { commentTlm, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 
 describe('<File />', () => {
   const props = {
-    setApiUrl: () => {},
+    setApiUrl: () => { },
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    registerLiveMessageHandlerList: () => {},
-    registerCustomEventHandlerList: () => {},
+    registerLiveMessageHandlerList: () => { },
+    registerCustomEventHandlerList: () => { },
     i18n: {},
     content: contentFile,
     t: key => key
@@ -37,57 +37,23 @@ describe('<File />', () => {
     describe('eventType content', () => {
       describe('handleContentCreated', () => {
         describe('Create a new comment', () => {
-          const tlmData = {
-            author: {
-              avatar_url: null,
-              public_name: 'Global manager',
-              user_id: 1
-            },
-            content: {
-              ...commentTlm,
-              parent_id: contentFile.file.content_id,
-              content_id: 9
-            }
-          }
-
-          before(() => {
-            wrapper.instance().handleContentCommentCreated(tlmData)
-          })
-
           it('should have the new comment in the Timeline', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData.content.content_id)
-          })
-        })
-
-        describe('Create 2 comments received in the wrong time order', () => {
-          const tlmData1 = {
-            content: {
-              ...commentTlm,
-              parent_id: contentFile.file.content_id,
-              content_id: 10,
-              created: '2020-05-22T14:02:02Z'
+            const tlmData = {
+              author: {
+                avatar_url: null,
+                public_name: 'Global manager',
+                user_id: 1
+              },
+              content: {
+                ...commentTlm,
+                parent_id: contentFile.file.content_id,
+                content_id: 9
+              }
             }
-          }
+            wrapper.instance().handleContentCommentCreated(tlmData)
 
-          const tlmData2 = {
-            content: {
-              ...commentTlm,
-              parent_id: contentFile.file.content_id,
-              content_id: 11,
-              created: '2020-05-22T14:02:05Z'
-            }
-          }
-
-          before(function () {
-            wrapper.instance().handleContentCommentCreated(tlmData2)
-            wrapper.instance().handleContentCommentCreated(tlmData1)
-          })
-
-          it('should have correctly order the timeline with the last comment created at the end', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].content_id).to.equal(tlmData2.content.content_id)
-          })
-          it('should have correctly order the timeline with the second last comment created not at the end', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 2].content_id).to.equal(tlmData1.content.content_id)
+            const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.content.content_id))
+            expect(hasComment).to.equal(true)
           })
         })
 
@@ -117,7 +83,8 @@ describe('<File />', () => {
             content: {
               ...contentFile.file,
               filename: 'newName.jpeg'
-            }
+            },
+            author: contentFile.file.author
           }
 
           before(() => {
@@ -125,7 +92,10 @@ describe('<File />', () => {
           })
 
           it('should be updated with the content modified', () => {
-            expect(wrapper.state('content').filename).to.equal(tlmData.content.filename)
+            expect(wrapper.state('newContent').filename).to.equal(tlmData.content.filename)
+          })
+          it('should have the new revision in the timeline', () => {
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].filename).to.equal(tlmData.content.filename)
           })
         })
 
@@ -134,7 +104,8 @@ describe('<File />', () => {
             content: {
               ...contentFile.file,
               raw_content: 'new random description'
-            }
+            },
+            author: contentFile.file.author
           }
 
           before(() => {
@@ -142,7 +113,10 @@ describe('<File />', () => {
           })
 
           it('should be updated with the content modified', () => {
-            expect(wrapper.state('content').raw_content).to.equal(tlmData.content.raw_content)
+            expect(wrapper.state('newContent').raw_content).to.equal(tlmData.content.raw_content)
+          })
+          it('should have the new revision in the timeline', () => {
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].raw_content).to.equal(tlmData.content.raw_content)
           })
         })
 
@@ -160,7 +134,9 @@ describe('<File />', () => {
               page_nb: 3,
               modified: '2020-05-20T12:15:57Z',
               mimetype: 'image/jpeg'
-            }
+            },
+            user: contentFile.file.author,
+            author: contentFile.file.author
           }
 
           before(() => {
@@ -168,22 +144,22 @@ describe('<File />', () => {
           })
 
           it('should have the new filename', () => {
-            expect(wrapper.state('content').filename).to.equal(tlmData.content.filename)
+            expect(wrapper.state('newContent').filename).to.equal(tlmData.content.filename)
           })
           it('should have the new size', () => {
-            expect(wrapper.state('content').size).to.equal(tlmData.content.size)
+            expect(wrapper.state('newContent').size).to.equal(tlmData.content.size)
           })
           it('should have the new created date', () => {
-            expect(wrapper.state('content').created).to.equal(tlmData.content.created)
+            expect(wrapper.state('newContent').created).to.equal(tlmData.content.created)
           })
           it('should have the new page_nb', () => {
-            expect(wrapper.state('content').page_nb).to.equal(tlmData.content.page_nb)
+            expect(wrapper.state('newContent').page_nb).to.equal(tlmData.content.page_nb)
           })
           it('should have build the new previewUrl', () => {
-            expect(wrapper.state('content').previewUrl).to.equal('http://localhost:1337/workspaces/0/files/0/revisions/137/preview/jpg/500x500/New File.jpg?page=1')
+            expect(wrapper.state('newContent').previewUrl).to.equal('http://localhost:1337/workspaces/0/files/0/revisions/137/preview/jpg/500x500/New File.jpg?page=1')
           })
           it('should have 3 preview pages', () => {
-            expect(wrapper.state('content').lightboxUrlList.length).to.equal(3)
+            expect(wrapper.state('newContent').lightboxUrlList.length).to.equal(3)
           })
         })
 
@@ -205,14 +181,18 @@ describe('<File />', () => {
           })
         })
       })
-      describe('handleContentDeleted', () => {
+      describe('handleContentDeletedOrRestored', () => {
         describe('Delete the current content', () => {
           const tlmData = {
-            content: contentFile.file
+            content: {
+              ...contentFile.file,
+              is_deleted: true
+            },
+            author: contentFile.file.author
           }
 
           before(() => {
-            wrapper.instance().handleContentDeleted(tlmData)
+            wrapper.instance().handleContentDeletedOrRestored(tlmData)
           })
 
           after(() => {
@@ -220,10 +200,10 @@ describe('<File />', () => {
           })
 
           it('should be deleted correctly', () => {
-            expect(wrapper.state('content').is_deleted).to.equal(true)
+            expect(wrapper.state('newContent').is_deleted).to.equal(true)
           })
-          it('should be in view mode', () => {
-            expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.VIEW)
+          it('should have the new revision in the timeline', () => {
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].is_deleted).to.equal(true)
           })
         })
 
@@ -231,28 +211,32 @@ describe('<File />', () => {
           const tlmData = {
             content: {
               ...contentFile.file,
-              content_id: contentFile.file.content_id + 1
+              content_id: contentFile.file.content_id + 1,
+              is_deleted: true
             }
           }
 
           before(() => {
-            wrapper.instance().handleContentDeleted(tlmData)
+            wrapper.instance().handleContentDeletedOrRestored(tlmData)
           })
 
           it('should not be deleted', () => {
             expect(wrapper.state('content').is_deleted).to.equal(false)
           })
         })
-      })
-      describe('handleContentRestored', () => {
+
         describe('Restore the current content', () => {
           const tlmData = {
-            content: contentFile.file
+            content: {
+              ...contentFile.file,
+              is_deleted: false
+            },
+            author: contentFile.file.author
           }
 
           before(() => {
             wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-            wrapper.instance().handleContentRestored(tlmData)
+            wrapper.instance().handleContentDeletedOrRestored(tlmData)
           })
 
           after(() => {
@@ -260,7 +244,10 @@ describe('<File />', () => {
           })
 
           it('should be restored correctly', () => {
-            expect(wrapper.state('content').is_deleted).to.equal(false)
+            expect(wrapper.state('newContent').is_deleted).to.equal(false)
+          })
+          it('should have the new revision in the timeline', () => {
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].is_deleted).to.equal(false)
           })
         })
 
@@ -268,19 +255,54 @@ describe('<File />', () => {
           const tlmData = {
             content: {
               ...contentFile.file,
-              content_id: contentFile.file.content_id + 1
+              content_id: contentFile.file.content_id + 1,
+              is_deleted: false
             }
           }
 
           before(() => {
             wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
-            wrapper.instance().handleContentRestored(tlmData)
+            wrapper.instance().handleContentDeletedOrRestored(tlmData)
           })
 
           it('should not be restored', () => {
             expect(wrapper.state('content').is_deleted).to.equal(true)
           })
         })
+      })
+    })
+
+    describe('eventType user', () => {
+      describe('handleUserModified', () => {
+        describe('If the user is the author of a revision or comment', () => {
+          it('should update the timeline with the data of the user', () => {
+            const tlmData = { user: { ...user, public_name: 'newName' } }
+            wrapper.instance().handleUserModified(tlmData)
+
+            const listPublicNameOfAuthor = wrapper.state('timeline')
+              .filter(timelineItem => timelineItem.author.user_id === tlmData.user.user_id)
+              .map(timelineItem => timelineItem.author.public_name)
+            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.user.public_name)
+            expect(isNewName).to.be.equal(true)
+          })
+        })
+      })
+    })
+  })
+
+  describe('its internal functions', () => {
+    describe('handleClickRefresh', () => {
+      it('should update content state', () => {
+        wrapper.setState(prev => ({ newContent: { ...prev.content, filename: 'New Name' } }))
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('content')).to.deep.equal(wrapper.state('newContent'))
+      })
+      it('should update showRefreshWarning state', () => {
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('showRefreshWarning')).to.deep.equal(false)
+      })
+      it('should be in view mode', () => {
+        expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.VIEW)
       })
     })
   })

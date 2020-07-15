@@ -14,7 +14,8 @@ import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   buildHeadTitle,
   CUSTOM_EVENT,
-  checkEmailValidity
+  checkEmailValidity,
+  serialize
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -40,6 +41,7 @@ import {
   PAGE,
   COOKIE_FRONTEND
 } from '../util/helper.js'
+import { serializeUserProps } from '../reducer/user.js'
 
 const qs = require('query-string')
 
@@ -147,7 +149,7 @@ class Login extends React.Component {
         this.loadAppList()
         this.loadContentTypeList()
         this.loadWorkspaceList()
-        props.tlmManager.openLiveMessageConnection(fetchPostUserLogin.json.user_id)
+        props.tlm.manager.openLiveMessageConnection(fetchPostUserLogin.json.user_id)
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)
@@ -220,7 +222,7 @@ class Login extends React.Component {
 
   setDefaultUserLang = async loggedUser => {
     const { props } = this
-    const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
+    const fetchPutUserLang = await props.dispatch(putUserLang(serialize(loggedUser, serializeUserProps), props.user.lang))
     switch (fetchPutUserLang.status) {
       case 200: break
       default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
@@ -253,7 +255,7 @@ class Login extends React.Component {
                 parentClassName='loginpage__card__form__groupelogin'
                 customClass='mb-3 mt-4'
                 icon='fa-at'
-                type='email'
+                type='text'
                 placeHolder={props.t('Email address or username')}
                 invalidMsg={props.t('Invalid email or username')}
                 maxLength={512}
@@ -300,5 +302,5 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, system, breadcrumbs, tlmManager }) => ({ user, system, breadcrumbs, tlmManager })
+const mapStateToProps = ({ user, system, breadcrumbs, tlm }) => ({ user, system, breadcrumbs, tlm })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Login))))

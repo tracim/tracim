@@ -42,11 +42,11 @@ export const WorkspaceMembersList = props => {
                   <Avatar width='50px' publicName={m.user.public_name} />
                 </div>
 
-                <div className='workspace_advanced__userlist__list__item__name'>
+                <div className='workspace_advanced__userlist__list__item__name' title={m.user.public_name}>
                   {m.user.public_name}
 
                   {m.user.username && (
-                    <div className='workspace_advanced__userlist__list__item__name__username'>
+                    <div className='workspace_advanced__userlist__list__item__name__username' title={`@${m.user.username}`}>
                       @{m.user.username}
                     </div>
                   )}
@@ -94,7 +94,7 @@ export const WorkspaceMembersList = props => {
                   </div>
                 </div>
 
-                {(m.user_id !== props.loggedUser.user_id
+                {(m.user_id !== props.loggedUser.userId
                   ? (
                     <div
                       className='workspace_advanced__userlist__list__item__delete'
@@ -114,7 +114,7 @@ export const WorkspaceMembersList = props => {
       {props.displayFormNewMember === true && (
         <NewMemberForm
           onClickCloseAddMemberBtn={props.onClickToggleFormNewMember}
-          personalData={props.newMemberName}
+          publicName={props.newMemberName}
           isEmail={props.isEmail}
           onChangePersonalData={props.onChangeNewMemberName}
           searchedKnownMemberList={props.searchedKnownMemberList}

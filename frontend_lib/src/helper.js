@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
@@ -219,7 +220,7 @@ export const APP_FEATURE_MODE = {
   REVISION: 'revision'
 }
 
-// INFO - GB - 2019-07-05 - This password generetor function was based on
+// INFO - GB - 2019-07-05 - This password generator function was based on
 // https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
 export const generateRandomPassword = () => {
   let password = []
@@ -236,10 +237,31 @@ export const generateRandomPassword = () => {
   return randomPassword
 }
 
+export const getOrCreateSessionClientToken = () => {
+  const clientTokenKey = 'tracimClientToken'
+  let token = window.sessionStorage.getItem(clientTokenKey)
+  if (token === null) {
+    token = uuidv4()
+    window.sessionStorage.setItem(clientTokenKey, token)
+  }
+  return token
+}
+
+export const COMMON_REQUEST_HEADERS = {
+  'Accept': 'application/json',
+  'X-Tracim-ClientToken': getOrCreateSessionClientToken()
+}
+
 export const FETCH_CONFIG = {
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
+    ...COMMON_REQUEST_HEADERS,
+    'Content-Type': 'application/json',
+  }
+}
+
+export const setupCommonRequestHeaders = (xhr) => {
+  for (const [key, value] of Object.entries(COMMON_REQUEST_HEADERS)) {
+    xhr.setRequestHeader(key, value)
   }
 }
 
@@ -300,6 +322,11 @@ export const CONTENT_TYPE = {
   COMMENT: 'comment'
 }
 
+export const TIMELINE_TYPE = {
+  COMMENT: CONTENT_TYPE.COMMENT,
+  REVISION: 'revision'
+}
+
 export const sortTimelineByDate = (timeline) => {
   return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
 }
@@ -316,6 +343,8 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
     ...revisionObject
   } = data.content
 
+  const revisionNumber = 1 + timeline.filter(tl => tl.timelineType === 'revision' ).length
+
   return [
     ...timeline,
     {
@@ -329,7 +358,7 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
       comment_ids: [],
       created: displayDistanceDate(data.content.modified, lang),
       created_raw: data.content.modified,
-      number: timeline.length + 1,
+      number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
       timelineType: 'revision'
@@ -349,3 +378,13 @@ export const removeAtInUsername = (username) => {
 export const hasNotAllowedCharacters = name => !(/^[A-Za-z0-9_-]*$/.test(name))
 
 export const hasSpaces = name => /\s/.test(name)
+
+// FIXME - GM - 2020-06-24 - This function doesn't handle nested object, it need to be improved
+// https://github.com/tracim/tracim/issues/3229
+export const serialize = (objectToSerialize, propertyMap) => {
+  return Object.fromEntries(
+    Object.entries(objectToSerialize)
+      .map(([key, value]) => [propertyMap[key], value])
+      .filter(([key, value]) => key !== undefined)
+  )
+}

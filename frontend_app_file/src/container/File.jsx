@@ -36,9 +36,13 @@ import {
   APP_FEATURE_MODE,
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
-  sortTimelineByDate
+  sortTimelineByDate,
+  addRevisionFromTLM,
+  RefreshWarningMessage,
+  setupCommonRequestHeaders,
+  getOrCreateSessionClientToken
 } from 'tracim_frontend_lib'
-import { PAGE } from '../helper.js'
+import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
@@ -74,6 +78,7 @@ export class File extends React.Component {
         props.t('Upload files')
       ],
       newComment: '',
+      newContent: {},
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
@@ -85,9 +90,14 @@ export class File extends React.Component {
       },
       shareEmails: '',
       sharePassword: '',
-      shareLinkList: []
+      shareLinkList: [],
+      previewVideo: false,
+      showRefreshWarning: false,
+      editionAuthor: '',
+      isLastTimelineItemCurrentToken: false
     }
     this.refContentLeftTop = React.createRef()
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -102,9 +112,10 @@ export class File extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentRestored },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
 
@@ -142,22 +153,28 @@ export class File extends React.Component {
   }
 
   handleContentModified = (data) => {
-    const { state, props } = this
+    const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
-    this.sendGlobalFlashMessage(props.t('File has been updated'), 'info')
-
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     const filenameNoExtension = removeExtensionOfFilename(data.content.filename)
-    this.setHeadTitle(filenameNoExtension)
+    const newContentObject = {
+      ...state.content,
+      ...data.content,
+      previewUrl: buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, 1, 500, 500),
+      lightboxUrlList: (new Array(data.content.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
+        buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, pageNb, 1920, 1080)
+      )
+    }
+
+    if (clientToken === data.client_token) this.setHeadTitle(filenameNoExtension)
     this.setState(prev => ({
-      content: {
-        ...prev.content,
-        ...data.content,
-        previewUrl: buildFilePreviewUrl(prev.config.apiUrl, prev.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, 1, 500, 500),
-        lightboxUrlList: (new Array(data.content.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
-          buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.content.content_id, data.content.current_revision_id, filenameNoExtension, pageNb, 1920, 1080)
-        )
-      }
+      content: clientToken === data.client_token ? newContentObject : prev.content,
+      newContent: newContentObject,
+      editionAuthor: data.author.public_name,
+      showRefreshWarning: clientToken !== data.client_token,
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
 
@@ -168,47 +185,45 @@ export class File extends React.Component {
         {
           ...data.content,
           created_raw: data.content.created,
+          created: displayDistanceDate(data.content.created, this.state.loggedUser.lang),
           timelineType: data.content.content_type
         }
       ])
-      this.setState({ timeline: sortedNewTimeLine })
+      this.setState({
+        timeline: sortedNewTimeLine,
+        isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+      })
     }
   }
 
-  handleContentDeleted = data => {
-    const { state, props } = this
+  handleContentDeletedOrRestored = data => {
+    const { state } = this
     if (data.content.content_id !== state.content.content_id) return
 
-    this.sendGlobalFlashMessage(props.t('File has been deleted'), 'info')
-
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev =>
       ({
-        content: {
+        content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+        newContent: {
           ...prev.content,
-          ...data.content,
-          is_deleted: true
+          ...data.content
         },
-        mode: APP_FEATURE_MODE.VIEW
+        editionAuthor: data.author.public_name,
+        showRefreshWarning: clientToken !== data.client_token,
+        mode: clientToken === data.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
+        timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+        isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
       })
     )
   }
 
-  handleContentRestored = data => {
-    const { state, props } = this
-    if (data.content.content_id !== state.content.content_id) return
-
-    this.sendGlobalFlashMessage(props.t('File has been restored'), 'info')
-
-    this.setState(prev =>
-      ({
-        content:
-          {
-            ...prev.content,
-            ...data.content,
-            is_deleted: false
-          }
-      })
+  handleUserModified = data => {
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.user.user_id
+      ? { ...timelineItem, author: data.user }
+      : timelineItem
     )
+
+    this.setState({ timeline: newTimeline })
   }
 
   async componentDidMount () {
@@ -292,7 +307,8 @@ export class File extends React.Component {
               `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/revisions/${response.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
           },
-          mode: APP_FEATURE_MODE.VIEW
+          mode: APP_FEATURE_MODE.VIEW,
+          isLastTimelineItemCurrentToken: false
         })
         this.setHeadTitle(filenameNoExtension)
         break
@@ -385,6 +401,7 @@ export class File extends React.Component {
       await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
+      case 200: break
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
@@ -526,7 +543,7 @@ export class File extends React.Component {
 
     // FIXME - b.l - refactor urls
     xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
-    xhr.setRequestHeader('Accept', 'application/json')
+    setupCommonRequestHeaders(xhr)
     xhr.withCredentials = true
 
     xhr.onreadystatechange = () => {
@@ -678,6 +695,19 @@ export class File extends React.Component {
     }
   }
 
+  handleClickRefresh = () => {
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...prev.newContent
+      },
+      mode: APP_FEATURE_MODE.VIEW,
+      showRefreshWarning: false
+    }))
+    const filenameNoExtension = removeExtensionOfFilename(this.state.newContent.filename)
+    this.setHeadTitle(filenameNoExtension)
+  }
+
   getDownloadBaseUrl = (apiUrl, content, mode) => {
     const urlRevisionPart = mode === APP_FEATURE_MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
     // FIXME - b.l - refactor urls
@@ -741,6 +771,7 @@ export class File extends React.Component {
           onClickWysiwygBtn={this.handleToggleWysiwyg}
           onClickRevisionBtn={this.handleClickShowRevision}
           shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+          isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           key='Timeline'
         />
       )
@@ -867,9 +898,27 @@ export class File extends React.Component {
                   {props.t('Last version')}
                 </button>
               )}
+
+              {isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST) && (
+                <GenericButton
+                  customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
+                  customColor={state.config.hexcolor}
+                  label={props.t('Play video')}
+                  onClick={() => this.setState({ previewVideo: true })}
+                  faIcon='play'
+                  style={{ marginLeft: '5px' }}
+                />
+              )}
             </div>
 
             <div className='d-flex'>
+              {state.showRefreshWarning && (
+                <RefreshWarningMessage
+                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  onClickRefresh={this.handleClickRefresh}
+                />
+              )}
+
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -906,6 +955,7 @@ export class File extends React.Component {
             filePageNb={state.content.page_nb}
             fileCurrentPage={state.fileCurrentPage}
             version={state.content.number}
+            mimeType={state.content.mimetype}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
@@ -926,6 +976,8 @@ export class File extends React.Component {
             newFile={state.newFile}
             newFilePreview={state.newFilePreview}
             progressUpload={state.progressUpload}
+            previewVideo={state.previewVideo}
+            onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
             ref={this.refContentLeftTop}
           />
 
