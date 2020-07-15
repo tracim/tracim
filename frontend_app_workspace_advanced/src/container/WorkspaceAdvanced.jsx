@@ -174,7 +174,6 @@ export class WorkspaceAdvanced extends React.Component {
         memberList: prev.content.memberList.map(m => m.user_id === data.user.user_id
           ? {
             ...m,
-            user_id: data.user.user_id,
             user: data.user,
             is_active: data.user.is_active
           }
