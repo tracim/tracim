@@ -53,5 +53,14 @@
   "Files already uploaded:": "Fichiers déjà téléversés",
   "Upload files": "Téléverser des fichiers",
   "New file": "Nouveau fichier",
-  "Preview loading...": "Chargement de l'aperçu ..."
+  "Preview loading...": "Chargement de l'aperçu ...",
+  "Play video": "Lire la vidéo",
+  "In that case, you can download the video and try opening it manually.": "Dans ce cas, vous pouvez télécharger la vidéo et essayer de la lire manuellement",
+  "To download the video, leave the fullscreen mode and click on download button {{icon}}.": "Pour télécharger la vidéo, quittez le mode plein écran et cliquez sur le bouton de téléchargement {{icon}}.",
+  "Note: Your browser might not be able to read this file.": "Remarque: Votre navigateur peut ne pas pouvoir lire le fichier.",
+  "File has been updated": "Le fichier a été mis à jour",
+  "File has been deleted": "Le fichier a été supprimé",
+  "File has been restored": "Le fichier a été restauré",
+  "The file has been updated, it can't be edited anymore": "Le fichier a été mis à jour, il ne peut plus être édité",
+  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}"
 }

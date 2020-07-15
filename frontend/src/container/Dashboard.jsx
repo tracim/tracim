@@ -3,6 +3,9 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { Link, withRouter } from 'react-router-dom'
 import {
+  TracimComponent,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   PageWrapper,
   PageTitle,
   PageContent,
@@ -12,7 +15,8 @@ import {
   ROLE,
   ROLE_LIST,
   PROFILE,
-  buildHeadTitle
+  buildHeadTitle,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -33,13 +37,12 @@ import {
   setWorkspaceRecentActivityList,
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
-  removeWorkspaceMember,
   updateUserWorkspaceSubscriptionNotif,
   setWorkspaceAgendaUrl,
   setBreadcrumbs
 } from '../action-creator.sync.js'
-import appFactory from '../appFactory.js'
-import { PAGE, findUserRoleIdInWorkspace } from '../helper.js'
+import appFactory from '../util/appFactory.js'
+import { PAGE, findUserRoleIdInWorkspace } from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
@@ -50,16 +53,19 @@ import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
 
 const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
 
-class Dashboard extends React.Component {
+export class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
+      workspaceIdInUrl: props.match.params.idws
+        ? parseInt(props.match.params.idws)
+        : null, // this is used to avoid handling the parseInt every time
       advancedDashboardOpenedId: null,
       newMember: {
         id: '',
         avatarUrl: '',
-        nameOrEmail: '',
+        personalData: '',
+        publicName: '',
         role: '',
         isEmail: false
       },
@@ -71,21 +77,27 @@ class Dashboard extends React.Component {
       displayWebdavBtn: false
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, handler: this.handleRefreshDashboardMemberList },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified }
+    ])
   }
 
-  customEventReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST: this.loadMemberList(); break
-      case CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL:
-        await this.loadWorkspaceDetail()
-        this.buildBreadcrumbs()
-        break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        this.setHeadTitle()
-        break
-    }
+  handleRefreshDashboardMemberList = () => this.loadMemberList()
+
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
+  }
+
+  handleWorkspaceModified = data => {
+    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    this.setHeadTitle()
+    this.buildBreadcrumbs()
   }
 
   async componentDidMount () {
@@ -111,7 +123,8 @@ class Dashboard extends React.Component {
       newMember: {
         id: '',
         avatarUrl: '',
-        nameOrEmail: '',
+        personalData: '',
+        publicName: '',
         role: '',
         isEmail: false
       }
@@ -130,7 +143,7 @@ class Dashboard extends React.Component {
   loadWorkspaceDetail = async () => {
     const { props } = this
 
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, props.match.params.idws))
+    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.match.params.idws))
     switch (fetchWorkspaceDetail.status) {
       case 200:
         props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
@@ -152,11 +165,12 @@ class Dashboard extends React.Component {
 
     const fetchCalendar = await props.dispatch(getLoggedUserCalendar())
     switch (fetchCalendar.status) {
-      case 200:
+      case 200: {
         const currentWorkspaceId = parseInt(props.match.params.idws)
         const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === currentWorkspaceId) || { agenda_url: '' }).agenda_url
         this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
         break
+      }
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('agenda details')}`, 'warning')); break
     }
   }
@@ -197,7 +211,13 @@ class Dashboard extends React.Component {
     if (props.system.config.instance_name) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Dashboard'), props.system.config.instance_name]) }
+        data: {
+          title: buildHeadTitle([
+            props.t('Dashboard'),
+            props.curWs.label,
+            props.system.config.instance_name
+          ])
+        }
       })
     }
   }
@@ -256,9 +276,9 @@ class Dashboard extends React.Component {
     }
   }
 
-  handleSearchUser = async userNameToSearch => {
+  handleSearchUser = async personalDataToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(userNameToSearch, props.curWs.id))
+    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(personalDataToSearch, props.curWs.id))
     switch (fetchUserKnownMemberList.status) {
       case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.json }); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
@@ -267,18 +287,21 @@ class Dashboard extends React.Component {
 
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
 
-  handleChangeNewMemberNameOrEmail = async newNameOrEmail => {
+  handleChangePersonalData = async newPersonalData => {
     this.setState(prev => ({
       newMember: {
         ...prev.newMember,
-        nameOrEmail: newNameOrEmail,
-        isEmail: this.isEmail(newNameOrEmail)
+        personalData: newPersonalData,
+        publicName: newPersonalData,
+        isEmail: this.isEmail(newPersonalData)
       },
       autoCompleteClicked: false
     }))
 
-    if (newNameOrEmail.length >= 2) {
-      await this.handleSearchUser(newNameOrEmail)
+    const personalData = removeAtInUsername(newPersonalData)
+
+    if (personalData.length >= 2) {
+      await this.handleSearchUser(personalData)
       this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
@@ -288,7 +311,8 @@ class Dashboard extends React.Component {
       newMember: {
         ...prev.newMember,
         id: knownMember.user_id,
-        nameOrEmail: knownMember.public_name,
+        publicName: knownMember.public_name,
+        personalData: knownMember.username,
         avatarUrl: knownMember.avatar_url,
         isEmail: false
       },
@@ -307,8 +331,8 @@ class Dashboard extends React.Component {
   handleClickValidateNewMember = async () => {
     const { props, state } = this
 
-    if (state.newMember.nameOrEmail === '') {
-      props.dispatch(newFlashMessage(props.t('Please set a name or email'), 'warning'))
+    if (state.newMember.personalData === '') {
+      props.dispatch(newFlashMessage(props.t('Please set a name, an email or a username'), 'warning'))
       return false
     }
 
@@ -317,38 +341,34 @@ class Dashboard extends React.Component {
       return false
     }
 
-    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.nameOrEmail)
-
-    if (!props.system.config.email_notification_activated && !newMemberInKnownMemberList) {
-      props.dispatch(newFlashMessage(props.t('Unknown user'), 'warning'))
-      return false
-    }
+    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.user_id === state.newMember.id)
 
     if (state.newMember.id === '' && newMemberInKnownMemberList) { // this is to force sending the id of the user to the api if he exists
       this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
-    const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
+    const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.curWs.id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      publicName: state.newMember.isEmail ? '' : state.newMember.nameOrEmail,
-      email: state.newMember.isEmail ? state.newMember.nameOrEmail : '',
+      email: state.newMember.isEmail ? state.newMember.personalData : '',
+      username: state.newMember.isEmail ? '' : state.newMember.personalData,
       role: state.newMember.role
     }))
 
+    this.setState({
+      newMember: {
+        id: '',
+        avatarUrl: '',
+        personalData: '',
+        publicName: '',
+        role: '',
+        isEmail: false
+      },
+      autoCompleteFormNewMemberActive: false,
+      displayNewMemberForm: false
+    })
+
     switch (fetchWorkspaceNewMember.status) {
       case 200:
-        this.loadMemberList()
-        this.setState({
-          newMember: {
-            id: '',
-            avatarUrl: '',
-            nameOrEmail: '',
-            role: '',
-            isEmail: false
-          },
-          autoCompleteFormNewMemberActive: false,
-          displayNewMemberForm: false
-        })
         props.dispatch(newFlashMessage(props.t('Member added'), 'info'))
         return true
       case 400:
@@ -356,7 +376,7 @@ class Dashboard extends React.Component {
           case 2042:
             props.dispatch(newFlashMessage(props.t('This account is deactivated'), 'warning'))
             return false
-          case 1001:
+          case 1001: {
             const ErrorMsg = () => (
               <div>
                 {props.t('Unknown user')}<br />
@@ -365,6 +385,7 @@ class Dashboard extends React.Component {
             )
             props.dispatch(newFlashMessage(<ErrorMsg />))
             return false
+          }
           case 3008:
             props.dispatch(newFlashMessage(props.t('This user already is in the workspace'), 'warning'))
             return false
@@ -381,10 +402,9 @@ class Dashboard extends React.Component {
   handleClickRemoveMember = async memberId => {
     const { props } = this
 
-    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.user, props.curWs.id, memberId))
+    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.curWs.id, memberId))
     switch (fetchWorkspaceRemoveMember.status) {
       case 204:
-        props.dispatch(removeWorkspaceMember(memberId))
         props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while removing member'), 'warning')); break
@@ -404,7 +424,7 @@ class Dashboard extends React.Component {
           creationLabel: ''
         },
         props.user,
-        findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE_LIST),
+        findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST),
         { ...props.curWs, workspace_id: props.curWs.id }
       )
     } else {
@@ -418,7 +438,7 @@ class Dashboard extends React.Component {
     const { props } = this
     const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.curWs.id, true))
     switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, true)); break
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.curWs.id, true)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
@@ -427,7 +447,7 @@ class Dashboard extends React.Component {
     const { props } = this
     const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.curWs.id, false))
     switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, false)); break
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.curWs.id, false)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
@@ -435,7 +455,7 @@ class Dashboard extends React.Component {
   render () {
     const { props, state } = this
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE_LIST)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST)
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326
@@ -503,7 +523,7 @@ class Dashboard extends React.Component {
             <PageTitle
               parentClass='dashboard__header'
               title={props.t('Dashboard')}
-              subtitle={''}
+              subtitle=''
               icon='home'
               breadcrumbsList={props.breadcrumbs}
             >
@@ -516,8 +536,7 @@ class Dashboard extends React.Component {
                   >
                     <i className='fa fa-fw fa-cog' />
                     {props.t('Open advanced Dashboard')}
-                  </button>
-                }
+                  </button>}
               </div>
             </PageTitle>
 
@@ -588,9 +607,9 @@ class Dashboard extends React.Component {
                   roleList={ROLE_LIST}
                   searchedKnownMemberList={state.searchedKnownMemberList}
                   autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                  nameOrEmail={state.newMember.nameOrEmail}
+                  publicName={state.newMember.publicName}
                   isEmail={state.newMember.isEmail}
-                  onChangeNameOrEmail={this.handleChangeNewMemberNameOrEmail}
+                  onChangePersonalData={this.handleChangePersonalData}
                   onClickKnownMember={this.handleClickKnownMember}
                   // createAccount={state.newMember.createAccount}
                   // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
@@ -638,4 +657,4 @@ class Dashboard extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
   breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system
 })
-export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Dashboard)))))

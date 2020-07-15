@@ -17,11 +17,13 @@ env:
     - TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/open_documents
     - TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER=/tmp/test/radicale_storage
     - TEST_CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tests_configs.ini
+    - TEST_PUSHPIN_FILE_PATH=$TRAVIS_BUILD_DIR/backend/pushpin_test.conf
     - TEST_MIGRATION_SCRIPT_LOCATION=$TRAVIS_BUILD_DIR/backend/tracim_backend/migration
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
 language: python
 dist: bionic
 python: "3.6"
+os: linux
 
 _install_backend: &_install_backend
   addons:
@@ -39,9 +41,10 @@ _install_backend: &_install_backend
         - libldap2-dev
         - libsasl2-dev
         - docker-ce
+        - docker-compose
         - libimage-exiftool-perl
   services:
-    - redis-server
+    - redis
   before_install:
     # INFO - G.M - 2019-05-02 - some useful debug information
     - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
@@ -108,9 +111,9 @@ _install_full_tracim: &_install_full_tracim
     - alembic -c $BACKEND_TEST_CONFIG_FILE stamp head
     # install frontend
     - cd $TRAVIS_BUILD_DIR
-    - ./install_frontend_dependencies.sh root
-    - ./build_full_frontend.sh root
-    - ./setup_functionnal_tests.sh root
+    - ./install_frontend_dependencies.sh
+    - ./build_full_frontend.sh
+    - IGNORE_APT_INSTALL=true ./setup_functionnal_tests.sh
 
 _backend_quick_test: &_backend_quick_test
   <<: *_install_backend
@@ -120,6 +123,7 @@ _backend_quick_test: &_backend_quick_test
       packages:
         - libimage-exiftool-perl
   services:
+    - redis-server
   before_script:
   script:
     - pytest backend --ignore "backend/tracim_backend/tests/functional" --ignore "backend/tracim_backend/tests/commands"
@@ -152,18 +156,23 @@ jobs:
 
     # INFO - G.M - 2019-04-25 - Stage: Static tests ###
     - stage: static-tests
-      name: fmt
+      name: black
       install:
-        - pip install black isort
+        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-static-tests.txt
       script:
         - black --version
-        - echo -n "isort " & isort --version-number
         - black -l 100 --exclude '/(\..*)/' --diff --check $TRAVIS_BUILD_DIR/backend/tracim_backend
+    - stage: static-tests
+      name: isort
+      install:
+        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-static-tests.txt
+      script:
+        - echo -n "isort " & isort --version-number
         - isort -df -c $TRAVIS_BUILD_DIR/backend/tracim_backend/**/*.py
     - stage: static-tests
       name: flake8
       install:
-        - pip install flake8
+        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-static-tests.txt
       script:
         - flake8 --version
         - flake8 $TRAVIS_BUILD_DIR/backend/tracim_backend
@@ -220,33 +229,33 @@ jobs:
     - stage: frontend
       name: Frontend unit tests
       install:
-        - ./install_frontend_dependencies.sh root
-        - ./build_full_frontend.sh root
+        - ./install_frontend_dependencies.sh
+        - ./build_full_frontend.sh
       env:
         - TRAVIS_NODE_VERSION="10"
       script:
         - cd $TRAVIS_BUILD_DIR/frontend_lib
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR/frontend
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_html-document
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_file
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_thread
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_folder_advanced
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_workspace
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_workspace_advanced
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_agenda
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_admin_workspace_user
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_gallery
-        - npm run test
+        - yarn run test
         - cd $TRAVIS_BUILD_DIR
       if: commit_message !~ /(\[skip ci unit_test\])/
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
@@ -260,10 +269,11 @@ jobs:
         - TRAVIS_NODE_VERSION="10"
       script:
         - cd $TRAVIS_BUILD_DIR/backend
+        - PUSHPIN_CONFIG_DIR=./pushpin_cypress_config docker-compose up -d pushpin
         - nohup pserve $BACKEND_TEST_CONFIG_FILE > $PSERVE_LOG 2>&1 &
+        - nohup tracimcli caldav start &
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
-        - nohup tracimcli caldav start&
-        - npm run travis-cypress-run
+        - yarn run travis-cypress-run
         - cd $TRAVIS_BUILD_DIR
       if: commit_message !~ /(\[skip ci cypress\])/
 

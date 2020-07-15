@@ -68,23 +68,9 @@ fi
 mkdir -p /var/run/uwsgi/app/
 chown www-data:www-data -R /var/run/uwsgi
 chown www-data:www-data -R /var/tracim
-chmod +x /tracim/backend/daemons/mail_fetcher.py
-chmod +x /tracim/backend/daemons/mail_notifier.py
 
 # activate apache mods
 a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav expires
-
-# starting services
-service redis-server start  # async email sending
-supervisord -c /tracim/tools_docker/Debian_Uwsgi/supervisord_tracim.conf
-
-# Start daemon for async email
-supervisorctl start tracim_mail_notifier
-
-# Activate daemon for reply by email
-if [ "$REPLY_BY_EMAIL" = "1" ];then
-    supervisorctl start tracim_mail_fetcher
-fi
 
 # Activate or deactivate webdav
 if [ "$START_WEBDAV" = "1" ]; then
@@ -92,13 +78,13 @@ if [ "$START_WEBDAV" = "1" ]; then
         ln -s /etc/uwsgi/apps-available/tracim_webdav.ini /etc/uwsgi/apps-enabled/tracim_webdav.ini
     fi
     sed -i "s|^webdav.ui.enabled = .*|webdav.ui.enabled = True|g" /etc/tracim/development.ini
-    sed -i "s|^\s*#ProxyPass /webdav http://127.0.0.1:3030/webdav|    ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
-    sed -i "s|^\s*#ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|    ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*#ProxyPass http://127.0.0.1:3030/webdav|        ProxyPass http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*#ProxyPassReverse http://127.0.0.1:3030/webdav|        ProxyPassReverse http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_webdav.ini
     sed -i "s|^webdav.ui.enabled = .*|webdav.ui.enabled = False|g" /etc/tracim/development.ini
-    sed -i "s|^\s*ProxyPass /webdav http://127.0.0.1:3030/webdav|    #ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
-    sed -i "s|^\s*ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|    #ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*ProxyPass http://127.0.0.1:3030/webdav|        #ProxyPass http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*ProxyPassReverse http://127.0.0.1:3030/webdav|        #ProxyPassReverse http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 fi
 
 # Activate or deactivate caldav
@@ -129,11 +115,18 @@ sed -i "s|^;\s*app.enabled = .*|app.enabled = $DEFAULT_APP_LIST|g" /etc/tracim/d
 cd /tracim/backend/
 tracimcli search index-create -c /etc/tracim/development.ini
 
-# Reload apache config
+
+# starting services
+service pushpin start # tracim live messages (TLMs) sending
+service zurl start # tracim live messages (TLMs) sending
+service redis-server start  # async jobs (for mails and TLMs)
 service apache2 restart
 
-# starting xvfb for preview-generator
-Xvfb :99 -screen 0 1x1x16 > /dev/null 2>&1 &
+supervisord -c /tracim/tools_docker/Debian_Uwsgi/supervisord_tracim.conf
+# Activate daemon for reply by email
+if [ "$REPLY_BY_EMAIL" = "1" ];then
+    supervisorctl start tracim_mail_fetcher
+fi
 
 # Start tracim
 set +e
@@ -143,4 +136,4 @@ if [ "$START_CALDAV" = "1" ]; then
     cd /tracim/backend/
     tracimcli caldav sync -c /etc/tracim/development.ini
 fi
-tail -f /var/log/dpkg.log
+tail -f /var/tracim/logs/tracim_web.log

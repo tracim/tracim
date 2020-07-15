@@ -1,22 +1,22 @@
-*Please indicate here a summary of pull request content or if related issue exist, please indicate issue reference here*
+*Please indicate here a summary of the pull request content. If a related issue exists, please indicate issue reference here*
 
 ## Checkpoints
 
-The goal of this section is to help code reviewer and merge request author to do required checks on this pull request. Please don't edit this list.
-If one or more of these checkpoints are out of scope, please write below why they are.
+These points must be checked before merging. Please don't edit them out.
 
-**For code reviewer**
+**For developers**
 
-- [ ] Code is clear enough
-- [ ] If there are FIXME in the code, then there are associated issues and issue is referenced in the FIXME
-- [ ] If there are TODO, NOTE or HACK in code, date and developer initials are present
-- [ ] Automated tests have been written (covering feature or non regression), or *at least* an issue has been created for test implementation
+- [ ] If relevant, manual tests have been done to ensure the stability of the whole application and that the involved feature works
+- [ ] The original issue is up to date w.r.t the latest discussions and contains a short summary of the implemented solution
+- [ ] Automated tests covering the feature or the fix, have been written, deemed irrelevant (give the reason), or an issue has been created to implement the test (give the link)
 
-**For developper**
 
-- [ ] Manual tests done to ensure stability on whole application layers, issue expectation follow
-- [ ] Original issue have been updated with a short resume of implemented solution
+**For code reviewers**
 
-**For quality team**
+- [ ] The code is clear enough
+- [ ] If there are FIXMEs in the code, related issues are mentioned in the FIXME
+- [ ] If there are TODOs, NOTEs or HACKs in code, the date and the developer initials are present
 
-- [ ] Tested by quality team
+**For testers**
+
+- [ ] Manual, quality tests have been done

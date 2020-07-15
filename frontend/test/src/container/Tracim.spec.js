@@ -12,14 +12,21 @@ import { translateMock } from '../../hocMock/translate'
 import { Provider } from 'react-redux'
 import { isFunction } from '../../hocMock/helper'
 import {
-  ADD, APP_LIST, APPEND,
-  BREADCRUMBS, CONFIG, CONTENT_TYPE_LIST, FLASH_MESSAGE, REMOVE,
+  ADD,
+  APP_LIST,
+  APPEND,
+  BREADCRUMBS,
+  CONFIG,
+  CONTENT_TYPE_LIST,
+  FLASH_MESSAGE,
+  REMOVE,
   SET,
   USER,
-  WORKSPACE_LIST, WORKSPACE_LIST_MEMBER
+  WORKSPACE_LIST,
+  WORKSPACE_LIST_MEMBER
 } from '../../../src/action-creator.sync'
 import { withRouterMock } from '../../hocMock/withRouter'
-import { FETCH_CONFIG } from '../../../src/helper'
+import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
   mockGetAppList200,
   mockGetConfig200,
@@ -102,6 +109,7 @@ describe('<Tracim />', () => {
       id: 1
     },
     flashMessage: [],
+    registerCustomEventHandlerList: () => {},
     dispatch: dispatchCallBack
   }
 

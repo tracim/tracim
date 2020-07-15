@@ -2,6 +2,8 @@ describe('delete a html-document content', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
+    cy.loginAs('administrators')
+    cy.createHtmlDocument('firstHtmlDoc', 1)
   })
 
   beforeEach(function () {

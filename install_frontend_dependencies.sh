@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -eu
 # Main in bottom
 
 YELLOW='\033[1;33m'
@@ -18,178 +18,171 @@ function loggood {
 
 function logerror {
     echo -e "\n${RED}[$(date +'%H:%M:%S')]${RED} $ $1${NC}"
+    exit 1
 }
 
 ##################################################################
 
-# Check if not running with sudoers
-if [ "$1" == "root" ]; then
-    SUDO=""
-    SUDOCURL=""
-else
-    SUDO="sudo"
-    SUDOCURL="sudo -E"
-fi
+SUDO="sudo"
+SUDOCURL="sudo -E"
 
-DEFAULTDIR=$(pwd)
-export DEFAULTDIR
-echo "This is DEFAULTDIR \"$DEFAULTDIR\""
-
-# install npm and nodjs if not installed
-log "check whether npm is installed"
-npm -v
-if [ $? -eq 0 ]; then
-    loggood "npm \"$(npm -v)\" and node \"$(node -v)\" are installed"
-else
-    logerror "npm not installed"
-    log "install npm with nodejs"
-    $SUDO apt install -y curl && loggood "install curl success" || logerror "failed to install curl"
-    curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
-    $SUDO apt update
-    $SUDO apt install -y nodejs && loggood "install nodejs success" || logerror "failed to install nodejs"
-    log "check whether nodejs 10.x is now installed"
-    dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s10.'
-    if [ $? -eq 0 ]; then
-        loggood "node \"$(node -v)\" is correctly installed"
-        npm -v
-        if [ $? -eq 0 ]; then
-            loggood  "npm \"$(npm -v)\" is correctly installed"
-        else
-            logerror "npm is not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
-        exit 1
-        fi
-    else
-        logerror "nodejs 10.x and npm are not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
-        exit 1
+if ! [ -z ${1+x} ]; then
+    if [ "$1" == "root" ]; then
+        SUDO=""
+        SUDOCURL=""
+    elif [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "help" ]; then
+        echo "This script installs the dependencies of the frontend."
+        echo "It installs node and yarn using the APT debian package manager" \
+             "if they are not already installed."
+        echo "It also checks that the installed version of node is version 10."
+        echo "It then configures yarn and run yarn install to install the node modules used by the frontend."
+        echo
+        echo "Usage: $0 [root]"
+        echo
+        echo "Pass parameter 'root' if you are root and don't want to use" \
+             "to install debian packages."
+        exit
     fi
 fi
 
+test_node_version() {
+    node_version=$(node -v | cut -d. -f1 | sed 's/v//g')
+    if [ "$node_version" -gt 9 ]; then
+        loggood "Node $(node -v) is installed."
+    else
+        logerror "Node is installed but the version is $(node -v) instead of version 10. Please install this version."
+        exit 1
+    fi
+}
 
+debian_install_curl() {
+    if ! curl -V > /dev/null 2>&1; then
+        log "Curl is not installed, installing curl…"
+        $SUDO apt-get update && \
+            $SUDO apt-get install -y curl && \
+            loggood "Curl was installed successfully." || \
+            logerror "Failed to install curl."
+    fi
+}
 
+debian_install() {
+    apt_install=""
+    install_node_package=""
+    install_yarn_package=""
 
-# install Tracim Lib
-log "cd $DEFAULTDIR/frontend_lib"
-cd $DEFAULTDIR/frontend_lib  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "$USER npm link"
-$SUDO npm link && loggood "success" || logerror "some error"
+    log "Checking whether Yarn is installed…"
+    if which yarn > /dev/null 2>&1; then
+        loggood "Yarn is installed."
+    else
+        log "Yarn is not installed. Adding its repository."
 
+        debian_install_curl
 
-# install Tracim Frontend
-log "cd $DEFAULTDIR/frontend"
-cd $DEFAULTDIR/frontend  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-log "check if configEnv.json exist"
-if [ ! -f configEnv.json ]; then
-    log "cp configEnv.json.sample configEnv.json ..."
-    cp configEnv.json.sample configEnv.json && loggood "success" || logerror "some error"
-else
-    loggood "configEnv.json already exist"
-fi
+        curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | $SUDO apt-key add -
+        echo "deb https://dl.yarnpkg.com/debian/ stable main" | $SUDO tee /etc/apt/sources.list.d/yarn.list
 
+        log "We will install yarn."
+        apt_install=true
+        install_yarn_package=yarn
+    fi
 
-# install app Html Document
-log "cd $DEFAULTDIR/frontend_app_html-document"
-cd $DEFAULTDIR/frontend_app_html-document  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+    log "Checking whether Node v10+ is installed…"
+    if node -v > /dev/null 2>&1; then
+        test_node_version
+    else
+        log "Node is not installed."
 
+        debian_install_curl
 
-# install app Thread
-log "cd $DEFAULTDIR/frontend_app_thread"
-cd $DEFAULTDIR/frontend_app_thread  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+        log "Installing the node repository…"
+        curl -sL https://deb.nodesource.com/setup_12.x | $SUDOCURL bash - && \
+            loggood "The node repository was successfully installed." || \
+            logerror "Failed to install node repository. Please install Node v10+ manually."
 
+        log "We will install node."
+        apt_install=true
+        install_node_package=nodejs
+    fi
 
-# install app Workspace
-log "cd $DEFAULTDIR/frontend_app_workspace"
-cd $DEFAULTDIR/frontend_app_workspace  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+    if [ "$apt_install" != "" ]; then
+        log "Installing $install_node_package $install_yarn_package…"
 
+        if [ "$install_node_package" = "" ]; then
+            # if install_node_package is not empty,
+            # deb.nodesource.com/setup_10.x already updated the repository
 
+            $SUDO apt-get update || logerror "Failed updating the repositories."
+        fi
 
-# install app workspace advanced
-log "cd $DEFAULTDIR/frontend_app_workspace_advanced"
-cd $DEFAULTDIR/frontend_app_workspace_advanced  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+        $SUDO apt-get install -y $install_node_package $install_yarn_package && \
+            loggood "Dependencies successfully installed." || \
+            logerror "Failed to install some dependencies."
+    fi
+}
 
+yarn_expected_version() {
+    min_yarn2_rc_version=34
+    # RJ - 2020-06-12 - NOTE: Yarn 2.0.0-rc.33 and earlier had issues related
+    # to rewritting the checksums of the whole yarn.lock by prefixing them
+    # with 2/ or 3/. We could not find anything about this issue on the web.
+    case "$1" in
+        2.0.*)
+            [ "$(printf "$1" | awk -F'rc.' '{print $2}')" -ge "$min_yarn2_rc_version" ];
+            return $?
+        ;;
+        2.*)
+            return 0
+        ;;
+    esac
+    return 1
+}
 
-# install app file
-log "cd $DEFAULTDIR/frontend_app_file"
-cd $DEFAULTDIR/frontend_app_file  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+setup_yarn() {
+    yarn_version="$(yarn -v)"
 
+    if ! yarn_expected_version "$yarn_version" ; then
+        log "You have Yarn $yarn_version. Setting up Yarn 2 to the last version."
+        case "$yarn_version" in
+            2.*) yarn set version latest ;;
+            *) yarn policies set-version berry ;;
+        esac
 
-# install app Admin Workspace User
-log "cd $DEFAULTDIR/frontend_app_admin_workspace_user"
-cd $DEFAULTDIR/frontend_app_admin_workspace_user  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+        yarn_version="$(yarn -v)"
+        if ! yarn_expected_version "$yarn_version" ; then
+            logerror "We expected Yarn 2 ≥ 2.0.0-rc.33, we got $yarn_version."
+        fi
+    fi
 
+    loggood "Yarn version: $yarn_version"
 
-# install app Folder Advanced
-log "cd $DEFAULTDIR/frontend_app_folder_advanced"
-cd $DEFAULTDIR/frontend_app_folder_advanced  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+    if ! grep -F 'nodeLinker: node-modules' .yarnrc.yml > /dev/null; then
+        log "Setting yarn nodeLinker to node-modules mode."
+        echo 'nodeLinker: node-modules' >> .yarnrc.yml
+    fi
+}
 
+setup_config() {
+    log "Checking whether configEnv.json exists.."
 
-# install app Share Folder Advanced
-log "cd $DEFAULTDIR/frontend_app_share_folder_advanced"
-cd $DEFAULTDIR/frontend_app_share_folder_advanced  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+    if [ ! -f frontend/configEnv.json ]; then
+        log "cp frontend/configEnv.json.sample frontend/configEnv.json ..."
+        cp frontend/configEnv.json.sample frontend/configEnv.json && \
+            loggood "ok" || \
+            logerror "Failed to copy the configuration."
+    else
+        log "configEnv.json already exists."
+    fi
+}
 
+yarn_install() {
+    log "Running yarn install…"
+    yarn install
+}
 
-# install app Agenda
-log "cd $DEFAULTDIR/frontend_app_agenda"
-cd $DEFAULTDIR/frontend_app_agenda  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-# install app Gallery
-log "cd $DEFAULTDIR/frontend_app_gallery"
-cd $DEFAULTDIR/frontend_app_gallery  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-# install app Collaborative document edition
-log "cd $DEFAULTDIR/frontend_app_collaborative_document_edition"
-cd $DEFAULTDIR/frontend_app_collaborative_document_edition  || exit 1
-log "npm i"
-npm i --loglevel warn && loggood "success" || logerror "some error"
-log "npm link tracim_frontend_lib"
-npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-
-
-# Return to "$DEFAULTDIR/"
-log "cd $DEFAULTDIR"
-cd $DEFAULTDIR || exit 1
+debian_install                && \
+test_node_version > /dev/null && \
+setup_yarn                    && \
+setup_config                  && \
+yarn_install                  && \
+    loggood "Frontend dependencies are correctly installed." || \
+    logerror "Something went wrong while installing the frontend dependencies."

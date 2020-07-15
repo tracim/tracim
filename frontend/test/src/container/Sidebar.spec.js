@@ -21,6 +21,8 @@ describe('<Sidebar />', () => {
         idcts: 1
       }
     },
+    registerLiveMessageHandlerList: () => {},
+    registerCustomEventHandlerList: () => {},
     t: tradKey => tradKey
   }
 

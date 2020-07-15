@@ -23,11 +23,11 @@ describe('<SelectStatus />', () => {
   )
 
   describe('Static design', () => {
-    it(`should have the button not disabled when the property disabled is false`, () =>
+    it('should have the button not disabled when the property disabled is false', () =>
       expect(wrapper.find('#dropdownMenu2').prop('disabled')).to.equal(props.disabled)
     )
 
-    it(`should have the button disabled when the property disabled is true`, () => {
+    it('should have the button disabled when the property disabled is true', () => {
       wrapper.setProps({ disabled: true })
       expect(wrapper.find('#dropdownMenu2').prop('disabled')).to.equal(true)
       wrapper.setProps({ disabled: props.disabled })
@@ -38,25 +38,25 @@ describe('<SelectStatus />', () => {
     })
 
     it(`should have ${props.availableStatus.length} submenu_item`, () => {
-      expect(wrapper.find(`button.selectStatus__submenu__item`)).to.have.lengthOf(props.availableStatus.length)
+      expect(wrapper.find('button.selectStatus__submenu__item')).to.have.lengthOf(props.availableStatus.length)
     })
 
     it(`first submenu_item should have its icon: "${props.availableStatus[0].faIcon}"`, () => {
-      expect(wrapper.find(`button.selectStatus__submenu__item`).at(0)
+      expect(wrapper.find('button.selectStatus__submenu__item').at(0)
         .find(`i.fa-${props.availableStatus[0].faIcon}`))
         .to.have.lengthOf(1)
     })
 
     it(`second submenu_item should have its icon: "${props.availableStatus[1].faIcon}"`, () => {
-      expect(wrapper.find(`button.selectStatus__submenu__item`).at(1)
+      expect(wrapper.find('button.selectStatus__submenu__item').at(1)
         .find(`i.fa-${props.availableStatus[1].faIcon}`))
         .to.have.lengthOf(1)
     })
   })
 
   describe('Handlers', () => {
-    it(`first submenu_item should call the proper onClick`, () => {
-      wrapper.find(`button.selectStatus__submenu__item`).first().simulate('click')
+    it('first submenu_item should call the proper onClick', () => {
+      wrapper.find('button.selectStatus__submenu__item').first().simulate('click')
       expect(onChangeStatusCallBack.called).to.equal(true)
       onChangeStatusCallBack.resetHistory()
     })

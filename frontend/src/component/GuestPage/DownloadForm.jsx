@@ -47,7 +47,7 @@ class DownloadForm extends React.Component {
     if (response.apiResponse) {
       switch (response.apiResponse.status) {
         case 204:
-          this.refs['test'].submit()
+          this.refs.test.submit()
           return true
         case 400:
           this.sendGlobalFlashMessage(props.t('Error in the URL'))
@@ -65,7 +65,7 @@ class DownloadForm extends React.Component {
           this.sendGlobalFlashMessage(props.t('Error while downloading file'))
       }
     } else {
-      this.refs['test'].submit()
+      this.refs.test.submit()
     }
     return false
   }
@@ -84,7 +84,7 @@ class DownloadForm extends React.Component {
             )} ({props.file.fileSize})
           </div>
 
-          {props.file.isProtected &&
+          {props.file.isProtected && (
             <div className='d-flex'>
               <InputGroupText
                 parentClassName='guestdownload__card__form__groupepw'
@@ -112,7 +112,8 @@ class DownloadForm extends React.Component {
                 placement='bottom'
                 isOpen={this.state.popoverPasswordInfoOpen}
                 target='popoverPasswordInfo'
-                toggle={this.handleTogglePopoverPasswordInfo}
+                // INFO - CH - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+                toggle={this.handleTogglePopoverPasswordInfo} // eslint-disable-line react/jsx-handler-names
                 trigger={isMobile ? 'focus' : 'hover'}
               >
                 <PopoverBody>
@@ -120,7 +121,7 @@ class DownloadForm extends React.Component {
                 </PopoverBody>
               </Popover>
             </div>
-          }
+          )}
         </form>
         <div className='d-flex'>
           {/* INFO - G.B. - 2019-08-22 - This button should be always outside the form, to not trigger the submit. */}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
+import { DisplayState } from 'tracim_frontend_lib'
 
 const color = require('color')
 
@@ -53,18 +54,18 @@ export class FileProperties extends React.Component {
               {props.t('Number of shares:')} {props.activesShares}
             </div>
 
-            <div className='fileProperties__content__detail__item' title={props.creationDateFormatted} >
+            <div className='fileProperties__content__detail__item' title={props.creationDateFormatted}>
               {props.t('Creation date:')} {props.creationDateFormattedWithTime}
             </div>
 
-            <div className='fileProperties__content__detail__item' title={props.lastModificationFormatted} >
+            <div className='fileProperties__content__detail__item' title={props.lastModificationFormatted}>
               {props.t('Last modification:')} {props.lastModification}
             </div>
 
             <div className='fileProperties__content__detail__description'>
               {props.t('Description:')}
             </div>
-            {state.displayFormNewDescription
+            {(state.displayFormNewDescription
               ? (
                 <form className='fileProperties__content__detail__description__editiondesc'>
                   <textarea
@@ -72,15 +73,23 @@ export class FileProperties extends React.Component {
                     onChange={this.handleChangeDescription}
                   />
 
+                  {props.disableChangeDescription && (
+                    <DisplayState
+                      msg={props.t("The file has been updated, it can't be edited anymore")}
+                      icon='warning'
+                    />
+                  )}
+
                   <div className='fileProperties__content__detail__description__editiondesc__btn'>
                     <button
                       type='button'
-                      className='fileProperties__content__detail__description__editiondesc__btn__cancel btn'
+                      className='fileProperties__content__detail__description__editiondesc__btn__cancel btn highlightBtn'
                       onClick={this.handleToggleFormNewDescription}
                       key='cancelBtn'
                       style={{
+                        backgroundColor: props.color,
                         ':hover': {
-                          backgroundColor: props.color
+                          backgroundColor: color(props.color).darken(0.15).hex()
                         }
                       }}
                     >
@@ -89,14 +98,16 @@ export class FileProperties extends React.Component {
 
                     <button
                       type='button'
-                      className='fileProperties__content__detail__description__editiondesc__btn__validate btn'
+                      className='fileProperties__content__detail__description__editiondesc__btn__validate btn highlightBtn'
                       onClick={this.handleClickValidateNewDescription}
                       key='validateBtn'
                       style={{
+                        backgroundColor: props.color,
                         ':hover': {
-                          backgroundColor: props.color
+                          backgroundColor: color(props.color).darken(0.15).hex()
                         }
                       }}
+                      disabled={props.disableChangeDescription}
                     >
                       {props.t('Validate')}
                     </button>
@@ -108,9 +119,9 @@ export class FileProperties extends React.Component {
                   {props.description}
                 </div>
               )
-            }
+            )}
 
-            {props.displayChangeDescriptionBtn && !state.displayFormNewDescription &&
+            {props.displayChangeDescriptionBtn && !state.displayFormNewDescription && (
               <button
                 type='button'
                 className='fileProperties__content__detail__btndesc btn highlightBtn'
@@ -125,7 +136,7 @@ export class FileProperties extends React.Component {
               >
                 {props.t('Change description')}
               </button>
-            }
+            )}
           </div>
         </div>
       </div>

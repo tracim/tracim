@@ -32,7 +32,7 @@ describe('<WorkspaceMembersList />', () => {
       slug: 'content-manager'
     }],
     loggedUser: {
-      user_id: 1
+      userId: 1
     },
     userRoleIdInWorkspace: ROLE.workspaceManager.id,
     displayFormNewMember: false,
@@ -47,13 +47,13 @@ describe('<WorkspaceMembersList />', () => {
       expect(wrapper.find('li.workspace_advanced__userlist__list__item').length).to.equal(props.memberList.length)
     )
 
-    it(`should display the publicName of each member in memberList`, () => {
+    it('should display the publicName of each member in memberList', () => {
       for (let i = 0; i < props.memberList.length; i++) {
-        expect(wrapper.find(`div.workspace_advanced__userlist__list__item__name`).at(i)).to.text().equal(props.memberList[i].user.public_name)
+        expect(wrapper.find('div.workspace_advanced__userlist__list__item__name').at(i)).to.text().equal(props.memberList[i].user.public_name)
       }
     })
 
-    it(`should not display the memberList when displayFormNewMember is true`, () => {
+    it('should not display the memberList when displayFormNewMember is true', () => {
       wrapper.setProps({ displayFormNewMember: true })
       expect(wrapper.find('.workspace_advanced__userlist__list').length).to.equal(0)
       wrapper.setProps({ displayFormNewMember: props.displayFormNewMember })
@@ -61,7 +61,7 @@ describe('<WorkspaceMembersList />', () => {
   })
 
   describe('handlers', () => {
-    it(`onClickToggleFormNewMemberCallBack should be called when add button is clicked`, () => {
+    it('onClickToggleFormNewMemberCallBack should be called when add button is clicked', () => {
       wrapper.find('div.workspace_advanced__userlist__adduser').simulate('click')
       expect(onClickToggleFormNewMemberCallBack.called).to.equal(true)
     })

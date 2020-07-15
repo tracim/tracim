@@ -1,12 +1,15 @@
 import i18n from './i18n.js'
 import {
   addAllResourceI18n,
+  addRevisionFromTLM,
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
+  hasNotAllowedCharacters,
+  hasSpaces,
   BREADCRUMBS_TYPE,
   ROLE,
   ROLE_LIST,
@@ -22,9 +25,22 @@ import {
   buildFilePreviewUrl,
   removeExtensionOfFilename,
   computeProgressionPercentage,
-  buildHeadTitle
+  buildHeadTitle,
+  CONTENT_TYPE,
+  buildTracimLiveMessageEventType,
+  sortTimelineByDate,
+  removeAtInUsername,
+  setupCommonRequestHeaders,
+  serialize,
+  getOrCreateSessionClientToken
 } from './helper.js'
+import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
+import {
+  TLM_ENTITY_TYPE,
+  TLM_CORE_EVENT_TYPE,
+  TLM_SUB_TYPE
+} from './tracimLiveMessage.js'
 
 import { appContentFactory } from './appContentFactory.js'
 
@@ -60,6 +76,7 @@ import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
 import SelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
+import RefreshWarningMessage from './component/RefreshWarningMessage/RefreshWarningMessage.jsx'
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
@@ -87,7 +104,6 @@ const customEventReducer = ({ detail: { type, data } }) => {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
       i18n.changeLanguage(data)
       break
-    default: break
   }
 }
 
@@ -99,6 +115,8 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
 export {
   appContentFactory,
+  addRevisionFromTLM,
+  TracimComponent,
   addAllResourceI18n,
   handleFetchResult,
   displayDistanceDate,
@@ -106,9 +124,12 @@ export {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
+  hasNotAllowedCharacters,
+  hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
   removeExtensionOfFilename,
+  removeAtInUsername,
   computeProgressionPercentage,
   Breadcrumbs,
   PopinFixed,
@@ -135,6 +156,9 @@ export {
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
   CUSTOM_EVENT,
+  TLM_ENTITY_TYPE,
+  TLM_CORE_EVENT_TYPE,
+  TLM_SUB_TYPE,
   BREADCRUMBS_TYPE,
   ROLE,
   ROLE_LIST,
@@ -157,5 +181,12 @@ export {
   ShareLink,
   ShareDownload,
   ProgressBar,
-  RadioBtnGroup
+  RadioBtnGroup,
+  CONTENT_TYPE,
+  buildTracimLiveMessageEventType,
+  RefreshWarningMessage,
+  sortTimelineByDate,
+  setupCommonRequestHeaders,
+  serialize,
+  getOrCreateSessionClientToken
 }

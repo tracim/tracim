@@ -1,4 +1,5 @@
 {
+  "A content with same name already exists": "Un contenu avec le même nom existe déjà",
   "Timeline": "Historique",
   "Restore": "Restaurer",
   "Simple edition": "Édition simple",
@@ -22,7 +23,7 @@
   "Item moved": "Elément déplacé",
   "Item copied": "Elément copié",
   "Item archived": "Elément archivé",
-  "Enter the name or email of the user": "Saisir le nom ou l'email de l'utilisateur",
+  "Enter the username, email or full name of the user": "Entrez l'identifiant, l'adresse email ou le nom complet de l'utilisateur",
   "Add a member": "Ajouter un membre",
   "If you type an email that isn't associated to an account, an invitational email will be sent": "Si vous entrez un email qui n'est associé à aucun compte, un email d'invitation lui sera envoyé",
   "Email notifications are disabled, you can't create new users from here": "Les notifications par email sont désactivées, vous ne pouvez pas créer d'utilisateur à partir d'ici",
@@ -30,9 +31,15 @@
   "Send an invitational email to this user": "Envoyer un email d'invitation à cet utilisateur",
   "I know this user exist": "Je sais que cet utilisateur existe",
   "Cancel": "Annuler",
-  "Full name or email": "Nom complet ou email",
+  "Search user...": "Rechercher un utilisateur...",
   "Unknown error, please inform an administrator": "Erreur inconnue, veuillez contacter un administrateur",
   "Error detail": "Détail de l'erreur",
+  "Error while archiving content": "Erreur lors de l'archivage d'un contenu",
+  "Error while changing status": "Erreur lors d'un changement de statut",
+  "Error while deleting content": "Erreur lors de la suppression d'un contenu",
+  "Error while restoring content": "Erreur lors de la restauration du contenu",
+  "Error while saving new comment": "Erreur lors de l'enregistrement d'un nouveau commentaire",
+  "Error while saving the title": "Erreur lors de l'enregistrement du nouveau titre",
   "This content is archived": "Ce contenu est archivé",
   "This content is deleted": "Ce contenu est supprimé",
   "Status changed to {{status}}": "Statut changé en {{status}}",
@@ -81,5 +88,9 @@
   "Access to shared spaces where user is member": "Accès aux espaces partagés où l'utilisateur est membre",
   "Trusted user + create users, administration of instance": "Utilisateur de confiance + créer des utilisateurs, administration d'instance",
   "User + create shared spaces, add members in shared spaces": "Utilisateur + créer des espaces partagés, ajouter des membres dans les espaces partagés",
-  "Shared space manager": "Responsable"
+  "Shared space manager": "Responsable",
+  "Refresh?": "Rafraîchir ?",
+  "If you refresh, you will lose the current changes": "Si vous rafraîchissez, vous perdrez les modifications actuelles",
+  "You can't send an empty comment": "Vous ne pouvez pas envoyer un commentaire vide",
+  "You must change the status or restore this content before any change": "Vous devez changer le statut ou restaurer ce contenu avant de le modifier"
 }

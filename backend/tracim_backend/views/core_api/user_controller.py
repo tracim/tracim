@@ -1,4 +1,8 @@
+import typing
+
+from hapic import HapicData
 from pyramid.config import Configurator
+from pyramid.response import Response
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
@@ -6,12 +10,15 @@ from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
+from tracim_backend.exceptions import UsernameAlreadyExistInDb
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
@@ -22,18 +29,24 @@ from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.event import Message
+from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
+from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMemberQuerySchema
+from tracim_backend.views.core_api.schemas import LiveMessageSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
+from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
+from tracim_backend.views.core_api.schemas import TracimLiveEventHeaderSchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
@@ -47,6 +60,7 @@ from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_EN
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -67,6 +81,10 @@ SWAGGER_TAG__USER_CONTENT_ENDPOINTS = generate_documentation_swagger_tag(
 )
 SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG__NOTIFICATION_SECTION
+)
+
+SWAGGER_TAG__USER_EVENT_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_EVENT_ENDPOINTS
 )
 
 
@@ -188,6 +206,30 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(UsernameAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
+    @check_right(has_personal_access)
+    @hapic.input_body(SetUsernameSchema())
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(UserSchema())
+    def set_user_username(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Set user username
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        user = uapi.set_username(
+            request.candidate_user,
+            hapic_data.body.loggedin_user_password,
+            hapic_data.body.username,
+            do_save=True,
+        )
+        return uapi.get_user_with_context(user)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
@@ -237,12 +279,13 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
     @check_right(is_administrator)
     @hapic.input_body(UserCreationSchema())
     @hapic.output_body(UserSchema())
     def create_user(self, context, request: TracimRequest, hapic_data=None):
         """
-        Create new user
+        Create new user. Note: One of username or email required.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
@@ -263,6 +306,7 @@ class UserController(Controller):
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
             name=hapic_data.body.public_name,
+            username=hapic_data.body.username,
             do_notify=hapic_data.body.email_notification,
             allowed_space=hapic_data.body.allowed_space,
             profile=profile,
@@ -542,6 +586,53 @@ class UserController(Controller):
         wapi.save(workspace)
         return
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(GetLiveMessageQuerySchema())
+    @hapic.output_body(LiveMessageSchema(many=True))
+    def get_user_messages(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.List[Message]:
+        """
+        Returns user messages matching the given query
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        return event_api.get_messages_for_user(
+            request.candidate_user.user_id, ReadStatus(hapic_data.query["read_status"])
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_headers(TracimLiveEventHeaderSchema())
+    def open_message_stream(self, context, request: TracimRequest, hapic_data=None) -> Response:
+        """
+        Open the message stream for the given user.
+        Tracim Live Message Events as ServerSide Event Stream
+        """
+        stream_opened_event = ":Tracim Live Messages for user {}\n\nevent: stream-open\ndata:\n\n".format(
+            str(request.candidate_user.user_id)
+        )
+        escaped_keealive_event = "event: keep-alive\\ndata:\\n\\n"
+        user_channel_name = "user_{}".format(request.candidate_user.user_id)
+        headers = [
+            # Here we ask push pin to keep the connection open
+            ("Grip-Hold", "stream"),
+            # and register this connection on the given channel
+            # multiple channels subscription is possible
+            ("Grip-Channel", user_channel_name),
+            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keealive_event)),
+            # content type for SSE
+            ("Content-Type", "text/event-stream"),
+            # do not cache the events
+            ("Cache-Control", "no-cache"),
+        ]
+        return Response(
+            headerlist=headers, charset="utf-8", status_code=200, body=stream_opened_event
+        )
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -581,6 +672,12 @@ class UserController(Controller):
             "set_user_email", "/users/{user_id:\d+}/email", request_method="PUT"
         )  # noqa: W605
         configurator.add_view(self.set_user_email, route_name="set_user_email")
+
+        # set user username
+        configurator.add_route(
+            "set_user_username", "/users/{user_id:\d+}/username", request_method="PUT"
+        )  # noqa: W605
+        configurator.add_view(self.set_user_username, route_name="set_user_username")
 
         # set user password
         configurator.add_route(
@@ -694,3 +791,16 @@ class UserController(Controller):
         configurator.add_view(
             self.disable_workspace_notification, route_name="disable_workspace_notification"
         )
+        # TracimLiveMessages notification
+        configurator.add_route(
+            "live_messages",
+            "/users/{user_id:\d+}/live_messages",  # noqa: W605
+            request_method="GET",
+        )
+        configurator.add_view(self.open_message_stream, route_name="live_messages")
+
+        # Tracim user messages
+        configurator.add_route(
+            "messages", "/users/{user_id:\d+}/messages", request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_user_messages, route_name="messages")

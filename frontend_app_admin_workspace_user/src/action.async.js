@@ -1,6 +1,6 @@
 import { FETCH_CONFIG } from 'tracim_frontend_lib'
 
-export const getWorkspaceList = (user, apiUrl) =>
+export const getWorkspaceList = (apiUrl) =>
   fetch(`${apiUrl}/workspaces`, {
     credentials: 'include',
     headers: {
@@ -96,18 +96,28 @@ export const putUserProfile = (apiUrl, userId, newProfile) =>
     method: 'PUT'
   })
 
-export const postAddUser = (apiUrl, name, email, profile, emailNotif, password) =>
+export const postAddUser = (apiUrl, publicName, username, email, profile, emailNotif, password) =>
   fetch(`${apiUrl}/users`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
     body: JSON.stringify({
-      public_name: name,
-      email,
+      public_name: publicName,
+      username: username || null,
+      email: email || null,
       email_notification: emailNotif,
-      password: password || null, // '' will generate the password by backend
+      password: password || null,
       profile
     }),
     method: 'POST'
+  })
+
+export const getUsernameAvailability = (apiUrl, username) =>
+  fetch(`${apiUrl}/system/username-availability?username=${username}`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
   })

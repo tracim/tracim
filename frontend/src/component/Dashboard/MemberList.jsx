@@ -10,7 +10,11 @@ import {
 require('./MemberList.styl')
 
 export class MemberList extends React.Component {
-  handleClickBtnValidate = async () => await this.props.onClickValidateNewMember() && this.setState({ displayNewMemberList: true })
+  handleClickBtnValidate = async () => {
+    if (await this.props.onClickValidateNewMember()) {
+      this.setState({ displayNewMemberList: true })
+    }
+  }
 
   render () {
     const { props } = this
@@ -23,13 +27,13 @@ export class MemberList extends React.Component {
         </div>
 
         <div className='memberlist__wrapper'>
-          {props.displayNewMemberForm
+          {(props.displayNewMemberForm
             ? (
               <NewMemberForm
                 onClickCloseAddMemberBtn={props.onClickCloseAddMemberBtn}
-                nameOrEmail={props.nameOrEmail}
+                publicName={props.publicName}
                 isEmail={props.isEmail}
-                onChangeNameOrEmail={props.onChangeNameOrEmail}
+                onChangePersonalData={props.onChangePersonalData}
                 searchedKnownMemberList={props.searchedKnownMemberList}
                 autoCompleteActive={props.autoCompleteFormNewMemberActive}
                 onClickKnownMember={props.onClickKnownMember}
@@ -62,15 +66,13 @@ export class MemberList extends React.Component {
                   </div>
                 )}
 
-                <ul className={classnames('memberlist__list', { 'withAddBtn': props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
+                <ul className={classnames('memberlist__list', { withAddBtn: props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
                   {props.memberList.map((m, index) =>
                     <li
-                      className={
-                        classnames(
-                          'memberlist__list__item',
-                          { 'memberlist__list__item__last': props.memberList.length === index + 1 }
-                        )
-                      }
+                      className={classnames(
+                        'memberlist__list__item',
+                        { memberlist__list__item__last: props.memberList.length === index + 1 }
+                      )}
                       key={m.id}
                     >
                       <div className='memberlist__list__item__avatar'>
@@ -78,16 +80,30 @@ export class MemberList extends React.Component {
                       </div>
 
                       <div className='memberlist__list__item__info'>
-                        <div className='memberlist__list__item__info__name'>
-                          {m.publicName}
+                        <div className='memberlist__list__item__info__firstColumn'>
+                          <div
+                            className='memberlist__list__item__info__firstColumn__name'
+                            title={m.publicName}
+                          >
+                            {m.publicName}
+                          </div>
+
+                          {m.username && (
+                            <div
+                              className='memberlist__list__item__info__firstColumn__username'
+                              title={`@${m.username}`}
+                            >
+                              @{m.username}
+                            </div>
+                          )}
                         </div>
 
                         <div className='memberlist__list__item__info__role'>
-                          {props.t(props.roleList.find(r => r.slug === m.role).label)}
+                          - {props.t(props.roleList.find(r => r.slug === m.role).label)}
                         </div>
                       </div>
 
-                      {props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && m.id !== props.loggedUser.user_id && (
+                      {props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && m.id !== props.loggedUser.userId && (
                         <div
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}
@@ -100,7 +116,7 @@ export class MemberList extends React.Component {
                 </ul>
               </div>
             )
-          }
+          )}
         </div>
       </div>
     )

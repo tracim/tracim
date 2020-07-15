@@ -17,7 +17,16 @@ import {
   BREADCRUMBS_TYPE,
   ROLE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  addRevisionFromTLM,
+  RefreshWarningMessage,
+  sortTimelineByDate,
+  displayDistanceDate,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
+  TracimComponent,
+  getOrCreateSessionClientToken
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -26,7 +35,7 @@ import {
   putThreadRead
 } from '../action.async.js'
 
-class Thread extends React.Component {
+export class Thread extends React.Component {
   constructor (props) {
     super(props)
 
@@ -39,8 +48,9 @@ class Thread extends React.Component {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
-      listMessage: [],
+      timeline: [],
       newComment: '',
+      newContent: {},
       timelineWysiwyg: false,
       externalTranslationList: [
         props.t('Thread'),
@@ -48,47 +58,106 @@ class Thread extends React.Component {
         props.t('thread'),
         props.t('threads'),
         props.t('Start a topic')
-      ]
+      ],
+      showRefreshWarning: false,
+      editionAuthor: '',
+      isLastTimelineItemCurrentToken: false
     }
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
+      { name: CUSTOM_EVENT.HIDE_APP(this.state.config.slug), handler: this.handleHideApp },
+      { name: CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), handler: this.handleReloadContent },
+      { name: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(this.state.config.slug), handler: this.handleReloadAppFeatureData },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
+  handleShowApp = data => {
     const { props, state } = this
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-        console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
-        if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
-        break
+    console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
+    props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+    if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
+  }
 
-      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
-        console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
-        break
+  handleHideApp = data => {
+    console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP(this.state.config.slug), data)
+    this.props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
+  }
 
-      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
-        console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
-        break
+  handleReloadContent = data => {
+    console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), data)
+    this.props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), this.state.appName)
+  }
 
-      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
-        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
-        break
+  handleReloadAppFeatureData = () => {
+    console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(this.state.config.slug))
+    this.props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
+  }
 
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerAllAppChangeLanguage(
-          data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
-        )
-        this.loadTimeline()
-        break
-    }
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(
+      data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
+    )
+    this.loadTimeline()
+  }
+
+  handleContentChanged = data => {
+    if (data.content.content_id !== this.state.content.content_id) return
+
+    const clientToken = this.state.config.apiHeader['X-Tracim-ClientToken']
+    this.setState(prev => ({
+      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+      newContent: { ...prev.content, ...data.content },
+      editionAuthor: data.author.public_name,
+      showRefreshWarning: clientToken !== data.client_token,
+      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+    }))
+  }
+
+  handleCommentCreated = data => {
+    const { state } = this
+
+    if (data.content.parent_id !== state.content.content_id) return
+
+    const newTimelineSorted = sortTimelineByDate([
+      ...state.timeline,
+      {
+        ...data.content,
+        created: displayDistanceDate(data.content.created, state.loggedUser.lang),
+        created_raw: data.content.created,
+        timelineType: 'comment'
+      }
+    ])
+
+    this.setState({
+      timeline: newTimelineSorted,
+      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+    })
+  }
+
+  handleUserModified = data => {
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.user.user_id
+      ? { ...timelineItem, author: data.user }
+      : timelineItem
+    )
+
+    this.setState({ timeline: newTimeline })
   }
 
   async componentDidMount () {
@@ -117,14 +186,13 @@ class Thread extends React.Component {
       this.buildBreadcrumbs()
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
+    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<Thread> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymce.remove('#wysiwygTimelineComment')
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -153,7 +221,10 @@ class Thread extends React.Component {
     const response = await handleFetchResult(
       await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     )
-    this.setState({ content: response.body })
+    this.setState({
+      content: response.body,
+      isLastTimelineItemCurrentToken: false
+    })
     this.setHeadTitle(response.body.label)
 
     await putThreadRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
@@ -173,7 +244,7 @@ class Thread extends React.Component {
 
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
 
-    this.setState({ listMessage: revisionWithComment })
+    this.setState({ timeline: revisionWithComment })
   }
 
   buildBreadcrumbs = () => {
@@ -239,6 +310,16 @@ class Thread extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
+  handleClickRefresh = () => {
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...prev.newContent
+      },
+      showRefreshWarning: false
+    }))
+  }
+
   render () {
     const { state } = this
 
@@ -264,6 +345,13 @@ class Thread extends React.Component {
           i18n={i18n}
         >
           <div className='justify-content-end'>
+            {state.showRefreshWarning && (
+              <RefreshWarningMessage
+                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                onClickRefresh={this.handleClickRefresh}
+              />
+            )}
+
             {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
               <SelectStatus
                 selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -291,7 +379,7 @@ class Thread extends React.Component {
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
-            timelineData={state.listMessage}
+            timelineData={state.timeline}
             newComment={state.newComment}
             disableComment={!state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
@@ -309,6 +397,7 @@ class Thread extends React.Component {
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             showTitle={false}
+            isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           />
         </PopinFixedContent>
       </PopinFixed>
@@ -316,4 +405,4 @@ class Thread extends React.Component {
   }
 }
 
-export default translate()(appContentFactory(Thread))
+export default translate()(appContentFactory(TracimComponent(Thread)))

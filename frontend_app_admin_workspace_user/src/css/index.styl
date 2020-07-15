@@ -1,4 +1,4 @@
-@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+@import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .adminWorkspace
   &__createworkspace
@@ -48,12 +48,40 @@
       border 1px solid grey
       border-radius 5px
       padding 20px
-      &__username
-        .username
+      &__userData
+        .userData
           &__text
             font-weight bold
+            margin-top 10px
+            margin-bottom 0px
           &__input
-            margin-bottom 10px
+            width 300px
+            &__username
+              &__errorMsg
+                width 300px
+                font-size small
+                text-align right
+                color errorRed
+              &__errorIcon
+                margin-right 5px
+              &__errorInfo
+                width 300px
+                font-size small
+                text-align right
+          &__info
+            color grey
+            &__icon
+              margin 0 5px
+          &__email
+            &__info
+              background-color transparent
+              border none
+              color grey
+              cursor pointer
+              &:focus
+                box-shadow 0 0 0 0
+                border 0 none
+                outline 0
       &__profile
         .profile
           &__text
@@ -90,6 +118,12 @@
           color inherit
         & > i
           margin-right 5px
+      &__td-text
+        max-width 0
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
+
 
 .adminworkspaceuser__popup
   .cardPopup__container
@@ -117,6 +151,29 @@
         text-align right
       &__delete
         width 10%
+
+.adminUser
+  &__right
+    width 35%
+    display inline
+    float right
+  &__left
+    width 60%
+    display inline
+    float left
+
+.formInfo > span
+  margin-right 0.5%
+  margin-left 0.5%
+
+.formInfo > button
+  margin-left 2%
+
+.fieldInfo
+  & input
+    width 100%
+  & textarea
+    width 100%
 
 @media (min-width: min-sm) and (max-width: max-md)
   .adminWorkspace

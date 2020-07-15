@@ -1,4 +1,6 @@
 export const CUSTOM_EVENT = {
+  TRACIM_LIVE_MESSAGE_STATUS_CHANGED: 'TracimLiveMessageStatusChanged',
+  TRACIM_LIVE_MESSAGE: 'TracimLiveMessage',
   ADD_FLASH_MSG: 'addFlashMsg',
   ALL_APP_CHANGE_LANGUAGE: 'allApp_changeLanguage',
   APPEND_BREADCRUMBS: 'appendBreadcrumbs',
@@ -13,7 +15,7 @@ export const CUSTOM_EVENT = {
   REFRESH_CONTENT_LIST: 'refreshContentList',
   REFRESH_DASHBOARD_MEMBER_LIST: 'refreshDashboardMemberList',
   REFRESH_WORKSPACE_DETAIL: 'refreshWorkspaceDetail',
-  REFRESH_WORKSPACE_LIST: 'refreshWorkspaceList',
+  OPEN_WORKSPACE_IN_SIDEBAR: 'openWorkspaceInSidebar',
   REFRESH_WORKSPACE_LIST_THEN_REDIRECT: 'refreshWorkspaceList_then_redirect',
   RELOAD_CONTENT: type => `${type}_reloadContent`,
   RELOAD_APP_FEATURE_DATA: type => `${type}_reloadAppFeatureData`,

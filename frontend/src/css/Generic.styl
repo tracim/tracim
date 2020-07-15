@@ -1,4 +1,4 @@
-@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+@import "~tracim_frontend_lib/src/css/Variable.styl"
 
 a
   &:hover, &:link, &:visited
@@ -43,23 +43,23 @@ div.mce-fullscreen
   &.mce-container
     top 61px
 // INFO - GM - 2020/03/20 - Custom css to make TinyMCE fill its 100% height container
-// Solution found here: https://stackoverflow.com/questions/19861838/tinymce-4-and-100-height-within-containing-element?answertab=votes#tab-top
+// Solution inspired originally by these answer: https://stackoverflow.com/questions/19861838/tinymce-4-and-100-height-within-containing-element?answertab=votes#tab-top
 /*Editing container*/
-.mce-tinymce, .mce-container-body
+.mce-tinymce:not(.mce-fullscreen), .mce-container-body
   min-height 100%
-/*Editing area*/
-.mce-container-body .mce-edit-area
-  position absolute
-  top 69px
-  bottom 37px
-  left 0
-  right 0
-/*Footer*/
-.mce-tinymce .mce-statusbar
-  position absolute
-  bottom 0
-  left 0
-  right 0
+.mce-container-body.mce-stack-layout
+  height 100%
+  display flex
+  flex-flow column
+/*Editor header*/
+div.mce-top-part
+  flex 0 1 auto
+/*Editor body*/
+div.mce-edit-area
+  flex 1 1 auto
+/*Editor footer*/
+div.mce-statusbar
+  flex 0 1 31px
 
 .sidebarpagecontainer
   display flex

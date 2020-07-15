@@ -48,7 +48,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
-from tracim_backend.views import BASE_API_V2
+from tracim_backend.views import BASE_API
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentCreationSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
@@ -132,7 +132,7 @@ class WorkspaceController(Controller):
     def workspaces(self, context, request: TracimRequest, hapic_data=None):
         """
         Returns the list of all workspaces. This route is for admin only.
-        Standard users must use their own route: /api/v2/users/me/workspaces
+        Standard users must use their own route: /api/users/me/workspaces
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
@@ -350,11 +350,12 @@ class WorkspaceController(Controller):
             show_deleted=True,
         )
         try:
-            _, user = uapi.find(
-                user_id=hapic_data.body.user_id,
-                email=hapic_data.body.user_email,
-                public_name=hapic_data.body.user_public_name,
-            )
+            if hapic_data.body.user_id:
+                user = uapi.get_one(hapic_data.body.user_id)
+            elif hapic_data.body.user_email:
+                user = uapi.get_one_by_email(hapic_data.body.user_email)
+            else:
+                user = uapi.get_one_by_username(hapic_data.body.user_username)
             if user.is_deleted:
                 raise UserIsDeleted("This user has been deleted. Unable to invite him.")
             if not user.is_active:
@@ -373,7 +374,7 @@ class WorkspaceController(Controller):
                 if (
                     app_config.EMAIL__NOTIFICATION__ACTIVATED
                     and app_config.NEW_USER__INVITATION__DO_NOTIFY
-                    and app_config.EMAIL__PROCESSING_MODE.lower() == "sync"
+                    and app_config.JOBS__PROCESSING_MODE == app_config.CST.SYNC
                 ):
                     email_sent = True
             else:
@@ -491,7 +492,7 @@ class WorkspaceController(Controller):
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
         raise HTTPFound(
             "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(
-                base_url=BASE_API_V2,
+                base_url=BASE_API,
                 workspace_id=content.workspace_id,
                 content_type=content_type,
                 content_id=content.content_id,
@@ -517,7 +518,7 @@ class WorkspaceController(Controller):
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
         raise HTTPFound(
             "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(
-                base_url=BASE_API_V2,
+                base_url=BASE_API,
                 workspace_id=content.workspace_id,
                 content_type=content_type,
                 content_id=content.content_id,

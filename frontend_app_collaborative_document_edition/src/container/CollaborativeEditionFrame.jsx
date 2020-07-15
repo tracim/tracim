@@ -49,9 +49,8 @@ export class CollaborativeEditionFrame extends React.Component {
   }
 
   async componentDidMount () {
-    const { props } = this
-    console.log('%c<CollaboraFrame> did mount', `color: ${props.data.config.hexcolor}`, props)
-    //  // INFO - B.L - 2019/09/03 Collabora fire the event from window we need to listen window.
+    // console.log('%c<CollaboraFrame> did mount', `color: ${props.data.config.hexcolor}`, props)
+    // INFO - B.L - 2019/09/03 Collabora fire the event from window we need to listen window.
     window.addEventListener('message', this.handleIframeIsClosing)
     try {
       await this.loadContent()
@@ -69,10 +68,8 @@ export class CollaborativeEditionFrame extends React.Component {
     window.removeEventListener('message', this.handleIframeIsClosing)
   }
 
-  setHeadTitle = async (contentName) => {
+  setHeadTitle = async (contentName, workspaceLabel) => {
     const { state } = this
-
-    const workspaceLabel = await this.loadWorkspaceLabel()
 
     if (state.config && state.config.system && state.config.system.config) {
       GLOBAL_dispatchEvent({
@@ -117,33 +114,37 @@ export class CollaborativeEditionFrame extends React.Component {
 
   loadContent = async () => {
     const { props } = this
-    const request = await getFileContent(props.data.config.apiUrl, props.data.content.workspace_id, props.data.content.content_id)
-    const response = await handleFetchResult(request)
-    switch (response.apiResponse.status) {
+    const requestContent = getFileContent(props.data.config.apiUrl, props.data.content.workspace_id, props.data.content.content_id)
+    const requestWorkspace = getWorkspaceDetail(props.data.config.apiUrl, props.data.content.workspace_id)
+
+    const [requestContentUnHandled, requestWorkspaceUnHandled] = await Promise.all([requestContent, requestWorkspace])
+
+    const [responseContent, responseWorkspace] = await Promise.all([
+      handleFetchResult(requestContentUnHandled),
+      handleFetchResult(requestWorkspaceUnHandled)
+    ])
+
+    switch (responseContent.apiResponse.status) {
       case 200:
-        this.setState({
-          content: {
-            ...response.body
-          }
-        })
-        this.setHeadTitle(response.body.label)
+        this.setState({ content: { ...responseContent.body } })
+        if (responseWorkspace.apiResponse.status === 200) this.setHeadTitle(responseContent.body.label, responseWorkspace.body.label)
         break
       case 400:
-        switch (response.body.code) {
+        switch (responseContent.body.code) {
           // INFO - B.L - 2019.08.06 - content id does not exists in db
           case 1003:
           // INFO - B.L - 2019.08.06 - content id is not a valid integer
           case 2023: // eslint-disable-line no-fallthrough
             this.sendGlobalFlashMessage(props.t('Content not found'))
             this.redirectTo(props.data.content.workspace_id)
-            throw new Error(response.body.message)
+            throw new Error(responseContent.body.message)
           // INFO - B.L - 2019.08.06 - workspace does not exists or forbidden
           case 1002:
           // INFO - B.L - 2019.08.06 - workspace id is not a valid integer
           case 2022: // eslint-disable-line no-fallthrough
             this.sendGlobalFlashMessage(props.t('Workspace not found'))
             this.redirectTo()
-            throw new Error(response.body.message)
+            throw new Error(responseContent.body.message)
         }
         break
       default:
@@ -151,25 +152,6 @@ export class CollaborativeEditionFrame extends React.Component {
         this.redirectTo()
         throw new Error('Unknown error')
     }
-  }
-
-  loadWorkspaceLabel = async () => {
-    const { props } = this
-
-    let workspaceLabel = ''
-
-    const fetchResultWorkspaceDetail = await handleFetchResult(
-      await getWorkspaceDetail(props.data.config.apiUrl, props.data.content.workspace_id)
-    )
-
-    switch (fetchResultWorkspaceDetail.apiResponse.status) {
-      case 200:
-        workspaceLabel = fetchResultWorkspaceDetail.body.label
-        break
-      default:
-        this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
-    }
-    return workspaceLabel
   }
 
   setIframeConfig = async () => {
@@ -229,9 +211,7 @@ export class CollaborativeEditionFrame extends React.Component {
     }
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.REDIRECT,
-      data: {
-        url: url
-      }
+      data: { url: url }
     })
   }
 
@@ -241,7 +221,7 @@ export class CollaborativeEditionFrame extends React.Component {
         <form id={this.state.formId} name={this.state.formId} target={this.state.iframeId} action={this.state.iframeUrl} method='post'>
           <input name='access_token' value={this.state.accessToken} type='hidden' />
         </form>
-        <iframe id={this.state.iframeId} name={this.state.iframeId} allowfullscreen style={this.state.iframeStyle} />
+        <iframe id={this.state.iframeId} name={this.state.iframeId} allowFullScreen style={this.state.iframeStyle} />
       </div>
     )
   }

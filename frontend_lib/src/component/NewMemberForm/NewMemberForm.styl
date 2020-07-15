@@ -29,8 +29,6 @@
         font-size 14px
       .autocomplete
         position absolute
-        top 80px
-        left 0
         width 300px
         background-color offWhite
         border-radius 10px
@@ -58,6 +56,14 @@
             font-size 28px
           &__name
             margin-left 15px
+            overflow hidden
+            text-overflow ellipsis
+            white-space nowrap
+            &__username
+              font-size small
+              color grey
+              overflow hidden
+              text-overflow ellipsis
             &__unknownuser
               &__msg
                 color grey

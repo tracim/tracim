@@ -76,14 +76,15 @@ export class NewUpload extends React.Component {
             placement='bottom'
             isOpen={state.popoverMultipleEmailsOpen}
             target='popoverMultipleEmails'
-            toggle={this.handleTogglePopoverMultipleEmails}
+            // INFO - CH - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+            toggle={this.handleTogglePopoverMultipleEmails} // eslint-disable-line react/jsx-handler-names
             trigger={isMobile ? 'focus' : 'hover'}
           >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}</PopoverBody>
           </Popover>
         </div>
 
-        {state.isPasswordActive
+        {(state.isPasswordActive
           ? (
             <div className='newUpload__password'>
               <div className='newUpload__password__active'>
@@ -135,7 +136,7 @@ export class NewUpload extends React.Component {
               </span>
             </div>
           )
-        }
+        )}
 
         <div className='d-flex'>
           <button

@@ -16,7 +16,7 @@ export const HomeNoWorkspace = props =>
     <div className='homepagecard__delimiter delimiter primaryColorBg' />
 
     <div className='homepagecard__text'>
-      {props.canCreateWorkspace
+      {(props.canCreateWorkspace
         ? props.t('You will create your first shared space')
         : (
           <div className='homepagecard__text__user'>
@@ -26,7 +26,7 @@ export const HomeNoWorkspace = props =>
             <div>{props.t('Please refer to an administrator or a trusted user')}</div>
           </div>
         )
-      }
+      )}
     </div>
 
     {props.canCreateWorkspace && (
@@ -35,7 +35,7 @@ export const HomeNoWorkspace = props =>
         data-cy='homepagecard__btn'
         onClick={props.onClickCreateWorkspace}
       >
-        {props.t('create a shared space')}
+        {props.t('Create a shared space')}
       </button>
     )}
 

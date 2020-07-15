@@ -1,6 +1,6 @@
 import React from 'react'
-import { expect, assert } from 'chai'
-import { shallow, mount, configure } from 'enzyme'
+import { expect } from 'chai'
+import { shallow, mount } from 'enzyme'
 import { HtmlDocument } from '../../src/component/HtmlDocument.jsx'
 import {
   TextAreaApp,
@@ -33,7 +33,12 @@ const props = {
   onClickRestoreArchived: () => {},
   onClickRestoreDeleted: () => {},
   onClickShowDraft: () => {},
-  t: () => {}
+  t: (s, opts) => {
+    for (const p in opts) {
+      s = s.replace('{{' + p + '}}', opts[p])
+    }
+    return s
+  }
 }
 
 describe('<HtmlDocument />', () => {
@@ -45,7 +50,8 @@ describe('<HtmlDocument />', () => {
     it(`should display the last version number ${props.lastVersion}`, () =>
       expect(wrapper.find('.html-document__contentpage__textnote__version').render().text()).to.contains(props.lastVersion)
     )
-    it(`should display the content of the document`, () =>
+
+    it('should display the content of the document', () =>
       expect(wrapper.find('.html-document__contentpage__textnote__text').render().text()).to.contains(props.text)
     )
 
@@ -53,11 +59,11 @@ describe('<HtmlDocument />', () => {
       const wrapper = mount(
         <HtmlDocument
           {...props}
-          isArchived={true}
+          isArchived
         />
       )
 
-      it(`should display the archived warning`, () =>
+      it('should display the archived warning', () =>
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
           .to.have.descendants(DisplayState)
           .and
@@ -69,11 +75,11 @@ describe('<HtmlDocument />', () => {
       const wrapper = mount(
         <HtmlDocument
           {...props}
-          isDeleted={true}
+          isDeleted
         />
       )
 
-      it(`should display the trash warning`, () =>
+      it('should display the trash warning', () =>
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
           .to.have.descendants(DisplayState)
           .and
@@ -85,7 +91,7 @@ describe('<HtmlDocument />', () => {
       const wrapper = mount(
         <HtmlDocument
           {...props}
-          isDeprecated={true}
+          isDeprecated
         />
       )
 
@@ -101,15 +107,15 @@ describe('<HtmlDocument />', () => {
       const wrapper = mount(
         <HtmlDocument
           {...props}
-          isDraftAvailable={true}
+          isDraftAvailable
         />
       )
 
-      it(`should display the "resume writing" button`, () =>
+      it('should display the "resume writing" button', () =>
         expect(wrapper.find('.html-document__contentpage__textnote'))
           .to.have.descendants(DisplayState)
           .and
-          .have.html().to.contains(`fa-hand-o-right`)
+          .have.html().to.contains('fa-hand-o-right')
       )
     })
   })
@@ -139,8 +145,7 @@ describe('in EDIT mode', () => {
     />
   )
 
-  it(`should contain a <TextAreaApp /> component`, () =>
+  it('should contain a <TextAreaApp /> component', () =>
     expect(wrapper.find('.html-document__contentpage__textnote')).to.have.descendants(TextAreaApp)
   )
 })
-

@@ -42,14 +42,14 @@ describe('<Comment />', () => {
       expect(wrapper.find(`div.${props.customClass}__body__text`).render()).to.have.text().equal(props.text)
     })
 
-    it(`should have the className "sent" when it is your comment`, () => {
+    it('should have the className "sent" when it is your comment', () => {
       wrapper.setProps({ fromMe: true })
       expect(wrapper.find(`div.${props.customClass}.sent`)).to.have.lengthOf(1)
       expect(wrapper.find(`div.${props.customClass}.received`)).to.have.lengthOf(0)
       wrapper.setProps({ fromMe: props.fromMe })
     })
 
-    it(`should have the className "received" when it is your comment`, () => {
+    it('should have the className "received" when it is your comment', () => {
       wrapper.setProps({ fromMe: false })
       expect(wrapper.find(`div.${props.customClass}.received`)).to.have.lengthOf(1)
       expect(wrapper.find(`div.${props.customClass}.sent`)).to.have.lengthOf(0)

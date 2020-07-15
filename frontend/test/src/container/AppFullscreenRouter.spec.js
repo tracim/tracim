@@ -5,7 +5,7 @@ import { AppFullscreenRouter as AppFullscreenRouterWithoutHOC } from '../../../s
 import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user'
 import { MemoryRouter } from 'react-router'
-import { PAGE } from '../../../src/helper'
+import { PAGE } from '../../../src/util/helper.js'
 import { ROLE } from 'tracim_frontend_lib'
 
 describe('<AppFullscreenRouter />', () => {
@@ -40,9 +40,9 @@ describe('<AppFullscreenRouter />', () => {
     it('should not render any app', () => {
       // INFO - GM - 2020/03/30 - In order to set props to children when mounting a element, we need to set props too root
       // See: https://github.com/enzymejs/enzyme/issues/1925#issuecomment-445490387
-      wrapper.setProps({ children: (<ComponentWithHOC {...props} user={{...user, logged: false}} /> )})
+      wrapper.setProps({ children: (<ComponentWithHOC {...props} user={{ ...user, logged: false }} />) })
       expect(wrapper.find('.AppFullScreenManager').length).equal(0)
-      wrapper.setProps({ children: (<ComponentWithHOC {...props} /> )})
+      wrapper.setProps({ children: (<ComponentWithHOC {...props} />) })
     })
   })
 
@@ -55,7 +55,7 @@ describe('<AppFullscreenRouter />', () => {
       wrapper.instance().history.replace(PAGE.WORKSPACE.CONTENT_EDITION(1, 1))
       expect(renderAppFullscreenCallBack.called).to.equal(true)
 
-      let args = renderAppFullscreenCallBack.getCalls()[0].args
+      const args = renderAppFullscreenCallBack.getCalls()[0].args
       expect(args).to.deep.equal([
         { slug: 'collaborative_document_edition', hexcolor: '#7d4e24' },
         props.user,
@@ -68,7 +68,7 @@ describe('<AppFullscreenRouter />', () => {
       wrapper.instance().history.replace(PAGE.WORKSPACE.AGENDA(1))
       expect(renderAppFullscreenCallBack.called).to.equal(true)
 
-      let args = renderAppFullscreenCallBack.getCalls()[0].args
+      const args = renderAppFullscreenCallBack.getCalls()[0].args
       expect(args).to.deep.equal([{ slug: 'agenda', hexcolor: '#7d4e24', appConfig: { workspaceId: 1, forceShowSidebar: false } }, props.user, ROLE.reader.id, {}])
     })
 
@@ -76,7 +76,7 @@ describe('<AppFullscreenRouter />', () => {
       wrapper.instance().history.replace(PAGE.AGENDA)
       expect(renderAppFullscreenCallBack.called).to.equal(true)
 
-      let args = renderAppFullscreenCallBack.getCalls()[0].args
+      const args = renderAppFullscreenCallBack.getCalls()[0].args
       expect(args).to.deep.equal([{ slug: 'agenda', hexcolor: '#7d4e24', appConfig: { workspaceId: null, forceShowSidebar: true } }, props.user, null, {}])
     })
 
@@ -84,7 +84,7 @@ describe('<AppFullscreenRouter />', () => {
       wrapper.instance().history.replace(PAGE.ADMIN.USER)
       expect(renderAppFullscreenCallBack.called).to.equal(true)
 
-      let args = renderAppFullscreenCallBack.getCalls()[0].args
+      const args = renderAppFullscreenCallBack.getCalls()[0].args
       expect(args).to.deep.equal([{ slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'user' }, props.user, null, { workspaceList: [], userList: [] }])
     })
 
@@ -92,7 +92,7 @@ describe('<AppFullscreenRouter />', () => {
       wrapper.instance().history.replace(PAGE.ADMIN.WORKSPACE)
       expect(renderAppFullscreenCallBack.called).to.equal(true)
 
-      let args = renderAppFullscreenCallBack.getCalls()[0].args
+      const args = renderAppFullscreenCallBack.getCalls()[0].args
       expect(args).to.deep.equal([{ slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'workspace' }, props.user, null, { workspaceList: [], userList: [] }])
     })
   })

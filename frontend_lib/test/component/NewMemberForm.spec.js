@@ -12,18 +12,18 @@ describe('<NewMemberForm />', () => {
   const onClickBtnValidateCallBack = sinon.spy()
   const onChangeRoleCallBack = sinon.spy()
   const onClickKnownMemberCallBack = sinon.spy()
-  const onChangeNameOrEmailCallBack = sinon.spy()
+  const onChangePersonalDataCallBack = sinon.spy()
 
   const props = {
     onClickCloseAddMemberBtn: onClickCloseAddMemberBtnCallBack,
-    nameOrEmail: 'randomNameOrEmail',
+    publicName: 'randomPersonalData',
     searchedKnownMemberList: [
-      { public_name: 'random', user_id: 1 },
-      { public_name: 'Searched', user_id: 2 },
-      { public_name: 'Known', user_id: 3 },
-      { public_name: 'Member', user_id: 4 },
-      { public_name: 'List', user_id: 5 },
-      { public_name: 'Test', user_id: 6 }
+      { public_name: 'random', username: 'random', user_id: 1 },
+      { public_name: 'Searched', username: 'Searched', user_id: 2 },
+      { public_name: 'Known', username: 'Known', user_id: 3 },
+      { public_name: 'Member', username: 'Member', user_id: 4 },
+      { public_name: 'List', username: 'List', user_id: 5 },
+      { public_name: 'Test', username: 'Test', user_id: 6 }
     ],
     isEmail: false,
     onClickAutoComplete: onClickAutoCompleteCallBack,
@@ -35,7 +35,7 @@ describe('<NewMemberForm />', () => {
     onClickBtnValidate: onClickBtnValidateCallBack,
     onChangeRole: onChangeRoleCallBack,
     onClickKnownMember: onClickKnownMemberCallBack,
-    onChangeNameOrEmail: onChangeNameOrEmailCallBack,
+    onChangePersonalData: onChangePersonalDataCallBack,
     autoCompleteActive: true,
     role: 'randomRole'
   }
@@ -47,8 +47,8 @@ describe('<NewMemberForm />', () => {
   )
 
   describe('Static design', () => {
-    it(`text input should have the value: ${props.nameOrEmail}`, () => {
-      expect(wrapper.find('#addmember').prop('value')).to.equal(props.nameOrEmail)
+    it(`text input should have the value: ${props.publicName}`, () => {
+      expect(wrapper.find('#addmember').prop('value')).to.equal(props.publicName)
     })
 
     it(`should display ${props.roleList.length} roles`, () => {
@@ -66,48 +66,48 @@ describe('<NewMemberForm />', () => {
         .to.equal(!props.autoCompleteClicked)
     })
 
-    it(`should display the 5 first searched known Member of the list`, () => {
+    it('should display the 5 first searched known Member of the list', () => {
       expect(wrapper.find('.autocomplete__item').length).equal(5)
       for (let i = 0; i < 5; i++) {
         expect(wrapper.find('div.autocomplete__item__avatar > Avatar').at(i).prop('publicName'))
           .to.equal(props.searchedKnownMemberList[i].public_name)
         expect(wrapper.find('div.autocomplete__item__name').at(i))
-          .to.have.text().equal(props.searchedKnownMemberList[i].public_name)
+          .to.have.text().equal(`${props.searchedKnownMemberList[i].public_name}@${props.searchedKnownMemberList[i].username}`)
       }
     })
   })
 
   describe('Handlers', () => {
     it('should call props.onClickBtnValidate when handler onClickBtnValidate is called at form validation', () => {
-      wrapper.find(`button`).simulate('click')
+      wrapper.find('button').simulate('click')
       expect(onClickBtnValidateCallBack.called).to.equal(true)
     })
 
     it('should call props.onClickCloseAddMemberBtn when handler onClickCloseAddMemberBtn is called at form closing', () => {
-      wrapper.find(`.memberlist__form__close`).simulate('click')
+      wrapper.find('.memberlist__form__close').simulate('click')
       expect(onClickCloseAddMemberBtnCallBack.called).to.equal(true)
     })
 
     it('should call props.onClickKnownMember when handler onClickKnownMember is called', () => {
-      wrapper.find(`div.autocomplete__item`).first().simulate('click')
+      wrapper.find('div.autocomplete__item').first().simulate('click')
       expect(onClickKnownMemberCallBack.called).to.equal(true)
     })
 
     it('should call props.onClickAutoComplete when handler onClickAutoComplete is called', () => {
       wrapper.setProps({ searchedKnownMemberList: [] })
-      wrapper.find(`div.autocomplete__item`).first().simulate('click')
+      wrapper.find('div.autocomplete__item').first().simulate('click')
       expect(onClickAutoCompleteCallBack.called).to.equal(true)
       wrapper.setProps({ searchedKnownMemberList: props.searchedKnownMemberList })
     })
 
     it('should call props.onChangeRole when handler onChangeRole is called', () => {
-      wrapper.find(`.item__radiobtn > input`).first().simulate('change')
+      wrapper.find('.item__radiobtn > input').first().simulate('change')
       expect(onChangeRoleCallBack.called).to.equal(true)
     })
 
-    it('should call props.onChangeNameOrEmail when handler onChangeNameOrEmail is called', () => {
-      wrapper.find(`input.name__input`).simulate('change', { target: { value: 'randomValue' } })
-      expect(onChangeNameOrEmailCallBack.called).to.equal(true)
+    it('should call props.onChangePersonalData when handler onChangePersonalData is called', () => {
+      wrapper.find('input.name__input').simulate('change', { target: { value: 'randomValue' } })
+      expect(onChangePersonalDataCallBack.called).to.equal(true)
     })
   })
 })

@@ -14,6 +14,7 @@ import zope.sqlalchemy
 
 from tracim_backend.applications.share.models import ContentShare  # noqa: F401
 from tracim_backend.applications.upload_permissions.models import UploadPermission  # noqa: F401
+from tracim_backend.lib.crud_hook.caller import DatabaseCrudHookCaller
 from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.models.auth import User  # noqa: F401
 from tracim_backend.models.data import Content  # noqa: F401
@@ -25,6 +26,8 @@ if typing.TYPE_CHECKING:
     # INFO - G.M - 2019-05-03 - import for type-checking only, setted here to
     # avoid circular import issue
     from tracim_backend.config import CFG
+    from tracim_backend.lib.utils.request import TracimContext
+
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
 configure_mappers()
@@ -95,6 +98,18 @@ def get_tm_session(session_factory, transaction_manager) -> Session:
     return dbsession
 
 
+def create_dbsession_for_context(
+    session_factory, transaction_manager, context: "TracimContext"
+) -> Session:
+    """Creates and initialize a sqlalchemy session for the given context"""
+    dbsession = get_tm_session(session_factory, transaction_manager)
+    dbsession.set_context(context)
+    # Keep a reference on the crud hook caller for the session's lifetime
+    dbsession.info["crud_hook_caller"] = DatabaseCrudHookCaller(dbsession, context.plugin_manager)
+    context.plugin_manager.hook.on_context_session_created(db_session=dbsession, context=context)
+    return dbsession
+
+
 def init_models(configurator: Configurator, app_config: "CFG") -> None:
     """
     Initialize the model for a Pyramid app.
@@ -114,7 +129,7 @@ def init_models(configurator: Configurator, app_config: "CFG") -> None:
     # make request.dbsession available for use in Pyramid
     configurator.add_request_method(
         # r.tm is the transaction manager used by pyramid_tm
-        lambda r: get_tm_session(session_factory, r.tm),
+        lambda r: create_dbsession_for_context(session_factory, r.tm, r),
         "dbsession",
         reify=True,
     )

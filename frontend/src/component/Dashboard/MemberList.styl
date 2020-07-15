@@ -1,4 +1,4 @@
-@import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+@import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .memberlist
   margin-left 30px
@@ -30,11 +30,25 @@
           height 50px
       &__info
         margin-right auto
-        &__name
-          font-size 20px
+        width calc(100% - 81px) // 81px is the avatar's size
+        display flex
+        flex-direction row
+        &__firstColumn
+          overflow hidden
+          white-space nowrap
+          &__name
+            font-size 20px
+            text-overflow ellipsis
+            overflow hidden
+          &__username
+            font-size 14px
+            color mediumDarkGrey
+            text-overflow ellipsis
+            overflow hidden
         &__role
           font-size 14px
-          color #999
+          color mediumDarkGrey
+          margin auto 5px
       &__delete
         font-size 20px
         color darkGrey

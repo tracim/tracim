@@ -1,5 +1,5 @@
 import i18n from './i18n.js'
-
+import { FETCH_CONFIG as LIB_FETCH_CONFIG } from 'tracim_frontend_lib'
 import DRAW from './images/libreoffice_icons/draw.png'
 import CALC from './images/libreoffice_icons/spreadsheet.png'
 import WRITER from './images/libreoffice_icons/text.png'
@@ -34,15 +34,10 @@ export const PAGE = {
   WORKSPACE: {
     CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`
   },
-  ONLINE_EDITION: (contentId) => `/api/v2/collaborative-document-edition/wopi/files/${contentId}`
+  ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`
 }
 
-export const FETCH_CONFIG = {
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
-}
+export const FETCH_CONFIG = LIB_FETCH_CONFIG
 
 export const getTemplateFromFileType = (software, fileType, availableTemplates) => {
   const softwareSupportedFileTypes = FILE_TYPES[software] || {}

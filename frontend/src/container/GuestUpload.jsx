@@ -10,14 +10,15 @@ import {
   CUSTOM_EVENT,
   ProgressBar,
   computeProgressionPercentage,
-  FILE_PREVIEW_STATE
+  FILE_PREVIEW_STATE,
+  setupCommonRequestHeaders
 } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
 import {
   FETCH_CONFIG,
   PAGE
-} from '../helper.js'
+} from '../util/helper.js'
 import { getGuestUploadInfo } from '../action-creator.async'
 
 class GuestUpload extends React.Component {
@@ -125,7 +126,17 @@ class GuestUpload extends React.Component {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
-          msg: <div>{props.t('Files already uploaded:')}<br /><ul>{alreadyUploadedList.map(file => <li>{file.name}</li>)}</ul></div>,
+          msg: (
+            <div>
+              {props.t('Files already uploaded:')}
+              <br />
+              <ul>
+                {alreadyUploadedList.map(file =>
+                  <li key={file.name}>{file.name}</li>
+                )}
+              </ul>
+            </div>
+          ),
           type: 'warning',
           delay: undefined
         }
@@ -148,7 +159,7 @@ class GuestUpload extends React.Component {
 
   validateForm = () => {
     const { props, state } = this
-    let errors = []
+    const errors = []
     if (state.guestFullname.value.length < 1) errors.push({ field: 'guestFullname', msg: props.t('Full name must be at least 1 character') })
     if (state.guestFullname.value.length > 255) errors.push({ field: 'guestFullname', msg: props.t('Full name must be less than 255 characters') })
     if (state.hasPassword && (state.guestPassword.value.length < 6)) errors.push({ field: 'guestPassword', msg: props.t('Password must be at least 6 characters') })
@@ -163,7 +174,7 @@ class GuestUpload extends React.Component {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
-          msg: <div>{props.t('Errors in form:')}<br /><ul>{errors.map(error => <li key={error.field} >{error.msg}</li>)}</ul></div>,
+          msg: <div>{props.t('Errors in form:')}<br /><ul>{errors.map(error => <li key={error.field}>{error.msg}</li>)}</ul></div>,
           type: 'warning',
           delay: undefined
         }
@@ -192,7 +203,7 @@ class GuestUpload extends React.Component {
     xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: this.UPLOAD_STATUS.AFTER_LOAD, percent: 0 } }), false)
 
     xhr.open('POST', `${FETCH_CONFIG.apiUrl}/public/guest-upload/${this.props.match.params.token}`, true)
-    xhr.setRequestHeader('Accept', 'application/json')
+    setupCommonRequestHeaders(xhr)
     xhr.withCredentials = true
 
     xhr.onreadystatechange = () => {
@@ -201,7 +212,7 @@ class GuestUpload extends React.Component {
           case 204:
             this.setState({ fileToUploadList: [] })
             break
-          case 400:
+          case 400: {
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
               case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
@@ -212,7 +223,8 @@ class GuestUpload extends React.Component {
             }
             this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
             break
-          case 403:
+          }
+          case 403: {
             const jsonResult403 = JSON.parse(xhr.responseText)
             switch (jsonResult403.code) {
               case 2053:
@@ -224,6 +236,7 @@ class GuestUpload extends React.Component {
                 this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
             }
             break
+          }
           default:
             this.sendGlobalFlashMessage(props.t('Error while uploading file'))
             this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
@@ -271,10 +284,12 @@ class GuestUpload extends React.Component {
                     />
                   )
                 default:
-                  return <ImportConfirmation
-                    title={props.t('Thank you, your upload is finished!')}
-                    text={props.t('Your interlocutor has been notified of your upload. You can close this window.')}
-                  />
+                  return (
+                    <ImportConfirmation
+                      title={props.t('Thank you, your upload is finished!')}
+                      text={props.t('Your interlocutor has been notified of your upload. You can close this window.')}
+                    />
+                  )
               }
             })()}
           </CardBody>

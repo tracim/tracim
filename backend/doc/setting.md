@@ -14,122 +14,123 @@ The priority order is (from less to more priority):
 - configuration file
 - environnement variables
 
-|<env_var_name>                |<config_file_name>            |<config_name>                 |
-|------------------------------|------------------------------|------------------------------|
-|TRACIM_APP__ENABLED           |app.enabled                   |APP__ENABLED                  |
-|TRACIM_SQLALCHEMY__URL        |sqlalchemy.url                |SQLALCHEMY__URL               |
-|TRACIM_DEFAULT_LANG           |default_lang                  |DEFAULT_LANG                  |
-|TRACIM_COLOR__CONFIG_FILE_PATH|color.config_file_path        |COLOR__CONFIG_FILE_PATH       |
-|TRACIM_DEPOT_STORAGE_DIR      |depot_storage_dir             |DEPOT_STORAGE_DIR             |
-|TRACIM_DEPOT_STORAGE_NAME     |depot_storage_name            |DEPOT_STORAGE_NAME            |
-|TRACIM_PREVIEW_CACHE_DIR      |preview_cache_dir             |PREVIEW_CACHE_DIR             |
-|TRACIM_AUTH_TYPES             |auth_types                    |AUTH_TYPES                    |
-|TRACIM_REMOTE_USER_HEADER     |remote_user_header            |REMOTE_USER_HEADER            |
-|TRACIM_API__KEY               |api.key                       |API__KEY                      |
-|TRACIM_SESSION__REISSUE_TIME  |session.reissue_time          |SESSION__REISSUE_TIME         |
-|TRACIM_SESSION__DATA_DIR      |session.data_dir              |SESSION__DATA_DIR             |
-|TRACIM_SESSION__LOCK_DIR      |session.lock_dir              |SESSION__LOCK_DIR             |
-|TRACIM_WEBSITE__TITLE         |website.title                 |WEBSITE__TITLE                |
-|TRACIM_WEBSITE__BASE_URL      |website.base_url              |WEBSITE__BASE_URL             |
-|TRACIM_API__BASE_URL          |api.base_url                  |API__BASE_URL                 |
-|TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN|cors.access-control-allowed-origin|CORS__ACCESS_CONTROL_ALLOWED_ORIGIN|
-|TRACIM_DEFAULT_ANONYMIZED_USER_DISPLAY_NAME|default_anonymized_user_display_name|DEFAULT_ANONYMIZED_USER_DISPLAY_NAME|
-|TRACIM_USER__AUTH_TOKEN__VALIDITY|user.auth_token.validity      |USER__AUTH_TOKEN__VALIDITY    |
-|TRACIM_USER__RESET_PASSWORD__VALIDITY|user.reset_password.validity  |USER__RESET_PASSWORD__VALIDITY|
-|TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME|user.reset_password.token_lifetime|USER__RESET_PASSWORD__TOKEN_LIFETIME|
-|TRACIM_USER__DEFAULT_PROFILE  |user.default_profile          |USER__DEFAULT_PROFILE         |
-|TRACIM_KNOWN_MEMBERS__FILTER  |known_members.filter          |KNOWN_MEMBERS__FILTER         |
-|TRACIM_DEBUG                  |debug                         |DEBUG                         |
-|TRACIM_BUILD_VERSION          |build_version                 |BUILD_VERSION                 |
-|TRACIM_PREVIEW__JPG__RESTRICTED_DIMS|preview.jpg.restricted_dims   |PREVIEW__JPG__RESTRICTED_DIMS |
-|TRACIM_PREVIEW__JPG__ALLOWED_DIMS|preview.jpg.allowed_dims      |PREVIEW__JPG__ALLOWED_DIMS    |
-|TRACIM_FRONTEND__SERVE        |frontend.serve                |FRONTEND__SERVE               |
-|TRACIM_FRONTEND__CACHE_TOKEN  |frontend.cache_token          |FRONTEND__CACHE_TOKEN         |
-|TRACIM_BACKEND__I18N_FOLDER_PATH|backend.i18n_folder_path      |BACKEND__I18N_FOLDER_PATH     |
-|TRACIM_FRONTEND__DIST_FOLDER_PATH|frontend.dist_folder_path     |FRONTEND__DIST_FOLDER_PATH    |
-|TRACIM_PLUGIN__FOLDER_PATH    |plugin.folder_path            |PLUGIN__FOLDER_PATH           |
-|TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH|frontend.custom_toolbox_folder_path|FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH|
-|TRACIM_LIMITATION__SHAREDSPACE_PER_USER|limitation.sharedspace_per_user|LIMITATION__SHAREDSPACE_PER_USER|
-|TRACIM_LIMITATION__CONTENT_LENGTH_FILE_SIZE|limitation.content_length_file_size|LIMITATION__CONTENT_LENGTH_FILE_SIZE|
-|TRACIM_LIMITATION__WORKSPACE_SIZE|limitation.workspace_size     |LIMITATION__WORKSPACE_SIZE    |
-|TRACIM_LIMITATION__USER_DEFAULT_ALLOWED_SPACE|limitation.user_default_allowed_space|LIMITATION__USER_DEFAULT_ALLOWED_SPACE|
-|TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION|email.notification.enabled_on_invitation|EMAIL__NOTIFICATION__ENABLED_ON_INVITATION|
-|TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL|email.notification.from.email |EMAIL__NOTIFICATION__FROM__EMAIL|
-|TRACIM_EMAIL__NOTIFICATION__FROM|email.notification.from       |EMAIL__NOTIFICATION__FROM     |
-|TRACIM_EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL|email.notification.from.default_label|EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL|
-|TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL|email.notification.reply_to.email|EMAIL__NOTIFICATION__REPLY_TO__EMAIL|
-|TRACIM_EMAIL__NOTIFICATION__REFERENCES__EMAIL|email.notification.references.email|EMAIL__NOTIFICATION__REFERENCES__EMAIL|
-|TRACIM_EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML|email.notification.content_update.template.html|EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML|
-|TRACIM_EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT|email.notification.content_update.subject|EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT|
-|TRACIM_EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML|email.notification.created_account.template.html|EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML|
-|TRACIM_EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT|email.notification.created_account.subject|EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT|
-|TRACIM_EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML|email.notification.reset_password_request.template.html|EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML|
-|TRACIM_EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT|email.notification.reset_password_request.subject|EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT|
-|TRACIM_EMAIL__NOTIFICATION__ACTIVATED|email.notification.activated  |EMAIL__NOTIFICATION__ACTIVATED|
-|TRACIM_EMAIL__NOTIFICATION__SMTP__SERVER|email.notification.smtp.server|EMAIL__NOTIFICATION__SMTP__SERVER|
-|TRACIM_EMAIL__NOTIFICATION__SMTP__PORT|email.notification.smtp.port  |EMAIL__NOTIFICATION__SMTP__PORT|
-|TRACIM_EMAIL__NOTIFICATION__SMTP__USER|email.notification.smtp.user  |EMAIL__NOTIFICATION__SMTP__USER|
-|TRACIM_EMAIL__NOTIFICATION__SMTP__PASSWORD|email.notification.smtp.password|EMAIL__NOTIFICATION__SMTP__PASSWORD|
-|TRACIM_EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL|email.notification.smtp.use_implicit_ssl|EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL|
-|TRACIM_EMAIL__REPLY__ACTIVATED|email.reply.activated         |EMAIL__REPLY__ACTIVATED       |
-|TRACIM_EMAIL__REPLY__IMAP__SERVER|email.reply.imap.server       |EMAIL__REPLY__IMAP__SERVER    |
-|TRACIM_EMAIL__REPLY__IMAP__PORT|email.reply.imap.port         |EMAIL__REPLY__IMAP__PORT      |
-|TRACIM_EMAIL__REPLY__IMAP__USER|email.reply.imap.user         |EMAIL__REPLY__IMAP__USER      |
-|TRACIM_EMAIL__REPLY__IMAP__PASSWORD|email.reply.imap.password     |EMAIL__REPLY__IMAP__PASSWORD  |
-|TRACIM_EMAIL__REPLY__IMAP__FOLDER|email.reply.imap.folder       |EMAIL__REPLY__IMAP__FOLDER    |
-|TRACIM_EMAIL__REPLY__CHECK__HEARTBEAT|email.reply.check.heartbeat   |EMAIL__REPLY__CHECK__HEARTBEAT|
-|TRACIM_EMAIL__REPLY__IMAP__USE_SSL|email.reply.imap.use_ssl      |EMAIL__REPLY__IMAP__USE_SSL   |
-|TRACIM_EMAIL__REPLY__IMAP__USE_IDLE|email.reply.imap.use_idle     |EMAIL__REPLY__IMAP__USE_IDLE  |
-|TRACIM_EMAIL__REPLY__CONNECTION__MAX_LIFETIME|email.reply.connection.max_lifetime|EMAIL__REPLY__CONNECTION__MAX_LIFETIME|
-|TRACIM_EMAIL__REPLY__USE_HTML_PARSING|email.reply.use_html_parsing  |EMAIL__REPLY__USE_HTML_PARSING|
-|TRACIM_EMAIL__REPLY__USE_TXT_PARSING|email.reply.use_txt_parsing   |EMAIL__REPLY__USE_TXT_PARSING |
-|TRACIM_EMAIL__REPLY__LOCKFILE_PATH|email.reply.lockfile_path     |EMAIL__REPLY__LOCKFILE_PATH   |
-|TRACIM_EMAIL__PROCESSING_MODE |email.processing_mode         |EMAIL__PROCESSING_MODE        |
-|TRACIM_EMAIL__ASYNC__REDIS__HOST|email.async.redis.host        |EMAIL__ASYNC__REDIS__HOST     |
-|TRACIM_EMAIL__ASYNC__REDIS__PORT|email.async.redis.port        |EMAIL__ASYNC__REDIS__PORT     |
-|TRACIM_EMAIL__ASYNC__REDIS__DB|email.async.redis.db          |EMAIL__ASYNC__REDIS__DB       |
-|TRACIM_NEW_USER__INVITATION__DO_NOTIFY|new_user.invitation.do_notify |NEW_USER__INVITATION__DO_NOTIFY|
-|TRACIM_NEW_USER__INVITATION__MINIMAL_PROFILE|new_user.invitation.minimal_profile|NEW_USER__INVITATION__MINIMAL_PROFILE|
-|TRACIM_LDAP_URL               |ldap_url                      |LDAP_URL                      |
-|TRACIM_LDAP_BASE_URL          |ldap_base_url                 |LDAP_BASE_URL                 |
-|TRACIM_LDAP_BIND_DN           |ldap_bind_dn                  |LDAP_BIND_DN                  |
-|TRACIM_LDAP_BIND_PASS         |ldap_bind_pass                |LDAP_BIND_PASS                |
-|TRACIM_LDAP_TLS               |ldap_tls                      |LDAP_TLS                      |
-|TRACIM_LDAP_USER_BASE_DN      |ldap_user_base_dn             |LDAP_USER_BASE_DN             |
-|TRACIM_LDAP_LOGIN_ATTRIBUTE   |ldap_login_attribute          |LDAP_LOGIN_ATTRIBUTE          |
-|TRACIM_LDAP_NAME_ATTRIBUTE    |ldap_name_attribute           |LDAP_NAME_ATTRIBUTE           |
-|TRACIM_WEBDAV__UI__ENABLED    |webdav.ui.enabled             |WEBDAV__UI__ENABLED           |
-|TRACIM_WEBDAV__BASE_URL       |webdav.base_url               |WEBDAV__BASE_URL              |
-|TRACIM_WEBDAV__VERBOSE__LEVEL |webdav.verbose.level          |WEBDAV__VERBOSE__LEVEL        |
-|TRACIM_WEBDAV__ROOT_PATH      |webdav.root_path              |WEBDAV__ROOT_PATH             |
-|TRACIM_WEBDAV__BLOCK_SIZE     |webdav.block_size             |WEBDAV__BLOCK_SIZE            |
-|TRACIM_WEBDAV__DIR_BROWSER__ENABLED|webdav.dir_browser.enabled    |WEBDAV__DIR_BROWSER__ENABLED  |
-|TRACIM_WEBDAV__DIR_BROWSER__FOOTER|webdav.dir_browser.footer     |WEBDAV__DIR_BROWSER__FOOTER   |
-|TRACIM_SEARCH__ENGINE         |search.engine                 |SEARCH__ENGINE                |
-|TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS|search.elasticsearch.index_alias|SEARCH__ELASTICSEARCH__INDEX_ALIAS|
-|TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|search.elasticsearch.index_pattern_template|SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|
-|TRACIM_SEARCH__ELASTICSEARCH__USE_INGEST|search.elasticsearch.use_ingest|SEARCH__ELASTICSEARCH__USE_INGEST|
-|TRACIM_SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST|search.elasticsearch.ingest.mimetype_whitelist|SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST|
-|TRACIM_SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST|search.elasticsearch.ingest.mimetype_blacklist|SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST|
-|TRACIM_SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT|search.elasticsearch.ingest.size_limit|SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT|
-|TRACIM_SEARCH__ELASTICSEARCH__HOST|search.elasticsearch.host     |SEARCH__ELASTICSEARCH__HOST   |
-|TRACIM_SEARCH__ELASTICSEARCH__PORT|search.elasticsearch.port     |SEARCH__ELASTICSEARCH__PORT   |
-|TRACIM_SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT|search.elasticsearch.request_timeout|SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT|
-|TRACIM_CALDAV__RADICALE_PROXY__BASE_URL|caldav.radicale_proxy.base_url|CALDAV__RADICALE_PROXY__BASE_URL|
-|TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|caldav.radicale.storage.filesystem_folder|CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|
-|TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE|collaborative_document_edition.software|COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE|
-|TRACIM_COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL|collaborative_document_edition.collabora.base_url|COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL|
-|TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR|collaborative_document_edition.file_template_dir|COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR|
-|TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML|email.notification.share_content_to_receiver.template.html|EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML|
-|TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT|email.notification.share_content_to_receiver.subject|EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT|
-|TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML|email.notification.share_content_to_emitter.template.html|EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML|
-|TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT|email.notification.share_content_to_emitter.subject|EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT|
-|TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML|email.notification.upload_permission_to_receiver.template.html|EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML|
-|TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT|email.notification.upload_permission_to_receiver.subject|EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT|
-|TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML|email.notification.upload_permission_to_emitter.template.html|EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML|
-|TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT|email.notification.upload_permission_to_emitter.subject|EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT|
-|TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML|email.notification.new_upload_event.template.html|EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML|
-|TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT|email.notification.new_upload_event.subject|EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT|
+| <env_var_name>                                                            | <config_file_name>                                             | <config_name>                                                      |
+|---------------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------|
+| TRACIM_APP__ENABLED                                                       | app.enabled                                                    | APP__ENABLED                                                       |
+| TRACIM_SQLALCHEMY__URL                                                    | sqlalchemy.url                                                 | SQLALCHEMY__URL                                                    |
+| TRACIM_DEFAULT_LANG                                                       | default_lang                                                   | DEFAULT_LANG                                                       |
+| TRACIM_COLOR__CONFIG_FILE_PATH                                            | color.config_file_path                                         | COLOR__CONFIG_FILE_PATH                                            |
+| TRACIM_DEPOT_STORAGE_DIR                                                  | depot_storage_dir                                              | DEPOT_STORAGE_DIR                                                  |
+| TRACIM_DEPOT_STORAGE_NAME                                                 | depot_storage_name                                             | DEPOT_STORAGE_NAME                                                 |
+| TRACIM_PREVIEW_CACHE_DIR                                                  | preview_cache_dir                                              | PREVIEW_CACHE_DIR                                                  |
+| TRACIM_AUTH_TYPES                                                         | auth_types                                                     | AUTH_TYPES                                                         |
+| TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
+| TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
+|TRACIM_SESSION__TYPE                                                       |session.type                                                    |SESSION__TYPE                                                       |
+|TRACIM_SESSION__URL                                                        |session.url                                                     |SESSION__URL                                                        |
+|TRACIM_SESSION__DATA_DIR                                                   |session.data_dir                                                |SESSION__DATA_DIR                                                   |
+|TRACIM_SESSION__LOCK_DIR                                                   |session.lock_dir                                                |SESSION__LOCK_DIR                                                   |
+| TRACIM_WEBSITE__TITLE                                                     | website.title                                                  | WEBSITE__TITLE                                                     |
+| TRACIM_WEBSITE__BASE_URL                                                  | website.base_url                                               | WEBSITE__BASE_URL                                                  |
+| TRACIM_API__BASE_URL                                                      | api.base_url                                                   | API__BASE_URL                                                      |
+| TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                | cors.access-control-allowed-origin                             | CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                |
+| TRACIM_DEFAULT_ANONYMIZED_USER_DISPLAY_NAME                               | default_anonymized_user_display_name                           | DEFAULT_ANONYMIZED_USER_DISPLAY_NAME                               |
+| TRACIM_USER__AUTH_TOKEN__VALIDITY                                         | user.auth_token.validity                                       | USER__AUTH_TOKEN__VALIDITY                                         |
+| TRACIM_USER__RESET_PASSWORD__VALIDITY                                     | user.reset_password.validity                                   | USER__RESET_PASSWORD__VALIDITY                                     |
+| TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME                               | user.reset_password.token_lifetime                             | USER__RESET_PASSWORD__TOKEN_LIFETIME                               |
+| TRACIM_USER__DEFAULT_PROFILE                                              | user.default_profile                                           | USER__DEFAULT_PROFILE                                              |
+| TRACIM_KNOWN_MEMBERS__FILTER                                              | known_members.filter                                           | KNOWN_MEMBERS__FILTER                                              |
+| TRACIM_DEBUG                                                              | debug                                                          | DEBUG                                                              |
+| TRACIM_BUILD_VERSION                                                      | build_version                                                  | BUILD_VERSION                                                      |
+| TRACIM_PREVIEW__JPG__RESTRICTED_DIMS                                      | preview.jpg.restricted_dims                                    | PREVIEW__JPG__RESTRICTED_DIMS                                      |
+| TRACIM_PREVIEW__JPG__ALLOWED_DIMS                                         | preview.jpg.allowed_dims                                       | PREVIEW__JPG__ALLOWED_DIMS                                         |
+| TRACIM_FRONTEND__SERVE                                                    | frontend.serve                                                 | FRONTEND__SERVE                                                    |
+| TRACIM_FRONTEND__CACHE_TOKEN                                              | frontend.cache_token                                           | FRONTEND__CACHE_TOKEN                                              |
+| TRACIM_BACKEND__I18N_FOLDER_PATH                                          | backend.i18n_folder_path                                       | BACKEND__I18N_FOLDER_PATH                                          |
+| TRACIM_FRONTEND__DIST_FOLDER_PATH                                         | frontend.dist_folder_path                                      | FRONTEND__DIST_FOLDER_PATH                                         |
+| TRACIM_PLUGIN__FOLDER_PATH                                                | plugin.folder_path                                             | PLUGIN__FOLDER_PATH                                                |
+| TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               | frontend.custom_toolbox_folder_path                            | FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               |
+| TRACIM_LIMITATION__SHAREDSPACE_PER_USER                                   | limitation.sharedspace_per_user                                | LIMITATION__SHAREDSPACE_PER_USER                                   |
+| TRACIM_LIMITATION__CONTENT_LENGTH_FILE_SIZE                               | limitation.content_length_file_size                            | LIMITATION__CONTENT_LENGTH_FILE_SIZE                               |
+| TRACIM_LIMITATION__WORKSPACE_SIZE                                         | limitation.workspace_size                                      | LIMITATION__WORKSPACE_SIZE                                         |
+| TRACIM_LIMITATION__USER_DEFAULT_ALLOWED_SPACE                             | limitation.user_default_allowed_space                          | LIMITATION__USER_DEFAULT_ALLOWED_SPACE                             |
+| TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         | email.notification.enabled_on_invitation                       | EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         |
+| TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL                                   | email.notification.from.email                                  | EMAIL__NOTIFICATION__FROM__EMAIL                                   |
+| TRACIM_EMAIL__NOTIFICATION__FROM                                          | email.notification.from                                        | EMAIL__NOTIFICATION__FROM                                          |
+| TRACIM_EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           | email.notification.from.default_label                          | EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           |
+| TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               | email.notification.reply_to.email                              | EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               |
+| TRACIM_EMAIL__NOTIFICATION__REFERENCES__EMAIL                             | email.notification.references.email                            | EMAIL__NOTIFICATION__REFERENCES__EMAIL                             |
+| TRACIM_EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML                | email.notification.content_update.template.html                | EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML                |
+| TRACIM_EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT                       | email.notification.content_update.subject                      | EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT                       |
+| TRACIM_EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML               | email.notification.created_account.template.html               | EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML               |
+| TRACIM_EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT                      | email.notification.created_account.subject                     | EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT                      |
+| TRACIM_EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML        | email.notification.reset_password_request.template.html        | EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML        |
+| TRACIM_EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT               | email.notification.reset_password_request.subject              | EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT               |
+| TRACIM_EMAIL__NOTIFICATION__ACTIVATED                                     | email.notification.activated                                   | EMAIL__NOTIFICATION__ACTIVATED                                     |
+| TRACIM_EMAIL__NOTIFICATION__SMTP__SERVER                                  | email.notification.smtp.server                                 | EMAIL__NOTIFICATION__SMTP__SERVER                                  |
+| TRACIM_EMAIL__NOTIFICATION__SMTP__PORT                                    | email.notification.smtp.port                                   | EMAIL__NOTIFICATION__SMTP__PORT                                    |
+| TRACIM_EMAIL__NOTIFICATION__SMTP__USER                                    | email.notification.smtp.user                                   | EMAIL__NOTIFICATION__SMTP__USER                                    |
+| TRACIM_EMAIL__NOTIFICATION__SMTP__PASSWORD                                | email.notification.smtp.password                               | EMAIL__NOTIFICATION__SMTP__PASSWORD                                |
+| TRACIM_EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL                        | email.notification.smtp.use_implicit_ssl                       | EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL                        |
+| TRACIM_EMAIL__REPLY__ACTIVATED                                            | email.reply.activated                                          | EMAIL__REPLY__ACTIVATED                                            |
+| TRACIM_EMAIL__REPLY__IMAP__SERVER                                         | email.reply.imap.server                                        | EMAIL__REPLY__IMAP__SERVER                                         |
+| TRACIM_EMAIL__REPLY__IMAP__PORT                                           | email.reply.imap.port                                          | EMAIL__REPLY__IMAP__PORT                                           |
+| TRACIM_EMAIL__REPLY__IMAP__USER                                           | email.reply.imap.user                                          | EMAIL__REPLY__IMAP__USER                                           |
+| TRACIM_EMAIL__REPLY__IMAP__PASSWORD                                       | email.reply.imap.password                                      | EMAIL__REPLY__IMAP__PASSWORD                                       |
+| TRACIM_EMAIL__REPLY__IMAP__FOLDER                                         | email.reply.imap.folder                                        | EMAIL__REPLY__IMAP__FOLDER                                         |
+| TRACIM_EMAIL__REPLY__CHECK__HEARTBEAT                                     | email.reply.check.heartbeat                                    | EMAIL__REPLY__CHECK__HEARTBEAT                                     |
+| TRACIM_EMAIL__REPLY__IMAP__USE_SSL                                        | email.reply.imap.use_ssl                                       | EMAIL__REPLY__IMAP__USE_SSL                                        |
+| TRACIM_EMAIL__REPLY__IMAP__USE_IDLE                                       | email.reply.imap.use_idle                                      | EMAIL__REPLY__IMAP__USE_IDLE                                       |
+| TRACIM_EMAIL__REPLY__CONNECTION__MAX_LIFETIME                             | email.reply.connection.max_lifetime                            | EMAIL__REPLY__CONNECTION__MAX_LIFETIME                             |
+| TRACIM_EMAIL__REPLY__USE_HTML_PARSING                                     | email.reply.use_html_parsing                                   | EMAIL__REPLY__USE_HTML_PARSING                                     |
+| TRACIM_EMAIL__REPLY__USE_TXT_PARSING                                      | email.reply.use_txt_parsing                                    | EMAIL__REPLY__USE_TXT_PARSING                                      |
+| TRACIM_EMAIL__REPLY__LOCKFILE_PATH                                        | email.reply.lockfile_path                                      | EMAIL__REPLY__LOCKFILE_PATH                                        |
+| TRACIM_JOBS__PROCESSING_MODE                                              | jobs.processing_mode                                           | JOBS__PROCESSING_MODE                                              |
+| TRACIM_JOBS__ASYNC__REDIS__HOST                                           | jobs.async.redis.host                                          | JOBS__ASYNC__REDIS__HOST                                           |
+| TRACIM_JOBS__ASYNC__REDIS__PORT                                           | jobs.async.redis.port                                          | JOBS__ASYNC__REDIS__PORT                                           |
+| TRACIM_JOBS__ASYNC__REDIS__DB                                             | jobs.async.redis.db                                            | JOBS__ASYNC__REDIS__DB                                             |
+| TRACIM_NEW_USER__INVITATION__DO_NOTIFY                                    | new_user.invitation.do_notify                                  | NEW_USER__INVITATION__DO_NOTIFY                                    |
+| TRACIM_NEW_USER__INVITATION__MINIMAL_PROFILE                              | new_user.invitation.minimal_profile                            | NEW_USER__INVITATION__MINIMAL_PROFILE                              |
+| TRACIM_LDAP_URL                                                           | ldap_url                                                       | LDAP_URL                                                           |
+| TRACIM_LDAP_BASE_URL                                                      | ldap_base_url                                                  | LDAP_BASE_URL                                                      |
+| TRACIM_LDAP_BIND_DN                                                       | ldap_bind_dn                                                   | LDAP_BIND_DN                                                       |
+| TRACIM_LDAP_BIND_PASS                                                     | ldap_bind_pass                                                 | LDAP_BIND_PASS                                                     |
+| TRACIM_LDAP_TLS                                                           | ldap_tls                                                       | LDAP_TLS                                                           |
+| TRACIM_LDAP_USER_BASE_DN                                                  | ldap_user_base_dn                                              | LDAP_USER_BASE_DN                                                  |
+| TRACIM_LDAP_LOGIN_ATTRIBUTE                                               | ldap_login_attribute                                           | LDAP_LOGIN_ATTRIBUTE                                               |
+| TRACIM_LDAP_NAME_ATTRIBUTE                                                | ldap_name_attribute                                            | LDAP_NAME_ATTRIBUTE                                                |
+| TRACIM_WEBDAV__UI__ENABLED                                                | webdav.ui.enabled                                              | WEBDAV__UI__ENABLED                                                |
+| TRACIM_WEBDAV__BASE_URL                                                   | webdav.base_url                                                | WEBDAV__BASE_URL                                                   |
+| TRACIM_WEBDAV__VERBOSE__LEVEL                                             | webdav.verbose.level                                           | WEBDAV__VERBOSE__LEVEL                                             |
+| TRACIM_WEBDAV__ROOT_PATH                                                  | webdav.root_path                                               | WEBDAV__ROOT_PATH                                                  |
+| TRACIM_WEBDAV__BLOCK_SIZE                                                 | webdav.block_size                                              | WEBDAV__BLOCK_SIZE                                                 |
+| TRACIM_WEBDAV__DIR_BROWSER__ENABLED                                       | webdav.dir_browser.enabled                                     | WEBDAV__DIR_BROWSER__ENABLED                                       |
+| TRACIM_WEBDAV__DIR_BROWSER__FOOTER                                        | webdav.dir_browser.footer                                      | WEBDAV__DIR_BROWSER__FOOTER                                        |
+| TRACIM_SEARCH__ENGINE                                                     | search.engine                                                  | SEARCH__ENGINE                                                     |
+| TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS                                 | search.elasticsearch.index_alias                               | SEARCH__ELASTICSEARCH__INDEX_ALIAS                                 |
+| TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE                      | search.elasticsearch.index_pattern_template                    | SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE                      |
+| TRACIM_SEARCH__ELASTICSEARCH__USE_INGEST                                  | search.elasticsearch.use_ingest                                | SEARCH__ELASTICSEARCH__USE_INGEST                                  |
+| TRACIM_SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST                  | search.elasticsearch.ingest.mimetype_whitelist                 | SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST                  |
+| TRACIM_SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST                  | search.elasticsearch.ingest.mimetype_blacklist                 | SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST                  |
+| TRACIM_SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT                          | search.elasticsearch.ingest.size_limit                         | SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT                          |
+| TRACIM_SEARCH__ELASTICSEARCH__HOST                                        | search.elasticsearch.host                                      | SEARCH__ELASTICSEARCH__HOST                                        |
+| TRACIM_SEARCH__ELASTICSEARCH__PORT                                        | search.elasticsearch.port                                      | SEARCH__ELASTICSEARCH__PORT                                        |
+| TRACIM_SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT                             | search.elasticsearch.request_timeout                           | SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT                             |
+| TRACIM_CALDAV__RADICALE_PROXY__BASE_URL                                   | caldav.radicale_proxy.base_url                                 | CALDAV__RADICALE_PROXY__BASE_URL                                   |
+| TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       | caldav.radicale.storage.filesystem_folder                      | CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           | collaborative_document_edition.software                        | COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                | collaborative_document_edition.collabora.base_url              | COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  | collaborative_document_edition.file_template_dir               | COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  |
+| TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     | email.notification.share_content_to_receiver.template.html     | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     |
+| TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            | email.notification.share_content_to_receiver.subject           | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            |
+| TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      | email.notification.share_content_to_emitter.template.html      | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      |
+| TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT             | email.notification.share_content_to_emitter.subject            | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__SUBJECT             |
+| TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML | email.notification.upload_permission_to_receiver.template.html | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML |
+| TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT        | email.notification.upload_permission_to_receiver.subject       | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT        |
+| TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML  | email.notification.upload_permission_to_emitter.template.html  | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML  |
+| TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         | email.notification.upload_permission_to_emitter.subject        | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         |
+| TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              | email.notification.new_upload_event.template.html              | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              |
+| TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     | email.notification.new_upload_event.subject                    | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     |
 
 ### Parameters Only Working in the Configuration File
 
@@ -172,7 +173,7 @@ With this configuration, CORS can work with 2 different servers with 2 different
 This may be needed if the frontend and the backend are on different domains.
 You can add as many servers as you want, separated by ','.
 
-     cors.access-control-allowed-origin = http://mysuperservername.ndd:6543,http://myotherservername.ndd:8090
+     cors.access-control-allowed-origin = http://mysuperservername.ndd:7999,http://myotherservername.ndd:8090
 
 ## Authentication in Tracim
 
@@ -183,7 +184,7 @@ Tracim comes with several authentication methods:
 - Special authentifications mechanisms like Api-Key
 - REMOTE AUTH, like Apache Auth, later explained in the documentation.
 
-You can chose valid auth_source and order them by priority with `auth_types` paramaters in the INI configuration file.
+You can chose valid auth_source and order them by priority with `auth_types` parameters in the INI configuration file.
 
 For instance:
 
@@ -191,6 +192,63 @@ For instance:
 - `auth_types = internal,ldap`
 
 The last one will check the internal user database first. Then, if the auth fails, it will also try to authenticate the user using LDAP.
+
+The authentication is done with a login, which is either the user's email address or the username. For authentication methods which don't provide a way to distinguish between the two, a login with "@" will be considered as an email address and a login without as a username.
+
+:warning: If you use LDAP or the Remote Auth method, the automatic creation of a username-only user (without "@") can fail if:
+`email.required=True`, which means every user should have an email address set. To solve this case, either:
+- set `email.required` to `False`, or
+- create the user with both an username and an email address and then authenticate using the LDAP/Remote Auth.
+
+### Tracim session storage
+Tracim uses a session by user, which work with cookie
+This session store:
+
+- the id of the user
+- the session creation datetime
+- the last-access to session datetime.
+
+Sessions are implemented with [Beaker](https://beaker.readthedocs.io/en/latest/configuration.html) and can be stored in several back-ends: files (the default), redis, mongodb, memcached, sql databases…
+Tracim is actively used and tested with 2 session back-ends: files and redis.
+
+The recommended session back-end for production is redis as it avoids having to manage deletion of expired session files. If you choose to use the file back-end please read the "File back-end upkeep" section below.```
+
+#### Configuration
+
+A relevant configuration for file backend (default):
+
+    # note: basic_setup.sessions_data_root_dir parameter should exist and be a real path
+    session.type = file
+    session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
+
+A relevant configuration for redis backend:
+
+    session.type = ext:redis
+    session.url = redis://localhost:6379/0
+
+Generic configuration (needed for all backend):
+
+    # note: basic_setup.sessions_data_root_dir parameter should exist and be a real path
+    session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
+    session.key = session_key
+    session.secret = %(basic_setup.session_secret)s
+    session.save_accessed_time = True
+    session.cookie_expires = 604800
+    session.timeout = 604800
+    session.cookie_on_exception = True
+
+for other beaker backends, read [beaker documentation](https://beaker.readthedocs.io/en/latest/configuration.html) for more information.
+
+#### File back-end upkeep
+
+When this back-end is used, the session's file are [not deleted automatically](https://beaker.readthedocs.io/en/latest/sessions.html#removing-expired-old-sessions).
+ To avoid keeping expired session files you should run :
+
+    find . -type f -mtime +10 -print -exec rm {} \;
+
+regularly (for example by using a cron job), which will delete file which have not been modified since 10 days.
+You should use this command in both session data and session lock dirs.
+
 
 ### LDAP Authentication
 
@@ -232,14 +290,14 @@ This allow user with the key to act as anyone and to do anything possible with t
 It relies on 2 HTTP headers:
 
 - `Tracim-Api-Key` : Tracim api key, as marked in config in `api.key`
-- `Tracim-Api-Login` : User email login, in order to act as the user given
+- `Tracim-Api-Login` : User's login (either an email or a username), in order to act as the given user
 
 If `api.key` is empty, the API key authentication will be disabled.
 
 ### Remote Auth Authentification (eg apache authentication)
 
 It is possible to connect to Tracim using remote authentification (e.g. the Apache authentication method).
-The idea is that the webserver authenticates user and then pass the email of the authenticated user trhough uWSGI environment variables or an HTTP header.
+The idea is that the webserver authenticates the user and then pass the login of the authenticated user through uWSGI environment variables or an HTTP header.
 
 :heavy_exclamation_mark: When logging in Tracim, if a valid remote user doesn't
 exist in Tracim, it will be created as a standard user.
@@ -266,7 +324,7 @@ In the Tracim INI configuration file:
    remote_user_header = HTTP_X_REMOTE_USER
 `
 
-apache_virtualhost (Tracim should be listening on port 6543):
+apache_virtualhost (Tracim should be listening on port 6543, pushpin on 7999):
 
 
 ```
@@ -287,6 +345,9 @@ Listen 6544
     # RequestHeader set X-Remote-User %{REMOTE_USER}s
 
     ProxyPreserveHost On
+    ProxyPassMatch /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
+    ProxyPassReverse /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
+
     ProxyPass / http://127.0.0.1:6543/
     ProxyPassReverse / http://127.0.0.1:6543/
 </VirtualHost>
@@ -304,7 +365,7 @@ to enable mail notification, smallest config is this:
     # references header of mail, similar to mail, used to have threaded mail
     # but do not need to be a valid email address
     email.notification.references.email = test_user+{content_id}@supersmtpserver.ndd
-    email.processing_mode = async
+    jobs.processing_mode = sync
     email.notification.smtp.server = supersmtpserver.ndd
     email.notification.smtp.port = 1025
     email.notification.smtp.user = test_user
@@ -336,12 +397,12 @@ However, if you rely mostly on external authentication, disabling it is better.
 
 Configure how to handle invitation of non-existent users in Tracim with these parameters:
 
-| email.notification.activated | new_user.invitation.do_notify | behaviour                                                |
-|------------------------------|---------------------------------|----------------------------------------------------------|
-| True                         | True                            | create **account with autogenerated password** send by **email**. |
-| True                         | False                           | create **account without password** and do not send email
-| False                        | True                            | **account invitation disabled**
-| False                        | False                           | create **account without password** and do not send email
+| email.notification.activated | new_user.invitation.do_notify | behaviour                                                         |
+|------------------------------|-------------------------------|-------------------------------------------------------------------|
+| True                         | True                          | create **account with autogenerated password** send by **email**. |
+| True                         | False                         | create **account without password** and do not send email         |
+| False                        | True                          | **account invitation disabled**                                   |
+| False                        | False                         | create **account without password** and do not send email         |
 
 ## Enabling the Reply by Email Feature ##
 

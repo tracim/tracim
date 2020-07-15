@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import appFactory from '../../appFactory.js'
-import { findUserRoleIdInWorkspace } from '../../helper.js'
+import appFactory from '../../util/appFactory.js'
+import { findUserRoleIdInWorkspace } from '../../util/helper.js'
 import { ROLE_LIST, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 export class OpenShareFolderApp extends React.Component {
@@ -43,10 +43,10 @@ export class OpenShareFolderApp extends React.Component {
       renderAppFeature(
         shareConfig,
         user,
-        findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE_LIST),
+        findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST),
         contentToOpen
       )
-      this.props.updateAppOpenedType(contentToOpen.type)
+      this.props.onUpdateAppOpenedType(contentToOpen.type)
     }
   }
 
@@ -61,7 +61,7 @@ export class OpenShareFolderApp extends React.Component {
     console.log('%c<OpenShareFolderApp> did Update', 'color: #dcae84', this.props)
 
     if (props.match && prevProps.match && props.match.params.idws !== prevProps.match.params.idws) {
-      props.updateAppOpenedType(false)
+      props.onUpdateAppOpenedType(false)
       props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
     }
 

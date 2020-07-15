@@ -1,7 +1,7 @@
 The Tracim Backend
 ==================
 
-Backend source code of Tracim v2, using Pyramid Framework.
+Backend source code of Tracim, using Pyramid Framework.
 
 Installation
 ---------------
@@ -37,6 +37,13 @@ For better preview support:
     sudo apt install libreoffice # most office documents file and text format
     sudo apt install inkscape # for .svg files.
 
+#### Supported database engines
+
+- SQLite 3.9+
+- PostgreSQL 9.3+
+- MySQL 8.0.1+
+- MariaDB 10.3+
+
 ### Get the Source ###
 
 get source from github:
@@ -69,8 +76,8 @@ Install the project in editable mode with its develop requirements:
 
     pip install -e ".[dev]"
 
-If you want to use PostgreSQL(9.3+), MySQL(8.0.1+) or MariaDB(10.3+) database engine instead of
-the default one (SQLite bundle with python), you need to install python driver for those databases
+If you want to use PostgreSQL, MySQL or MariaDB database engine instead of
+the default one (SQLite bundled with python), you need to install the python driver for those databases
 that are supported by SQLAlchemy.
 
 For PostgreSQL and MariaDB/MySQL, those are shortcuts to install Tracim with test and
@@ -163,9 +170,11 @@ You can also preset uWSGI config for Tracim by creating this kind of .ini file:
     chdir = <PATH>/tracim/backend/
     module = wsgi.web:application
     home = <PATH>/tracim/backend/env/
+    workers = 4
+    threads = 4
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-And for WebDAV:
+For WebDAV:
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
@@ -173,9 +182,10 @@ And for WebDAV:
     chdir = <PATH>/tracim/backend/
     module = wsgi.webdav:application
     home = <PATH>/tracim/backend/env/
+    threads = 8
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-And for CalDAV:
+For CalDAV:
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
@@ -183,6 +193,7 @@ And for CalDAV:
     chdir = <PATH>/tracim/backend/
     module = wsgi.caldav:application
     home = <PATH>/tracim/backend/env/
+    threads = 8
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
 You can then run the process this way:
@@ -202,7 +213,7 @@ in` development.ini.sample`
 :warning: By default, python warning are disabled. To enable warning please set
 `PYTHONWARNINGS` env var, for example `export PYTHONWARNINGS=default` .
 
-Run the Tracim backend web API:
+Run the Tracim backend web API (doesn't include live messages):
 
     pserve development.ini
 
@@ -213,6 +224,7 @@ Run the WsgiDAV server:
 Run the CalDAV server:
 
     tracimcli caldav start
+
 
 Running Tracim Backend Daemon
 ---------------
@@ -231,6 +243,8 @@ daemons to work correctly.
     python3 daemons/mail_notifier.py &
     # email fetcher (if email reply is enabled)
     python3 daemons/mail_fetcher.py &
+    # RQ worker for live messages
+    rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event &
 
 #### Stop Daemons
 
@@ -238,6 +252,8 @@ daemons to work correctly.
     killall python3 daemons/mail_notifier.py
     # email fetcher
     killall python3 daemons/mail_fetcher.py
+    # RQ worker
+    killall rq
 
 ### Using Supervisor
 
@@ -252,7 +268,7 @@ Example of `supervisord.conf`:
     [supervisord]
     ; You need to replace <PATH> with correct absolute path
 
-    ; email notifier (if async email notification is enabled)
+    ; email notifier (if async jobs processing is enabled)
     [program:tracim_mail_notifier]
     directory=<PATH>/tracim/backend/
     command=<PATH>/tracim/backend/env/bin/python <PATH>/tracim/backend/daemons/mail_notifier.py
@@ -272,13 +288,37 @@ Example of `supervisord.conf`:
     autorestart=true
     environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
+    ; RQ worker (if async jobs processing is enabled)
+    [program:rq_database_worker]
+    directory=<PATH>/tracim/backend/
+    command=rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event
+    stdout_logfile =/tmp/rq_database_worker.log
+    redirect_stderr=true
+    autostart=true
+    autorestart=true
+    environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
+
 Run with (supervisord.conf should be provided, see [supervisord.conf default_paths](http://supervisord.org/configuration.html):
 
     supervisord
 
+
+Running Pushpin Service
+---------------
+
+For a working Tracim instance, you need to setup pushpin as proxy for tracim web service.
+
+See [main readme](../README.md)  section _Install and run pushpin for UI updates_
+
 ## Run Tests and Others Checks ##
 
 ### Run Tests ###
+
+Some functional tests need additional daemons that are run through docker:
+
+```shell
+sudo apt install docker.io docker-compose
+```
 
 Some directories are required to make tests functional, you can create them and do some other check
 with this script:
@@ -316,7 +356,11 @@ Run your project's tests:
 
     pytest
 
-### Lints and Others Checks ###
+### Linting and Other Checks ###
+
+Install the required versions:
+
+    pip install -r requirements-static-tests.txt
 
 Run mypy checks:
 
@@ -357,16 +401,16 @@ Order of usage is (from less to more important, last is used if set):
 The Tracim API
 ----------
 
-Tracim_backend gives access to a REST API in */api/v2*.
+Tracim_backend gives access to a REST API in */api*.
 This API is auto-documented with [Hapic](https://github.com/algoo/hapic).
-The specification is accessible when you run Tracim, go to */api/v2/doc* .
+The specification is accessible when you run Tracim, go to */api/doc* .
 
 For example, with the default configuration:
 
     # run Tracim
     pserve development.ini
     # launch your favorite web-browser
-    firefox http://localhost:6543/api/v2/doc/
+    firefox http://localhost:6543/api/doc/
 
 ## Roles, Profile and Access Rights
 

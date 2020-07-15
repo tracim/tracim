@@ -21,7 +21,7 @@ describe('<CardBody />', () => {
       expect(wrapper.find(`div.card-body > div.${props.formClass}`).length).to.equal(1)
     )
 
-    it(`should contains the children`, () =>
+    it('should contains the children', () =>
       expect(wrapper.find(`div.card-body > div.${props.formClass}`).children()).to.contains(Children)
     )
   })

@@ -15,13 +15,13 @@ requires = [
     'zope.sqlalchemy',
     'alembic',
     # API
-    'hapic[marshmallow]==0.77',
+    'hapic[marshmallow]>=0.83',
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
     # in hapic, apispec-marshmallow-advanced==0.3
     # and hapic==0.73 aren't compatible
     'apispec-marshmallow-advanced>=0.4'
-    'apispec==1.1.0',
-    'marshmallow <3.0.0a1,>2.0.0',
+    'apispec==2.0.2',
+    'marshmallow <3.0.0a1,>=2.21.0',
     # CLI
     'cliff',
     # Webdav
@@ -68,19 +68,24 @@ requires = [
     # logging
     'colorlog',
     # plugin
-    'pluggy'
+    'pluggy',
+    # live message
+    'gripcontrol'
 ]
 
 tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
     'pytest',
     'pytest-dotenv',
+    'pytest-pyramid-server',
+    'pytest-services',
     'responses',
     'mock',
     'Pillow',
     # INFO - G.M - 2020-01-14 - static version of freezeguh due to regression
     # with webtest, see https://github.com/spulec/freezegun/issues/326
     'freezegun==0.3.12',
+    'sseclient-py',
 ]
 
 devtools_require=[
@@ -141,6 +146,7 @@ setup(
             'search index-drop = tracim_backend.command.search:SearchIndexDeleteCommand',
             'dev parameters list = tracim_backend.command.devtools:ParametersListCommand',
             'dev parameters value = tracim_backend.command.devtools:ParametersValueCommand',
+            'dev test live-messages = tracim_backend.command.devtools:LiveMessageTesterCommand',
             'user delete = tracim_backend.command.cleanup:DeleteUserCommand',
             'user anonymize = tracim_backend.command.cleanup:AnonymizeUserCommand',
         ]

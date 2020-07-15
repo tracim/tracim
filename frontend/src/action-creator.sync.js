@@ -3,10 +3,12 @@ export const UPDATE = 'Update' // edit data from api
 export const TOGGLE = 'Toggle'
 export const ADD = 'Add'
 export const REMOVE = 'Remove'
+export const RESTORE = 'Restore'
 export const PREPEND = 'Prepend'
 export const APPEND = 'Append'
 export const RESET = 'Reset'
 export const MOVE = 'Move'
+export const USERNAME_AVAILABILITY = 'username_availability'
 
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
@@ -35,13 +37,13 @@ export const setUserLang = lang => ({ type: `${SET}/${USER}/Lang`, lang })
 export const USER_KNOWN_MEMBER = `${USER}/KnownMember`
 export const USER_KNOWN_MEMBER_LIST = `${USER_KNOWN_MEMBER}/List`
 
-export const USER_NAME = `${USER}/PublicName`
-export const updateUserName = newName => ({ type: `${UPDATE}/${USER_NAME}`, newName })
+export const updateUser = newUser => ({ type: `${UPDATE}/${USER}`, newUser })
+export const USER_PUBLIC_NAME = `${USER}/PublicName`
+export const USER_USERNAME = `${USER}/Username`
 export const USER_EMAIL = `${USER}/Email`
-export const updateUserEmail = newEmail => ({ type: `${UPDATE}/${USER_EMAIL}`, newEmail })
 export const USER_PASSWORD = `${USER}/Password`
-export const updateUserAgendaUrl = newAgendaUrl => ({ type: `${SET}/${USER_AGENDA_URL}`, newAgendaUrl })
 export const USER_AGENDA_URL = `${USER}/Agenda`
+export const updateUserAgendaUrl = newAgendaUrl => ({ type: `${SET}/${USER_AGENDA_URL}`, newAgendaUrl })
 
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
@@ -50,10 +52,14 @@ export const SHARE_FOLDER = 'SHARE_FOLDER'
 export const WORKSPACE_CONTENT_SHARE_FOLDER = `${WORKSPACE_CONTENT}/${SHARE_FOLDER}`
 export const PATH = 'Path'
 export const WORKSPACE_CONTENT_PATH = `${WORKSPACE_CONTENT}/${PATH}`
-export const setWorkspaceContentList = (workspaceContentList, folderIdToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, folderIdToOpenList })
-export const setWorkspaceShareFolderContentList = (workspaceShareFolderContentList, folderIdToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, folderIdToOpenList })
-export const addWorkspaceContentList = workspaceContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT}`, workspaceContentList })
-export const addWorkspaceShareFolderContentList = workspaceShareFolderContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList })
+export const setWorkspaceContentList = (workspaceContentList, folderIdToOpenList, workspaceId) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, folderIdToOpenList, workspaceId })
+export const setWorkspaceShareFolderContentList = (workspaceShareFolderContentList, folderIdToOpenList, workspaceId) => ({ type: `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, folderIdToOpenList, workspaceId })
+
+export const addWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${ADD}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
+export const updateWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${UPDATE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
+export const deleteWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
+export const unDeleteWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${RESTORE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
+
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
@@ -74,6 +80,8 @@ export const moveWorkspaceContent = (source, destination) => ({ type: `${MOVE}/$
 
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
 export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
+export const addWorkspaceList = workspaceList => ({ type: `${ADD}/${WORKSPACE_LIST}`, workspaceList })
+export const removeWorkspace = workspace => ({ type: `${REMOVE}/${WORKSPACE_LIST}`, workspace })
 export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
 
 export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
@@ -84,13 +92,24 @@ export const setWorkspaceListMemberList = workspaceListMemberList => ({ type: `$
 // workspace related const bellow is for currentWorkspace
 export const WORKSPACE_DETAIL = `${WORKSPACE}/Detail`
 export const setWorkspaceDetail = workspaceDetail => ({ type: `${SET}/${WORKSPACE_DETAIL}`, workspaceDetail })
+export const updateWorkspaceDetail = workspaceDetail => ({ type: `${UPDATE}/${WORKSPACE_DETAIL}`, workspaceDetail })
 
 export const WORKSPACE_MEMBER = `${WORKSPACE}/Member`
 export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
 export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
 export const WORKSPACE_MEMBER_REMOVE = `${WORKSPACE_MEMBER}/${REMOVE}`
-export const removeWorkspaceMember = memberId => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId })
+export const addWorkspaceMember = (user, workspaceId, member) => ({
+  type: `${ADD}/${WORKSPACE_MEMBER}`,
+  newMember: { user: user, ...member },
+  workspaceId
+})
+export const updateWorkspaceMember = (user, workspaceId, member) => ({
+  type: `${UPDATE}/${WORKSPACE_MEMBER}`,
+  member: { user: user, ...member },
+  workspaceId
+})
+export const removeWorkspaceMember = (memberId, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId, workspaceId })
 
 export const WORKSPACE_RECENT_ACTIVITY = `${WORKSPACE}/RecentActivity/List`
 export const WORKSPACE_RECENT_ACTIVITY_LIST = `${WORKSPACE_RECENT_ACTIVITY}/List`
@@ -100,15 +119,19 @@ export const appendWorkspaceRecentActivityList = workspaceRecentActivityList => 
 export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
 export const setWorkspaceReadStatusList = workspaceReadStatusList => ({ type: `${SET}/${WORKSPACE_READ_STATUS_LIST}`, workspaceReadStatusList })
+export const addWorkspaceReadStatus = (content, workspaceId) => ({ type: `${ADD}/${WORKSPACE_READ_STATUS_LIST}`, content, workspaceId })
+export const removeWorkspaceReadStatus = (unreadContent, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_READ_STATUS}`, unreadContent, workspaceId })
 
 export const WORKSPACE_AGENDA_URL = `${WORKSPACE}/AgendaUrl`
 export const setWorkspaceAgendaUrl = agendaUrl => ({ type: `${SET}/${WORKSPACE_AGENDA_URL}`, agendaUrl })
 
 export const FOLDER = 'Folder'
 export const READ = 'Read'
-export const toggleFolderOpen = folderId => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, folderId })
+export const toggleFolderOpen = (folderId, workspaceId) => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, folderId, workspaceId })
 export const FOLDER_READ = `${FOLDER}/${READ}`
 export const setWorkspaceContentRead = folderId => ({ type: `${SET}/${FOLDER_READ}`, folderId })
+export const setWorkspaceFolderContentList = (workspaceId, folderId, contentList) =>
+  ({ type: `${SET}/${WORKSPACE}/${FOLDER}/${CONTENT}`, workspaceId, folderId, contentList })
 
 export const APP = 'App'
 export const APP_FEATURE = `${APP}Feature`
@@ -141,3 +164,8 @@ export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
 export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
 export const SEARCH_CURRENT_PAGE = 'SearchCurrentPage'
 export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEARCH_CURRENT_PAGE}`, currentNumberPage })
+
+export const TLM_MANAGER = 'TracimLiveMessageManager'
+export const setLiveMessageManager = TLMManager => ({ type: `${SET}/${TLM_MANAGER}`, TLMManager })
+export const TLM_MANAGER_STATUS = 'TracimLiveMessageManagerStatus'
+export const setLiveMessageManagerStatus = status => ({ type: `${SET}/${TLM_MANAGER_STATUS}`, status })

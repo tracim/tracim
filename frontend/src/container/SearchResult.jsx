@@ -11,11 +11,12 @@ import {
   IconButton,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   PAGE
-} from '../helper.js'
+} from '../util/helper.js'
 import ContentItemSearch from '../component/ContentItemSearch.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
@@ -31,7 +32,7 @@ import { getSearchedKeywords } from '../action-creator.async.js'
 
 const qs = require('query-string')
 
-class SearchResult extends React.Component {
+export class SearchResult extends React.Component {
   constructor (props) {
     super(props)
     // FIXME - GB - 2019-06-26 - this state is needed to know if there are still any results not sent from the backend
@@ -40,7 +41,15 @@ class SearchResult extends React.Component {
       totalHits: 0
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+  }
+
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<Search> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+    this.setHeadTitle()
+    this.buildBreadcrumbs()
   }
 
   parseUrl () {
@@ -58,29 +67,15 @@ class SearchResult extends React.Component {
     return searchObject
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<Search> Custom event', 'color: #28a745', type, data)
-        this.setHeadTitle()
-        this.buildBreadcrumbs()
-        break
-    }
-  }
-
   componentDidMount () {
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.loadSearchUrl()
   }
 
-  componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
-  }
-
   componentDidUpdate (prevProps) {
-    let prevSearchedKeywords = qs.parse(prevProps.location.search).q
-    let currentSearchedKeywords = this.parseUrl().searchedKeywords
+    const prevSearchedKeywords = qs.parse(prevProps.location.search).q
+    const currentSearchedKeywords = this.parseUrl().searchedKeywords
 
     if (prevSearchedKeywords !== currentSearchedKeywords) {
       this.loadSearchUrl()
@@ -145,7 +140,7 @@ class SearchResult extends React.Component {
     let contentName = ''
 
     if (props.contentType.length > 1) {
-      contentName = content.content_type === props.contentType[1].slug ? content.filename : content.label
+      contentName = content.contentType === props.contentType[1].slug ? content.filename : content.label
     } else {
       props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
     }
@@ -184,11 +179,10 @@ class SearchResult extends React.Component {
     const { props } = this
     const { searchResult } = props
 
-    let subtitle
-    let numberResults = searchResult.resultsList.length
-    let text = numberResults === 1 ? props.t('best result for') : props.t('best results for')
+    const numberResults = searchResult.resultsList.length
+    const text = numberResults === 1 ? props.t('best result for') : props.t('best results for')
 
-    subtitle = `${numberResults} ${text} "${searchResult.searchedKeywords}"`
+    const subtitle = `${numberResults} ${text} "${searchResult.searchedKeywords}"`
 
     return subtitle
   }
@@ -230,21 +224,21 @@ class SearchResult extends React.Component {
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='searchResult'>
             <PageTitle
-              parentClass={'searchResult'}
-              title={currentNumberSearchResults === 1
+              parentClass='searchResult'
+              title={(currentNumberSearchResults === 1
                 ? props.t('Search result')
                 : props.t('Search results')
-              }
+              )}
               icon='search'
               subtitle={this.getSubtitle()}
               breadcrumbsList={props.breadcrumbs}
             />
 
             <PageContent parentClass='searchResult'>
-              <div className='folder__content' data-cy={'search__content'}>
-                {currentNumberSearchResults > 0 &&
+              <div className='folder__content' data-cy='search__content'>
+                {currentNumberSearchResults > 0 && (
                   <ContentItemHeader showSearchDetails />
-                }
+                )}
 
                 {currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
@@ -256,37 +250,39 @@ class SearchResult extends React.Component {
                   <ListItemWrapper
                     label={searchItem.label}
                     read
-                    contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.content_type) : null}
+                    contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
                     isLast={index === props.searchResult.resultsList.length - 1}
-                    key={searchItem.content_id}
+                    key={searchItem.contentId}
                   >
                     <ContentItemSearch
                       label={searchItem.label}
                       path={`${searchItem.workspace.label} > ${this.getPath(searchItem.parents)}${this.getContentName(searchItem)}`}
-                      lastModificationAuthor={searchItem.last_modifier.public_name}
-                      lastModificationTime={displayDistanceDate(searchItem.modified, this.props.user.lang)}
+                      lastModificationAuthor={searchItem.lastModifier.public_name}
+                      lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
                       lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
-                      fileExtension={searchItem.file_extension}
-                      faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.content_type)).faIcon : null}
+                      fileExtension={searchItem.fileExtension}
+                      faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
                       statusSlug={searchItem.status}
-                      contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.content_type) : null}
-                      urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspace_id, searchItem.content_type, searchItem.content_id)}`}
-                      key={searchItem.content_id}
+                      contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
+                      urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
+                      key={searchItem.contentId}
                     />
                   </ListItemWrapper>
                 ))}
               </div>
               <div className='searchResult__btnSeeMore'>
-                { this.hasMoreResults()
-                  ? <IconButton
-                    className='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                    onClick={this.handleClickSeeMore}
-                    icon='chevron-down'
-                    text={props.t('See more')}
-                  />
+                {(this.hasMoreResults()
+                  ? (
+                    <IconButton
+                      className='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                      onClick={this.handleClickSeeMore}
+                      icon='chevron-down'
+                      text={props.t('See more')}
+                    />
+                  )
                   : currentNumberSearchResults > props.searchResult.numberResultsByPage &&
                     props.t('No more results')
-                }
+                )}
               </div>
             </PageContent>
           </PageWrapper>
@@ -297,4 +293,4 @@ class SearchResult extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, searchResult, contentType, system, user }) => ({ breadcrumbs, searchResult, contentType, system, user })
-export default connect(mapStateToProps)(translate()(SearchResult))
+export default connect(mapStateToProps)(translate()(TracimComponent(SearchResult)))

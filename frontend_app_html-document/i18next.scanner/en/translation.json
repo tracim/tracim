@@ -3,7 +3,8 @@
   "Validate and create": "Validate and create",
   "Document's title": "Document's title",
   "New Document": "New Document",
-  "latest version :": "latest version :",
+  "latest version: {{versionNumber}}": "latest version: {{versionNumber}}",
+  "Version #{{versionNumber}}": "Version #{{versionNumber}}",
   "Write a document": "Write a document",
   "Text Documents": "Text Documents",
   "Edit": "Edit",
@@ -13,7 +14,7 @@
   "Restore": "Restore",
   "This content is deleted": "This content is deleted",
   "You have a pending draft": "You have a pending draft",
-  "resume writing": "resume writing",
+  "Resume writing": "Resume writing",
   "Error while saving new version": "Error while saving new version",
   "Text Document": "Text Document",
   "Text document": "Text document",
@@ -21,5 +22,7 @@
   "text documents": "text documents",
   "This content is deprecated": "This content is deprecated",
   "Timeline": "Timeline",
-  "New text document": "New text document"
+  "New text document": "New text document",
+  "You must change the status or restore this document before any change": "You must change the status or restore this document before any change",
+  "The content has been modified by {{author}}": "The content has been modified by {{author}}"
 }

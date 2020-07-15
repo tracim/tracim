@@ -13,7 +13,7 @@ export const ContentItemSearch = props => {
     <Link
       to={props.urlContent}
       className='content__item'
-      data-cy={'content__item'}
+      data-cy='content__item'
     >
       <div
         className='content__type'
@@ -26,28 +26,28 @@ export const ContentItemSearch = props => {
       <div
         className='content__name searchResultPage'
         title={props.label}
-        data-cy={'content__name'}
+        data-cy='content__name'
       >
-        { props.label }
-        { props.contentType.slug === 'file' && (
+        {props.label}
+        {props.contentType.slug === 'file' && (
           <Badge text={props.fileExtension} customClass='badgeBackgroundColor' />
         )}
       </div>
 
       <div className='content__path' title={props.path}>
-        { props.path }
+        {props.path}
       </div>
 
       <div className='content__lastModification' title={props.lastModificationFormated}>
         <Avatar
-          width={'40px'}
+          width='40px'
           style={{
             display: 'inline-block',
             marginRight: '10px'
           }}
           publicName={props.lastModificationAuthor}
         />
-        { props.lastModificationTime }
+        {props.lastModificationTime}
       </div>
 
       <div

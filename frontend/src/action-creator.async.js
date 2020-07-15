@@ -5,46 +5,48 @@ import {
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   history
-} from './helper.js'
-import i18n from './i18n.js'
+} from './util/helper.js'
+import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
 import {
-  USER_LOGIN,
-  USER_LOGOUT,
-  USER_REQUEST_PASSWORD,
-  USER_CONNECTED,
-  setRedirectLogin,
-  setUserDisconnected,
-  USER_KNOWN_MEMBER_LIST,
-  USER_NAME,
-  USER_EMAIL,
-  USER_PASSWORD,
-  USER_LANG,
-  WORKSPACE,
-  WORKSPACE_LIST,
-  WORKSPACE_DETAIL,
-  WORKSPACE_MEMBER_LIST,
-  WORKSPACE_MEMBER_ADD,
-  WORKSPACE_MEMBER_REMOVE,
+  APP_LIST,
+  CONFIG,
+  CONTENT,
+  CONTENT_TYPE_LIST,
   FOLDER,
   FOLDER_READ,
-  CONFIG,
-  APP_LIST,
-  CONTENT_TYPE_LIST,
+  newFlashMessage,
+  SEARCHED_KEYWORDS,
+  setRedirectLogin,
+  setUserDisconnected,
+  USER,
+  USER_CONNECTED,
+  USER_EMAIL,
+  USER_KNOWN_MEMBER_LIST,
+  USER_LANG,
+  USER_LOGIN,
+  USER_LOGOUT,
+  USER_PASSWORD,
+  USER_PUBLIC_NAME,
+  USER_REQUEST_PASSWORD,
+  USER_USERNAME,
+  USER_WORKSPACE_DO_NOTIFY,
+  USER_WORKSPACE_LIST,
+  USERNAME_AVAILABILITY,
+  WORKSPACE,
+  WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT_ARCHIVED,
   WORKSPACE_CONTENT_DELETED,
-  WORKSPACE_RECENT_ACTIVITY,
-  WORKSPACE_READ_STATUS,
-  WORKSPACE_CONTENT_SHARE_FOLDER,
-  USER_WORKSPACE_DO_NOTIFY,
-  USER,
-  USER_WORKSPACE_LIST,
-  CONTENT,
-  WORKSPACE_CONTENT_PATH,
-  newFlashMessage,
-  WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT_MOVE,
-  SEARCHED_KEYWORDS
+  WORKSPACE_CONTENT_PATH,
+  WORKSPACE_CONTENT_SHARE_FOLDER,
+  WORKSPACE_DETAIL,
+  WORKSPACE_LIST,
+  WORKSPACE_MEMBER_ADD,
+  WORKSPACE_MEMBER_LIST,
+  WORKSPACE_MEMBER_REMOVE,
+  WORKSPACE_READ_STATUS,
+  WORKSPACE_RECENT_ACTIVITY
 } from './action-creator.sync.js'
 import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
 
@@ -116,7 +118,7 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
   }
 }
 
-export const postUserLogin = (login, password, rememberMe) => async dispatch => {
+export const postUserLogin = (credentials, rememberMe) => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/auth/login`,
     param: {
@@ -124,8 +126,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
       headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
-        email: login,
-        password: password
+        ...credentials
         // remember_me: rememberMe
       })
     },
@@ -134,7 +135,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
   })
 }
 
-export const postForgotPassword = email => async dispatch => {
+export const postForgotPassword = login => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/request`,
     param: {
@@ -142,7 +143,7 @@ export const postForgotPassword = email => async dispatch => {
       headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
-        email: email
+        ...login
       })
     },
     actionName: USER_REQUEST_PASSWORD,
@@ -257,14 +258,14 @@ export const putMyselfName = (user, newName) => dispatch => {
         lang: user.lang
       })
     },
-    actionName: USER_NAME,
+    actionName: USER_PUBLIC_NAME,
     dispatch
   })
 }
 
-export const putUserName = (user, newName) => dispatch => {
+export const putUserPublicName = (user, newName) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}`,
     param: {
       credentials: 'include',
       headers: {
@@ -277,7 +278,41 @@ export const putUserName = (user, newName) => dispatch => {
         lang: user.lang
       })
     },
-    actionName: USER_NAME,
+    actionName: USER_PUBLIC_NAME,
+    dispatch
+  })
+}
+
+export const putUserUsername = (user, newUsername, checkPassword) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/username`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        username: newUsername,
+        loggedin_user_password: checkPassword
+      })
+    },
+    actionName: USER_USERNAME,
+    dispatch
+  })
+}
+
+export const getUsernameAvailability = (username) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/username-availability?username=${username}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USERNAME_AVAILABILITY,
     dispatch
   })
 }
@@ -303,7 +338,7 @@ export const putMyselfEmail = (newEmail, checkPassword) => dispatch => {
 
 export const putUserEmail = (user, newEmail, checkPassword) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/email`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/email`,
     param: {
       credentials: 'include',
       headers: {
@@ -340,9 +375,9 @@ export const putMyselfPassword = (oldPassword, newPassword, newPassword2) => dis
   })
 }
 
-export const putUserPassword = (user, oldPassword, newPassword, newPassword2) => dispatch => {
+export const putUserPassword = (userId, oldPassword, newPassword, newPassword2) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/password`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/password`,
     param: {
       credentials: 'include',
       headers: {
@@ -362,7 +397,7 @@ export const putUserPassword = (user, oldPassword, newPassword, newPassword2) =>
 
 export const putUserLang = (user, newLang) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}`,
     param: {
       credentials: 'include',
       headers: {
@@ -370,7 +405,7 @@ export const putUserLang = (user, newLang) => dispatch => {
       },
       method: 'PUT',
       body: JSON.stringify({
-        public_name: user.public_name,
+        public_name: user.publicName,
         timezone: user.timezone,
         lang: newLang
       })
@@ -412,7 +447,7 @@ export const putMyselfWorkspaceDoNotify = (workspaceId, doNotify) => dispatch =>
 
 export const putUserWorkspaceDoNotify = (user, workspaceId, doNotify) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
     param: {
       credentials: 'include',
       headers: {
@@ -440,7 +475,7 @@ export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
   })
 }
 
-export const getWorkspaceDetail = (user, workspaceId) => dispatch => {
+export const getWorkspaceDetail = (workspaceId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}`,
     param: {
@@ -470,10 +505,9 @@ export const getWorkspaceMemberList = (workspaceId, showDisabledUser = false) =>
   })
 }
 
-export const getContent = (workspaceId, contentId, contentType) => dispatch => {
+export const getContent = (workspaceId, contentId) => dispatch => {
   return fetchWrapper({
-    // @FIXME - Côme - 2018/11/06 - find better solution for the -s in string bellow
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents/${contentId}`,
     param: {
       credentials: 'include',
       headers: {
@@ -496,7 +530,7 @@ export const getFolderContentList = (workspaceId, folderIdList) => dispatch => {
       },
       method: 'GET'
     },
-    actionName: WORKSPACE,
+    actionName: FOLDER,
     dispatch
   })
 }
@@ -576,7 +610,7 @@ export const getMyselfWorkspaceReadStatusList = workspaceId => dispatch => {
   })
 }
 
-export const postWorkspaceMember = (user, workspaceId, newMember) => dispatch => {
+export const postWorkspaceMember = (workspaceId, newMember) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members`,
     param: {
@@ -588,7 +622,7 @@ export const postWorkspaceMember = (user, workspaceId, newMember) => dispatch =>
       body: JSON.stringify({
         user_id: newMember.id || null,
         user_email: newMember.email || null,
-        user_public_name: newMember.publicName || null,
+        user_username: newMember.username || null,
         role: newMember.role
       })
     },
@@ -597,7 +631,7 @@ export const postWorkspaceMember = (user, workspaceId, newMember) => dispatch =>
   })
 }
 
-export const deleteWorkspaceMember = (user, workspaceId, memberId) => dispatch => {
+export const deleteWorkspaceMember = (workspaceId, memberId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {

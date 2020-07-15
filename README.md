@@ -102,6 +102,31 @@ Alternatively, under root:
 
 You can add "-d" to build_full_frontend.sh to disable obfuscation and reduce build time.
 
+### Install and run pushpin for UI updates
+
+Tracim relies on [pushpin](https://pushpin.org/docs/about/) for UI updates, so you need to setup pushpin.
+
+#### For development purpose
+
+If you are in development environnement, the recommended way is to use docker,
+you should follow this documentation : [Live message setup for dev env](/backend/doc/live_message_setup.md)
+
+#### For production usage
+
+You should install pushpin, for example in debian/ubuntu:
+
+    sudo apt install pushpin
+
+and configure it to proxy tracim (by default tracim web run on port 6543):
+
+    echo "* localhost:6543" | sudo tee /etc/pushpin/routes
+
+and after this change you need to restart your pushpin service:
+
+    sudo systemctl restart pushpin
+
+more info about installation are available in [Backend README](backend/README.md).
+
 ### Run Tracim
 
 Tracim is composed of multiples services, some are web wsgi applications and others
@@ -138,12 +163,27 @@ You can run some Tracim daemons too if you want those features:
     # email fetcher (if email reply is enabled)
     python3 daemons/mail_fetcher.py &
 
-You can now head to
-[http://127.0.0.1:6543](http://127.0.0.1:6543) and login with the admin account:
+You can now head to (if pushpin is correctly configured and use default port 7999)
+[http://127.0.0.1:7999](http://127.0.0.1:7999) and login with the admin account:
 
  * user: `admin@admin.admin`
  * password: `admin@admin.admin`
 
+:warning: If this does not work, you can try to access [http://127.0.0.1:6543](http://127.0.0.1:6543). If it works, the issue is related to the configuration of pushpin.
+
+:warning: Using tracim without pushpin will mean no live message leading to unrefreshed frontend information.
+
+### Upkeep
+
+If you use default "file" storage for session, new session file will be created but not removed, which mean lot of unneeded file.
+To mitigate this, you could remove file older than 8 day with :
+
+    find . -type f -mtime +8 -print -exec rm {} \;
+
+You should use this command in both session data and session lock dirs.
+
+Another way to solve this issue is to set session to use another backend(we do support all beaker backend),
+see [session](/backend/doc/setting.md) documentation for more information.
 
 #### More documentation about running Tracim and Tracim services
 
@@ -157,7 +197,7 @@ and `Running Tracim Backend WSGI APP`.
 
 #### Installation of Cypress: Automated script for easy setup
 
-This script check if nodejs is installed (npm is necessary to install Cypress), if file package.json and cypress.json exist in 'functionnal_tests' folder. if not the script install necessary file and install Cypress and his dependency's.
+This script installs some system dependencies of Cypress and checks whether files package.json and cypress.json exist in 'functionnal_tests' folder. If not, the script installs the necessary files.
 
     ./setup_functionnal_tests.sh
 
@@ -166,11 +206,11 @@ Alternatively, under root:
 
     ./setup_functionnal_tests.sh root
 
-If you need to run Cypress with external server of Tracim, modify "baseurl" in cypress.json (for more details, see: https://docs.cypress.io/guides/references/configuration.html#Options ).
+If you need to run Cypress with an external server of Tracim, modify "baseurl" in cypress.json (for more details, see: https://docs.cypress.io/guides/references/configuration.html#Options ).
 
-#### Prerequisit for running Cypress tests
+#### Prerequisite for running Cypress tests
 
-⚠ To run Cypress tests, you need a running Tracim with a specific configuration:
+⚠ To run Cypress tests, you need to run Tracim with a specific configuration:
 
     cd backend/
     source env/bin/activate
@@ -180,26 +220,26 @@ If you need to run Cypress with external server of Tracim, modify "baseurl" in c
 
 You must change the apiUrl property in `frontend/configEnv.json` to:
 
-    http://localhost:1337/api/v2
+    http://localhost:1337/api
 
 Then rebuild the frontend:
 
     cd frontend/
-    npm run build
+    yarn run build
 
 #### Run tests from the command line ##
 
 To runs all the tests in the 'functionnal_tests/cypress/integration' folder:
 
     cd functionnal_tests/
-    npm run cypress-run
+    yarn run cypress-run
 
 #### Run tests with Cypress GUI ##
 
 You can watch the tests running directly from a (graphical) web interface:
 
     cd functionnal_tests/
-    npm run cypress-open
+    yarn run cypress-open
 
 ### Running frontend unit tests
 
@@ -224,7 +264,7 @@ To run all the unit tests:
 To run the unit tests of a specific frontend app or of frontend_lib:
 
     cd frontend_app_file # (or any frontend app)
-    npm run test
+    yarn run test
 
 Note: to retrieve all frontend apps, run this command:
 

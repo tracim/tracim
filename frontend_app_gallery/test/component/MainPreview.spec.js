@@ -6,11 +6,11 @@ import sinon from 'sinon'
 import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
 describe('<MainPreview />', () => {
-  const handleClickShowImageRaw = sinon.spy()
+  const onClickShowImageRaw = sinon.spy()
 
   const props = {
     rotationAngle: 0,
-    handleClickShowImageRaw
+    onClickShowImageRaw
   }
 
   // INFO - GM - 2020/04/15 - Use mount here because MainPreview is using refs
@@ -49,10 +49,10 @@ describe('<MainPreview />', () => {
   })
 
   describe('callback test', () => {
-    describe('handleClickShowImageRaw()', () => {
-      it('handleClickShowImageRaw() should be called when the image is clicked', () => {
+    describe('onClickShowImageRaw()', () => {
+      it('should be called when the image is clicked', () => {
         wrapper.find('.carousel__item__preview__content__image > img').simulate('click')
-        expect(handleClickShowImageRaw.called).to.be.true
+        expect(onClickShowImageRaw.called).to.be.true
       })
     })
   })

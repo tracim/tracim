@@ -15,13 +15,13 @@ describe('<PageWrapper />', () => {
     <PageWrapper
       {...props}
     >
-      <PageTitle title={'randomTitle'} />
+      <PageTitle title='randomTitle' />
       <PageContent />
     </PageWrapper>
   )
 
   describe('Static design', () => {
-    it(`should have its children`, () => {
+    it('should have its children', () => {
       expect(wrapper.find('.pageWrapperGeneric').find(PageTitle).length).equal(1)
       expect(wrapper.find('.pageWrapperGeneric').find(PageContent).length).equal(1)
     })

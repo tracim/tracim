@@ -2,8 +2,8 @@
 from datetime import datetime
 import typing
 
+from sqlalchemy import func
 from sqlalchemy.orm import Query
-from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend import app_list
@@ -26,6 +26,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
 
@@ -33,7 +34,7 @@ __author__ = "damien"
 class WorkspaceApi(object):
     def __init__(
         self,
-        session: Session,
+        session: TracimSession,
         current_user: typing.Optional[User],
         config: CFG,
         force_role: bool = False,
@@ -43,6 +44,7 @@ class WorkspaceApi(object):
         :param current_user: Current user of context
         :param force_role: If True, app role in queries even if admin
         """
+        session.assert_event_mecanism()
         self._session = session
         self._user = current_user
         self._config = config
@@ -72,6 +74,18 @@ class WorkspaceApi(object):
         )
         return query
 
+    def _user_allowed_to_create_new_workspaces(self, user: User) -> bool:
+        # INFO - G.M - 2019-08-21 - 0 mean no limit here
+        if self._config.LIMITATION__SHAREDSPACE_PER_USER == 0:
+            return True
+
+        owned_workspace_count = (
+            self._session.query(func.count(Workspace.workspace_id))
+            .filter(Workspace.owner_id == user.user_id)
+            .scalar()
+        )
+        return owned_workspace_count < self._config.LIMITATION__SHAREDSPACE_PER_USER
+
     def get_workspace_with_context(self, workspace: Workspace) -> WorkspaceInContext:
         """
         Return WorkspaceInContext object from Workspace
@@ -90,12 +104,7 @@ class WorkspaceApi(object):
         public_upload_enabled: bool = True,
         save_now: bool = False,
     ) -> Workspace:
-        # TODO - G.M - 2019-04-11 - Fix Circular Import issue between userApi
-        # and workspaceApi
-        from tracim_backend.lib.core.user import UserApi
-
-        uapi = UserApi(session=self._session, current_user=self._user, config=self._config)
-        if not uapi.allowed_to_create_new_workspaces(self._user):
+        if not self._user_allowed_to_create_new_workspaces(self._user):
             raise UserNotAllowedToCreateMoreWorkspace("User not allowed to create more workspace")
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
@@ -114,7 +123,7 @@ class WorkspaceApi(object):
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
 
         role = role_api.create_one(
-            self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=True
+            self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=True,
         )
 
         self._session.add(workspace)
@@ -274,7 +283,14 @@ class WorkspaceApi(object):
 
     def get_notifiable_roles(
         self, workspace: Workspace, force_notify: bool = False
-    ) -> [UserRoleInWorkspace]:
+    ) -> typing.List[UserRoleInWorkspace]:
+        """return workspace roles of given workspace which can be notified. Note that user without
+        email are excluded from return as user with no notification parameter (if force_notify is
+        False).
+
+        :param workspace: concerned workspace
+        :param force_notify: don't care about notification configuration of user
+        """
         roles = []
         for role in workspace.roles:
             if (
@@ -283,6 +299,7 @@ class WorkspaceApi(object):
                 and role.user.is_active
                 and not role.user.is_deleted
                 and role.user.auth_type != AuthType.UNKNOWN
+                and role.user.email
             ):
                 roles.append(role)
         return roles

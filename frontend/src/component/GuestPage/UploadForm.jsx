@@ -45,7 +45,7 @@ class UploadForm extends React.Component {
             invalidMsg={props.t('Full name is required')}
           />
 
-          {props.hasPassword &&
+          {props.hasPassword && (
             <div className='d-flex'>
               <InputGroupText
                 parentClassName='guestupload__card__form__groupepw'
@@ -71,7 +71,8 @@ class UploadForm extends React.Component {
                 placement='bottom'
                 isOpen={this.state.popoverPasswordInfoOpen}
                 target='popoverPasswordInfo'
-                toggle={this.handleTogglePopoverPasswordInfo}
+                // INFO - CH - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+                toggle={this.handleTogglePopoverPasswordInfo} // eslint-disable-line react/jsx-handler-names
                 trigger={isMobile ? 'focus' : 'hover'}
               >
                 <PopoverBody>
@@ -79,7 +80,7 @@ class UploadForm extends React.Component {
                 </PopoverBody>
               </Popover>
             </div>
-          }
+          )}
 
           <InputTextArea
             placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
@@ -103,7 +104,8 @@ class UploadForm extends React.Component {
             customTitle={props.t('Attached files')}
           />
 
-          <button type='button'
+          <button
+            type='button'
             className='guestupload__card__form__right__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
             onClick={props.onClickSend}
             disabled={this.sendButtonIsDisabled()}

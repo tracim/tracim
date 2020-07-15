@@ -13,7 +13,8 @@ import {
   CUSTOM_EVENT,
   checkEmailValidity,
   parserStringToList,
-  buildHeadTitle
+  buildHeadTitle,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -23,7 +24,7 @@ import {
   getContentTypeList
 } from '../action.async.js'
 
-class ShareFolderAdvanced extends React.Component {
+export class ShareFolderAdvanced extends React.Component {
   constructor (props) {
     super(props)
 
@@ -55,29 +56,36 @@ class ShareFolderAdvanced extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
+      { name: CUSTOM_EVENT.HIDE_APP(this.state.config.slug), handler: this.handleHideApp },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
+  // Custom Event Handlers
+  handleShowApp = data => {
     const { props, state } = this
+    console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
 
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-        console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), () => {})
-        this.setHeadTitle()
-        break
-      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
-        console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
-        break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
-        this.loadContentTypeList()
-        this.setHeadTitle()
-        break
-    }
+    props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), () => {})
+    this.setHeadTitle()
+  }
+
+  handleHideApp = data => {
+    const { props, state } = this
+    console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP(state.config.slug), data)
+
+    props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
+  }
+
+  handleAllAppChangeLanguage = data => {
+    const { props } = this
+    console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+
+    props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+    this.loadContentTypeList()
+    this.setHeadTitle()
   }
 
   componentDidMount () {
@@ -88,7 +96,6 @@ class ShareFolderAdvanced extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<ShareFolderAdvanced> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
@@ -174,7 +181,7 @@ class ShareFolderAdvanced extends React.Component {
     const { state, props } = this
 
     let uploadEmailList = parserStringToList(state.uploadEmails)
-    let invalidEmails = []
+    const invalidEmails = []
 
     uploadEmailList.forEach(uploadEmail => {
       if (!checkEmailValidity(uploadEmail)) invalidEmails.push(uploadEmail)
@@ -183,7 +190,7 @@ class ShareFolderAdvanced extends React.Component {
     uploadEmailList = uploadEmailList.filter(uploadEmail => !invalidEmails.includes(uploadEmail))
 
     if (invalidEmails.length > 0) {
-      this.sendGlobalFlashMessage(`${props.t(`Error, these emails are invalid: `)} ${invalidEmails.join(', ')}`)
+      this.sendGlobalFlashMessage(`${props.t('Error, these emails are invalid: ')} ${invalidEmails.join(', ')}`)
     } else {
       const fetchResultPostImportAuthorizations = await handleFetchResult(await postImportAuthorizationsList(
         state.config.apiUrl,
@@ -227,8 +234,8 @@ class ShareFolderAdvanced extends React.Component {
 
   handleKeyDownEnter = e => {
     if (e.key === 'Enter') {
-      let emailList = parserStringToList(this.state.uploadEmails)
-      let invalidEmails = []
+      const emailList = parserStringToList(this.state.uploadEmails)
+      const invalidEmails = []
 
       emailList.forEach(email => {
         if (!checkEmailValidity(email)) invalidEmails.push(email)
@@ -251,7 +258,7 @@ class ShareFolderAdvanced extends React.Component {
     return (
       <PopinFixed customClass='share_folder_advanced'>
         <PopinFixedHeader
-          customClass={'folderAdvanced'}
+          customClass='folderAdvanced'
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
           componentTitle={<div>{props.t('Received files')}</div>}
@@ -261,7 +268,7 @@ class ShareFolderAdvanced extends React.Component {
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
-          {state.currentPageStatus === this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
+          {(state.currentPageStatus === this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
             ? (
               <UploadFilesManagement
                 customColor={customColor}
@@ -284,11 +291,11 @@ class ShareFolderAdvanced extends React.Component {
                 emailNotifActivated={state.config.system.config.email_notification_activated}
               />
             )
-          }
+          )}
         </PopinFixedContent>
       </PopinFixed>
     )
   }
 }
 
-export default translate()(appContentFactory(ShareFolderAdvanced))
+export default translate()(appContentFactory(TracimComponent(ShareFolderAdvanced)))

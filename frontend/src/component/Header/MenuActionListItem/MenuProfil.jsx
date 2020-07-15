@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { PAGE } from '../../../helper.js'
+import { PAGE } from '../../../util/helper.js'
 import { translate } from 'react-i18next'
 import { Avatar } from 'tracim_frontend_lib'
 
@@ -20,16 +20,16 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__button'
         >
           <Avatar
-            width={'40px'}
+            width='40px'
             style={{
               display: 'inline-block',
               marginRight: '10px'
             }}
-            publicName={props.user.public_name}
+            publicName={props.user.publicName}
           />
 
           <div className='menuprofil__dropdown__name__text'>
-            {props.user.public_name}
+            {props.user.publicName}
           </div>
         </button>
 
@@ -43,7 +43,11 @@ export const MenuProfil = props => {
             {props.t('My Account')}
           </Link>
 
-          <div className='menuprofil__dropdown__setting__link primaryColorBgActive dropdown-item' onClick={props.onClickLogout}>
+          <div
+            className='menuprofil__dropdown__setting__link primaryColorBgActive dropdown-item'
+            onClick={props.onClickLogout}
+            data-cy='menuprofil__dropdown__logout__link'
+          >
             <i className='fa fa-fw fa-sign-out mr-2' />
             {props.t('Logout')}
           </div>

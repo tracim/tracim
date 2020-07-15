@@ -309,8 +309,12 @@ class CFG(object):
         """Parse configuration file and env variables"""
         self.log_config_header("Global config parameters:")
         self._load_global_config()
+        self.log_config_header("Live Messages Config parameters:")
+        self._load_live_messages_config()
         self.log_config_header("Limitation config parameters:")
         self._load_limitation_config()
+        self.log_config_header("Jobs config parameters:")
+        self._load_jobs_config()
         self.log_config_header("Email config parameters:")
         self._load_email_config()
         self.log_config_header("LDAP config parameters:")
@@ -342,8 +346,8 @@ class CFG(object):
         self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", default_sqlalchemy_url)
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        tracim_v2_folder = os.path.dirname(backend_folder)
-        default_color_config_file_path = os.path.join(tracim_v2_folder, "color.json")
+        tracim_folder = os.path.dirname(backend_folder)
+        default_color_config_file_path = os.path.join(tracim_folder, "color.json")
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
         )
@@ -362,15 +366,16 @@ class CFG(object):
         self.REMOTE_USER_HEADER = self.get_raw_config("remote_user_header", None)
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
-        self.SESSION__REISSUE_TIME = int(self.get_raw_config("session.reissue_time", "120"))
         default_session_data_dir = self.here_macro_replace("%(here)s/sessions_data")
-        default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_data")
+        default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_lock")
+        self.SESSION__TYPE = self.get_raw_config("session.type", "file")
+        self.SESSION__URL = self.get_raw_config("session.url")
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
 
         # base url of the frontend
-        self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "http://localhost:6543")
+        self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "http://localhost:7999")
 
         self.API__BASE_URL = self.get_raw_config("api.base_url", self.WEBSITE__BASE_URL)
 
@@ -386,7 +391,7 @@ class CFG(object):
             do_strip=True,
         )
         self.DEFAULT_ANONYMIZED_USER_DISPLAY_NAME = self.get_raw_config(
-            "default_anonymized_user_display_name", "Lost Meerkat"
+            "default_anonymized_user_display_name", "Deleted user"
         )
 
         self.USER__AUTH_TOKEN__VALIDITY = int(
@@ -428,9 +433,9 @@ class CFG(object):
         self.FRONTEND__SERVE = asbool(self.get_raw_config("frontend.serve", "True"))
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
         # is probably in frontend subfolder
-        # of tracim_v2 parent of both backend and frontend
+        # of tracim parent of both backend and frontend
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        tracim_v2_folder = os.path.dirname(backend_folder)
+        tracim_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")
 
         self.FRONTEND__CACHE_TOKEN = self.get_raw_config(
@@ -441,7 +446,7 @@ class CFG(object):
             "backend.i18n_folder_path", backend_i18n_folder
         )
 
-        frontend_dist_folder = os.path.join(tracim_v2_folder, "frontend", "dist")
+        frontend_dist_folder = os.path.join(tracim_folder, "frontend", "dist")
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
@@ -452,6 +457,11 @@ class CFG(object):
 
         self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
             "frontend.custom_toolbox_folder_path", None
+        )
+
+    def _load_live_messages_config(self) -> None:
+        self.LIVE_MESSAGES__CONTROL_URI = self.get_raw_config(
+            "live_messages.control_uri", "http://localhost:5561"
         )
 
     def _load_limitation_config(self) -> None:
@@ -548,7 +558,6 @@ class CFG(object):
 
         # TODO - G.M - 2019-01-22 - add feature to process notification email
         # asynchronously see issue https://github.com/tracim/tracim/issues/1345
-        self.EMAIL__NOTIFICATION__PROCESSING_MODE = "sync"
         self.EMAIL__NOTIFICATION__ACTIVATED = asbool(
             self.get_raw_config("email.notification.activated", "False")
         )
@@ -595,12 +604,6 @@ class CFG(object):
         self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config(
             "email.reply.lockfile_path", self.here_macro_replace("%(here)s/email_fetcher.lock")
         )
-
-        self.EMAIL__PROCESSING_MODE = self.get_raw_config("email.processing_mode", "sync").upper()
-
-        self.EMAIL__ASYNC__REDIS__HOST = self.get_raw_config("email.async.redis.host", "localhost")
-        self.EMAIL__ASYNC__REDIS__PORT = int(self.get_raw_config("email.async.redis.port", "6379"))
-        self.EMAIL__ASYNC__REDIS__DB = int(self.get_raw_config("email.async.redis.db", "0"))
         self.NEW_USER__INVITATION__DO_NOTIFY = asbool(
             self.get_raw_config("new_user.invitation.do_notify", "True")
         )
@@ -608,6 +611,8 @@ class CFG(object):
         self.NEW_USER__INVITATION__MINIMAL_PROFILE = self.get_raw_config(
             "new_user.invitation.minimal_profile", Profile.TRUSTED_USER.slug
         )
+
+        self.EMAIL__REQUIRED = asbool(self.get_raw_config("email.required", "True"))
 
     def _load_webdav_config(self) -> None:
         """
@@ -720,6 +725,12 @@ class CFG(object):
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
         )
 
+    def _load_jobs_config(self) -> None:
+        self.JOBS__PROCESSING_MODE = self.get_raw_config("jobs.processing_mode", "sync").upper()
+        self.JOBS__ASYNC__REDIS__HOST = self.get_raw_config("jobs.async.redis.host", "localhost")
+        self.JOBS__ASYNC__REDIS__PORT = int(self.get_raw_config("jobs.async.redis.port", "6379"))
+        self.JOBS__ASYNC__REDIS__DB = int(self.get_raw_config("jobs.async.redis.db", "0"))
+
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -727,6 +738,8 @@ class CFG(object):
         Check if config setted is correct
         """
         self._check_global_config_validity()
+        self._check_live_messages_config_validity()
+        self._check_jobs_config_validity()
         self._check_email_config_validity()
         self._check_ldap_config_validity()
         self._check_search_config_validity()
@@ -740,9 +753,20 @@ class CFG(object):
         Check config for global stuff
         """
         self.check_mandatory_param("SQLALCHEMY__URL", self.SQLALCHEMY__URL)
-        self.check_mandatory_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR)
-        self.check_directory_path_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True)
-
+        self.check_mandatory_param("SESSION__TYPE", self.SESSION__TYPE)
+        if self.SESSION__TYPE == "file":
+            self.check_mandatory_param(
+                "SESSION__DATA_DIR", self.SESSION__DATA_DIR, when_str="if session type is file"
+            )
+            self.check_directory_path_param(
+                "SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True
+            )
+        elif self.SESSION__TYPE in ["ext:database", "ext:mongodb", "ext:redis", "ext:memcached"]:
+            self.check_mandatory_param(
+                "SESSION__URL",
+                self.SESSION__URL,
+                when_str="if session type is {}".format(self.SESSION__TYPE),
+            )
         self.check_mandatory_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR)
         self.check_directory_path_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR, writable=True)
         # INFO - G.M - 2019-04-03 - check color file validity
@@ -809,6 +833,9 @@ class CFG(object):
                 'ERROR user.default_profile given "{}" is invalid,'
                 "valids values are {}.".format(self.USER__DEFAULT_PROFILE, profile_str_list)
             )
+
+    def _check_live_messages_config_validity(self) -> None:
+        self.check_mandatory_param("LIVE_MESSAGES__CONTROL_URI", self.LIVE_MESSAGES__CONTROL_URI)
 
     def _check_email_config_validity(self) -> None:
         """
@@ -916,12 +943,13 @@ class CFG(object):
                         )
                     )
 
-        if self.EMAIL__PROCESSING_MODE not in (self.CST.ASYNC, self.CST.SYNC):
+    def _check_jobs_config_validity(self) -> None:
+        if self.JOBS__PROCESSING_MODE not in (self.CST.ASYNC, self.CST.SYNC):
             raise Exception(
-                "EMAIL__PROCESSING_MODE "
+                "JOBS__PROCESSING_MODE "
                 "can "
                 'be "{}" or "{}", not "{}"'.format(
-                    self.CST.ASYNC, self.CST.SYNC, self.EMAIL__PROCESSING_MODE
+                    self.CST.ASYNC, self.CST.SYNC, self.JOBS__PROCESSING_MODE
                 )
             )
 

@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import ContentItem from './ContentItem.jsx'
 import Folder from './Folder.jsx'
-import { PAGE, SHARE_FOLDER_ID } from '../../helper.js'
+import { PAGE, SHARE_FOLDER_ID } from '../../util/helper.js'
 import { ROLE } from 'tracim_frontend_lib'
 
 require('./Folder.styl')
@@ -37,9 +37,9 @@ class ShareFolder extends React.Component {
     return (
       <div
         className={classnames('folder', {
-          'active': props.isOpen && folderContentList.length > 0,
+          active: props.isOpen && folderContentList.length > 0,
           'item-last': props.isLast,
-          'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
+          read: true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
         data-cy={SHARE_FOLDER_ID}
         id={SHARE_FOLDER_ID}
@@ -53,10 +53,9 @@ class ShareFolder extends React.Component {
             <div className='folder__header__triangleborder__triangle' />
           </div>
 
-          <div
-            className='folder__header__dragPreview'
-          >
-            <div className='folder__header__icon'
+          <div className='folder__header__dragPreview'>
+            <div
+              className='folder__header__icon'
               title={props.t('Folder')}
               style={{ color: (props.contentType.find(c => c.slug === 'folder') || { hexcolor: '' }).hexcolor }}
             >
@@ -126,7 +125,7 @@ class ShareFolder extends React.Component {
                 onClickCreateContent={props.onClickCreateContent}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
-                setFolderRead={props.setFolderRead}
+                onSetFolderRead={props.onSetFolderRead}
                 isLast={index === props.shareFolderContentList.length - 1}
                 key={content.id}
                 t={props.t}

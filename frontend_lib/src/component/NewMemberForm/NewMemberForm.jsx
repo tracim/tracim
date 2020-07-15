@@ -20,22 +20,22 @@ export const NewMemberForm = props => {
 
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>
-            {props.t('Enter the name or email of the user')}
+            {props.t('Enter the username, email or full name of the user')}
           </label>
 
           <input
             type='text'
             className='name__input form-control'
             id='addmember'
-            placeholder={props.t('Full name or email')}
+            placeholder={props.t('Search user...')}
             data-cy='addmember'
-            value={props.nameOrEmail}
-            onChange={e => props.onChangeNameOrEmail(e.target.value)}
+            value={props.publicName}
+            onChange={e => props.onChangePersonalData(e.target.value)}
             autoComplete='off'
             autoFocus
           />
 
-          {props.autoCompleteActive && props.nameOrEmail.length >= 2 && (
+          {props.autoCompleteActive && props.publicName.length >= 2 && (
             // Côme - 2018/10/18 - see https://github.com/tracim/tracim/issues/1021 for details about theses tests
             <div className='autocomplete primaryColorBorder'>
               {props.searchedKnownMemberList.length > 0
@@ -49,8 +49,22 @@ export const NewMemberForm = props => {
                       <Avatar publicName={u.public_name} width={'44px'} />
                     </div>
 
-                    <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
+                    <div
+                      className='autocomplete__item__name'
+                      data-cy='autocomplete__item__name'
+                      title={u.public_name}
+                    >
                       {u.public_name}
+
+                      {u.username && (
+                        <div
+                          className='autocomplete__item__name__username'
+                          data-cy='autocomplete__item__username'
+                          title={`@${u.username}`}
+                        >
+                          @{u.username}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )
@@ -80,7 +94,7 @@ export const NewMemberForm = props => {
 
                       <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
                         <div className='autocomplete__item__name__unknownuser'>
-                          {props.nameOrEmail}
+                          {props.publicName}
                           <div className='autocomplete__item__name__unknownuser__msg'>
                             {props.t('I know this user exist')}
                           </div>
@@ -174,7 +188,7 @@ export default translate()(NewMemberForm)
 
 NewMemberForm.propTypes = {
   onClickCloseAddMemberBtn: PropTypes.func,
-  nameOrEmail: PropTypes.string,
+  publicName: PropTypes.string,
   searchedKnownMemberList: PropTypes.arrayOf(PropTypes.object),
   isEmail: PropTypes.bool,
   onClickAutoComplete: PropTypes.func,
@@ -186,13 +200,13 @@ NewMemberForm.propTypes = {
   onClickBtnValidate: PropTypes.func,
   onChangeRole: PropTypes.func,
   onClickKnownMember: PropTypes.func,
-  onChangeNameOrEmail: PropTypes.func,
+  onChangePersonalData: PropTypes.func,
   autoCompleteActive: PropTypes.bool,
   role: PropTypes.string
 }
 
 NewMemberForm.defaultProps = {
-  nameOrEmail: '',
+  publicName: '',
   searchedKnownMemberList: [],
   isEmail: false,
   userRoleIdInWorkspace: 0,
@@ -205,7 +219,7 @@ NewMemberForm.defaultProps = {
   onClickBtnValidate: () => {},
   onChangeRole: () => {},
   onClickKnownMember: () => {},
-  onChangeNameOrEmail: () => {},
+  onChangePersonalData: () => {},
   onClickAutoComplete: () => {},
   onClickCloseAddMemberBtn: () => {}
 }
