@@ -31,7 +31,7 @@ requires = [
     'filedepot',
     'babel',
     'python-slugify',
-    'preview-generator>=0.13',
+    'preview-generator>=0.14',
     'colour',
     'python-dateutil',
     'gitpython',
