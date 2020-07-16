@@ -32,7 +32,7 @@ describe('<Gallery />', () => {
             search: `?folder_ids=${folderId}`
           }
         },
-        translation :''
+        translation: ''
       },
       loggedUser: {
         ...defaultDebug.loggedUser
@@ -57,19 +57,67 @@ describe('<Gallery />', () => {
     }))
   }
 
+  describe('Intern function', () => {
+    describe('liveMessageNotRelevant', () => {
+      const initialState = {
+        config: {
+          appConfig: {
+            workspaceId: 1
+          }
+        },
+        folderId: 1
+      }
+      const initialData = {
+        content: {
+          workspace_id: 1,
+          parent_id: 1
+        }
+      }
+
+      it('should return false when the workspace is the same and the folderId is undefined', () => {
+        const state = {
+          ...initialState,
+          folderId: undefined
+        }
+        expect(wrapper.instance().liveMessageNotRelevant(initialData, state)).to.equal(false)
+      })
+      it('should return true when the workspace is not the same', () => {
+        const data = {
+          content: {
+            ...initialData.content,
+            workspace_id: initialData.content.workspace_id + 1
+          }
+        }
+        expect(wrapper.instance().liveMessageNotRelevant(data, initialState)).to.equal(true)
+      })
+      it('should return false when the folder id and the workspace are the same', () => {
+        expect(wrapper.instance().liveMessageNotRelevant(initialData, initialState)).to.equal(false)
+      })
+      it('should return true when the folder id is not the same', () => {
+        const data = {
+          content: {
+            ...initialData.content,
+            parent_id: initialState.folderId + 1
+          }
+        }
+        expect(wrapper.instance().liveMessageNotRelevant(data, initialState)).to.equal(true)
+      })
+    })
+  })
+
   describe('TLM handlers', () => {
     describe('handleContentDeleted', () => {
       describe('after deleting a picture', () => {
         it('should not be in the picture list anymore', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({content: pictures[1]})
+          wrapper.instance().handleContentDeleted({ content: pictures[1] })
           expect(wrapper.state().imagePreviewList.every(image => image.contentId !== pictures[1].content_id))
           expect(wrapper.state().imagePreviewList.length).to.equal(stateMock.imagePreviewList.length - 1)
         })
 
         it('should go to the next picture when the current picture is deleted', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({content: pictures[1]})
+          wrapper.instance().handleContentDeleted({ content: pictures[1] })
           expect(wrapper.state().displayedPictureIndex).to.equal(1)
         })
 

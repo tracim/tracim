@@ -95,7 +95,7 @@ export class Gallery extends React.Component {
 
   liveMessageNotRelevant (data, state) {
     return Number(data.content.workspace_id) !== Number(state.config.appConfig.workspaceId) ||
-    Number(data.content.parent_id) !== Number(state.folderId)
+    (state.folderId !== undefined && Number(data.content.parent_id) !== Number(state.folderId))
   }
 
   handleShowApp = data => {
