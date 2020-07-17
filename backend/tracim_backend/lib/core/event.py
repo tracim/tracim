@@ -71,9 +71,16 @@ class EventApi:
         self._session = session
         self._config = config
 
-    def get_messages_for_user(self, user_id: int, read_status: ReadStatus) -> typing.List[Message]:
+    def get_messages_for_user(
+        self,
+        user_id: int,
+        read_status: ReadStatus,
+        before_event_id: typing.Optional[int],
+        count: typing.Optional[int],
+    ) -> typing.List[Message]:
         query = (
             self._session.query(Message)
+            .order_by(Message.event_id.desc())
             .filter(Message.receiver_id == user_id)
             .options(joinedload(Message.event))
         )
@@ -84,6 +91,10 @@ class EventApi:
         else:
             # ALL doesn't need any filtering an is the only other handled case
             assert read_status == ReadStatus.ALL
+        if before_event_id:
+            query = query.filter(Message.event_id < before_event_id)
+        if count:
+            query = query.limit(count)
         return query.all()
 
 

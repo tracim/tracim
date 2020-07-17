@@ -30,7 +30,6 @@ from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.event import Message
-from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
@@ -600,7 +599,10 @@ class UserController(Controller):
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
         return event_api.get_messages_for_user(
-            request.candidate_user.user_id, ReadStatus(hapic_data.query["read_status"])
+            user_id=request.candidate_user.user_id,
+            read_status=hapic_data.query.read_status,
+            before_event_id=hapic_data.query.before_event_id,
+            count=hapic_data.query.count,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])

@@ -45,6 +45,7 @@ from tracim_backend.models.context_models import FileQuery
 from tracim_backend.models.context_models import FileRevisionPath
 from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import KnownMemberQuery
+from tracim_backend.models.context_models import LiveMessageQuery
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
@@ -1415,9 +1416,15 @@ class LiveMessageSchema(marshmallow.Schema):
 class GetLiveMessageQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages endpoint."""
 
+    count = marshmallow.fields.Int(example=10, validate=strictly_positive_int_validator)
+    before_event_id = marshmallow.fields.Int(example=21, validate=strictly_positive_int_validator)
     read_status = marshmallow.fields.String(
         missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values())
     )
+
+    @post_load
+    def live_message_query(self, data: typing.Dict[str, typing.Any]) -> object:
+        return LiveMessageQuery(**data)
 
 
 class TracimLiveEventHeaderSchema(marshmallow.Schema):
