@@ -36,9 +36,8 @@ Optional - describe the environment which reveals the bug:
 
 Help us understand the problem with screenshots. You can use [peek](https://github.com/phw/peek) to generate animated GIFs.
 
-
-*The following sections are for the maintainers*
 ________________________________________________
+*The following sections are for the maintainers*
 
 ## Diagnostic
 
