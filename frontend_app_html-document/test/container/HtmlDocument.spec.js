@@ -1,6 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
+import sinon from 'sinon'
 import {
   mockGetHtmlDocumentComment200,
   mockGetHtmlDocumentContent200,
@@ -23,6 +24,8 @@ describe('<HtmlDocument />', () => {
     setApiUrl: () => { },
     t: key => key
   }
+  const buildBreadcrumbsSpy = sinon.spy()
+  const setHeadTitleSpy = sinon.spy()
 
   mockGetHtmlDocumentContent200(debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id, contentHtmlDocument.htmlDocument)
   mockPutHtmlDocumentRead200(debug.loggedUser, debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id)
@@ -30,6 +33,13 @@ describe('<HtmlDocument />', () => {
   mockGetHtmlDocumentRevision200(debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id, contentHtmlDocument.revisionList).persist()
 
   const wrapper = shallow(<HtmlDocument {...props} />)
+  wrapper.instance().buildBreadcrumbs = buildBreadcrumbsSpy
+  wrapper.instance().setHeadTitle = setHeadTitleSpy
+
+  const resetSpiesHistory = () => {
+    buildBreadcrumbsSpy.resetHistory()
+    setHeadTitleSpy.resetHistory()
+  }
 
   describe('TLM handlers', () => {
     describe('eventType content', () => {
@@ -71,15 +81,27 @@ describe('<HtmlDocument />', () => {
             content: {
               ...contentHtmlDocument.htmlDocument,
               label: 'newContentName'
-            }
+            },
+            client_token: wrapper.state('config').apiHeader['X-Tracim-ClientToken']
           }
 
           before(() => {
+            resetSpiesHistory()
             wrapper.instance().handleContentModified(tlmData)
+          })
+
+          after(() => {
+            resetSpiesHistory()
           })
 
           it('should update the document with the new name', () => {
             expect(wrapper.state('newContent').label).to.equal(tlmData.content.label)
+          })
+          it('should call buildBreadcrumbs()', () => {
+            expect(buildBreadcrumbsSpy.called).to.equal(true)
+          })
+          it('should call setHeadTitle() with the right args', () => {
+            expect(setHeadTitleSpy.calledOnceWith(tlmData.content.label)).to.equal(true)
           })
         })
 

@@ -120,12 +120,14 @@ export class FolderAdvanced extends React.Component {
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token
     }))
-    if (clientToken === data.client_token) this.setHeadTitle(data.content.label)
+    if (clientToken === data.client_token) {
+      this.setHeadTitle(data.content.label)
+      this.buildBreadcrumbs(data.content)
+    }
   }
 
   async componentDidMount () {
     await this.loadContent()
-    this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -133,7 +135,6 @@ export class FolderAdvanced extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      this.buildBreadcrumbs()
     }
   }
 
@@ -166,6 +167,7 @@ export class FolderAdvanced extends React.Component {
       case 200:
         this.setState({ content: fetchFolder.body })
         this.setHeadTitle(fetchFolder.body.label)
+        this.buildBreadcrumbs(fetchFolder.body)
         break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder details'), 'warning')
     }
@@ -178,15 +180,15 @@ export class FolderAdvanced extends React.Component {
 
   loadTimeline = () => {}
 
-  buildBreadcrumbs = () => {
+  buildBreadcrumbs = (content = this.state.content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
-          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
-          label: state.content.label,
+          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
+          label: content.label,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         }]
