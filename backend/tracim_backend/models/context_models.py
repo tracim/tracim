@@ -31,6 +31,7 @@ from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.event import EventType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.roles import WorkspaceRoles
 
@@ -587,10 +588,17 @@ class LiveMessageQuery(object):
     Folder Content update model
     """
 
-    def __init__(self, read_status: str, count: int = None, before_event_id: int = None) -> None:
+    def __init__(
+        self,
+        read_status: str,
+        event_types: Optional[List[EventType]] = None,
+        count: int = None,
+        before_event_id: int = None,
+    ) -> None:
         self.read_status = ReadStatus(read_status)
         self.count = count
         self.before_event_id = before_event_id
+        self.event_types = event_types
 
 
 class FolderContentUpdate(object):

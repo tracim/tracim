@@ -76,6 +76,7 @@ from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.event import EntityType
+from tracim_backend.models.event import EventType
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 
@@ -90,6 +91,18 @@ class StrippedString(String):
         if value:
             value = value.strip()
         return value.strip()
+
+
+class EventTypeListField(StrippedString):
+    def _deserialize(self, value, attr, data, **kwargs):
+        result = []
+        value = super()._deserialize(value, attr, data, **kwargs)
+        if value:
+            values = value.split(",")
+            for item in values:
+                result.append(EventType(item.strip()))
+            return result
+        return None
 
 
 class RFCEmail(ValidatedField, String):
@@ -1418,9 +1431,8 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
 
     count = marshmallow.fields.Int(example=10, validate=strictly_positive_int_validator)
     before_event_id = marshmallow.fields.Int(example=21, validate=strictly_positive_int_validator)
-    read_status = marshmallow.fields.String(
-        missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values())
-    )
+    read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
+    event_types = EventTypeListField()
 
     @post_load
     def live_message_query(self, data: typing.Dict[str, typing.Any]) -> object:

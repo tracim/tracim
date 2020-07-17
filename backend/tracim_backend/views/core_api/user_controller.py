@@ -603,6 +603,7 @@ class UserController(Controller):
             read_status=hapic_data.query.read_status,
             before_event_id=hapic_data.query.before_event_id,
             count=hapic_data.query.count,
+            event_types=hapic_data.query.event_types,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])

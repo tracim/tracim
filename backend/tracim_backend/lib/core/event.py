@@ -3,9 +3,11 @@ import contextlib
 from datetime import datetime
 import typing
 
+from sqlalchemy import and_
 from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
 from sqlalchemy import null
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 
@@ -37,6 +39,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
+from tracim_backend.models.event import EventType
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
@@ -77,9 +80,11 @@ class EventApi:
         read_status: ReadStatus,
         before_event_id: typing.Optional[int],
         count: typing.Optional[int],
+        event_types: typing.List[EventType],
     ) -> typing.List[Message]:
         query = (
             self._session.query(Message)
+            .join(Event)
             .order_by(Message.event_id.desc())
             .filter(Message.receiver_id == user_id)
             .options(joinedload(Message.event))
@@ -93,6 +98,21 @@ class EventApi:
             assert read_status == ReadStatus.ALL
         if before_event_id:
             query = query.filter(Message.event_id < before_event_id)
+
+        if event_types:
+            event_type_filters = []
+            for event_type in event_types:
+                event_type_filter = and_(
+                    Event.entity_type == event_type.entity,
+                    Event.operation == event_type.operation,
+                    Event.entity_subtype == event_type.subtype,
+                )
+                event_type_filters.append(event_type_filter)
+
+            if len(event_type_filters) > 1:
+                query = query.filter(or_(*event_type_filters))
+            else:
+                query = query.filter(event_type_filters[0])
         if count:
             query = query.limit(count)
         return query.all()
