@@ -5,71 +5,54 @@ title: "Bug:"
 labels: to sort
 assignees: ""
 ---
-## Bug description & symptom
+## Description and expectations
 
-*Explain the bug and what is going wrong.*
+Explain:
 
-## Diagnostic
+- the bug and what is going wrong.
+- what needs to be done to consider the bug solved.
 
-*Optional - explain what has been found and what is not clear yet. If unknown, write "unknown".*
+If you know which component may be affected, feel free to mention it.
 
-## Expected
+### How to reproduce
 
-*Describe the expectations in order to consider the bug resolved**
+Detail steps to reproduce the bug:
 
-## Context and version information
-
-*Optional - describe the environment which reveals the bug:*
-
-- Desktop environment (if applicable)
-    - *OS: [e.g. iOS]*
-    - *Browser [e.g. chrome, safari]*
-    - *Version [e.g. 22]*
-- Smartphone/Tablet (if applicable)
-    - *Device: [e.g. iPhone6]*
-    - *OS: [e.g. iOS8.1]*
-    - *Browser [e.g. stock browser, safari]*
-    - *Version [e.g. 22]*
-
-*...*
-
-## Prerequisites
-
-*Optional - list issues that must be closed before the current one.*
-
-- *#xxx*
-- *...*
+1. Go to…
+2. Click on…
+3. Scroll down to…
 
 
-## How to reproduce
+### Version information
 
-*Optional - detail steps to reproduce the behavior:*
+Optional - describe the environment which reveals the bug:
 
-1. *Go to '...'*
-1. *Click on '....'*
-1. *Scroll down to '....'*
-1. *See error*
+- Tracim version: [e.g. v2.7, Mon Tracim]
+- Web browser: [e.g. Google Chrome, Firefox, Safari]
+- Version: [e.g. 22, latest]
+- Device / System: [e.g. PC, iPhone 6]
 
 ## Screenshots
 
-*Optional - add screenshots to help explain your problem.*
+Help us understand the problem with screenshots. You can use [peek](https://github.com/phw/peek) to generate animated GIFs.
 
-*Please consider sharing an [animated GIF screencast generated with peek](https://github.com/phw/peek)*
 
-## Impacted components
+*The following sections are for the maintainers*
+________________________________________________
 
-*Optional - list components which will be impacted.*
+## Diagnostic
 
-*For example:*
+Explain what may cause the bug.
 
-- *backend*
-- *frontend*
-- *htmldoc / file / thread app*
-- *webdav*
-- *...*
+## Prerequisites
 
-*If unsure, write "unknown"*
+Optional - list the issues that must be solved before handling this issue.
 
-## Extra information
+## Required sections, if relevant
 
-*Optional - add any useful information to understand and develop the feature*
+ - To be discussed before development
+ - Interface
+ - Translations
+ - Workaround
+ - Extra information
+ - Implemented solution
