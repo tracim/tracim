@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import argparse
+import re
 import traceback
 
 from depot.manager import DepotManager
 from pyramid.paster import get_appsettings
+from sqlalchemy.engine import reflection
 from sqlalchemy.exc import IntegrityError
 import transaction
 
@@ -137,3 +139,75 @@ class DeleteDBCommand(AppContextCommand):
             print(force_arg_required)
             print("Database not deleted")
             raise ForceArgumentNeeded(force_arg_required)
+
+
+class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
+    auto_setup_context = False
+
+    convention = {
+        "ix": "ix__%(column_0_label)s",  # Indexes
+        "uq": "uq__%(table_name)s__%(column_0_name)s",  # Unique constrains
+        "fk": "fk__%(table_name)s__%(column_0_name)s__%(referred_table_name)s",  # Foreign keys
+        "pk": "pk__%(table_name)s",  # Primary keys
+    }
+
+    def get_description(self) -> str:
+        return "Update database naming conventions from V1 database to V2"
+
+    def take_action(self, parsed_args: argparse.Namespace) -> None:
+        super(UpdateNamingConventionsV1ToV2Command, self).take_action(parsed_args)
+        config_uri = parsed_args.config_file
+        # setup_logging(config_uri)
+        settings = get_appsettings(config_uri)
+        settings.update(settings.global_conf)
+        app_config = CFG(settings)
+        app_config.configure_filedepot()
+        engine = get_engine(app_config)
+        inspector = reflection.Inspector.from_engine(engine)
+        v1_index_convention = re.compile(r"idx__(\w+)")
+        v1_unique_convention = re.compile(r"uk__(\w+)__(\w+)")
+        v1_foreign_key_convention = re.compile(r"fk__(\w+)__(\w+)__(\w+)")
+        v1_primary_key_convention = re.compile(r"pk__(\w+)")
+
+        with engine.begin():
+            for table_name in inspector.get_table_names():
+                if table_name == "migrate_version":
+                    continue
+                for index in inspector.get_indexes(table_name):
+                    match = v1_index_convention.search(index["name"])
+                    if match:
+                        new_name = "ix_{}".format(match.group(1))
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO {}".format(index["name"], new_name)
+                        )
+
+                for unique_constraint in inspector.get_unique_constraints(table_name):
+                    match = v1_unique_convention.search(unique_constraint["name"])
+                    if match:
+                        new_name = "uq__{}__{}".format(match.group(1), match.group(2))
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, unique_constraint["name"], new_name
+                            )
+                        )
+
+                for foreign_key in inspector.get_foreign_keys(table_name):
+                    match = v1_foreign_key_convention.search(foreign_key["name"])
+                    if match:
+                        new_name = "fk_{}_{}_{}".format(
+                            match.group(1), match.group(2), match.group(3)
+                        )
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, foreign_key["name"], new_name
+                            )
+                        )
+
+                primary_key = inspector.get_pk_constraint(table_name)
+                if primary_key:
+                    match = v1_primary_key_convention.search(primary_key["name"])
+                    if match:
+                        new_name = "pk_{}".format(match.group(1))
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO {}".format(primary_key["name"], new_name)
+                        )
