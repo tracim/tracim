@@ -150,7 +150,6 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
     def take_action(self, parsed_args: argparse.Namespace) -> None:
         super(UpdateNamingConventionsV1ToV2Command, self).take_action(parsed_args)
         config_uri = parsed_args.config_file
-        # setup_logging(config_uri)
         settings = get_appsettings(config_uri)
         settings.update(settings.global_conf)
         app_config = CFG(settings)
