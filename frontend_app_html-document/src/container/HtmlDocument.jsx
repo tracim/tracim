@@ -285,7 +285,7 @@ export class HtmlDocument extends React.Component {
     )
   }
 
-  buildBreadcrumbs = (content = this.state.content) => {
+  buildBreadcrumbs = (content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({

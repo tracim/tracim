@@ -106,7 +106,7 @@ export class FolderAdvanced extends React.Component {
   handleReloadAppFeatureData = data => {
     const { props, state } = this
     console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug), data)
-    props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
+    props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline)
   }
 
   handleFolderChanged = data => {
@@ -180,7 +180,7 @@ export class FolderAdvanced extends React.Component {
 
   loadTimeline = () => {}
 
-  buildBreadcrumbs = (content = this.state.content) => {
+  buildBreadcrumbs = (content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({

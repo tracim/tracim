@@ -105,7 +105,7 @@ export class Thread extends React.Component {
 
   handleReloadAppFeatureData = () => {
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(this.state.config.slug))
-    this.props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
+    this.props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline)
   }
 
   handleAllAppChangeLanguage = data => {
@@ -252,7 +252,7 @@ export class Thread extends React.Component {
     this.setState({ timeline: revisionWithComment })
   }
 
-  buildBreadcrumbs = (content = this.state.content) => {
+  buildBreadcrumbs = (content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({
