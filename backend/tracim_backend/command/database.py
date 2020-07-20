@@ -144,13 +144,6 @@ class DeleteDBCommand(AppContextCommand):
 class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
     auto_setup_context = False
 
-    convention = {
-        "ix": "ix__%(column_0_label)s",  # Indexes
-        "uq": "uq__%(table_name)s__%(column_0_name)s",  # Unique constrains
-        "fk": "fk__%(table_name)s__%(column_0_name)s__%(referred_table_name)s",  # Foreign keys
-        "pk": "pk__%(table_name)s",  # Primary keys
-    }
-
     def get_description(self) -> str:
         return "Update database naming conventions from V1 database to V2"
 
@@ -168,6 +161,9 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
         v1_unique_convention = re.compile(r"uk__(\w+)__(\w+)")
         v1_foreign_key_convention = re.compile(r"fk__(\w+)__(\w+)__(\w+)")
         v1_primary_key_convention = re.compile(r"pk__(\w+)")
+
+        if not engine.dialect.name.startswith("postgresql"):
+            raise ValueError("This command is only supported on PostgreSQL databases")
 
         with engine.begin():
             for table_name in inspector.get_table_names():
