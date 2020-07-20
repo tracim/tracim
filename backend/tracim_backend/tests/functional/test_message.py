@@ -112,6 +112,28 @@ class TestMessages(object):
         ).json_body
         assert len(message_dicts) == 2
 
+    def test_api__read_message__error_400__message_does_not_exist(
+        self, session, web_testapp
+    ) -> None:
+        """
+        Read one message error message does not exist
+        """
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        result = web_testapp.put("/api/users/1/messages/{}/read".format("1000"), status=400)
+        assert result.json_body["code"] == 1009
+
+    def test_api__unread_message__error_400__message_does_not_exist(
+        self, session, web_testapp
+    ) -> None:
+        """
+        Unread one message error message does not exist
+        """
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        result = web_testapp.put("/api/users/1/messages/{}/unread".format("1000"), status=400)
+        assert result.json_body["code"] == 1009
+
     def test_api__read_message__ok_204__nominal_case(self, session, web_testapp) -> None:
         """
         Read one unread message
