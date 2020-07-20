@@ -38,6 +38,7 @@ from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMemberQuerySchema
 from tracim_backend.views.core_api.schemas import LiveMessageSchema
+from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
@@ -606,6 +607,46 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def read_all_messages(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        """
+        Read all unread message for user
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        event_api.read_all_messages_of_user(request.candidate_user.user_id)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(MessageIdsPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def read_message(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        """
+        Read one message
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        event_api.read_message_of_user(
+            user_id=request.candidate_user.user_id, event_id=hapic_data.path.event_id,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(MessageIdsPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def unread_message(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        """
+        unread one message
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        event_api.unread_message_of_user(
+            user_id=request.candidate_user.user_id, event_id=hapic_data.path.event_id,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
     @hapic.input_headers(TracimLiveEventHeaderSchema())
     def open_message_stream(self, context, request: TracimRequest, hapic_data=None) -> Response:
         """
@@ -804,3 +845,27 @@ class UserController(Controller):
             "messages", "/users/{user_id:\d+}/messages", request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.get_user_messages, route_name="messages")
+
+        # read all unread messages for user
+        configurator.add_route(
+            "read_messages",
+            "/users/{user_id:\d+}/messages/read",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.read_all_messages, route_name="read_messages")
+
+        # read all unread messages for user
+        configurator.add_route(
+            "read_message",
+            "/users/{user_id:\d+}/messages/{event_id:\d+}/read",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.read_message, route_name="read_message")
+
+        # read all unread messages for user
+        configurator.add_route(
+            "unread_message",
+            "/users/{user_id:\d+}/messages/{event_id:\d+}/unread",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.unread_message, route_name="unread_message")

@@ -415,10 +415,31 @@ class UserIdPathSchema(marshmallow.Schema):
     )
 
 
+class EventIdPathSchema(marshmallow.Schema):
+    event_id = marshmallow.fields.Int(
+        example=5,
+        required=True,
+        description="id of a valid event",
+        validate=strictly_positive_int_validator,
+    )
+
+
+class MessageIdsPathSchema(UserIdPathSchema, EventIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return MessageIdsPath(**data)
+
+
 class UserWorkspaceFilterQuery(object):
     def __init__(self, show_owned_workspace: int = 1, show_workspace_with_role: int = 1):
         self.show_owned_workspace = bool(show_owned_workspace)
         self.show_workspace_with_role = bool(show_workspace_with_role)
+
+
+class MessageIdsPath(object):
+    def __init__(self, event_id: int, user_id: int):
+        self.event_id = event_id
+        self.user_id = user_id
 
 
 class UserWorkspaceFilterQuerySchema(marshmallow.Schema):
