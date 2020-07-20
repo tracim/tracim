@@ -45,6 +45,18 @@ describe('<Agenda />', () => {
           wrapper.instance().handleUserModified(tlmData)
           expect(wrapper.state('loggedUser').publicName).to.equal(tlmData.user.public_name)
         })
+
+        it('should have showRefreshWarning state as false if changes just the user language', () => {
+          const tlmData = {
+            author: user,
+            user: {
+              ...user,
+              lang: 'otherLang'
+            }
+          }
+          wrapper.instance().handleUserModified(tlmData)
+          expect(wrapper.state('showRefreshWarning')).to.equal(false)
+        })
       })
     })
 
