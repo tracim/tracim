@@ -129,6 +129,7 @@ export class Gallery extends React.Component {
   handleContentModified = data => {
     const { state } = this
     if (this.liveMessageNotRelevant(data, state)) {
+      // INFO - GM - 2020-07-20 - The if below covers the move functionality.
       if (state.imagePreviewList.find(p => data.content.content_id === p.contentId)) {
         this.removeContent(data.content.content_id)
       }
