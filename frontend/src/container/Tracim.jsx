@@ -71,7 +71,9 @@ export class Tracim extends React.Component {
     this.state = {
       firstTlmConnection: true,
       displayConnectionError: false,
-      connectionErrorDisplayTimeoutId: -1
+      connectionErrorDisplayTimeoutId: -1,
+      isNotificationWallOpen: false,
+      notificationCount: 0
     }
 
     this.liveMessageManager = new LiveMessageManager()
@@ -260,6 +262,14 @@ export class Tracim extends React.Component {
 
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))
 
+  handleClickNotification = () => {
+    this.setState(prev => ({
+      isNotificationWallOpen: !prev.isNotificationWallOpen,
+      // TODO FETCH NOTIFICATION NOT READ, THIS LINE IS JUST TO TEST
+      notificationCount: prev.notificationCount + 1
+    }))
+  }
+
   render () {
     const { props, state } = this
 
@@ -281,7 +291,10 @@ export class Tracim extends React.Component {
 
     return (
       <div className='tracim fullWidthFullHeight'>
-        <Header />
+        <Header
+          onClickNotification={this.handleClickNotification.bind(this)}
+          notificationCount={state.notificationCount}
+        />
         {state.displayConnectionError && (
           <FlashMessage
             className='connection_error'
