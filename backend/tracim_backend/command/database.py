@@ -180,15 +180,6 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
 
                 for foreign_key in inspector.get_foreign_keys(table_name):
                     match = v1_foreign_key_convention.search(foreign_key["name"])
-                    if match:
-                        new_name = "fk_{}_{}_{}".format(
-                            match.group(1), match.group(2), match.group(3)
-                        )
-                        engine.execute(
-                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
-                                table_name, foreign_key["name"], new_name
-                            )
-                        )
                     # special cases for content_revisions and revision_read_status
                     if foreign_key["name"] == "fk__content_revisions__owner_id":
                         new_name = "fk_content_revisions_owner_id_users"
@@ -197,15 +188,24 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                                 table_name, foreign_key["name"], new_name
                             )
                         )
-                    if foreign_key["name"] == "revision_read_status_revision_id_fkey":
+                    elif foreign_key["name"] == "revision_read_status_revision_id_fkey":
                         new_name = "fk_revision_read_status_revision_id_content_revisions"
                         engine.execute(
                             "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
                                 table_name, foreign_key["name"], new_name
                             )
                         )
-                    if foreign_key["name"] == "revision_read_status_user_id_fkey":
+                    elif foreign_key["name"] == "revision_read_status_user_id_fkey":
                         new_name = "fk_revision_read_status_user_id_users"
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, foreign_key["name"], new_name
+                            )
+                        )
+                    elif match:
+                        new_name = "fk_{}_{}_{}".format(
+                            match.group(1), match.group(2), match.group(3)
+                        )
                         engine.execute(
                             "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
                                 table_name, foreign_key["name"], new_name
@@ -215,34 +215,32 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                 primary_key = inspector.get_pk_constraint(table_name)
                 if primary_key:
                     match = v1_primary_key_convention.search(primary_key["name"])
-                    if match:
-                        new_name = "pk_{}".format(match.group(1))
-                        engine.execute(
-                            "ALTER INDEX {} RENAME TO {}".format(primary_key["name"], new_name)
-                        )
                     if primary_key["name"] == "pk__users__user_id":
                         engine.execute(
                             "ALTER INDEX {} RENAME TO pk_users".format(primary_key["name"])
                         )
-                    if primary_key["name"] == "pk__content_revisions__revision_id":
+                    elif primary_key["name"] == "pk__content_revisions__revision_id":
                         engine.execute(
                             "ALTER INDEX {} RENAME TO pk_content_revisions".format(
                                 primary_key["name"]
                             )
                         )
-
-                    if primary_key["name"] == "pk__user_workspace__user_id__workspace_id":
+                    elif primary_key["name"] == "pk__user_workspace__user_id__workspace_id":
                         engine.execute(
                             "ALTER INDEX {} RENAME TO pk_user_workspace".format(primary_key["name"])
                         )
-                    if primary_key["name"] == "pk__workspace__workspace_id":
+                    elif primary_key["name"] == "pk__workspace__workspace_id":
                         engine.execute(
                             "ALTER INDEX {} RENAME TO pk_workspaces".format(primary_key["name"])
                         )
-
-                    if primary_key["name"] == "revision_read_status_pkey":
+                    elif primary_key["name"] == "revision_read_status_pkey":
                         engine.execute(
                             "ALTER INDEX {} RENAME TO pk_revision_read_status".format(
                                 primary_key["name"]
                             )
+                        )
+                    elif match:
+                        new_name = "pk_{}".format(match.group(1))
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO {}".format(primary_key["name"], new_name)
                         )
