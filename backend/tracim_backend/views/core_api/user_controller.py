@@ -609,27 +609,29 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def read_all_messages(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+    def set_all_user_messages_as_read(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> None:
         """
         Read all unread message for user
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
-        event_api.read_all_messages_of_user(request.candidate_user.user_id)
+        event_api.mark_user_messages_as_read(request.candidate_user.user_id)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @hapic.handle_exception(MessageDoesNotExist, http_code=HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_path(MessageIdsPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def read_message(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+    def set_message_as_read(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
         Read one message
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
-        event_api.read_message_of_user(
-            user_id=request.candidate_user.user_id, event_id=hapic_data.path.event_id,
+        event_api.mark_user_message_as_read(
+            event_id=hapic_data.path.event_id, user_id=request.candidate_user.user_id
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
@@ -637,14 +639,14 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(MessageIdsPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def unread_message(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+    def set_message_as_unread(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
         unread one message
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
-        event_api.unread_message_of_user(
-            user_id=request.candidate_user.user_id, event_id=hapic_data.path.event_id,
+        event_api.mark_user_message_as_unread(
+            event_id=hapic_data.path.event_id, user_id=request.candidate_user.user_id
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
@@ -855,7 +857,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/messages/read",
             request_method="PUT",  # noqa: W605
         )
-        configurator.add_view(self.read_all_messages, route_name="read_messages")
+        configurator.add_view(self.set_all_user_messages_as_read, route_name="read_messages")
 
         # read all unread messages for user
         configurator.add_route(
@@ -863,7 +865,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/messages/{event_id:\d+}/read",
             request_method="PUT",  # noqa: W605
         )
-        configurator.add_view(self.read_message, route_name="read_message")
+        configurator.add_view(self.set_message_as_read, route_name="read_message")
 
         # read all unread messages for user
         configurator.add_route(
@@ -871,4 +873,4 @@ class UserController(Controller):
             "/users/{user_id:\d+}/messages/{event_id:\d+}/unread",
             request_method="PUT",  # noqa: W605
         )
-        configurator.add_view(self.unread_message, route_name="unread_message")
+        configurator.add_view(self.set_message_as_unread, route_name="unread_message")

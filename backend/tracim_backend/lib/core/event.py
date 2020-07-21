@@ -77,8 +77,8 @@ class EventApi:
     def _base_query(
         self,
         read_status: ReadStatus = ReadStatus.ALL,
-        user_id: typing.Optional[int] = None,
         event_id: typing.Optional[int] = None,
+        user_id: typing.Optional[int] = None,
     ) -> Query:
         query = self._session.query(Message)
         if event_id:
@@ -95,9 +95,9 @@ class EventApi:
             assert read_status == ReadStatus.ALL
         return query
 
-    def get_one_message(self, user_id: int, event_id: int) -> Message:
+    def get_one_message(self, event_id: int, user_id: int) -> Message:
         try:
-            return self._base_query(user_id=user_id, event_id=event_id).one()
+            return self._base_query(event_id=event_id, user_id=user_id).one()
         except NoResultFound as exc:
             raise MessageDoesNotExist(
                 'Message for user {} with event id "{}" not found in database'.format(
@@ -105,21 +105,21 @@ class EventApi:
                 )
             ) from exc
 
-    def read_message_of_user(self, user_id, event_id) -> Message:
-        message = self.get_one_message(user_id, event_id)
+    def mark_user_message_as_read(self, event_id: int, user_id: int) -> Message:
+        message = self.get_one_message(event_id, user_id)
         message.read = datetime.utcnow()
         self._session.add(message)
         self._session.flush()
         return message
 
-    def unread_message_of_user(self, user_id, event_id) -> Message:
-        message = self.get_one_message(user_id, event_id)
+    def mark_user_message_as_unread(self, event_id: int, user_id: int) -> Message:
+        message = self.get_one_message(event_id, user_id)
         message.read = None
         self._session.add(message)
         self._session.flush()
         return message
 
-    def read_all_messages_of_user(self, user_id) -> typing.List[Message]:
+    def mark_user_messages_as_read(self, user_id: int) -> typing.List[Message]:
         unread_messages = self._base_query(read_status=ReadStatus.UNREAD, user_id=user_id).all()
         for message in unread_messages:
             message.read = datetime.utcnow()
