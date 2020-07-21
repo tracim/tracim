@@ -220,22 +220,22 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                         engine.execute(
                             "ALTER INDEX {} RENAME TO {}".format(primary_key["name"], new_name)
                         )
-                    if primary_key["name"] == "pk_users__user_id":
+                    if primary_key["name"] == "pk__users__user_id":
                         engine.execute(
                             "ALTER INDEX {} RENAME TO pk_users".format(primary_key["name"])
                         )
-                    if primary_key["name"] == "pk_content_revisions__revision_id":
+                    if primary_key["name"] == "pk__content_revisions__revision_id":
                         engine.execute(
                             "ALTER INDEX {} RENAME TO pk_content_revisions".format(
                                 primary_key["name"]
                             )
                         )
 
-                    if primary_key["name"] == "pk_user_workspace__user_id__workspace_id":
+                    if primary_key["name"] == "pk__user_workspace__user_id__workspace_id":
                         engine.execute(
                             "ALTER INDEX {} RENAME TO pk_user_workspace".format(primary_key["name"])
                         )
-                    if primary_key["name"] == "pk_workspace__workspace_id":
+                    if primary_key["name"] == "pk__workspace__workspace_id":
                         engine.execute(
                             "ALTER INDEX {} RENAME TO pk_workspaces".format(primary_key["name"])
                         )
