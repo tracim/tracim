@@ -6,6 +6,7 @@ from pyramid.response import Response
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
 from tracim_backend.exceptions import EmailAlreadyExistsInDb
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
@@ -160,6 +161,7 @@ class UserController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(KnownMembersQuerySchema())
     @hapic.output_body(UserDigestSchema(many=True))
+    @hapic.handle_exception(CannotUseBothIncludeAndExcludeWorkspaceUsers, HTTPStatus.BAD_REQUEST)
     def known_members(self, context, request: TracimRequest, hapic_data=None):
         """
         Get known users list
