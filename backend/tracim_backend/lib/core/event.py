@@ -3,6 +3,8 @@ import contextlib
 from datetime import datetime
 import typing
 
+from sqlakeyset import Page
+from sqlakeyset import get_page
 from sqlalchemy import and_
 from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
@@ -33,6 +35,7 @@ from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.rq.worker import worker_context
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
+from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
@@ -151,19 +154,13 @@ class EventApi:
         user_id: int,
         read_status: ReadStatus,
         event_types: typing.List[EventType] = None,
-        count: typing.Optional[int] = None,
-        before_event_id: typing.Optional[int] = None,
-    ) -> typing.List[Message]:
+        count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
+        page_token: typing.Optional[int] = None,
+    ) -> Page:
         query = self._base_query(
             user_id=user_id, read_status=read_status, event_types=event_types,
         ).order_by(Message.event_id.desc())
-        if before_event_id:
-            query = query.filter(Message.event_id < before_event_id)
-
-        if count:
-            query = query.limit(count)
-
-        return query.all()
+        return get_page(query, per_page=count, page=page_token or False)
 
 
 class EventBuilder:

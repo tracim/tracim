@@ -31,6 +31,7 @@ from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
+from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
@@ -1447,11 +1448,28 @@ class LiveMessageSchema(marshmallow.Schema):
     )
 
 
+class LiveMessageSchemaPage(marshmallow.Schema):
+    previous_page_token = marshmallow.fields.String()
+    next_page_token = marshmallow.fields.String()
+    has_next = marshmallow.fields.Bool()
+    has_previous = marshmallow.fields.Bool()
+    per_page = marshmallow.fields.Int()
+    items = marshmallow.fields.Nested(LiveMessageSchema, many=True)
+
+
 class GetLiveMessageQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages endpoint."""
 
-    count = marshmallow.fields.Int(example=10, validate=strictly_positive_int_validator)
-    before_event_id = marshmallow.fields.Int(example=21, validate=strictly_positive_int_validator)
+    count = marshmallow.fields.Int(
+        example=10,
+        validate=strictly_positive_int_validator,
+        missing=DEFAULT_NB_ITEM_PAGINATION,
+        default=DEFAULT_NB_ITEM_PAGINATION,
+        allow_none=False,
+    )
+    page_token = marshmallow.fields.String(
+        description="token of the page wanted, if not provided get first" "elements"
+    )
     read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
     event_types = EventTypeListField()
 

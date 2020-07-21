@@ -6,6 +6,7 @@ from typing import List
 from typing import Optional
 
 from slugify import slugify
+from sqlakeyset import Page
 from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import content_type_list
@@ -591,13 +592,13 @@ class LiveMessageQuery(object):
     def __init__(
         self,
         read_status: str,
+        count: int,
         event_types: Optional[List[EventType]] = None,
-        count: int = None,
-        before_event_id: int = None,
+        page_token: Optional[str] = None,
     ) -> None:
         self.read_status = ReadStatus(read_status)
         self.count = count
-        self.before_event_id = before_event_id
+        self.page_token = page_token
         self.event_types = event_types
 
 
@@ -1546,3 +1547,13 @@ class RevisionInContext(object):
         :return: complete filename with both label and file extension part
         """
         return core_convert_file_name_to_display(self.revision.file_name)
+
+
+class PaginatedObject(object):
+    def __init__(self, page: Page):
+        self.previous_page_token = page.paging.bookmark_previous
+        self.next_page_token = page.paging.bookmark_next
+        self.has_previous = page.paging.has_previous
+        self.has_next = page.paging.has_next
+        self.per_page = page.paging.per_page
+        self.items = page

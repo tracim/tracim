@@ -35,6 +35,7 @@ FRONTEND_UI_SUBPATH = "ui"
 LOGIN_SUBPATH = "login"
 RESET_PASSWORD_SUBPATH = "reset-password"
 UNKNOWN_BUILD_VERSION = "unknown"
+DEFAULT_NB_ITEM_PAGINATION = 10
 
 
 def generate_documentation_swagger_tag(*sections: str) -> str:
