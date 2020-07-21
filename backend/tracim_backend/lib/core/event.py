@@ -8,8 +8,10 @@ from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
 from sqlalchemy import null
 from sqlalchemy import or_
+from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.app_models.contents import FILE_TYPE
@@ -17,6 +19,7 @@ from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.content import ContentApi
@@ -74,21 +77,19 @@ class EventApi:
         self._session = session
         self._config = config
 
-    def get_messages_for_user(
+    def _base_query(
         self,
-        user_id: int,
-        read_status: ReadStatus,
-        before_event_id: typing.Optional[int],
-        count: typing.Optional[int],
-        event_types: typing.List[EventType],
-    ) -> typing.List[Message]:
-        query = (
-            self._session.query(Message)
-            .join(Event)
-            .order_by(Message.event_id.desc())
-            .filter(Message.receiver_id == user_id)
-            .options(joinedload(Message.event))
-        )
+        read_status: ReadStatus = ReadStatus.ALL,
+        event_id: typing.Optional[int] = None,
+        user_id: typing.Optional[int] = None,
+        event_types: typing.List[EventType] = None,
+    ) -> Query:
+        query = self._session.query(Message).join(Event)
+        if event_id:
+            query = query.filter(Message.event_id == event_id)
+        if user_id:
+            query = query.filter(Message.receiver_id == user_id)
+        query = query.options(joinedload(Message.event))
         if read_status == ReadStatus.READ:
             query = query.filter(Message.read != null())
         elif read_status == ReadStatus.UNREAD:
@@ -96,8 +97,6 @@ class EventApi:
         else:
             # ALL doesn't need any filtering an is the only other handled case
             assert read_status == ReadStatus.ALL
-        if before_event_id:
-            query = query.filter(Message.event_id < before_event_id)
 
         if event_types:
             event_type_filters = []
@@ -113,8 +112,57 @@ class EventApi:
                 query = query.filter(or_(*event_type_filters))
             else:
                 query = query.filter(event_type_filters[0])
+        return query
+
+    def get_one_message(self, event_id: int, user_id: int) -> Message:
+        try:
+            return self._base_query(event_id=event_id, user_id=user_id).one()
+        except NoResultFound as exc:
+            raise MessageDoesNotExist(
+                'Message for user {} with event id "{}" not found in database'.format(
+                    user_id, event_id
+                )
+            ) from exc
+
+    def mark_user_message_as_read(self, event_id: int, user_id: int) -> Message:
+        message = self.get_one_message(event_id, user_id)
+        message.read = datetime.utcnow()
+        self._session.add(message)
+        self._session.flush()
+        return message
+
+    def mark_user_message_as_unread(self, event_id: int, user_id: int) -> Message:
+        message = self.get_one_message(event_id, user_id)
+        message.read = None
+        self._session.add(message)
+        self._session.flush()
+        return message
+
+    def mark_user_messages_as_read(self, user_id: int) -> typing.List[Message]:
+        unread_messages = self._base_query(read_status=ReadStatus.UNREAD, user_id=user_id).all()
+        for message in unread_messages:
+            message.read = datetime.utcnow()
+            self._session.add(message)
+        self._session.flush()
+        return unread_messages
+
+    def get_paginated_messages_for_user(
+        self,
+        user_id: int,
+        read_status: ReadStatus,
+        event_types: typing.List[EventType] = None,
+        count: typing.Optional[int] = None,
+        before_event_id: typing.Optional[int] = None,
+    ) -> typing.List[Message]:
+        query = self._base_query(
+            user_id=user_id, read_status=read_status, event_types=event_types,
+        ).order_by(Message.event_id.desc())
+        if before_event_id:
+            query = query.filter(Message.event_id < before_event_id)
+
         if count:
             query = query.limit(count)
+
         return query.all()
 
 
