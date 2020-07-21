@@ -607,13 +607,13 @@ class KnownMembersQuerySchema(marshmallow.Schema):
     exclude_workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="3,4",
-        description="comma separated list of excluded workspaces: members of this workspace are excluded from the result",
+        description="comma separated list of excluded workspaces: members of this workspace are excluded from the result; cannot be used with include_workspace_ids",
     )
 
     include_workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="3,4",
-        description="comma separated list of included workspaces: members of this workspace are excluded from the result",
+        description="comma separated list of included workspaces: members of this workspace are excluded from the result; cannot be used with exclude_workspace_ids",
     )
 
     @post_load
