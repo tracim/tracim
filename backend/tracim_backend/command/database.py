@@ -197,6 +197,14 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                                 table_name, foreign_key["name"], new_name
                             )
                         )
+                    # special cases for content_revisions
+                    if foreign_key["name"] == "fk__content_revisions__owner_id":
+                        new_name = "fk_content_revisions_owner_id_users"
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, foreign_key["name"], new_name
+                            )
+                        )
 
                 primary_key = inspector.get_pk_constraint(table_name)
                 if primary_key:
@@ -205,4 +213,26 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                         new_name = "pk_{}".format(match.group(1))
                         engine.execute(
                             "ALTER INDEX {} RENAME TO {}".format(primary_key["name"], new_name)
+                        )
+                    if primary_key["name"] == "pk_users__user_id":
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO pk_users".format(primary_key["name"])
+                        )
+                    if primary_key["name"] == "pk_content_revisions__revision_id":
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO pk_content_revisions".format(primary_key["name"])
+                        )
+
+                    if primary_key["name"] == "pk_user_workspace__user_id__workspace_id":
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO pk_user_workspace".format(primary_key["name"])
+                        )
+                    if primary_key["name"] == "pk_workspace__workspace_id":
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO pk_workspaces".format(primary_key["name"])
+                        )
+
+                    if primary_key["name"] == "revision_read_status_pkey":
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO pk_revision_read_status".format(primary_key["name"])
                         )
