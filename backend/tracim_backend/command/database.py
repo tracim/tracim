@@ -156,7 +156,6 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
         app_config.configure_filedepot()
         engine = get_engine(app_config)
         inspector = reflection.Inspector.from_engine(engine)
-        v1_index_convention = re.compile(r"idx__(\w+)")
         v1_unique_convention = re.compile(r"uk__(\w+)__(\w+)")
         v1_foreign_key_convention = re.compile(r"fk__(\w+)__(\w+)__(\w+)")
         v1_primary_key_convention = re.compile(r"pk__(\w+)")
@@ -168,13 +167,6 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
             for table_name in inspector.get_table_names():
                 if table_name == "migrate_version":
                     continue
-                for index in inspector.get_indexes(table_name):
-                    match = v1_index_convention.search(index["name"])
-                    if match:
-                        new_name = "ix_{}".format(match.group(1))
-                        engine.execute(
-                            "ALTER INDEX {} RENAME TO {}".format(index["name"], new_name)
-                        )
 
                 for unique_constraint in inspector.get_unique_constraints(table_name):
                     match = v1_unique_convention.search(unique_constraint["name"])
@@ -234,7 +226,9 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                         )
                     if primary_key["name"] == "pk_content_revisions__revision_id":
                         engine.execute(
-                            "ALTER INDEX {} RENAME TO pk_content_revisions".format(primary_key["name"])
+                            "ALTER INDEX {} RENAME TO pk_content_revisions".format(
+                                primary_key["name"]
+                            )
                         )
 
                     if primary_key["name"] == "pk_user_workspace__user_id__workspace_id":
@@ -248,5 +242,7 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
 
                     if primary_key["name"] == "revision_read_status_pkey":
                         engine.execute(
-                            "ALTER INDEX {} RENAME TO pk_revision_read_status".format(primary_key["name"])
+                            "ALTER INDEX {} RENAME TO pk_revision_read_status".format(
+                                primary_key["name"]
+                            )
                         )
