@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from email.message import Message
 from email.mime.multipart import MIMEMultipart
 import smtplib
 import typing
@@ -12,7 +11,7 @@ from tracim_backend.lib.utils.logger import logger
 
 
 def send_email_through(
-    config: CFG, sendmail_callable: typing.Callable[[Message], None], message: Message
+    config: CFG, sendmail_callable: typing.Callable[[MIMEMultipart], None], message: MIMEMultipart
 ) -> None:
     """
     Send mail encapsulation to send it in async or sync mode.

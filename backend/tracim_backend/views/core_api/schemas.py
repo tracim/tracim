@@ -44,7 +44,7 @@ from tracim_backend.models.context_models import FilePreviewSizedPath
 from tracim_backend.models.context_models import FileQuery
 from tracim_backend.models.context_models import FileRevisionPath
 from tracim_backend.models.context_models import FolderContentUpdate
-from tracim_backend.models.context_models import KnownMemberQuery
+from tracim_backend.models.context_models import KnownMembersQuery
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
@@ -593,7 +593,7 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
         return CommentPath(**data)
 
 
-class KnownMemberQuerySchema(marshmallow.Schema):
+class KnownMembersQuerySchema(marshmallow.Schema):
     acp = StrippedString(
         example="test", description="search text to query", validate=acp_validator, required=True
     )
@@ -601,17 +601,24 @@ class KnownMemberQuerySchema(marshmallow.Schema):
     exclude_user_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="1,5",
-        description="comma separated list of excluded user",
+        description="comma separated list of excluded users",
     )
+
     exclude_workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="3,4",
-        description="comma separated list of excluded workspace: user of this workspace are excluded from result",
+        description="comma separated list of excluded workspaces: members of this workspace are excluded from the result",
+    )
+
+    include_workspace_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,4",
+        description="comma separated list of included workspaces: members of this workspace are excluded from the result",
     )
 
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
-        return KnownMemberQuery(**data)
+        return KnownMembersQuery(**data)
 
 
 class FileQuerySchema(marshmallow.Schema):
