@@ -197,9 +197,23 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                                 table_name, foreign_key["name"], new_name
                             )
                         )
-                    # special cases for content_revisions
+                    # special cases for content_revisions and revision_read_status
                     if foreign_key["name"] == "fk__content_revisions__owner_id":
                         new_name = "fk_content_revisions_owner_id_users"
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, foreign_key["name"], new_name
+                            )
+                        )
+                    if foreign_key["name"] == "revision_read_status_revision_id_fkey":
+                        new_name = "fk_revision_read_status_revision_id_content_revisions"
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, foreign_key["name"], new_name
+                            )
+                        )
+                    if foreign_key["name"] == "revision_read_status_user_id_fkey":
+                        new_name = "fk_revision_read_status_user_id_users"
                         engine.execute(
                             "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
                                 table_name, foreign_key["name"], new_name
