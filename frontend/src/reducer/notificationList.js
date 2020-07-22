@@ -1,16 +1,21 @@
 import { uniqBy } from 'lodash'
 import {
   ADD,
+  NOTIFICATION,
   NOTIFICATION_LIST,
-  SET
+  SET,
+  UPDATE
 } from '../action-creator.sync.js'
 
 const defaultNotificationList = [{
-  url: 0,
-  id: 0,
+  author: '',
+  content: '',
   icon: '',
+  id: 0,
   read: false,
-  text: ''
+  text: '',
+  url: 0,
+  workspace: ''
 }]
 
 const getNotificationFromTLM = (eventData, contentData) => {
@@ -18,24 +23,32 @@ const getNotificationFromTLM = (eventData, contentData) => {
 
   if (/content.*created/.test(eventData.event_type)) {
     typeIcon = 'fa-magic'
-    typeText = `${contentData.author.public_name} created ${contentData.content.label} at ${contentData.workspace.slug}`
+    typeText = '{{author}} created {{content}} at {{workspace}}'
     url = `/ui/workspaces/${contentData.workspace.workspace_id}/contents/${contentData.content.content_type}/${contentData.content.content_id}`
   } else if (/content.*modified/.test(eventData.event_type)) {
-    typeIcon = 'fa-history'
-    typeText = `${contentData.author.public_name} updated ${contentData.content.label} at ${contentData.workspace.slug}`
+    if (contentData.content.current_revision_type === 'status-update') {
+      typeIcon = 'fa-random'
+      typeText = '{{author}} updated the status of {{content}} at {{workspace}}'
+    } else {
+      typeIcon = 'fa-history'
+      typeText = '{{author}} updated a new version of {{content}} at {{workspace}}'
+    }
     url = `/ui/workspaces/${contentData.workspace.workspace_id}/contents/${contentData.content.content_type}/${contentData.content.content_id}`
   } else if (/workspace_member.*created/.test(eventData.event_type)) {
     typeIcon = 'fa-user-o'
-    typeText = `${contentData.author.public_name} added you to ${contentData.workspace.slug}`
+    typeText = '{{author}} added you to {{workspace}}'
     url = `/ui/workspaces/${contentData.workspace.workspace_id}/dashboard`
   }
 
   return {
-    url: url,
-    id: eventData.event_id,
+    author: contentData.author.public_name,
+    content: contentData.content ? contentData.content.label : '',
     icon: typeIcon,
+    id: eventData.event_id,
     read: eventData.read,
-    text: typeText
+    text: typeText,
+    url: url,
+    workspace: contentData.workspace.slug
   }
 }
 
@@ -49,10 +62,13 @@ export default function notificationList (state = defaultNotificationList, actio
       return uniqBy(notificationList, 'id')
     }
 
-    case `${ADD}/${NOTIFICATION_LIST}`: {
+    case `${ADD}/${NOTIFICATION}`: {
       // INFO - 2020-07-22 - GB - The event and the content data are in the same place, that's why we send the same constant
       return uniqBy([getNotificationFromTLM(action.notification, action.notification), ...state], 'id')
     }
+
+    case `${UPDATE}/${NOTIFICATION}`:
+      return state.map(no => no.id === action.notification.id ? action.notification : no)
 
     default:
       return state

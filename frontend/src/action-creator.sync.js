@@ -166,8 +166,10 @@ export const SEARCH_CURRENT_PAGE = 'SearchCurrentPage'
 export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEARCH_CURRENT_PAGE}`, currentNumberPage })
 
 export const NOTIFICATION_LIST = 'NotificationList'
+export const NOTIFICATION = 'Notification'
 export const setNotificationList = notificationList => ({ type: `${SET}/${NOTIFICATION_LIST}`, notificationList })
-export const addNotification = notification => ({ type: `${ADD}/${NOTIFICATION_LIST}`, notification })
+export const addNotification = notification => ({ type: `${ADD}/${NOTIFICATION}`, notification })
+export const updateNotification = notification => ({ type: `${UPDATE}/${NOTIFICATION}`, notification })
 
 export const TLM_MANAGER = 'TracimLiveMessageManager'
 export const setLiveMessageManager = TLMManager => ({ type: `${SET}/${TLM_MANAGER}`, TLMManager })

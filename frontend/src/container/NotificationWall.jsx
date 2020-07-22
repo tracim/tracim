@@ -1,16 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-// import { withRouter } from 'react-router'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
-// import { isMobile } from 'react-device-detect'
-// import appFactory from '../util/appFactory.js'
+import { getNotificationList } from '../action-creator.async.js'
 import {
-  getNotificationList
-} from '../action-creator.async.js'
-import {
-  setNotificationList
+  setNotificationList,
+  updateNotification
 } from '../action-creator.sync.js'
 import {
   GenericButton,
@@ -41,7 +37,12 @@ export class NotificationWall extends React.Component {
     }
   }
 
-  handleClickBtnClose = () => this.setState({ isNotificationWallOpen: false })
+  handleClickBtnClose = notificationId => {
+    const { props } = this
+    const notification = props.notificationList.find(notification => notification.id === notificationId)
+    props.dispatch(updateNotification({ ...notification, read: true }))
+    this.setState({ isNotificationWallOpen: false })
+  }
 
   handleClickSeeMore = () => { }
 
@@ -71,14 +72,21 @@ export class NotificationWall extends React.Component {
               >
                 <Link
                   to={notification.url}
-                  onClick={this.handleClickBtnClose}
+                  onClick={() => this.handleClickBtnClose(notification.id)}
                   className={
                     classnames('notification__list__item', { itemRead: notification.read })
                   }
                   key={notification.id}
                 >
                   <i className={`notification__list__item__icon fa ${notification.icon}`} />
-                  <div>{notification.text}</div>
+                  <div>
+                    {props.t(notification.text, {
+                      author: notification.author,
+                      content: notification.content,
+                      workspace: notification.workspace,
+                      interpolation: { escapeValue: false }
+                    })}
+                  </div>
                   {!notification.read && <i className='notification__list__item__circle fa fa-circle' />}
                 </Link>
               </ListItemWrapper>

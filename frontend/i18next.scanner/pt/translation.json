@@ -1,4 +1,8 @@
 {
+  "{{author}} added you to {{workspace}}": "{{author}} adicionou-o à {{workspace}}",
+  "{{author}} created {{content}} at {{workspace}}": "{{author}} criou {{content}} em {{workspace}}",
+  "{{author}} updated a new version of {{content}} at {{workspace}}": "{{author}} actualizou uma nova versão de {{content}} em {{workspace}}",
+  "{{author}} updated the status of {{content}} at {{workspace}}": "{{author}} actualizou o status de {{content}} em {{workspace}}",
   "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}",
   "Create a shared space": "Criar um espaço partilhado",
   "Dashboard": "Painel",
