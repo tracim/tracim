@@ -55,10 +55,10 @@ export const WORKSPACE_CONTENT_PATH = `${WORKSPACE_CONTENT}/${PATH}`
 export const setWorkspaceContentList = (workspaceContentList, folderIdToOpenList, workspaceId) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, folderIdToOpenList, workspaceId })
 export const setWorkspaceShareFolderContentList = (workspaceShareFolderContentList, folderIdToOpenList, workspaceId) => ({ type: `${SET}/${WORKSPACE_CONTENT_SHARE_FOLDER}`, workspaceShareFolderContentList, folderIdToOpenList, workspaceId })
 
-export const addWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${ADD}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
-export const updateWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${UPDATE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
+export const addWorkspaceContentList = (workspaceContentList, workspace) => ({ type: `${ADD}/${WORKSPACE_CONTENT}`, workspaceContentList, workspace })
+export const updateWorkspaceContentList = (workspaceContentList, workspace) => ({ type: `${UPDATE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspace })
 export const deleteWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
-export const unDeleteWorkspaceContentList = (workspaceContentList, workspaceId) => ({ type: `${RESTORE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspaceId })
+export const unDeleteWorkspaceContentList = (workspaceContentList, workspace) => ({ type: `${RESTORE}/${WORKSPACE_CONTENT}`, workspaceContentList, workspace })
 
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
@@ -99,10 +99,10 @@ export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
 export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
 export const WORKSPACE_MEMBER_REMOVE = `${WORKSPACE_MEMBER}/${REMOVE}`
-export const addWorkspaceMember = (user, workspaceId, member) => ({
+export const addWorkspaceMember = (user, workspace, member) => ({
   type: `${ADD}/${WORKSPACE_MEMBER}`,
   newMember: { user: user, ...member },
-  workspaceId
+  workspace
 })
 export const updateWorkspaceMember = (user, workspaceId, member) => ({
   type: `${UPDATE}/${WORKSPACE_MEMBER}`,
@@ -164,6 +164,9 @@ export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
 export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
 export const SEARCH_CURRENT_PAGE = 'SearchCurrentPage'
 export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEARCH_CURRENT_PAGE}`, currentNumberPage })
+
+export const NOTIFICATION_LIST = 'NotificationList'
+export const setNotificationList = notificationList => ({ type: `${SET}/${NOTIFICATION_LIST}`, notificationList })
 
 export const TLM_MANAGER = 'TracimLiveMessageManager'
 export const setLiveMessageManager = TLMManager => ({ type: `${SET}/${TLM_MANAGER}`, TLMManager })

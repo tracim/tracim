@@ -76,7 +76,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleMemberCreated = data => {
-    this.props.dispatch(addWorkspaceMember(data.user, data.workspace.workspace_id, data.member))
+    this.props.dispatch(addWorkspaceMember(data.user, data.workspace, data.member))
   }
 
   handleMemberModified = data => {
@@ -89,7 +89,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentCreated = data => {
-    this.props.dispatch(addWorkspaceContentList([data.content], data.workspace.workspace_id))
+    this.props.dispatch(addWorkspaceContentList([data.content], data.workspace))
   }
 
   handleContentCommentCreated = async data => {
@@ -103,7 +103,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentModified = data => {
-    this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace.workspace_id))
+    this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace))
     if (data.author.user_id === this.props.user.userId) {
       this.props.dispatch(addWorkspaceReadStatus(data.content, data.workspace.workspace_id))
     }
@@ -114,7 +114,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentUnDeleted = data => {
-    this.props.dispatch(unDeleteWorkspaceContentList([data.content], data.workspace.workspace_id))
+    this.props.dispatch(unDeleteWorkspaceContentList([data.content], data.workspace))
   }
 
   handleUserModified = data => {

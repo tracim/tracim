@@ -54,7 +54,7 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
     case `${RESTORE}/${WORKSPACE_CONTENT}`:
     case `${ADD}/${WORKSPACE_CONTENT}`: {
       if (
-        state.workspaceId !== action.workspaceId ||
+        state.workspaceId !== action.workspace.workspace_id ||
         !action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)
       ) return state
 
@@ -83,7 +83,7 @@ export default function workspaceContentList (state = defaultWorkspaceContentLis
     case `${UPDATE}/${WORKSPACE_CONTENT}`: {
       if (!action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.CONTENT)) return state
 
-      if (state.workspaceId !== action.workspaceId) {
+      if (state.workspaceId !== action.workspace.workspace_id) {
         return {
           workspaceId: state.workspaceId,
           contentList: state.contentList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id))

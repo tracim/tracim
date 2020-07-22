@@ -43,7 +43,7 @@ export default function workspaceShareFolderContentList (state = defaultWorkspac
     case `${RESTORE}/${WORKSPACE_CONTENT}`:
     case `${ADD}/${WORKSPACE_CONTENT}`: {
       if (
-        state.workspaceId !== action.workspaceId ||
+        state.workspaceId !== action.workspace.workspace_id ||
         !action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.UPLOAD)
       ) return state
 
@@ -73,7 +73,7 @@ export default function workspaceShareFolderContentList (state = defaultWorkspac
     case `${UPDATE}/${WORKSPACE_CONTENT}`: {
       if (!action.workspaceContentList.some(cc => cc.content_namespace === CONTENT_NAMESPACE.UPLOAD)) return state
 
-      if (state.workspaceId !== action.workspaceId) {
+      if (state.workspaceId !== action.workspace.workspace_id) {
         return {
           workspaceId: state.workspaceId,
           contentList: state.contentList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id))

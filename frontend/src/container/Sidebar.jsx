@@ -60,7 +60,7 @@ export class Sidebar extends React.Component {
 
     if (loggedUserId === tlmUser.user_id) {
       props.dispatch(addWorkspaceList([tlmWorkspace]))
-      props.dispatch(addWorkspaceMember(tlmUser, tlmWorkspace.workspace_id, tlmFieldObject.member))
+      props.dispatch(addWorkspaceMember(tlmUser, tlmWorkspace, tlmFieldObject.member))
 
       // INFO - CH - 2020-06-25 - if logged used is author of the TLM and the new role is for him, it means the logged
       // user created a new workspace
