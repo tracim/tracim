@@ -73,8 +73,8 @@ export function workspaceList (state = [], action) {
       )
 
     case `${ADD}/${WORKSPACE_MEMBER}`:
-      if (!state.some(ws => ws.id === action.workspace.workspace_id)) return state
-      return state.map(ws => ws.id === action.workspace.workspace_id
+      if (!state.some(ws => ws.id === action.workspaceId)) return state
+      return state.map(ws => ws.id === action.workspaceId
         ? {
           ...ws,
           memberList: [

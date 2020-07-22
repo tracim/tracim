@@ -7,6 +7,9 @@ import { translate } from 'react-i18next'
 // import { isMobile } from 'react-device-detect'
 // import appFactory from '../util/appFactory.js'
 import {
+  getNotificationList
+} from '../action-creator.async.js'
+import {
   setNotificationList
 } from '../action-creator.sync.js'
 import {
@@ -21,33 +24,21 @@ export class NotificationWall extends React.Component {
     super(props)
     this.state = {
       isNotificationWallOpen: true,
-      hasMoreNotifications: true,
-      notificationList: [{
-        text: 'a',
-        icon: 'fa-bell',
-        read: false
-      }, {
-        text: 'b',
-        icon: 'fa-bell',
-        read: true
-      }, {
-        text: 'c',
-        icon: 'fa-bell',
-        read: true
-      }, {
-        text: 'd',
-        icon: 'fa-bell',
-        read: false
-      }, {
-        text: 'd',
-        icon: 'fa-bell',
-        read: true
-      }]
+      hasMoreNotifications: true
     }
   }
 
-  componentDidMount () {
-    this.props.dispatch(setNotificationList(this.state.notificationList))
+  async componentDidMount () {
+    const { props } = this
+
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(props.user.userId))
+    switch (fetchGetNotificationWall.status) {
+      case 200:
+        props.dispatch(setNotificationList(fetchGetNotificationWall.json))
+        break
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while loading notification list'))
+    }
   }
 
   handleClickBtnClose = () => this.setState({ isNotificationWallOpen: false })

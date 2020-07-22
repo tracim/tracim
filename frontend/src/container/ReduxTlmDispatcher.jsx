@@ -7,6 +7,7 @@ import {
   TLM_SUB_TYPE as TLM_ST
 } from 'tracim_frontend_lib'
 import {
+  addNotification,
   addWorkspaceContentList,
   addWorkspaceMember,
   deleteWorkspaceContentList,
@@ -76,7 +77,8 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleMemberCreated = data => {
-    this.props.dispatch(addWorkspaceMember(data.user, data.workspace, data.member))
+    this.props.dispatch(addWorkspaceMember(data.user, data.workspace.workspace_id, data.member))
+    this.props.dispatch(addNotification(data))
   }
 
   handleMemberModified = data => {
@@ -89,7 +91,8 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentCreated = data => {
-    this.props.dispatch(addWorkspaceContentList([data.content], data.workspace))
+    this.props.dispatch(addWorkspaceContentList([data.content], data.workspace.workspace_id))
+    this.props.dispatch(addNotification(data))
   }
 
   handleContentCommentCreated = async data => {
@@ -103,10 +106,11 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentModified = data => {
-    this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace))
+    this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace.workspace_id))
     if (data.author.user_id === this.props.user.userId) {
       this.props.dispatch(addWorkspaceReadStatus(data.content, data.workspace.workspace_id))
     }
+    this.props.dispatch(addNotification(data))
   }
 
   handleContentDeleted = data => {

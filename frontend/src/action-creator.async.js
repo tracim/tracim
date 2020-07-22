@@ -16,6 +16,7 @@ import {
   FOLDER,
   FOLDER_READ,
   newFlashMessage,
+  NOTIFICATION_LIST,
   SEARCHED_KEYWORDS,
   setRedirectLogin,
   setUserDisconnected,
@@ -843,6 +844,21 @@ export const getGuestUploadInfo = token => dispatch => {
       method: 'GET'
     },
     actionName: 'GuestUpload',
+    dispatch
+  })
+}
+
+export const getNotificationList = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: NOTIFICATION_LIST,
     dispatch
   })
 }

@@ -92,7 +92,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${ADD}/${WORKSPACE_MEMBER}`:
-      if (state.id !== action.workspace.workspace_id) return state
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: [
@@ -135,7 +135,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
 
     case `${ADD}/${WORKSPACE_CONTENT}`:
     case `${RESTORE}/${WORKSPACE_CONTENT}`:
-      if (state.id !== action.workspace.workspace_id) return state
+      if (state.id !== action.workspaceId) return state
       return {
         ...state,
         recentActivityList: [
@@ -145,7 +145,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       }
 
     case `${UPDATE}/${WORKSPACE_CONTENT}`:
-      if (state.id !== action.workspace.workspace_id) {
+      if (state.id !== action.workspaceId) {
         return {
           ...state,
           recentActivityList: state.recentActivityList.filter(c => !action.workspaceContentList.some(cc => c.id === cc.content_id)),
