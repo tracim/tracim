@@ -70,7 +70,7 @@ export class NotificationWall extends React.Component {
                 key={notification.id}
               >
                 <Link
-                  to='/ui'
+                  to={notification.url}
                   onClick={this.handleClickBtnClose}
                   className={
                     classnames('notification__list__item', { itemRead: notification.read })
