@@ -175,6 +175,11 @@ class RemoteAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthentic
         return user
 
     def unauthenticated_userid(self, request: TracimRequest) -> typing.Optional[str]:
+        """Return the user id found in the configured header.
+
+        MUST return None if no user id is found as pyramid_multiauth tests
+        the validity with `userid is None`.
+        """
         return request.environ.get(self.remote_user_login_header)
 
     def remember(
@@ -217,7 +222,12 @@ class ApiTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthent
             return None
         return user
 
-    def unauthenticated_userid(self, request: TracimRequest) -> str:
+    def unauthenticated_userid(self, request: TracimRequest) -> typing.Optional[str]:
+        """Return the user id found in the configured header.
+
+        MUST return None if no user id is found as pyramid_multiauth tests
+        the validity with `userid is None`.
+        """
         return request.headers.get(self.api_user_login_header)
 
     def remember(
@@ -257,7 +267,13 @@ class QueryTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthe
             return None
         return user
 
-    def unauthenticated_userid(self, request: TracimRequest) -> str:
+    def unauthenticated_userid(self, request: TracimRequest) -> typing.Optional[str]:
+        """Return the user id found in the query parameter.
+        The user id in this case in the user's token.
+
+        MUST return None if no user id is found as pyramid_multiauth tests
+        the validity with `userid is None`.
+        """
         return request.params.get(AUTH_TOKEN_QUERY_PARAMETER)
 
     def remember(
