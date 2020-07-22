@@ -56,6 +56,7 @@ import {
   setLiveMessageManager,
   setLiveMessageManagerStatus
 } from '../action-creator.sync.js'
+import NotificationWall from './NotificationWall.jsx'
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
@@ -304,6 +305,8 @@ export class Tracim extends React.Component {
 
         <div className='sidebarpagecontainer'>
           <Route render={() => <Sidebar />} />
+
+          <Route render={() => <NotificationWall />} />
 
           <Route path={PAGE.LOGIN} component={Login} />
 
