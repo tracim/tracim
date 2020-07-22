@@ -2,9 +2,7 @@ import { SELECTORS as s } from '../../support/generic_selector_commands'
 
 context('Add file(s) with PopupCreateFile', function () {
   let workspaceId
-  const pngFile1 = 'Linux-Free-PNG.png'
-  const pngFile2 = 'artikodin.png'
-  const pdfFile1 = 'the_pdf.pdf'
+  const pngFile = 'artikodin.png'
 
   before(function () {
     cy.resetDB()
@@ -29,7 +27,7 @@ context('Add file(s) with PopupCreateFile', function () {
         .get('[data-cy="contentTypeBtn_contents/file"]')
         .click()
 
-      cy.dropFixtureInDropZone(pngFile1, 'image/png', '.filecontent__form', 'file_exemple1.png')
+      cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', 'file_exemple1.png')
       cy.getTag({ selectorName: s.CARD_POPUP_BODY })
         .get('[data-cy=popup__createcontent__form__button]')
         .click()
@@ -51,8 +49,8 @@ context('Add file(s) with PopupCreateFile', function () {
           .get('[data-cy="contentTypeBtn_contents/file"]')
           .click()
 
-        cy.dropFixtureInDropZone(pngFile2, 'image/png', '.filecontent__form', `${fileName1}.png`)
-        cy.dropFixtureInDropZone(pdfFile1, 'application/pdf', '.filecontent__form', `${fileName2}.pdf`)
+        cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName1}.png`)
+        cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName2}.png`)
         cy.getTag({ selectorName: s.CARD_POPUP_BODY })
           .get('[data-cy=popup__createcontent__form__button]')
           .click()
@@ -68,14 +66,14 @@ context('Add file(s) with PopupCreateFile', function () {
         const fileName1 = 'png_exemple3'
         const fileName2 = 'pdf_exemple3'
 
-        cy.createFile(pngFile1, 'image/png', `${fileName1}.png`, workspaceId)
+        cy.createFile(pngFile, 'image/png', `${fileName1}.png`, workspaceId)
 
         cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
           .get('[data-cy="contentTypeBtn_contents/file"]')
           .click()
 
-        cy.dropFixtureInDropZone(pngFile2, 'image/png', '.filecontent__form', `${fileName1}.png`)
-        cy.dropFixtureInDropZone(pdfFile1, 'application/pdf', '.filecontent__form', `${fileName2}.pdf`)
+        cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName1}.png`)
+        cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName2}.png`)
         cy.getTag({ selectorName: s.CARD_POPUP_BODY })
           .get('[data-cy=popup__createcontent__form__button]')
           .click()
@@ -97,9 +95,9 @@ context('Add file(s) with PopupCreateFile', function () {
           .get('[data-cy="contentTypeBtn_contents/file"]')
           .click()
 
-        cy.dropFixtureInDropZone(pngFile2, 'image/png', '.filecontent__form', `${fileName1}.png`)
-        cy.dropFixtureInDropZone(pdfFile1, 'application/pdf', '.filecontent__form', `${fileName2}.pdf`)
-        cy.dropFixtureInDropZone(pngFile1, 'image/png', '.filecontent__form', `${fileName3}.png`)
+        cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName1}.png`)
+        cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName2}.png`)
+        cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName3}.png`)
         cy.getTag({ selectorName: s.CARD_POPUP_BODY })
           .get('.file__upload__list__item__label')
           .contains(`${fileName3}.png`)
