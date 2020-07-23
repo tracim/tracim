@@ -118,7 +118,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleContentUnDeleted = data => {
-    this.props.dispatch(unDeleteWorkspaceContentList([data.content], data.workspace))
+    this.props.dispatch(unDeleteWorkspaceContentList([data.content], data.workspace.workspace_id))
   }
 
   handleUserModified = data => {

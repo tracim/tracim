@@ -21,7 +21,7 @@ const defaultNotificationList = [{
 const getNotificationFromTLM = (eventData, contentData) => {
   let typeIcon, typeText, url
 
-  if (/content.*created/.test(eventData.event_type)) {
+  if (!/comment/.test(eventData.event_type) && /content.*created/.test(eventData.event_type)) {
     typeIcon = 'fa-magic'
     typeText = '{{author}} created {{content}} at {{workspace}}'
     url = `/ui/workspaces/${contentData.workspace.workspace_id}/contents/${contentData.content.content_type}/${contentData.content.content_id}`
@@ -38,7 +38,7 @@ const getNotificationFromTLM = (eventData, contentData) => {
     typeIcon = 'fa-user-o'
     typeText = '{{author}} added you to {{workspace}}'
     url = `/ui/workspaces/${contentData.workspace.workspace_id}/dashboard`
-  }
+  } else return null
 
   return {
     author: contentData.author.public_name,
@@ -56,9 +56,9 @@ export default function notificationList (state = defaultNotificationList, actio
   switch (action.type) {
     case `${SET}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
-        .filter(no => !/comment/.test(no.event_type) && /(content.*created)|(content.*modified)|(workspace_member.*created)/.test(no.event_type))
-        .reverse()
         .map(no => getNotificationFromTLM(no, no.fields))
+        .filter(no => no !== null)
+        .reverse()
       return uniqBy(notificationList, 'id')
     }
 
