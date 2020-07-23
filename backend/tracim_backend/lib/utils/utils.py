@@ -17,7 +17,9 @@ import uuid
 
 from colour import Color
 from git import InvalidGitRepositoryError
+from marshmallow import ValidationError
 import pytz
+from sqlakeyset import unserialize_bookmark
 
 from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableDirectory
@@ -493,3 +495,13 @@ def get_build_version(path: str) -> str:
     except StopIteration:
         # INFO - G.M - 2020-01-13 - return the 10 first letter of current commit hash
         return repo.head.object.hexsha[:10]
+
+
+def validate_page_token(page_token: str):
+    # INFO - G.M - 2020-07-23 - Explicitly catch error for unvalid bookmark
+    # as unserialize_bookmark method of sqlakeyset doesn't return explicit exception
+    # see https://github.com/djrobstep/sqlakeyset/issues/34
+    try:
+        unserialize_bookmark(page_token)
+    except Exception as e:
+        raise ValidationError('Page token "{}" is not a valid page token'.format(page_token)) from e

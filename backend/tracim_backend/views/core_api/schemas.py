@@ -17,6 +17,7 @@ from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import content_global_status_validator
 from tracim_backend.app_models.validator import content_status_validator
 from tracim_backend.app_models.validator import not_empty_string_validator
+from tracim_backend.app_models.validator import page_token_validator
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
@@ -1468,7 +1469,8 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
         allow_none=False,
     )
     page_token = marshmallow.fields.String(
-        description="token of the page wanted, if not provided get first" "elements"
+        description="token of the page wanted, if not provided get first" "elements",
+        validate=page_token_validator,
     )
     read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
     event_types = EventTypeListField()
