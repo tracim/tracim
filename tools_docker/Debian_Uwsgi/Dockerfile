@@ -85,6 +85,14 @@ ENV LC_ALL C.UTF-8
 
 RUN \
     apt install -qy \
+        apt-transport-https \
+        software-properties-common \
+        gnupg2 \
+    && echo deb https://dl.bintray.com/fanout/debian fanout-stretch main \
+        | tee /etc/apt/sources.list.d/fanout.list \
+    && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 \
+        --recv-keys 379CE192D401AB61 \
+    && apt install -qy \
         apache2 \
         ffmpeg \
         ghostscript \
