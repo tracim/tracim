@@ -756,6 +756,12 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
+    def test_api__whoami__ok_200__with_cookie(self, web_testapp):
+        params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
+        web_testapp.post_json("/api/auth/login", params=params, status=200)
+        sleep(0.3)
+        web_testapp.get("/api/auth/whoami", status=200)
+
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(

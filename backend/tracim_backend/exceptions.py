@@ -243,6 +243,10 @@ class UserDoesNotExist(TracimException):
     error_code = ErrorCode.USER_NOT_FOUND
 
 
+class MessageDoesNotExist(TracimException):
+    error_code = ErrorCode.MESSAGE_NOT_FOUND
+
+
 class UserNotFoundInTracimRequest(TracimException):
     error_code = ErrorCode.USER_NOT_IN_TRACIM_REQUEST
 
