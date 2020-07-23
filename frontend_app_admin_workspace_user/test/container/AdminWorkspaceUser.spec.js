@@ -120,10 +120,12 @@ describe('<AdminWorkspaceUser />', () => {
         description: ''
       }
       const member = {
-        user_id: 1,
-        user: props.data.loggedUser,
-        workspace: workspace,
+        do_notify: true,
         role: 'contributor'
+      }
+      const user = {
+        ...props.data.loggedUser,
+        is_active: true
       }
 
       describe('handleWorkspaceMemberCreated', () => {
@@ -132,7 +134,8 @@ describe('<AdminWorkspaceUser />', () => {
 
         const tlmData = {
           workspace: workspace,
-          member: member
+          member: member,
+          user: user
         }
         before(() => {
           wrapper.instance().handleWorkspaceMemberCreated(tlmData)
@@ -140,7 +143,14 @@ describe('<AdminWorkspaceUser />', () => {
         it('should add the created member to the end of the workspace\'s member list', () => {
           const workspaceList = wrapper.state('content').workspaceList
           const lastWorkspace = workspaceList[workspaceList.length - 1]
-          expect(lastWorkspace.memberList).to.deep.equal([member])
+          expect(lastWorkspace.memberList).to.deep.equal([{
+            ...member,
+            is_active: user.is_active,
+            user: user,
+            user_id: user.user_id,
+            workspace: workspace,
+            workspace_id: workspace.workspace_id
+          }])
         })
       })
 
@@ -149,7 +159,8 @@ describe('<AdminWorkspaceUser />', () => {
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
         const tlmData = {
           workspace: workspace,
-          member: member
+          member: member,
+          user: user
         }
         before(() => {
           wrapper.instance().handleWorkspaceMemberDeleted(tlmData)
