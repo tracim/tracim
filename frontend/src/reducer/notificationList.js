@@ -10,15 +10,16 @@ import {
 const defaultNotificationList = [{
   author: '',
   content: '',
+  created: '',
   icon: '',
   id: 0,
   read: false,
   type: '',
-  url: 0,
+  url: '',
   workspace: ''
 }]
 
-const getNotificationFromTLM = (eventData, contentData) => {
+export const getNotificationFromTLM = (eventData, contentData) => {
   let typeIcon, type, url
 
   if (!/comment/.test(eventData.event_type) && /content.*created/.test(eventData.event_type)) {
@@ -49,7 +50,7 @@ const getNotificationFromTLM = (eventData, contentData) => {
     read: eventData.read,
     type: type,
     url: url,
-    workspace: contentData.workspace.slug
+    workspace: contentData.workspace.label
   }
 }
 
