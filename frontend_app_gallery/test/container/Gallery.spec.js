@@ -2,14 +2,11 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { Gallery } from '../../src/container/Gallery.jsx'
-import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import pictures from '../fixture/content/pictures.js'
-import { debug } from '../../src/debug.js'
 import { defaultDebug } from 'tracim_frontend_lib'
 
 describe('<Gallery />', () => {
   const folderId = 1
-  const folderName = 'folderTest'
 
   const props = {
     i18n: {},
@@ -32,7 +29,7 @@ describe('<Gallery />', () => {
             search: `?folder_ids=${folderId}`
           }
         },
-        translation :''
+        translation: ''
       },
       loggedUser: {
         ...defaultDebug.loggedUser
@@ -53,23 +50,78 @@ describe('<Gallery />', () => {
       lightBoxUrlList: [picture.filename],
       previewUrlForThumbnail: [picture.filename],
       rotationAngle: 0,
-      rawFileUrl: [picture.filename]
-    }))
+      rawFileUrl: [picture.filename],
+      workspaceId: picture.workspace_id,
+      folderId
+    })),
+    folderId
   }
 
+  describe('Intern function', () => {
+    describe('liveMessageNotRelevant', () => {
+      const initialState = {
+        config: {
+          appConfig: {
+            workspaceId: 1
+          }
+        },
+        folderId: 1
+      }
+      const initialData = {
+        content: {
+          workspace_id: 1,
+          parent_id: 1
+        }
+      }
+
+      it('should return false when the workspace is the same and the folderId is undefined', () => {
+        const state = {
+          ...initialState,
+          folderId: undefined
+        }
+        expect(wrapper.instance().liveMessageNotRelevant(initialData, state)).to.equal(false)
+      })
+      it('should return true when the workspace is not the same', () => {
+        const data = {
+          content: {
+            ...initialData.content,
+            workspace_id: initialData.content.workspace_id + 1
+          }
+        }
+        expect(wrapper.instance().liveMessageNotRelevant(data, initialState)).to.equal(true)
+      })
+      it('should return false when the folder id and the workspace are the same', () => {
+        expect(wrapper.instance().liveMessageNotRelevant(initialData, initialState)).to.equal(false)
+      })
+      it('should return true when the folder id is not the same', () => {
+        const data = {
+          content: {
+            ...initialData.content,
+            parent_id: initialState.folderId + 1
+          }
+        }
+        expect(wrapper.instance().liveMessageNotRelevant(data, initialState)).to.equal(true)
+      })
+    })
+  })
+
   describe('TLM handlers', () => {
+    before(() => {
+      wrapper.setState(stateMock)
+    })
+
     describe('handleContentDeleted', () => {
       describe('after deleting a picture', () => {
         it('should not be in the picture list anymore', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({content: pictures[1]})
-          expect(wrapper.state().imagePreviewList.every(image => image.contentId !== pictures[1].content_id))
+          wrapper.instance().handleContentDeleted({ content: pictures[1] })
+          expect(wrapper.state().imagePreviewList.every(image => image.contentId !== pictures[1].content_id)).to.equal(true)
           expect(wrapper.state().imagePreviewList.length).to.equal(stateMock.imagePreviewList.length - 1)
         })
 
         it('should go to the next picture when the current picture is deleted', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({content: pictures[1]})
+          wrapper.instance().handleContentDeleted({ content: pictures[1] })
           expect(wrapper.state().displayedPictureIndex).to.equal(1)
         })
 
@@ -104,8 +156,8 @@ describe('<Gallery />', () => {
         it('should not keep the old label in the picture list anymore but the new one, yes after rename', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ content: { ...pictures[1], label: 'betterversion' } })
-          expect(wrapper.state().imagePreviewList.every(image => image.label !== pictures[1].label))
-          expect(wrapper.state().imagePreviewList.some(image => image.label === 'betterversion'))
+          expect(wrapper.state().imagePreviewList.every(image => image.label !== pictures[1].label)).to.equal(true)
+          expect(wrapper.state().imagePreviewList.some(image => image.label === 'betterversion')).to.equal(true)
         })
 
         it('should keep the picture list sorted', () => {
@@ -133,13 +185,25 @@ describe('<Gallery />', () => {
         it('should ignore files from other folders', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ content: { ...pictures[0], label: 'NotRelevant', parent_id: folderId + 1 } })
-          expect(wrapper.state().imagePreviewList.every(image => image.label !== 'NotRelevant'))
+          expect(wrapper.state().imagePreviewList.every(image => image.label !== 'NotRelevant')).to.equal(true)
         })
 
         it('should ignore files from other workspaces', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ content: { ...pictures[0], label: 'NotRelevant', workspace_id: 2 } })
-          expect(wrapper.state().imagePreviewList.every(image => image.label !== 'NotRelevant'))
+          expect(wrapper.state().imagePreviewList.every(image => image.label !== 'NotRelevant')).to.equal(true)
+        })
+      })
+      describe('moving a content outside the current folder', () => {
+        it('should remove this content from the list when it was moved in a other workspace', () => {
+          wrapper.setState(stateMock)
+          wrapper.instance().handleContentModified({ content: { ...pictures[0], workspace_id: 2 } })
+          expect(wrapper.state().imagePreviewList.every(image => image.filename !== pictures[0].filename)).to.equal(true)
+        })
+        it('should remove this content from the list when it was moved in a other folder and same workspace', () => {
+          wrapper.setState(stateMock)
+          wrapper.instance().handleContentModified({ content: { ...pictures[0], parent_id: folderId + 1 } })
+          expect(wrapper.state().imagePreviewList.every(image => image.contentId !== pictures[0].content_id)).to.equal(true)
         })
       })
     })
