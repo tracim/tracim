@@ -9,6 +9,7 @@ import {
   updateNotification
 } from '../action-creator.sync.js'
 import {
+  displayDistanceDate,
   GenericButton,
   ListItemWrapper,
   PopinFixedHeader,
@@ -46,6 +47,20 @@ export class NotificationWall extends React.Component {
 
   handleClickSeeMore = () => { }
 
+  getNotificationTypeText = notification => {
+    const { props } = this
+    switch (notification.type) {
+      case 'content.created':
+        return props.t(' created ')
+      case 'content.modified':
+        return props.t(' updated a new version of ')
+      case 'status.modified':
+        return props.t(' updated the status of ')
+      case 'member.created':
+        return props.t(' added you ')
+    }
+  }
+
   render () {
     const { props, state } = this
 
@@ -62,7 +77,7 @@ export class NotificationWall extends React.Component {
         />
 
         <div className='notification__list'>
-          {props.notificationList.map((notification, i) => {
+          {props.notificationList && props.notificationList.map((notification, i) => {
             return (
               <ListItemWrapper
                 isLast={i === props.notificationList.length - 1}
@@ -79,30 +94,27 @@ export class NotificationWall extends React.Component {
                   key={notification.id}
                 >
                   <i className={`notification__list__item__icon fa ${notification.icon}`} />
-                  <div>
-                    {props.t(notification.text, {
-                      author: notification.author,
-                      content: notification.content,
-                      workspace: notification.workspace,
-                      interpolation: { escapeValue: false }
-                    })}
+                  <div className='notification__list__item__text'>
+                    {notification.author} {this.getNotificationTypeText(notification)}
+                    {notification.content ? <u>{notification.content}</u> : ''}
+                    {props.t(' at ')} <b>{notification.workspace}</b> {displayDistanceDate(notification.created, props.user.lang)}
                   </div>
                   {!notification.read && <i className='notification__list__item__circle fa fa-circle' />}
                 </Link>
               </ListItemWrapper>
             )
           })}
-        </div>
 
-        {state.hasMoreNotifications &&
-          <div className='notification__footer'>
-            <GenericButton
-              customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-              onClick={this.handleClickSeeMore}
-              label={props.t('See more')}
-              faIcon='chevron-down'
-            />
-          </div>}
+          {state.hasMoreNotifications &&
+            <div className='notification__footer'>
+              <GenericButton
+                customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                onClick={this.handleClickSeeMore}
+                label={props.t('See more')}
+                faIcon='chevron-down'
+              />
+            </div>}
+        </div>
       </div>
     )
   }
