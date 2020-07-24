@@ -3673,6 +3673,20 @@ class TestKnownMembersEndpoint(object):
         assert res[0]["public_name"] == test_user.display_name
         assert res[0]["avatar_url"] is None
 
+    def test_api__known_members_fails_when_both_including_and_excluding_workspaces(
+        self, admin_user, web_testapp
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.get(
+            "/api/users/{user_id}/known_members".format(user_id=admin_user.user_id),
+            status=400,
+            params={
+                "acp": "bob",
+                "exclude_workspace_ids": str([1]),
+                "include_workspace_ids": str([1]),
+            },
+        )
+
     def test_api__get_user__ok_200__admin__by_name__deactivated_members(
         self, user_api_factory, web_testapp, admin_user
     ):
