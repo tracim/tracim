@@ -90,7 +90,7 @@ export class WorkspaceAdvanced extends React.Component {
   // Custom Event Handlers
   handleShowApp = data => {
     console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(this.state.config.slug), data)
-    this.props.appContentCustomEventHandlerShowApp(data.content, this.state.content, this.setState.bind(this), this.buildBreadcrumbs)
+    this.props.appContentCustomEventHandlerShowApp(data.content, this.state.content, this.setState.bind(this), () => {})
   }
 
   handleHideApp = data => {
