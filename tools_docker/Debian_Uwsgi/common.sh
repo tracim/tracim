@@ -194,7 +194,7 @@ fi
 # Modify default log path for Pushpin, Redis, Zurl (since Tracim 3.0.0)
 sed -i "s|^logdir=.*|logdir=/var/tracim/logs/pushpin/|g" /etc/pushpin/pushpin.conf
 sed -i "s|^logfile.*|logfile /var/tracim/logs/redis/redis-server.log|g" /etc/redis/redis.conf
-sed -i "s|^DAEMON_ARGS=.*|DAEMON_ARGS="--config=/etc/zurl.conf --logfile=/var/tracim/logs/zurl.log" # Arguments to run the daemon with|g" /etc/init.d/zurl
+sed -i "s|^DAEMON_ARGS=.*|DAEMON_ARGS=\"--config=/etc/zurl.conf --logfile=/var/tracim/logs/zurl.log\" # Arguments to run the daemon with|g" /etc/init.d/zurl
 
 # Add user Pushpin, Redis, Zurl in www-data group for logging (since Tracim 3.0.0)
 adduser redis www-data
