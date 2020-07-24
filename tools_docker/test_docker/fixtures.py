@@ -58,7 +58,7 @@ def tracim_docker_params(tracim_env_var_params):
 def client():
     return testinfra.get_host('local://')
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def tracim(request, tracim_docker_params, elasticsearch, collabora):
     # run a container
     docker_id = subprocess.check_output(tracim_docker_params).decode().strip()

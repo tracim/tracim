@@ -27,6 +27,7 @@ def test_caldav_running(tracim):
 def test_pushpin_running(tracim):
     assert tracim.socket("tcp://127.0.0.1:7999").is_listening
     assert tracim.socket("tcp://127.0.0.1:5561").is_listening
+    assert tracim.process.get(user="pushpin", comm='pushpin')
 
 def test_mail_notifier_running(tracim):
     tracim_mail_notifier = tracim.supervisor('tracim_mail_notifier')
@@ -43,14 +44,6 @@ def test_rq_worker_is_running(tracim):
 def test_xvfb_is_running(tracim):
     xvfb = tracim.supervisor('xvfb')
     assert xvfb.is_running
-
-def test_tracimcli_access(tracim, capsys):
-    result = tracim.check_output('tracimcli dev parameters value -f -d -c /etc/tracim/development.ini')
-    with capsys.disabled():
-        print('\n')
-        print(result)
-        print('\n')
-    assert result
 
 def test_tracim_dirs_exists(tracim):
     assert tracim.file("/etc/tracim/").is_directory
@@ -154,3 +147,33 @@ def test_removed_packages(tracim):
     assert not tracim.package('nodejs').is_installed
     assert not tracim.package('python3-dev').is_installed
     assert not tracim.package('build-essential').is_installed
+
+def test_tracimcli_access(tracim, capsys):
+    result = tracim.check_output('tracimcli dev parameters value -f -d -c /etc/tracim/development.ini')
+    with capsys.disabled():
+        print('\n')
+        print(result)
+        print('\n')
+    assert result
+
+def test_all(tracim, capsys):
+    test_redis_running(tracim)
+    test_apache_running(tracim)
+    test_uwsgi_running(tracim)
+    test_webdav_running(tracim)
+    test_caldav_running(tracim)
+    test_pushpin_running(tracim)
+    test_mail_notifier_running(tracim)
+    test_mail_fetcher_is_running(tracim)
+    test_rq_worker_is_running(tracim)
+    test_xvfb_is_running(tracim)
+    test_tracim_dirs_exists(tracim)
+    test_docker_scripts_exists(tracim)
+    test_defaut_file_created(tracim)
+    test_sqlite_database_available(tracim)
+    test_webdav_config_available(tracim)
+    test_caldav_config_available(tracim)
+    test_removed_files(tracim)
+    test_existing_packages(tracim)
+    test_removed_packages(tracim)
+    test_tracimcli_access(tracim, capsys)
