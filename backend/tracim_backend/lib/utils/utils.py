@@ -498,9 +498,9 @@ def get_build_version(path: str) -> str:
 
 
 def validate_page_token(page_token: str):
-    # INFO - G.M - 2020-07-23 - Explicitly catch error for unvalid bookmark
-    # as unserialize_bookmark method of sqlakeyset doesn't return explicit exception
-    # see https://github.com/djrobstep/sqlakeyset/issues/34
+    # INFO - G.M - 2020-07-23 - Because they lack an explicit message, we catch exceptions from
+    # the unserialize_bookmark method of sqlakeyset and re-raise them with an explicit message.
+    # See https://github.com/djrobstep/sqlakeyset/issues/34
     try:
         unserialize_bookmark(page_token)
     except Exception as e:

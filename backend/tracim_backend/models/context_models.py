@@ -586,7 +586,7 @@ class TextBasedContentUpdate(object):
 
 class LiveMessageQuery(object):
     """
-    Folder Content update model
+    Live Message query model
     """
 
     def __init__(
@@ -1550,7 +1550,7 @@ class RevisionInContext(object):
 
 
 class PaginatedObject(object):
-    def __init__(self, page: Page):
+    def __init__(self, page: Page) -> None:
         self.previous_page_token = page.paging.bookmark_previous
         self.next_page_token = page.paging.bookmark_next
         self.has_previous = page.paging.has_previous

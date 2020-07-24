@@ -1476,7 +1476,7 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
     event_types = EventTypeListField()
 
     @post_load
-    def live_message_query(self, data: typing.Dict[str, typing.Any]) -> object:
+    def live_message_query(self, data: typing.Dict[str, typing.Any]) -> LiveMessageQuery:
         return LiveMessageQuery(**data)
 
 

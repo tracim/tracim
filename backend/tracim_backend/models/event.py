@@ -26,10 +26,10 @@ class EventType(object):
     database
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         event_type_data = name.split(".")
         if not len(event_type_data) in [2, 3]:
-            raise ValidationError("event_type should have 2 to 3 part")
+            raise ValidationError("event_type should have 2 to 3 parts")
         if len(event_type_data) == 2:
             event_type_data.append(None)
         entity = event_type_data[0]
