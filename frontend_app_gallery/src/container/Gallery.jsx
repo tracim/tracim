@@ -95,7 +95,7 @@ export class Gallery extends React.Component {
 
   liveMessageNotRelevant (data, state) {
     return Number(data.content.workspace_id) !== Number(state.config.appConfig.workspaceId) ||
-    Number(data.content.parent_id) !== Number(state.folderId)
+    (state.folderId !== undefined && Number(data.content.parent_id) !== Number(state.folderId))
   }
 
   handleShowApp = data => {
@@ -128,8 +128,13 @@ export class Gallery extends React.Component {
 
   handleContentModified = data => {
     const { state } = this
-    if (this.liveMessageNotRelevant(data, state)) return
-
+    if (this.liveMessageNotRelevant(data, state)) {
+      // INFO - GM - 2020-07-20 - The if below covers the move functionality.
+      if (state.imagePreviewList.find(p => data.content.content_id === p.contentId)) {
+        this.removeContent(data.content.content_id)
+      }
+      return
+    }
     // RJ - 2020-06-15 - NOTE
     // We need to reorder the list because the label of the file could have changed.
     // We could test whether this is the case, but handling only one case is
@@ -153,6 +158,11 @@ export class Gallery extends React.Component {
   handleContentDeleted = data => {
     const { state } = this
     if (this.liveMessageNotRelevant(data, state)) return
+    this.removeContent(data.content.content_id)
+  }
+
+  removeContent = (contentId) => {
+    const { state } = this
 
     let displayedPictureIndex = state.displayedPictureIndex
     let imagePreviewList = state.imagePreviewList
@@ -160,7 +170,7 @@ export class Gallery extends React.Component {
     let deletedIndex = -1
 
     imagePreviewList = state.imagePreviewList.filter((image, i) => {
-      const isDeletedImage = Number(image.contentId) === Number(data.content.content_id)
+      const isDeletedImage = Number(image.contentId) === Number(contentId)
       if (isDeletedImage) deletedIndex = i
       return !isDeletedImage
     })

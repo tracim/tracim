@@ -88,6 +88,7 @@ export class MainPreview extends React.Component {
 
   componentDidUpdate (prevProps) {
     if (prevProps.rotationAngle !== this.props.rotationAngle) this.computeImageRatioForRotation()
+    if (prevProps.previewSrc !== this.props.previewSrc) this.setState({ imageLoaded: IMG_LOAD_STATE.LOADING })
   }
 
   render () {

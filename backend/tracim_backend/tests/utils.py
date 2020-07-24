@@ -293,7 +293,7 @@ def set_html_document_slug_to_legacy(session_factory: sessionmaker) -> None:
     assert content_query.count() > 0
 
 
-def create_1000px_png_test_image() -> None:
+def create_1000px_png_test_image() -> BytesIO:
     file = BytesIO()
     image = Image.new("RGBA", size=(1000, 1000), color=(0, 0, 0))
     image.save(file, "png")

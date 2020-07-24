@@ -7,9 +7,6 @@ import {
   CardPopupCreateContent,
   CUSTOM_EVENT,
   handleFetchResult,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
 import { postHtmlDocContent } from '../action.async.js'
@@ -37,30 +34,6 @@ class PopupCreateHtmlDocument extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
-
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentCreated }
-    ])
-  }
-
-  // TLM Handlers
-  handleContentCreated = data => {
-    const { state } = this
-    if (Number(data.content.parent_id) !== Number(state.folderId) ||
-      state.loggedUser.userId !== data.author.user_id ||
-      state.newContentName !== data.content.label
-    ) return
-
-    this.handleClose()
-
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.OPEN_CONTENT_URL,
-      data: {
-        workspaceId: data.content.workspace_id,
-        contentType: state.appName,
-        contentId: data.content.content_id
-      }
-    })
   }
 
   // Custom Event Handlers
@@ -95,38 +68,44 @@ class PopupCreateHtmlDocument extends React.Component {
     }
   })
 
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
+
   handleValidate = async () => {
-    const { config, workspaceId, folderId, newContentName } = this.state
+    const { config, appName, workspaceId, folderId, newContentName } = this.state
 
     const fetchSaveNewHtmlDoc = postHtmlDocContent(config.apiUrl, workspaceId, folderId, config.slug, newContentName)
 
     const resSave = await handleFetchResult(await fetchSaveNewHtmlDoc)
 
-    if (resSave.apiResponse.status !== 200) {
-      switch (resSave.apiResponse.status) {
-        case 400:
-          switch (resSave.body.code) {
-            case 3002:
-              GLOBAL_dispatchEvent({
-                type: CUSTOM_EVENT.ADD_FLASH_MSG,
-                data: {
-                  msg: this.props.t('A content with the same name already exists'),
-                  type: 'warning',
-                  delay: undefined
-                }
-              })
-              break
-          }
-          break
-        default: GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    switch (resSave.apiResponse.status) {
+      case 200:
+        this.handleClose()
+
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.OPEN_CONTENT_URL,
           data: {
-            msg: this.props.t('Error while creating document'),
-            type: 'warning',
-            delay: undefined
+            workspaceId: resSave.body.workspace_id,
+            contentType: appName,
+            contentId: resSave.body.content_id
+            // will be open in edit mode because revision.length === 1
           }
         })
-      }
+        break
+      case 400:
+        switch (resSave.body.code) {
+          case 3002:
+            this.sendGlobalFlashMessage(this.props.t('A content with the same name already exists'))
+            break
+        }
+        break
+      default: this.sendGlobalFlashMessage(this.props.t('Error while creating document'))
     }
   }
 
