@@ -1,11 +1,13 @@
 import React from 'react'
 import { expect } from 'chai'
+import sinon from 'sinon'
 import { shallow } from 'enzyme'
 import {
   mockGetWorkspaces200,
   mockGetWorkspaceMembers200,
   mockGetUsers200,
-  mockGetUserDetails200
+  mockGetUserDetails200,
+  mockPostUser200
 } from '../apiMock.js'
 import { AdminWorkspaceUser } from '../../src/container/AdminWorkspaceUser.jsx'
 
@@ -36,6 +38,231 @@ describe('<AdminWorkspaceUser />', () => {
       }
     }
   }
+
+  describe('intern functions', () => {
+    mockGetWorkspaces200(
+      props.data.config.apiUrl,
+      [{ workspace_id: 1, label: 'Hello', description: '' }]
+    ).persist()
+    const wrapper = shallow(<AdminWorkspaceUser {...props} />)
+    const initialName = 'John'
+    const initialUsername = 'john'
+    const initialEmail = 'john.doe@johndoe.com'
+    const initialProfile = 'administrators'
+    const initialPassword = 'password'
+
+    describe('handleClickAddUser()', () => {
+      const sendGlobalFlashMsgSpy = sinon.spy()
+      const initialSendGlobalFlashMsg = wrapper.instance().sendGlobalFlashMsg
+      wrapper.instance().sendGlobalFlashMsg = sendGlobalFlashMsgSpy
+
+      after(() => {
+        wrapper.instance().sendGlobalFlashMsg = initialSendGlobalFlashMsg
+      })
+
+      describe('adding a new user with a name too small', () => {
+        before(() => {
+          wrapper.instance().handleClickAddUser(
+            'a',
+            initialUsername,
+            initialEmail,
+            initialEmail,
+            initialProfile,
+            initialPassword
+          )
+        })
+
+        afterEach(() => {
+          sendGlobalFlashMsgSpy.resetHistory()
+        })
+
+        it('should display a warning flash message', () => {
+          expect(sendGlobalFlashMsgSpy.calledOnceWith(
+            props.t('Full name must be at least {{minimumCharactersPublicName}} characters')
+          )).to.equal(true)
+        })
+      })
+
+      describe('adding a new user with a wrong password', () => {
+        const addUserWithDifferentPassword = password => {
+          wrapper.instance().handleClickAddUser(
+            initialName,
+            initialUsername,
+            initialEmail,
+            initialProfile,
+            password
+          )
+        }
+
+        describe('when emailNotificationActivated is disabled', () => {
+          afterEach(() => {
+            sendGlobalFlashMsgSpy.resetHistory()
+          })
+
+          it('should display a flash message when the password is not defined', () => {
+            addUserWithDifferentPassword('')
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('Please set a password')
+            )).to.equal(true)
+          })
+
+          it('should display a flash message when the password is not long enough', () => {
+            addUserWithDifferentPassword('pa')
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('New password is too short (minimum 6 characters)')
+            )).to.equal(true)
+          })
+
+          it('should display a flash message when the password is too long', () => {
+            let password = ''
+            for (let i = 0; i < 530; i++) {
+              password += 'a'
+            }
+            addUserWithDifferentPassword(password)
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('New password is too long (maximum 512 characters)')
+            )).to.equal(true)
+          })
+        })
+        describe('when emailNotificationActivated is enabled', () => {
+          const wrapperStateConfig = wrapper.state().config
+
+          before(() => {
+            wrapper.setState({
+              config: {
+                ...wrapperStateConfig,
+                system: {
+                  ...wrapperStateConfig.system,
+                  config: {
+                    ...wrapperStateConfig.system.config,
+                    email_notification_activated: true
+                  }
+                }
+              }
+            })
+          })
+
+          after(() => {
+            wrapper.setState({
+              config: wrapperStateConfig
+            })
+          })
+
+          afterEach(() => {
+            sendGlobalFlashMsgSpy.resetHistory()
+          })
+
+          it('should display a flash message when the password is not long enough', () => {
+            addUserWithDifferentPassword('pa')
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('New password is too short (minimum 6 characters)')
+            )).to.equal(true)
+          })
+
+          it('should display a flash message when the password is too long', () => {
+            let password = ''
+            for (let i = 0; i < 530; i++) {
+              password += 'a'
+            }
+            addUserWithDifferentPassword(password)
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('New password is too long (maximum 512 characters)')
+            )).to.equal(true)
+          })
+        })
+      })
+
+      describe('adding a new user with a valid form', () => {
+        describe('when emailNotificationActivated is disabled', () => {
+          before(() => {
+            mockPostUser200(props.data.config.apiUrl)
+            wrapper.instance().handleClickAddUser(
+              initialName,
+              initialUsername,
+              initialEmail,
+              initialProfile,
+              initialPassword
+            )
+          })
+
+          afterEach(() => {
+            sendGlobalFlashMsgSpy.resetHistory()
+          })
+
+          it('should display the success flash message', () => {
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('User created')
+            )).to.equal(true)
+          })
+        })
+        describe('when emailNotificationActivated is enabled', () => {
+          const wrapperStateConfig = wrapper.state().config
+
+          before(() => {
+            wrapper.setState({
+              config: {
+                ...wrapperStateConfig,
+                system: {
+                  ...wrapperStateConfig.system,
+                  config: {
+                    ...wrapperStateConfig.system.config,
+                    email_notification_activated: true
+                  }
+                }
+              }
+            })
+          })
+
+          after(() => {
+            wrapper.setState({
+              config: wrapperStateConfig
+            })
+          })
+
+          afterEach(() => {
+            sendGlobalFlashMsgSpy.resetHistory()
+          })
+
+          describe('with a password', () => {
+            before(() => {
+              mockPostUser200(props.data.config.apiUrl)
+              wrapper.instance().handleClickAddUser(
+                initialName,
+                initialUsername,
+                initialEmail,
+                initialProfile,
+                initialPassword
+              )
+            })
+
+            it('should display the success flash message', () => {
+              expect(sendGlobalFlashMsgSpy.calledOnceWith(
+                props.t('User created and email sent')
+              )).to.equal(true)
+            })
+          })
+
+          describe('without a password', () => {
+            before(() => {
+              mockPostUser200(props.data.config.apiUrl)
+              wrapper.instance().handleClickAddUser(
+                initialName,
+                initialUsername,
+                initialEmail,
+                initialProfile,
+                ''
+              )
+            })
+            it('should display the success flash message', () => {
+              expect(sendGlobalFlashMsgSpy.calledOnceWith(
+                props.t('User created and email sent')
+              )).to.equal(true)
+            })
+          })
+        })
+      })
+    })
+  })
 
   describe('TLM handlers', () => {
     describe('eventType workspace', () => {

@@ -428,7 +428,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    if (!state.config.system.config.email_notification_activated) {
+    if (!state.config.system.config.email_notification_activated || password !== '') {
       if (password === '') {
         this.sendGlobalFlashMsg(props.t('Please set a password'), 'warning')
         return
