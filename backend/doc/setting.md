@@ -345,8 +345,8 @@ Listen 6544
     # RequestHeader set X-Remote-User %{REMOTE_USER}s
 
     ProxyPreserveHost On
-    ProxyPassMatch /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
-    ProxyPassReverse /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
+    ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
+    ProxyPassReverse ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
 
     ProxyPass / http://127.0.0.1:6543/
     ProxyPassReverse / http://127.0.0.1:6543/

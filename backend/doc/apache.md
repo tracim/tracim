@@ -51,8 +51,8 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
         ProxyPassReverse /ui http://127.0.0.1:6543/ui
 
         # Proxying Tracim Live Message to Pushpin
-        ProxyPassMatch /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
-        ProxyPassReverse /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
+        ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
+        ProxyPassReverse ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
 
         # Proxying Backend API
         ProxyPass /api http://127.0.0.1:6543/api
