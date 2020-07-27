@@ -100,18 +100,57 @@ if [ ! -d /etc/tracim/custom_toolbox ]; then
     mkdir /etc/tracim/custom_toolbox -p
 fi
 
-# Create logs, folder and assets directories
+# Create folder and logs file
 if [ ! -d /var/tracim/logs ]; then
     mkdir /var/tracim/logs -p
+    mkdir /var/tracim/logs/redis -p
+    mkdir /var/tracim/logs/pushpin -p
     touch /var/tracim/logs/tracim_web.log
     touch /var/tracim/logs/tracim_webdav.log
     touch /var/tracim/logs/tracim_caldav.log
     touch /var/tracim/logs/apache2-access.log
     touch /var/tracim/logs/apache2-error.log
-    chown root:www-data -R /var/tracim/logs
+    touch /var/tracim/logs/mail_notifier.log
+    touch /var/tracim/logs/rq_worker.log
+    touch /var/tracim/logs/supervisord.log
+    touch /var/tracim/logs/redis/redis-server.log
+    touch /var/tracim/logs/pushpin/access_7999.log
+    touch /var/tracim/logs/pushpin/error_7999.log
+    touch /var/tracim/logs/pushpin/m2adapter.log
+    touch /var/tracim/logs/pushpin/mongrel2_7999.log
+    touch /var/tracim/logs/pushpin/pushpin-handler.log
+    touch /var/tracim/logs/pushpin/pushpin-proxy.log
+    touch /var/tracim/logs/zurl.log
+    chown www-data:www-data -R /var/tracim/logs
     chmod 775 -R /var/tracim/logs
 fi
 
+# Create log folder for Pushpin (necessary when migrate from Tracim < 3.0.0 )
+if [ ! -d /var/tracim/logs/redis ]; then
+    mkdir /var/tracim/logs/redis -p
+    touch /var/tracim/logs/redis/redis-server.log
+    chown www-data:www-data -R /var/tracim/logs/redis
+    chmod 775 -R /var/tracim/logs/redis
+fi
+# Create log folder for Redis (necessary when migrate from Tracim < 3.0.0 )
+if [ ! -d /var/tracim/logs/pushpin ]; then
+    mkdir /var/tracim/logs/pushpin -p
+    touch /var/tracim/logs/pushpin/access_7999.log
+    touch /var/tracim/logs/pushpin/error_7999.log
+    touch /var/tracim/logs/pushpin/m2adapter.log
+    touch /var/tracim/logs/pushpin/mongrel2_7999.log
+    touch /var/tracim/logs/pushpin/pushpin-handler.log
+    touch /var/tracim/logs/pushpin/pushpin-proxy.log
+    chown www-data:www-data -R /var/tracim/logs/pushpin
+    chmod 775 -R /var/tracim/logs/pushpin
+fi
+# Create Zurl log (necessary when migrate from Tracim < 3.0.0 )
+if [ ]/var/tracim/logs/zurl.log ];then
+    touch /var/tracim/logs/zurl.log
+    chown www-data:www-data /var/tracim/logs/zurl.log
+fi
+
+# Create symbollic link to easy find log in container folder
 if [ ! -L /var/log/uwsgi/app/tracim_web.log ]; then
     ln -sf /var/tracim/logs/tracim_web.log /var/log/uwsgi/app/tracim_web.log
 fi
@@ -127,14 +166,54 @@ fi
 if [ ! -L /var/log/apache2/tracim-error.log ]; then
   ln -sf /var/tracim/logs/apache2-error.log /var/log/apache2/tracim-error.log
 fi
-# Create folder and assets directories
+if [ ! -L /var/log/redis-server.log ]; then
+  ln -sf /var/tracim/logs/redis/redis-server.log /var/log/redis-server.log
+fi
+if [ ! -L /var/log/access_7999.log ]; then
+  ln -sf /var/tracim/logs/pushpin/access_7999.log /var/log/access_7999.log
+fi
+if [ ! -L /var/log/error_7999.log ]; then
+  ln -sf /var/tracim/logs/pushpin/error_7999.log /var/log/error_7999.log
+fi
+if [ ! -L /var/log/m2adapter.log ]; then
+  ln -sf /var/tracim/logs/pushpin/m2adapter.log /var/log/m2adapter.log
+fi
+if [ ! -L /var/log/mongrel2_7999.log ]; then
+  ln -sf /var/tracim/logs/pushpin/mongrel2_7999.log /var/log/mongrel2_7999.log
+fi
+if [ ! -L /var/log/pushpin-handler.log ]; then
+  ln -sf /var/tracim/logs/pushpin/pushpin-handler.log /var/log/pushpin-handler.log
+fi
+if [ ! -L /var/log/pushpin-proxy.log ]; then
+  ln -sf /var/tracim/logs/pushpin/pushpin-proxy.log /var/log/pushpin-proxy.log
+fi
+if [ ! -L /var/log/zurl.log ]; then
+  ln -sf /var/tracim/logs/zurl.log /var/log/zurl.log
+fi
+
+# Modify default log path for Pushpin, Redis, Zurl (since Tracim 3.0.0)
+sed -i "s|^logdir=.*|logdir=/var/tracim/logs/pushpin/|g" /etc/pushpin/pushpin.conf
+sed -i "s|^logfile.*|logfile /var/tracim/logs/redis/redis-server.log|g" /etc/redis/redis.conf
+sed -i "s|^DAEMON_ARGS=.*|DAEMON_ARGS=\"--config=/etc/zurl.conf --logfile=/var/tracim/logs/zurl.log\" # Arguments to run the daemon with|g" /etc/init.d/zurl
+
+# Add user Pushpin, Redis, Zurl in www-data group for logging (since Tracim 3.0.0)
+adduser redis www-data
+adduser pushpin www-data
+adduser zurl www-data
+
+# Create uWSGi app folder and set right
+if [ ! -d /var/run/uwsgi/app ]; then
+    mkdir /var/run/uwsgi/app -p
+    chown www-data:www-data -R /var/run/uwsgi
+fi
+
+# Create Tracim required folder
 if [ ! -d /var/tracim/data ]; then
     mkdir /var/tracim/data -p
 fi
 if [ ! -f /var/tracim/assets ]; then
     mkdir /var/tracim/assets -p
 fi
-# Create required folder
 if [ ! -d /var/tracim/data/sessions_data ]; then
     mkdir /var/tracim/data/sessions_data
 fi

@@ -65,8 +65,6 @@ else
     alembic -c /etc/tracim/development.ini upgrade head
 fi
 
-mkdir -p /var/run/uwsgi/app/
-chown www-data:www-data -R /var/run/uwsgi
 chown www-data:www-data -R /var/tracim
 
 # activate apache mods
