@@ -64,38 +64,50 @@ describe('<WorkspaceAdvanced />', () => {
           expect(member.role).to.equal(tlmData.fields.member.role)
         })
       })
-    })
 
-    describe('handleMemberModified', () => {
-      describe('modify the member role', () => {
-        it('should update the member with the new role', () => {
+      describe('handleMemberModified', () => {
+        describe('modify the member role', () => {
+          it('should update the member with the new role', () => {
+            const tlmData = {
+              fields: {
+                author: author,
+                user: user,
+                member: { role: 'contributor', do_notify: true },
+                workspace: workspace
+              }
+            }
+            wrapper.instance().handleMemberModified(tlmData)
+            const stateMember = wrapper.state('content').memberList.find(member => member.user_id === tlmData.fields.user.user_id)
+            expect(stateMember.role).to.equal(tlmData.fields.member.role)
+          })
+        })
+      })
+
+      describe('handleMemberDeleted', () => {
+        it("should delete the user from member's list", () => {
           const tlmData = {
             fields: {
               author: author,
               user: user,
-              member: { role: 'contributor', do_notify: true },
               workspace: workspace
             }
           }
-          wrapper.instance().handleMemberModified(tlmData)
-          const stateMember = wrapper.state('content').memberList.find(member => member.user_id === tlmData.fields.user.user_id)
-          expect(stateMember.role).to.equal(tlmData.fields.member.role)
+          wrapper.instance().handleMemberDeleted(tlmData)
+          const hasMember = !!(wrapper.state('content').memberList.find(member => member.user_id === tlmData.fields.user.user_id))
+          expect(hasMember).to.equal(false)
         })
       })
     })
 
-    describe('handleMemberDeleted', () => {
-      it("should delete the user from member's list", () => {
-        const tlmData = {
-          fields: {
-            author: author,
-            user: user,
-            workspace: workspace
-          }
-        }
-        wrapper.instance().handleMemberDeleted(tlmData)
-        const hasMember = !!(wrapper.state('content').memberList.find(member => member.user_id === tlmData.fields.user.user_id))
-        expect(hasMember).to.equal(false)
+    describe('eventType user', () => {
+      describe('handleUserModified', () => {
+        it("should update the member's username", () => {
+          wrapper.setState({ content: { ...wrapper.state('content'), memberList: [user] } })
+          const tlmData = { fields: { user: { ...user, username: 'newUsername' } } }
+          wrapper.instance().handleUserModified(tlmData)
+          const stateMember = wrapper.state('content').memberList.find(member => member.user_id === tlmData.fields.user.user_id)
+          expect(stateMember.user.username).to.equal(tlmData.fields.user.username)
+        })
       })
     })
   })

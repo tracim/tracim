@@ -10,7 +10,12 @@ import random
 import string
 import sys
 import types
-import typing
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
 from urllib.parse import urlencode
 from urllib.parse import urljoin
 import uuid
@@ -24,7 +29,7 @@ from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from tracim_backend.config import CFG
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
@@ -143,7 +148,7 @@ class Timezone(object):
         self.name = name
 
 
-def get_timezones_list() -> typing.List[Timezone]:
+def get_timezones_list() -> List[Timezone]:
     tz_list = []
     for tz_name in pytz.common_timezones:
         tz_list.append(Timezone(tz_name))
@@ -198,11 +203,11 @@ class ExtendedColor(Color):
 
 
 def string_to_list(
-    base_string: str,
+    base_string: Optional[str],
     separator: str,
-    cast_func: typing.Callable[[str], typing.Any],
+    cast_func: Callable[[str], Any],
     do_strip: bool = False,
-) -> typing.List[typing.Any]:
+) -> List[Any]:
     """
     Convert a string to a list of separated item of one type according
     to a string separator and to a cast_func
@@ -230,11 +235,8 @@ def string_to_list(
 
 
 def string_to_unique_item_list(
-    base_string: str,
-    separator: str,
-    cast_func: typing.Callable[[str], typing.Any],
-    do_strip: bool = False,
-) -> typing.List[typing.Any]:
+    base_string: str, separator: str, cast_func: Callable[[str], Any], do_strip: bool = False,
+) -> List[Any]:
     """
     Convert a string to a list of separated item of one type according
     to a string separator and to a cast_func, but with storing only unique value.
@@ -257,7 +259,7 @@ def string_to_unique_item_list(
     return list(OrderedDict.fromkeys(item_list))
 
 
-def deprecated(func: typing.Callable):
+def deprecated(func: Callable):
     """ Dummy deprecated function"""
     # TODO - G.M - 2018-12-04 - Replace this with a true deprecated function ?
     return func
@@ -325,7 +327,7 @@ def normpath(path: str) -> str:
     return base_normpath(path)
 
 
-def sliced_dict(data: typing.Dict[str, any], beginning_key_string: str) -> typing.Dict[str, any]:
+def sliced_dict(data: Dict[str, any], beginning_key_string: str) -> Dict[str, any]:
     """
     Get dict of all item beginning with beginning_key_string
     :param data:
@@ -390,7 +392,7 @@ class EmailUser(object):
     Useful object to handle more easily different way to deal with email address and username
     """
 
-    def __init__(self, user_email: str, username: typing.Optional[str] = None) -> None:
+    def __init__(self, user_email: str, username: Optional[str] = None) -> None:
         assert user_email
         email_username, email_address = email.utils.parseaddr(user_email)
         self.username = username or email_username or ""
@@ -405,7 +407,7 @@ class EmailUser(object):
         return "mailto:{email_address}".format(email_address=self.email_address)
 
 
-def find_direct_submodule_path(module: types.ModuleType) -> typing.List[str]:
+def find_direct_submodule_path(module: types.ModuleType) -> List[str]:
     """
     Get path of submodules of given module
     :param module: module to check
@@ -420,7 +422,7 @@ def find_direct_submodule_path(module: types.ModuleType) -> typing.List[str]:
     return sorted(module_path_list)
 
 
-def find_all_submodule_path(module: types.ModuleType) -> typing.List[str]:
+def find_all_submodule_path(module: types.ModuleType) -> List[str]:
     """
     get all submodules path of a module
     like "tracim_backend.lib.core.plugin"
@@ -458,7 +460,7 @@ def get_cache_token(path: str) -> str:
     return cache_token
 
 
-def get_current_git_hash(path: str) -> typing.Optional[str]:
+def get_current_git_hash(path: str) -> Optional[str]:
     """
     Get git hash of current code if available, else return None
     :param path:  path of git repository

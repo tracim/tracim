@@ -2,6 +2,7 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import { File } from '../../src/container/File.jsx'
 import { expect } from 'chai'
+import sinon from 'sinon'
 import {
   mockGetFileContent200,
   mockPutMyselfFileRead200,
@@ -24,6 +25,8 @@ describe('<File />', () => {
     content: contentFile,
     t: key => key
   }
+  const buildBreadcrumbsSpy = sinon.spy()
+  const setHeadTitleSpy = sinon.spy()
 
   mockGetFileContent200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id, contentFile.file)
   mockPutMyselfFileRead200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id)
@@ -32,6 +35,13 @@ describe('<File />', () => {
   mockGetFileRevision200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id, contentFile.revisionList).persist()
 
   const wrapper = shallow(<File {...props} />)
+  wrapper.instance().buildBreadcrumbs = buildBreadcrumbsSpy
+  wrapper.instance().setHeadTitle = setHeadTitleSpy
+
+  const resetSpiesHistory = () => {
+    buildBreadcrumbsSpy.resetHistory()
+    setHeadTitleSpy.resetHistory()
+  }
 
   describe('TLM Handlers', () => {
     describe('eventType content', () => {
@@ -89,12 +99,18 @@ describe('<File />', () => {
                 ...contentFile.file,
                 filename: 'newName.jpeg'
               },
-              author: contentFile.file.author
+              author: contentFile.file.author,
+              client_token: wrapper.state('config').apiHeader['X-Tracim-ClientToken']
             }
           }
 
           before(() => {
+            resetSpiesHistory()
             wrapper.instance().handleContentModified(tlmData)
+          })
+
+          after(() => {
+            resetSpiesHistory()
           })
 
           it('should be updated with the content modified', () => {
@@ -102,6 +118,12 @@ describe('<File />', () => {
           })
           it('should have the new revision in the timeline', () => {
             expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].filename).to.equal(tlmData.fields.content.filename)
+          })
+          it('should have called buildBreadcrumbs()', () => {
+            expect(buildBreadcrumbsSpy.calledOnce).to.equal(true)
+          })
+          it('should have called setHeadTitle() with the right args', () => {
+            expect(setHeadTitleSpy.calledOnce).to.equal(true)
           })
         })
 

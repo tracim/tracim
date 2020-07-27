@@ -169,7 +169,7 @@ describe('<Gallery />', () => {
         it('should keep the picture list sorted', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ fields: { content: { ...pictures[1], label: 'betterversion' } } })
-          let sortedImagesPreviews = [... wrapper.state().imagePreviewList]
+          let sortedImagesPreviews = [...wrapper.state().imagePreviewList]
           sortedImagesPreviews.sort((a, b) => (a.label.localeCompare(b.label)))
           expect(sortedImagesPreviews).to.be.deep.equal(wrapper.state().imagePreviewList)
         })

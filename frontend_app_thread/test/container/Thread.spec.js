@@ -2,6 +2,7 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import { Thread } from '../../src/container/Thread.jsx'
 import { expect } from 'chai'
+import sinon from 'sinon'
 import {
   mockGetThreadContent200,
   mockGetThreadComment200,
@@ -25,6 +26,8 @@ describe('<Thread />', () => {
     },
     t: key => key
   }
+  const buildBreadcrumbsSpy = sinon.spy()
+  const setHeadTitleSpy = sinon.spy()
 
   mockGetThreadContent200(debug.config.apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.thread)
   mockPutMyselfThreadRead200(debug.config.apiUrl, props.loggedUser.userId, contentThread.thread.workspace_id, contentThread.thread.content_id)
@@ -32,6 +35,13 @@ describe('<Thread />', () => {
   mockGetThreadRevision200(debug.config.apiUrl, contentThread.thread.workspace_id, contentThread.thread.content_id, contentThread.revisionList)
 
   const wrapper = shallow(<Thread {...props} />)
+  wrapper.instance().buildBreadcrumbs = buildBreadcrumbsSpy
+  wrapper.instance().setHeadTitle = setHeadTitleSpy
+
+  const resetSpiesHistory = () => {
+    buildBreadcrumbsSpy.resetHistory()
+    setHeadTitleSpy.resetHistory()
+  }
 
   describe('TLM Handlers', () => {
     describe('eventType content', () => {
@@ -132,16 +142,28 @@ describe('<Thread />', () => {
               content: {
                 ...baseRevisionTlm.content,
                 label: 'new label'
-              }
+              },
+              client_token: wrapper.state('config').apiHeader['X-Tracim-ClientToken']
             }
           }
 
           before(() => {
+            resetSpiesHistory()
             wrapper.instance().handleContentChanged(tlmData)
+          })
+
+          after(() => {
+            resetSpiesHistory()
           })
 
           it('should update the state label', () => {
             expect(wrapper.state('newContent').label).to.equal(tlmData.fields.content.label)
+          })
+          it('should call buildBreadcrumbs()', () => {
+            expect(buildBreadcrumbsSpy.called).to.equal(true)
+          })
+          it('should call setHeadTitle() with the right args', () => {
+            expect(setHeadTitleSpy.calledOnceWith(tlmData.fields.content.label)).to.equal(true)
           })
         })
 

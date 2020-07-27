@@ -46,8 +46,7 @@ describe('<NotificationWall />', () => {
     describe('getNotificationDetails', () => {
       const baseNotification = {
         workspace: firstWorkspaceFromApi,
-        content: contentFromApi,
-
+        content: contentFromApi
       }
       it(`should return type comment object if type is ${buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)}`, () => {
         expect(NotificationWallInstance.getNotificationDetails({
@@ -55,9 +54,9 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)
         }))
           .to.deep.equal({
-            icon:'fa-comments-o',
-            text:' commented on ',
-            url:`/ui/workspaces/${baseNotification.workspace.workspace_id}/dashboard`
+            icon: 'fa-comments-o',
+            text: ' commented on ',
+            url: `/ui/workspaces/${baseNotification.workspace.workspace_id}/dashboard`
           })
       })
 
@@ -67,9 +66,9 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon:'fa-magic',
-            text:' created ',
-            url:`/ui/workspaces/${baseNotification.workspace.workspace_id}/contents/${baseNotification.content.content_type}/${baseNotification.content.content_id}`
+            icon: 'fa-magic',
+            text: ' created ',
+            url: `/ui/workspaces/${baseNotification.workspace.workspace_id}/contents/${baseNotification.content.content_type}/${baseNotification.content.content_id}`
           })
       })
 
@@ -92,7 +91,7 @@ describe('<NotificationWall />', () => {
         }))
           .to.deep.equal({
             icon: 'fa-user-o',
-            text:' added you ',
+            text: ' added you ',
             url: `/ui/workspaces/${baseNotification.workspace.workspace_id}/dashboard`
           })
       })

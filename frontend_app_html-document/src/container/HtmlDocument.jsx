@@ -101,16 +101,21 @@ export class HtmlDocument extends React.Component {
     if (data.fields.content.content_id !== state.content.content_id) return
 
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+    const newContentObject = { ...state.content, ...data.fields.content }
     this.setState(prev => ({
       ...prev,
-      content: clientToken === data.fields.client_token ? { ...prev.content, ...data.fields.content } : prev.content,
-      newContent: { ...prev.content, ...data.fields.content },
+      content: clientToken === data.fields.client_token ? newContentObject : prev.content,
+      newContent: newContentObject,
       editionAuthor: data.fields.author.public_name,
       showRefreshWarning: clientToken !== data.fields.client_token,
       rawContentBeforeEdit: data.fields.content.raw_content,
       timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang),
       isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     }))
+    if (clientToken === data.fields.client_token) {
+      this.setHeadTitle(newContentObject.label)
+      this.buildBreadcrumbs(newContentObject)
+    }
   }
 
   handleContentCreated = data => {
@@ -198,7 +203,6 @@ export class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
 
     await this.loadContent()
-    this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -210,7 +214,6 @@ export class HtmlDocument extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      this.buildBreadcrumbs()
       globalThis.tinymce.remove('#wysiwygNewVersion')
       globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
@@ -282,15 +285,15 @@ export class HtmlDocument extends React.Component {
     )
   }
 
-  buildBreadcrumbs = () => {
+  buildBreadcrumbs = (content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
-          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
-          label: state.content.label,
+          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
+          label: content.label,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         }]
@@ -349,6 +352,7 @@ export class HtmlDocument extends React.Component {
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
+    this.buildBreadcrumbs(resHtmlDocument.body)
     await putHtmlDocRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
@@ -514,17 +518,21 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickRefresh = () => {
+    const { state } = this
     globalThis.tinymce.remove('#wysiwygNewVersion')
 
-    this.setState(prev => ({
-      content: {
-        ...prev.content,
-        ...prev.newContent,
-        raw_content: prev.rawContentBeforeEdit
-      },
+    const newObjectContent = {
+      ...state.content,
+      ...state.newContent
+    }
+
+    this.setState({
+      content: newObjectContent,
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
-    }))
+    })
+    this.setHeadTitle(newObjectContent.label)
+    this.buildBreadcrumbs(newObjectContent)
   }
 
   render () {

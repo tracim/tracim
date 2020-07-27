@@ -346,8 +346,16 @@ export class AdminWorkspaceUser extends React.Component {
     }
 
     const newMemberList = workspaceList[workspaceIndex].memberList.slice()
-    newMemberList.push(message.fields.member)
-    const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
+    newMemberList.push({
+      user_id: message.fields.user.user_id,
+      user: message.fields.user,
+      workspace_id: message.fields.workspace.workspace_id,
+      workspace: message.fields.workspace,
+      do_notify: message.fields.member.do_notify,
+      is_active: message.fields.user.is_active,
+      role: message.fields.member.role
+    })
+    const newWorkspace = { ...message.workspace, memberList: newMemberList }
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
       newWorkspace,
@@ -373,7 +381,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    const newMemberList = workspaceList[workspaceIndex].memberList.filter(m => m.user_id !== message.fields.role.user_id)
+    const newMemberList = workspaceList[workspaceIndex].memberList.filter(m => m.user_id !== message.fields.user.user_id)
     const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
@@ -420,7 +428,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    if (!state.config.system.config.email_notification_activated) {
+    if (!state.config.system.config.email_notification_activated || password !== '') {
       if (password === '') {
         this.sendGlobalFlashMsg(props.t('Please set a password'), 'warning')
         return
