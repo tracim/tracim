@@ -1,11 +1,19 @@
 import React from 'react'
 import sinon from 'sinon'
 import { expect } from 'chai'
+import { contentFromApi } from '../../fixture/content/content.js'
+import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import { isFunction } from '../../hocMock/helper'
 import { NotificationWall } from '../../../src/container/NotificationWall.jsx'
 import { shallow } from 'enzyme'
 import { user } from '../../hocMock/redux/user/user'
 import { UPDATE, NOTIFICATION } from '../../../src/action-creator.sync.js'
+import {
+  buildTracimLiveMessageEventType,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST
+} from 'tracim_frontend_lib'
 
 describe('<NotificationWall />', () => {
   const updateNotificationCallBack = sinon.spy()
@@ -35,25 +43,58 @@ describe('<NotificationWall />', () => {
   const NotificationWallInstance = wrapper.instance()
 
   describe('its internal functions', () => {
-    describe('getNotificationTypeText', () => {
-      it('should return created if type is content.created', () => {
-        expect(NotificationWallInstance.getNotificationTypeText({ type: 'content.created' }))
-          .to.equal(' created ')
+    describe('getNotificationDetails', () => {
+      const baseNotification = {
+        workspace: firstWorkspaceFromApi,
+        content: contentFromApi,
+
+      }
+      it(`should return type comment object if type is ${buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)}`, () => {
+        expect(NotificationWallInstance.getNotificationDetails({
+          ...baseNotification,
+          type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)
+        }))
+          .to.deep.equal({
+            icon:'fa-comments-o',
+            text:' commented on ',
+            url:`/ui/workspaces/${baseNotification.workspace.workspace_id}/dashboard`
+          })
       })
 
-      it('should return  updated a new version of  if type is content.modified', () => {
-        expect(NotificationWallInstance.getNotificationTypeText({ type: 'content.modified' }))
-          .to.equal(' updated a new version of ')
+      it(`should return type content.created object if type is ${buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)}`, () => {
+        expect(NotificationWallInstance.getNotificationDetails({
+          ...baseNotification,
+          type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)
+        }))
+          .to.deep.equal({
+            icon:'fa-magic',
+            text:' created ',
+            url:`/ui/workspaces/${baseNotification.workspace.workspace_id}/contents/${baseNotification.content.content_type}/${baseNotification.content.content_id}`
+          })
       })
 
-      it('should return updated the status of if type is status.modified', () => {
-        expect(NotificationWallInstance.getNotificationTypeText({ type: 'status.modified' }))
-          .to.equal(' updated the status of ')
+      it(`should return type content.modified object if type is ${buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD)}`, () => {
+        expect(NotificationWallInstance.getNotificationDetails({
+          ...baseNotification,
+          type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD)
+        }))
+          .to.deep.equal({
+            icon: 'fa-history',
+            text: ' updated a new version of ',
+            url: `/ui/workspaces/${baseNotification.workspace.workspace_id}/contents/${baseNotification.content.content_type}/${baseNotification.content.content_id}`
+          })
       })
 
-      it('should return added you if type is member.created', () => {
-        expect(NotificationWallInstance.getNotificationTypeText({ type: 'member.created' }))
-          .to.equal(' added you ')
+      it(`should return type workspace_member.created if type is ${buildTracimLiveMessageEventType(TLM_ET.SHAREDSPACE_MEMBER, TLM_CET.CREATED)}`, () => {
+        expect(NotificationWallInstance.getNotificationDetails({
+          ...baseNotification,
+          type: buildTracimLiveMessageEventType(TLM_ET.SHAREDSPACE_MEMBER, TLM_CET.CREATED)
+        }))
+          .to.deep.equal({
+            icon: 'fa-user-o',
+            text:' added you ',
+            url: `/ui/workspaces/${baseNotification.workspace.workspace_id}/dashboard`
+          })
       })
     })
 

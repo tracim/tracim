@@ -70,10 +70,12 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleWorkspaceDeleted = data => {
     this.props.dispatch(removeWorkspace(data.fields.workspace))
+    this.props.dispatch(addNotification(data))
   }
 
   handleWorkspaceModified = data => {
     this.props.dispatch(updateWorkspaceDetail(data.fields.workspace))
+    this.props.dispatch(addNotification(data))
   }
 
   handleMemberCreated = data => {
@@ -83,11 +85,13 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleMemberModified = data => {
     this.props.dispatch(updateWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
+    this.props.dispatch(addNotification(data))
   }
 
   handleMemberDeleted = data => {
     this.props.dispatch(removeWorkspaceMember(data.fields.user.user_id, data.fields.workspace.workspace_id))
     if (this.props.user.userId === data.fields.user.user_id) this.props.dispatch(removeWorkspace(data.fields.workspace))
+    this.props.dispatch(addNotification(data))
   }
 
   handleContentCreated = data => {
@@ -103,6 +107,7 @@ export class ReduxTlmDispatcher extends React.Component {
     if (response.status !== 200) return
 
     this.props.dispatch(removeWorkspaceReadStatus(response.json, data.fields.workspace.workspace_id))
+    this.props.dispatch(addNotification(data))
   }
 
   handleContentModified = data => {
@@ -115,14 +120,17 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleContentDeleted = data => {
     this.props.dispatch(deleteWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
+    this.props.dispatch(addNotification(data))
   }
 
   handleContentUnDeleted = data => {
     this.props.dispatch(unDeleteWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
+    this.props.dispatch(addNotification(data))
   }
 
   handleUserModified = data => {
     this.props.dispatch(updateUser(data.fields.user))
+    this.props.dispatch(addNotification(data))
   }
 
   render () {

@@ -9,10 +9,14 @@ import {
   updateNotification
 } from '../action-creator.sync.js'
 import {
+  buildTracimLiveMessageEventType,
   displayDistanceDate,
   GenericButton,
   ListItemWrapper,
   PopinFixedHeader,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
 
@@ -47,18 +51,50 @@ export class NotificationWall extends React.Component {
 
   handleClickSeeMore = () => { }
 
-  getNotificationTypeText = notification => {
+  getNotificationDetails = notification => {
     const { props } = this
+    let icon, text, url
+
     switch (notification.type) {
-      case 'content.created':
-        return props.t(' created ')
-      case 'content.modified':
-        return props.t(' updated a new version of ')
-      case 'status.modified':
-        return props.t(' updated the status of ')
-      case 'member.created':
-        return props.t(' added you ')
+      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT):
+        icon = 'fa-comments-o'
+        text = props.t(' commented on ')
+        url = `/ui/workspaces/${notification.workspace.workspace_id}/dashboard`
+        break
+      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.HTML_DOCUMENT):
+      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE):
+      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD):
+      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FOLDER):
+        icon = 'fa-magic'
+        text = props.t(' created ')
+        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+        break
+      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.HTML_DOCUMENT):
+      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FILE):
+      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD):
+      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FOLDER):
+        if (notification.content.current_revision_type === 'status-update') {
+          icon = 'fa-random'
+          text = props.t(' updated the status of ')
+        } else {
+          icon = 'fa-history'
+          text = props.t(' updated a new version of ')
+        }
+        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+        break
+      case buildTracimLiveMessageEventType(TLM_ET.SHAREDSPACE_MEMBER, TLM_CET.CREATED):
+        icon = 'fa-user-o'
+        text = props.t(' added you ')
+        url = `/ui/workspaces/${notification.workspace.workspace_id}/dashboard`
+        break
+      default:
+        icon = 'fa-bell'
+        text = ` ${notification.type} `
+        url = notification.content
+          ? `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+          : ''
     }
+    return { icon, text, url }
   }
 
   render () {
@@ -86,18 +122,19 @@ export class NotificationWall extends React.Component {
                 key={notification.id}
               >
                 <Link
-                  to={notification.url}
+                  to={this.getNotificationDetails(notification).url}
                   onClick={() => this.handleClickBtnClose(notification.id)}
                   className={
                     classnames('notification__list__item', { itemRead: notification.read })
                   }
                   key={notification.id}
                 >
-                  <i className={`notification__list__item__icon fa ${notification.icon}`} />
+                  <i className={`notification__list__item__icon fa ${this.getNotificationDetails(notification).icon}`} />
                   <div className='notification__list__item__text'>
-                    {notification.author} {this.getNotificationTypeText(notification)}
-                    {notification.content ? <u>{notification.content}</u> : ''}
-                    {props.t(' at ')} <b>{notification.workspace}</b> {displayDistanceDate(notification.created, props.user.lang)}
+                    {notification.author} {this.getNotificationDetails(notification).text}
+                    {notification.content ? <u>{notification.content.label}</u> : ' '}
+                    {notification.workspace ? <span>{props.t(' at ')} <b>{notification.workspace.label} </b></span> : ' '}
+                    {displayDistanceDate(notification.created, props.user.lang)}
                   </div>
                   {!notification.read && <i className='notification__list__item__circle fa fa-circle' />}
                 </Link>
