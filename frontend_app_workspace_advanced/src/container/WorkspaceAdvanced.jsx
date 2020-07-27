@@ -109,47 +109,47 @@ export class WorkspaceAdvanced extends React.Component {
 
   // TLM Handlers
   handleWorkspaceModified = (data) => {
-    if (data.workspace.workspace_id !== this.state.content.workspace_id) return
+    if (data.fields.workspace.workspace_id !== this.state.content.workspace_id) return
 
     this.setState(prev => ({
-      content: { ...prev.content, ...data.workspace }
+      content: { ...prev.content, ...data.fields.workspace }
     }))
   }
 
   handleMemberCreated = data => {
-    if (data.workspace.workspace_id !== this.state.content.workspace_id) return
+    if (data.fields.workspace.workspace_id !== this.state.content.workspace_id) return
 
     this.setState(prev => ({
       content: {
         ...prev.content,
         memberList: [...prev.content.memberList, {
-          user_id: data.user.user_id,
-          user: data.user,
-          workspace_id: data.workspace.workspace_id,
-          workspace: data.workspace,
-          do_notify: data.member.do_notify,
-          is_active: data.user.is_active,
-          role: data.member.role
+          user_id: data.fields.user.user_id,
+          user: data.fields.user,
+          workspace_id: data.fields.workspace.workspace_id,
+          workspace: data.fields.workspace,
+          do_notify: data.fields.member.do_notify,
+          is_active: data.fields.user.is_active,
+          role: data.fields.member.role
         }]
       }
     }))
   }
 
   handleMemberModified = data => {
-    if (data.workspace.workspace_id !== this.state.content.workspace_id) return
+    if (data.fields.workspace.workspace_id !== this.state.content.workspace_id) return
 
     this.setState(prev => ({
       content: {
         ...prev.content,
-        memberList: prev.content.memberList.map(m => m.user_id === data.user.user_id
+        memberList: prev.content.memberList.map(m => m.user_id === data.fields.user.user_id
           ? {
-            user_id: data.user.user_id,
-            user: data.user,
-            workspace_id: data.workspace.workspace_id,
-            workspace: data.workspace,
-            do_notify: data.member.do_notify,
-            is_active: data.user.is_active,
-            role: data.member.role
+            user_id: data.fields.user.user_id,
+            user: data.fields.user,
+            workspace_id: data.fields.workspace.workspace_id,
+            workspace: data.fields.workspace,
+            do_notify: data.fields.member.do_notify,
+            is_active: data.fields.user.is_active,
+            role: data.fields.member.role
           }
           : m
         )
@@ -161,7 +161,7 @@ export class WorkspaceAdvanced extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        memberList: prev.content.memberList.filter(m => m.user_id !== data.user.user_id)
+        memberList: prev.content.memberList.filter(m => m.user_id !== data.fields.user.user_id)
       }
     }))
   }

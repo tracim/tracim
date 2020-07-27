@@ -46,9 +46,9 @@ class PopupCreateHtmlDocument extends React.Component {
   // TLM Handlers
   handleContentCreated = data => {
     const { state } = this
-    if (Number(data.content.parent_id) !== Number(state.folderId) ||
-      state.loggedUser.userId !== data.author.user_id ||
-      state.newContentName !== data.content.label
+    if (Number(data.fields.content.parent_id) !== Number(state.folderId) ||
+      state.loggedUser.userId !== data.fields.author.user_id ||
+      state.newContentName !== data.fields.content.label
     ) return
 
     this.handleClose()
@@ -56,9 +56,9 @@ class PopupCreateHtmlDocument extends React.Component {
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.OPEN_CONTENT_URL,
       data: {
-        workspaceId: data.content.workspace_id,
+        workspaceId: data.fields.content.workspace_id,
         contentType: state.appName,
-        contentId: data.content.content_id
+        contentId: data.fields.content.content_id
       }
     })
   }

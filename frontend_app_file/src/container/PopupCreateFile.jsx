@@ -54,14 +54,14 @@ class PopupCreateFile extends React.Component {
     const { state } = this
 
     if (
-      data.content.workspace_id !== state.workspaceId ||
-      state.loggedUser.userId !== data.content.author.user_id ||
-      !state.fileToUploadList.some(f => f.name === data.content.filename)
+      data.fields.content.workspace_id !== state.workspaceId ||
+      state.loggedUser.userId !== data.fields.content.author.user_id ||
+      !state.fileToUploadList.some(f => f.name === data.fields.content.filename)
     ) return
 
-    const filePosted = new File([data.content], data.content.filename)
+    const filePosted = new File([data.fields.content], data.fields.content.filename)
 
-    filePosted.content = { ...data.content }
+    filePosted.content = { ...data.fields.content }
     const newFileUploadedList = [...state.fileUploadedList, filePosted]
     this.setState({ fileUploadedList: newFileUploadedList })
   }

@@ -51,9 +51,7 @@ describe('<AdminWorkspaceUser />', () => {
         }
         mockGetWorkspaceMembers200(props.data.config.apiUrl, workspace.workspace_id, [])
 
-        const tlmData = {
-          workspace: workspace
-        }
+        const tlmData = { fields: { workspace: workspace } }
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
 
         before(() => {
@@ -63,7 +61,7 @@ describe('<AdminWorkspaceUser />', () => {
         it('should add the created workspace to the end of the list', () => {
           const workspaceList = wrapper.state('content').workspaceList
           const lastWorkspace = workspaceList[workspaceList.length - 1]
-          expect(lastWorkspace).to.deep.equal({ ...tlmData.workspace, memberList: [] })
+          expect(lastWorkspace).to.deep.equal({ ...tlmData.fields.workspace, memberList: [] })
         })
       })
 
@@ -75,16 +73,14 @@ describe('<AdminWorkspaceUser />', () => {
         }
 
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
-        const tlmData = {
-          workspace: workspace
-        }
+        const tlmData = { fields: { workspace: workspace } }
         before(() => {
           wrapper.instance().handleWorkspaceModified(tlmData)
         })
         it('should replace the modified workspace', () => {
           const workspaceList = wrapper.state('content').workspaceList
           const lastWorkspace = workspaceList[workspaceList.length - 1]
-          expect(lastWorkspace).to.deep.equal({ ...tlmData.workspace, memberList: [] })
+          expect(lastWorkspace).to.deep.equal({ ...tlmData.fields.workspace, memberList: [] })
         })
       })
 
@@ -96,9 +92,7 @@ describe('<AdminWorkspaceUser />', () => {
         }
 
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
-        const tlmData = {
-          workspace: workspace
-        }
+        const tlmData = { fields: { workspace: workspace } }
         before(() => {
           wrapper.instance().handleWorkspaceDeleted(tlmData)
         })
@@ -131,8 +125,10 @@ describe('<AdminWorkspaceUser />', () => {
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
 
         const tlmData = {
-          workspace: workspace,
-          member: member
+          fields: {
+            workspace: workspace,
+            member: member
+          }
         }
         before(() => {
           wrapper.instance().handleWorkspaceMemberCreated(tlmData)
@@ -148,8 +144,10 @@ describe('<AdminWorkspaceUser />', () => {
         mockGetWorkspaceMembers200(props.data.config.apiUrl, 1, [member])
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
         const tlmData = {
-          workspace: workspace,
-          member: member
+          fields: {
+            workspace: workspace,
+            member: member
+          }
         }
         before(() => {
           wrapper.instance().handleWorkspaceMemberDeleted(tlmData)
@@ -191,9 +189,7 @@ describe('<AdminWorkspaceUser />', () => {
         mockGetUsers200(props.data.config.apiUrl, [admin])
         mockGetUserDetails200(props.data.config.apiUrl, adminDetails)
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
-        const tlmData = {
-          user: userDetails
-        }
+        const tlmData = { fields: { user: userDetails } }
 
         before(() => {
           wrapper.instance().handleUserCreated(tlmData)
@@ -210,9 +206,7 @@ describe('<AdminWorkspaceUser />', () => {
         mockGetUserDetails200(props.data.config.apiUrl, adminDetails)
         mockGetUserDetails200(props.data.config.apiUrl, userDetails)
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
-        const tlmData = {
-          user: userDetails
-        }
+        const tlmData = { fields: { user: userDetails } }
         before(() => {
           wrapper.instance().handleUserDeleted(tlmData)
         })
@@ -230,7 +224,9 @@ describe('<AdminWorkspaceUser />', () => {
         mockGetUserDetails200(props.data.config.apiUrl, userDetails)
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
         const tlmData = {
-          user: { ...userDetails, public_name: 'Foo2' }
+          fields: {
+            user: { ...userDetails, public_name: 'Foo2' }
+          }
         }
         before(() => {
           wrapper.instance().handleUserModified(tlmData)
@@ -238,7 +234,7 @@ describe('<AdminWorkspaceUser />', () => {
         it('should update the user list with the message\'s user', () => {
           const userList = wrapper.state('content').userList
           const lastUser = userList[userList.length - 1]
-          expect(lastUser).to.deep.equal(tlmData.user)
+          expect(lastUser).to.deep.equal(tlmData.fields.user)
         })
       })
     })

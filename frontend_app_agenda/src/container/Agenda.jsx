@@ -86,37 +86,37 @@ export class Agenda extends React.Component {
   // TLM Handlers
   handleUserModified = data => {
     const { state } = this
-    if (state.loggedUser.userId !== data.user.user_id) return
+    if (state.loggedUser.userId !== data.fields.user.user_id) return
 
     this.setState(prev => ({
       loggedUser: {
         ...prev.loggedUser,
-        authType: data.user.auth_type,
-        avatarUrl: data.user.avatar_url,
-        email: data.user.email,
-        isActive: data.user.is_active,
-        profile: data.user.profile,
-        publicName: data.user.public_name,
-        timezone: data.user.timezone,
-        username: data.user.username
+        authType: data.fields.user.auth_type,
+        avatarUrl: data.fields.user.avatar_url,
+        email: data.fields.user.email,
+        isActive: data.fields.user.is_active,
+        profile: data.fields.user.profile,
+        publicName: data.fields.user.public_name,
+        timezone: data.fields.user.timezone,
+        username: data.fields.user.username
       },
-      editionAuthor: data.author.public_name,
+      editionAuthor: data.fields.author.public_name,
       // INFO - GB - 2020-06-18 - Just show the warning message if there have been any changes in "My agendas" page and if it's not the language that changes (handled by custom event)
       // state.userWorkspaceList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.userWorkspaceList.length is always 1 (there is only the workspace in the list)
       // and there is no need to show the warning in these agendas because there is no data that can be changed visible.
-      showRefreshWarning: state.userWorkspaceList.length !== 1 && state.loggedUser.lang === data.user.lang
+      showRefreshWarning: state.userWorkspaceList.length !== 1 && state.loggedUser.lang === data.fields.user.lang
     }))
   }
 
   handleSharedspaceModified = data => {
     const { state } = this
-    if (!state.userWorkspaceList.find(workspace => workspace.workspace_id === data.workspace.workspace_id)) return
+    if (!state.userWorkspaceList.find(workspace => workspace.workspace_id === data.fields.workspace.workspace_id)) return
 
     this.setState({
       content: {
-        workspaceLabel: data.workspace.label
+        workspaceLabel: data.fields.workspace.label
       },
-      editionAuthor: data.author.public_name,
+      editionAuthor: data.fields.author.public_name,
       // INFO - GB - 2020-06-18 - Just show the warning message if there have been any changes in "My agendas" page
       // state.userWorkspaceList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.userWorkspaceList.length is always 1 (there is only the workspace in the list)
       // and there is no need to show the warning in these agendas because there is no data that can be changed visible.

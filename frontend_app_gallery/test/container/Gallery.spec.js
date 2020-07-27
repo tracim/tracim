@@ -68,9 +68,11 @@ describe('<Gallery />', () => {
         folderId: 1
       }
       const initialData = {
-        content: {
-          workspace_id: 1,
-          parent_id: 1
+        fields: {
+          content: {
+            workspace_id: 1,
+            parent_id: 1
+          }
         }
       }
 
@@ -83,9 +85,11 @@ describe('<Gallery />', () => {
       })
       it('should return true when the workspace is not the same', () => {
         const data = {
-          content: {
-            ...initialData.content,
-            workspace_id: initialData.content.workspace_id + 1
+          fields: {
+            content: {
+              ...initialData.content,
+              workspace_id: initialData.fields.content.workspace_id + 1
+            }
           }
         }
         expect(wrapper.instance().liveMessageNotRelevant(data, initialState)).to.equal(true)
@@ -95,9 +99,11 @@ describe('<Gallery />', () => {
       })
       it('should return true when the folder id is not the same', () => {
         const data = {
-          content: {
-            ...initialData.content,
-            parent_id: initialState.folderId + 1
+          fields: {
+            content: {
+              ...initialData.content,
+              parent_id: initialState.folderId + 1
+            }
           }
         }
         expect(wrapper.instance().liveMessageNotRelevant(data, initialState)).to.equal(true)
@@ -114,38 +120,38 @@ describe('<Gallery />', () => {
       describe('after deleting a picture', () => {
         it('should not be in the picture list anymore', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({ content: pictures[1] })
+          wrapper.instance().handleContentDeleted({ fields: { content: pictures[1] } })
           expect(wrapper.state().imagePreviewList.every(image => image.contentId !== pictures[1].content_id)).to.equal(true)
           expect(wrapper.state().imagePreviewList.length).to.equal(stateMock.imagePreviewList.length - 1)
         })
 
         it('should go to the next picture when the current picture is deleted', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({ content: pictures[1] })
+          wrapper.instance().handleContentDeleted({ fields: { content: pictures[1] } })
           expect(wrapper.state().displayedPictureIndex).to.equal(1)
         })
 
         it('should stay at the same index if the current picture is before the deleted picture', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({ content: pictures[0] })
+          wrapper.instance().handleContentDeleted({ fields: { content: pictures[0] } })
           expect(wrapper.state().displayedPictureIndex).to.equal(0)
         })
 
         it('should go to the previous picture if the last picture is deleted and this was the current picture', () => {
           wrapper.setState({ ...stateMock, displayedPictureIndex: 2 })
-          wrapper.instance().handleContentDeleted({ content: pictures[2] })
+          wrapper.instance().handleContentDeleted({ fields: { content: pictures[2] } })
           expect(wrapper.state().displayedPictureIndex).to.equal(1)
         })
 
         it('should ignore files from other folders', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({ content: { ...pictures[0], parent_id: folderId + 1 } })
+          wrapper.instance().handleContentDeleted({ fields: { content: { ...pictures[0], parent_id: folderId + 1 } } })
           expect(wrapper.state().imagePreviewList.length).to.equal(stateMock.imagePreviewList.length)
         })
 
         it('should ignore files from other workspaces', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({ content: { ...pictures[0], workspace_id: 2 } })
+          wrapper.instance().handleContentDeleted({ fields: { content: { ...pictures[0], workspace_id: 2 } } })
           expect(wrapper.state().imagePreviewList.length).to.equal(stateMock.imagePreviewList.length)
         })
       })
@@ -155,14 +161,14 @@ describe('<Gallery />', () => {
       describe('modifying the current picture', () => {
         it('should not keep the old label in the picture list anymore but the new one, yes after rename', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentModified({ content: { ...pictures[1], label: 'betterversion' } })
+          wrapper.instance().handleContentModified({ fields: { content: { ...pictures[1], label: 'betterversion' } } })
           expect(wrapper.state().imagePreviewList.every(image => image.label !== pictures[1].label)).to.equal(true)
           expect(wrapper.state().imagePreviewList.some(image => image.label === 'betterversion')).to.equal(true)
         })
 
         it('should keep the picture list sorted', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentModified({ content: { ...pictures[1], label: 'betterversion' } })
+          wrapper.instance().handleContentModified({ fields: { content: { ...pictures[1], label: 'betterversion' } } })
           let sortedImagesPreviews = [... wrapper.state().imagePreviewList]
           sortedImagesPreviews.sort((a, b) => (a.label.localeCompare(b.label)))
           expect(sortedImagesPreviews).to.be.deep.equal(wrapper.state().imagePreviewList)
@@ -170,39 +176,39 @@ describe('<Gallery />', () => {
 
         it('should stay at the same picture if the displayed picture is not touched', () => {
           wrapper.setState({ ...stateMock, displayedPictureIndex: 2 })
-          wrapper.instance().handleContentModified({ content: pictures[1] })
+          wrapper.instance().handleContentModified({ fields: { content: pictures[1] } })
           expect(wrapper.state().imagePreviewList[wrapper.state().displayedPictureIndex].label).to.equal(pictures[2].label)
 
           wrapper.setState({ ...stateMock, displayedPictureIndex: 0 })
-          wrapper.instance().handleContentModified({ content: pictures[1] })
+          wrapper.instance().handleContentModified({ fields: { content: pictures[1] } })
           expect(wrapper.state().imagePreviewList[wrapper.state().displayedPictureIndex].label).to.equal(pictures[0].label)
 
           wrapper.setState({ ...stateMock, displayedPictureIndex: 1 })
-          wrapper.instance().handleContentModified({ content: pictures[0] })
+          wrapper.instance().handleContentModified({ fields: { content: pictures[0] } })
           expect(wrapper.state().imagePreviewList[wrapper.state().displayedPictureIndex].label).to.equal(pictures[1].label)
         })
 
         it('should ignore files from other folders', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentModified({ content: { ...pictures[0], label: 'NotRelevant', parent_id: folderId + 1 } })
+          wrapper.instance().handleContentModified({ fields: { content: { ...pictures[0], label: 'NotRelevant', parent_id: folderId + 1 } } })
           expect(wrapper.state().imagePreviewList.every(image => image.label !== 'NotRelevant')).to.equal(true)
         })
 
         it('should ignore files from other workspaces', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentModified({ content: { ...pictures[0], label: 'NotRelevant', workspace_id: 2 } })
+          wrapper.instance().handleContentModified({ fields: { content: { ...pictures[0], label: 'NotRelevant', workspace_id: 2 } } })
           expect(wrapper.state().imagePreviewList.every(image => image.label !== 'NotRelevant')).to.equal(true)
         })
       })
       describe('moving a content outside the current folder', () => {
         it('should remove this content from the list when it was moved in a other workspace', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentModified({ content: { ...pictures[0], workspace_id: 2 } })
+          wrapper.instance().handleContentModified({ fields: { content: { ...pictures[0], workspace_id: 2 } } })
           expect(wrapper.state().imagePreviewList.every(image => image.filename !== pictures[0].filename)).to.equal(true)
         })
         it('should remove this content from the list when it was moved in a other folder and same workspace', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentModified({ content: { ...pictures[0], parent_id: folderId + 1 } })
+          wrapper.instance().handleContentModified({ fields: { content: { ...pictures[0], parent_id: folderId + 1 } } })
           expect(wrapper.state().imagePreviewList.every(image => image.contentId !== pictures[0].content_id)).to.equal(true)
         })
       })
@@ -212,14 +218,14 @@ describe('<Gallery />', () => {
       it("should update the gallery's title", () => {
         const newWorkspaceLabel = 'Workspace name changed'
         wrapper.setState(stateMock)
-        wrapper.instance().handleWorkspaceModified({ workspace: { workspace_id: 0, label: newWorkspaceLabel } })
+        wrapper.instance().handleWorkspaceModified({ fields: { workspace: { workspace_id: 0, label: newWorkspaceLabel } } })
         expect(wrapper.state().workspaceLabel).to.be.equal(newWorkspaceLabel)
       })
 
       it("should NOT change the gallery's title if the modified workspace is not the one displayed", () => {
         const newWorkspaceLabel = 'This is not my workspace'
         wrapper.setState(stateMock)
-        wrapper.instance().handleWorkspaceModified({ workspace: { workspace_id: 2, label: newWorkspaceLabel } })
+        wrapper.instance().handleWorkspaceModified({ fields: { workspace: { workspace_id: 2, label: newWorkspaceLabel } } })
         expect(wrapper.state().workspaceLabel).to.be.not.equal(newWorkspaceLabel)
       })
     })

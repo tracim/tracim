@@ -31,33 +31,37 @@ describe('<FolderAdvanced />', () => {
     describe('eventType content folder', () => {
       describe('handleFolderChanged (same folder)', () => {
         const tlmData = {
-          author: {
-            avatar_url: null,
-            public_name: 'Global manager',
-            user_id: 1
-          },
-          content: {
-            ...debug.content,
-            label: 'Hello, world'
+          fields: {
+            author: {
+              avatar_url: null,
+              public_name: 'Global manager',
+              user_id: 1
+            },
+            content: {
+              ...debug.content,
+              label: 'Hello, world'
+            }
           }
         }
 
         it("should update the component's folder", () => {
           wrapper.instance().handleFolderChanged(tlmData)
-          expect(wrapper.state('newContent')).to.deep.equal(tlmData.content)
+          expect(wrapper.state('newContent')).to.deep.equal(tlmData.fields.content)
         })
       })
 
       describe('handleFolderChanged (different folder)', () => {
         const tlmData = {
-          author: {
-            avatar_url: null,
-            public_name: 'Global manager',
-            user_id: 1
-          },
-          content: {
-            ...debug.content,
-            content_id: 2
+          fields: {
+            author: {
+              avatar_url: null,
+              public_name: 'Global manager',
+              user_id: 1
+            },
+            content: {
+              ...debug.content,
+              content_id: 2
+            }
           }
         }
 
@@ -67,7 +71,7 @@ describe('<FolderAdvanced />', () => {
         })
 
         it("should NOT update the component's folder", () => {
-          expect(wrapper.state('newContent')).to.not.equal(tlmData.content)
+          expect(wrapper.state('newContent')).to.not.equal(tlmData.fields.content)
         })
         it('should NOT update the head title', () => {
           expect(dispatchEventSpy.called).to.be.false

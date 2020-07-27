@@ -19,38 +19,38 @@ const defaultNotificationList = [{
   workspace: ''
 }]
 
-export const getNotificationFromTLM = (eventData, contentData) => {
+export const getNotificationFromTLM = data => {
   let typeIcon, type, url
 
-  if (!/comment/.test(eventData.event_type) && /content.*created/.test(eventData.event_type)) {
+  if (!/comment/.test(data.event_type) && /content.*created/.test(data.event_type)) {
     typeIcon = 'fa-magic'
     type = 'content.created'
-    url = `/ui/workspaces/${contentData.workspace.workspace_id}/contents/${contentData.content.content_type}/${contentData.content.content_id}`
-  } else if (/content.*modified/.test(eventData.event_type)) {
-    if (contentData.content.current_revision_type === 'status-update') {
+    url = `/ui/workspaces/${data.fields.workspace.workspace_id}/contents/${data.fields.content.content_type}/${data.fields.content.content_id}`
+  } else if (/content.*modified/.test(data.event_type)) {
+    if (data.fields.content.current_revision_type === 'status-update') {
       typeIcon = 'fa-random'
       type = 'status.modified'
     } else {
       typeIcon = 'fa-history'
       type = 'content.modified'
     }
-    url = `/ui/workspaces/${contentData.workspace.workspace_id}/contents/${contentData.content.content_type}/${contentData.content.content_id}`
-  } else if (eventData.event_type === 'workspace_member.created') {
+    url = `/ui/workspaces/${data.fields.workspace.workspace_id}/contents/${data.fields.content.content_type}/${data.fields.content.content_id}`
+  } else if (data.event_type === 'workspace_member.created') {
     typeIcon = 'fa-user-o'
     type = 'member.created'
-    url = `/ui/workspaces/${contentData.workspace.workspace_id}/dashboard`
+    url = `/ui/workspaces/${data.fields.workspace.workspace_id}/dashboard`
   } else return null
 
   return {
-    author: contentData.author.public_name,
-    content: contentData.content ? contentData.content.label : '',
-    created: eventData.created,
+    author: data.fields.author.public_name,
+    content: data.fields.content ? data.fields.content.label : '',
+    created: data.created,
     icon: typeIcon,
-    id: eventData.event_id,
-    read: eventData.read,
+    id: data.event_id,
+    read: data.read,
     type: type,
     url: url,
-    workspace: contentData.workspace.label
+    workspace: data.fields.workspace.label
   }
 }
 
@@ -58,15 +58,14 @@ export default function notificationList (state = defaultNotificationList, actio
   switch (action.type) {
     case `${SET}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
-        .map(no => getNotificationFromTLM(no, no.fields))
+        .map(no => getNotificationFromTLM(no))
         .filter(no => no !== null)
         .reverse()
       return uniqBy(notificationList, 'id')
     }
 
     case `${ADD}/${NOTIFICATION}`: {
-      // INFO - 2020-07-22 - GB - The event and the content data are in the same place, that's why we send the same constant
-      return uniqBy([getNotificationFromTLM(action.notification, action.notification), ...state], 'id')
+      return uniqBy([getNotificationFromTLM(action.notification), ...state], 'id')
     }
 
     case `${UPDATE}/${NOTIFICATION}`:
