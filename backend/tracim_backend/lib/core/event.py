@@ -45,7 +45,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
-from tracim_backend.models.event import EventType
+from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
@@ -85,7 +85,7 @@ class EventApi:
         read_status: ReadStatus = ReadStatus.ALL,
         event_id: typing.Optional[int] = None,
         user_id: typing.Optional[int] = None,
-        event_types: typing.List[EventType] = None,
+        event_types: typing.List[EventTypeDatabaseParameters] = None,
     ) -> Query:
         query = self._session.query(Message).join(Event)
         if event_id:
@@ -153,7 +153,7 @@ class EventApi:
         self,
         user_id: int,
         read_status: ReadStatus,
-        event_types: typing.List[EventType] = None,
+        event_types: typing.List[EventTypeDatabaseParameters] = None,
         count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
         page_token: typing.Optional[int] = None,
     ) -> Page:

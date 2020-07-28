@@ -20,38 +20,6 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 
 
-class EventType(object):
-    """
-    Helper to convert event_type string as real used parameters in
-    database
-    """
-
-    def __init__(self, name: str):
-        event_type_data = name.split(".")
-        if not len(event_type_data) in [2, 3]:
-            raise ValidationError("event_type should have 2 to 3 part")
-        if len(event_type_data) == 2:
-            event_type_data.append(None)
-        entity = event_type_data[0]
-        operation = event_type_data[1]
-        subtype = event_type_data[2]
-
-        try:
-            self.entity = EntityType(entity)
-        except ValueError as e:
-            raise ValidationError('entity "{}" is not a valid entity type'.format(entity)) from e
-
-        try:
-            self.operation = OperationType(operation)
-        except ValueError as e:
-            raise ValidationError(
-                'operation "{}" is not a valid operation type'.format(operation)
-            ) from e
-
-        self.subtype = subtype
-        self.name = name
-
-
 class OperationType(enum.Enum):
     CREATED = "created"
     MODIFIED = "modified"
@@ -78,6 +46,46 @@ class EntityType(enum.Enum):
     @classmethod
     def values(cls) -> typing.List[str]:
         return [e.value for e in cls]
+
+
+class EventTypeDatabaseParameters:
+    def __init__(
+        self, entity: EntityType, operation: OperationType, subtype: typing.Optional[str]
+    ) -> None:
+        self.entity = entity
+        self.operation = operation
+        self.subtype = subtype
+
+    @staticmethod
+    def from_event_type(event_type: str) -> "EventTypeDatabaseParameters":
+        """
+        Helper to convert event_type string as real used parameters in
+        database
+        """
+        event_type_data = event_type.split(".")
+        if not len(event_type_data) in [2, 3]:
+            raise ValidationError("event_type should have 2 to 3 part")
+        if len(event_type_data) == 2:
+            event_type_data.append(None)
+        entity_str = event_type_data[0]
+        operation_str = event_type_data[1]
+        subtype = event_type_data[2]
+
+        try:
+            entity = EntityType(entity_str)
+        except ValueError as e:
+            raise ValidationError(
+                'entity "{}" is not a valid entity type'.format(entity_str)
+            ) from e
+
+        try:
+            operation = OperationType(operation_str)
+        except ValueError as e:
+            raise ValidationError(
+                'operation "{}" is not a valid operation type'.format(operation_str)
+            ) from e
+
+        return EventTypeDatabaseParameters(entity, operation, subtype)
 
 
 class ReadStatus(enum.Enum):

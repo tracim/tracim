@@ -32,7 +32,7 @@ from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.event import EventType
+from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.roles import WorkspaceRoles
 
@@ -593,7 +593,7 @@ class LiveMessageQuery(object):
         self,
         read_status: str,
         count: int,
-        event_types: Optional[List[EventType]] = None,
+        event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         page_token: Optional[str] = None,
     ) -> None:
         self.read_status = ReadStatus(read_status)

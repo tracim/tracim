@@ -78,7 +78,7 @@ from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.event import EntityType
-from tracim_backend.models.event import EventType
+from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 
@@ -102,7 +102,7 @@ class EventTypeListField(StrippedString):
         if value:
             values = value.split(",")
             for item in values:
-                result.append(EventType(item.strip()))
+                result.append(EventTypeDatabaseParameters.from_event_type(item.strip()))
             return result
         return None
 
