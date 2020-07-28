@@ -145,9 +145,10 @@ if [ ! -d /var/tracim/logs/pushpin ]; then
     chmod 775 -R /var/tracim/logs/pushpin
 fi
 # Create Zurl log (necessary when migrate from Tracim < 3.0.0 )
-if [ ]/var/tracim/logs/zurl.log ];then
+if [ ! -f /var/tracim/logs/zurl.log ];then
     touch /var/tracim/logs/zurl.log
     chown www-data:www-data /var/tracim/logs/zurl.log
+    chmod 775 /var/tracim/logs/zurl.log
 fi
 
 # Create symbollic link to easy find log in container folder
