@@ -36,12 +36,18 @@ class EventType(object):
         operation = event_type_data[1]
         subtype = event_type_data[2]
 
-        if entity not in EntityType.values():
-            raise ValidationError('entity "{}" is not a valid entity type'.format(entity))
-        if operation not in OperationType.values():
-            raise ValidationError('operation "{}" is not a valid operation type'.format(operation))
-        self.entity = EntityType(entity)
-        self.operation = OperationType(operation)
+        try:
+            self.entity = EntityType(entity)
+        except ValueError as e:
+            raise ValidationError('entity "{}" is not a valid entity type'.format(entity)) from e
+
+        try:
+            self.operation = OperationType(operation)
+        except ValueError as e:
+            raise ValidationError(
+                'operation "{}" is not a valid operation type'.format(operation)
+            ) from e
+
         self.subtype = subtype
         self.name = name
 
