@@ -167,7 +167,6 @@ export class File extends React.Component {
       )
     }
 
-    if (clientToken === data.client_token) this.setHeadTitle(filenameNoExtension)
     this.setState(prev => ({
       content: clientToken === data.client_token ? newContentObject : prev.content,
       newContent: newContentObject,
@@ -176,6 +175,10 @@ export class File extends React.Component {
       timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
       isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
+    if (clientToken === data.client_token) {
+      this.setHeadTitle(filenameNoExtension)
+      this.buildBreadcrumbs(newContentObject)
+    }
   }
 
   handleContentCommentCreated = (data) => {
@@ -237,7 +240,6 @@ export class File extends React.Component {
 
     await this.loadContent()
     this.loadTimeline()
-    this.buildBreadcrumbs()
     if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
@@ -251,7 +253,6 @@ export class File extends React.Component {
       this.setState({ fileCurrentPage: 1 })
       await this.loadContent(1)
       this.loadTimeline()
-      this.buildBreadcrumbs()
       if (state.config.workspace.downloadEnabled) {
         this.setState({})
         this.loadShareLinkList()
@@ -311,6 +312,7 @@ export class File extends React.Component {
           isLastTimelineItemCurrentToken: false
         })
         this.setHeadTitle(filenameNoExtension)
+        this.buildBreadcrumbs(response.body)
         break
       }
       default:
@@ -360,7 +362,7 @@ export class File extends React.Component {
     }
   }
 
-  buildBreadcrumbs = () => {
+  buildBreadcrumbs = (content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({
@@ -368,8 +370,8 @@ export class File extends React.Component {
       data: {
         breadcrumbs: [{
           // FIXME - b.l - refactor urls
-          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
-          label: `${state.content.filename}`,
+          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
+          label: `${content.filename}`,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         }]
@@ -696,16 +698,21 @@ export class File extends React.Component {
   }
 
   handleClickRefresh = () => {
-    this.setState(prev => ({
-      content: {
-        ...prev.content,
-        ...prev.newContent
-      },
+    const { state } = this
+
+    const newObjectContent = {
+      ...state.content,
+      ...state.newContent
+    }
+
+    this.setState({
+      content: newObjectContent,
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
-    }))
+    })
     const filenameNoExtension = removeExtensionOfFilename(this.state.newContent.filename)
     this.setHeadTitle(filenameNoExtension)
+    this.buildBreadcrumbs(newObjectContent)
   }
 
   getDownloadBaseUrl = (apiUrl, content, mode) => {

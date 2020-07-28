@@ -164,7 +164,7 @@ class TestUserModel(object):
         user.email = email
         user.password = password
 
-        assert user.validate_password("uncorrect_password") is False
+        assert user.validate_password("incorrect_password") is False
 
     def test_unit__validate_password__false__empty_password(self):
         """

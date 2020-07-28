@@ -393,17 +393,22 @@ class CommentPath(object):
         self.comment_id = comment_id
 
 
-class KnownMemberQuery(object):
+class KnownMembersQuery(object):
     """
     Autocomplete query model
     """
 
     def __init__(
-        self, acp: str, exclude_user_ids: str = None, exclude_workspace_ids: str = None
+        self,
+        acp: str,
+        exclude_user_ids: str = None,
+        exclude_workspace_ids: str = None,
+        include_workspace_ids: str = None,
     ) -> None:
         self.acp = acp
         self.exclude_user_ids = string_to_list(exclude_user_ids, ",", int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)
+        self.include_workspace_ids = string_to_list(include_workspace_ids, ",", int)
 
 
 class AgendaFilterQuery(object):
@@ -586,7 +591,7 @@ class TextBasedContentUpdate(object):
 
 class LiveMessageQuery(object):
     """
-    Folder Content update model
+    Live Message query model
     """
 
     def __init__(
@@ -1550,7 +1555,7 @@ class RevisionInContext(object):
 
 
 class PaginatedObject(object):
-    def __init__(self, page: Page):
+    def __init__(self, page: Page) -> None:
         self.previous_page_token = page.paging.bookmark_previous
         self.next_page_token = page.paging.bookmark_next
         self.has_previous = page.paging.has_previous
