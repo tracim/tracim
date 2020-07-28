@@ -16,6 +16,7 @@ import {
   FOLDER,
   FOLDER_READ,
   newFlashMessage,
+  NOTIFICATION,
   NOTIFICATION_LIST,
   SEARCHED_KEYWORDS,
   setRedirectLogin,
@@ -859,6 +860,21 @@ export const getNotificationList = userId => dispatch => {
       method: 'GET'
     },
     actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+export const putNotificationAsRead = (userId, eventId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/${eventId}/read`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION,
     dispatch
   })
 }

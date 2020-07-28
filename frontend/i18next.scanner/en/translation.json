@@ -189,6 +189,8 @@
   "Error while deleting content": "Error while deleting content",
   "Error while moving content": "Error while moving content",
   "Error while uploading file": "Error while uploading file",
+  "Error while loading notification list": "Error while loading notification list",
+  "Error while marking the notification as read": "Error while marking the notification as read",
   "Move this content": "Move this content",
   "Move this folder": "Move this folder",
   "A content with same name already exists": "A content with same name already exists",

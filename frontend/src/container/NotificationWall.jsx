@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
-import { getNotificationList } from '../action-creator.async.js'
 import {
+  getNotificationList,
+  putNotificationAsRead
+} from '../action-creator.async.js'
+import {
+  newFlashMessage,
   setNotificationList,
   updateNotification
 } from '../action-creator.sync.js'
@@ -38,15 +42,29 @@ export class NotificationWall extends React.Component {
         props.dispatch(setNotificationList(fetchGetNotificationWall.json))
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading notification list'))
+        props.dispatch(newFlashMessage(props.t('Error while loading notification list'), 'warning'))
     }
   }
 
-  handleClickBtnClose = notificationId => {
-    const { props } = this
-    const notification = props.notificationList.find(notification => notification.id === notificationId)
-    props.dispatch(updateNotification({ ...notification, read: true }))
+  handleCloseNotificationWall = () => {
     this.setState({ isNotificationWallOpen: false })
+  }
+
+  handleClickNotification = async notificationId => {
+    const { props } = this
+
+    const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
+    switch (fetchPutNotificationAsRead.status) {
+      case 204: {
+        const notification = props.notificationList.find(notification => notification.id === notificationId)
+        props.dispatch(updateNotification({ ...notification, read: true }))
+        break
+      }
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
+    }
+
+    this.handleCloseNotificationWall()
   }
 
   handleClickSeeMore = () => { }
@@ -92,7 +110,7 @@ export class NotificationWall extends React.Component {
         text = ` ${notification.type} `
         url = notification.content
           ? `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
-          : ''
+          : '/ui'
     }
     return { icon, text, url }
   }
@@ -109,7 +127,7 @@ export class NotificationWall extends React.Component {
           faIcon='bell-o'
           rawTitle={props.t('Notifications')}
           componentTitle={<div>{props.t('Notifications')}</div>}
-          onClickCloseBtn={this.handleClickBtnClose}
+          onClickCloseBtn={this.handleCloseNotificationWall}
         />
 
         <div className='notification__list'>
@@ -123,7 +141,7 @@ export class NotificationWall extends React.Component {
               >
                 <Link
                   to={this.getNotificationDetails(notification).url}
-                  onClick={() => this.handleClickBtnClose(notification.id)}
+                  onClick={() => this.handleClickNotification(notification.id)}
                   className={
                     classnames('notification__list__item', { itemRead: notification.read })
                   }

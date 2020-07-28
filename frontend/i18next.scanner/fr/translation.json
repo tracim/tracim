@@ -190,6 +190,8 @@
   "Error while deleting content": "Erreur lors de la suppression du contenu",
   "Error while moving content": "Erreur lors du déplacement du contenu",
   "Error while uploading file": "Erreur lors du téléchargement du fichier",
+  "Error while loading notification list": "Erreur lors du chargement de la liste des notifications",
+  "Error while marking the notification as read": "Erreur au moment de marquer la notification comme lue",
   "Move this content": "Déplacer ce contenu",
   "Move this folder": "Déplacer ce dossier",
   "A content with same name already exists": "Un contenu avec le même nom existe déjà",
