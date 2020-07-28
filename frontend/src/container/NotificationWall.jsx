@@ -132,8 +132,8 @@ export class NotificationWall extends React.Component {
                   <i className={`notification__list__item__icon fa ${this.getNotificationDetails(notification).icon}`} />
                   <div className='notification__list__item__text'>
                     {notification.author} {this.getNotificationDetails(notification).text}
-                    {notification.content ? <u>{notification.content.label}</u> : ' '}
-                    {notification.workspace ? <span>{props.t(' at ')} <b>{notification.workspace.label} </b></span> : ' '}
+                    {notification.content ? <span className='contentTitle__highlight'>{notification.content.label}</span> : ' '}
+                    {notification.workspace ? <span>{props.t(' at ')} <span className='documentTitle__highlight'>{notification.workspace.label} </span></span> : ' '}
                     {displayDistanceDate(notification.created, props.user.lang)}
                   </div>
                   {!notification.read && <i className='notification__list__item__circle fa fa-circle' />}
