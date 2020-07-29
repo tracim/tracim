@@ -29,6 +29,7 @@ from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
 from tracim_backend.lib.core.event import EventBuilder
+from tracim_backend.lib.core.event import EventPublisher
 from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
@@ -210,9 +211,13 @@ def session(request, engine, session_factory, app_config, test_logger):
                 # requiring a working pushpin instance for every test
                 event_builder = mock.MagicMock(spec=EventBuilder)
                 event_builder.__name__ = EventBuilder.__name__
+                event_publisher = mock.MagicMock(spec=EventPublisher)
+                event_publisher.__name__ = EventPublisher.__name__
             else:
                 event_builder = EventBuilder(app_config)
+                event_publisher = EventPublisher(app_config)
             self._plugin_manager.register(event_builder)
+            self._plugin_manager.register(event_publisher)
             self._dbsession = create_dbsession_for_context(
                 session_factory, transaction.manager, self
             )

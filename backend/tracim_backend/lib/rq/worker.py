@@ -27,8 +27,10 @@ class RqWorkerTracimContext(TracimContext):
         self._plugin_manager = create_plugin_manager()
 
         from tracim_backend.lib.core.event import EventBuilder
+        from tracim_backend.lib.core.event import EventPublisher
 
         self._plugin_manager.register(EventBuilder(config))
+        self._plugin_manager.register(EventPublisher(config))
 
     @property
     def app_config(self) -> CFG:

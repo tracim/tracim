@@ -40,7 +40,11 @@ class TracimSession(Session):
             "session must be created through create_dbsession_for_context()"
         )
         assert self.context.plugin_manager.has_plugin("EventBuilder"), (
-            "event builder not registered, you must register EventBuider()"
+            "event builder not registered, you must register EventBuilder()"
+            "on session's context plugin_manager"
+        )
+        assert self.context.plugin_manager.has_plugin("EventPublisher"), (
+            "event publisher not registered, you must register EventPublisher()"
             "on session's context plugin_manager"
         )
 

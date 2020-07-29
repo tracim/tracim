@@ -35,6 +35,7 @@ from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.event import EventBuilder
+from tracim_backend.lib.core.event import EventPublisher
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
@@ -87,6 +88,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     # Init plugin manager
     plugin_manager = init_plugin_manager(app_config)
     plugin_manager.register(EventBuilder(app_config))
+    plugin_manager.register(EventPublisher(app_config))
     settings["plugin_manager"] = plugin_manager
 
     configurator = Configurator(settings=settings, autocommit=True)
@@ -202,10 +204,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
         app.load_controllers(
-            app_config=app_config,
-            configurator=configurator,
-            route_prefix=BASE_API,
-            context=context,
+            app_config=app_config, configurator=configurator, route_prefix=BASE_API, context=context
         )
 
     configurator.scan("tracim_backend.lib.utils.authentification")
