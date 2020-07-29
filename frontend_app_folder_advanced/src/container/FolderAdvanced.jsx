@@ -294,15 +294,15 @@ export class FolderAdvanced extends React.Component {
         />
 
         <PopinFixedOption>
-          {state.showRefreshWarning && (
-            <RefreshWarningMessage
-              tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-              onClickRefresh={this.handleClickRefresh}
-            />
-          )}
+          <div className='folder_advanced__header'>
+            {state.showRefreshWarning && (
+              <RefreshWarningMessage
+                tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                onClickRefresh={this.handleClickRefresh}
+              />
+            )}
 
-          <div className='justify-content-end'>
-            <div className='d-flex'>
+            <div className='folder_advanced__header__deleteButton'>
               {/* state.loggedUser.userRoleIdInWorkspace >= 2 &&
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}

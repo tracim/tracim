@@ -344,31 +344,33 @@ export class Thread extends React.Component {
           customColor={state.config.hexcolor}
           i18n={i18n}
         >
-          {state.showRefreshWarning && (
-            <RefreshWarningMessage
-              tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-              onClickRefresh={this.handleClickRefresh}
-            />
-          )}
-
-          <div className='justify-content-end'>
-            {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-              <SelectStatus
-                selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                availableStatus={state.config.availableStatuses}
-                onChangeStatus={this.handleChangeStatus}
-                disabled={state.content.is_archived || state.content.is_deleted}
+          <div>
+            {state.showRefreshWarning && (
+              <RefreshWarningMessage
+                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                onClickRefresh={this.handleClickRefresh}
               />
             )}
 
-            {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-              <ArchiveDeleteContent
-                customColor={state.config.hexcolor}
-                onClickArchiveBtn={this.handleClickArchive}
-                onClickDeleteBtn={this.handleClickDelete}
-                disabled={state.content.is_archived || state.content.is_deleted}
-              />
-            )}
+            <div className='thread__rightMenu'>
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
+                <SelectStatus
+                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                  availableStatus={state.config.availableStatuses}
+                  onChangeStatus={this.handleChangeStatus}
+                  disabled={state.content.is_archived || state.content.is_deleted}
+                />
+              )}
+
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
+                <ArchiveDeleteContent
+                  customColor={state.config.hexcolor}
+                  onClickArchiveBtn={this.handleClickArchive}
+                  onClickDeleteBtn={this.handleClickDelete}
+                  disabled={state.content.is_archived || state.content.is_deleted}
+                />
+              )}
+            </div>
           </div>
         </PopinFixedOption>
 
