@@ -576,9 +576,7 @@ export class HtmlDocument extends React.Component {
                   {props.t('Last version')}
                 </button>
               )}
-            </div>
 
-            <div className='d-flex'>
               {state.showRefreshWarning && (
                 <RefreshWarningMessage
                   tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
@@ -586,6 +584,9 @@ export class HtmlDocument extends React.Component {
                 />
               )}
 
+            </div>
+
+            <div className='d-flex'>
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}

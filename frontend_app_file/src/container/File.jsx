@@ -909,16 +909,16 @@ export class File extends React.Component {
                   style={{ marginLeft: '5px' }}
                 />
               )}
-            </div>
 
-            <div className='d-flex'>
               {state.showRefreshWarning && (
                 <RefreshWarningMessage
                   tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
                   onClickRefresh={this.handleClickRefresh}
                 />
               )}
+            </div>
 
+            <div className='d-flex'>
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
