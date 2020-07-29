@@ -3,6 +3,8 @@
   " added you ": " added you ",
   " created ": " created ",
   " commented on ": " commented on ",
+  " mentioned you in ": " mentioned you in ",
+  " mentioned you in a comment in ": " mentioned you in a comment in ",
   " updated a new version of ": " updated a new version of ",
   " updated the status of ": " updated the status of ",
   "Allowed characters: {{allowedCharactersUsername}}": "Allowed characters: {{allowedCharactersUsername}}",

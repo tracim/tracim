@@ -15,6 +15,7 @@ import {
 } from '../action-creator.sync.js'
 import {
   buildTracimLiveMessageEventType,
+  CONTENT_TYPE,
   displayDistanceDate,
   GenericButton,
   ListItemWrapper,
@@ -30,7 +31,7 @@ export class NotificationWall extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      isNotificationWallOpen: true
+      isNotificationWallOpen: false
     }
   }
 
@@ -104,6 +105,17 @@ export class NotificationWall extends React.Component {
         icon = 'fa-user-o'
         text = props.t(' added you ')
         url = `/ui/workspaces/${notification.workspace.workspace_id}/dashboard`
+        break
+      case buildTracimLiveMessageEventType(TLM_ET.MENTION, TLM_CET.CREATED):
+        if(notification.content.content_type === CONTENT_TYPE.COMMENT) {
+          icon = 'fa-comment-o'
+          text = props.t(' mentioned you in a comment in ')
+          url = `/ui/workspaces/${notification.workspace.workspace_id}/dashboard`
+        } else {
+          icon = 'fa-at'
+          text = props.t(' mentioned you in ')
+          url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+        }
         break
       default:
         icon = 'fa-bell'

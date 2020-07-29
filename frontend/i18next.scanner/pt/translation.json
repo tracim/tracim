@@ -3,6 +3,8 @@
   " added you ": " adicionou-o ",
   " created ": " criou ",
   " commented on ": " comentou em ",
+  " mentioned you in ": " mencionou-o no ",
+  " mentioned you in a comment in ": " mencionou-o num comentário do ",
   " updated a new version of ": " actualizou uma nova versão de ",
   " updated the status of ": " actualizou o status de ",
   "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}",
