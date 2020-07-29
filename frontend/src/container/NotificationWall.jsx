@@ -8,8 +8,9 @@ import {
   putNotificationAsRead
 } from '../action-creator.async.js'
 import {
+  appendNotificationList,
   newFlashMessage,
-  setNotificationList,
+  setNextPage,
   updateNotification
 } from '../action-creator.sync.js'
 import {
@@ -23,26 +24,13 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
+import { NUMBER_RESULTS_BY_PAGE } from '../util/helper.js'
 
 export class NotificationWall extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      isNotificationWallOpen: true,
-      hasMoreNotifications: true
-    }
-  }
-
-  async componentDidMount () {
-    const { props } = this
-
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(props.user.userId))
-    switch (fetchGetNotificationWall.status) {
-      case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading notification list'), 'warning'))
+      isNotificationWallOpen: true
     }
   }
 
@@ -56,7 +44,7 @@ export class NotificationWall extends React.Component {
     const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
     switch (fetchPutNotificationAsRead.status) {
       case 204: {
-        const notification = props.notificationList.find(notification => notification.id === notificationId)
+        const notification = props.notificationList.list.find(notification => notification.id === notificationId)
         props.dispatch(updateNotification({ ...notification, read: true }))
         break
       }
@@ -67,7 +55,19 @@ export class NotificationWall extends React.Component {
     this.handleCloseNotificationWall()
   }
 
-  handleClickSeeMore = () => { }
+  handleClickSeeMore = async () => {
+    const { props } = this
+
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(props.user.userId, NUMBER_RESULTS_BY_PAGE, props.notificationList.nextPageToken))
+    switch (fetchGetNotificationWall.status) {
+      case 200:
+        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading notification list'), 'warning'))
+    }
+  }
 
   getNotificationDetails = notification => {
     const { props } = this
@@ -131,10 +131,10 @@ export class NotificationWall extends React.Component {
         />
 
         <div className='notification__list'>
-          {props.notificationList && props.notificationList.map((notification, i) => {
+          {props.notificationList.list.length !== 0 && props.notificationList.list.map((notification, i) => {
             return (
               <ListItemWrapper
-                isLast={i === props.notificationList.length - 1}
+                isLast={i === props.notificationList.list.length - 1}
                 read={false}
                 id={notification.id}
                 key={notification.id}
@@ -160,7 +160,7 @@ export class NotificationWall extends React.Component {
             )
           })}
 
-          {state.hasMoreNotifications &&
+          {props.notificationList.hasNextPage &&
             <div className='notification__footer'>
               <GenericButton
                 customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'

@@ -31,12 +31,14 @@ import {
   PAGE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
-  getUserProfile
+  getUserProfile,
+  NUMBER_RESULTS_BY_PAGE
 } from '../util/helper.js'
 import {
   getConfig,
   getAppList,
   getContentTypeList,
+  getNotificationList,
   getUserIsConnected,
   getMyselfWorkspaceList,
   putUserLang,
@@ -48,6 +50,8 @@ import {
   setConfig,
   setAppList,
   setContentTypeList,
+  setNextPage,
+  setNotificationList,
   setUserConnected,
   setWorkspaceList,
   setBreadcrumbs,
@@ -156,7 +160,7 @@ export class Tracim extends React.Component {
 
     const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
-      case 200:
+      case 200: {
         if (fetchGetUserIsConnected.json.lang === null) this.setDefaultUserLang(fetchGetUserIsConnected.json)
 
         props.dispatch(setUserConnected({
@@ -174,7 +178,18 @@ export class Tracim extends React.Component {
 
         this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id)
 
+        const fetchGetNotificationWall = await props.dispatch(getNotificationList(fetchGetUserIsConnected.json.user_id, NUMBER_RESULTS_BY_PAGE))
+        switch (fetchGetNotificationWall.status) {
+          case 200:
+            props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+            props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+            break
+          default:
+            props.dispatch(newFlashMessage(props.t('Error while loading notification list'), 'warning'))
+            break
+        }
         break
+      }
       case 401: props.dispatch(setUserConnected({ logged: false })); break
       default: props.dispatch(setUserConnected({ logged: false })); break
     }
