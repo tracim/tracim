@@ -344,14 +344,14 @@ export class Thread extends React.Component {
           customColor={state.config.hexcolor}
           i18n={i18n}
         >
-          <div className='justify-content-end'>
-            {state.showRefreshWarning && (
-              <RefreshWarningMessage
-                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                onClickRefresh={this.handleClickRefresh}
-              />
-            )}
+          {state.showRefreshWarning && (
+            <RefreshWarningMessage
+              tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+              onClickRefresh={this.handleClickRefresh}
+            />
+          )}
 
+          <div className='justify-content-end'>
             {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
               <SelectStatus
                 selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
