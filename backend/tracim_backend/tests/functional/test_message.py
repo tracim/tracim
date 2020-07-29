@@ -349,3 +349,19 @@ class TestMessages(object):
             "/api/users/1/messages?read_status=read", status=200,
         ).json_body.get("items")
         assert len(message_dicts) == 0
+
+    def test_api__messages_summary__ok_200__nominal_case(self, session, web_testapp) -> None:
+        """
+        check summary of messages
+        """
+        create_events_and_messages(session)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        message_dicts = web_testapp.get("/api/users/1/messages/summary", status=200,).json_body
+        assert message_dicts["user_id"] == 1
+        assert message_dicts["unread_messages_count"] == 1
+        assert message_dicts["read_messages_count"] == 1
+        assert message_dicts["messages_count"] == 2
+        assert message_dicts["user"]["user_id"] == 1
+        assert message_dicts["user"]["username"] == "TheAdmin"

@@ -607,6 +607,15 @@ class LiveMessageQuery(object):
         self.event_types = event_types
 
 
+class MessageSummaryQuery(object):
+    """
+    Message summary query model
+    """
+
+    def __init__(self, event_types: Optional[List[EventTypeDatabaseParameters]] = None,) -> None:
+        self.event_types = event_types
+
+
 class FolderContentUpdate(object):
     """
     Folder Content update model
@@ -1562,3 +1571,15 @@ class PaginatedObject(object):
         self.has_next = page.paging.has_next
         self.per_page = page.paging.per_page
         self.items = page
+
+
+class UserMessageSummary(object):
+    def __init__(self, user: UserInContext, read_messages_count: int, unread_messages_count: int):
+        self.read_messages_count = read_messages_count
+        self.unread_messages_count = unread_messages_count
+        self.messages_count = self.unread_messages_count + self.read_messages_count
+        self.user = user
+
+    @property
+    def user_id(self) -> int:
+        return self.user.user_id

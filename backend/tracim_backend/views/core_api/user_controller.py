@@ -30,6 +30,8 @@ from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import PaginatedObject
+from tracim_backend.models.context_models import UserMessageSummary
+from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
@@ -38,6 +40,8 @@ from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMembersQuerySchema
 from tracim_backend.views.core_api.schemas import LiveMessageSchemaPage
 from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
+from tracim_backend.views.core_api.schemas import MessageSummaryQuerySchema
+from tracim_backend.views.core_api.schemas import MessageSummarySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
@@ -613,6 +617,36 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(MessageSummaryQuerySchema())
+    @hapic.output_body(MessageSummarySchema())
+    def get_user_messages_summary(self, context, request: TracimRequest, hapic_data: HapicData):
+        """
+        Returns a summary about messages filtered
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        candidate_user = UserApi(
+            request.current_user, request.dbsession, app_config
+        ).get_user_with_context(request.candidate_user)
+        unread_messages_count = event_api.get_nb_messages(
+            user_id=candidate_user.user_id,
+            read_status=ReadStatus.UNREAD,
+            event_types=hapic_data.body.event_types,
+        )
+        read_messages_count = event_api.get_nb_messages(
+            user_id=candidate_user.user_id,
+            read_status=ReadStatus.READ,
+            event_types=hapic_data.body.event_types,
+        )
+        return UserMessageSummary(
+            user=candidate_user,
+            unread_messages_count=unread_messages_count,
+            read_messages_count=read_messages_count,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def set_all_user_messages_as_read(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -855,6 +889,13 @@ class UserController(Controller):
             "messages", "/users/{user_id:\d+}/messages", request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.get_user_messages, route_name="messages")
+
+        configurator.add_route(
+            "messages_summary",
+            "/users/{user_id:\d+}/messages/summary",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_user_messages_summary, route_name="messages_summary")
 
         # read all unread messages for user
         configurator.add_route(

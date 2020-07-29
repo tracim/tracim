@@ -49,6 +49,7 @@ from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import KnownMembersQuery
 from tracim_backend.models.context_models import LiveMessageQuery
 from tracim_backend.models.context_models import LoginCredentials
+from tracim_backend.models.context_models import MessageSummaryQuery
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
 from tracim_backend.models.context_models import RadicaleUserSubitemsPath
@@ -1501,3 +1502,21 @@ class PathSuffixSchema(marshmallow.Schema):
         default="",
         example="/workspaces/1/notifications/activate",
     )
+
+
+class MessageSummaryQuerySchema(marshmallow.Schema):
+    """Possible query parameters for the GET messages summary endpoint."""
+
+    event_types = EventTypeListField()
+
+    @post_load
+    def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> MessageSummaryQuery:
+        return MessageSummaryQuery(**data)
+
+
+class MessageSummarySchema(marshmallow.Schema):
+    messages_count = marshmallow.fields.Int(example=42)
+    read_messages_count = marshmallow.fields.Int(example=30)
+    unread_messages_count = marshmallow.fields.Int(example=12)
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user = marshmallow.fields.Nested(UserDigestSchema())
