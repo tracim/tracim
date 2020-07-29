@@ -30,7 +30,7 @@ class TestLivesMessages(object):
         self, user_api_factory, web_testapp, admin_user
     ):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/users/{}/live_messages".format(admin_user.user_id), status=400,)
+        res = web_testapp.get("/api/users/{}/live_messages".format(admin_user.user_id), status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR

@@ -18,7 +18,6 @@ from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import MessageDoesNotExist
-from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
@@ -53,19 +52,33 @@ from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 
-_USER_FIELD = "user"
-_AUTHOR_FIELD = "author"
-_CLIENT_TOKEN_FIELD = "client_token"
-_WORKSPACE_FIELD = "workspace"
-_CONTENT_FIELD = "content"
-_MEMBER_FIELD = "member"
-
 
 RQ_QUEUE_NAME = "event"
+
+JsonDict = typing.Dict[str, typing.Any]
 
 
 class EventApi:
     """Api to query event & messages"""
+
+    USER_FIELD = "user"
+    AUTHOR_FIELD = "author"
+    CLIENT_TOKEN_FIELD = "client_token"
+    WORKSPACE_FIELD = "workspace"
+    CONTENT_FIELD = "content"
+    MEMBER_FIELD = "member"
+
+    user_schema = UserSchema()
+    workspace_schema = WorkspaceSchema()
+    content_schemas = {
+        COMMENT_TYPE: CommentSchema(),
+        HTML_DOCUMENTS_TYPE: TextBasedContentSchema(),
+        FILE_TYPE: FileContentSchema(),
+        FOLDER_TYPE: TextBasedContentSchema(),
+        THREAD_TYPE: TextBasedContentSchema(),
+    }
+    event_schema = EventSchema()
+    workspace_user_role_schema = WorkspaceMemberDigestSchema()
 
     def __init__(
         self, current_user: typing.Optional[User], session: TracimSession, config: CFG
@@ -130,14 +143,50 @@ class EventApi:
     def get_messages_for_user(self, user_id: int, read_status: ReadStatus) -> typing.List[Message]:
         return self._base_query(user_id=user_id, read_status=read_status).all()
 
-    def add_event(self, event: Event, context: TracimContext) -> None:
-        """Add an event to the given context and prepare its publication through TLMs.
-
-        TLMs will be published when the db session is flushed/commited depending
-        on the processing mode for TLMs (sync or async).
-        """
+    def create_event(
+        self,
+        entity_type: EntityType,
+        operation: OperationType,
+        additional_fields: typing.Dict[str, JsonDict],
+        context: TracimContext,
+        entity_subtype: typing.Optional[str] = None,
+    ) -> Event:
+        current_user = context.safe_current_user()
+        user_api = UserApi(
+            current_user=current_user,
+            session=context.dbsession,
+            config=self._config,
+            show_deleted=True,
+        )
+        fields = {
+            self.AUTHOR_FIELD: self.user_schema.dump(
+                user_api.get_user_with_context(current_user)
+            ).data,
+            self.CLIENT_TOKEN_FIELD: context.client_token,
+        }
+        fields.update(additional_fields)
+        event = Event(
+            entity_type=entity_type,
+            operation=operation,
+            entity_subtype=entity_subtype,
+            fields=fields,
+        )
         context.dbsession.add(event)
         context.pending_events.append(event)
+
+    @classmethod
+    def get_content_schema_for_type(cls, content_type: str) -> ContentSchema:
+        try:
+            return cls.content_schemas[content_type]
+        except KeyError:
+            logger.error(
+                cls,
+                (
+                    "Cannot dump proper content for content-type '{}' in generated event "
+                    "as it is unknown, falling back to generic content schema"
+                ).format(content_type),
+            )
+            return ContentSchema()
 
 
 class EventPublisher:
@@ -203,34 +252,11 @@ class EventPublisher:
 class EventBuilder:
     """Create Event objects from the database crud hooks."""
 
-    _user_schema = UserSchema()
-    _workspace_schema = WorkspaceSchema()
-    _content_schemas = {
-        COMMENT_TYPE: CommentSchema(),
-        HTML_DOCUMENTS_TYPE: TextBasedContentSchema(),
-        FILE_TYPE: FileContentSchema(),
-        FOLDER_TYPE: TextBasedContentSchema(),
-        THREAD_TYPE: TextBasedContentSchema(),
-    }
-    _event_schema = EventSchema()
-    _workspace_user_role_schema = WorkspaceMemberDigestSchema()
-
     # pluggy uses this attribute to name the plugin
     __name__ = "EventBuilder"
 
     def __init__(self, config: CFG) -> None:
         self._config = config
-
-    @staticmethod
-    def _get_current_user(context: TracimContext) -> typing.Optional[User]:
-        """Return the current user of the given context or None if not authenticated.
-
-        Not authenticated happens with tracimcli commands.
-        """
-        try:
-            return context.current_user
-        except NotAuthenticated:
-            return None
 
     # User events
     @hookimpl
@@ -249,7 +275,7 @@ class EventBuilder:
     def _create_user_event(
         self, operation: OperationType, user: User, context: TracimContext
     ) -> None:
-        current_user = self._get_current_user(context)
+        current_user = context.safe_current_user()
         user_api = UserApi(
             current_user=current_user,
             session=context.dbsession,
@@ -257,15 +283,17 @@ class EventBuilder:
             show_deleted=True,
         )
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(current_user)
-            ).data,
-            _CLIENT_TOKEN_FIELD: context.client_token,
-            _USER_FIELD: self._user_schema.dump(user_api.get_user_with_context(user)).data,
+            EventApi.USER_FIELD: EventApi.user_schema.dump(
+                user_api.get_user_with_context(user)
+            ).data
         }
-        event = Event(entity_type=EntityType.USER, operation=operation, fields=fields)
         event_api = EventApi(current_user, context.dbsession, self._config)
-        event_api.add_event(event, context)
+        event_api.create_event(
+            entity_type=EntityType.USER,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
 
     # Workspace events
     @hookimpl
@@ -284,29 +312,21 @@ class EventBuilder:
     def _create_workspace_event(
         self, operation: OperationType, workspace: Workspace, context: TracimContext
     ) -> None:
+        current_user = context.safe_current_user()
         api = WorkspaceApi(
-            current_user=self._get_current_user(context),
-            session=context.dbsession,
-            config=self._config,
-        )
-        current_user = self._get_current_user(context)
-        user_api = UserApi(
-            current_user=current_user,
-            session=context.dbsession,
-            config=self._config,
-            show_deleted=True,
+            current_user=current_user, session=context.dbsession, config=self._config
         )
         workspace_in_context = api.get_workspace_with_context(workspace)
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(current_user)
-            ).data,
-            _CLIENT_TOKEN_FIELD: context._client_token,
-            _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
+            EventApi.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data
         }
-        event = Event(entity_type=EntityType.WORKSPACE, operation=operation, fields=fields)
         event_api = EventApi(current_user, context.dbsession, self._config)
-        event_api.add_event(event, context)
+        event_api.create_event(
+            entity_type=EntityType.WORKSPACE,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
 
     # Content events
     @hookimpl
@@ -325,45 +345,28 @@ class EventBuilder:
     def _create_content_event(
         self, operation: OperationType, content: Content, context: TracimContext
     ) -> None:
-        current_user = self._get_current_user(context)
+        current_user = context.safe_current_user()
         content_api = ContentApi(context.dbsession, current_user, self._config)
         content_in_context = content_api.get_content_in_context(content)
-        try:
-            content_schema = content_dict = self._content_schemas[content.type]
-        except KeyError:
-            content_schema = ContentSchema()
-            logger.error(
-                self,
-                (
-                    "Cannot dump proper content for content-type '{}' in generated event "
-                    "as it is unknown, falling back to generic content schema"
-                ).format(content.type),
-            )
+        content_schema = EventApi.get_content_schema_for_type(content.type)
         content_dict = content_schema.dump(content_in_context).data
 
-        workspace_api = WorkspaceApi(
-            context.dbsession, self._get_current_user(context), self._config
-        )
+        workspace_api = WorkspaceApi(context.dbsession, current_user, self._config)
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace.workspace_id)
         )
-        user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(current_user)
-            ).data,
-            _CONTENT_FIELD: content_dict,
-            _CLIENT_TOKEN_FIELD: context._client_token,
-            _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
+            EventApi.CONTENT_FIELD: content_dict,
+            EventApi.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
         }
-        event = Event(
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
             entity_type=EntityType.CONTENT,
             operation=operation,
-            fields=fields,
+            additional_fields=fields,
             entity_subtype=content.type,
+            context=context,
         )
-        event_api = EventApi(current_user, context.dbsession, self._config)
-        event_api.add_event(event, context)
 
     # UserRoleInWorkspace events
     @hookimpl
@@ -387,7 +390,7 @@ class EventBuilder:
     def _create_role_event(
         self, operation: OperationType, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        current_user = self._get_current_user(context)
+        current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
             session=context.dbsession,
             current_user=current_user,
@@ -402,7 +405,7 @@ class EventBuilder:
             current_user=current_user, session=context.dbsession, config=self._config
         )
         try:
-            user_field = self._user_schema.dump(
+            user_field = EventApi.user_schema.dump(
                 user_api.get_user_with_context(user_api.get_one(role.user_id))
             ).data
         except UserDoesNotExist:
@@ -411,17 +414,17 @@ class EventBuilder:
 
         role_in_context = role_api.get_user_role_workspace_with_context(role)
         fields = {
-            _AUTHOR_FIELD: self._user_schema.dump(
-                user_api.get_user_with_context(current_user)
-            ).data,
-            _USER_FIELD: user_field,
-            _CLIENT_TOKEN_FIELD: context.client_token,
-            _WORKSPACE_FIELD: self._workspace_schema.dump(workspace_in_context).data,
-            _MEMBER_FIELD: self._workspace_user_role_schema.dump(role_in_context).data,
+            EventApi.USER_FIELD: user_field,
+            EventApi.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            EventApi.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(role_in_context).data,
         }
-        event = Event(entity_type=EntityType.WORKSPACE_MEMBER, operation=operation, fields=fields)
         event_api = EventApi(current_user, context.dbsession, self._config)
-        event_api.add_event(event, context)
+        event_api.create_event(
+            entity_type=EntityType.WORKSPACE_MEMBER,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
 
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
@@ -442,13 +445,59 @@ class EventBuilder:
         return False
 
 
+def _get_user_event_receiver_ids(
+    event: Event, session: TracimSession, config: CFG
+) -> typing.Set[int]:
+    user_api = UserApi(current_user=event.user, session=session, config=config)
+    receiver_ids = user_api.get_user_ids_from_profile(Profile.ADMIN)
+    if event.user:
+        receiver_ids.append(event.user["user_id"])
+        same_workspaces_user_ids = user_api.get_users_ids_in_same_workpaces(event.user["user_id"])
+        receiver_ids = set(receiver_ids + same_workspaces_user_ids)
+    return receiver_ids
+
+
+def _get_workspace_event_receiver_ids(
+    event: Event, session: TracimSession, config: CFG
+) -> typing.Set[int]:
+    user_api = UserApi(current_user=None, session=session, config=config)
+    administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
+    role_api = RoleApi(current_user=None, session=session, config=config)
+    workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
+    return set(administrators + workspace_members)
+
+
+def _get_content_event_receiver_ids(
+    event: Event, session: TracimSession, config: CFG
+) -> typing.Set[int]:
+    role_api = RoleApi(current_user=None, session=session, config=config)
+    workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
+    return set(workspace_members)
+
+
+GetReceiverIdsCallable = typing.Callable[[Event, TracimSession, CFG], typing.Iterable[int]]
+
+
 class BaseLiveMessageBuilder(abc.ABC):
     """"Base class for message building with most implementation."""
 
     _event_schema = EventSchema()
 
+    _get_receiver_ids_callables = {
+        EntityType.USER: _get_user_event_receiver_ids,
+        EntityType.WORKSPACE: _get_workspace_event_receiver_ids,
+        EntityType.WORKSPACE_MEMBER: _get_workspace_event_receiver_ids,
+        EntityType.CONTENT: _get_content_event_receiver_ids,
+    }  # type: typing.Dict[str, GetReceiverIdsCallable]
+
     def __init__(self, config: CFG) -> None:
         self._config = config
+
+    @classmethod
+    def register_entity_type(
+        cls, entity_type: EntityType, get_receiver_ids_callable: GetReceiverIdsCallable
+    ) -> None:
+        cls._get_receiver_ids_callables[entity_type] = get_receiver_ids_callable
 
     @contextlib.contextmanager
     @abc.abstractmethod
@@ -463,7 +512,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         with self.context() as context:
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
-            receiver_ids = self._get_receiver_ids(session, event)
+            receiver_ids = self._get_receiver_ids(event, session)
 
             messages = [
                 Message(
@@ -479,43 +528,12 @@ class BaseLiveMessageBuilder(abc.ABC):
             for message in messages:
                 live_message_lib.publish_message_to_user(message)
 
-    def _get_receiver_ids(self, session: Session, event: Event):
-        if event.entity_type == EntityType.USER:
-            receiver_ids = self._get_user_event_receiver_ids(event, session)
-        elif event.entity_type == EntityType.WORKSPACE:
-            receiver_ids = self._get_workspace_event_receiver_ids(event, session)
-        elif event.entity_type == EntityType.CONTENT:
-            receiver_ids = self._get_content_event_receiver_ids(event, session)
-        elif event.entity_type == EntityType.WORKSPACE_MEMBER:
-            receiver_ids = self._get_workspace_event_receiver_ids(event, session)
-        return receiver_ids
-
-    def _get_user_event_receiver_ids(self, event: Event, session: TracimSession) -> typing.Set[int]:
-        user_api = UserApi(current_user=event.user, session=session, config=self._config)
-        receiver_ids = user_api.get_user_ids_from_profile(Profile.ADMIN)
-        if event.user:
-            receiver_ids.append(event.user["user_id"])
-            same_workspaces_user_ids = user_api.get_users_ids_in_same_workpaces(
-                event.user["user_id"]
-            )
-            receiver_ids = set(receiver_ids + same_workspaces_user_ids)
-        return receiver_ids
-
-    def _get_workspace_event_receiver_ids(
-        self, event: Event, session: TracimSession
-    ) -> typing.Set[int]:
-        user_api = UserApi(current_user=None, session=session, config=self._config)
-        administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
-        role_api = RoleApi(current_user=None, session=session, config=self._config)
-        workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
-        return set(administrators + workspace_members)
-
-    def _get_content_event_receiver_ids(
-        self, event: Event, session: TracimSession
-    ) -> typing.Set[int]:
-        role_api = RoleApi(current_user=None, session=session, config=self._config)
-        workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
-        return set(workspace_members)
+    def _get_receiver_ids(self, event: Event, session: Session) -> typing.Iterable[int]:
+        try:
+            get_receiver_ids = self._get_receiver_ids_callables[event.entity_type]
+            return get_receiver_ids(event, session, self._config)
+        except KeyError:
+            raise ValueError("Unknown entity type {}".format(event.entity_type))
 
 
 class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
