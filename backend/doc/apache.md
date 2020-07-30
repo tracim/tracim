@@ -84,7 +84,7 @@ Enable this configuration file:
 
     sudo ln -s /etc/apache2/sites-available/tracim.conf /etc/apache2/sites-enabled/tracim.conf
 
-#### Permit access to guest download with old direct link url used before Tracim 3.x (old API path is `/api/v2/`)
+#### Allow guest downloads from direct URLs produced before Tracim v3 (the old API path is `/api/v2/`)
 
 example:
 - old url (Tracim < 3.x): `http://localhost/api/v2/public/guest-download/.....`
