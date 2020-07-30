@@ -107,7 +107,7 @@ describe('<HtmlDocument />', () => {
 
           it('should display the right version number', () => {
             wrapper.setState({ mode: APP_FEATURE_MODE.REVISION })
-            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision' && !t.isNotUpToDate).length
+            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
             wrapper.instance().handleContentModified(tlmData)
             expect(wrapper.state('content').number).to.equal(oldRevisionNumber)
           })
@@ -147,7 +147,7 @@ describe('<HtmlDocument />', () => {
 
           it('should display the right version number', () => {
             wrapper.setState({ mode: APP_FEATURE_MODE.REVISION })
-            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision' && !t.isNotUpToDate).length
+            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
             wrapper.instance().handleContentModified(tlmData)
             expect(wrapper.state('content').number).to.equal(oldRevisionNumber)
           })
