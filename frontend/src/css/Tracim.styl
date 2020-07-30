@@ -10,3 +10,20 @@
       overflow-y auto
 #AppFullScreenManager
   display none
+
+.mention
+  font-weight bold
+
+.autocomplete__tinymce
+  // transform translateY(-100%)
+  font-size 14px
+  &__delimiter
+    height 2px
+    margin 5px 20px
+    background-color grey
+  &__item
+    &__content
+      padding 1px 10px
+      cursor pointer
+    &.active > .autocomplete__tinymce__item__content, & > .autocomplete__tinymce__item__content:hover
+      background-color grey-hover

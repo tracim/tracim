@@ -38,7 +38,8 @@ import {
   getHtmlDocComment,
   getHtmlDocRevision,
   putHtmlDocContent,
-  putHtmlDocRead
+  putHtmlDocRead,
+  getMyselfKnownMember
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -444,6 +445,20 @@ export class HtmlDocument extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
+  searchMentionList = async (query) => {
+    const { props, state } = this
+
+    if (query.length < 2) return
+
+    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, query, []))
+
+    switch (fetchUserKnownMemberList.apiResponse.status) {
+      case 200: return fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))
+      default: this.sendGlobalFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning'); break
+    }
+    return []
+  }
+
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
     props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
@@ -633,6 +648,7 @@ export class HtmlDocument extends React.Component {
             onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
+            searchMentionList={this.searchMentionList}
             key='html-document'
           />
 
@@ -659,6 +675,7 @@ export class HtmlDocument extends React.Component {
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
                   isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+                  searchMentionList={this.searchMentionList}
                 />
               )
             }]}

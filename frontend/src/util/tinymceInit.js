@@ -1,4 +1,5 @@
 import i18n from './i18n.js'
+import { getMyselfKnownMember2 } from '../action-creator.async'
 
 (function () {
   function base64EncodeAndTinyMceInsert (files) {
@@ -29,6 +30,8 @@ import i18n from './i18n.js'
     }
   }
 
+  var editor
+
   globalThis.wysiwyg = function (selector, lang, handleOnChange) {
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
@@ -57,6 +60,17 @@ import i18n from './i18n.js'
       }
     }
 
+    const handleSearchUser = async personalDataToSearch => {
+      const fetchUserKnownMemberList = await getMyselfKnownMember2(personalDataToSearch, [])
+
+      switch (fetchUserKnownMemberList.status) {
+        case 200: {
+          return await fetchUserKnownMemberList.json()
+        }
+      }
+      return []
+    }
+
     globalThis.tinymce.init({
       selector: selector,
       language: getTinyMceLang(lang),
@@ -65,7 +79,7 @@ import i18n from './i18n.js'
       skin: 'lightgray',
       relative_urls: false,
       remove_script_host: false,
-      plugins: 'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
+      plugins: 'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help mention',
       toolbar: [
         'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
         'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
@@ -74,6 +88,48 @@ import i18n from './i18n.js'
       // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1
       content_style: 'div {height: 100%;}',
       height: '100%',
+      mentions: {
+        source: (query, process, delimiter) => {
+          // When using multiple delimiters you can alter the query depending on the delimiter used
+          if (delimiter === '@') {
+            // TODO FETCH USER
+            let data = [
+              { name: i18n.t('contributor'), detail: 'Envoie une notification à tous les utilisateurs Contributeurs' },
+              { name: i18n.t('reader'), detail: 'Envoie une notification à tous les utilisateurs Lecteur' },
+              { name: i18n.t('all'), detail: 'Envoie une notification à tous les membre de lespace partagé' }
+            ]
+            // if (query.length < 2) process(data)
+            console.log('hello2')
+            handleSearchUser(query).then(r => {
+              data = [...r.map(m => ({ name: m.username, detail: m.public_name, ...m }))].map((d, index) => ({ ...d, delimiter, index }))
+              console.log('hello', data)
+              process(data)
+            }).catch(r => console.log('hello error', r))
+          }
+        },
+        insert: function (item) {
+          return `<span>${item.delimiter}${item.name} </span>`
+        },
+        render: function (item) {
+          return `<li class="autocomplete__tinymce__item">${item.index === 3 ? '<div class="autocomplete__tinymce__delimiter" />' : ''}<div class="autocomplete__tinymce__item__content"><b>@${item.name}</b> - ${item.detail}</div></li>`
+        },
+        renderDropdown: function () {
+          var nodePosition = $(editor.selection.getNode()).position()
+          var selectionHeight = $(editor.selection.getNode()).css('height')
+          selectionHeight = parseInt(selectionHeight.substr(0, selectionHeight.length - 2))
+          var textareaLeft = 0
+          if (editor.selection.getRng().getClientRects().length > 0) {
+            textareaLeft = editor.selection.getRng().getClientRects()[0].left
+          } else {
+            textareaLeft = nodePosition.left
+          }
+          return `<ul class="rte-autocomplete dropdown-menu autocomplete__tinymce"></ul>`
+          // return `<ul class="rte-autocomplete dropdown-menu autocomplete__tinymce" style="margin-left: ${-textareaLeft + 25}px;margin-top: -${selectionHeight + 5}px;"></ul>`
+        },
+        matcher: function () {
+          return true
+        }
+      },
       setup: function ($editor) {
         $editor.on('init', function (e) {
           // INFO - GM - 2020/03/17 - theses 3 lines enable autofocus at the end of the document
@@ -82,6 +138,26 @@ import i18n from './i18n.js'
           $editor.selection.collapse(false)
           const event = new globalThis.CustomEvent('tinymceLoaded', { detail: {}, editor: this })
           document.dispatchEvent(event)
+          editor = $editor
+          globalThis.getCursorPosition = () => {
+            var tinymcePosition = $($editor.getContainer()).position()
+            var toolbarPosition = $($editor.getContainer()).find('.mce-toolbar').first()
+            var nodePosition = $($editor.selection.getNode()).position()
+            var textareaTop = 0
+            var textareaLeft = 0
+            if ($editor.selection.getRng().getClientRects().length > 0) {
+              textareaTop = $editor.selection.getRng().getClientRects()[0].top + editor.selection.getRng().getClientRects()[0].height
+              textareaLeft = $editor.selection.getRng().getClientRects()[0].left
+            } else {
+              textareaTop = parseInt($(editor.selection.getNode()).css('font-size')) * 1.3 + nodePosition.top
+              textareaLeft = nodePosition.left
+            }
+            var position = $(editor.getContainer()).offset()
+            return {
+              top: position.top + toolbarPosition.innerHeight() + textareaTop,
+              left: position.left
+            }
+          }
         })
 
         $editor.on('change keyup', function (e) {

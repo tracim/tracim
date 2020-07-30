@@ -388,3 +388,9 @@ export const serialize = (objectToSerialize, propertyMap) => {
       .filter(([key, value]) => key !== undefined)
   )
 }
+
+export const commonMentionList = [
+  { mention: i18n.t('contributor'), detail: 'Envoie une notification à tous les utilisateurs Contributeurs' },
+  { mention: i18n.t('reader'), detail: 'Envoie une notification à tous les utilisateurs Lecteur' },
+  { mention: i18n.t('all'), detail: 'Envoie une notification à tous les membre de lespace partagé' }
+]

@@ -6,56 +6,78 @@ import Radium from 'radium'
 // require('./TextAreaApp.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
 
-export const TextAreaApp = props =>
-  <form className={`${props.customClass} editionmode`}>
-    <textarea
-      id={props.id}
-      className={`${props.customClass}__text editionmode__text`}
-      value={props.text}
-      onChange={props.onChangeText}
-    />
+export class TextAreaApp extends React.Component {
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    if (prevProps.text !== this.props.text) {
+      console.log('TextAreaApp change : ', globalThis.getCursorPosition())
+    }
+  }
 
-    <div className={`${props.customClass}__button editionmode__button`}>
-      <button
-        type='button'
-        className={`${props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn mr-3`}
-        onClick={props.onClickCancelBtn}
-        tabIndex='1'
-        style={{
-          backgroundColor: '#fdfdfd',
-          color: props.customColor,
-          borderColor: props.customColor,
-          ':hover': {
-            backgroundColor: props.customColor,
-            color: '#fdfdfd'
-          }
-        }}
-        key='TextAreaApp__cancel'
-      >
-        {props.t('Cancel')}
-      </button>
+  render () {
+    const { props } = this
+    return (
+      <form className={`${props.customClass} editionmode`}>
+        <textarea
+          id={props.id}
+          className={`${props.customClass}__text editionmode__text`}
+          value={props.text}
+          onChange={props.onChangeText}
+        />
+        {/*<AutoCompleteTextArea*/}
+        {/*  onChangeNewComment={props.onChangeText}*/}
+        {/*  newComment={props.text}*/}
+        {/*  id={props.id}*/}
+        {/*  customClass={`${props.customClass}__text editionmode__text`}*/}
+        {/*  disableComment={false}*/}
+        {/*  wysiwyg*/}
+        {/*  autocompletePositionFixed*/}
+        {/*  searchMentionList={props.searchMentionList}*/}
+        {/*/>*/}
 
-      <button
-        type='button'
-        data-cy='editionmode__button__submit'
-        className={`${props.customClass}__submit editionmode__button__submit btn highlightBtn`}
-        onClick={props.onClickValidateBtn}
-        disabled={props.disableValidateBtn}
-        tabIndex='0'
-        style={{
-          backgroundColor: props.customColor,
-          color: '#fdfdfd',
-          borderColor: props.customColor,
-          ':hover': {
-            backgroundColor: color(props.customColor).darken(0.15).hex()
-          }
-        }}
-        key='TextAreaApp__validate'
-      >
-        {props.t('Validate')}
-      </button>
-    </div>
-  </form>
+        <div className={`${props.customClass}__button editionmode__button`}>
+          <button
+            type='button'
+            className={`${props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn mr-3`}
+            onClick={props.onClickCancelBtn}
+            tabIndex='1'
+            style={{
+              backgroundColor: '#fdfdfd',
+              color: props.customColor,
+              borderColor: props.customColor,
+              ':hover': {
+                backgroundColor: props.customColor,
+                color: '#fdfdfd'
+              }
+            }}
+            key='TextAreaApp__cancel'
+          >
+            {props.t('Cancel')}
+          </button>
+
+          <button
+            type='button'
+            data-cy='editionmode__button__submit'
+            className={`${props.customClass}__submit editionmode__button__submit btn highlightBtn`}
+            onClick={props.onClickValidateBtn}
+            disabled={props.disableValidateBtn}
+            tabIndex='0'
+            style={{
+              backgroundColor: props.customColor,
+              color: '#fdfdfd',
+              borderColor: props.customColor,
+              ':hover': {
+                backgroundColor: color(props.customColor).darken(0.15).hex()
+              }
+            }}
+            key='TextAreaApp__validate'
+          >
+            {props.t('Validate')}
+          </button>
+        </div>
+      </form>
+    )
+  }
+}
 
 export default translate()(Radium(TextAreaApp))
 

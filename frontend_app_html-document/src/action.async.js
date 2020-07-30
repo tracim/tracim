@@ -63,3 +63,11 @@ export const putHtmlDocRead = (user, apiUrl, workspaceId, contentId) => {
     method: 'PUT'
   })
 }
+
+export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToExclude) => {
+  return fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${workspaceIdToExclude}`, {
+    credentials: 'include',
+    headers: { ...FETCH_CONFIG.headers },
+    method: 'GET'
+  })
+}
