@@ -607,7 +607,7 @@ class LiveMessageQuery(object):
         self.event_types = event_types
 
 
-class MessageSummaryQuery(object):
+class UserMessagesSummaryQuery(object):
     """
     Message summary query model
     """

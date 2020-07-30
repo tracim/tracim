@@ -49,7 +49,6 @@ from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import KnownMembersQuery
 from tracim_backend.models.context_models import LiveMessageQuery
 from tracim_backend.models.context_models import LoginCredentials
-from tracim_backend.models.context_models import MessageSummaryQuery
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
 from tracim_backend.models.context_models import RadicaleUserSubitemsPath
@@ -68,6 +67,7 @@ from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserInfos
+from tracim_backend.models.context_models import UserMessagesSummaryQuery
 from tracim_backend.models.context_models import UserProfile
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentPath
@@ -1510,8 +1510,8 @@ class UserMessagesSummaryQuerySchema(marshmallow.Schema):
     event_types = EventTypeListField()
 
     @post_load
-    def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> MessageSummaryQuery:
-        return MessageSummaryQuery(**data)
+    def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> UserMessagesSummaryQuery:
+        return UserMessagesSummaryQuery(**data)
 
 
 class UserMessagesSummarySchema(marshmallow.Schema):
