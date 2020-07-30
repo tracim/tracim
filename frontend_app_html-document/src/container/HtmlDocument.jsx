@@ -29,7 +29,8 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent
+  TracimComponent,
+  getCurrentContentVersionNumber
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -105,7 +106,7 @@ export class HtmlDocument extends React.Component {
       ...prev,
       content: clientToken === data.client_token
         ? { ...prev.content, ...data.content }
-        : { ...prev.content, number: this.getCurrentVersionNumber() },
+        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
@@ -126,7 +127,8 @@ export class HtmlDocument extends React.Component {
           ...data.content,
           created: displayDistanceDate(data.content.created, state.loggedUser.lang),
           created_raw: data.content.created,
-          timelineType: 'comment'
+          timelineType: 'comment',
+          hasBeenRead: data.client_token === this.sessionClientToken
         }
       ]
     )
@@ -146,7 +148,7 @@ export class HtmlDocument extends React.Component {
       ...prev,
       content: clientToken === data.client_token
         ? { ...prev.content, ...data.content }
-        : { ...prev.content, number: this.getCurrentVersionNumber() },
+        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
@@ -196,13 +198,6 @@ export class HtmlDocument extends React.Component {
     initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
     this.loadContent()
-  }
-
-  getCurrentVersionNumber = () => {
-    const { state } = this
-
-    if (state.mode === APP_FEATURE_MODE.REVISION) return state.content.number
-    return state.timeline.filter(t => t.timelineType === 'revision' && !t.isNotUpToDate).length
   }
 
   async componentDidMount () {
@@ -533,7 +528,7 @@ export class HtmlDocument extends React.Component {
         ...prev.newContent,
         raw_content: prev.rawContentBeforeEdit
       },
-      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, isNotUpToDate: false })),
+      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
     }))

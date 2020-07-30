@@ -362,7 +362,7 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
       timelineType: 'revision',
-      isNotUpToDate: !isTokenClient
+      hasBeenRead: isTokenClient
     }
   ]
 }
@@ -388,4 +388,9 @@ export const serialize = (objectToSerialize, propertyMap) => {
       .map(([key, value]) => [propertyMap[key], value])
       .filter(([key, value]) => key !== undefined)
   )
+}
+
+export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
+  if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number
+  return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
 }
