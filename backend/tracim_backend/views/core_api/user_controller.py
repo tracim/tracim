@@ -617,7 +617,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_body(MessageSummaryQuerySchema())
+    @hapic.input_query(MessageSummaryQuerySchema())
     @hapic.output_body(MessageSummarySchema())
     def get_user_messages_summary(self, context, request: TracimRequest, hapic_data: HapicData):
         """
@@ -631,12 +631,12 @@ class UserController(Controller):
         unread_messages_count = event_api.get_nb_messages(
             user_id=candidate_user.user_id,
             read_status=ReadStatus.UNREAD,
-            event_types=hapic_data.body.event_types,
+            event_types=hapic_data.query.event_types,
         )
         read_messages_count = event_api.get_nb_messages(
             user_id=candidate_user.user_id,
             read_status=ReadStatus.READ,
-            event_types=hapic_data.body.event_types,
+            event_types=hapic_data.query.event_types,
         )
         return UserMessageSummary(
             user=candidate_user,
