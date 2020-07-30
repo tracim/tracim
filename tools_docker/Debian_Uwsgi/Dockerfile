@@ -99,7 +99,7 @@ RUN \
         gnupg \
         imagemagick \
         inkscape \
-        libapache2-mod-wsgi-py3 \
+        libapache2-mod-proxy-uwsgi \
         libreoffice \
         poppler-utils \
         postgresql-client \
