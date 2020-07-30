@@ -7,16 +7,24 @@ import { isFunction } from '../../hocMock/helper'
 import { NotificationWall } from '../../../src/container/NotificationWall.jsx'
 import { shallow } from 'enzyme'
 import { user } from '../../hocMock/redux/user/user'
-import { UPDATE, NOTIFICATION } from '../../../src/action-creator.sync.js'
+import {
+  APPEND,
+  NOTIFICATION,
+  NOTIFICATION_LIST,
+  UPDATE
+} from '../../../src/action-creator.sync.js'
+import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
   buildTracimLiveMessageEventType,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST
 } from 'tracim_frontend_lib'
+import { mockPutNotificationAsRead204 } from '../../apiMock.js'
 
 describe('<NotificationWall />', () => {
   const updateNotificationCallBack = sinon.spy()
+  const appendNotificationListCallBack = sinon.spy()
 
   const dispatchCallBack = (param) => {
     if (isFunction(param)) {
@@ -25,6 +33,7 @@ describe('<NotificationWall />', () => {
 
     switch (param.type) {
       case `${UPDATE}/${NOTIFICATION}`: updateNotificationCallBack(); break
+      case `${APPEND}/${NOTIFICATION_LIST}`: appendNotificationListCallBack(); break
       default:
         return param
     }
@@ -32,9 +41,11 @@ describe('<NotificationWall />', () => {
 
   const props = {
     dispatch: dispatchCallBack,
-    notificationList: [{
-      id: 0
-    }],
+    notificationList: {
+      list: [{
+        id: 1
+      }]
+    },
     t: tradKey => tradKey,
     user: user
   }
@@ -97,10 +108,19 @@ describe('<NotificationWall />', () => {
       })
     })
 
-    describe('handleClickBtnClose', () => {
+    describe('handleCloseNotificationWall', () => {
       it('should set isNotificationWallOpen state as false', () => {
-        NotificationWallInstance.handleClickBtnClose(0)
+        NotificationWallInstance.handleCloseNotificationWall()
         expect(wrapper.state('isNotificationWallOpen')).to.equal(false)
+      })
+    })
+
+    describe('handleClickNotification', () => {
+      it('should call updateNotification()', (done) => {
+        mockPutNotificationAsRead204(FETCH_CONFIG.apiUrl, props.user.userId, 1)
+        NotificationWallInstance.handleClickNotification(1).then(() => {
+          expect(updateNotificationCallBack.called).to.equal(true)
+        }).then(done, done)
       })
     })
   })

@@ -78,7 +78,7 @@ export class NotificationWall extends React.Component {
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT):
         icon = 'fa-comments-o'
         text = props.t(' commented on ')
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/dashboard`
+        url = `/ui/workspaces/${notification.workspace.workspace_id}/contens/${notification.content.parent_content_type}/${notification.content.content_id}`
         break
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.HTML_DOCUMENT):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE):
@@ -107,10 +107,10 @@ export class NotificationWall extends React.Component {
         url = `/ui/workspaces/${notification.workspace.workspace_id}/dashboard`
         break
       case buildTracimLiveMessageEventType(TLM_ET.MENTION, TLM_CET.CREATED):
-        if(notification.content.content_type === CONTENT_TYPE.COMMENT) {
+        if (notification.content.content_type === CONTENT_TYPE.COMMENT) {
           icon = 'fa-comment-o'
           text = props.t(' mentioned you in a comment in ')
-          url = `/ui/workspaces/${notification.workspace.workspace_id}/dashboard`
+          url = `/ui/workspaces/${notification.workspace.workspace_id}/contens/${notification.content.parent_content_type}/${notification.content.content_id}`
         } else {
           icon = 'fa-at'
           text = props.t(' mentioned you in ')
@@ -130,7 +130,7 @@ export class NotificationWall extends React.Component {
   render () {
     const { props, state } = this
 
-    if (!state.isNotificationWallOpen) return null
+    if (!state.isNotificationWallOpen || !props.notificationList.list) return null
 
     return (
       <div className='notification'>
