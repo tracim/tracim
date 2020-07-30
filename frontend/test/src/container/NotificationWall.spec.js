@@ -41,7 +41,7 @@ describe('<NotificationWall />', () => {
 
   const props = {
     dispatch: dispatchCallBack,
-    notificationList: {
+    notificationPage: {
       list: [{
         id: 1
       }]

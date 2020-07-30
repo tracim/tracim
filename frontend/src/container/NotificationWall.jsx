@@ -31,7 +31,7 @@ export class NotificationWall extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      isNotificationWallOpen: false
+      isNotificationWallOpen: true
     }
   }
 
@@ -45,7 +45,7 @@ export class NotificationWall extends React.Component {
     const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
     switch (fetchPutNotificationAsRead.status) {
       case 204: {
-        const notification = props.notificationList.list.find(notification => notification.id === notificationId)
+        const notification = props.notificationPage.list.find(notification => notification.id === notificationId)
         props.dispatch(updateNotification({ ...notification, read: true }))
         break
       }
@@ -59,14 +59,14 @@ export class NotificationWall extends React.Component {
   handleClickSeeMore = async () => {
     const { props } = this
 
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(props.user.userId, NUMBER_RESULTS_BY_PAGE, props.notificationList.nextPageToken))
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(props.user.userId, NUMBER_RESULTS_BY_PAGE, props.notificationPage.nextPageToken))
     switch (fetchGetNotificationWall.status) {
       case 200:
         props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items))
         props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
         break
       default:
-        props.dispatch(newFlashMessage(props.t('Error while loading notification list'), 'warning'))
+        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
     }
   }
 
@@ -78,7 +78,7 @@ export class NotificationWall extends React.Component {
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT):
         icon = 'fa-comments-o'
         text = props.t(' commented on ')
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/contens/${notification.content.parent_content_type}/${notification.content.content_id}`
+        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.parent_content_type}/${notification.content.content_id}`
         break
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.HTML_DOCUMENT):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE):
@@ -110,7 +110,7 @@ export class NotificationWall extends React.Component {
         if (notification.content.content_type === CONTENT_TYPE.COMMENT) {
           icon = 'fa-comment-o'
           text = props.t(' mentioned you in a comment in ')
-          url = `/ui/workspaces/${notification.workspace.workspace_id}/contens/${notification.content.parent_content_type}/${notification.content.content_id}`
+          url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.parent_content_type}/${notification.content.content_id}`
         } else {
           icon = 'fa-at'
           text = props.t(' mentioned you in ')
@@ -130,7 +130,7 @@ export class NotificationWall extends React.Component {
   render () {
     const { props, state } = this
 
-    if (!state.isNotificationWallOpen || !props.notificationList.list) return null
+    if (!state.isNotificationWallOpen || !props.notificationPage.list) return null
 
     return (
       <div className='notification'>
@@ -143,10 +143,10 @@ export class NotificationWall extends React.Component {
         />
 
         <div className='notification__list'>
-          {props.notificationList.list.length !== 0 && props.notificationList.list.map((notification, i) => {
+          {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
             return (
               <ListItemWrapper
-                isLast={i === props.notificationList.list.length - 1}
+                isLast={i === props.notificationPage.list.length - 1}
                 read={false}
                 id={notification.id}
                 key={notification.id}
@@ -172,7 +172,7 @@ export class NotificationWall extends React.Component {
             )
           })}
 
-          {props.notificationList.hasNextPage &&
+          {props.notificationPage.hasNextPage &&
             <div className='notification__footer'>
               <GenericButton
                 customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
@@ -187,5 +187,5 @@ export class NotificationWall extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, notificationList }) => ({ user, notificationList })
+const mapStateToProps = ({ user, notificationPage }) => ({ user, notificationPage })
 export default connect(mapStateToProps)(translate()(TracimComponent(NotificationWall)))

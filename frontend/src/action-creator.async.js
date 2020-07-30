@@ -854,9 +854,7 @@ export const getNotificationList = (userId, notificationsByPage, nextPageToken =
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?count=${notificationsByPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
     param: {
       credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
+      headers: FETCH_CONFIG.headers,
       method: 'GET'
     },
     actionName: NOTIFICATION_LIST,
@@ -869,9 +867,7 @@ export const putNotificationAsRead = (userId, eventId) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/${eventId}/read`,
     param: {
       credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
+      headers: FETCH_CONFIG.headers,
       method: 'PUT'
     },
     actionName: NOTIFICATION,

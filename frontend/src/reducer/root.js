@@ -12,7 +12,7 @@ import contentType from './contentType.js'
 import timezone from './timezone.js'
 import system from './system.js'
 import searchResult from './searchResult.js'
-import notificationList from './notificationList.js'
+import notificationPage from './notificationPage.js'
 import tlm from './tlm.js'
 
 const rootReducer = combineReducers({
@@ -29,7 +29,7 @@ const rootReducer = combineReducers({
   timezone,
   system,
   searchResult,
-  notificationList,
+  notificationPage,
   tlm
 })
 

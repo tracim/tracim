@@ -185,7 +185,7 @@ export class Tracim extends React.Component {
             props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
             break
           default:
-            props.dispatch(newFlashMessage(props.t('Error while loading notification list'), 'warning'))
+            props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
             break
         }
         break

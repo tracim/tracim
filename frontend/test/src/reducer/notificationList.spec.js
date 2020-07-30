@@ -13,7 +13,7 @@ import {
   UPDATE,
   updateNotification
 } from '../../../src/action-creator.sync.js'
-import notificationList from '../../../src/reducer/notificationList.js'
+import notificationPage from '../../../src/reducer/notificationPage.js'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 
@@ -38,10 +38,10 @@ const notification = {
   read: null
 }
 
-describe('reducer notificationList.js', () => {
+describe('reducer notificationPage.js', () => {
   describe('actions', () => {
     describe(`${SET}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationList({ list: [], hasNextPage: false, nextPageToken: '' }, setNotificationList([TLM]))
+      const listOfNotification = notificationPage({ list: [], hasNextPage: false, nextPageToken: '' }, setNotificationList([TLM]))
 
       it('should return the list of notification from the objects passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ list: [notification], hasNextPage: false, nextPageToken: '' })
@@ -49,7 +49,7 @@ describe('reducer notificationList.js', () => {
     })
 
     describe(`${ADD}/${NOTIFICATION}`, () => {
-      const listOfNotification = notificationList({ list: [], hasNextPage: false, nextPageToken: '' }, addNotification(TLM))
+      const listOfNotification = notificationPage({ list: [], hasNextPage: false, nextPageToken: '' }, addNotification(TLM))
 
       it('should return the list of notification added from the object passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ list: [notification], hasNextPage: false, nextPageToken: '' })
@@ -57,7 +57,7 @@ describe('reducer notificationList.js', () => {
     })
 
     describe(`${UPDATE}/${NOTIFICATION}`, () => {
-      const listOfNotification = notificationList({ list: [notification], hasNextPage: false, nextPageToken: '' }, updateNotification({ ...notification, read: true }))
+      const listOfNotification = notificationPage({ list: [notification], hasNextPage: false, nextPageToken: '' }, updateNotification({ ...notification, read: true }))
 
       it('should return the list of objects passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ list: [{ ...notification, read: true }], hasNextPage: false, nextPageToken: '' })
@@ -65,7 +65,7 @@ describe('reducer notificationList.js', () => {
     })
 
     describe(`${APPEND}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationList({ list: [notification], hasNextPage: false, nextPageToken: '' }, appendNotificationList([{ ...TLM, event_id: 999 }]))
+      const listOfNotification = notificationPage({ list: [notification], hasNextPage: false, nextPageToken: '' }, appendNotificationList([{ ...TLM, event_id: 999 }]))
 
       it('should return the list of notifications appended with the list passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ list: [notification, { ...notification, id: 999 }], hasNextPage: false, nextPageToken: '' })
@@ -73,7 +73,7 @@ describe('reducer notificationList.js', () => {
     })
 
     describe(`${SET}/${NEXT_PAGE}`, () => {
-      const listOfNotification = notificationList({ list: [], hasNextPage: false, nextPageToken: '' }, setNextPage(true, 'token'))
+      const listOfNotification = notificationPage({ list: [], hasNextPage: false, nextPageToken: '' }, setNextPage(true, 'token'))
 
       it('should return the object with the parameters hasNextPage and nextPageToken updated', () => {
         expect(listOfNotification).to.deep.equal({ list: [], hasNextPage: true, nextPageToken: 'token' })
