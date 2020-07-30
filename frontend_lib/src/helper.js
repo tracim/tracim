@@ -331,7 +331,7 @@ export const sortTimelineByDate = (timeline) => {
   return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
 }
 
-export const addRevisionFromTLM = (data, timeline, lang) => {
+export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) => {
   // INFO - GB - 2020-05-29 In the filter below we use the names from the TLM message so they are not in camelCase and it is necessary to ignore the eslint rule.
   const {
     actives_shares, // eslint-disable-line camelcase
@@ -343,7 +343,7 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
     ...revisionObject
   } = data.content
 
-  const revisionNumber = 1 + timeline.filter(tl => tl.timelineType === 'revision' ).length
+  const revisionNumber = 1 + timeline.filter(tl => tl.timelineType === 'revision').length
 
   return [
     ...timeline,
@@ -361,7 +361,8 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
       number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
-      timelineType: 'revision'
+      timelineType: 'revision',
+      isNotUpToDate: !isTokenClient
     }
   ]
 }

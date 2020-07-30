@@ -103,12 +103,14 @@ export class HtmlDocument extends React.Component {
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+      content: clientToken === data.client_token
+        ? { ...prev.content, ...data.content }
+        : { ...prev.content, number: this.getCurrentVersionNumber() },
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
       rawContentBeforeEdit: data.content.raw_content,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang, data.client_token === this.sessionClientToken),
       isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
@@ -142,11 +144,13 @@ export class HtmlDocument extends React.Component {
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+      content: clientToken === data.client_token
+        ? { ...prev.content, ...data.content }
+        : { ...prev.content, number: this.getCurrentVersionNumber() },
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang, data.client_token === this.sessionClientToken),
       isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
@@ -192,6 +196,13 @@ export class HtmlDocument extends React.Component {
     initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
     this.loadContent()
+  }
+
+  getCurrentVersionNumber = () => {
+    const { state } = this
+
+    if (state.mode === APP_FEATURE_MODE.REVISION) return state.content.number
+    return state.timeline.filter(t => t.timelineType === 'revision' && !t.isNotUpToDate).length
   }
 
   async componentDidMount () {
@@ -522,6 +533,7 @@ export class HtmlDocument extends React.Component {
         ...prev.newContent,
         raw_content: prev.rawContentBeforeEdit
       },
+      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, isNotUpToDate: false })),
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
     }))
@@ -635,6 +647,7 @@ export class HtmlDocument extends React.Component {
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
+            isRefreshNeeded={state.showRefreshWarning}
           />
 
           <PopinFixedRightPart
