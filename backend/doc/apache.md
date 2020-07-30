@@ -84,7 +84,7 @@ Enable this configuration file:
 
     sudo ln -s /etc/apache2/sites-available/tracim.conf /etc/apache2/sites-enabled/tracim.conf
 
-#### Permit access to public download with old link url used before Tracim 3.x (old API path using `/api/v2/`)
+#### Permit access to public download with old link url used before Tracim 3.x (old API path is `/api/v2/`)
 
 You just need to add this in your apache2 configuration to make sure old direct link working correctly:
 ~~~
