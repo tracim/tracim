@@ -1573,7 +1573,7 @@ class PaginatedObject(object):
         self.items = page
 
 
-class UserMessageSummary(object):
+class UserMessagesSummary(object):
     def __init__(self, user: UserInContext, read_messages_count: int, unread_messages_count: int):
         self.read_messages_count = read_messages_count
         self.unread_messages_count = unread_messages_count

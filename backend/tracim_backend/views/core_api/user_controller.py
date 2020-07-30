@@ -30,7 +30,7 @@ from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import PaginatedObject
-from tracim_backend.models.context_models import UserMessageSummary
+from tracim_backend.models.context_models import UserMessagesSummary
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
@@ -40,8 +40,6 @@ from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMembersQuerySchema
 from tracim_backend.views.core_api.schemas import LiveMessageSchemaPage
 from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
-from tracim_backend.views.core_api.schemas import MessageSummaryQuerySchema
-from tracim_backend.views.core_api.schemas import MessageSummarySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
@@ -55,6 +53,8 @@ from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
+from tracim_backend.views.core_api.schemas import UserMessagesSummaryQuerySchema
+from tracim_backend.views.core_api.schemas import UserMessagesSummarySchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
@@ -617,9 +617,11 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_query(MessageSummaryQuerySchema())
-    @hapic.output_body(MessageSummarySchema())
-    def get_user_messages_summary(self, context, request: TracimRequest, hapic_data: HapicData):
+    @hapic.input_query(UserMessagesSummaryQuerySchema())
+    @hapic.output_body(UserMessagesSummarySchema())
+    def get_user_messages_summary(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> UserMessagesSummary:
         """
         Returns a summary about messages filtered
         """
@@ -628,17 +630,17 @@ class UserController(Controller):
         candidate_user = UserApi(
             request.current_user, request.dbsession, app_config
         ).get_user_with_context(request.candidate_user)
-        unread_messages_count = event_api.get_nb_messages(
+        unread_messages_count = event_api.get_messages_count(
             user_id=candidate_user.user_id,
             read_status=ReadStatus.UNREAD,
             event_types=hapic_data.query.event_types,
         )
-        read_messages_count = event_api.get_nb_messages(
+        read_messages_count = event_api.get_messages_count(
             user_id=candidate_user.user_id,
             read_status=ReadStatus.READ,
             event_types=hapic_data.query.event_types,
         )
-        return UserMessageSummary(
+        return UserMessagesSummary(
             user=candidate_user,
             unread_messages_count=unread_messages_count,
             read_messages_count=read_messages_count,

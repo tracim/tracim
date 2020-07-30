@@ -1504,7 +1504,7 @@ class PathSuffixSchema(marshmallow.Schema):
     )
 
 
-class MessageSummaryQuerySchema(marshmallow.Schema):
+class UserMessagesSummaryQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages summary endpoint."""
 
     event_types = EventTypeListField()
@@ -1514,7 +1514,7 @@ class MessageSummaryQuerySchema(marshmallow.Schema):
         return MessageSummaryQuery(**data)
 
 
-class MessageSummarySchema(marshmallow.Schema):
+class UserMessagesSummarySchema(marshmallow.Schema):
     messages_count = marshmallow.fields.Int(example=42)
     read_messages_count = marshmallow.fields.Int(example=30)
     unread_messages_count = marshmallow.fields.Int(example=12)
