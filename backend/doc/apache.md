@@ -84,6 +84,18 @@ Enable this configuration file:
 
     sudo ln -s /etc/apache2/sites-available/tracim.conf /etc/apache2/sites-enabled/tracim.conf
 
+#### Allow guest downloads from direct URLs produced before Tracim v3 (the old API path is `/api/v2/`)
+
+Example:
+- old url (Tracim < 3.x): `http://localhost/api/v2/public/guest-download/.....`
+- new url (Tracim ≥ 3.x): `http://localhost/api/public/guest-download/.....`
+
+You can add this in your apache2 configuration to make sure old direct links still work:
+~~~
+    # Proxy old api path for direct guest download link
+    ProxyPass /api/v2/public/guest-download http://127.0.0.1:8080/api/public/guest-download
+~~~
+
 #### Configuring uWSGI for the Tracim Server
 
 Create the file named `/etc/uwsgi/apps-available/tracim.ini` containing:
