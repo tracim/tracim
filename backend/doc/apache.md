@@ -86,7 +86,7 @@ Enable this configuration file:
 
 #### Allow guest downloads from direct URLs produced before Tracim v3 (the old API path is `/api/v2/`)
 
-example:
+Example:
 - old url (Tracim < 3.x): `http://localhost/api/v2/public/guest-download/.....`
 - new url (Tracim ≥ 3.x): `http://localhost/api/public/guest-download/.....`
 
