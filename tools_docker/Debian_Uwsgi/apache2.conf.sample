@@ -31,10 +31,11 @@
     # Can't be added in Location https://httpd.apache.org/docs/2.4/en/mod/mod_headers.html
     RequestHeader edit Destination ^https http early
 
-    # Default proxying to tracim web's with uwsgi protocol
-    <Location />
-        ProxyPass uwsgi://localhost:8081/
-    </Location>
+    # Proxy those paths to tracim web's with uwsgi protocol
+    <LocationMatch ^/(agenda|ui|api|custom_toolbox-assets|$)>
+        ProxyPassMatch uwsgi://localhost:8081/
+        ProxyPassReverse uwsgi://localhost:8081/
+    </LocationMatch>
 
     # Proxying Webdav to tracim_webdav
     <Location /webdav>
@@ -45,8 +46,8 @@
     </Location>
 
     # Proxying Tracim Live Message to Pushpin
-    <LocationMatch /api/users/[0-9]+/live_messages>
-        ProxyPass http://127.0.0.1:7999/
+    <LocationMatch ^/api/users/[0-9]+/live_messages>
+        ProxyPassMatch http://127.0.0.1:7999/
         ProxyPassReverse http://127.0.0.1:7999/
     </LocationMatch>
 
