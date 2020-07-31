@@ -67,7 +67,7 @@ describe('<NotificationWall />', () => {
           .to.deep.equal({
             icon: 'fa-comments-o',
             text: ' commented on ',
-            url: `/ui/workspaces/${baseNotification.workspace.workspace_id}/dashboard`
+            url: `/ui/workspaces/${baseNotification.workspace.workspace_id}/contents/${baseNotification.content.parent_content_type}/${baseNotification.content.content_id}`
           })
       })
 
