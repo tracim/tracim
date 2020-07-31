@@ -1331,6 +1331,9 @@ class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
+    parent_content_type = StrippedString(
+        example="html-document", validate=all_content_types_validator
+    )
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(

@@ -953,6 +953,13 @@ class ContentInContext(object):
         return None
 
     @property
+    def parent_content_type(self) -> Optional[str]:
+        p = self.parent
+        if p:
+            return p.content_type
+        return None
+
+    @property
     def parents(self) -> List["ContentInContext"]:
         parents = []
         if self.parent:

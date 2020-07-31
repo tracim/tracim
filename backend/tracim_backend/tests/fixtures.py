@@ -43,9 +43,9 @@ from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import ShareLibFactory
+from tracim_backend.tests.utils import TracimTestContext
 from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
-from tracim_backend.tests.utils import TracimTestContext
 from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 
@@ -299,7 +299,7 @@ def application_api_factory(app_list) -> ApplicationApiFactory:
 
 
 @pytest.fixture()
-def admin_user(session: Session, base_fixture) -> User:
+def admin_user(session: Session) -> User:
     return session.query(User).filter(User.email == "admin@admin.admin").one()
 
 

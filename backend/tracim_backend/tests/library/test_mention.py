@@ -35,21 +35,30 @@ def create_content(
     description: str,
     user_api_factory,
     workspace_api_factory,
-    content_type_list,
     session,
     app_config,
+    content_type: str = "html-document",
+    parent_content: typing.Optional[Content] = None,
 ) -> Content:
     with transaction.manager:
         uapi = user_api_factory.get()
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
-        workspace = workspace_api_factory.get(user).create_workspace(
-            "test workspace", save_now=True
-        )
+        try:
+            user = uapi.get_one_by_email(email="this.is@user")
+        except Exception:
+            user = uapi.create_minimal_user(
+                email="this.is@user", profile=Profile.ADMIN, save_now=True
+            )
+        if parent_content:
+            workspace = parent_content.workspace
+        else:
+            workspace = workspace_api_factory.get(user).create_workspace(
+                "test workspace", save_now=True
+            )
         api = ContentApi(current_user=user, session=session, config=app_config)
         content = api.create(
-            content_type_slug=content_type_list.Folder.slug,
+            content_type_slug=content_type,
             workspace=workspace,
-            parent=None,
+            parent=parent_content,
             label="Content",
             do_save=True,
         )
@@ -63,41 +72,30 @@ def create_content(
 
 @pytest.fixture
 def one_content_with_a_mention(
-    user_api_factory, workspace_api_factory, session, app_config, content_type_list
+    base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     return create_content(
-        html_with_one_mention,
-        user_api_factory,
-        workspace_api_factory,
-        content_type_list,
-        session,
-        app_config,
+        html_with_one_mention, user_api_factory, workspace_api_factory, session, app_config,
     )
 
 
 @pytest.fixture
 def one_content_without_mention(
-    user_api_factory, workspace_api_factory, session, app_config, content_type_list
+    base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     return create_content(
-        comment_without_mention,
-        user_api_factory,
-        workspace_api_factory,
-        content_type_list,
-        session,
-        app_config,
+        comment_without_mention, user_api_factory, workspace_api_factory, session, app_config,
     )
 
 
 @pytest.fixture
 def one_updated_content_with_one_new_mention(
-    user_api_factory, workspace_api_factory, session, app_config, content_type_list
+    base_fixture, user_api_factory, workspace_api_factory, session, app_config,
 ) -> Content:
     content = create_content(
         '<span id="mention-foo">@foo</span>',
         user_api_factory,
         workspace_api_factory,
-        content_type_list,
         session,
         app_config,
     )
@@ -111,13 +109,12 @@ def one_updated_content_with_one_new_mention(
 
 @pytest.fixture
 def one_updated_content_with_no_new_mention(
-    user_api_factory, workspace_api_factory, session, app_config, content_type_list
+    base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     content = create_content(
         '<span id="mention-foo">@foo</span>',
         user_api_factory,
         workspace_api_factory,
-        content_type_list,
         session,
         app_config,
     )
@@ -127,6 +124,26 @@ def one_updated_content_with_no_new_mention(
         api.update_content(content, new_label=content.label)
         api.save(content)
     return content
+
+
+@pytest.fixture
+def one_comment_with_a_mention(
+    base_fixture,
+    user_api_factory,
+    workspace_api_factory,
+    session,
+    app_config,
+    one_content_with_a_mention: Content,
+) -> Content:
+    return create_content(
+        html_with_one_mention,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        parent_content=one_content_with_a_mention,
+        content_type="comment",
+    )
 
 
 class TestMentionBuilder:
@@ -160,6 +177,19 @@ class TestMentionBuilder:
         assert "content" in mention_event.fields
         assert "workspace" in mention_event.fields
         assert {"id": "foo", "recipient": "bar"} == mention_event.fields["mention"]
+
+    def test_unit_on_content_created__ok__comment(
+        self, session_factory, app_config, one_comment_with_a_mention: Content
+    ) -> None:
+        builder = MentionBuilder()
+        context = TracimTestContext(
+            app_config, session_factory, user=one_comment_with_a_mention.owner
+        )
+        builder.on_content_created(one_comment_with_a_mention, context)
+        assert 1 == len(context.pending_events)
+        mention_event = context.pending_events[0]
+        assert "content" in mention_event.fields
+        assert mention_event.content["parent_content_type"] == "html-document"
 
     def test_unit_on_content_created__ok__no_mention(
         self, session_factory, app_config, one_content_without_mention: Content

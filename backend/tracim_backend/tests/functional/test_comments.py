@@ -26,6 +26,7 @@ class TestCommentsEndpoint(object):
         comment = res.json_body[0]
         assert comment["content_id"] == 18
         assert comment["parent_id"] == 7
+        assert comment["parent_content_type"] == "thread"
         assert (
             comment["raw_content"]
             == "<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>"

@@ -2,10 +2,10 @@ from io import BytesIO
 import multiprocessing
 import os
 import subprocess
-from unittest import mock
 import typing
 from typing import Any
 from typing import Optional
+from unittest import mock
 
 from PIL import Image
 import plaster
