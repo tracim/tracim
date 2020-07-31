@@ -211,7 +211,7 @@ class EventPublisher:
 
         processing_mode = self._config.JOBS__PROCESSING_MODE
 
-        def publish(session: TracimSession, flush_context) -> None:
+        def publish(session: TracimSession, flush_context=None) -> None:
             EventPublisher._publish_pending_events_of_context(processing_mode, context.dbsession)
 
         sqlalchemy_event.listen(db_session, commit_event, publish)

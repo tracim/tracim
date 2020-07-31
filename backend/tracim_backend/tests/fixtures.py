@@ -99,6 +99,7 @@ def tracim_webserver(settings, config_uri) -> PyramidTestServer:
         config_filename=config_filename,
         config_dir=config_dir,
         extra_config_vars={"app:main": settings},
+        hostname="127.0.0.1",
     ) as server:
         server.start()
         yield server
