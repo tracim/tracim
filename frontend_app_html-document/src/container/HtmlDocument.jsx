@@ -515,6 +515,11 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickLastVersion = () => {
+    if (this.state.showRefreshWarning) {
+      this.handleClickRefresh()
+      return
+    }
+
     this.loadContent()
     this.setState({ mode: APP_FEATURE_MODE.VIEW })
   }
