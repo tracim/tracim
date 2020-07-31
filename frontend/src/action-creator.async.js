@@ -846,3 +846,18 @@ export const getGuestUploadInfo = token => dispatch => {
     dispatch
   })
 }
+
+export const getUserMessagesSummary = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: 'UserMessageSummary',
+    dispatch
+  })
+}

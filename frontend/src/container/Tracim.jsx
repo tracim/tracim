@@ -40,7 +40,8 @@ import {
   getUserIsConnected,
   getMyselfWorkspaceList,
   putUserLang,
-  getWorkspaceMemberList
+  getWorkspaceMemberList,
+  getUserMessagesSummary
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -73,6 +74,7 @@ export class Tracim extends React.Component {
       displayConnectionError: false,
       connectionErrorDisplayTimeoutId: -1,
       isNotificationWallOpen: false,
+      // TODO add this state in REDUX
       notificationCount: 0
     }
 
@@ -157,11 +159,13 @@ export class Tracim extends React.Component {
 
     const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
-      case 200:
-        if (fetchGetUserIsConnected.json.lang === null) this.setDefaultUserLang(fetchGetUserIsConnected.json)
+      case 200: {
+        const fetchUser = fetchGetUserIsConnected.json
+
+        if (fetchUser.lang === null) this.setDefaultUserLang(fetchGetUserIsConnected.json)
 
         props.dispatch(setUserConnected({
-          ...fetchGetUserIsConnected.json,
+          ...fetchUser,
           logged: true
         }))
 
@@ -172,10 +176,12 @@ export class Tracim extends React.Component {
 
         this.loadAppConfig()
         this.loadWorkspaceList()
+        this.loadNotificationNotRead(fetchUser.user_id)
 
         this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id)
 
         break
+      }
       case 401: props.dispatch(setUserConnected({ logged: false })); break
       default: props.dispatch(setUserConnected({ logged: false })); break
     }
@@ -251,6 +257,18 @@ export class Tracim extends React.Component {
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
+  loadNotificationNotRead = async (userId) => {
+    const { props } = this
+
+    const fetchNotificationNotRead = await props.dispatch(getUserMessagesSummary(userId))
+
+    switch (fetchNotificationNotRead.status) {
+      // TODO add this state in REDUX
+      case 200: this.setState({ notificationCount: fetchNotificationNotRead.json.unread_messages_count }); break
+      default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
+    }
+  }
+
   setDefaultUserLang = async loggedUser => {
     const { props } = this
     const fetchPutUserLang = await props.dispatch(putUserLang(serialize(loggedUser, serializeUserProps), props.user.lang))
@@ -264,9 +282,7 @@ export class Tracim extends React.Component {
 
   handleClickNotification = () => {
     this.setState(prev => ({
-      isNotificationWallOpen: !prev.isNotificationWallOpen,
-      // TODO FETCH NOTIFICATION NOT READ, THIS LINE IS JUST TO TEST
-      notificationCount: prev.notificationCount + 1
+      isNotificationWallOpen: !prev.isNotificationWallOpen
     }))
   }
 
