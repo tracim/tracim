@@ -10,7 +10,7 @@ import transaction
 import tracim_backend
 from tracim_backend.command import TracimCLI
 from tracim_backend.exceptions import DatabaseInitializationFailed
-from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import EmailAlreadyExistsInDb
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
@@ -72,7 +72,7 @@ class TestCommands(object):
             api.get_one_by_email("command_test@user")
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
-        # TracimCLI need reseted context when ran.
+        # TracimCLI needs the context to be reset when ran.
         DepotManager._clear()
         app = TracimCLI()
         result = app.run(
@@ -166,7 +166,7 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(EmailAlreadyExistInDb):
+        with pytest.raises(EmailAlreadyExistsInDb):
             app.run(
                 [
                     "--debug",

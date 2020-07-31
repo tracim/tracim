@@ -105,7 +105,7 @@ export class Thread extends React.Component {
 
   handleReloadAppFeatureData = () => {
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(this.state.config.slug))
-    this.props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
+    this.props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline)
   }
 
   handleAllAppChangeLanguage = data => {
@@ -117,17 +117,23 @@ export class Thread extends React.Component {
   }
 
   handleContentChanged = data => {
+    const { state } = this
     if (data.content.content_id !== this.state.content.content_id) return
 
     const clientToken = this.state.config.apiHeader['X-Tracim-ClientToken']
+    const newContentObject = { ...state.content, ...data.content }
     this.setState(prev => ({
-      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
-      newContent: { ...prev.content, ...data.content },
+      content: clientToken === data.client_token ? newContentObject : prev.content,
+      newContent: newContentObject,
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
       timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
       isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
+    if (clientToken === data.client_token) {
+      this.setHeadTitle(newContentObject.label)
+      this.buildBreadcrumbs(newContentObject)
+    }
   }
 
   handleCommentCreated = data => {
@@ -171,7 +177,6 @@ export class Thread extends React.Component {
 
     await this.loadContent()
     this.loadTimeline()
-    this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -183,7 +188,6 @@ export class Thread extends React.Component {
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
       this.loadTimeline()
-      this.buildBreadcrumbs()
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
@@ -226,6 +230,7 @@ export class Thread extends React.Component {
       isLastTimelineItemCurrentToken: false
     })
     this.setHeadTitle(response.body.label)
+    this.buildBreadcrumbs(response.body)
 
     await putThreadRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
@@ -247,15 +252,15 @@ export class Thread extends React.Component {
     this.setState({ timeline: revisionWithComment })
   }
 
-  buildBreadcrumbs = () => {
+  buildBreadcrumbs = (content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
-          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
-          label: state.content.label,
+          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
+          label: content.label,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         }]
@@ -311,6 +316,13 @@ export class Thread extends React.Component {
   }
 
   handleClickRefresh = () => {
+    const { state } = this
+
+    const newObjectContent = {
+      ...state.content,
+      ...state.newContent
+    }
+
     this.setState(prev => ({
       content: {
         ...prev.content,
@@ -318,6 +330,8 @@ export class Thread extends React.Component {
       },
       showRefreshWarning: false
     }))
+    this.setHeadTitle(newObjectContent.label)
+    this.buildBreadcrumbs(newObjectContent)
   }
 
   render () {

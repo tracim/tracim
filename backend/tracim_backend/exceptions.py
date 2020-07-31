@@ -243,6 +243,10 @@ class UserDoesNotExist(TracimException):
     error_code = ErrorCode.USER_NOT_FOUND
 
 
+class MessageDoesNotExist(TracimException):
+    error_code = ErrorCode.MESSAGE_NOT_FOUND
+
+
 class UserNotFoundInTracimRequest(TracimException):
     error_code = ErrorCode.USER_NOT_IN_TRACIM_REQUEST
 
@@ -463,6 +467,10 @@ class TooShortAutocompleteString(TracimException):
     pass
 
 
+class CannotUseBothIncludeAndExcludeWorkspaceUsers(TracimException):
+    pass
+
+
 class PageNotFound(TracimException):
     pass
 
@@ -471,7 +479,7 @@ class AppDoesNotExist(TracimException):
     pass
 
 
-class EmailAlreadyExistInDb(TracimException):
+class EmailAlreadyExistsInDb(TracimException):
     error_code = ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
 
 

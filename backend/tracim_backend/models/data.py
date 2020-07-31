@@ -5,7 +5,9 @@ from datetime import timedelta
 import enum
 import json
 import os
-import typing
+from typing import Any
+from typing import List
+from typing import Optional
 
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
@@ -93,7 +95,7 @@ class Workspace(DeclarativeBase):
     owner = relationship("User", remote_side=[User.user_id])
 
     @hybrid_property
-    def contents(self) -> ["Content"]:
+    def contents(self) -> List["Content"]:
         # Return a list of unique revisions parent content
         contents = []
         for revision in self.revisions:
@@ -126,7 +128,7 @@ class Workspace(DeclarativeBase):
         """ this method is for interoperability with Content class"""
         return self.label
 
-    def get_allowed_content_types(self) -> typing.List[TracimContentType]:
+    def get_allowed_content_types(self) -> List[TracimContentType]:
         # @see Content.get_allowed_content_types()
         return content_type_list.endpoint_allowed_types()
 
@@ -220,14 +222,14 @@ class UserRoleInWorkspace(DeclarativeBase):
         return self.role_object().label
 
     @classmethod
-    def get_all_role_values(cls) -> typing.List[int]:
+    def get_all_role_values(cls) -> List[int]:
         """
         Return all valid role value
         """
         return [role.level for role in WorkspaceRoles.get_all_valid_role()]
 
     @classmethod
-    def get_all_role_slug(cls) -> typing.List[str]:
+    def get_all_role_slug(cls) -> List[str]:
         """
         Return all valid role slug
         """
@@ -788,7 +790,7 @@ class ContentRevisionRO(DeclarativeBase):
                 ) from exc
         return copy_rev
 
-    def __setattr__(self, key: str, value: typing.Any):
+    def __setattr__(self, key: str, value: Any):
         """
         ContentRevisionUpdateError is raised if tried to update column and revision own identity
         :param key: attribute name
@@ -1017,7 +1019,7 @@ class Content(DeclarativeBase):
         self.revision.file_extension = value
 
     @file_extension.expression
-    def file_extension(cls) -> InstrumentedAttribute:
+    def file_extension(cls) -> str:
         return ContentRevisionRO.file_extension
 
     @hybrid_property
@@ -1227,7 +1229,7 @@ class Content(DeclarativeBase):
         return ContentRevisionRO.owner
 
     @property
-    def children(self) -> ["Content"]:
+    def children(self) -> List["Content"]:
         return (
             object_session(self)
             .query(Content)
@@ -1237,8 +1239,8 @@ class Content(DeclarativeBase):
         )
 
     @property
-    def recursive_children(self) -> ["Content"]:
-        """
+    def recursive_children(self) -> List["Content"]:
+        """typing.Listtyping.List
         :return: list of children Content
         :rtype Content
         """
@@ -1272,7 +1274,7 @@ class Content(DeclarativeBase):
             )
         return []
 
-    def get_children(self, recursively: bool = False) -> ["Content"]:
+    def get_children(self, recursively: bool = False) -> List["Content"]:
         """
         Get all children of content recursively or not (including children of children...)
         """
@@ -1320,7 +1322,7 @@ class Content(DeclarativeBase):
         self.current_revision = new_rev
         return new_rev
 
-    def get_valid_children(self, content_types: list = None) -> ["Content"]:
+    def get_valid_children(self, content_types: List[str] = None) -> List["Content"]:
         query = self.children.filter(ContentRevisionRO.is_deleted == False).filter(  # noqa: E712
             ContentRevisionRO.is_archived == False  # noqa: E712
         )
@@ -1395,10 +1397,10 @@ class Content(DeclarativeBase):
 
         return False
 
-    def get_comments(self) -> typing.List["Content"]:
+    def get_comments(self) -> List["Content"]:
         return self.get_valid_children(content_types=[content_type_list.Comment.slug])
 
-    def get_last_comment_from(self, user: User) -> "Content":
+    def get_last_comment_from(self, user: User) -> Optional["Content"]:
         # TODO - Make this more efficient
         last_comment_updated = None
         last_comment = None
@@ -1429,7 +1431,7 @@ class Content(DeclarativeBase):
         # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
         return BeautifulSoup(self.description, "html.parser").text
 
-    def get_allowed_content_types(self) -> typing.List[TracimContentType]:
+    def get_allowed_content_types(self) -> List[TracimContentType]:
         types = []
         allowed_types = self.properties["allowed_content"]
         for type_label, is_allowed in allowed_types.items():
@@ -1451,7 +1453,7 @@ class Content(DeclarativeBase):
                     )
         return types
 
-    def get_history(self, drop_empty_revision=False) -> "[VirtualEvent]":
+    def get_history(self, drop_empty_revision=False) -> List["VirtualEvent"]:
         events = []
         for comment in self.get_comments():
             events.append(VirtualEvent.create_from_content(comment))
@@ -1482,9 +1484,9 @@ class Content(DeclarativeBase):
         cid = content.content_id
         return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
 
-    def get_tree_revisions(self) -> typing.List[ContentRevisionRO]:
+    def get_tree_revisions(self) -> List[ContentRevisionRO]:
         """Get all revision sorted by id of content and all his children recursively"""
-        revisions = []  # type: typing.List[ContentRevisionRO]
+        revisions = []  # type: List[ContentRevisionRO]
         for revision in self.revisions:
             revisions.append(revision)
         for child in self.get_children(recursively=True):
@@ -1492,7 +1494,7 @@ class Content(DeclarativeBase):
         revisions = sorted(revisions, key=lambda revision: revision.revision_id)
         return revisions
 
-    def get_tree_revisions_advanced(self) -> typing.List[ContentRevisionRO]:
+    def get_tree_revisions_advanced(self) -> List[ContentRevisionRO]:
         """Get all revision sorted by id of content and all his children recursively"""
         RevisionsData = namedtuple("revision_data", ["revision", "is_current_rev"])
         revisions_data = []
@@ -1548,9 +1550,7 @@ class NodeTreeItem(object):
         is not directly related to sqlalchemy and database
     """
 
-    def __init__(
-        self, node: Content, children: typing.List["NodeTreeItem"], is_selected: bool = False
-    ):
+    def __init__(self, node: Content, children: List["NodeTreeItem"], is_selected: bool = False):
         self.node = node
         self.children = children
         self.is_selected = is_selected

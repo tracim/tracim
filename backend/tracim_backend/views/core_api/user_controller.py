@@ -1,14 +1,14 @@
-import typing
-
 from hapic import HapicData
 from pyramid.config import Configurator
 from pyramid.response import Response
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
+from tracim_backend.exceptions import EmailAlreadyExistsInDb
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
@@ -29,15 +29,17 @@ from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.event import Message
+from tracim_backend.models.context_models import PaginatedObject
+from tracim_backend.models.context_models import UserMessagesSummary
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
-from tracim_backend.views.core_api.schemas import KnownMemberQuerySchema
-from tracim_backend.views.core_api.schemas import LiveMessageSchema
+from tracim_backend.views.core_api.schemas import KnownMembersQuerySchema
+from tracim_backend.views.core_api.schemas import LiveMessageSchemaPage
+from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
@@ -51,6 +53,8 @@ from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
+from tracim_backend.views.core_api.schemas import UserMessagesSummaryQuerySchema
+from tracim_backend.views.core_api.schemas import UserMessagesSummarySchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
@@ -158,8 +162,9 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_query(KnownMemberQuerySchema())
+    @hapic.input_query(KnownMembersQuerySchema())
     @hapic.output_body(UserDigestSchema(many=True))
+    @hapic.handle_exception(CannotUseBothIncludeAndExcludeWorkspaceUsers, HTTPStatus.BAD_REQUEST)
     def known_members(self, context, request: TracimRequest, hapic_data=None):
         """
         Get known users list
@@ -171,7 +176,7 @@ class UserController(Controller):
             config=app_config,
             show_deactivated=False,
         )
-        users = uapi.get_known_user(
+        users = uapi.get_known_users(
             acp=hapic_data.query.acp,
             exclude_user_ids=hapic_data.query.exclude_user_ids,
             exclude_workspace_ids=hapic_data.query.exclude_workspace_ids,
@@ -182,7 +187,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(EmailAlreadyExistsInDb, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetEmailSchema())
@@ -278,7 +283,7 @@ class UserController(Controller):
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
-    @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(EmailAlreadyExistsInDb, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
     @check_right(is_administrator)
     @hapic.input_body(UserCreationSchema())
@@ -590,17 +595,99 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(GetLiveMessageQuerySchema())
-    @hapic.output_body(LiveMessageSchema(many=True))
+    @hapic.output_body(LiveMessageSchemaPage())
     def get_user_messages(
         self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> typing.List[Message]:
+    ) -> PaginatedObject:
         """
         Returns user messages matching the given query
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
-        return event_api.get_messages_for_user(
-            request.candidate_user.user_id, ReadStatus(hapic_data.query["read_status"])
+        return PaginatedObject(
+            event_api.get_paginated_messages_for_user(
+                user_id=request.candidate_user.user_id,
+                read_status=hapic_data.query.read_status,
+                page_token=hapic_data.query.page_token,
+                count=hapic_data.query.count,
+                event_types=hapic_data.query.event_types,
+            )
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserMessagesSummaryQuerySchema())
+    @hapic.output_body(UserMessagesSummarySchema())
+    def get_user_messages_summary(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> UserMessagesSummary:
+        """
+        Returns a summary about messages filtered
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        candidate_user = UserApi(
+            request.current_user, request.dbsession, app_config
+        ).get_user_with_context(request.candidate_user)
+        unread_messages_count = event_api.get_messages_count(
+            user_id=candidate_user.user_id,
+            read_status=ReadStatus.UNREAD,
+            event_types=hapic_data.query.event_types,
+        )
+        read_messages_count = event_api.get_messages_count(
+            user_id=candidate_user.user_id,
+            read_status=ReadStatus.READ,
+            event_types=hapic_data.query.event_types,
+        )
+        return UserMessagesSummary(
+            user=candidate_user,
+            unread_messages_count=unread_messages_count,
+            read_messages_count=read_messages_count,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_all_user_messages_as_read(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> None:
+        """
+        Read all unread message for user
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        event_api.mark_user_messages_as_read(request.candidate_user.user_id)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @hapic.handle_exception(MessageDoesNotExist, http_code=HTTPStatus.BAD_REQUEST)
+    @check_right(has_personal_access)
+    @hapic.input_path(MessageIdsPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_message_as_read(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        """
+        Read one message
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        event_api.mark_user_message_as_read(
+            event_id=hapic_data.path.event_id, user_id=request.candidate_user.user_id
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @hapic.handle_exception(MessageDoesNotExist, http_code=HTTPStatus.BAD_REQUEST)
+    @check_right(has_personal_access)
+    @hapic.input_path(MessageIdsPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_message_as_unread(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        """
+        unread one message
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        event_api.mark_user_message_as_unread(
+            event_id=hapic_data.path.event_id, user_id=request.candidate_user.user_id
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
@@ -804,3 +891,34 @@ class UserController(Controller):
             "messages", "/users/{user_id:\d+}/messages", request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.get_user_messages, route_name="messages")
+
+        configurator.add_route(
+            "messages_summary",
+            "/users/{user_id:\d+}/messages/summary",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_user_messages_summary, route_name="messages_summary")
+
+        # read all unread messages for user
+        configurator.add_route(
+            "read_messages",
+            "/users/{user_id:\d+}/messages/read",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.set_all_user_messages_as_read, route_name="read_messages")
+
+        # read all unread messages for user
+        configurator.add_route(
+            "read_message",
+            "/users/{user_id:\d+}/messages/{event_id:\d+}/read",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.set_message_as_read, route_name="read_message")
+
+        # read all unread messages for user
+        configurator.add_route(
+            "unread_message",
+            "/users/{user_id:\d+}/messages/{event_id:\d+}/unread",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.set_message_as_unread, route_name="unread_message")

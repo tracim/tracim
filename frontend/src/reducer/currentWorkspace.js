@@ -10,6 +10,7 @@ import {
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_RECENT_ACTIVITY_LIST,
   WORKSPACE_MEMBER, UPDATE,
+  USER,
   USER_WORKSPACE_DO_NOTIFY,
   FOLDER_READ,
   WORKSPACE_AGENDA_URL,
@@ -223,6 +224,17 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
 
     case `${SET}/${WORKSPACE_AGENDA_URL}`:
       return { ...state, agendaUrl: action.agendaUrl }
+
+    case `${UPDATE}/${USER}`:
+      if (!state.memberList.some(member => member.id === action.newUser.user_id)) return state
+
+      return {
+        ...state,
+        memberList: state.memberList.map(member => member.id === action.newUser.user_id
+          ? serializeMember({ ...member, user: action.newUser })
+          : member
+        )
+      }
 
     default:
       return state

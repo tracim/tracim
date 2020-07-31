@@ -14,6 +14,7 @@ requires = [
     'transaction',
     'zope.sqlalchemy',
     'alembic',
+    'sqlakeyset',
     # API
     'hapic[marshmallow]>=0.83',
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
@@ -137,6 +138,7 @@ setup(
             'user_update = tracim_backend.command.user:UpdateUserCommand',
             'db_init = tracim_backend.command.database:InitializeDBCommand',
             'db_delete = tracim_backend.command.database:DeleteDBCommand',
+            'db update-naming-conventions = tracim_backend.command.database:UpdateNamingConventionsV1ToV2Command',
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
             'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand',

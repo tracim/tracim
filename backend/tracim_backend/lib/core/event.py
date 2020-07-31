@@ -3,11 +3,17 @@ import contextlib
 from datetime import datetime
 import typing
 
+from sqlakeyset import Page
+from sqlakeyset import get_page
+from sqlalchemy import and_
 from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
 from sqlalchemy import null
+from sqlalchemy import or_
+from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.app_models.contents import FILE_TYPE
@@ -15,6 +21,7 @@ from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.content import ContentApi
@@ -28,6 +35,7 @@ from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.rq.worker import worker_context
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
+from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
@@ -37,6 +45,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
+from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
@@ -71,12 +80,19 @@ class EventApi:
         self._session = session
         self._config = config
 
-    def get_messages_for_user(self, user_id: int, read_status: ReadStatus) -> typing.List[Message]:
-        query = (
-            self._session.query(Message)
-            .filter(Message.receiver_id == user_id)
-            .options(joinedload(Message.event))
-        )
+    def _base_query(
+        self,
+        read_status: ReadStatus = ReadStatus.ALL,
+        event_id: typing.Optional[int] = None,
+        user_id: typing.Optional[int] = None,
+        event_types: typing.List[EventTypeDatabaseParameters] = None,
+    ) -> Query:
+        query = self._session.query(Message).join(Event)
+        if event_id:
+            query = query.filter(Message.event_id == event_id)
+        if user_id:
+            query = query.filter(Message.receiver_id == user_id)
+        query = query.options(joinedload(Message.event))
         if read_status == ReadStatus.READ:
             query = query.filter(Message.read != null())
         elif read_status == ReadStatus.UNREAD:
@@ -84,7 +100,77 @@ class EventApi:
         else:
             # ALL doesn't need any filtering an is the only other handled case
             assert read_status == ReadStatus.ALL
-        return query.all()
+
+        if event_types:
+            event_type_filters = []
+            for event_type in event_types:
+                event_type_filter = and_(
+                    Event.entity_type == event_type.entity,
+                    Event.operation == event_type.operation,
+                    Event.entity_subtype == event_type.subtype,
+                )
+                event_type_filters.append(event_type_filter)
+
+            if len(event_type_filters) > 1:
+                query = query.filter(or_(*event_type_filters))
+            else:
+                query = query.filter(event_type_filters[0])
+        return query
+
+    def get_one_message(self, event_id: int, user_id: int) -> Message:
+        try:
+            return self._base_query(event_id=event_id, user_id=user_id).one()
+        except NoResultFound as exc:
+            raise MessageDoesNotExist(
+                'Message for user {} with event id "{}" not found in database'.format(
+                    user_id, event_id
+                )
+            ) from exc
+
+    def mark_user_message_as_read(self, event_id: int, user_id: int) -> Message:
+        message = self.get_one_message(event_id, user_id)
+        message.read = datetime.utcnow()
+        self._session.add(message)
+        self._session.flush()
+        return message
+
+    def mark_user_message_as_unread(self, event_id: int, user_id: int) -> Message:
+        message = self.get_one_message(event_id, user_id)
+        message.read = None
+        self._session.add(message)
+        self._session.flush()
+        return message
+
+    def mark_user_messages_as_read(self, user_id: int) -> typing.List[Message]:
+        unread_messages = self._base_query(read_status=ReadStatus.UNREAD, user_id=user_id).all()
+        for message in unread_messages:
+            message.read = datetime.utcnow()
+            self._session.add(message)
+        self._session.flush()
+        return unread_messages
+
+    def get_paginated_messages_for_user(
+        self,
+        user_id: int,
+        read_status: ReadStatus,
+        event_types: typing.List[EventTypeDatabaseParameters] = None,
+        count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
+        page_token: typing.Optional[int] = None,
+    ) -> Page:
+        query = self._base_query(
+            user_id=user_id, read_status=read_status, event_types=event_types,
+        ).order_by(Message.event_id.desc())
+        return get_page(query, per_page=count, page=page_token or False)
+
+    def get_messages_count(
+        self,
+        user_id: int,
+        read_status: ReadStatus,
+        event_types: typing.List[EventTypeDatabaseParameters] = None,
+    ) -> int:
+        return self._base_query(
+            user_id=user_id, event_types=event_types, read_status=read_status
+        ).count()
 
 
 class EventBuilder:

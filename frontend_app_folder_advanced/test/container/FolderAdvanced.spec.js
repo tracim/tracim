@@ -21,11 +21,20 @@ describe('<FolderAdvanced />', () => {
     registerCustomEventHandlerList: () => { },
     i18n: {}
   }
+  const buildBreadcrumbsSpy = sinon.spy()
+  const setHeadTitleSpy = sinon.spy()
 
   mockGetSystemContentTypes200(debug.config.apiUrl, [{ label: 'folder' }, { label: 'html-document' }]).persist()
   mockGetFolder200(debug.config.apiUrl, debug.content.workspace_id, debug.content.content_id, debug.content).persist()
 
   const wrapper = shallow(<FolderAdvanced {...props} />)
+  wrapper.instance().buildBreadcrumbs = buildBreadcrumbsSpy
+  wrapper.instance().setHeadTitle = setHeadTitleSpy
+
+  const resetSpiesHistory = () => {
+    buildBreadcrumbsSpy.resetHistory()
+    setHeadTitleSpy.resetHistory()
+  }
 
   describe('TLM Handlers', () => {
     describe('eventType content folder', () => {
@@ -39,12 +48,27 @@ describe('<FolderAdvanced />', () => {
           content: {
             ...debug.content,
             label: 'Hello, world'
-          }
+          },
+          client_token: wrapper.state('config').apiHeader['X-Tracim-ClientToken']
         }
 
-        it("should update the component's folder", () => {
+        before(() => {
+          resetSpiesHistory()
           wrapper.instance().handleFolderChanged(tlmData)
+        })
+
+        after(() => {
+          resetSpiesHistory()
+        })
+
+        it("should update the component's folder", () => {
           expect(wrapper.state('newContent')).to.deep.equal(tlmData.content)
+        })
+        it('should call buildBreadcrumbs()', () => {
+          expect(buildBreadcrumbsSpy.called).to.equal(true)
+        })
+        it('should call setHeadTitle() with the right args', () => {
+          expect(setHeadTitleSpy.calledOnceWith(tlmData.content.label)).to.equal(true)
         })
       })
 
