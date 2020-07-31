@@ -12,9 +12,7 @@ export class AutoCompleteTextArea extends React.Component {
     this.state = {
       mentionAutocomplete: false,
       autoCompleteItemList: [],
-      autoCompleteCursorPosition: 0,
-      cursorTop: 0,
-      cursorLeft: 0
+      autoCompleteCursorPosition: 0
     }
   }
 
@@ -42,10 +40,9 @@ export class AutoCompleteTextArea extends React.Component {
     const newComment = this.props.newComment
     const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
     let index = lastCharBeforeCursorIndex
-    while (newComment[index] !== ' ' && newComment.slice(0, index).slice(-6) !== '&nbsp;' && index >= 0) {
-      if (newComment[index] === '@') {
+    while (newComment[index] !== ' ' && index >= 0) {
+      if (newComment[index] === '@' && (index === 0 || newComment[index - 1] === ' ')) {
         const mentionList = await this.props.searchMentionList(newComment.slice(index + 1, lastCharBeforeCursorIndex + 1))
-        // const autoCompleteItemList = !mentionList ? [...commonMentionList] : [...commonMentionList, ...mentionList]
         const autoCompleteItemList = mentionList
         this.setState({
           mentionAutocomplete: true,
@@ -107,7 +104,7 @@ export class AutoCompleteTextArea extends React.Component {
     }
     if (atIndex === -1) return
     const newComment = [...this.props.newComment]
-    newComment.splice(atIndex + 1, (lastCharBeforeCursorIndex) - atIndex, [...autoCompleteItem.mention, ' '])
+    newComment.splice(atIndex + 1, lastCharBeforeCursorIndex - atIndex, [...autoCompleteItem.mention, ' '])
     this.props.onChangeNewComment({ target: { value: newComment.flatMap(m => m).reduce((val, m) => (val + m), '') } })
 
     this.setState({
@@ -120,20 +117,10 @@ export class AutoCompleteTextArea extends React.Component {
   render () {
     const { props, state } = this
 
-    let style = {}
-    if (props.autocompletePositionFixed) {
-      style = {
-        position: 'fixed',
-        top: state.cursorTop,
-        left: state.cursorLeft,
-        'z-index': 3000
-      }
-    }
-
     return (
       <>
         {(!props.disableComment) && state.mentionAutocomplete && (
-          <div className='textarea__autocomplete' style={style}>
+          <div className='textarea__autocomplete'>
             {state.autoCompleteItemList.map((m, i) => (
               <>
                 {i === commonMentionList.length && (
