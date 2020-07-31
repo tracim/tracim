@@ -32,10 +32,27 @@
     RequestHeader edit Destination ^https http early
 
     # Proxy those paths to tracim web's with uwsgi protocol
-    <LocationMatch ^/(agenda|ui|api|custom_toolbox-assets|$)>
-        ProxyPassMatch uwsgi://localhost:8081/
+    <Location /agenda>
+        # ProxyPass uwsgi://localhost:8081/
+        # ProxyPassReverse uwsgi://localhost:8081/
+    </Location>
+    <Location /ui>
+        ProxyPass uwsgi://localhost:8081/
         ProxyPassReverse uwsgi://localhost:8081/
-    </LocationMatch>
+    </Location>
+    <Location /api>
+        ProxyPass uwsgi://localhost:8081/
+        ProxyPassReverse uwsgi://localhost:8081/
+    </Location>
+    <Location /custom_toolbox-assets>
+        ProxyPass uwsgi://localhost:8081/
+        ProxyPassReverse uwsgi://localhost:8081/
+    </Location>
+    <Location />
+        ProxyPass uwsgi://localhost:8081/
+        ProxyPassReverse uwsgi://localhost:8081/
+    </Location>
+
 
     # Proxying Webdav to tracim_webdav
     <Location /webdav>
@@ -46,9 +63,10 @@
     </Location>
 
     # Proxying Tracim Live Message to Pushpin
+    # ! if a redirection is needed one day, note that ProxyPassReverse do not work
+    # in a LocationMatch (as mentionned in apache's documentation).
     <LocationMatch ^/api/users/[0-9]+/live_messages>
         ProxyPassMatch http://127.0.0.1:7999/
-        ProxyPassReverse http://127.0.0.1:7999/
     </LocationMatch>
 
     CustomLog /var/tracim/logs/apache2-access.log combined

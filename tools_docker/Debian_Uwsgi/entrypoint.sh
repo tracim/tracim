@@ -91,12 +91,12 @@ if [ "$START_CALDAV" = "1" ]; then
         ln -s /etc/uwsgi/apps-available/tracim_caldav.ini /etc/uwsgi/apps-enabled/tracim_caldav.ini
     fi
     DEFAULT_APP_LIST="$DEFAULT_APP_LIST,agenda"
-    sed -i "s|^\s*#ProxyPass /agenda http://127.0.0.1:8080/agenda|    ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
-    sed -i "s|^\s*#ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*# ProxyPass uwsgi://localhost:8081/|    ProxyPass uwsgi://localhost:8081/|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*# ProxyPassReverse uwsgi://localhost:8081/|    ProxyPassReverse uwsgi://localhost:8081/|g" /etc/tracim/apache2.conf
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_caldav.ini
-    sed -i "s|^\s*ProxyPass /agenda http://127.0.0.1:8080/agenda|    #ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
-    sed -i "s|^\s*ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*ProxyPass uwsgi://localhost:8081/|    # ProxyPass uwsgi://localhost:8081/|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*ProxyPassReverse uwsgi://localhost:8081/|    # # ProxyPassReverse uwsgi://localhost:8081/|g" /etc/tracim/apache2.conf
 fi
 
 # INFO - G.M - 2020-01-28 - enable collaborative_document_edition app as default app
