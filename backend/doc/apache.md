@@ -5,7 +5,11 @@
 Install Tracim first.
 Install the Apache server and uWSGI:
 
-    sudo apt install apache2 libapache2-mod-wsgi-py3 uwsgi uwsgi-plugin-python3
+    sudo apt install apache2 libapache2-mod-proxy-uwsgi uwsgi uwsgi-plugin-python3
+
+Activate the proxy_uwsgi module:
+
+    sudo a2enmod proxy_uwsgi
 
 ### Configuration ###
 
@@ -25,11 +29,31 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
             Require all granted
         </Directory>
 
-        <Directory "/">
-            Require all granted
-            Dav On
-        </Directory>
         SetEnv proxy-sendcl
+
+        # Main tracim paths proxyied to tracim_web with uwsgi protocol
+        <Location /ui>
+            ProxyPass uwsgi://localhost:6544/
+            ProxyPassReverse uwsgi://localhost:6544/
+        </Location>
+        <Location /api>
+            ProxyPass uwsgi://localhost:6544/
+            ProxyPassReverse uwsgi://localhost:6544/
+        </Location>
+        <Location /custom_toolbox-assets>
+            ProxyPass uwsgi://localhost:6544/
+            ProxyPassReverse uwsgi://localhost:6544/
+        </Location>
+        <Location />
+            ProxyPass uwsgi://localhost:6544/
+            ProxyPassReverse uwsgi://localhost:6544/
+        </Location>
+
+        # Proxying Caldav
+        <Location /agenda>
+            ProxyPass uwsgi://localhost:6544/agenda
+            ProxyPassReverse uwsgi://localhost:6544/agenda
+        </Location>
 
         # Proxying Webdav
         <Location /webdav>
@@ -42,28 +66,11 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
             ProxyPassReverse http://127.0.0.1:3030/webdav
         </Location>
 
-        # Proxying Caldav
-        ProxyPass /agenda http://127.0.0.1:5232/agenda
-        ProxyPassReverse /agenda http://127.0.0.1:5232/agenda
+         # Proxying Tracim Live Message to Pushpin
+        <LocationMatch ^/api/users/[0-9]+/live_messages$>
+            ProxyPassMatch http://127.0.0.1:7999/
+        </LocationMatch>
 
-        # Proxying Frontend
-        ProxyPass /ui http://127.0.0.1:6543/ui
-        ProxyPassReverse /ui http://127.0.0.1:6543/ui
-
-        # Proxying Tracim Live Message to Pushpin
-        ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
-        ProxyPassReverse ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
-
-        # Proxying Backend API
-        ProxyPass /api http://127.0.0.1:6543/api
-        ProxyPassReverse /api http://127.0.0.1:6543/api
-
-        # Proxying Plugin assets
-        ProxyPass /custom_toolbox-assets http://127.0.0.1:6543/custom_toolbox-assets
-        ProxyPassReverse /custom_toolbox-assets http://127.0.0.1:6543/custom_toolbox-assets
-
-        ProxyPassMatch ^/$ http://localhost:6543
-        ProxyPassReverse ^/$ http://127.0.0.1:6543
 
         CustomLog /var/log/apache2/apache2-tracim-access.log combined
         ErrorLog /var/log/apache2/apache2-tracim-error.log
@@ -94,6 +101,7 @@ Create the file named `/etc/uwsgi/apps-available/tracim.ini` containing:
     module = wsgi.web:application
     env = TRACIM_CONF_PATH=[TRACIM_PATH]/backend/development.ini
     virtualenv = [TRACIM_PATH]/backend/env
+    socket = :6544
     http-socket = :6543
     socket-timeout = 360
     #workers = 4
