@@ -72,7 +72,7 @@
     # Proxying Tracim Live Message to Pushpin
     # ! if a redirection is needed one day, note that ProxyPassReverse do not work
     # in a LocationMatch (as mentionned in apache's documentation).
-    <LocationMatch ^/api/users/[0-9]+/live_messages>
+    <LocationMatch ^/api/users/[0-9]+/live_messages$>
         ProxyPassMatch http://127.0.0.1:7999/
     </LocationMatch>
 
