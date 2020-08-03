@@ -4,6 +4,7 @@ import pytest
 import transaction
 
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.mention import DescriptionMentionParser
 from tracim_backend.lib.core.mention import Mention
 from tracim_backend.lib.core.mention import MentionBuilder
 from tracim_backend.models.auth import Profile
@@ -158,7 +159,7 @@ class TestMentionBuilder:
     def test_unit_get_mentions_from_html__ok__nominal_cases(
         self, html: str, mentions: typing.List[Mention]
     ) -> None:
-        assert MentionBuilder.get_mentions_from_html(html) == mentions
+        assert DescriptionMentionParser.get_mentions_from_html(html) == mentions
 
     def test_unit_on_content_created__ok__nominal_case(
         self, session_factory, app_config, one_content_with_a_mention: Content
