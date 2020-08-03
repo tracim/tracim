@@ -1,3 +1,5 @@
+from typing import Dict
+
 from hapic import HapicData
 from pyramid.config import Configurator
 from pyramid.response import Response
@@ -20,6 +22,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userconfig import UserConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
@@ -42,6 +45,7 @@ from tracim_backend.views.core_api.schemas import LiveMessageSchemaPage
 from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
+from tracim_backend.views.core_api.schemas import SetConfigSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
@@ -49,6 +53,7 @@ from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventHeaderSchema
+from tracim_backend.views.core_api.schemas import UserConfigSchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
@@ -65,6 +70,7 @@ from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -73,6 +79,7 @@ except ImportError:
 
 
 SWAGGER_TAG__USER_ENDPOINTS = "Users"
+
 SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 )
@@ -80,15 +87,21 @@ SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_t
 SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 )
+
 SWAGGER_TAG__USER_CONTENT_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG__CONTENT_ENDPOINTS
 )
+
 SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG__NOTIFICATION_SECTION
 )
 
 SWAGGER_TAG__USER_EVENT_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_EVENT_ENDPOINTS
+)
+
+SWAGGER_TAG__USER_CONFIG_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_USER_CONFIG_ENDPOINTS
 )
 
 
@@ -256,7 +269,6 @@ class UserController(Controller):
             hapic_data.body.new_password2,
             do_save=True,
         )
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)
@@ -333,7 +345,6 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.enable(user=request.candidate_user, do_save=True)
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS])
     @hapic.handle_exception(UserCantDeleteHimself, HTTPStatus.BAD_REQUEST)
@@ -349,7 +360,6 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.delete(user=request.candidate_user, do_save=True)
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS])
     @check_right(is_administrator)
@@ -367,7 +377,6 @@ class UserController(Controller):
             show_deleted=True,
         )
         uapi.undelete(user=request.candidate_user, do_save=True)
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS])
     @hapic.handle_exception(UserCantDisableHimself, HTTPStatus.BAD_REQUEST)
@@ -513,7 +522,6 @@ class UserController(Controller):
             config=app_config,
         )
         api.mark_read(request.current_content, do_flush=True)
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -532,7 +540,6 @@ class UserController(Controller):
             config=app_config,
         )
         api.mark_unread(request.current_content, do_flush=True)
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -551,7 +558,6 @@ class UserController(Controller):
             config=app_config,
         )
         api.mark_read__workspace(request.current_workspace)
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
     @check_right(has_personal_access)
@@ -570,7 +576,6 @@ class UserController(Controller):
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         wapi.enable_notifications(request.candidate_user, workspace)
         wapi.save(workspace)
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
     @check_right(has_personal_access)
@@ -589,7 +594,6 @@ class UserController(Controller):
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         wapi.disable_notifications(request.candidate_user, workspace)
         wapi.save(workspace)
-        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -719,6 +723,29 @@ class UserController(Controller):
         return Response(
             headerlist=headers, charset="utf-8", status_code=200, body=stream_opened_event
         )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(UserConfigSchema())
+    def get_user_config(self, context, request: TracimRequest, hapic_data: HapicData) -> Dict:
+        """
+        get all the configuration parameters for the given user
+        """
+        config_api = UserConfigApi(user=request.candidate_user, session=request.dbsession)
+        return {"parameters": config_api.get_all_params()}
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(SetConfigSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_user_config(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        """
+        set or update the given configuration parameters for the given user
+        """
+        config_api = UserConfigApi(user=request.candidate_user, session=request.dbsession)
+        config_api.set_params(params=hapic_data.body["parameters"])
 
     def bind(self, configurator: Configurator) -> None:
         """
@@ -922,3 +949,14 @@ class UserController(Controller):
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_message_as_unread, route_name="unread_message")
+
+        # User configuration
+        configurator.add_route(
+            "config_get", "/users/{user_id:\d+}/config", request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_user_config, route_name="config_get")
+
+        configurator.add_route(
+            "config_post", "/users/{user_id:\d+}/config", request_method="POST",  # noqa: W605
+        )
+        configurator.add_view(self.set_user_config, route_name="config_post")

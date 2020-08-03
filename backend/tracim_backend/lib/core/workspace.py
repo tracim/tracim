@@ -44,7 +44,7 @@ class WorkspaceApi(object):
         :param current_user: Current user of context
         :param force_role: If True, app role in queries even if admin
         """
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config

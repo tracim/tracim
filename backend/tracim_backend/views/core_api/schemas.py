@@ -254,7 +254,7 @@ class UserSchema(UserDigestSchema):
         allow_none=True,
         required=False,
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
+        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     class Meta:
@@ -263,6 +263,10 @@ class UserSchema(UserDigestSchema):
 
 class LoggedInUserPasswordSchema(marshmallow.Schema):
     loggedin_user_password = String(required=True, validate=user_password_validator)
+
+
+class SetConfigSchema(marshmallow.Schema):
+    parameters = marshmallow.fields.Dict(required=True, example='{"param1":"value1"}')
 
 
 class SetEmailSchema(LoggedInUserPasswordSchema):
@@ -348,7 +352,7 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
         allow_none=True,
         required=False,
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit.",
+        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit.",
     )
 
     @post_load
@@ -405,7 +409,7 @@ class UserCreationSchema(marshmallow.Schema):
         allow_none=True,
         required=False,
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
+        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     @marshmallow.validates_schema(pass_original=True)
@@ -687,7 +691,6 @@ class PageQuerySchema(FileQuerySchema):
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
-
     parent_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="0,4,5",
@@ -779,7 +782,6 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
 
 
 class ContentIdsQuerySchema(marshmallow.Schema):
-
     content_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="1,5",
@@ -1030,6 +1032,12 @@ class WorkspaceSchema(WorkspaceDigestSchema):
 
     class Meta:
         description = "Full workspace informations"
+
+
+class UserConfigSchema(marshmallow.Schema):
+    parameters = marshmallow.fields.Dict(
+        description="parameters present in the user's configuration."
+    )
 
 
 class WorkspaceDiskSpaceSchema(marshmallow.Schema):

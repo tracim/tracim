@@ -34,7 +34,7 @@ class TracimSession(Session):
     def get_allowed_revision_deletion(self) -> bool:
         return self._allow_revision_deletion
 
-    def assert_event_mecanism(self) -> None:
+    def assert_event_mechanism(self) -> None:
         assert self.info["crud_hook_caller"], (
             "Entity crud hook caller not registered, "
             "session must be created through create_dbsession_for_context()"
