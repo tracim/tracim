@@ -40,7 +40,8 @@ import {
   addRevisionFromTLM,
   RefreshWarningMessage,
   setupCommonRequestHeaders,
-  getOrCreateSessionClientToken
+  getOrCreateSessionClientToken,
+  getCurrentContentVersionNumber
 } from 'tracim_frontend_lib'
 import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
@@ -169,11 +170,13 @@ export class File extends React.Component {
 
     if (clientToken === data.client_token) this.setHeadTitle(filenameNoExtension)
     this.setState(prev => ({
-      content: clientToken === data.client_token ? newContentObject : prev.content,
+      content: clientToken === data.client_token
+        ? newContentObject
+        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
       newContent: newContentObject,
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang, clientToken === data.client_token),
       isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
@@ -186,7 +189,8 @@ export class File extends React.Component {
           ...data.content,
           created_raw: data.content.created,
           created: displayDistanceDate(data.content.created, this.state.loggedUser.lang),
-          timelineType: data.content.content_type
+          timelineType: data.content.content_type,
+          hasBeenRead: data.client_token === this.sessionClientToken
         }
       ])
       this.setState({
@@ -203,7 +207,9 @@ export class File extends React.Component {
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev =>
       ({
-        content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+        content: clientToken === data.client_token
+          ? { ...prev.content, ...data.content }
+          : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
         newContent: {
           ...prev.content,
           ...data.content
@@ -211,7 +217,7 @@ export class File extends React.Component {
         editionAuthor: data.author.public_name,
         showRefreshWarning: clientToken !== data.client_token,
         mode: clientToken === data.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
-        timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+        timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang, clientToken === data.client_token),
         isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
       })
     )
@@ -701,6 +707,7 @@ export class File extends React.Component {
         ...prev.content,
         ...prev.newContent
       },
+      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
     }))
