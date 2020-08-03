@@ -31,7 +31,7 @@ export class NotificationWall extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      isNotificationWallOpen: true
+      isNotificationWallOpen: false
     }
   }
 
