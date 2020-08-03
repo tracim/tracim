@@ -53,8 +53,8 @@
     # Define START_CALDAV
     <IfDefine START_CALDAV>
       <Location /agenda>
-        ProxyPass uwsgi://localhost:8081/agenda
-        ProxyPassReverse uwsgi://localhost:8081/agenda
+        ProxyPass uwsgi://localhost:8081/
+        ProxyPassReverse uwsgi://localhost:8081/
       </Location>
     </IfDefine>
 

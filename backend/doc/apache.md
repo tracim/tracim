@@ -51,8 +51,8 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
 
         # Proxying Caldav
         <Location /agenda>
-            ProxyPass uwsgi://localhost:6544/agenda
-            ProxyPassReverse uwsgi://localhost:6544/agenda
+            ProxyPass uwsgi://localhost:6544/
+            ProxyPassReverse uwsgi://localhost:6544/
         </Location>
 
         # Proxying Webdav
