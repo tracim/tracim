@@ -71,7 +71,7 @@ export class NotificationWall extends React.Component {
           workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
           interpolation: { escapeValue: false }
         })
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.parentContentType}/${notification.content.content_id}`
+        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.id}`
         break
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.HTML_DOCUMENT):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE):
@@ -84,13 +84,13 @@ export class NotificationWall extends React.Component {
           workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
           interpolation: { escapeValue: false }
         })
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
         break
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.HTML_DOCUMENT):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FILE):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FOLDER):
-        if (notification.content.current_revision_type === 'status-update') {
+        if (notification.content.currentRevisionType === 'status-update') {
           icon = 'fa-random'
           text = props.t('{{author}} updated the status of {{content}} at {{workspace}}', {
             author: notification.author,
@@ -107,11 +107,11 @@ export class NotificationWall extends React.Component {
             interpolation: { escapeValue: false }
           })
         }
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
         break
       case buildTracimLiveMessageEventType(TLM_ET.SHAREDSPACE_MEMBER, TLM_CET.CREATED):
         icon = 'fa-user-o'
-        text = props.user.userId === notification.user.user_id
+        text = props.user.userId === notification.user.userId
           ? props.t('{{author}} added you to {{workspace}}', {
             author: notification.author,
             workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
@@ -119,14 +119,14 @@ export class NotificationWall extends React.Component {
           })
           : props.t('{{author}} added {{user}} to {{workspace}}', {
             author: notification.author,
-            user: notification.user.public_name,
+            user: notification.user.publicName,
             workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
             interpolation: { escapeValue: false }
           })
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/dashboard`
+        url = `/ui/workspaces/${notification.workspace.id}/dashboard`
         break
       case buildTracimLiveMessageEventType(TLM_ET.MENTION, TLM_CET.CREATED):
-        if (notification.content.content_type === CONTENT_TYPE.COMMENT) {
+        if (notification.content.type === CONTENT_TYPE.COMMENT) {
           icon = 'fa-comment-o'
           text = props.t('{{author}} mentioned you in a comment in {{content}} at {{workspace}}', {
             author: notification.author,
@@ -134,7 +134,7 @@ export class NotificationWall extends React.Component {
             workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
             interpolation: { escapeValue: false }
           })
-          url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.parent_content_type}/${notification.content.content_id}`
+          url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.id}`
         } else {
           icon = 'fa-at'
           text = props.t('{{author}} mentioned you in {{content}} at {{workspace}}', {
@@ -143,14 +143,14 @@ export class NotificationWall extends React.Component {
             workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
             interpolation: { escapeValue: false }
           })
-          url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+          url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
         }
         break
       default:
         icon = 'fa-bell'
         text = `${notification.author} ${notification.type}`
         url = notification.content
-          ? `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+          ? `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
           : '/ui'
     }
     return { icon, text, url }
