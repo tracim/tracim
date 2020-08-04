@@ -152,7 +152,7 @@ export class Header extends React.Component {
 
               <li className='header__menu__rightside__notification nav-item'>
                 <NotificationButton
-                  notificationCount={props.notificationCount}
+                  notificationNotReadCount={props.notificationNotReadCount}
                   onClickNotification={props.onClickNotification}
                 />
               </li>

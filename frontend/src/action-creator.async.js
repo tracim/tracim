@@ -18,6 +18,7 @@ import {
   newFlashMessage,
   NOTIFICATION,
   NOTIFICATION_LIST,
+  NOTIFICATION_NOT_READ_COUNT,
   SEARCHED_KEYWORDS,
   setRedirectLogin,
   setUserDisconnected,
@@ -885,7 +886,7 @@ export const getUserMessagesSummary = userId => dispatch => {
       },
       method: 'GET'
     },
-    actionName: 'UserMessageSummary',
+    actionName: NOTIFICATION_NOT_READ_COUNT,
     dispatch
   })
 }

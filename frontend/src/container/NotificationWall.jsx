@@ -11,7 +11,7 @@ import {
   appendNotificationList,
   newFlashMessage,
   setNextPage,
-  updateNotification
+  readNotification
 } from '../action-creator.sync.js'
 import {
   buildTracimLiveMessageEventType,
@@ -28,32 +28,20 @@ import {
 import { NUMBER_RESULTS_BY_PAGE } from '../util/helper.js'
 
 export class NotificationWall extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      isNotificationWallOpen: false
-    }
-  }
-
-  handleCloseNotificationWall = () => {
-    this.setState({ isNotificationWallOpen: false })
-  }
-
   handleClickNotification = async notificationId => {
     const { props } = this
 
     const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
     switch (fetchPutNotificationAsRead.status) {
       case 204: {
-        const notification = props.notificationPage.list.find(notification => notification.id === notificationId)
-        props.dispatch(updateNotification({ ...notification, read: true }))
+        props.dispatch(readNotification(notificationId))
         break
       }
       default:
         props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
     }
 
-    this.handleCloseNotificationWall()
+    props.onCloseNotificationWall()
   }
 
   handleClickSeeMore = async () => {
@@ -79,7 +67,7 @@ export class NotificationWall extends React.Component {
         icon = 'fa-comments-o'
         text = props.t('{{author}} commented on {{content}} at {{workspace}}', {
           author: notification.author,
-          content: `<span class='contentTitle__highlight'>${notification.content.label}</span>`,
+          content: `<span class='contentTitle__highlight'>${notification.content.parent_label}</span>`,
           workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
           interpolation: { escapeValue: false }
         })
@@ -123,11 +111,18 @@ export class NotificationWall extends React.Component {
         break
       case buildTracimLiveMessageEventType(TLM_ET.SHAREDSPACE_MEMBER, TLM_CET.CREATED):
         icon = 'fa-user-o'
-        text = props.t('{{author}} added you to {{workspace}}', {
-          author: notification.author,
-          workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
-          interpolation: { escapeValue: false }
-        })
+        text = props.user.userId === notification.user.user_id
+          ? props.t('{{author}} added you to {{workspace}}', {
+            author: notification.author,
+            workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
+            interpolation: { escapeValue: false }
+          })
+          : props.t('{{author}} added {{user}} to {{workspace}}', {
+            author: notification.author,
+            user: notification.user.public_name,
+            workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
+            interpolation: { escapeValue: false }
+          })
         url = `/ui/workspaces/${notification.workspace.workspace_id}/dashboard`
         break
       case buildTracimLiveMessageEventType(TLM_ET.MENTION, TLM_CET.CREATED):
@@ -162,18 +157,18 @@ export class NotificationWall extends React.Component {
   }
 
   render () {
-    const { props, state } = this
+    const { props } = this
 
-    if (!state.isNotificationWallOpen || !props.notificationPage.list) return null
+    if (!props.notificationPage.list) return null
 
     return (
-      <div className='notification'>
+      <div className={classnames('notification', !props.isNotificationWallOpen ? 'notification__wallClose' : '')}>
         <PopinFixedHeader
           customClass='notification'
           faIcon='bell-o'
           rawTitle={props.t('Notifications')}
           componentTitle={<div>{props.t('Notifications')}</div>}
-          onClickCloseBtn={this.handleCloseNotificationWall}
+          onClickCloseBtn={props.onCloseNotificationWall}
         />
 
         <div className='notification__list'>

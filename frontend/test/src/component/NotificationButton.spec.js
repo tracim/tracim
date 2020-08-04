@@ -17,29 +17,29 @@ describe('<NotificationButton />', () => {
   describe('Notification counter', () => {
     describe('when there is 0 notifications', () => {
       before(() => {
-        wrapper.setProps({ notificationCount: 0 })
+        wrapper.setProps({ notificationNotReadCount: 0 })
       })
 
       it('should not display the notification counter bubble', () => {
-        expect(wrapper.find('.notification__count').length).to.equal(0)
+        expect(wrapper.find('.notificationButton__count').length).to.equal(0)
       })
     })
     describe('when there is 5 notifications', () => {
       before(() => {
-        wrapper.setProps({ notificationCount: 5 })
+        wrapper.setProps({ notificationNotReadCount: 5 })
       })
 
       it('should display 5 in the notification counter bubble', () => {
-        expect(wrapper.find('.notification__count').text()).to.equal('5')
+        expect(wrapper.find('.notificationButton__count').text()).to.equal('5')
       })
     })
     describe('when there is more than 99 notifications', () => {
       before(() => {
-        wrapper.setProps({ notificationCount: 100 })
+        wrapper.setProps({ notificationNotReadCount: 100 })
       })
 
       it('should display 99+ in the notification counter bubble', () => {
-        expect(wrapper.find('.notification__count').text()).to.equal('99+')
+        expect(wrapper.find('.notificationButton__count').text()).to.equal('99+')
       })
     })
   })

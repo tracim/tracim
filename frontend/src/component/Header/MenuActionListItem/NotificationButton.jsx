@@ -5,20 +5,20 @@ require('./NotificationButton.styl')
 
 export const NotificationButton = props => {
   return (
-    <div className='notification'>
+    <div className='notificationButton'>
       <button
-        className='notification__btn btn outlineTextBtn nohover primaryColorBorder'
+        className='notificationButton__btn btn outlineTextBtn nohover primaryColorBorder'
         type='button'
         onClick={props.onClickNotification}
       >
         <i className='fa fa-fw fa-bell-o' />
         {props.t('Notifications')}
-        {props.notificationCount > 0 && (
+        {props.notificationNotReadCount > 0 && (
           <div
-            className='notification__count'
-            style={{ 'font-size': props.notificationCount > 99 ? '10px' : '11px' }}
+            className='notificationButton__count'
+            style={{ fontSize: props.notificationNotReadCount > 99 ? '10px' : '11px' }}
           >
-            {props.notificationCount > 99 ? '99+' : props.notificationCount}
+            {props.notificationNotReadCount > 99 ? '99+' : props.notificationNotReadCount}
           </div>
         )}
       </button>
@@ -28,11 +28,11 @@ export const NotificationButton = props => {
 export default translate()(NotificationButton)
 
 NotificationButton.propTypes = {
-  notificationCount: PropTypes.number,
+  notificationNotReadCount: PropTypes.number,
   onClickNotification: PropTypes.func
 }
 
 NotificationButton.defaultProps = {
-  notificationCount: 0,
+  notificationNotReadCount: 0,
   onClickNotification: () => {}
 }

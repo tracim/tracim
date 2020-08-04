@@ -59,7 +59,8 @@ import {
   appendBreadcrumbs,
   setWorkspaceListMemberList,
   setLiveMessageManager,
-  setLiveMessageManagerStatus
+  setLiveMessageManagerStatus,
+  setNotificationNotReadCounter
 } from '../action-creator.sync.js'
 import NotificationWall from './NotificationWall.jsx'
 import SearchResult from './SearchResult.jsx'
@@ -78,9 +79,7 @@ export class Tracim extends React.Component {
       firstTlmConnection: true,
       displayConnectionError: false,
       connectionErrorDisplayTimeoutId: -1,
-      isNotificationWallOpen: false,
-      // TODO add this state in REDUX
-      notificationCount: 0
+      isNotificationWallOpen: false
     }
 
     this.liveMessageManager = new LiveMessageManager()
@@ -279,7 +278,7 @@ export class Tracim extends React.Component {
 
     switch (fetchNotificationNotRead.status) {
       // TODO add this state in REDUX
-      case 200: this.setState({ notificationCount: fetchNotificationNotRead.json.unread_messages_count }); break
+      case 200: props.dispatch(setNotificationNotReadCounter(fetchNotificationNotRead.json.unread_messages_count)); break
       default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
     }
   }
@@ -295,7 +294,7 @@ export class Tracim extends React.Component {
 
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))
 
-  handleClickNotification = () => {
+  handleClickNotificationButton = () => {
     this.setState(prev => ({
       isNotificationWallOpen: !prev.isNotificationWallOpen
     }))
@@ -323,8 +322,8 @@ export class Tracim extends React.Component {
     return (
       <div className='tracim fullWidthFullHeight'>
         <Header
-          onClickNotification={this.handleClickNotification.bind(this)}
-          notificationCount={state.notificationCount}
+          onClickNotification={this.handleClickNotificationButton}
+          notificationNotReadCount={props.notificationPage.notificationNotReadCount}
         />
         {state.displayConnectionError && (
           <FlashMessage
@@ -349,7 +348,12 @@ export class Tracim extends React.Component {
         <div className='sidebarpagecontainer'>
           <Route render={() => <Sidebar />} />
 
-          <Route render={() => <NotificationWall />} />
+          <Route render={() => (
+            <NotificationWall
+              onCloseNotificationWall={this.handleClickNotificationButton}
+              isNotificationWallOpen={state.isNotificationWallOpen}
+            />)}
+          />
 
           <Route path={PAGE.LOGIN} component={Login} />
 
@@ -444,7 +448,7 @@ export class Tracim extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, tlm }) => ({
-  breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, tlm
+const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, tlm, notificationPage }) => ({
+  breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, tlm, notificationPage
 })
 export default withRouter(connect(mapStateToProps)(translate()(TracimComponent(Tracim))))

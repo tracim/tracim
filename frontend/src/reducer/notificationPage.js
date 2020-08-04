@@ -6,13 +6,15 @@ import {
   NOTIFICATION,
   NOTIFICATION_LIST,
   SET,
-  UPDATE
+  READ,
+  NOTIFICATION_NOT_READ_COUNT
 } from '../action-creator.sync.js'
 
 const defaultNotificationsObject = {
   list: [],
   hasNextPage: false,
-  nextPageToken: ''
+  nextPageToken: '',
+  notificationNotReadCount: 0
 }
 
 // FIXME - GB - 2020-07-30 - We can't use the global serializer in this case because it doesn't handle nested object
@@ -20,6 +22,7 @@ const defaultNotificationsObject = {
 export const serializeNotification = no => {
   return {
     author: no.fields.author.public_name,
+    user: no.fields.user ? no.fields.user : null,
     content: no.fields.content ? no.fields.content : null,
     created: no.created,
     id: no.event_id,
@@ -52,15 +55,26 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         list: uniqBy([
           serializeNotification(action.notification),
           ...state.list
-        ], 'id')
+        ], 'id'),
+        notificationNotReadCount: state.notificationNotReadCount + 1
       }
     }
 
-    case `${UPDATE}/${NOTIFICATION}`:
-      return { ...state, list: state.list.map(no => no.id === action.notification.id ? action.notification : no) }
+    case `${READ}/${NOTIFICATION}`: {
+      const notification = state.list.find(notification => notification.id === action.notificationId && !notification.read)
+      if (!notification) return
+      return {
+        ...state,
+        list: state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no),
+        notificationNotReadCount: state.notificationNotReadCount - 1
+      }
+    }
 
     case `${SET}/${NEXT_PAGE}`:
       return { ...state, hasNextPage: action.hasNextPage, nextPageToken: action.nextPageToken }
+
+    case `${SET}/${NOTIFICATION_NOT_READ_COUNT}`:
+      return { ...state, notificationNotReadCount: action.notificationNotReadCount }
 
     default:
       return state
