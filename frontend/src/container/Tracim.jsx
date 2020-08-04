@@ -31,12 +31,14 @@ import {
   PAGE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
-  getUserProfile
+  getUserProfile,
+  NUMBER_RESULTS_BY_PAGE
 } from '../util/helper.js'
 import {
   getConfig,
   getAppList,
   getContentTypeList,
+  getNotificationList,
   getUserIsConnected,
   getMyselfWorkspaceList,
   putUserLang,
@@ -49,6 +51,8 @@ import {
   setConfig,
   setAppList,
   setContentTypeList,
+  setNextPage,
+  setNotificationList,
   setUserConnected,
   setWorkspaceList,
   setBreadcrumbs,
@@ -57,6 +61,7 @@ import {
   setLiveMessageManager,
   setLiveMessageManagerStatus
 } from '../action-creator.sync.js'
+import NotificationWall from './NotificationWall.jsx'
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
@@ -180,6 +185,16 @@ export class Tracim extends React.Component {
 
         this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id)
 
+        const fetchGetNotificationWall = await props.dispatch(getNotificationList(fetchGetUserIsConnected.json.user_id, NUMBER_RESULTS_BY_PAGE))
+        switch (fetchGetNotificationWall.status) {
+          case 200:
+            props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+            props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+            break
+          default:
+            props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
+            break
+        }
         break
       }
       case 401: props.dispatch(setUserConnected({ logged: false })); break
@@ -333,6 +348,8 @@ export class Tracim extends React.Component {
 
         <div className='sidebarpagecontainer'>
           <Route render={() => <Sidebar />} />
+
+          <Route render={() => <NotificationWall />} />
 
           <Route path={PAGE.LOGIN} component={Login} />
 
