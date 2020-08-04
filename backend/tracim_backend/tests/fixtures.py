@@ -27,10 +27,14 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
+from tracim_backend.lib.core.event import RQ_QUEUE_NAME
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
+from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
@@ -77,7 +81,7 @@ def pushpin(tracim_webserver, tmp_path_factory):
 
 
 @pytest.fixture
-def rq_database_worker(config_uri):
+def rq_database_worker(config_uri, empty_rq_event_queue):
 
     worker_env = os.environ.copy()
     worker_env["TRACIM_CONF_PATH"] = "{}#rq_worker_test".format(config_uri)
@@ -91,7 +95,7 @@ def rq_database_worker(config_uri):
 
 
 @pytest.fixture
-def tracim_webserver(settings, config_uri) -> PyramidTestServer:
+def tracim_webserver(settings, config_uri, engine) -> PyramidTestServer:
     config_filename = basename(config_uri)
     config_dir = dirname(config_uri)
 
@@ -99,10 +103,10 @@ def tracim_webserver(settings, config_uri) -> PyramidTestServer:
         config_filename=config_filename,
         config_dir=config_dir,
         extra_config_vars={"app:main": settings},
-        hostname="127.0.0.1",
     ) as server:
         server.start()
         yield server
+        DeclarativeBase.metadata.drop_all(engine)
 
 
 @pytest.fixture
@@ -150,6 +154,13 @@ def web_testapp(settings, hapic, session):
     DepotManager._clear()
     app = web({}, **settings)
     return TestApp(app)
+
+
+@pytest.fixture
+def empty_rq_event_queue(app_config):
+    redis_connection = get_redis_connection(app_config)
+    queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+    queue.delete()
 
 
 @pytest.fixture
@@ -201,7 +212,6 @@ def session(request, engine, session_factory, app_config, test_logger):
     context = TracimTestContext(
         app_config, mock_event_builder=mock_event_builder, session_factory=session_factory
     )
-    from tracim_backend.models.meta import DeclarativeBase
 
     with transaction.manager:
         try:
@@ -211,7 +221,6 @@ def session(request, engine, session_factory, app_config, test_logger):
             transaction.abort()
             raise e
     yield context.dbsession
-    from tracim_backend.models.meta import DeclarativeBase
 
     context.dbsession.rollback()
     context.dbsession.close_all()

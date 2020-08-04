@@ -268,6 +268,8 @@ class DockerCompose:
         self.execute("down")
 
     def execute(self, *arguments: str, env: dict = None) -> None:
+        if env:
+            env.update(os.environ)
         subprocess.run(self.command + list(arguments), env=env, check=True)
 
 

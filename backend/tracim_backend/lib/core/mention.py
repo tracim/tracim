@@ -11,6 +11,8 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.plugins import hookimpl
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
@@ -102,6 +104,7 @@ class MentionBuilder:
     }  # type: typing.Dict[str, BaseMentionParser]
 
     MENTION_FIELD = "mention"
+    ALL__GROUP_MENTIONS = ("all", "tous", "todos")
 
     @classmethod
     def register_content_type_parser(cls, content_type: str, parser: BaseMentionParser) -> None:
@@ -147,8 +150,17 @@ class MentionBuilder:
     def get_receiver_ids(
         cls, event: Event, session: TracimSession, config: CFG
     ) -> typing.Iterable[int]:
-        # FIXME: S.G 2020-07-29 - return proper receiver ids from the event's mention field (#3349)
-        return []
+        recipient = event.fields[cls.MENTION_FIELD]["recipient"]
+        if recipient in cls.ALL__GROUP_MENTIONS:
+            # send to all workspace users
+            role_api = RoleApi(session=session, config=config, current_user=None)
+            workspace_id = event.workspace["workspace_id"]
+            return role_api.get_workspace_member_ids(workspace_id)
+        else:
+            # send to mentioned user
+            user_api = UserApi(session=session, config=config, current_user=None)
+            user = user_api.get_one_by_username(recipient)
+            return [user.user_id]
 
     @classmethod
     def _create_mention_events(
