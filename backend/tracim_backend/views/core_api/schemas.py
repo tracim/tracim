@@ -67,6 +67,7 @@ from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserInfos
+from tracim_backend.models.context_models import UserMessagesSummaryQuery
 from tracim_backend.models.context_models import UserProfile
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentPath
@@ -1501,3 +1502,21 @@ class PathSuffixSchema(marshmallow.Schema):
         default="",
         example="/workspaces/1/notifications/activate",
     )
+
+
+class UserMessagesSummaryQuerySchema(marshmallow.Schema):
+    """Possible query parameters for the GET messages summary endpoint."""
+
+    event_types = EventTypeListField()
+
+    @post_load
+    def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> UserMessagesSummaryQuery:
+        return UserMessagesSummaryQuery(**data)
+
+
+class UserMessagesSummarySchema(marshmallow.Schema):
+    messages_count = marshmallow.fields.Int(example=42)
+    read_messages_count = marshmallow.fields.Int(example=30)
+    unread_messages_count = marshmallow.fields.Int(example=12)
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user = marshmallow.fields.Nested(UserDigestSchema())

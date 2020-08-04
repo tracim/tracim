@@ -106,7 +106,7 @@ class TestMessages(object):
         "event_type",
         ["user", "user.modified.subtype.subsubtype", "user.donothing", "nothing.deleted"],
     )
-    def test_api__get_messages__ok_400__invalid_event_type_filter(
+    def test_api__get_messages__err_400__invalid_event_type_filter(
         self, session, web_testapp, event_type: str
     ) -> None:
         """
@@ -230,9 +230,7 @@ class TestMessages(object):
         ).json_body.get("items")
         assert len(message_dicts) == 2
 
-    def test_api__read_message__error_400__message_does_not_exist(
-        self, session, web_testapp
-    ) -> None:
+    def test_api__read_message__err_400__message_does_not_exist(self, session, web_testapp) -> None:
         """
         Read one message error message does not exist
         """
@@ -241,7 +239,7 @@ class TestMessages(object):
         result = web_testapp.put("/api/users/1/messages/{}/read".format("1000"), status=400)
         assert result.json_body["code"] == 1009
 
-    def test_api__unread_message__error_400__message_does_not_exist(
+    def test_api__unread_message__err_400__message_does_not_exist(
         self, session, web_testapp
     ) -> None:
         """
@@ -349,3 +347,61 @@ class TestMessages(object):
             "/api/users/1/messages?read_status=read", status=200,
         ).json_body.get("items")
         assert len(message_dicts) == 0
+
+    def test_api__messages_summary__ok_200__nominal_case(self, session, web_testapp) -> None:
+        """
+        check summary of messages
+        """
+        create_events_and_messages(session)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        message_dicts = web_testapp.get("/api/users/1/messages/summary", status=200,).json_body
+        assert message_dicts["user_id"] == 1
+        assert message_dicts["unread_messages_count"] == 1
+        assert message_dicts["read_messages_count"] == 1
+        assert message_dicts["messages_count"] == 2
+        assert message_dicts["user"]["user_id"] == 1
+        assert message_dicts["user"]["username"] == "TheAdmin"
+
+    @pytest.mark.parametrize(
+        "event_types,read_messages_count,unread_messages_count",
+        [
+            (["user.created", "user.modified"], 1, 1),
+            (["user.created"], 1, 0),
+            (["user.modified"], 0, 1),
+        ],
+    )
+    def test_api__messages_summary__ok_200__filter_all(
+        self, session, web_testapp, event_types, read_messages_count, unread_messages_count
+    ) -> None:
+        """
+        check summary of messages
+        """
+        create_events_and_messages(session)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        event_type_filter = ",".join(event_types)
+        message_dicts = web_testapp.get(
+            "/api/users/1/messages/summary?event_types={}".format(event_type_filter), status=200,
+        ).json_body
+        assert message_dicts["user_id"] == 1
+        assert message_dicts["unread_messages_count"] == unread_messages_count
+        assert message_dicts["read_messages_count"] == read_messages_count
+        assert message_dicts["messages_count"] == read_messages_count + unread_messages_count
+        assert message_dicts["user"]["user_id"] == 1
+        assert message_dicts["user"]["username"] == "TheAdmin"
+
+    def test_api__messages_summary__err_400__invalid_event_type_filter(
+        self, session, web_testapp,
+    ) -> None:
+        """
+        Check invalid event type case for summary
+        """
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        result = web_testapp.get(
+            "/api/users/1/messages/summary?event_types=unknown", status=400,
+        ).json_body
+        assert result["code"] == 2001
+        assert result["message"] == "Validation error of input data"
