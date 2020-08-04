@@ -277,7 +277,6 @@ export class Tracim extends React.Component {
     const fetchNotificationNotRead = await props.dispatch(getUserMessagesSummary(userId))
 
     switch (fetchNotificationNotRead.status) {
-      // TODO add this state in REDUX
       case 200: props.dispatch(setNotificationNotReadCounter(fetchNotificationNotRead.json.unread_messages_count)); break
       default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
     }
@@ -348,11 +347,13 @@ export class Tracim extends React.Component {
         <div className='sidebarpagecontainer'>
           <Route render={() => <Sidebar />} />
 
-          <Route render={() => (
-            <NotificationWall
-              onCloseNotificationWall={this.handleClickNotificationButton}
-              isNotificationWallOpen={state.isNotificationWallOpen}
-            />)}
+          <Route
+            render={() => (
+              <NotificationWall
+                onCloseNotificationWall={this.handleClickNotificationButton}
+                isNotificationWallOpen={state.isNotificationWallOpen}
+              />
+            )}
           />
 
           <Route path={PAGE.LOGIN} component={Login} />

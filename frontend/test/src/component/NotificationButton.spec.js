@@ -15,7 +15,7 @@ describe('<NotificationButton />', () => {
   const wrapper = shallow(<NotificationWithoutHOC {...props} t={key => key} />)
 
   describe('Notification counter', () => {
-    describe('when there is 0 notifications', () => {
+    describe('when there are 0 notifications', () => {
       before(() => {
         wrapper.setProps({ notificationNotReadCount: 0 })
       })
@@ -24,7 +24,7 @@ describe('<NotificationButton />', () => {
         expect(wrapper.find('.notificationButton__count').length).to.equal(0)
       })
     })
-    describe('when there is 5 notifications', () => {
+    describe('when there are 5 notifications', () => {
       before(() => {
         wrapper.setProps({ notificationNotReadCount: 5 })
       })
@@ -33,7 +33,7 @@ describe('<NotificationButton />', () => {
         expect(wrapper.find('.notificationButton__count').text()).to.equal('5')
       })
     })
-    describe('when there is more than 99 notifications', () => {
+    describe('when there are more than 99 notifications', () => {
       before(() => {
         wrapper.setProps({ notificationNotReadCount: 100 })
       })

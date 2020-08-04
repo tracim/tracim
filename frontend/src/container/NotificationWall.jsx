@@ -67,11 +67,11 @@ export class NotificationWall extends React.Component {
         icon = 'fa-comments-o'
         text = props.t('{{author}} commented on {{content}} at {{workspace}}', {
           author: notification.author,
-          content: `<span class='contentTitle__highlight'>${notification.content.parent_label}</span>`,
+          content: `<span class='contentTitle__highlight'>${notification.content.parentLabel}</span>`,
           workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
           interpolation: { escapeValue: false }
         })
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.parent_content_type}/${notification.content.content_id}`
+        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.parentContentType}/${notification.content.content_id}`
         break
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.HTML_DOCUMENT):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE):
@@ -173,6 +173,8 @@ export class NotificationWall extends React.Component {
 
         <div className='notification__list'>
           {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
+            const notificationDetails = this.getNotificationDetails(notification)
+
             return (
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
@@ -181,18 +183,18 @@ export class NotificationWall extends React.Component {
                 key={notification.id}
               >
                 <Link
-                  to={this.getNotificationDetails(notification).url}
+                  to={notificationDetails.url}
                   onClick={() => this.handleClickNotification(notification.id)}
                   className={
                     classnames('notification__list__item', { itemRead: notification.read })
                   }
                   key={notification.id}
                 >
-                  <i className={`notification__list__item__icon fa ${this.getNotificationDetails(notification).icon}`} />
+                  <i className={`notification__list__item__icon fa ${notificationDetails.icon}`} />
                   <div className='notification__list__item__text'>
                     <span
                       dangerouslySetInnerHTML={{
-                        __html: `${this.getNotificationDetails(notification).text} `
+                        __html: `${notificationDetails.text} `
                       }}
                     />
                     {displayDistanceDate(notification.created, props.user.lang)}

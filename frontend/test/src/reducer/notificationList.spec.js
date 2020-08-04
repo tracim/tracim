@@ -16,6 +16,9 @@ import {
 import notificationPage from '../../../src/reducer/notificationPage.js'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
+import { serialize } from 'tracim_frontend_lib'
+import { serializeUserProps } from '../../../src/reducer/user.js'
+import { serializeWorkspaceListProps } from '../../../src/reducer/workspaceList.js'
 
 const TLM = {
   created: '2020-07-23T12:44:50Z',
@@ -35,9 +38,9 @@ const notification = {
   created: '2020-07-23T12:44:50Z',
   id: 583,
   type: 'workspace_member.created',
-  workspace: firstWorkspaceFromApi,
+  workspace: serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
   read: null,
-  user: globalManagerFromApi
+  user: serialize(globalManagerFromApi, serializeUserProps)
 }
 
 describe('reducer notificationPage.js', () => {
