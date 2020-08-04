@@ -101,7 +101,6 @@
   "Users": "Utilizadores",
   "My Account": "Minha conta",
   "Logout": "Terminar sessão",
-  "Deleted File": "Ficheiro eliminado",
   "Welcome to Tracim": "Bem-vindo ao Tracim",
   "You aren't member of any shared space yet": " Você ainda não é membro de nenhum espaço partilhado",
   "Please refer to an administrator or a trusted user": "Consulte um administrador ou um utilizador confiável",
@@ -249,7 +248,6 @@
   "Contents": "Conteúdos",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Encontre todos os seus documentos colocados online directamente no seu computador através da estação de trabalho, sem passar pelo software.",
   "Have a good day!": "Tenha um bom dia!",
-  "Archived Topic": "Tópico arquivado",
   "Search…": "Pesquisar...",
   "Your personal data has been changed": "Os seus dados pessoais foram alterados",
   "Your username and your name has been changed": "O seu identificador e o seu nome foi alterado",
@@ -269,5 +267,6 @@
   "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} é maior que 1MB, isto pode demorar algum tempo a carregar, quer continuar?",
   "Tracim has a connection problem, please wait or reload the page if the problem persists": "Tracim está com problemas de conexão, por favor aguarde ou actualize a página se o problema persistir",
   "Your username": "Seu identificador",
-  "Your username has been set": "O seu identificador foi definido"
+  "Your username has been set": "O seu identificador foi definido",
+  "{{author}} added {{user}} to {{workspace}}": "{{author}} acrescentou {{user}} à {{workspace}}"
 }

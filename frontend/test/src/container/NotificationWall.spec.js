@@ -25,6 +25,7 @@ import { mockPutNotificationAsRead204 } from '../../apiMock.js'
 describe('<NotificationWall />', () => {
   const updateNotificationCallBack = sinon.spy()
   const appendNotificationListCallBack = sinon.spy()
+  const onCloseNotificationWallCallBack = sinon.spy()
 
   const dispatchCallBack = (param) => {
     if (isFunction(param)) {
@@ -47,7 +48,8 @@ describe('<NotificationWall />', () => {
       }]
     },
     t: tradKey => tradKey,
-    user: user
+    user: user,
+    onCloseNotificationWall: onCloseNotificationWallCallBack
   }
 
   const wrapper = shallow(<NotificationWall {...props} />)
@@ -98,28 +100,22 @@ describe('<NotificationWall />', () => {
       it(`should return type workspace_member.created if type is ${buildTracimLiveMessageEventType(TLM_ET.SHAREDSPACE_MEMBER, TLM_CET.CREATED)}`, () => {
         expect(NotificationWallInstance.getNotificationDetails({
           ...baseNotification,
-          type: buildTracimLiveMessageEventType(TLM_ET.SHAREDSPACE_MEMBER, TLM_CET.CREATED)
+          type: buildTracimLiveMessageEventType(TLM_ET.SHAREDSPACE_MEMBER, TLM_CET.CREATED),
+          user: user
         }))
           .to.deep.equal({
             icon: 'fa-user-o',
-            text: '{{author}} added you to {{workspace}}',
+            text: '{{author}} added {{user}} to {{workspace}}',
             url: `/ui/workspaces/${baseNotification.workspace.workspace_id}/dashboard`
           })
       })
     })
 
-    describe('handleCloseNotificationWall', () => {
-      it('should set isNotificationWallOpen state as false', () => {
-        NotificationWallInstance.handleCloseNotificationWall()
-        expect(wrapper.state('isNotificationWallOpen')).to.equal(false)
-      })
-    })
-
     describe('handleClickNotification', () => {
-      it('should call updateNotification()', (done) => {
+      it('should call onCloseNotificationWallCallBack()', (done) => {
         mockPutNotificationAsRead204(FETCH_CONFIG.apiUrl, props.user.userId, 1)
         NotificationWallInstance.handleClickNotification(1).then(() => {
-          expect(updateNotificationCallBack.called).to.equal(true)
+          expect(onCloseNotificationWallCallBack.called).to.equal(true)
         }).then(done, done)
       })
     })

@@ -10,7 +10,7 @@ import NavbarToggler from '../component/Header/NavbarToggler.jsx'
 import DropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
 import Help from '../component/Header/MenuActionListItem/Help.jsx'
 import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
-import Notification from '../component/Header/MenuActionListItem/Notification.jsx'
+import NotificationButton from '../component/Header/MenuActionListItem/NotificationButton.jsx'
 import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
 import logoHeader from '../img/logo-tracim.png'
 import {
@@ -150,6 +150,13 @@ export class Header extends React.Component {
                 </li>
               )}
 
+              <li className='header__menu__rightside__notification nav-item'>
+                <NotificationButton
+                  notificationNotReadCount={props.notificationNotReadCount}
+                  onClickNotification={props.onClickNotification}
+                />
+              </li>
+
               {!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && props.appList.some(a => a.slug === 'agenda') && (
                 <li className='header__menu__rightside__agenda'>
                   <Link
@@ -171,8 +178,6 @@ export class Header extends React.Component {
               <Help
                 onClickHelp={this.handleClickHelp}
               />
-
-              <Notification />
 
               <MenuProfil
                 user={props.user}
