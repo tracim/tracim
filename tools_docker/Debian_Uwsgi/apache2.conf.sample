@@ -32,6 +32,7 @@
     RequestHeader edit Destination ^https http early
 
     # Proxying Webdav
+    # Define START_WEBDAV
     <IfDefine START_WEBDAV>
       <Location /webdav>
           # Preserving host is needed for working move/copy in webdav
@@ -44,23 +45,23 @@
     # Proxying Caldav
     # Define START_CALDAV
     <IfDefine START_CALDAV>
-      ProxyPass /agenda uwsgi://127.0.0.1:8081/
+      ProxyPassMatch ^/agenda uwsgi://127.0.0.1:8081/
       ProxyPassReverse /agenda uwsgi://127.0.0.1:8081/
     </IfDefine>
 
     # Proxying Frontend
-    ProxyPass /ui uwsgi://127.0.0.1:8081/
+    ProxyPassMatch ^/ui uwsgi://127.0.0.1:8081/
     ProxyPassReverse /ui uwsgi://127.0.0.1:8081/
 
     # Proxying Tracim Live Message to Pushpin
+    # NOTE: no reverse as ProxyPassMatchReverse does not exist...
     ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
-    ProxyPassReverse ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
 
     # Proxying Backend API
-    ProxyPass /api uwsgi://127.0.0.1:8081/
+    ProxyPassMatch ^/api uwsgi://127.0.0.1:8081/
     ProxyPassReverse /api uwsgi://127.0.0.1:8081/
 
-    ProxyPass /custom_toolbox-assets uwsgi://127.0.0.1:8081/
+    ProxyPassMatch ^/custom_toolbox-assets uwsgi://127.0.0.1:8081/
     ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:8081/
 
     ProxyPassMatch ^/$ uwsgi://localhost:8081/
