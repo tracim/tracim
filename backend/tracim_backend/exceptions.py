@@ -561,3 +561,7 @@ class ConflictingMoveInChild(TracimException):
 
 class CannotDeleteUniqueRevisionWithoutDeletingContent(Exception):
     pass
+
+
+class ReservedUsernameError(TracimException):
+    error_code = ErrorCode.RESERVED_USERNAME

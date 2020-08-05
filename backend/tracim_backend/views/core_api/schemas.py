@@ -1111,6 +1111,10 @@ class AboutSchema(marshmallow.Schema):
     website = marshmallow.fields.URL()
 
 
+class ReservedUsernamesSchema(marshmallow.Schema):
+    items = marshmallow.fields.List(String(), required=True)
+
+
 class ErrorCodeSchema(marshmallow.Schema):
     name = marshmallow.fields.Str()
     code = marshmallow.fields.Int()
