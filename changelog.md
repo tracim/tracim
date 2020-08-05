@@ -15,7 +15,7 @@
 
 ### Other Changes
 
-- Tracim frontend use Yarn now instead of npm
+- Tracim frontend is now built with Yarn instead of NPM. See how to migrate your working copy of Tracim here: https://github.com/tracim/tracim/issues/2916
 
 ### Breaking/Important change
 
