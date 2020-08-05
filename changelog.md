@@ -25,7 +25,7 @@
 - Database: databases that were created from Tracim v1 need to be updated manually, more information here: https://github.com/tracim/tracim/issues/2785#issuecomment-660879104 (#3343)
 - Pushpin is now mandatory to run Tracim (pushpin is integrated by default in Tracim docker images)
 - Some parameters in development.ini have been renamed, more information here https://github.com/tracim/tracim/issues/2785#issuecomment-637544988 (#3100)
-- Default log of Tracim docker image is now also visible with `docker logs` command
+- The default log of the Tracim docker image is now also visible with the `docker logs` command
 
 
 ## 2.7.6 / 2020-07-01
