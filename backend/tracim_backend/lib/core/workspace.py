@@ -120,7 +120,7 @@ class WorkspaceApi(object):
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
 
         role = role_api.create_one(
-            self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=True,
+            self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=True
         )
 
         self._session.add(workspace)
