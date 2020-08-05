@@ -64,8 +64,8 @@ export const putHtmlDocRead = (user, apiUrl, workspaceId, contentId) => {
   })
 }
 
-export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToExclude) => {
-  return fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${workspaceIdToExclude}`, {
+export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToInclude) => {
+  return fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}&include_workspace_ids=${workspaceIdToInclude}`, {
     credentials: 'include',
     headers: { ...FETCH_CONFIG.headers },
     method: 'GET'

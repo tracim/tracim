@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   APP_FEATURE_MODE,
+  AutoCompleteContainer,
   DisplayState,
   TextAreaApp
 } from 'tracim_frontend_lib'
@@ -37,7 +38,7 @@ export const HtmlDocument = props => {
         />
       )}
 
-      <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
+      <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote' onScroll={(e) => { console.log('SCROLL : ', e) }}>
         {props.mode === APP_FEATURE_MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
             msg={props.t('You have a pending draft')}
@@ -71,6 +72,18 @@ export const HtmlDocument = props => {
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&
           <div className='html-document__editionmode__container'>
+            {props.textAppAutoComplete && props.autoCompleteItemList.length > 0 && (
+              <AutoCompleteContainer
+                autoCompleteItemList={props.autoCompleteItemList}
+                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+                onPointerEnter={() => {}}
+                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+                style={{
+                  width: props.tinymcePosition.width,
+                  top: props.tinymcePosition.top
+                }}
+              />
+            )}
             <TextAreaApp
               id={props.wysiwygNewVersion}
               customClass='html-document__editionmode'

@@ -1,7 +1,7 @@
 import i18n from './i18n.js'
 import { getMyselfKnownMember2 } from '../action-creator.async'
 
-(function () {
+export const TinymceInit = () => {
   function base64EncodeAndTinyMceInsert (files) {
     for (let i = 0; i < files.length; i++) {
       if (files[i].size > 1000000) {
@@ -32,7 +32,7 @@ import { getMyselfKnownMember2 } from '../action-creator.async'
 
   var editor
 
-  globalThis.wysiwyg = function (selector, lang, handleOnChange) {
+  globalThis.wysiwyg = function (selector, lang, handleOnChange, handleTinyMceInput, handleTinyMceKeyDown) {
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
     // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
@@ -79,7 +79,7 @@ import { getMyselfKnownMember2 } from '../action-creator.async'
       skin: 'lightgray',
       relative_urls: false,
       remove_script_host: false,
-      plugins: 'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help mention',
+      plugins: 'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
       toolbar: [
         'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
         'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
@@ -139,29 +139,57 @@ import { getMyselfKnownMember2 } from '../action-creator.async'
           const event = new globalThis.CustomEvent('tinymceLoaded', { detail: {}, editor: this })
           document.dispatchEvent(event)
           editor = $editor
-          globalThis.getCursorPosition = () => {
-            var tinymcePosition = $($editor.getContainer()).position()
-            var toolbarPosition = $($editor.getContainer()).find('.mce-toolbar').first()
-            var nodePosition = $($editor.selection.getNode()).position()
-            var textareaTop = 0
-            var textareaLeft = 0
-            if ($editor.selection.getRng().getClientRects().length > 0) {
-              textareaTop = $editor.selection.getRng().getClientRects()[0].top + editor.selection.getRng().getClientRects()[0].height
-              textareaLeft = $editor.selection.getRng().getClientRects()[0].left
-            } else {
-              textareaTop = parseInt($(editor.selection.getNode()).css('font-size')) * 1.3 + nodePosition.top
-              textareaLeft = nodePosition.left
-            }
-            var position = $(editor.getContainer()).offset()
-            return {
-              top: position.top + toolbarPosition.innerHeight() + textareaTop,
-              left: position.left
-            }
-          }
+          // globalThis.getCursorPosition = () => {
+          //   var tinymcePosition = $($editor.getContainer()).position()
+          //   var toolbarPosition = $($editor.getContainer()).find('.mce-toolbar').first()
+          //   var nodePosition = $($editor.selection.getNode()).position()
+          //   var textareaTop = 0
+          //   var textareaLeft = 0
+          //   if ($editor.selection.getRng().getClientRects().length > 0) {
+          //     textareaTop = $editor.selection.getRng().getClientRects()[0].top + editor.selection.getRng().getClientRects()[0].height
+          //     textareaLeft = $editor.selection.getRng().getClientRects()[0].left
+          //   } else {
+          //     textareaTop = parseInt($(editor.selection.getNode()).css('font-size')) * 1.3 + nodePosition.top
+          //     textareaLeft = nodePosition.left
+          //   }
+          //   var position = $(editor.getContainer()).offset()
+          //   return {
+          //     top: position.top + toolbarPosition.innerHeight() + textareaTop,
+          //     left: position.left
+          //   }
+          // }
         })
+
+        const getPosition = (e) => {
+          const toolbarPosition = $($editor.getContainer()).find('.mce-toolbar').first()
+          const nodePosition = $($editor.selection.getNode()).position()
+          const position = $(editor.getContainer()).offset()
+          const result = {
+            top: position.top + toolbarPosition.innerHeight() + nodePosition.top - 15,
+            width: $editor.getContainer().offsetWidth,
+            container: position
+          }
+          handleTinyMceInput(e, result)
+        }
 
         $editor.on('change keyup', function (e) {
           handleOnChange({ target: { value: $editor.getContent() } }) // target.value to emulate a js event so the react handler can expect one
+        })
+
+        $editor.on('keydown', function (e) {
+          handleTinyMceKeyDown(e)
+        })
+
+        $editor.on('input', function (e) {
+          return getPosition(e)
+        })
+
+        $editor.on('scroll', function (e) {
+          console.log('THE SCROLL IS ON')
+        })
+
+        $editor.on('selectionchange', function (e) {
+          console.log('selectionchange', e)
         })
 
         // ////////////////////////////////////////////
@@ -238,4 +266,8 @@ import { getMyselfKnownMember2 } from '../action-creator.async'
       }
     })
   }
-})()
+
+  return null
+}
+
+export default TinymceInit

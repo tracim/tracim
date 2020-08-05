@@ -17,21 +17,7 @@ export class AutoCompleteTextArea extends React.Component {
   }
 
   async componentDidUpdate (prevProps, prevState) {
-    const { props, state } = this
-
-    if (
-      !state.mentionAutocomplete &&
-      state.autoCompleteCursorPosition !== -1 &&
-      state.mentionAutocomplete !== prevState.mentionAutocomplete
-    ) {
-      this.textAreaRef.selectionStart = state.autoCompleteCursorPosition
-      this.textAreaRef.selectionEnd = state.autoCompleteCursorPosition
-      this.setState({
-        autoCompleteCursorPosition: -1
-      })
-    }
-
-    if (prevProps.newComment !== props.newComment) {
+    if (prevProps.newComment !== this.props.newComment) {
       this.loadAutoComplete()
     }
   }
@@ -42,12 +28,12 @@ export class AutoCompleteTextArea extends React.Component {
     let index = lastCharBeforeCursorIndex
     while (newComment[index] !== ' ' && index >= 0) {
       if (newComment[index] === '@' && (index === 0 || newComment[index - 1] === ' ')) {
-        const mentionList = await this.props.searchMentionList(newComment.slice(index + 1, lastCharBeforeCursorIndex + 1))
-        const autoCompleteItemList = mentionList
+        const query = newComment.slice(index + 1, lastCharBeforeCursorIndex + 1)
+        const mentionList = await this.props.searchMentionList(query)
         this.setState({
           mentionAutocomplete: true,
-          autoCompleteCursorPosition: autoCompleteItemList.length - 1,
-          autoCompleteItemList
+          autoCompleteCursorPosition: mentionList.length - 1,
+          autoCompleteItemList: mentionList
         })
         return
       }
@@ -119,7 +105,7 @@ export class AutoCompleteTextArea extends React.Component {
 
     return (
       <>
-        {(!props.disableComment) && state.mentionAutocomplete && (
+        {(!props.disableComment) && state.mentionAutocomplete && state.autoCompleteItemList.length > 0 && (
           <div className='textarea__autocomplete'>
             {state.autoCompleteItemList.map((m, i) => (
               <>
@@ -130,14 +116,14 @@ export class AutoCompleteTextArea extends React.Component {
                   className={
                     classnames(
                       'textarea__autocomplete__item',
-                      state.autoCompleteCursorPosition === i ? 'textarea__autocomplete__item__active' : null
+                      { textarea__autocomplete__item__active: state.autoCompleteCursorPosition === i }
                     )
                   }
                   key={m.mention}
                   onClick={() => this.handleClickAutoCompleteItem(m)}
                   onPointerEnter={() => this.setState({ autoCompleteCursorPosition: i })}
                 >
-                  {m.username && <Avatar width='15px' style={{ margin: '5px'}} publicName={m.detail} />}
+                  {m.username && <Avatar width='15px' style={{ margin: '5px' }} publicName={m.detail} />}
                   <b>@{m.mention}</b> - {m.detail}
                 </div>
               </>

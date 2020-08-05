@@ -61,6 +61,7 @@ import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
+import TinymceInit from '../util/TinymceInit.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -301,6 +302,7 @@ export class Tracim extends React.Component {
           t={props.t}
         />
         <ReduxTlmDispatcher />
+        <TinymceInit />
 
         <div className='sidebarpagecontainer'>
           <Route render={() => <Sidebar />} />

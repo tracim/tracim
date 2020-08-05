@@ -72,7 +72,10 @@ export class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
       editionAuthor: '',
-      isLastTimelineItemCurrentToken: false
+      isLastTimelineItemCurrentToken: false,
+      textAppAutoComplete: false,
+      autoCompleteCursorPosition: 0,
+      autoCompleteItemList: []
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -213,21 +216,121 @@ export class HtmlDocument extends React.Component {
       await this.loadContent()
       this.buildBreadcrumbs()
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText, this.handleTinyMceInput, this.handleTinyMceKeyDown)
     }
 
     if (state.mode === APP_FEATURE_MODE.EDIT && prevState.mode !== APP_FEATURE_MODE.EDIT) {
+      globalThis.tinymce.remove('#wysiwygTimelineComment')
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText, this.handleTinyMceInput, this.handleTinyMceKeyDown)
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
+      globalThis.tinymce.remove('#wysiwygNewVersion')
+      globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment, this.handleTinyMceInput, this.handleTinyMceKeyDown)
+    } else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
 
     // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
     if (!prevState.isVisible && state.isVisible) {
       initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
     }
+  }
+
+  handleTinyMceInput = (e, position) => {
+    if (!e.data) return
+
+    switch (e.data) {
+      case '@': {
+        const rawHtml = (
+          '<span id="autocomplete">' +
+            '<span id="autocomplete-searchtext"><span class="dummy">\uFEFF</span></span>' +
+          '</span>'
+        )
+
+        tinymce.activeEditor.execCommand('mceInsertContent', false, rawHtml)
+        tinymce.activeEditor.focus()
+        tinymce.activeEditor.selection.select(tinymce.activeEditor.selection.dom.select('span#autocomplete-searchtext span')[0])
+        tinymce.activeEditor.selection.collapse(0)
+
+        this.setState({
+          textAppAutoComplete: true,
+          tinymcePosition: position,
+          autoCompleteItemList: []
+        })
+        break
+      }
+      case ' ': {
+        tinymce.activeEditor.focus()
+        const query = tinymce.activeEditor.getDoc().getElementById('autocomplete-searchtext').textContent.replace('\ufeff', '')
+        const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
+        tinymce.activeEditor.dom.remove(selection)
+        tinymce.activeEditor.execCommand('mceInsertContent', false, query)
+        this.setState({ textAppAutoComplete: false, tinymcePosition: position })
+        break
+      }
+      default: this.searchForMention()
+    }
+  }
+
+  searchForMention = async () => {
+    if (!tinymce.activeEditor.getDoc().getElementById('autocomplete-searchtext')) return
+
+    const query = tinymce.activeEditor.getDoc().getElementById('autocomplete-searchtext').textContent.replace('\ufeff', '')
+
+    if (query.length < 2) return
+
+    const fetchSearchMentionList = await this.searchMentionList(query)
+    this.setState({
+      autoCompleteItemList: fetchSearchMentionList,
+      autoCompleteCursorPosition: 0
+    })
+  }
+
+  handleTinyMceKeyDown = e => {
+    const { state } = this
+
+    if (!this.state.textAppAutoComplete) return
+
+    switch (e.key) {
+      case ' ': this.setState({ textAppAutoComplete: false, autoCompleteItemList: [] }); break
+      case 'Enter': {
+        this.handleClickAutoCompleteItem(state.autoCompleteItemList[state.autoCompleteCursorPosition])
+        e.preventDefault()
+        break
+      }
+      case 'ArrowUp': {
+        if (state.autoCompleteCursorPosition > 0) {
+          this.setState(prevState => ({
+            autoCompleteCursorPosition: prevState.autoCompleteCursorPosition - 1
+          }))
+        }
+        e.preventDefault()
+        break
+      }
+      case 'ArrowDown': {
+        if (state.autoCompleteCursorPosition < state.autoCompleteItemList.length - 1) {
+          this.setState(prevState => ({
+            autoCompleteCursorPosition: prevState.autoCompleteCursorPosition + 1
+          }))
+        }
+        e.preventDefault()
+        break
+      }
+      case 'Backspace': this.searchForMention()
+    }
+  }
+
+  handleClickAutoCompleteItem = (item) => {
+    tinymce.activeEditor.focus()
+    const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
+    tinymce.activeEditor.dom.remove(selection)
+    tinymce.activeEditor.execCommand('mceInsertContent', false, `${item.mention} `)
+
+    this.setState({ textAppAutoComplete: false })
+  }
+
+  matcher = (item, query) => {
+    return item.toLowerCase().indexOf(query.toLowerCase())
   }
 
   componentWillUnmount () {
@@ -447,16 +550,17 @@ export class HtmlDocument extends React.Component {
 
   searchMentionList = async (query) => {
     const { props, state } = this
+    const mentionList = this.matcher('all', query) >= 0 ? [{ mention: 'all', detail: 'lol' }] : []
 
-    if (query.length < 2) return
+    if (query.length < 2) return mentionList
 
-    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, query, []))
+    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, query, state.content.workspace_id))
 
     switch (fetchUserKnownMemberList.apiResponse.status) {
-      case 200: return fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))
+      case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
       default: this.sendGlobalFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning'); break
     }
-    return []
+    return mentionList
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -650,6 +754,11 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             searchMentionList={this.searchMentionList}
             key='html-document'
+            textAppAutoComplete={state.textAppAutoComplete}
+            tinymcePosition={state.tinymcePosition}
+            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+            autoCompleteItemList={state.autoCompleteItemList}
+            onClickAutoCompleteItem={this.handleClickAutoCompleteItem}
           />
 
           <PopinFixedRightPart
