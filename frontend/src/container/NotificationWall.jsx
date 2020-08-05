@@ -162,7 +162,7 @@ export class NotificationWall extends React.Component {
     if (!props.notificationPage.list) return null
 
     return (
-      <div className={classnames('notification', !props.isNotificationWallOpen ? 'notification__wallClose' : '')}>
+      <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
         <PopinFixedHeader
           customClass='notification'
           faIcon='bell-o'
