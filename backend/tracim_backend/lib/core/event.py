@@ -162,6 +162,16 @@ class EventApi:
         ).order_by(Message.event_id.desc())
         return get_page(query, per_page=count, page=page_token or False)
 
+    def get_messages_count(
+        self,
+        user_id: int,
+        read_status: ReadStatus,
+        event_types: typing.List[EventTypeDatabaseParameters] = None,
+    ) -> int:
+        return self._base_query(
+            user_id=user_id, event_types=event_types, read_status=read_status
+        ).count()
+
 
 class EventBuilder:
     """Create Event objects from the database crud hooks."""

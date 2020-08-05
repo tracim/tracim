@@ -1,5 +1,3 @@
-from typing import Optional
-
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
@@ -22,10 +20,6 @@ class UserConfig(DeclarativeBase):
     user = relationship("User", remote_side=[User.user_id])
 
     fields = Column(JSON, nullable=False, default={})
-
-    def __init__(self, user: User, fields: Optional[JSON] = None):
-        self.user_id = user.user_id
-        self.fields = fields or {}
 
     def __repr__(self):
         return "<UserConfig(user_id=%s, fields=%s)>" % (repr(self.user_id), repr(self.fields),)

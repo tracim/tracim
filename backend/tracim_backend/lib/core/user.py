@@ -973,16 +973,13 @@ class UserApi(object):
 
     def save(self, user: User):
         is_new_user = not user.user_id
-        self._session.add(user)
-        self._session.flush()
 
-        # INFO - R.J - 2020-08-03 - the newly created user's object
-        # does not have an id until the session is flushed.
-        # This id is needed to create its configuration.
+        self._session.add(user)
 
         if is_new_user:
             self._session.add(UserConfig(user=user))
-            self._session.flush()
+
+        self._session.flush()
 
     def execute_updated_user_actions(self, user: User) -> None:
         """

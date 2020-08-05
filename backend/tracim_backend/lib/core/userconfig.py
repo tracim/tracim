@@ -1,3 +1,4 @@
+from typing import Any
 from typing import Dict
 
 from tracim_backend.models.auth import User
@@ -16,10 +17,10 @@ class UserConfigApi:
         query = self._session.query(UserConfig)
         return query.filter(UserConfig.user_id == self._user.user_id).one()
 
-    def get_all_params(self) -> Dict:
+    def get_all_params(self) -> Dict[str, Any]:
         return self.get_config().fields
 
-    def set_params(self, params: Dict) -> UserConfig:
+    def set_params(self, params: Dict[str, Any]) -> UserConfig:
         config = self.get_config()
         config.fields = {**config.fields, **params}
         self._session.add(config)
