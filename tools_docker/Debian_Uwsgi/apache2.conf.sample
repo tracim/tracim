@@ -34,19 +34,19 @@
     # Proxying Webdav
     # Define START_WEBDAV
     <IfDefine START_WEBDAV>
-      <Location /webdav>
-          # Preserving host is needed for working move/copy in webdav
-          ProxyPreserveHost On
-          ProxyPass http://127.0.0.1:3030/webdav
-          ProxyPassReverse http://127.0.0.1:3030/webdav
-      </Location>
+        <Location /webdav>
+            # Preserving host is needed for working move/copy in webdav
+            ProxyPreserveHost On
+            ProxyPass http://127.0.0.1:3030/webdav
+            ProxyPassReverse http://127.0.0.1:3030/webdav
+        </Location>
     </IfDefine>
 
     # Proxying Caldav
     # Define START_CALDAV
     <IfDefine START_CALDAV>
-      ProxyPassMatch ^/agenda uwsgi://127.0.0.1:8081/
-      ProxyPassReverse /agenda uwsgi://127.0.0.1:8081/
+        ProxyPassMatch ^/agenda uwsgi://127.0.0.1:8081/
+        ProxyPassReverse /agenda uwsgi://127.0.0.1:8081/
     </IfDefine>
 
     # Proxying Frontend
