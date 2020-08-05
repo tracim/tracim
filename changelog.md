@@ -3,8 +3,8 @@
 
 ### New Features
 
-- Tracim Live Message is now available. Its now not necessary to refresh Tracim web page manually, all new contents information are automatically available in your web browser
-- Tracim permit connection with a username instead of email. This username feature is mandatory to introduce mention feature (available in next release)
+- Tracim now automatically and instantly refreshes its interface when documents and comments are created, modified or deleted. It is not necessary to reload Tracim's web page anymore to see what changed.
+- It is now possible to log in using a username instead of one's email address. Usernames will be used for mentions, a feature that will be available in the next release.
 
 ### Fixed Issues
 
