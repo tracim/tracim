@@ -22,7 +22,7 @@
 - API: api path `/v2/` no more exists in Tracim. Scripts using this old API path need to be changed and a configuration is needed to make some direct links visible in old emails work (#1478, #3052, #3395)
 - uWSGI: default configuration change. You need to delete your config file `/{docker-volume}/etc/tracim_*.ini` (backup your files first) before starting/restarting the docker image
 - Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache.conf` (backup your file first) before starting/restarting the docker image
-- Database: databases come from Tracim v1 need to be updated manually, more information here: https://github.com/tracim/tracim/issues/2785#issuecomment-660879104 (#3343)
+- Database: databases that were created from Tracim v1 need to be updated manually, more information here: https://github.com/tracim/tracim/issues/2785#issuecomment-660879104 (#3343)
 - Pushpin is now mandatory when Tracim run in prod/dev (pushpin is integrated by default in Tracim docker images)
 - Some parameters name change in development.ini, more information here https://github.com/tracim/tracim/issues/2785#issuecomment-637544988 (#3100)
 - Default log of Tracim docker image is now also visible with `docker logs` command
