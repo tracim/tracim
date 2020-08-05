@@ -24,7 +24,7 @@
 - Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache.conf` (backup your file first) before starting/restarting the docker image
 - Database: databases that were created from Tracim v1 need to be updated manually, more information here: https://github.com/tracim/tracim/issues/2785#issuecomment-660879104 (#3343)
 - Pushpin is now mandatory to run Tracim (pushpin is integrated by default in Tracim docker images)
-- Some parameters name change in development.ini, more information here https://github.com/tracim/tracim/issues/2785#issuecomment-637544988 (#3100)
+- Some parameters in development.ini have been renamed, more information here https://github.com/tracim/tracim/issues/2785#issuecomment-637544988 (#3100)
 - Default log of Tracim docker image is now also visible with `docker logs` command
 
 
