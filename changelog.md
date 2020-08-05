@@ -5,6 +5,7 @@
 
 - Tracim now automatically and instantly refreshes its interface when documents and comments are created, modified or deleted. It is not necessary to reload Tracim's web page anymore to see what changed.
 - It is now possible to log in using a username instead of one's email address. Usernames will be used for mentions, a feature that will be available in the next release.
+- Tracim can now be configured to allow user account creation without an email address
 
 ### Fixed Issues
 
