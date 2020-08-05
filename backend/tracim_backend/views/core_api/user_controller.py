@@ -1,5 +1,3 @@
-import typing
-
 from hapic import HapicData
 from pyramid.config import Configurator
 from pyramid.response import Response
@@ -31,7 +29,8 @@ from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.event import Message
+from tracim_backend.models.context_models import PaginatedObject
+from tracim_backend.models.context_models import UserMessagesSummary
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
@@ -39,7 +38,7 @@ from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMembersQuerySchema
-from tracim_backend.views.core_api.schemas import LiveMessageSchema
+from tracim_backend.views.core_api.schemas import LiveMessageSchemaPage
 from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
@@ -54,6 +53,8 @@ from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
+from tracim_backend.views.core_api.schemas import UserMessagesSummaryQuerySchema
+from tracim_backend.views.core_api.schemas import UserMessagesSummarySchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
@@ -594,17 +595,55 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(GetLiveMessageQuerySchema())
-    @hapic.output_body(LiveMessageSchema(many=True))
+    @hapic.output_body(LiveMessageSchemaPage())
     def get_user_messages(
         self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> typing.List[Message]:
+    ) -> PaginatedObject:
         """
         Returns user messages matching the given query
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
-        return event_api.get_messages_for_user(
-            request.candidate_user.user_id, ReadStatus(hapic_data.query["read_status"])
+        return PaginatedObject(
+            event_api.get_paginated_messages_for_user(
+                user_id=request.candidate_user.user_id,
+                read_status=hapic_data.query.read_status,
+                page_token=hapic_data.query.page_token,
+                count=hapic_data.query.count,
+                event_types=hapic_data.query.event_types,
+            )
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserMessagesSummaryQuerySchema())
+    @hapic.output_body(UserMessagesSummarySchema())
+    def get_user_messages_summary(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> UserMessagesSummary:
+        """
+        Returns a summary about messages filtered
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+        candidate_user = UserApi(
+            request.current_user, request.dbsession, app_config
+        ).get_user_with_context(request.candidate_user)
+        unread_messages_count = event_api.get_messages_count(
+            user_id=candidate_user.user_id,
+            read_status=ReadStatus.UNREAD,
+            event_types=hapic_data.query.event_types,
+        )
+        read_messages_count = event_api.get_messages_count(
+            user_id=candidate_user.user_id,
+            read_status=ReadStatus.READ,
+            event_types=hapic_data.query.event_types,
+        )
+        return UserMessagesSummary(
+            user=candidate_user,
+            unread_messages_count=unread_messages_count,
+            read_messages_count=read_messages_count,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
@@ -852,6 +891,13 @@ class UserController(Controller):
             "messages", "/users/{user_id:\d+}/messages", request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.get_user_messages, route_name="messages")
+
+        configurator.add_route(
+            "messages_summary",
+            "/users/{user_id:\d+}/messages/summary",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_user_messages_summary, route_name="messages_summary")
 
         # read all unread messages for user
         configurator.add_route(

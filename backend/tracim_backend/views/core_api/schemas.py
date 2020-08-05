@@ -17,6 +17,7 @@ from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import content_global_status_validator
 from tracim_backend.app_models.validator import content_status_validator
 from tracim_backend.app_models.validator import not_empty_string_validator
+from tracim_backend.app_models.validator import page_token_validator
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
@@ -31,6 +32,7 @@ from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
+from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
@@ -45,6 +47,7 @@ from tracim_backend.models.context_models import FileQuery
 from tracim_backend.models.context_models import FileRevisionPath
 from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import KnownMembersQuery
+from tracim_backend.models.context_models import LiveMessageQuery
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
@@ -64,6 +67,7 @@ from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserInfos
+from tracim_backend.models.context_models import UserMessagesSummaryQuery
 from tracim_backend.models.context_models import UserProfile
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentPath
@@ -75,6 +79,7 @@ from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.event import EntityType
+from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 
@@ -89,6 +94,18 @@ class StrippedString(String):
         if value:
             value = value.strip()
         return value.strip()
+
+
+class EventTypeListField(StrippedString):
+    def _deserialize(self, value, attr, data, **kwargs):
+        result = []
+        value = super()._deserialize(value, attr, data, **kwargs)
+        if value:
+            values = value.split(",")
+            for item in values:
+                result.append(EventTypeDatabaseParameters.from_event_type(item.strip()))
+            return result
+        return None
 
 
 class RFCEmail(ValidatedField, String):
@@ -1443,12 +1460,35 @@ class LiveMessageSchema(marshmallow.Schema):
     )
 
 
+class LiveMessageSchemaPage(marshmallow.Schema):
+    previous_page_token = marshmallow.fields.String()
+    next_page_token = marshmallow.fields.String()
+    has_next = marshmallow.fields.Bool()
+    has_previous = marshmallow.fields.Bool()
+    per_page = marshmallow.fields.Int()
+    items = marshmallow.fields.Nested(LiveMessageSchema, many=True)
+
+
 class GetLiveMessageQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages endpoint."""
 
-    read_status = marshmallow.fields.String(
-        missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values())
+    count = marshmallow.fields.Int(
+        example=10,
+        validate=strictly_positive_int_validator,
+        missing=DEFAULT_NB_ITEM_PAGINATION,
+        default=DEFAULT_NB_ITEM_PAGINATION,
+        allow_none=False,
     )
+    page_token = marshmallow.fields.String(
+        description="token of the page wanted, if not provided get first" "elements",
+        validate=page_token_validator,
+    )
+    read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
+    event_types = EventTypeListField()
+
+    @post_load
+    def live_message_query(self, data: typing.Dict[str, typing.Any]) -> LiveMessageQuery:
+        return LiveMessageQuery(**data)
 
 
 class TracimLiveEventHeaderSchema(marshmallow.Schema):
@@ -1465,3 +1505,21 @@ class PathSuffixSchema(marshmallow.Schema):
         default="",
         example="/workspaces/1/notifications/activate",
     )
+
+
+class UserMessagesSummaryQuerySchema(marshmallow.Schema):
+    """Possible query parameters for the GET messages summary endpoint."""
+
+    event_types = EventTypeListField()
+
+    @post_load
+    def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> UserMessagesSummaryQuery:
+        return UserMessagesSummaryQuery(**data)
+
+
+class UserMessagesSummarySchema(marshmallow.Schema):
+    messages_count = marshmallow.fields.Int(example=42)
+    read_messages_count = marshmallow.fields.Int(example=30)
+    unread_messages_count = marshmallow.fields.Int(example=12)
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user = marshmallow.fields.Nested(UserDigestSchema())
