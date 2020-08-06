@@ -16,7 +16,18 @@ class UserConfig(DeclarativeBase):
 
     __tablename__ = "user_configs"
 
-    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True)
+    user_id = Column(
+        Integer,
+        ForeignKey(
+            "users.user_id",
+            name="fk_userconfig_user_id_users",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+        primary_key=True,
+    )
+
     user = relationship("User", remote_side=[User.user_id])
 
     fields = Column(JSON, nullable=False, default={})
