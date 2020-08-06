@@ -89,7 +89,7 @@ basic_setup.session_secret = change_this_value_please!
 ### Live Messages ###
 # control_uri for GRIP protocol reverse-proxy (PushPin)
 # this is the base url used for publishing new events to reverse-proxy.
-; live_messages.control_uri = http://localhost:5561
+; live_messages.control_zmq_uri = tcp://localhost:5563
 
 ### Plugins ###
 # if provided, this allow Tracim to load package from this dir and if package follow

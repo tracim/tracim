@@ -27,7 +27,9 @@ from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi
+from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import (
+    ESSearchApi,
+)
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
@@ -137,7 +139,9 @@ class RoleApiFactory(object):
 
 
 class WedavEnvironFactory(object):
-    def __init__(self, provider: Provider, session: Session, app_config: CFG, admin_user: User):
+    def __init__(
+        self, provider: Provider, session: Session, app_config: CFG, admin_user: User
+    ):
         self.provider = provider
         self.session = session
         self.app_config = app_config
@@ -153,7 +157,9 @@ class WedavEnvironFactory(object):
             "tracim_user": user,
         }
         tracim_context = WebdavTracimContext(
-            app_config=self.app_config, environ=environ, plugin_manager=self.plugin_manager
+            app_config=self.app_config,
+            environ=environ,
+            plugin_manager=self.plugin_manager,
         )
         tracim_context.dbsession = self.session
         environ["tracim_context"] = tracim_context
@@ -169,7 +175,10 @@ class ApplicationApiFactory(object):
 
 
 def webdav_put_new_test_file_helper(
-    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes
+    provider: Provider,
+    environ: typing.Dict[str, typing.Any],
+    file_path: str,
+    file_content: bytes,
 ) -> _DAVResource:
     # This part id a reproduction of
     # wsgidav.request_server.RequestServer#doPUT
@@ -197,7 +206,9 @@ class MailHogHelper(object):
     MAILHOG_MESSAGES_ENDPOINT = "/api/v1/messages"
 
     def cleanup_mailhog(self) -> Response:
-        return requests.delete("{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT))
+        return requests.delete(
+            "{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT)
+        )
 
     def get_mailhog_mails(self) -> typing.List[typing.Any]:
         return requests.get(
@@ -209,7 +220,9 @@ class MailHogHelper(object):
 
 class ElasticSearchHelper(object):
     def __init__(self, app_config, session):
-        self.elastic_search_api = ESSearchApi(config=app_config, current_user=None, session=session)
+        self.elastic_search_api = ESSearchApi(
+            config=app_config, current_user=None, session=session
+        )
         self.elastic_search_api.create_index()
 
     def refresh_elasticsearch(self) -> None:
@@ -241,7 +254,12 @@ class EventHelper(object):
         self._session = db_session
 
     def last_events(self, count: int) -> typing.List[Event]:
-        events = self._session.query(Event).order_by(Event.event_id.desc()).limit(count).all()
+        events = (
+            self._session.query(Event)
+            .order_by(Event.event_id.desc())
+            .limit(count)
+            .all()
+        )
         return sorted(events, key=lambda e: e.event_id)
 
     @property
@@ -263,6 +281,8 @@ class DockerCompose:
         self.execute("down")
 
     def execute(self, *arguments: str, env: dict = None) -> None:
+        if env:
+            env.update(os.environ)
         subprocess.run(self.command + list(arguments), env=env, check=True)
 
 
