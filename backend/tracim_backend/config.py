@@ -29,7 +29,9 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import ActionDescription
 
 ENV_VAR_PREFIX = "TRACIM_"
-CONFIG_LOG_TEMPLATE = "CONFIG: [ {config_source: <15} | {config_name} | {config_value} | {config_name_source} ]"
+CONFIG_LOG_TEMPLATE = (
+    "CONFIG: [ {config_source: <15} | {config_name} | {config_value} | {config_name_source} ]"
+)
 ID_SOURCE_ENV_VAR = "SOURCE_ENV_VAR"
 ID_SOURCE_CONFIG = "SOURCE_CONFIG"
 ID_SOURCE_DEFAULT = "SOURCE_DEFAULT"
@@ -78,9 +80,7 @@ class ConfigParam(object):
 
     @property
     def config_file_value(self):
-        return self._get_protected_value(
-            value=self._config_file_value, secret=self.secret
-        )
+        return self._get_protected_value(value=self._config_file_value, secret=self.secret)
 
     @property
     def env_var_value(self):
@@ -149,10 +149,7 @@ class CFG(object):
     # INFO - G.M - 2019-04-05 - Utils Methods
 
     def deprecate_parameter(
-        self,
-        parameter_name: str,
-        parameter_value: typing.Any,
-        extended_information: str,
+        self, parameter_name: str, parameter_value: typing.Any, extended_information: str,
     ) -> None:
         """
 
@@ -331,9 +328,7 @@ class CFG(object):
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
-            self.log_config_header(
-                '"{label}" app config parameters:'.format(label=app.label)
-            )
+            self.log_config_header('"{label}" app config parameters:'.format(label=app.label))
             app.load_config(self)
 
     def here_macro_replace(self, value: str) -> str:
@@ -349,12 +344,8 @@ class CFG(object):
         ###
         # General
         ###
-        default_sqlalchemy_url = self.here_macro_replace(
-            "sqlite:///%(here)s/tracim.sqlite"
-        )
-        self.SQLALCHEMY__URL = self.get_raw_config(
-            "sqlalchemy.url", default_sqlalchemy_url
-        )
+        default_sqlalchemy_url = self.here_macro_replace("sqlite:///%(here)s/tracim.sqlite")
+        self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", default_sqlalchemy_url)
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_folder = os.path.dirname(backend_folder)
@@ -363,14 +354,10 @@ class CFG(object):
             "color.config_file_path", default_color_config_file_path
         )
         default_depot_storage_dir = self.here_macro_replace("%(here)s/depot")
-        self.DEPOT_STORAGE_DIR = self.get_raw_config(
-            "depot_storage_dir", default_depot_storage_dir
-        )
+        self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir", default_depot_storage_dir)
         self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name", "tracim")
         default_preview_cache_dir = self.here_macro_replace("%(here)s/previews")
-        self.PREVIEW_CACHE_DIR = self.get_raw_config(
-            "preview_cache_dir", default_preview_cache_dir
-        )
+        self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir", default_preview_cache_dir)
 
         self.AUTH_TYPES = string_to_unique_item_list(
             self.get_raw_config("auth_types", "internal"),
@@ -385,32 +372,22 @@ class CFG(object):
         default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_lock")
         self.SESSION__TYPE = self.get_raw_config("session.type", "file")
         self.SESSION__URL = self.get_raw_config("session.url")
-        self.SESSION__DATA_DIR = self.get_raw_config(
-            "session.data_dir", default_session_data_dir
-        )
-        self.SESSION__LOCK_DIR = self.get_raw_config(
-            "session.lock_dir", default_session_lock_dir
-        )
+        self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
+        self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
 
         # base url of the frontend
-        self.WEBSITE__BASE_URL = self.get_raw_config(
-            "website.base_url", "http://localhost:7999"
-        )
+        self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "http://localhost:7999")
 
         self.API__BASE_URL = self.get_raw_config("api.base_url", self.WEBSITE__BASE_URL)
 
         if self.API__BASE_URL != self.WEBSITE__BASE_URL:
-            default_cors_allowed_origin = "{},{}".format(
-                self.WEBSITE__BASE_URL, self.API__BASE_URL
-            )
+            default_cors_allowed_origin = "{},{}".format(self.WEBSITE__BASE_URL, self.API__BASE_URL)
         else:
             default_cors_allowed_origin = self.WEBSITE__BASE_URL
 
         self.CORS__ACCESS_CONTROL_ALLOWED_ORIGIN = string_to_unique_item_list(
-            self.get_raw_config(
-                "cors.access-control-allowed-origin", default_cors_allowed_origin
-            ),
+            self.get_raw_config("cors.access-control-allowed-origin", default_cors_allowed_origin),
             separator=",",
             cast_func=str,
             do_strip=True,
@@ -432,22 +409,16 @@ class CFG(object):
             deprecated_extended_information="please use USER__RESET_PASSWORD__TOKEN_LIFETIME instead",
         )
         if self.USER__RESET_PASSWORD__VALIDITY:
-            self.USER__RESET_PASSWORD__TOKEN_LIFETIME = (
-                self.USER__RESET_PASSWORD__VALIDITY
-            )
+            self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.USER__RESET_PASSWORD__VALIDITY
         else:
             self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(
                 self.get_raw_config(
                     "user.reset_password.token_lifetime", defaut_reset_password_validity
                 )
             )
-        self.USER__DEFAULT_PROFILE = self.get_raw_config(
-            "user.default_profile", Profile.USER.slug
-        )
+        self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
 
-        self.KNOWN_MEMBERS__FILTER = asbool(
-            self.get_raw_config("known_members.filter", "True")
-        )
+        self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
         self.BUILD_VERSION = self.get_raw_config(
             "build_version", get_build_version(os.path.abspath(__file__))
@@ -502,9 +473,7 @@ class CFG(object):
         self.LIMITATION__CONTENT_LENGTH_FILE_SIZE = int(
             self.get_raw_config("limitation.content_length_file_size", "0")
         )
-        self.LIMITATION__WORKSPACE_SIZE = int(
-            self.get_raw_config("limitation.workspace_size", "0")
-        )
+        self.LIMITATION__WORKSPACE_SIZE = int(self.get_raw_config("limitation.workspace_size", "0"))
         self.LIMITATION__USER_DEFAULT_ALLOWED_SPACE = int(
             self.get_raw_config("limitation.user_default_allowed_space", "0")
         )
@@ -542,9 +511,7 @@ class CFG(object):
             # 'folder' --folder is skipped
         ]
 
-        self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config(
-            "email.notification.from.email"
-        )
+        self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config("email.notification.from.email")
         self.EMAIL__NOTIFICATION__FROM = self.get_raw_config(
             "email.notification.from",
             deprecated=True,
@@ -569,9 +536,7 @@ class CFG(object):
 
         self.EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT = self.get_raw_config(
             "email.notification.content_update.subject",
-            _(
-                "[{website_title}] [{workspace_label}] {content_label} ({content_status_label})"
-            ),
+            _("[{website_title}] [{workspace_label}] {content_label} ({content_status_label})"),
         )
         # Created account notification
         self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML = self.get_raw_config(
@@ -602,12 +567,8 @@ class CFG(object):
         self.EMAIL__NOTIFICATION__SMTP__SERVER = self.get_raw_config(
             "email.notification.smtp.server"
         )
-        self.EMAIL__NOTIFICATION__SMTP__PORT = self.get_raw_config(
-            "email.notification.smtp.port"
-        )
-        self.EMAIL__NOTIFICATION__SMTP__USER = self.get_raw_config(
-            "email.notification.smtp.user"
-        )
+        self.EMAIL__NOTIFICATION__SMTP__PORT = self.get_raw_config("email.notification.smtp.port")
+        self.EMAIL__NOTIFICATION__SMTP__USER = self.get_raw_config("email.notification.smtp.user")
         self.EMAIL__NOTIFICATION__SMTP__PASSWORD = self.get_raw_config(
             "email.notification.smtp.password", secret=True
         )
@@ -615,9 +576,7 @@ class CFG(object):
             self.get_raw_config("email.notification.smtp.use_implicit_ssl", "false")
         )
 
-        self.EMAIL__REPLY__ACTIVATED = asbool(
-            self.get_raw_config("email.reply.activated", "False")
-        )
+        self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config("email.reply.activated", "False"))
 
         self.EMAIL__REPLY__IMAP__SERVER = self.get_raw_config("email.reply.imap.server")
         self.EMAIL__REPLY__IMAP__PORT = self.get_raw_config("email.reply.imap.port")
@@ -625,9 +584,7 @@ class CFG(object):
         self.EMAIL__REPLY__IMAP__PASSWORD = self.get_raw_config(
             "email.reply.imap.password", secret=True
         )
-        self.EMAIL__REPLY__IMAP__FOLDER = self.get_raw_config(
-            "email.reply.imap.folder", "INBOX"
-        )
+        self.EMAIL__REPLY__IMAP__FOLDER = self.get_raw_config("email.reply.imap.folder", "INBOX")
         self.EMAIL__REPLY__CHECK__HEARTBEAT = int(
             self.get_raw_config("email.reply.check.heartbeat", "60")
         )
@@ -638,9 +595,7 @@ class CFG(object):
             self.get_raw_config("email.reply.imap.use_idle", "False")
         )
         self.EMAIL__REPLY__CONNECTION__MAX_LIFETIME = int(
-            self.get_raw_config(
-                "email.reply.connection.max_lifetime", "600"
-            )  # 10 minutes
+            self.get_raw_config("email.reply.connection.max_lifetime", "600")  # 10 minutes
         )
         self.EMAIL__REPLY__USE_HTML_PARSING = asbool(
             self.get_raw_config("email.reply.use_html_parsing", "True")
@@ -649,8 +604,7 @@ class CFG(object):
             self.get_raw_config("email.reply.use_txt_parsing", "True")
         )
         self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config(
-            "email.reply.lockfile_path",
-            self.here_macro_replace("%(here)s/email_fetcher.lock"),
+            "email.reply.lockfile_path", self.here_macro_replace("%(here)s/email_fetcher.lock"),
         )
         self.NEW_USER__INVITATION__DO_NOTIFY = asbool(
             self.get_raw_config("new_user.invitation.do_notify", "True")
@@ -671,15 +625,9 @@ class CFG(object):
         wsgidav_website = "https://github.com/mar10/wsgidav/"
         wsgidav_name = "WsgiDAV"
 
-        self.WEBDAV__UI__ENABLED = asbool(
-            self.get_raw_config("webdav.ui.enabled", "True")
-        )
-        self.WEBDAV__BASE_URL = self.get_raw_config(
-            "webdav.base_url", "http://localhost:3030"
-        )
-        self.WEBDAV__VERBOSE__LEVEL = int(
-            self.get_raw_config("webdav.verbose.level", "1")
-        )
+        self.WEBDAV__UI__ENABLED = asbool(self.get_raw_config("webdav.ui.enabled", "True"))
+        self.WEBDAV__BASE_URL = self.get_raw_config("webdav.base_url", "http://localhost:3030")
+        self.WEBDAV__VERBOSE__LEVEL = int(self.get_raw_config("webdav.verbose.level", "1"))
         self.WEBDAV__ROOT_PATH = self.get_raw_config("webdav.root_path", "/")
         self.WEBDAV__BLOCK_SIZE = int(self.get_raw_config("webdav.block_size", "8192"))
         self.WEBDAV__DIR_BROWSER__ENABLED = asbool(
@@ -722,9 +670,7 @@ class CFG(object):
         self.LDAP_USER_BASE_DN = self.get_raw_config("ldap_user_base_dn")
         self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config("ldap_login_attribute", "mail")
         # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
-        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config(
-            "ldap_name_attribute", "givenName"
-        )
+        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "givenName")
         # TODO - G.M - 2018-12-05 - [ldap_profile]
         # support for profile attribute disabled
         # Should be reenabled later probably with a better code
@@ -747,8 +693,7 @@ class CFG(object):
             "search.elasticsearch.index_alias"
         )
         self.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE = self.get_raw_config(
-            "search.elasticsearch.index_pattern_template",
-            DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE,
+            "search.elasticsearch.index_pattern_template", DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE,
         )
         self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
             self.get_raw_config("search.elasticsearch.use_ingest", "False")
@@ -757,8 +702,7 @@ class CFG(object):
         ALLOWED_INGEST_DEFAULT_MIMETYPE = ""
         self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_unique_item_list(
             self.get_raw_config(
-                "search.elasticsearch.ingest.mimetype_whitelist",
-                ALLOWED_INGEST_DEFAULT_MIMETYPE,
+                "search.elasticsearch.ingest.mimetype_whitelist", ALLOWED_INGEST_DEFAULT_MIMETYPE,
             ),
             separator=",",
             cast_func=str,
@@ -784,18 +728,10 @@ class CFG(object):
         )
 
     def _load_jobs_config(self) -> None:
-        self.JOBS__PROCESSING_MODE = self.get_raw_config(
-            "jobs.processing_mode", "sync"
-        ).upper()
-        self.JOBS__ASYNC__REDIS__HOST = self.get_raw_config(
-            "jobs.async.redis.host", "localhost"
-        )
-        self.JOBS__ASYNC__REDIS__PORT = int(
-            self.get_raw_config("jobs.async.redis.port", "6379")
-        )
-        self.JOBS__ASYNC__REDIS__DB = int(
-            self.get_raw_config("jobs.async.redis.db", "0")
-        )
+        self.JOBS__PROCESSING_MODE = self.get_raw_config("jobs.processing_mode", "sync").upper()
+        self.JOBS__ASYNC__REDIS__HOST = self.get_raw_config("jobs.async.redis.host", "localhost")
+        self.JOBS__ASYNC__REDIS__PORT = int(self.get_raw_config("jobs.async.redis.port", "6379"))
+        self.JOBS__ASYNC__REDIS__DB = int(self.get_raw_config("jobs.async.redis.db", "0"))
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 
@@ -822,9 +758,7 @@ class CFG(object):
         self.check_mandatory_param("SESSION__TYPE", self.SESSION__TYPE)
         if self.SESSION__TYPE == "file":
             self.check_mandatory_param(
-                "SESSION__DATA_DIR",
-                self.SESSION__DATA_DIR,
-                when_str="if session type is file",
+                "SESSION__DATA_DIR", self.SESSION__DATA_DIR, when_str="if session type is file",
             )
             self.check_directory_path_param(
                 "SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True
@@ -841,13 +775,9 @@ class CFG(object):
                 when_str="if session type is {}".format(self.SESSION__TYPE),
             )
         self.check_mandatory_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR)
-        self.check_directory_path_param(
-            "SESSION__LOCK_DIR", self.SESSION__LOCK_DIR, writable=True
-        )
+        self.check_directory_path_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR, writable=True)
         # INFO - G.M - 2019-04-03 - check color file validity
-        self.check_mandatory_param(
-            "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH
-        )
+        self.check_mandatory_param("COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH)
         if not os.path.exists(self.COLOR__CONFIG_FILE_PATH):
             raise ConfigurationError(
                 "ERROR: {} file does not exist. "
@@ -860,31 +790,23 @@ class CFG(object):
                 self.APPS_COLORS = json.load(json_file)
         except Exception as e:
             raise ConfigurationError(
-                "Error: {} file could not be load as json".format(
-                    self.COLOR__CONFIG_FILE_PATH
-                )
+                "Error: {} file could not be load as json".format(self.COLOR__CONFIG_FILE_PATH)
             ) from e
 
         try:
             self.APPS_COLORS["primary"]
         except KeyError as e:
             raise ConfigurationError(
-                "Error: primary color is required in {} file".format(
-                    self.COLOR__CONFIG_FILE_PATH
-                )
+                "Error: primary color is required in {} file".format(self.COLOR__CONFIG_FILE_PATH)
             ) from e
 
         self.check_mandatory_param("DEPOT_STORAGE_DIR", self.DEPOT_STORAGE_DIR)
-        self.check_directory_path_param(
-            "DEPOT_STORAGE_DIR", self.DEPOT_STORAGE_DIR, writable=True
-        )
+        self.check_directory_path_param("DEPOT_STORAGE_DIR", self.DEPOT_STORAGE_DIR, writable=True)
 
         self.check_mandatory_param("DEPOT_STORAGE_NAME", self.DEPOT_STORAGE_NAME)
 
         self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
-        self.check_directory_path_param(
-            "PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True
-        )
+        self.check_directory_path_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True)
 
         if AuthType.REMOTE is self.AUTH_TYPES:
             raise ConfigurationError(
@@ -894,9 +816,7 @@ class CFG(object):
 
         self.check_mandatory_param("WEBSITE__BASE_URL", self.WEBSITE__BASE_URL)
 
-        self.check_mandatory_param(
-            "BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH
-        )
+        self.check_mandatory_param("BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH)
         self.check_directory_path_param(
             "BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH, readable=True
         )
@@ -914,16 +834,11 @@ class CFG(object):
 
         if self.USER__DEFAULT_PROFILE not in Profile.get_all_valid_slugs():
             profile_str_list = ", ".join(
-                [
-                    '"{}"'.format(profile_name)
-                    for profile_name in Profile.get_all_valid_slugs()
-                ]
+                ['"{}"'.format(profile_name) for profile_name in Profile.get_all_valid_slugs()]
             )
             raise ConfigurationError(
                 'ERROR user.default_profile given "{}" is invalid,'
-                "valids values are {}.".format(
-                    self.USER__DEFAULT_PROFILE, profile_str_list
-                )
+                "valids values are {}.".format(self.USER__DEFAULT_PROFILE, profile_str_list)
             )
 
     def _check_live_messages_config_validity(self) -> None:
@@ -1033,8 +948,7 @@ class CFG(object):
                     raise ConfigurationError(
                         "ERROR: email template for {template_description} "
                         'not found at "{template_path}."'.format(
-                            template_description=template_description,
-                            template_path=template_path,
+                            template_description=template_description, template_path=template_path,
                         )
                     )
 
@@ -1051,14 +965,10 @@ class CFG(object):
     def _check_ldap_config_validity(self):
         if AuthType.LDAP in self.AUTH_TYPES:
             self.check_mandatory_param(
-                "LDAP_URL",
-                self.LDAP_URL,
-                when_str="when ldap is in available auth method",
+                "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(
-                "LDAP_BIND_DN",
-                self.LDAP_BIND_DN,
-                when_str="when ldap is in available auth method",
+                "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(
                 "LDAP_BIND_PASS",
@@ -1089,9 +999,7 @@ class CFG(object):
                 '"{}"'.format(engine) for engine in search_engine_valid
             )
             raise ConfigurationError(
-                "ERROR: SEARCH__ENGINE valid values are {}.".format(
-                    search_engine_list_str
-                )
+                "ERROR: SEARCH__ENGINE valid values are {}.".format(search_engine_list_str)
             )
         # FIXME - G.M - 2019-06-07 - hack to force index document alias check validity
         # see https://github.com/tracim/tracim/issues/1835
@@ -1135,9 +1043,7 @@ class CFG(object):
         ASYNC = "ASYNC"
         SYNC = "SYNC"
 
-    def check_mandatory_param(
-        self, param_name: str, value: typing.Any, when_str: str = ""
-    ) -> None:
+    def check_mandatory_param(self, param_name: str, value: typing.Any, when_str: str = "") -> None:
         """
         Check if param value is not falsy value, if falsy, raise ConfigurationError
         :param param_name: name of the parameter
@@ -1173,9 +1079,7 @@ class CFG(object):
                 'create it or change "{}" value in config '
                 "to a valid directory path."
             )
-            raise ConfigurationError(
-                not_a_directory_msg.format(path, param_name)
-            ) from exc
+            raise ConfigurationError(not_a_directory_msg.format(path, param_name)) from exc
         except NotWritableDirectory as exc:
             directory_not_writable_msg = (
                 "ERROR: current user as not enough right to write and create file"
@@ -1184,9 +1088,7 @@ class CFG(object):
                 " change user running this code or change"
                 ' directory path of parameter in config "{}" to solve this.'
             )
-            raise ConfigurationError(
-                directory_not_writable_msg.format(path, param_name)
-            ) from exc
+            raise ConfigurationError(directory_not_writable_msg.format(path, param_name)) from exc
         except NotReadableDirectory as exc:
             directory_not_writable_msg = (
                 "ERROR: current user as not enough right to read and/or open"
@@ -1195,9 +1097,7 @@ class CFG(object):
                 " change user running this code or change"
                 ' directory path of parameter in config "{}" to solve this.'
             )
-            raise ConfigurationError(
-                directory_not_writable_msg.format(path, param_name)
-            ) from exc
+            raise ConfigurationError(directory_not_writable_msg.format(path, param_name)) from exc
 
 
 class PreviewDim(object):

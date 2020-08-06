@@ -29,9 +29,7 @@ def big_html_document(workspace_api_factory, content_api_factory, session) -> Co
         do_notify=False,
     )
     with new_revision(session=session, tm=transaction.manager, content=html_document):
-        content_api.update_content(
-            html_document, new_content=description, new_label="Big document"
-        )
+        content_api.update_content(html_document, new_content=description, new_label="Big document")
         content_api.save(html_document)
     transaction.commit()
     return html_document
@@ -64,9 +62,7 @@ class TestLivesMessages(object):
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
         )
-        res = web_testapp.get(
-            "/api/users/{}/live_messages".format(admin_user.user_id), status=400,
-        )
+        res = web_testapp.get("/api/users/{}/live_messages".format(admin_user.user_id), status=400,)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
@@ -85,17 +81,13 @@ class TestLivesMessages(object):
         client_events = client.events()
         # INFO - G.M - 2020-06-29 - Skip first event
         next(client_events)
-        LiveMessagesLib(config=app_config).publish_dict(
-            "user_1", {"test_message": "example"}
-        )
+        LiveMessagesLib(config=app_config).publish_dict("user_1", {"test_message": "example"})
         event1 = next(client_events)
         response.close()
         assert json.loads(event1.data) == {"test_message": "example"}
         assert event1.event == "message"
 
-    @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_live_test"}], indirect=True
-    )
+    @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update(
         self, pushpin, app_config
     ):

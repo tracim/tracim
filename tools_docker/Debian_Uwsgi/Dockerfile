@@ -92,6 +92,7 @@ RUN \
         | tee /etc/apt/sources.list.d/fanout.list \
     && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 \
         --recv-keys 379CE192D401AB61 \
+    && apt update \
     && apt install -qy \
         apache2 \
         ffmpeg \

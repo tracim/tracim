@@ -46,9 +46,7 @@ class LiveMessagesLib(object):
         message_as_dict = message_schema.dump(message).data
         self.publish_dict(channel_name, message_as_dict=message_as_dict)
 
-    def publish_dict(
-        self, channel_name: str, message_as_dict: typing.Dict[str, typing.Any]
-    ):
+    def publish_dict(self, channel_name: str, message_as_dict: typing.Dict[str, typing.Any]):
         self.grip_pub_control.publish_http_stream(
             channel_name,
             str(JsonServerSideEvent(data=message_as_dict, event=TLM_EVENT_NAME)),
