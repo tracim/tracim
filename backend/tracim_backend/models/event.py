@@ -39,6 +39,7 @@ class EntityType(enum.Enum):
     WORKSPACE = "workspace"
     WORKSPACE_MEMBER = "workspace_member"
     CONTENT = "content"
+    MENTION = "mention"
 
     def __str__(self) -> str:
         return self.value
