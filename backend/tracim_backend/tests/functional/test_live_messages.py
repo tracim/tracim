@@ -1,6 +1,4 @@
 import json
-import random
-import string
 
 import pytest
 import requests
@@ -20,7 +18,7 @@ def big_html_document(workspace_api_factory, content_api_factory, session) -> Co
     workspace = workspace_api.create_workspace(label="Foobar")
     content_api = content_api_factory.get()
 
-    description = "".join(random.choice(string.ascii_letters) for _ in range(2000000))
+    description = 20000000 * "a"
     html_document = content_api.create(
         content_type_slug="html-document",
         workspace=workspace,
