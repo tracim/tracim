@@ -1,7 +1,7 @@
 """added_userconfig
 
 Revision ID: d6ce2c95006f
-Revises: fb2ae8c604ac
+Revises: 5d3331933ef3
 Create Date: 2020-07-29 19:31:48.953180
 
 """
@@ -23,7 +23,7 @@ metadata = MetaData(naming_convention=NAMING_CONVENTION)
 
 # revision identifiers, used by Alembic.
 revision = "d6ce2c95006f"
-down_revision = "fb2ae8c604ac"
+down_revision = "5d3331933ef3"
 
 
 def upgrade():
