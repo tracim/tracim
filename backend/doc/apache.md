@@ -31,49 +31,38 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
 
         SetEnv proxy-sendcl
 
-        # Main tracim paths proxyied to tracim_web with uwsgi protocol
-        <Location /ui>
-            ProxyPass uwsgi://localhost:6544/
-            ProxyPassReverse uwsgi://localhost:6544/
-        </Location>
-        <Location /api>
-            ProxyPass uwsgi://localhost:6544/
-            ProxyPassReverse uwsgi://localhost:6544/
-        </Location>
-        <Location /custom_toolbox-assets>
-            ProxyPass uwsgi://localhost:6544/
-            ProxyPassReverse uwsgi://localhost:6544/
-        </Location>
-        <Location />
-            ProxyPass uwsgi://localhost:6544/
-            ProxyPassReverse uwsgi://localhost:6544/
-        </Location>
+    # Proxying Webdav
+    <Location /webdav>
+        # Preserving host is needed for working move/copy in webdav
+        ProxyPreserveHost On
+        ProxyPass http://127.0.0.1:3030/webdav
+        ProxyPassReverse http://127.0.0.1:3030/webdav
+    </Location>
 
-        # Proxying Caldav
-        <Location /agenda>
-            ProxyPass uwsgi://localhost:6544/
-            ProxyPassReverse uwsgi://localhost:6544/
-        </Location>
+    # Proxying Caldav
+    ProxyPassMatch ^/agenda uwsgi://127.0.0.1:6544/
+    ProxyPassReverse /agenda uwsgi://127.0.0.1:6544/
 
-        # Proxying Webdav
-        <Location /webdav>
-            # Setting Destination header from https to http in proxy
-            # is needed for working move/copy in webdav
-            RequestHeader edit Destination ^https http early
-            # Preserving host is needed for working move/copy in webdav
-            ProxyPreserveHost On
-            ProxyPass http://127.0.0.1:3030/webdav
-            ProxyPassReverse http://127.0.0.1:3030/webdav
-        </Location>
+    # Proxying Frontend
+    ProxyPassMatch ^/ui uwsgi://127.0.0.1:6544/
+    ProxyPassReverse /ui uwsgi://127.0.0.1:6544/
 
-         # Proxying Tracim Live Message to Pushpin
-        <LocationMatch ^/api/users/[0-9]+/live_messages$>
-            ProxyPassMatch http://127.0.0.1:7999/
-        </LocationMatch>
+    # Proxying Tracim Live Message to Pushpin
+    # NOTE: no reverse as ProxyPassMatchReverse does not exist...
+    ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
 
+    # Proxying Backend API
+    ProxyPassMatch ^/api uwsgi://127.0.0.1:6544/
+    ProxyPassReverse /api uwsgi://127.0.0.1:6544/
 
-        CustomLog /var/log/apache2/apache2-tracim-access.log combined
-        ErrorLog /var/log/apache2/apache2-tracim-error.log
+    ProxyPassMatch ^/custom_toolbox-assets uwsgi://127.0.0.1:6544/
+    ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:6544/
+
+    ProxyPassMatch ^/$ uwsgi://localhost:6544/
+    ProxyPassReverse / uwsgi://127.0.0.1:6544/
+
+    CustomLog /var/log/apache2/apache2-tracim-access.log combined
+    ErrorLog /var/log/apache2/apache2-tracim-error.log
 
     </VirtualHost>
 
