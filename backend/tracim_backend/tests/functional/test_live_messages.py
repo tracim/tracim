@@ -18,7 +18,12 @@ def big_html_document(workspace_api_factory, content_api_factory, session) -> Co
     workspace = workspace_api.create_workspace(label="Foobar")
     content_api = content_api_factory.get()
 
-    description = 2000000 * "a"
+    # NOTE: MySQL and MariaDB have a maximum of 65536 bytes for description,
+    # so the size is chosen accordingly
+    if session.connection().dialect.name in ("mysql", "mariadb"):
+        description = 65000 * "a"
+    else:
+        description = 2000000 * "a"
     html_document = content_api.create(
         content_type_slug="html-document",
         workspace=workspace,
