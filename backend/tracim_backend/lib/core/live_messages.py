@@ -39,6 +39,7 @@ class LiveMessagesLib(object):
         self.grip_pub_control = GripPubControl(
             {"control_zmq_uri": config.LIVE_MESSAGES__CONTROL_ZMQ_URI}
         )
+        self.blocking_publish = config.LIVE_MESSAGES__BLOCKING_PUBLISH
 
     def publish_message_to_user(self, message: Message):
         channel_name = "user_{}".format(message.receiver_id)
@@ -50,5 +51,5 @@ class LiveMessagesLib(object):
         self.grip_pub_control.publish_http_stream(
             channel_name,
             str(JsonServerSideEvent(data=message_as_dict, event=TLM_EVENT_NAME)),
-            blocking=True,
+            blocking=self.blocking_publish,
         )

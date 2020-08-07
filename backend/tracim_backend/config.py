@@ -311,12 +311,12 @@ class CFG(object):
         """Parse configuration file and env variables"""
         self.log_config_header("Global config parameters:")
         self._load_global_config()
-        self.log_config_header("Live Messages Config parameters:")
-        self._load_live_messages_config()
         self.log_config_header("Limitation config parameters:")
         self._load_limitation_config()
         self.log_config_header("Jobs config parameters:")
         self._load_jobs_config()
+        self.log_config_header("Live Messages Config parameters:")
+        self._load_live_messages_config()
         self.log_config_header("Email config parameters:")
         self._load_email_config()
         self.log_config_header("LDAP config parameters:")
@@ -464,6 +464,10 @@ class CFG(object):
     def _load_live_messages_config(self) -> None:
         self.LIVE_MESSAGES__CONTROL_ZMQ_URI = self.get_raw_config(
             "live_messages.control_zmq_uri", "tcp://localhost:5563"
+        )
+        async_processing = str(self.JOBS__PROCESSING_MODE == self.CST.ASYNC)
+        self.LIVE_MESSAGES__BLOCKING_PUBLISH = asbool(
+            self.get_raw_config("live_messages.blocking_publish", async_processing)
         )
 
     def _load_limitation_config(self) -> None:
