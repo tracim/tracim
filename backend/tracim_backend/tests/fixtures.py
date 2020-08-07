@@ -28,8 +28,11 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
+from tracim_backend.lib.core.event import RQ_QUEUE_NAME
 from tracim_backend.lib.core.event import EventBuilder
 from tracim_backend.lib.core.plugins import create_plugin_manager
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.webdav import Provider
@@ -81,7 +84,7 @@ def pushpin(tracim_webserver, tmp_path_factory):
 
 
 @pytest.fixture
-def rq_database_worker(config_uri):
+def rq_database_worker(config_uri, empty_rq_event_queue):
 
     worker_env = os.environ.copy()
     worker_env["TRACIM_CONF_PATH"] = "{}#rq_worker_test".format(config_uri)
@@ -153,6 +156,13 @@ def web_testapp(settings, hapic, session):
     DepotManager._clear()
     app = web({}, **settings)
     return TestApp(app)
+
+
+@pytest.fixture
+def empty_rq_event_queue(app_config):
+    redis_connection = get_redis_connection(app_config)
+    queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+    queue.delete()
 
 
 @pytest.fixture
