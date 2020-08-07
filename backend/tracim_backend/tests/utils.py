@@ -153,7 +153,7 @@ class WedavEnvironFactory(object):
             "tracim_user": user,
         }
         tracim_context = WebdavTracimContext(
-            app_config=self.app_config, environ=environ, plugin_manager=self.plugin_manager
+            app_config=self.app_config, environ=environ, plugin_manager=self.plugin_manager,
         )
         tracim_context.dbsession = self.session
         environ["tracim_context"] = tracim_context
@@ -169,7 +169,7 @@ class ApplicationApiFactory(object):
 
 
 def webdav_put_new_test_file_helper(
-    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes
+    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes,
 ) -> _DAVResource:
     # This part id a reproduction of
     # wsgidav.request_server.RequestServer#doPUT
@@ -263,6 +263,8 @@ class DockerCompose:
         self.execute("down")
 
     def execute(self, *arguments: str, env: dict = None) -> None:
+        if env:
+            env.update(os.environ)
         subprocess.run(self.command + list(arguments), env=env, check=True)
 
 
