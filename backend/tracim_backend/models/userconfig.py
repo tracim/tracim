@@ -20,7 +20,6 @@ class UserConfig(DeclarativeBase):
         Integer,
         ForeignKey(
             "users.user_id",
-            name="fk_userconfig_user_id_users",
             onupdate="CASCADE",
             ondelete="CASCADE",
         ),
