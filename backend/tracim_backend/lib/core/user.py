@@ -1036,7 +1036,7 @@ class UserApi(object):
                 if agenda_already_exist:
                     logger.warning(
                         self,
-                        "user {} has just been created but their own agenda already exists !!".format(
+                        "user {} has just been created but their own agenda already exists".format(
                             user.user_id
                         ),
                     )
