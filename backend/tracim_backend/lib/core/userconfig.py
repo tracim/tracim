@@ -15,7 +15,7 @@ class UserConfigApi:
 
     def get_config(self) -> UserConfig:
         query = self._session.query(UserConfig)
-        return query.filter(UserConfig.user_id == self._user.user_id).one()
+        return query.filter(UserConfig.user_id == self._current_user.user_id).one()
 
     def get_all_params(self) -> Dict[str, Any]:
         return self.get_config().fields
