@@ -34,8 +34,12 @@ class JsonServerSideEvent(object):
 
 class LiveMessagesLib(object):
     def __init__(self, config: CFG,) -> None:
-        self.control_uri = config.LIVE_MESSAGES__CONTROL_URI
-        self.grip_pub_control = GripPubControl({"control_uri": self.control_uri})
+        # NOTE S.G. - 2020-08-06 - publishing using ZMQ to avoid
+        # low maximum message size when using HTTP transport (#3415)
+        self.grip_pub_control = GripPubControl(
+            {"control_zmq_uri": config.LIVE_MESSAGES__CONTROL_ZMQ_URI}
+        )
+        self.blocking_publish = config.LIVE_MESSAGES__BLOCKING_PUBLISH
 
     def publish_message_to_user(self, message: Message):
         channel_name = "user_{}".format(message.receiver_id)
@@ -45,5 +49,7 @@ class LiveMessagesLib(object):
 
     def publish_dict(self, channel_name: str, message_as_dict: typing.Dict[str, typing.Any]):
         self.grip_pub_control.publish_http_stream(
-            channel_name, str(JsonServerSideEvent(data=message_as_dict, event=TLM_EVENT_NAME))
+            channel_name,
+            str(JsonServerSideEvent(data=message_as_dict, event=TLM_EVENT_NAME)),
+            blocking=self.blocking_publish,
         )
