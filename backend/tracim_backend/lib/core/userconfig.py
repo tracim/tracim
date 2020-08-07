@@ -9,7 +9,7 @@ from tracim_backend.models.userconfig import UserConfig
 class UserConfigApi:
     """Api to query user configuration"""
 
-    def __init__(self, user: User, session: TracimSession):
+    def __init__(self, current_user: User, session: TracimSession):
         self._user = user
         self._session = session
 
