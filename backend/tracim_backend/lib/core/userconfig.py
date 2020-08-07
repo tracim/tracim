@@ -10,7 +10,7 @@ class UserConfigApi:
     """Api to query user configuration"""
 
     def __init__(self, current_user: User, session: TracimSession):
-        self._user = user
+        self._current_user = current_user
         self._session = session
 
     def get_config(self) -> UserConfig:
