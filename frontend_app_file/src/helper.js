@@ -5,7 +5,7 @@ export const PAGE = {
     CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
     CONTENT_EDITION: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}/online_edition`
   },
-  ONLINE_EDITION: (contentId) => `/api/v2/collaborative-document-edition/wopi/files/${contentId}`
+  ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`
 }
 
 export const DISALLOWED_VIDEO_MIME_TYPE_LIST = [

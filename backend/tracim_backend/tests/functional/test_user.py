@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Tests for /api/v2/users subpath endpoints.
+Tests for /api/users subpath endpoints.
 """
 
 import pytest
 import transaction
+from webtest import TestApp
 
 from tracim_backend import AuthType
 from tracim_backend.error import ErrorCode
@@ -12,6 +13,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import create_1000px_png_test_image
 
 
@@ -19,7 +21,7 @@ from tracim_backend.tests.utils import create_1000px_png_test_image
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserRecentlyActiveContentEndpoint(object):
     """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active
+    Tests for /api/users/{user_id}/workspaces/{workspace_id}/contents/recently_active
     """
 
     def test_api__get_recently_active_content__ok__200__admin(
@@ -121,7 +123,7 @@ class TestUserRecentlyActiveContentEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -253,7 +255,7 @@ class TestUserRecentlyActiveContentEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=400,
@@ -362,7 +364,7 @@ class TestUserRecentlyActiveContentEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -498,7 +500,7 @@ class TestUserRecentlyActiveContentEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=403,
@@ -595,7 +597,7 @@ class TestUserRecentlyActiveContentEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"limit": 2}
         res = web_testapp.get(
-            "/api/v2/users/1/workspaces/{}/contents/recently_active".format(workspace.workspace_id),
+            "/api/users/1/workspaces/{}/contents/recently_active".format(workspace.workspace_id),
             status=200,
             params=params,
         )
@@ -622,7 +624,7 @@ class TestUserRecentlyActiveContentEndpoint(object):
 
         params = {"limit": 2, "before_content_id": secondly_created_but_not_commented.content_id}
         res = web_testapp.get(
-            "/api/v2/users/1/workspaces/{}/contents/recently_active".format(workspace.workspace_id),
+            "/api/users/1/workspaces/{}/contents/recently_active".format(workspace.workspace_id),
             status=200,
             params=params,
         )
@@ -721,7 +723,7 @@ class TestUserRecentlyActiveContentEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"before_content_id": 4000}
         res = web_testapp.get(
-            "/api/v2/users/1/workspaces/{}/contents/recently_active".format(workspace.workspace_id),
+            "/api/users/1/workspaces/{}/contents/recently_active".format(workspace.workspace_id),
             status=400,
             params=params,
         )
@@ -734,7 +736,7 @@ class TestUserRecentlyActiveContentEndpoint(object):
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserReadStatusEndpoint(object):
     """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status
+    Tests for /api/users/{user_id}/workspaces/{workspace_id}/contents/read_status
     """
 
     def test_api__get_read_status__ok__200__admin(
@@ -837,7 +839,7 @@ class TestUserReadStatusEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -972,7 +974,7 @@ class TestUserReadStatusEndpoint(object):
                 cid4=selected_contents_id[3],
             )
         }
-        url = "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+        url = "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
             workspace_id=workspace.workspace_id, user_id=test_user.user_id
         )
         res = web_testapp.get(url=url, status=200, params=params)
@@ -1104,7 +1106,7 @@ class TestUserReadStatusEndpoint(object):
                 cid4=selected_contents_id[3],
             )
         }
-        url = "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+        url = "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
             workspace_id=workspace.workspace_id, user_id=admin_user.user_id
         )
         res = web_testapp.get(url=url, status=403, params=params)
@@ -1117,7 +1119,7 @@ class TestUserReadStatusEndpoint(object):
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserSetContentAsRead(object):
     """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read
+    Tests for /api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read
     """
 
     def test_api_set_content_as_read__ok__200__admin(
@@ -1165,7 +1167,7 @@ class TestUserSetContentAsRead(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1174,7 +1176,7 @@ class TestUserSetContentAsRead(object):
         assert res.json_body[0]["read_by_user"] is False
 
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1183,7 +1185,7 @@ class TestUserSetContentAsRead(object):
         assert res.json_body[0]["read_by_user"] is False
         # read
         web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
@@ -1191,7 +1193,7 @@ class TestUserSetContentAsRead(object):
         )
         # after
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1200,7 +1202,7 @@ class TestUserSetContentAsRead(object):
         assert res.json_body[0]["read_by_user"] is True
 
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1253,7 +1255,7 @@ class TestUserSetContentAsRead(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # read
         res = web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=4000, content_id=firstly_created.content_id, user_id=test_user.user_id
             ),
             status=400,
@@ -1307,7 +1309,7 @@ class TestUserSetContentAsRead(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # read
         res = web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=workspace.workspace_id, content_id=4000, user_id=test_user.user_id
             ),
             status=400,
@@ -1361,7 +1363,7 @@ class TestUserSetContentAsRead(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # before
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1371,7 +1373,7 @@ class TestUserSetContentAsRead(object):
 
         # read
         web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
@@ -1379,7 +1381,7 @@ class TestUserSetContentAsRead(object):
         )
         # after
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1433,7 +1435,7 @@ class TestUserSetContentAsRead(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # read
         res = web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=admin_user.user_id,
@@ -1490,7 +1492,7 @@ class TestUserSetContentAsRead(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1499,7 +1501,7 @@ class TestUserSetContentAsRead(object):
         assert res.json_body[0]["read_by_user"] is False
 
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1507,7 +1509,7 @@ class TestUserSetContentAsRead(object):
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
         web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
@@ -1515,7 +1517,7 @@ class TestUserSetContentAsRead(object):
         )
         # after
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1524,7 +1526,7 @@ class TestUserSetContentAsRead(object):
         assert res.json_body[0]["read_by_user"] is True
 
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1578,7 +1580,7 @@ class TestUserSetContentAsRead(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1587,7 +1589,7 @@ class TestUserSetContentAsRead(object):
         assert res.json_body[0]["read_by_user"] is False
 
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1595,7 +1597,7 @@ class TestUserSetContentAsRead(object):
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
         web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
@@ -1603,7 +1605,7 @@ class TestUserSetContentAsRead(object):
         )
         # after
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1612,7 +1614,7 @@ class TestUserSetContentAsRead(object):
         assert res.json_body[0]["read_by_user"] is True
 
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1625,7 +1627,7 @@ class TestUserSetContentAsRead(object):
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserSetContentAsUnread(object):
     """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread
+    Tests for /api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread
     """
 
     def test_api_set_content_as_unread__ok__200__admin(
@@ -1674,7 +1676,7 @@ class TestUserSetContentAsUnread(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1683,7 +1685,7 @@ class TestUserSetContentAsUnread(object):
         assert res.json_body[0]["read_by_user"] is True
 
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1693,7 +1695,7 @@ class TestUserSetContentAsUnread(object):
 
         # unread
         web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
@@ -1701,7 +1703,7 @@ class TestUserSetContentAsUnread(object):
         )
         # after
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1710,7 +1712,7 @@ class TestUserSetContentAsUnread(object):
         assert res.json_body[0]["read_by_user"] is False
 
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1764,7 +1766,7 @@ class TestUserSetContentAsUnread(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # unread
         res = web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=4000, content_id=firstly_created.content_id, user_id=test_user.user_id
             ),
             status=400,
@@ -1819,7 +1821,7 @@ class TestUserSetContentAsUnread(object):
 
         # unread
         res = web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=workspace.workspace_id, content_id=4000, user_id=test_user.user_id
             ),
             status=400,
@@ -1873,7 +1875,7 @@ class TestUserSetContentAsUnread(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # before
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1883,7 +1885,7 @@ class TestUserSetContentAsUnread(object):
 
         # unread
         web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
@@ -1891,7 +1893,7 @@ class TestUserSetContentAsUnread(object):
         )
         # after
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -1946,7 +1948,7 @@ class TestUserSetContentAsUnread(object):
 
         # unread
         res = web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=admin_user.user_id,
@@ -1985,20 +1987,20 @@ class TestUserSetContentAsUnread(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
+            "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
         web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=admin_user.user_id,
             )
         )
         res = web_testapp.get(
-            "/api/v2/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
+            "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -2032,20 +2034,20 @@ class TestUserSetContentAsUnread(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
+            "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
         web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=workspace.workspace_id,
                 content_id=comments.content_id,
                 user_id=admin_user.user_id,
             )
         )
         res = web_testapp.get(
-            "/api/v2/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
+            "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -2056,7 +2058,7 @@ class TestUserSetContentAsUnread(object):
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserSetWorkspaceAsRead(object):
     """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/read
+    Tests for /api/users/{user_id}/workspaces/{workspace_id}/read
     """
 
     def test_api_set_content_as_read__ok__200__admin(
@@ -2105,7 +2107,7 @@ class TestUserSetWorkspaceAsRead(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -2115,14 +2117,14 @@ class TestUserSetWorkspaceAsRead(object):
         assert res.json_body[1]["content_id"] == main_folder.content_id
         assert res.json_body[1]["read_by_user"] is False
         web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/read".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
             )
         )
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -2178,7 +2180,7 @@ class TestUserSetWorkspaceAsRead(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -2188,14 +2190,14 @@ class TestUserSetWorkspaceAsRead(object):
         assert res.json_body[1]["content_id"] == main_folder.content_id
         assert res.json_body[1]["read_by_user"] is False
         web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/read".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
             )
         )
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
@@ -2252,7 +2254,7 @@ class TestUserSetWorkspaceAsRead(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.put(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/read".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=admin_user.user_id,
@@ -2268,7 +2270,7 @@ class TestUserSetWorkspaceAsRead(object):
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserEnableWorkspaceNotification(object):
     """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate
+    Tests for /api/users/{user_id}/workspaces/{workspace_id}/notifications/activate
     """
 
     def test_api_enable_user_workspace_notification__ok__200__admin(
@@ -2304,7 +2306,7 @@ class TestUserEnableWorkspaceNotification(object):
         session.close()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         web_testapp.put_json(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=204,
@@ -2346,7 +2348,7 @@ class TestUserEnableWorkspaceNotification(object):
         session.close()
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         web_testapp.put_json(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=204,
@@ -2398,7 +2400,7 @@ class TestUserEnableWorkspaceNotification(object):
         assert role.do_notify is False
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
         res = web_testapp.put_json(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=403,
@@ -2412,7 +2414,7 @@ class TestUserEnableWorkspaceNotification(object):
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserDisableWorkspaceNotification(object):
     """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate
+    Tests for /api/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate
     """
 
     def test_api_disable_user_workspace_notification__ok__200__admin(
@@ -2448,7 +2450,7 @@ class TestUserDisableWorkspaceNotification(object):
         session.close()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         web_testapp.put_json(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=204,
@@ -2490,7 +2492,7 @@ class TestUserDisableWorkspaceNotification(object):
         session.close()
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         web_testapp.put_json(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=204,
@@ -2542,7 +2544,7 @@ class TestUserDisableWorkspaceNotification(object):
         assert role.do_notify is True
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
         res = web_testapp.put_json(
-            "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=403,
@@ -2556,7 +2558,7 @@ class TestUserDisableWorkspaceNotification(object):
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserWorkspaceEndpoint(object):
     """
-    Tests for /api/v2/users/{user_id}/workspaces
+    Tests for /api/users/{user_id}/workspaces
     """
 
     def test_api__get_user_workspaces__ok_200__with_filter(
@@ -2602,7 +2604,7 @@ class TestUserWorkspaceEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {}
         res = web_testapp.get(
-            "/api/v2/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -2613,7 +2615,7 @@ class TestUserWorkspaceEndpoint(object):
 
         params = {"show_workspace_with_role": "1", "show_owned_workspace": "1"}
         res = web_testapp.get(
-            "/api/v2/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -2624,7 +2626,7 @@ class TestUserWorkspaceEndpoint(object):
 
         params = {"show_workspace_with_role": "1", "show_owned_workspace": "0"}
         res = web_testapp.get(
-            "/api/v2/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -2634,7 +2636,7 @@ class TestUserWorkspaceEndpoint(object):
 
         params = {"show_workspace_with_role": "0", "show_owned_workspace": "1"}
         res = web_testapp.get(
-            "/api/v2/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -2644,7 +2646,7 @@ class TestUserWorkspaceEndpoint(object):
 
         params = {"show_workspace_with_role": "0", "show_owned_workspace": "0"}
         res = web_testapp.get(
-            "/api/v2/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == set()
@@ -2665,7 +2667,7 @@ class TestUserWorkspaceEndpoint(object):
             workspace=workspace, app_config=app_config
         )  # nope8
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/users/1/workspaces", status=200)
+        res = web_testapp.get("/api/users/1/workspaces", status=200)
         res = res.json_body
         workspace = res[0]
         assert workspace["workspace_id"] == 1
@@ -2688,7 +2690,7 @@ class TestUserWorkspaceEndpoint(object):
         with another non-admin user auth.
         """
         web_testapp.authorization = ("Basic", ("lawrence-not-real-email@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/v2/users/1/workspaces", status=403)
+        res = web_testapp.get("/api/users/1/workspaces", status=403)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -2702,7 +2704,7 @@ class TestUserWorkspaceEndpoint(object):
         without correct user auth (user unregistered).
         """
         web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
-        res = web_testapp.get("/api/v2/users/1/workspaces", status=401)
+        res = web_testapp.get("/api/users/1/workspaces", status=401)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] is None
@@ -2717,7 +2719,7 @@ class TestUserWorkspaceEndpoint(object):
         with a correct user auth.
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/users/5/workspaces", status=400)
+        res = web_testapp.get("/api/users/5/workspaces", status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
@@ -2732,7 +2734,7 @@ class TestUserWorkspaceEndpoint(object):
 class TestUserEndpointWithAllowedSpaceLimitation(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users/{user_id}
+    Tests for GET /api/users/{user_id}
     """
 
     def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp):
@@ -2743,6 +2745,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -2754,7 +2757,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["created"]
@@ -2762,6 +2765,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
         assert res["lang"] == "fr"
@@ -2776,9 +2780,10 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
             "timezone": "Europe/Paris",
             "lang": "fr",
             "public_name": "test user",
+            "username": "testu",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
         assert res["created"]
@@ -2786,6 +2791,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "test user"
+        assert res["username"] == "testu"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 134217728
@@ -2800,7 +2806,7 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
 class TestUserEndpointTrustedUserDefaultProfile(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users/{user_id}
+    Tests for GET /api/users/{user_id}
     """
 
     def test_api__create_user__ok_200__full_admin_default_profile(
@@ -2816,7 +2822,7 @@ class TestUserEndpointTrustedUserDefaultProfile(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
         user_id = res["user_id"]
@@ -2841,7 +2847,7 @@ class TestUserEndpointTrustedUserDefaultProfile(object):
 class TestUserDiskSpace(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users/{user_id}/allowed_space
+    Tests for GET /api/users/{user_id}/allowed_space
     """
 
     def test_api__get_user_disk_space__ok_200__admin(
@@ -2868,11 +2874,11 @@ class TestUserDiskSpace(object):
         image = create_1000px_png_test_image()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         web_testapp.post(
-            "/api/v2/workspaces/{}/files".format(workspace.workspace_id),
+            "/api/workspaces/{}/files".format(workspace.workspace_id),
             upload_files=[("files", image.name, image.getvalue())],
             status=200,
         )
-        res = web_testapp.get("/api/v2/users/{}/disk_space".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}/disk_space".format(user_id), status=200)
         res = res.json_body
         assert res["used_space"] == 6210
         assert res["user"]["public_name"] == "bob"
@@ -2885,7 +2891,7 @@ class TestUserDiskSpace(object):
 class TestUserEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users/{user_id}
+    Tests for GET /api/users/{user_id}
     """
 
     def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp):
@@ -2894,6 +2900,7 @@ class TestUserEndpoint(object):
         profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
+            username="testu",
             password="password",
             name="bob",
             profile=profile,
@@ -2907,7 +2914,7 @@ class TestUserEndpoint(object):
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["created"]
@@ -2915,6 +2922,7 @@ class TestUserEndpoint(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "bob"
+        assert res["username"] == "testu"
         assert res["timezone"] == "Europe/Paris"
         assert res["is_deleted"] is False
         assert res["lang"] == "fr"
@@ -2939,7 +2947,7 @@ class TestUserEndpoint(object):
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["created"]
@@ -2980,12 +2988,14 @@ class TestUserEndpoint(object):
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=403)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=403)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
 
-    def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
+    def test_api__create_user__ok_200__full_admin(
+        self, web_testapp, user_api_factory, event_helper
+    ):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "email": "test@test.test",
@@ -2996,7 +3006,7 @@ class TestUserEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
         assert res["created"]
@@ -3007,6 +3017,48 @@ class TestUserEndpoint(object):
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 0
+
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.created"
+        assert last_event.fields["user"] == res
+        assert last_event.fields["client_token"] is None
+        author = web_testapp.get("/api/users/1", status=200).json_body
+        assert last_event.fields["author"] == author
+
+    @pytest.mark.parametrize("email_required,status", ((True, 400), (False, 200)))
+    def test_api__create_user__with_only_username(
+        self, web_testapp, user_api_factory, email_required, status
+    ):
+        web_testapp.app.registry.settings["CFG"].EMAIL__REQUIRED = email_required
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "username": "testu",
+            "email_notification": False,
+        }
+        web_testapp.post_json("/api/users", status=status, params=params)
+
+    def test_api__create_user__err_400__with_no_username_and_no_email(
+        self, web_testapp, user_api_factory, app_config
+    ):
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/users", status=400, params=params)
+        res = res.json_body
+        assert res["code"] == 2001
+        assert res["message"] == "Validation error of input data"
 
     def test_api__create_user__ok_200__full_admin_with_allowed_space(
         self, web_testapp, user_api_factory
@@ -3022,7 +3074,7 @@ class TestUserEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
         user_id = res["user_id"]
@@ -3054,7 +3106,7 @@ class TestUserEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
         user_id = res["user_id"]
@@ -3082,12 +3134,12 @@ class TestUserEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
         user_id = res["user_id"]
         assert res["email"] == "thisisanemailwithuppercasecharacters@test.test"
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "thisisanemailwithuppercasecharacters@test.test"
         transaction.commit()
@@ -3102,7 +3154,7 @@ class TestUserEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=400, params=params)
+        res = web_testapp.post_json("/api/users", status=400, params=params)
         res = res.json_body
         assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
         params = {
@@ -3114,7 +3166,7 @@ class TestUserEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=400, params=params)
+        res = web_testapp.post_json("/api/users", status=400, params=params)
         res = res.json_body
         assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
         params = {
@@ -3126,14 +3178,14 @@ class TestUserEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=400, params=params)
+        res = web_testapp.post_json("/api/users", status=400, params=params)
         res = res.json_body
         assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
 
     def test_api__create_user__ok_200__limited_admin(self, web_testapp, user_api_factory):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"email": "test@test.test", "email_notification": False, "password": None}
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
         user_id = res["user_id"]
@@ -3150,6 +3202,32 @@ class TestUserEndpoint(object):
         user = uapi.get_one(user_id)
         assert user.email == "test@test.test"
         assert user.password is None
+
+    def test_api__update_user__ok_200__infos(self, web_testapp, user_api_factory, event_helper):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/users", status=200, params=params).json_body
+        user_id = res["user_id"]
+
+        res = web_testapp.put_json(
+            "/api/users/{}".format(user_id),
+            status=200,
+            params={"timezone": "Europe/London", "lang": "en", "public_name": "John Doe"},
+        ).json_body
+        assert res["timezone"] == "Europe/London"
+        assert res["lang"] == "en"
+        assert res["public_name"] == "John Doe"
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.modified"
+        assert last_event.fields["user"]["public_name"] == "John Doe"
 
     def test_api__create_user__err_400__email_already_in_db(self, user_api_factory, web_testapp):
 
@@ -3177,7 +3255,7 @@ class TestUserEndpoint(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=400, params=params)
+        res = web_testapp.post_json("/api/users", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
@@ -3208,7 +3286,7 @@ class TestUserEndpoint(object):
             "lang": "fr",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=403, params=params)
+        res = web_testapp.post_json("/api/users", status=403, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -3220,7 +3298,7 @@ class TestUserEndpoint(object):
 )
 class TestUserWithNotificationEndpoint(object):
     """
-    Tests for POST /api/v2/users/{user_id}
+    Tests for POST /api/users/{user_id}
     """
 
     def test_api__create_user__ok_200__full_admin_with_notif(
@@ -3236,7 +3314,7 @@ class TestUserWithNotificationEndpoint(object):
             "lang": "fr",
             "email_notification": True,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
         user_id = res["user_id"]
@@ -3266,7 +3344,7 @@ class TestUserWithNotificationEndpoint(object):
     ):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"email": "test@test.test", "email_notification": True}
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
         user_id = res["user_id"]
@@ -3292,7 +3370,7 @@ class TestUserWithNotificationEndpoint(object):
         assert headers["To"][0] == "test <test@test.test>"
         assert headers["Subject"][0] == "[Tracim] Created account"
 
-    def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, mailhog):
+    def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, event_helper):
 
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -3311,16 +3389,18 @@ class TestUserWithNotificationEndpoint(object):
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        web_testapp.put("/api/v2/users/{}/trashed".format(user_id), status=204)
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200).json_body
+        web_testapp.put("/api/users/{}/trashed".format(user_id), status=204)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200).json_body
         assert res["is_deleted"] is True
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.deleted"
 
     def test_api_delete_user__err_400__admin_itself(self, web_testapp, admin_user):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.put("/api/v2/users/{}/trashed".format(admin_user.user_id), status=400)
+        res = web_testapp.put("/api/users/{}/trashed".format(admin_user.user_id), status=400)
         assert res.json_body["code"] == ErrorCode.USER_CANT_DELETE_HIMSELF
-        res = web_testapp.get("/api/v2/users/{}".format(admin_user.user_id), status=200).json_body
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
         assert res["is_deleted"] is False
 
 
@@ -3329,7 +3409,7 @@ class TestUserWithNotificationEndpoint(object):
 class TestUsersEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users/{user_id}
+    Tests for GET /api/users/{user_id}
     """
 
     def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp, admin_user):
@@ -3338,6 +3418,7 @@ class TestUsersEndpoint(object):
         profile = Profile.USER
         test_user = uapi.create_user(
             email="test@test.test",
+            username="TheTestUSer",
             password="password",
             name="bob",
             profile=profile,
@@ -3350,7 +3431,7 @@ class TestUsersEndpoint(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/v2/users", status=200)
+        res = web_testapp.get("/api/users", status=200)
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
@@ -3359,6 +3440,7 @@ class TestUsersEndpoint(object):
 
         assert res[1]["user_id"] == admin_user.user_id
         assert res[1]["public_name"] == admin_user.display_name
+        assert res[1]["username"] == admin_user.username
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
@@ -3379,7 +3461,7 @@ class TestUsersEndpoint(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = web_testapp.get("/api/v2/users", status=403)
+        res = web_testapp.get("/api/users", status=403)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -3390,7 +3472,7 @@ class TestUsersEndpoint(object):
 class TestKnownMembersEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users/{user_id}
+    Tests for GET /api/users/{user_id}
     """
 
     def test_api__get_user__ok_200__admin__by_name(self, user_api_factory, admin_user, web_testapp):
@@ -3425,9 +3507,7 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
-            status=200,
-            params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
         )
         res = res.json_body
         assert len(res) == 2
@@ -3474,9 +3554,7 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_user_ids": str(test_user2.user_id)}
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
-            status=200,
-            params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
         )
         res = res.json_body
         assert len(res) == 1
@@ -3524,9 +3602,7 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_workspace_ids": str(workspace2.workspace_id)}
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
-            status=200,
-            params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
         )
         res = res.json_body
         assert len(res) == 1
@@ -3589,9 +3665,7 @@ class TestKnownMembersEndpoint(object):
             "exclude_user_ids": str(test_user3.user_id),
         }
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
-            status=200,
-            params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
         )
         res = res.json_body
         assert len(res) == 1
@@ -3634,9 +3708,7 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
-            status=200,
-            params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
         )
         res = res.json_body
         assert len(res) == 1
@@ -3678,9 +3750,7 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "test"}
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
-            status=200,
-            params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
         )
         res = res.json_body
         assert len(res) == 2
@@ -3725,9 +3795,7 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "t"}
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
-            status=400,
-            params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=400, params=params,
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -3783,9 +3851,7 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {"acp": "test"}
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
-            status=200,
-            params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
         )
         res = res.json_body
         assert len(res) == 2
@@ -3805,7 +3871,7 @@ class TestKnownMembersEndpoint(object):
 class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users/{user_id}
+    Tests for GET /api/users/{user_id}
     """
 
     def test_api__get_user__ok_200__show_all_members(
@@ -3858,9 +3924,7 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {"acp": "test"}
         res = web_testapp.get(
-            "/api/v2/users/{user_id}/known_members".format(user_id=user_id),
-            status=200,
-            params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
         )
         res = res.json_body
 
@@ -3885,8 +3949,8 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
 class TestSetEmailPasswordLdapEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for PUT /api/v2/users/{user_id}/email
-    Tests for PUT /api/v2/users/{user_id}/password
+    Tests for PUT /api/users/{user_id}/email
+    Tests for PUT /api/users/{user_id}/password
 
     for ldap user
     """
@@ -3912,18 +3976,16 @@ class TestSetEmailPasswordLdapEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "admin@admin.admin"}
-        res = web_testapp.put_json(
-            "/api/v2/users/{}/email".format(user_id), params=params, status=400
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
         assert res["auth_type"] == "ldap"
@@ -3961,7 +4023,7 @@ class TestSetEmailPasswordLdapEndpoint(object):
             "loggedin_user_password": "admin@admin.admin",
         }
         res = web_testapp.put_json(
-            "/api/v2/users/{}/password".format(user_id), params=params, status=400
+            "/api/users/{}/password".format(user_id), params=params, status=400
         )
         assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
         # Check After
@@ -3976,7 +4038,7 @@ class TestSetEmailPasswordLdapEndpoint(object):
 class TestSetEmailEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for PUT /api/v2/users/{user_id}/email
+    Tests for PUT /api/users/{user_id}/email
     """
 
     def test_api__set_user_email__ok_200__admin(self, user_api_factory, web_testapp):
@@ -3999,15 +4061,15 @@ class TestSetEmailEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "admin@admin.admin"}
-        web_testapp.put_json("/api/v2/users/{}/email".format(user_id), params=params, status=200)
+        web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=200)
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "mysuperemail@email.fr"
 
@@ -4031,20 +4093,18 @@ class TestSetEmailEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "admin@admin.admin", "loggedin_user_password": "admin@admin.admin"}
-        res = web_testapp.put_json(
-            "/api/v2/users/{}/email".format(user_id), params=params, status=400
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
@@ -4070,20 +4130,18 @@ class TestSetEmailEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "badpassword"}
-        res = web_testapp.put_json(
-            "/api/v2/users/{}/email".format(user_id), params=params, status=403
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WRONG_USER_PASSWORD
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
@@ -4110,21 +4168,19 @@ class TestSetEmailEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "thatisnotandemail", "loggedin_user_password": "admin@admin.admin"}
-        res = web_testapp.put_json(
-            "/api/v2/users/{}/email".format(user_id), params=params, status=400
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         # TODO - G.M - 2018-09-10 - Handled by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
@@ -4149,16 +4205,16 @@ class TestSetEmailEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "password"}
-        web_testapp.put_json("/api/v2/users/{}/email".format(user_id), params=params, status=200)
+        web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=200)
         web_testapp.authorization = ("Basic", ("mysuperemail@email.fr", "password"))
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "mysuperemail@email.fr"
 
@@ -4195,8 +4251,242 @@ class TestSetEmailEndpoint(object):
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
         # Set password
         params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "password"}
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=403)
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestSetUsernameEndpoint(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for PUT /api/users/{user_id}/username
+    """
+
+    def test_api__set_user_username__ok_200__admin(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # check before
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert not res["username"]
+
+        # Set username
+        params = {"username": "MyHero", "loggedin_user_password": "admin@admin.admin"}
+        web_testapp.put_json("/api/users/{}/username".format(user_id), params=params, status=200)
+        # Check After
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["username"] == "MyHero"
+
+    def test_api__set_user_username__err_400__admin_already_exist_username(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            username="TheHero",
+            password="password",
+            email="boby@boba.fet",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # check before
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["username"] == "TheHero"
+
+        # Set username
+        params = {"username": "TheAdmin", "loggedin_user_password": "admin@admin.admin"}
         res = web_testapp.put_json(
-            "/api/v2/users/{}/email".format(user_id), params=params, status=403
+            "/api/users/{}/username".format(user_id), params=params, status=400
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.USERNAME_ALREADY_EXIST_IN_DB
+        # Check After
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["username"] == "TheHero"
+
+    def test_api__set_user_username__err_403__admin_wrong_password(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # check before
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert not res["username"]
+
+        # Set password
+        params = {"username": "TheTest", "loggedin_user_password": "badpassword"}
+        res = web_testapp.put_json(
+            "/api/users/{}/username".format(user_id), params=params, status=403
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.WRONG_USER_PASSWORD
+        # Check After
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert not res["username"]
+
+    def test_api__set_user_username__err_400__admin_string_is_not_valid(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # check before
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert not res["username"]
+
+        # Set password
+        params = {"username": "This is not correct", "loggedin_user_password": "admin@admin.admin"}
+        res = web_testapp.put_json(
+            "/api/users/{}/username".format(user_id), params=params, status=400
+        )
+        # TODO - G.M - 2018-09-10 - Handled by marshmallow schema
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.INVALID_USERNAME_FORMAT
+        # Check After
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert not res["username"]
+
+    def test_api__set_user_username__ok_200__user_itself(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            username="TheTestUser",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        # check before
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["username"] == "TheTestUser"
+
+        # Set password
+        params = {"username": "TheNewTestUser", "loggedin_user_password": "password"}
+        web_testapp.put_json("/api/users/{}/username".format(user_id), params=params, status=200)
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        # Check After
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["username"] == "TheNewTestUser"
+
+    def test_api__set_user_username__err_403__other_normal_user(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp
+    ) -> None:
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="bob2",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user2)
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
+        # Set password
+        params = {"username": "TheTestUserBis", "loggedin_user_password": "password"}
+        res = web_testapp.put_json(
+            "/api/users/{}/username".format(user_id), params=params, status=403
         )
         assert res.json_body
         assert "code" in res.json_body
@@ -4208,7 +4498,7 @@ class TestSetEmailEndpoint(object):
 class TestSetPasswordEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for PUT /api/v2/users/{user_id}/password
+    Tests for PUT /api/users/{user_id}/password
     """
 
     def test_api__set_user_password__ok_200__admin(self, user_api_factory, web_testapp, session):
@@ -4242,7 +4532,7 @@ class TestSetPasswordEndpoint(object):
             "new_password2": "mynewpassword",
             "loggedin_user_password": "admin@admin.admin",
         }
-        web_testapp.put_json("/api/v2/users/{}/password".format(user_id), params=params, status=204)
+        web_testapp.put_json("/api/users/{}/password".format(user_id), params=params, status=204)
         # Check After
         uapi = user_api_factory.get()
         user = uapi.get_one(user_id)
@@ -4282,7 +4572,7 @@ class TestSetPasswordEndpoint(object):
             "loggedin_user_password": "wrongpassword",
         }
         res = web_testapp.put_json(
-            "/api/v2/users/{}/password".format(user_id), params=params, status=403
+            "/api/users/{}/password".format(user_id), params=params, status=403
         )
         assert res.json_body
         assert "code" in res.json_body
@@ -4328,7 +4618,7 @@ class TestSetPasswordEndpoint(object):
             "loggedin_user_password": "admin@admin.admin",
         }
         res = web_testapp.put_json(
-            "/api/v2/users/{}/password".format(user_id), params=params, status=400
+            "/api/users/{}/password".format(user_id), params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
@@ -4374,7 +4664,7 @@ class TestSetPasswordEndpoint(object):
             "new_password2": "mynewpassword",
             "loggedin_user_password": "password",
         }
-        web_testapp.put_json("/api/v2/users/{}/password".format(user_id), params=params, status=204)
+        web_testapp.put_json("/api/users/{}/password".format(user_id), params=params, status=204)
         # Check After
         uapi = user_api_factory.get()
         user = uapi.get_one(user_id)
@@ -4414,9 +4704,7 @@ class TestSetPasswordEndpoint(object):
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
         # Set password
         params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "password"}
-        res = web_testapp.put_json(
-            "/api/v2/users/{}/email".format(user_id), params=params, status=403
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -4427,7 +4715,7 @@ class TestSetPasswordEndpoint(object):
 class TestSetUserInfoEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for PUT /api/v2/users/{user_id}
+    Tests for PUT /api/users/{user_id}
     """
 
     def test_api__set_user_info__ok_200__admin(self, user_api_factory, web_testapp):
@@ -4439,6 +4727,7 @@ class TestSetUserInfoEndpoint(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -4451,20 +4740,22 @@ class TestSetUserInfoEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         # Set params
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
-        web_testapp.put_json("/api/v2/users/{}".format(user_id), params=params, status=200)
+        web_testapp.put_json("/api/users/{}".format(user_id), params=params, status=200)
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "updated"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
 
@@ -4477,6 +4768,7 @@ class TestSetUserInfoEndpoint(object):
             email="test@test.test",
             password="password",
             name="bob",
+            username="boby",
             profile=profile,
             timezone="Europe/Paris",
             lang="fr",
@@ -4489,20 +4781,22 @@ class TestSetUserInfoEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "bob"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         # Set params
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
-        web_testapp.put_json("/api/v2/users/{}".format(user_id), params=params, status=200)
+        web_testapp.put_json("/api/users/{}".format(user_id), params=params, status=200)
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "updated"
+        assert res["username"] == "boby"
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
 
@@ -4539,7 +4833,7 @@ class TestSetUserInfoEndpoint(object):
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
         # Set params
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
-        res = web_testapp.put_json("/api/v2/users/{}".format(user_id), params=params, status=403)
+        res = web_testapp.put_json("/api/users/{}".format(user_id), params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -4550,7 +4844,7 @@ class TestSetUserInfoEndpoint(object):
 class TestSetUserProfileEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for PUT /api/v2/users/{user_id}/profile
+    Tests for PUT /api/users/{user_id}/profile
     """
 
     def test_api__set_user_profile__ok_200__admin(self, user_api_factory, web_testapp):
@@ -4574,15 +4868,15 @@ class TestSetUserProfileEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["profile"] == "users"
         # Set params
         params = {"profile": "administrators"}
-        web_testapp.put_json("/api/v2/users/{}/profile".format(user_id), params=params, status=204)
+        web_testapp.put_json("/api/users/{}/profile".format(user_id), params=params, status=204)
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["profile"] == "administrators"
@@ -4597,18 +4891,18 @@ class TestSetUserProfileEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(admin_user.user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
         res = res.json_body
         assert res["user_id"] == admin_user.user_id
         assert res["profile"] == "administrators"
         # Set params
         params = {"profile": "users"}
         res = web_testapp.put_json(
-            "/api/v2/users/{}/profile".format(admin_user.user_id), params=params, status=400
+            "/api/users/{}/profile".format(admin_user.user_id), params=params, status=400
         )
         assert res.json_body["code"] == ErrorCode.USER_CANT_CHANGE_IS_OWN_PROFILE
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(admin_user.user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
         res = res.json_body
         assert res["user_id"] == admin_user.user_id
         assert res["profile"] == "administrators"
@@ -4651,7 +4945,7 @@ class TestSetUserProfileEndpoint(object):
         # Set params
         params = {"profile": "administrators"}
         res = web_testapp.put_json(
-            "/api/v2/users/{}/profile".format(user_id), params=params, status=403
+            "/api/users/{}/profile".format(user_id), params=params, status=403
         )
         assert res.json_body
         assert "code" in res.json_body
@@ -4663,7 +4957,7 @@ class TestSetUserProfileEndpoint(object):
 class TestSetUserAllowedSpaceEndpoint(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for PUT /api/v2/users/{user_id}/allowed_space
+    Tests for PUT /api/users/{user_id}/allowed_space
     """
 
     def test_api__set_user_allowed_space__ok_200__admin(self, user_api_factory, web_testapp):
@@ -4687,17 +4981,17 @@ class TestSetUserAllowedSpaceEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["allowed_space"] == 0
         # Set params
         params = {"allowed_space": 134217728}
         web_testapp.put_json(
-            "/api/v2/users/{}/allowed_space".format(user_id), params=params, status=204
+            "/api/users/{}/allowed_space".format(user_id), params=params, status=204
         )
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["allowed_space"] == 134217728
@@ -4742,7 +5036,7 @@ class TestSetUserAllowedSpaceEndpoint(object):
         # Set params
         params = {"allowed_space": 134217728}
         res = web_testapp.put_json(
-            "/api/v2/users/{}/allowed_space".format(user_id), params=params, status=403
+            "/api/users/{}/allowed_space".format(user_id), params=params, status=403
         )
         assert res.json_body
         assert "code" in res.json_body
@@ -4754,8 +5048,8 @@ class TestSetUserAllowedSpaceEndpoint(object):
 class TestSetUserEnableDisableEndpoints(object):
     # -*- coding: utf-8 -*-
     """
-    Tests for PUT /api/v2/users/{user_id}/enabled
-    and PUT /api/v2/users/{user_id}/disabled
+    Tests for PUT /api/users/{user_id}/enabled
+    and PUT /api/users/{user_id}/disabled
     """
 
     def test_api_enable_user__ok_200__admin(self, user_api_factory, web_testapp):
@@ -4780,13 +5074,13 @@ class TestSetUserEnableDisableEndpoints(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["is_active"] is False
-        web_testapp.put_json("/api/v2/users/{}/enabled".format(user_id), status=204)
+        web_testapp.put_json("/api/users/{}/enabled".format(user_id), status=204)
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["is_active"] is True
@@ -4813,13 +5107,13 @@ class TestSetUserEnableDisableEndpoints(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["is_active"] is True
-        web_testapp.put_json("/api/v2/users/{}/disabled".format(user_id), status=204)
+        web_testapp.put_json("/api/users/{}/disabled".format(user_id), status=204)
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["is_active"] is False
@@ -4830,14 +5124,14 @@ class TestSetUserEnableDisableEndpoints(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["is_active"] is True
-        res = web_testapp.put_json("/api/v2/users/{}/disabled".format(user_id), status=400)
+        res = web_testapp.put_json("/api/users/{}/disabled".format(user_id), status=400)
         assert res.json_body["code"] == ErrorCode.USER_CANT_DISABLE_HIMSELF
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
 
         assert res["user_id"] == user_id
@@ -4875,7 +5169,7 @@ class TestSetUserEnableDisableEndpoints(object):
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
-        res = web_testapp.put_json("/api/v2/users/{}/enabled".format(user_id), status=403)
+        res = web_testapp.put_json("/api/users/{}/enabled".format(user_id), status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -4912,7 +5206,7 @@ class TestSetUserEnableDisableEndpoints(object):
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
-        res = web_testapp.put_json("/api/v2/users/{}/disabled".format(user_id), status=403)
+        res = web_testapp.put_json("/api/users/{}/disabled".format(user_id), status=403)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -4946,16 +5240,16 @@ class TestSetUserEnableDisableEndpoints(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["is_active"] is True
-        res = web_testapp.put_json("/api/v2/users/{}/disabled".format(user_id), status=403)
+        res = web_testapp.put_json("/api/users/{}/disabled".format(user_id), status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
         # Check After
-        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["is_active"] is True
@@ -4969,7 +5263,7 @@ class TestUserEnpointsLDAPAuth(object):
         self, web_testapp
     ):
         web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        res = web_testapp.get("/api/v2/auth/whoami", status=200)
+        res = web_testapp.get("/api/auth/whoami", status=200)
         user_id = res.json_body["user_id"]
         # Set password
         params = {
@@ -4978,7 +5272,7 @@ class TestUserEnpointsLDAPAuth(object):
             "loggedin_user_password": "professor",
         }
         res = web_testapp.put_json(
-            "/api/v2/users/{}/password".format(user_id), params=params, status=400
+            "/api/users/{}/password".format(user_id), params=params, status=400
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -4987,16 +5281,14 @@ class TestUserEnpointsLDAPAuth(object):
     @pytest.mark.ldap
     def test_api_set_user_email__err__400__setting_email_unallowed_for_ldap_user(self, web_testapp):
         web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        res = web_testapp.get("/api/v2/auth/whoami", status=200)
+        res = web_testapp.get("/api/auth/whoami", status=200)
         user_id = res.json_body["user_id"]
         # Set password
         params = {
             "email": "hubertnewemail@planetexpress.com",
             "loggedin_user_password": "professor",
         }
-        res = web_testapp.put_json(
-            "/api/v2/users/{}/email".format(user_id), params=params, status=400
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
@@ -5004,7 +5296,7 @@ class TestUserEnpointsLDAPAuth(object):
     @pytest.mark.ldap
     def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
         web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        web_testapp.get("/api/v2/auth/whoami", status=200)
+        web_testapp.get("/api/auth/whoami", status=200)
         api = user_api_factory.get(current_user=None)
         user = api.get_one_by_email("hubert@planetexpress.com")
         api.update(user, auth_type=user.auth_type, profile=Profile.ADMIN)
@@ -5019,7 +5311,7 @@ class TestUserEnpointsLDAPAuth(object):
             "public_name": "test user",
             "email_notification": False,
         }
-        res = web_testapp.post_json("/api/v2/users", status=200, params=params)
+        res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["auth_type"] == "unknown"
         assert res["email"] == "test@test.test"

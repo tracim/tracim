@@ -15,7 +15,7 @@ class TestCollaborativeDocumentEdition(object):
         self, admin_user, session, app_config, web_testapp
     ):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/collaborative-document-edition/templates"
+        url = "/api/collaborative-document-edition/templates"
         res = web_testapp.get(url, status=200)
         content = res.json_body
         collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
@@ -40,7 +40,7 @@ class TestCollaborativeDocumentEdition(object):
         Ask for edition token
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/collaborative-document-edition/token"
+        url = "/api/collaborative-document-edition/token"
         res = web_testapp.get(url, status=200)
         content = res.json_body
         transaction.commit()
@@ -78,7 +78,7 @@ class TestCollaborativeDocumentEdition(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/collaborative-document-edition/workspaces/{}/files".format(
+        url = "/api/collaborative-document-edition/workspaces/{}/files".format(
             data_workspace.workspace_id
         )
         template_filename = collaborative_document_edition_api.get_file_template_list().file_templates[
@@ -104,9 +104,7 @@ class TestCollaborativeDocumentEdition(object):
         workspace_id = content["workspace_id"]
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/files/{}/raw/{}".format(
-                workspace_id, content_id, "test_file.ods"
-            ),
+            "/api/workspaces/{}/files/{}/raw/{}".format(workspace_id, content_id, "test_file.ods"),
             status=200,
         )
         with open(
@@ -140,7 +138,7 @@ class TestCollaborativeDocumentEdition(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/collaborative-document-edition/workspaces/{}/files".format(
+        url = "/api/collaborative-document-edition/workspaces/{}/files".format(
             data_workspace.workspace_id
         )
         template_filename = "unexistent_template"

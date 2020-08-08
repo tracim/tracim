@@ -1,4 +1,4 @@
-import { PAGES as p} from '../../support/urls_commands'
+import { PAGES as p } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 
 describe('Switching between workspaces', () => {

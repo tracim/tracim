@@ -27,7 +27,7 @@ export class Search extends React.Component {
       <div className='search primaryColorBorder'>
         <input
           className='search__text'
-          data-cy={'search__text'}
+          data-cy='search__text'
           type='text'
           placeholder={props.t('Search')}
           onChange={this.handleNewSearch}
@@ -35,7 +35,7 @@ export class Search extends React.Component {
         />
         <button
           className='search__btn'
-          data-cy={'search__btn'}
+          data-cy='search__btn'
           onClick={this.handleClickSearch}
           disabled={state.searchedKeywords === ''}
         >

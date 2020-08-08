@@ -26,11 +26,12 @@ from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.event import Event
 
 
 class TracimContext(ABC):
     """
-    Abstract class, Context of Tracim, neede for tracim authorization mechanism.
+    Abstract class, Context of Tracim, needed for tracim authorization mechanism.
     """
 
     def __init__(self) -> None:
@@ -48,10 +49,30 @@ class TracimContext(ABC):
         self._candidate_workspace = None  # type: Workspace
         # Candidate content_type found in request body
         self._candidate_content_type = None
+        # Client token, useful to permit link between request and TLM response
+        self._client_token = None  # type: typing.Optional[str]
+        # Pending events: have been created but are commited to the DB
+        self._pending_events = []  # type: typing.List[Event]
+
+    @property
+    def pending_events(self) -> typing.List[Event]:
+        return self._pending_events
+
+    @pending_events.setter
+    def pending_events(self, events: typing.List[Event]) -> None:
+        self._pending_events = events
 
     # INFO - G.M - 2018-12-03 - Useful property of Tracim Context
     def set_user(self, user: User):
         self._current_user = user
+        self.plugin_manager.hook.on_context_current_user_set(user=user, context=self)
+
+    def set_client_token(self, client_token: str):
+        self._client_token = client_token
+
+    @property
+    def client_token(self) -> typing.Optional[str]:
+        return self._client_token
 
     @property
     @abstractmethod
@@ -197,6 +218,20 @@ class TracimContext(ABC):
         content_type_slug = content_type_slug_fetcher()
         return content_type_list.get_one_by_slug(content_type_slug)
 
+    def cleanup(self) -> None:
+        """
+        Close dbsession at the end of the request in order to avoid exception
+        about not properly closed session or "object created in another thread"
+        issue
+        see https://github.com/tracim/tracim_backend/issues/62
+        :return: nothing.
+        """
+        self.plugin_manager.hook.on_context_finished(context=self)
+        self._current_user = None
+        self._current_workspace = None
+        if self.dbsession:
+            self.dbsession.close()
+
     # INFO - G.M - 2018-12-03 - Theses method need to be implemented
     # to support correctly Tracim Context
     # Method to Implements
@@ -216,6 +251,14 @@ class TracimContext(ABC):
     def app_config(self) -> CFG:
         """
         Current config available
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def plugin_manager(self) -> pluggy.PluginManager:
+        """
+        Plugin manager of the context
         """
         pass
 
@@ -248,7 +291,7 @@ class TracimRequest(TracimContext, Request):
         TracimContext.__init__(self)
 
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
-        self.add_finished_callback(self._cleanup)
+        self.add_finished_callback(lambda r: r.cleanup())
 
     @property
     def current_user(self) -> User:
@@ -273,21 +316,8 @@ class TracimRequest(TracimContext, Request):
         return self.registry.settings["CFG"]
 
     @property
-    def event_dispatcher(self) -> pluggy.PluginManager:
-        return self.registry.settings["event_dispatcher"]
-
-    def _cleanup(self, request: "TracimRequest") -> None:
-        """
-        Close dbsession at the end of the request in order to avoid exception
-        about not properly closed session or "object created in another thread"
-        issue
-        see https://github.com/tracim/tracim_backend/issues/62
-        :param request: same as self, request
-        :return: nothing.
-        """
-        self._current_user = None
-        self._current_workspace = None
-        self.dbsession.close()
+    def plugin_manager(self) -> pluggy.PluginManager:
+        return self.registry.settings["plugin_manager"]
 
     # INFO - G.M - 2018-12-03 - Internal utils function to simplify ID fetching
 

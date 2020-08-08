@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
 import { Badge, ROLE } from 'tracim_frontend_lib'
-import { PAGE } from '../../helper.js'
+import { PAGE } from '../../util/helper.js'
 
 require('./RecentActivity.styl')
 
@@ -24,7 +24,7 @@ export const RecentActivity = props =>
     </div>
 
     <div className='recentactivity__list'>
-      {props.recentActivityList.length > 0
+      {(props.recentActivityList.length > 0
         ? props.recentActivityList.map(content => {
           const contentType = props.contentTypeList.find(ct => ct.slug === content.type) || { hexcolor: '', faIcon: '' }
 
@@ -57,7 +57,7 @@ export const RecentActivity = props =>
           } else {
             return (
               <Link
-                className={classnames('recentactivity__list__item', { 'read': props.readByUserList.includes(content.id) })}
+                className={classnames('recentactivity__list__item', { read: props.readByUserList.includes(content.id) })}
                 to={PAGE.WORKSPACE.CONTENT(props.workspaceId, content.type, content.id)}
                 title={content.label}
                 key={content.id}
@@ -69,7 +69,7 @@ export const RecentActivity = props =>
           }
         })
         : <div className='recentactivity__empty'>{props.t('No recent activity')}</div>
-      }
+      )}
 
       <div
         className='recentactivity__more'

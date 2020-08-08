@@ -24,7 +24,7 @@ describe('<PageTitle />', () => {
   )
 
   describe('Static design', () => {
-    it(`should have its children`, () =>
+    it('should have its children', () =>
       expect(wrapper.find('.pageTitleGeneric').find(Children).length).equal(1)
     )
 

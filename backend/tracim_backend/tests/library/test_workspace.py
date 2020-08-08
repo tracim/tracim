@@ -106,6 +106,30 @@ class TestThread(object):
         assert role_1 not in wapi.get_notifiable_roles(workspace=workspace)
         assert role_2 in wapi.get_notifiable_roles(workspace=workspace)
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "base_test_optional_email"}], indirect=True
+    )
+    def test__unit__get_notifiable_roles__ok__do_not_show_without_email(
+        self, admin_user, session, app_config, user_api_factory, role_api_factory
+    ):
+        wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
+        workspace = wapi.create_workspace(label="workspace w", save_now=True)
+        uapi = user_api_factory.get()
+        user_1 = uapi.create_user(
+            email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+        )
+        user_2 = uapi.create_user(
+            username="U42", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+        )
+        assert wapi.get_notifiable_roles(workspace=workspace) == []
+
+        rapi = role_api_factory.get()
+        role_1 = rapi.create_one(user_1, workspace, UserRoleInWorkspace.READER, with_notif=True)
+        role_2 = rapi.create_one(user_2, workspace, UserRoleInWorkspace.READER, with_notif=True)
+
+        assert role_1 in wapi.get_notifiable_roles(workspace=workspace)
+        assert role_2 not in wapi.get_notifiable_roles(workspace=workspace)
+
     def test__unit__get_notifiable_roles__ok__do_not_show_unknown_auth(
         self, admin_user, session, app_config, user_api_factory, role_api_factory
     ):
@@ -150,7 +174,7 @@ class TestThread(object):
         assert [w1, w2, w3, w4] == wapi.get_all_manageable()
         # Checks a regular user gets none workspace.
 
-        u = uapi.create_minimal_user("u.s@e.r", Profile.USER, True)
+        u = uapi.create_minimal_user("u.s@e.r", profile=Profile.USER, save_now=True)
         wapi = WorkspaceApi(session=session, current_user=u, config=app_config)
         rapi = role_api_factory.get()
         rapi.create_one(u, w4, UserRoleInWorkspace.READER, False)

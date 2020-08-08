@@ -29,7 +29,9 @@
 
 ## global info (need for email and links)
 basic_setup.website_title = Tracim
-basic_setup.website_base_url = http://localhost:6543
+# public address of tracim known by tracim (pushpin proxy-address)
+basic_setup.website_base_url = http://localhost:7999
+# listened host:port of tracim web
 basic_setup.listen = localhost:6543
 ## storage path/connection
 basic_setup.sqlalchemy_url = sqlite:///%(here)s/tracim.sqlite
@@ -84,6 +86,14 @@ basic_setup.session_secret = change_this_value_please!
 # With all apps (add collaborative document edition):
 # app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,collaborative_document_edition,share_content,upload_permission,gallery
 
+### Live Messages ###
+# control_uri for GRIP protocol reverse-proxy (PushPin)
+# this is the base url used for publishing new events to reverse-proxy.
+; live_messages.control_zmq_uri = tcp://localhost:5563
+# do tracim block until publishing is complete or not
+# by default it will be False if jobs.processing_mode is sync and True if processing_mode is async
+# as sync publishing is done during the HTTP request
+; live_messages.blocking_publish = False
 
 ### Plugins ###
 # if provided, this allow Tracim to load package from this dir and if package follow
@@ -101,7 +111,7 @@ basic_setup.session_secret = change_this_value_please!
 
 ## Anonymized User
 # You can set default display name for anonymized user.
-; default_anonymized_user_display_name = "Lost Meerkat"
+; default_anonymized_user_display_name = "Deleted user"
 
 ## Build Version
 # If you leave build_version empty or unsetted here, Tracim will automatically
@@ -181,9 +191,19 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ### Session ###
 
 ### pyramid_beaker parameters ###
+
 session.type = file
+# needed for "file" storage config :
 ; session.data_dir = %(here)s/sessions_data
 session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
+# needed for many session storage type, but not for file (leave as empty for file)
+session.url =
+
+## "Redis" storage config sample:
+# session.type = ext:redis
+# note: redis db name are integer (by default 16 database are available from 0 to 15 db)
+# session.url = redis://localhost:6379/0
+
 ; session.lock_dir = %(here)s/sessions_data
 session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 session.key = session_key
@@ -193,8 +213,6 @@ session.save_accessed_time = True
 session.cookie_expires = 604800
 session.timeout = 604800
 session.cookie_on_exception = True
-## custom Tracim pyramid_beaker parameter
-; session.reissue_time = 120
 
 ####
 # AUTH
@@ -327,18 +345,27 @@ website.base_url = %(basic_setup.website_base_url)s
 ; webdav.ui.enabled = True
 
 ####
-# EMAIL-COMMON
+# JOB EXECUTION
 ####
 
-### Email sending configuration ###
+### configuration of potentially lengthy jobs ###
 # processing_mode may be sync or async,
-# if async is choosen, you need also to run mail_notifier daemon
-# see README for more info.
-; email.processing_mode = sync
+# if async is choosen, you need also to run:
+#  - a custom rq worker (see backend/README.md)
+#  - a redis server
+; jobs.processing_mode = sync
 ## with async, please also configure redis below
-; email.async.redis.host = localhost
-; email.async.redis.port = 6379
-; email.async.redis.db = 0
+; jobs.async.redis.host = localhost
+; jobs.async.redis.port = 6379
+# note: redis db name are integer (by default 16 database are available from 0 to 15 db)
+; jobs.async.redis.db = 0
+
+####
+# EMAIL-COMMON
+####
+# Require that every users have an email address associated with their account.
+# If disabled, users will be allowed to have accounts without an email address. In this case, the username is mandatory.
+; email.required = True
 
 ####
 # EMAIL-NOTIFICATION

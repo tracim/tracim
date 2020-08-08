@@ -14,14 +14,14 @@ import {
   PageContent,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  hasNotAllowedCharacters,
+  hasSpaces,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
-  updateUserName,
-  updateUserEmail,
-  updateUserWorkspaceSubscriptionNotif,
   updateUserAgendaUrl,
   setBreadcrumbs
 } from '../action-creator.sync.js'
@@ -29,14 +29,20 @@ import {
   getWorkspaceMemberList,
   putMyselfName,
   putMyselfEmail,
+  putUserUsername,
   putMyselfPassword,
   putMyselfWorkspaceDoNotify,
-  getLoggedUserCalendar
+  getLoggedUserCalendar,
+  getUsernameAvailability
 } from '../action-creator.async.js'
 import {
+  ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList,
-  PAGE
-} from '../helper.js'
+  PAGE,
+  MAXIMUM_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_PUBLIC_NAME,
+  MINIMUM_CHARACTERS_USERNAME
+} from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 export class Account extends React.Component {
@@ -60,7 +66,7 @@ export class Account extends React.Component {
       active: false,
       label: 'Password',
       translationKey: props.t('Password'),
-      display: editableUserAuthTypeList.includes(props.user.auth_type) // allow pw change only for users in tracim's db (eg. not from ldap)
+      display: editableUserAuthTypeList.includes(props.user.authType) // allow pw change only for users in tracim's db (eg. not from ldap)
     }, {
       name: 'agenda',
       active: false,
@@ -70,19 +76,20 @@ export class Account extends React.Component {
     }]
 
     this.state = {
-      subComponentMenu: builtSubComponentMenu.filter(menu => menu.display)
+      subComponentMenu: builtSubComponentMenu.filter(menu => menu.display),
+      isUsernameValid: true,
+      usernameInvalidMsg: ''
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        this.setHeadTitle()
-        break
-    }
+  // Custom Event Handler
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
   }
 
   componentDidMount () {
@@ -105,10 +112,11 @@ export class Account extends React.Component {
     const { props } = this
     const fetchUserAgenda = await props.dispatch(getLoggedUserCalendar())
     switch (fetchUserAgenda.status) {
-      case 200:
+      case 200: {
         const newAgendaUrl = (fetchUserAgenda.json.find(a => a.agenda_type === 'private') || { agenda_url: '' }).agenda_url
         props.dispatch(updateUserAgendaUrl(newAgendaUrl))
         break
+      }
       default:
         props.dispatch(newFlashMessage(props.t('Error while loading your agenda'), 'warning'))
     }
@@ -151,23 +159,26 @@ export class Account extends React.Component {
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
-    subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
+    subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName })),
+    isUsernameValid: true
   }))
 
-  handleSubmitNameOrEmail = async (newName, newEmail, checkPassword) => {
+  handleSubmitPersonalData = async (newPublicName, newUsername, newEmail, checkPassword) => {
     const { props } = this
 
-    if (newName !== '') {
-      if (newName.length < 3) {
-        props.dispatch(newFlashMessage(props.t('Full name must be at least 3 characters'), 'warning'))
+    if (newPublicName !== '') {
+      if (newPublicName.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
+        props.dispatch(newFlashMessage(
+          props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
+          , 'warning')
+        )
         return false
       }
 
-      const fetchPutUserName = await props.dispatch(putMyselfName(props.user, newName))
-      switch (fetchPutUserName.status) {
+      const fetchPutPublicName = await props.dispatch(putMyselfName(props.user, newPublicName))
+      switch (fetchPutPublicName.status) {
         case 200:
-          props.dispatch(updateUserName(newName))
-          if (newEmail === '') {
+          if (newEmail === '' && newUsername === '') {
             props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
             return true
           }
@@ -180,12 +191,48 @@ export class Account extends React.Component {
       }
     }
 
+    if (newUsername !== '') {
+      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, newUsername, checkPassword))
+
+      switch (fetchPutUsername.status) {
+        case 200:
+          if (newEmail === '') {
+            if (newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your username and your name has been changed'), 'info'))
+            else props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
+            return true
+          }
+          break
+        case 400:
+          switch (fetchPutUsername.json.code) {
+            case 2001:
+              props.dispatch(newFlashMessage(
+                props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
+              ))
+              break
+            case 2062:
+              props.dispatch(newFlashMessage(
+                props.t(
+                  'Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}',
+                  { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME }
+                ),
+                'warning'
+              ))
+              break
+            default: props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning'))
+          }
+          return false
+        case 403:
+          props.dispatch(newFlashMessage(props.t('Invalid password'), 'warning'))
+          return false
+        default: props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning')); return false
+      }
+    }
+
     if (newEmail !== '') {
       const fetchPutUserEmail = await props.dispatch(putMyselfEmail(newEmail, checkPassword))
       switch (fetchPutUserEmail.status) {
         case 200:
-          props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
-          if (newName !== '') props.dispatch(newFlashMessage(props.t('Your name and email has been changed'), 'info'))
+          if (newUsername !== '' || newPublicName !== '') props.dispatch(newFlashMessage(props.t('Your personal data has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
           return true
         default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); return false
@@ -193,13 +240,60 @@ export class Account extends React.Component {
     }
   }
 
+  handleChangeUsername = async (newUsername) => {
+    const { props } = this
+
+    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (hasSpaces(newUsername)) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t("Username can't contain any whitespace")
+      })
+      return
+    }
+
+    if (hasNotAllowedCharacters(newUsername)) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(newUsername))
+
+    switch (fetchUsernameAvailability.status) {
+      case 200:
+        this.setState({
+          isUsernameValid: fetchUsernameAvailability.json.available,
+          usernameInvalidMsg: props.t('This username is not available')
+        })
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning')); break
+    }
+  }
+
   handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
     const { props } = this
 
     const fetchPutUserWorkspaceDoNotify = await props.dispatch(putMyselfWorkspaceDoNotify(workspaceId, doNotify))
-    switch (fetchPutUserWorkspaceDoNotify.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, workspaceId, doNotify)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    if (fetchPutUserWorkspaceDoNotify.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
 
@@ -234,7 +328,7 @@ export class Account extends React.Component {
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='account'>
             <PageTitle
-              parentClass={'account'}
+              parentClass='account'
               title={props.t('My account')}
               icon='user-o'
               breadcrumbsList={props.breadcrumbs}
@@ -243,7 +337,7 @@ export class Account extends React.Component {
             <PageContent parentClass='account'>
               <UserInfo user={props.user} />
 
-              <Delimiter customClass={'account__delimiter'} />
+              <Delimiter customClass='account__delimiter' />
 
               <div className='account__userpreference'>
                 <MenuSubComponent
@@ -257,15 +351,18 @@ export class Account extends React.Component {
                       case 'personalData':
                         return (
                           <PersonalData
-                            userAuthType={props.user.auth_type}
-                            onClickSubmit={this.handleSubmitNameOrEmail}
+                            userAuthType={props.user.authType}
+                            onClickSubmit={this.handleSubmitPersonalData}
+                            onChangeUsername={this.handleChangeUsername}
+                            isUsernameValid={state.isUsernameValid}
+                            usernameInvalidMsg={state.usernameInvalidMsg}
                           />
                         )
 
                       case 'notification':
                         return (
                           <Notification
-                            userLoggedId={props.user.user_id}
+                            userLoggedId={props.user.userId}
                             workspaceList={props.workspaceList}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                           />
@@ -299,4 +396,4 @@ export class Account extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
   breadcrumbs, user, workspaceList, timezone, system, appList
 })
-export default connect(mapStateToProps)(translate()(Account))
+export default connect(mapStateToProps)(translate()(TracimComponent(Account)))

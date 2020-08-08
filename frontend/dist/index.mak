@@ -83,9 +83,6 @@
 
     <script type='text/javascript' src='/app/tracim_frontend_lib.style.js?token=${cache_token}'></script>
 
-    <script type='text/javascript' src='/assets/tracim/appInterface.js?token=${cache_token}'></script>
-    <script type='text/javascript' src='/assets/tracim/tinymceInit.js?token=${cache_token}'></script>
-
     % for custom_toolbox_file in custom_toolbox_files:
     <script type='text/javascript' src='/custom_toolbox-assets/${custom_toolbox_file.name}?token=${cache_token}'></script>
     % endfor

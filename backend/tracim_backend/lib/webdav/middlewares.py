@@ -18,11 +18,13 @@ from wsgidav.middleware import BaseMiddleware
 import yaml
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.core.event import EventBuilder
+from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import get_engine
-from tracim_backend.models.setup_models import get_scoped_session_factory
-from tracim_backend.models.setup_models import get_tm_session
+from tracim_backend.models.setup_models import get_session_factory
+from tracim_backend.models.setup_models import create_dbsession_for_context
 
 
 class TracimWsgiDavDebugFilter(BaseMiddleware):
@@ -185,8 +187,8 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
 
         # Start response (if it hasn't been done yet)
         if first_yield:
-            # Success!
             start_response(
+                # Success!
                 sub_app_start_response.status,
                 sub_app_start_response.response_headers,
                 sub_app_start_response.exc_info,
@@ -258,30 +260,38 @@ class TracimEnv(BaseMiddleware):
         self.settings = config["tracim_settings"]
         self.app_config = CFG(self.settings)
         self.app_config.configure_filedepot()
+        self.plugin_manager = create_plugin_manager()
+        self.plugin_manager.register(EventBuilder(self.app_config))
         self.engine = get_engine(self.app_config)
-        self.session_factory = get_scoped_session_factory(self.engine)
+        self.session_factory = get_session_factory(self.engine)
 
     def __call__(self, environ, start_response):
         # TODO - G.M - 18-05-2018 - This code should not create trouble
         # with thread and database, this should be verify.
         # see https://github.com/tracim/tracim_backend/issues/62
-        tm = transaction.manager
-        session = get_tm_session(self.session_factory, tm)
         registry = get_current_registry()
         registry.ldap_connector = None
         if AuthType.LDAP in self.app_config.AUTH_TYPES:
             registry = self.setup_ldap(registry, self.app_config)
         environ["tracim_registry"] = registry
-        environ["tracim_context"] = WebdavTracimContext(environ, self.app_config, session)
+        tracim_context = WebdavTracimContext(environ, self.app_config, self.plugin_manager)
+        session = create_dbsession_for_context(
+            self.session_factory, transaction.manager, tracim_context
+        )
+        tracim_context.dbsession = session
+        environ["tracim_context"] = tracim_context
         try:
-            app = self._application(environ, start_response)
-        except Exception as exc:
-            transaction.rollback()
-            raise exc
-        finally:
+            for chunk in self._application(environ, start_response):
+                yield chunk
             transaction.commit()
-            session.close()
-        return app
+        except Exception:
+            transaction.rollback()
+            raise
+        finally:
+            # NOTE SGD 2020-06-30: avoid circular reference between environment dict and context.
+            # This ensures the context will be deleted as soon as this function is exited
+            del environ["tracim_context"]
+            tracim_context.cleanup()
 
     def setup_ldap(self, registry: Registry, app_config: CFG):
         manager = ConnectionManager(

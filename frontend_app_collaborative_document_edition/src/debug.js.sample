@@ -8,7 +8,21 @@ export const debug = {
     faIcon: 'paperclip',
     hexcolor: '#ffa500',
     creationLabel: 'Upload a file',
-    label: 'File'
+    label: 'File',
+    system: {
+      ...defaultDebug.config.system,
+      config: {
+        ...defaultDebug.config.system.config,
+        collaborative_document_edition: {
+          software: 'collabora'
+        }
+      }
+    },
+    PAGE: {
+      WORKSPACE: {
+        CONTENT_EDITION: (workspaceId, contentId) => `/workspaces/${workspaceId}/content/file/${contentId}`
+      }
+    }
   },
   content: {
     ...defaultDebug.content,
@@ -18,5 +32,6 @@ export const debug = {
   },
   loggedUser: {
     ...defaultDebug.loggedUser
-  }
+  },
+  folderId: 0
 }

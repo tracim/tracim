@@ -1,17 +1,23 @@
 #!/usr/bin/env bash
 
+# address on which tracim web is accessible within docker
+# on port 8080 as uwsgi listens here by default.
+tracim_web_internal_listen="localhost:8080"
+
 # Create tracim conf file if none exists
 if [ ! -f /etc/tracim/development.ini ]; then
     CONFIG_FILE_IS_NEW=1
     KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
     SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
     cp /tracim/backend/development.ini.sample /etc/tracim/development.ini
-    sed -i "s|^basic_setup.website_base_url = .*|basic_setup.website_base_url = http://localhost:8080|g" /etc/tracim/development.ini
+    sed -i "s|^basic_setup.website_base_url = .*|basic_setup.website_base_url = http://${tracim_web_internal_listen}|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = /var/tracim/data/depot|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.caldav_storage_dir = .*|basic_setup.caldav_storage_dir = /var/tracim/data/radicale_storage|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.preview_cache_dir = .*|basic_setup.preview_cache_dir = /var/tracim/data/preview|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = /var/tracim/data|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.api_key =.*|basic_setup.api_key = $KEY|g" /etc/tracim/development.ini
+    sed -i "s|^session.type = .*|session.type = ext:redis|g" /etc/tracim/development.ini
+    sed -i "s|^session.url =.*|session.url = redis://localhost:6379/0|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/development.ini
     sed -i "s|^; email.notification.content_update.template.html = .*|email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak|g" /etc/tracim/development.ini
     sed -i "s|^; email.notification.created_account.template.html = .*|email.notification.created_account.template.html = %(email.template_dir)s/created_account_body_html.mak|g" /etc/tracim/development.ini
@@ -23,13 +29,13 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|^; email.notification.new_upload_event.template.html = .*|email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak|g" /etc/tracim/development.ini
     sed -i "s|^; email.template_dir =.*|email.template_dir = /tracim/backend/tracim_backend/templates/mail|g" /etc/tracim/development.ini
     sed -i "s|^; email.reply.lockfile_path = .*|email.reply.lockfile_path = /var/tracim/data/email_fetcher.lock|g" /etc/tracim/development.ini
-    sed -i "s|^; webdav.base_url = .*|webdav.base_url = http://localhost:8080|g" /etc/tracim/development.ini
+    sed -i "s|^; webdav.base_url = .*|webdav.base_url = http://${tracim_web_internal_listen}|g" /etc/tracim/development.ini
     sed -i "s|^; webdav.ui.enabled = .*|webdav.ui.enabled = True|g" /etc/tracim/development.ini
     sed -i "s|^; webdav.root_path = /|webdav.root_path = /webdav|g" /etc/tracim/development.ini
-    sed -i "s|^; email.processing_mode = sync|email.processing_mode = async|g" /etc/tracim/development.ini
-    sed -i "s|^; email.async.redis.host = .*|email.async.redis.host = localhost|g" /etc/tracim/development.ini
-    sed -i "s|^; email.async.redis.port = .*|email.async.redis.port = 6379|g" /etc/tracim/development.ini
-    sed -i "s|^; email.async.redis.db = .*|email.async.redis.db = 0|g" /etc/tracim/development.ini
+    sed -i "s|^; jobs.processing_mode = sync|jobs.processing_mode = async|g" /etc/tracim/development.ini
+    sed -i "s|^; jobs.async.redis.host = .*|jobs.async.redis.host = localhost|g" /etc/tracim/development.ini
+    sed -i "s|^; jobs.async.redis.port = .*|jobs.async.redis.port = 6379|g" /etc/tracim/development.ini
+    sed -i "s|^; jobs.async.redis.db = .*|jobs.async.redis.db = 0|g" /etc/tracim/development.ini
     sed -i "s|^; plugin.folder_path = .*|plugin.folder_path = /etc/tracim/plugins|g" /etc/tracim/development.ini
     sed -i "s|^; frontend.custom_toolbox_folder_path =.*|frontend.custom_toolbox_folder_path = /etc/tracim/custom_toolbox|g" /etc/tracim/development.ini
     sed -i "s|^; collaborative_document_edition.file_template_dir = .*|collaborative_document_edition.file_template_dir = /tracim/backend/tracim_backend/templates/open_documents|g" /etc/tracim/development.ini
@@ -57,6 +63,9 @@ fi
 # Create uwsgi conf file if none exists
 if [ ! -f /etc/tracim/tracim_web.ini ]; then
     cp /tracim/tools_docker/Debian_Uwsgi/uwsgi.ini.sample /etc/tracim/tracim_web.ini
+    sed -i "s|^#workers = .*|workers = 4|g" /etc/tracim/tracim_web.ini
+    sed -i "s|^#threads = .*|threads = 4|g" /etc/tracim/tracim_web.ini
+    sed -i "s|^#socket = :8081|socket = :8081|g" /etc/tracim/tracim_web.ini
 fi
 if [ ! -L /etc/uwsgi/apps-available/tracim_web.ini ]; then
     ln -s /etc/tracim/tracim_web.ini /etc/uwsgi/apps-available/tracim_web.ini
@@ -64,6 +73,9 @@ fi
 if [ ! -L /etc/uwsgi/apps-enabled/tracim_web.ini ]; then
     ln -s /etc/uwsgi/apps-available/tracim_web.ini /etc/uwsgi/apps-enabled/tracim_web.ini
 fi
+
+# Create pushpin route file
+echo "* ${tracim_web_internal_listen}" > /etc/pushpin/routes
 
 # Create color.json file if no exist
 if [ ! -f /etc/tracim/color.json ]; then
@@ -89,18 +101,58 @@ if [ ! -d /etc/tracim/custom_toolbox ]; then
     mkdir /etc/tracim/custom_toolbox -p
 fi
 
-# Create logs, folder and assets directories
+# Create folder and logs file
 if [ ! -d /var/tracim/logs ]; then
     mkdir /var/tracim/logs -p
+    mkdir /var/tracim/logs/redis -p
+    mkdir /var/tracim/logs/pushpin -p
     touch /var/tracim/logs/tracim_web.log
     touch /var/tracim/logs/tracim_webdav.log
     touch /var/tracim/logs/tracim_caldav.log
     touch /var/tracim/logs/apache2-access.log
     touch /var/tracim/logs/apache2-error.log
-    chown root:www-data -R /var/tracim/logs
+    touch /var/tracim/logs/mail_notifier.log
+    touch /var/tracim/logs/rq_worker.log
+    touch /var/tracim/logs/supervisord.log
+    touch /var/tracim/logs/redis/redis-server.log
+    touch /var/tracim/logs/pushpin/access_7999.log
+    touch /var/tracim/logs/pushpin/error_7999.log
+    touch /var/tracim/logs/pushpin/m2adapter.log
+    touch /var/tracim/logs/pushpin/mongrel2_7999.log
+    touch /var/tracim/logs/pushpin/pushpin-handler.log
+    touch /var/tracim/logs/pushpin/pushpin-proxy.log
+    touch /var/tracim/logs/zurl.log
+    chown www-data:www-data -R /var/tracim/logs
     chmod 775 -R /var/tracim/logs
 fi
 
+# Create log folder for Pushpin (necessary when migrate from Tracim < 3.0.0 )
+if [ ! -d /var/tracim/logs/redis ]; then
+    mkdir /var/tracim/logs/redis -p
+    touch /var/tracim/logs/redis/redis-server.log
+    chown www-data:www-data -R /var/tracim/logs/redis
+    chmod 775 -R /var/tracim/logs/redis
+fi
+# Create log folder for Redis (necessary when migrate from Tracim < 3.0.0 )
+if [ ! -d /var/tracim/logs/pushpin ]; then
+    mkdir /var/tracim/logs/pushpin -p
+    touch /var/tracim/logs/pushpin/access_7999.log
+    touch /var/tracim/logs/pushpin/error_7999.log
+    touch /var/tracim/logs/pushpin/m2adapter.log
+    touch /var/tracim/logs/pushpin/mongrel2_7999.log
+    touch /var/tracim/logs/pushpin/pushpin-handler.log
+    touch /var/tracim/logs/pushpin/pushpin-proxy.log
+    chown www-data:www-data -R /var/tracim/logs/pushpin
+    chmod 775 -R /var/tracim/logs/pushpin
+fi
+# Create Zurl log (necessary when migrate from Tracim < 3.0.0 )
+if [ ! -f /var/tracim/logs/zurl.log ];then
+    touch /var/tracim/logs/zurl.log
+    chown www-data:www-data /var/tracim/logs/zurl.log
+    chmod 775 /var/tracim/logs/zurl.log
+fi
+
+# Create symbollic link to easy find log in container folder
 if [ ! -L /var/log/uwsgi/app/tracim_web.log ]; then
     ln -sf /var/tracim/logs/tracim_web.log /var/log/uwsgi/app/tracim_web.log
 fi
@@ -116,14 +168,54 @@ fi
 if [ ! -L /var/log/apache2/tracim-error.log ]; then
   ln -sf /var/tracim/logs/apache2-error.log /var/log/apache2/tracim-error.log
 fi
-# Create folder and assets directories
+if [ ! -L /var/log/redis-server.log ]; then
+  ln -sf /var/tracim/logs/redis/redis-server.log /var/log/redis-server.log
+fi
+if [ ! -L /var/log/access_7999.log ]; then
+  ln -sf /var/tracim/logs/pushpin/access_7999.log /var/log/access_7999.log
+fi
+if [ ! -L /var/log/error_7999.log ]; then
+  ln -sf /var/tracim/logs/pushpin/error_7999.log /var/log/error_7999.log
+fi
+if [ ! -L /var/log/m2adapter.log ]; then
+  ln -sf /var/tracim/logs/pushpin/m2adapter.log /var/log/m2adapter.log
+fi
+if [ ! -L /var/log/mongrel2_7999.log ]; then
+  ln -sf /var/tracim/logs/pushpin/mongrel2_7999.log /var/log/mongrel2_7999.log
+fi
+if [ ! -L /var/log/pushpin-handler.log ]; then
+  ln -sf /var/tracim/logs/pushpin/pushpin-handler.log /var/log/pushpin-handler.log
+fi
+if [ ! -L /var/log/pushpin-proxy.log ]; then
+  ln -sf /var/tracim/logs/pushpin/pushpin-proxy.log /var/log/pushpin-proxy.log
+fi
+if [ ! -L /var/log/zurl.log ]; then
+  ln -sf /var/tracim/logs/zurl.log /var/log/zurl.log
+fi
+
+# Modify default log path for Pushpin, Redis, Zurl (since Tracim 3.0.0)
+sed -i "s|^logdir=.*|logdir=/var/tracim/logs/pushpin/|g" /etc/pushpin/pushpin.conf
+sed -i "s|^logfile.*|logfile /var/tracim/logs/redis/redis-server.log|g" /etc/redis/redis.conf
+sed -i "s|^DAEMON_ARGS=.*|DAEMON_ARGS=\"--config=/etc/zurl.conf --logfile=/var/tracim/logs/zurl.log\" # Arguments to run the daemon with|g" /etc/init.d/zurl
+
+# Add user Pushpin, Redis, Zurl in www-data group for logging (since Tracim 3.0.0)
+adduser redis www-data
+adduser pushpin www-data
+adduser zurl www-data
+
+# Create uWSGi app folder and set right
+if [ ! -d /var/run/uwsgi/app ]; then
+    mkdir /var/run/uwsgi/app -p
+    chown www-data:www-data -R /var/run/uwsgi
+fi
+
+# Create Tracim required folder
 if [ ! -d /var/tracim/data ]; then
     mkdir /var/tracim/data -p
 fi
 if [ ! -f /var/tracim/assets ]; then
     mkdir /var/tracim/assets -p
 fi
-# Create required folder
 if [ ! -d /var/tracim/data/sessions_data ]; then
     mkdir /var/tracim/data/sessions_data
 fi

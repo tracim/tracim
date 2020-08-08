@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  TextAreaApp,
+  APP_FEATURE_MODE,
   DisplayState,
-  APP_FEATURE_MODE
+  TextAreaApp
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
@@ -43,7 +43,7 @@ export const HtmlDocument = props => {
             msg={props.t('You have a pending draft')}
             btnType='link'
             icon='hand-o-right'
-            btnLabel={props.t('resume writing')}
+            btnLabel={props.t('Resume writing')}
             onClickBtn={props.onClickShowDraft}
           />
         )}
@@ -51,24 +51,29 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
             <div className='html-document__contentpage__textnote__version'>
-              version n°
-              <div dangerouslySetInnerHTML={{ __html: props.mode === APP_FEATURE_MODE.VIEW ? props.lastVersion : props.version }} />
-              {props.mode === APP_FEATURE_MODE.REVISION &&
-                <div className='html-document__contentpage__textnote__lastversion outlineTextBtn'>
-                  ({props.t('latest version :')} {props.lastVersion})
+              {props.t(
+                'Version #{{versionNumber}}', {
+                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
+                    ? props.lastVersion
+                    : props.version
+                }
+              )}
+              {(props.mode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
+                <div className='html-document__contentpage__textnote__lastversion'>
+                  ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
                 </div>
-              }
+              )}
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
             <div className='html-document__contentpage__textnote__text' dangerouslySetInnerHTML={{ __html: props.text }} />
           </div>
         )}
 
-        {props.mode === APP_FEATURE_MODE.EDIT &&
+        {(props.mode === APP_FEATURE_MODE.EDIT &&
           <div className='html-document__editionmode__container'>
             <TextAreaApp
               id={props.wysiwygNewVersion}
-              customClass={'html-document__editionmode'}
+              customClass='html-document__editionmode'
               customColor={props.customColor}
               onClickCancelBtn={props.onClickCloseEditMode}
               disableValidateBtn={props.disableValidateBtn}
@@ -77,7 +82,7 @@ export const HtmlDocument = props => {
               onChangeText={props.onChangeText}
             />
           </div>
-        }
+        )}
       </div>
     </div>
   )
@@ -103,5 +108,6 @@ HtmlDocument.propTypes = {
   onClickCloseEditMode: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
-  onClickShowDraft: PropTypes.func
+  onClickShowDraft: PropTypes.func,
+  isRefreshNeeded: PropTypes.bool
 }

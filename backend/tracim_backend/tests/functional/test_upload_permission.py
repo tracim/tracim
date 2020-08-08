@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from rq import SimpleWorker
 import transaction
@@ -5,10 +7,49 @@ import transaction
 from tracim_backend.applications.share.models import ContentShareType
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.error import ErrorCode
-from tracim_backend.lib.utils.utils import get_redis_connection
-from tracim_backend.lib.utils.utils import get_rq_queue
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
+from tracim_backend.models.auth import User
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+)
+class TestPrivateUploadPermissionEndpointsWithNotifications(object):
+    @pytest.mark.parametrize("with_email", (True, False))
+    def test_api__add_upload_permission__ok_200__emitter_with_or_without_email(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        upload_permission_lib_factory,
+        admin_user: User,
+        with_email: bool,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
+
+        if not with_email:
+            # remove admin (emitter) email before share content
+            admin_user.email = None
+            session.add(admin_user)
+            session.flush()
+
+        with mock.patch(
+            "tracim_backend.applications.upload_permissions.email_manager"
+            ".UploadPermissionEmailManager._notify_emitter",
+        ) as mocked__notify_emitter:
+            upload_permission_lib.add_permission_to_workspace(
+                workspace, emails=["target@user.local"], do_notify=True
+            )
+        assert mocked__notify_emitter.called == with_email
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -26,7 +67,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
         )
         content = res.json_body
         assert len(content) == 0
@@ -45,7 +86,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=400
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=400
         )
         assert res.json_body["code"] == ErrorCode.WORKSPACE_PUBLIC_UPLOAD_DISABLED
 
@@ -61,7 +102,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
         )
         content = res.json_body
         assert len(content) == 2
@@ -102,13 +143,13 @@ class TestPrivateUploadPermissionEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
         )
         content = res.json_body
         assert len(content) == 1
         params = {"emails": ["test <test@test.test>", "test2@test2.test2"], "password": "123456"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id),
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id),
             params=params,
             status=200,
         )
@@ -132,7 +173,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         assert content[1]["email"] == "test2@test2.test2"
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
         )
         content = res.json_body
         assert len(content) == 3
@@ -156,7 +197,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"emails": [], "password": "123456"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id),
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id),
             params=params,
             status=400,
         )
@@ -183,7 +224,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
         res = web_testapp.post_json(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id),
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id),
             params=params,
             status=400,
         )
@@ -201,7 +242,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
         )
         content = res.json_body
         assert len(content) == 1
@@ -210,20 +251,20 @@ class TestPrivateUploadPermissionEndpoints(object):
         upload_permission_token = content[0]["token"]
 
         web_testapp.delete(
-            "/api/v2/workspaces/{}/upload_permissions/{}".format(
+            "/api/workspaces/{}/upload_permissions/{}".format(
                 workspace.workspace_id, upload_permission_id
             ),
             status=204,
         )
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id), status=200
         )
         content = res.json_body
         assert len(content) == 0
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{}/upload_permissions".format(workspace.workspace_id),
+            "/api/workspaces/{}/upload_permissions".format(workspace.workspace_id),
             status=200,
             params={"show_disabled": 1},
         )
@@ -232,7 +273,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         params = {"username": "toto"}
         image = create_1000px_png_test_image()
         res = web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission_token
             ),
             params=params,
@@ -250,7 +291,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
         res = web_testapp.delete(
-            "/api/v2/workspaces/{}/upload_permissions/{}".format(workspace.workspace_id, 1),
+            "/api/workspaces/{}/upload_permissions/{}".format(workspace.workspace_id, 1),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
@@ -271,7 +312,7 @@ class TestPrivateUploadPermissionEndpoints(object):
 
         upload_permission_id = upload_permissions[0].upload_permission_id
         res = web_testapp.delete(
-            "/api/v2/workspaces/{}/upload_permissions/{}".format(
+            "/api/workspaces/{}/upload_permissions/{}".format(
                 workspace.workspace_id, upload_permission_id
             ),
             status=400,
@@ -438,7 +479,7 @@ class TestUploadPermissionWithNotification(object):
         image = create_1000px_png_test_image()
         mailhog.cleanup_mailhog()
         web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=204,
@@ -485,7 +526,7 @@ class TestGuestUploadEndpoints(object):
         params = {"username": "toto", "password": "mysuperpassword", "message": "hello folk !"}
         image = create_1000px_png_test_image()
         web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=204,
@@ -496,9 +537,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body
@@ -518,7 +557,7 @@ class TestGuestUploadEndpoints(object):
         assert dir["content_type"] == "folder"
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents/{content_id}/comments".format(
+            "/api/workspaces/{workspace_id}/contents/{content_id}/comments".format(
                 workspace_id=workspace.workspace_id, content_id=image_content_id
             ),
             status=200,
@@ -531,7 +570,7 @@ class TestGuestUploadEndpoints(object):
         assert comment_result["author"]["user_id"] == admin_user.user_id
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/files/{content_id}/raw/".format(
+            "/api/workspaces/{workspace_id}/files/{content_id}/raw/".format(
                 workspace_id=workspace.workspace_id, content_id=image_content_id
             ),
             status=200,
@@ -539,9 +578,7 @@ class TestGuestUploadEndpoints(object):
         assert res.body == image.getvalue()
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             status=200,
         )
         assert len(res.json_body) == 0
@@ -569,7 +606,7 @@ class TestGuestUploadEndpoints(object):
         params = {"username": "toto", "password": "anotherpassword", "message": "hello folk !"}
         image = create_1000px_png_test_image()
         res = web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=403,
@@ -603,7 +640,7 @@ class TestGuestUploadEndpoints(object):
         params = {"username": "toto", "password": "anotherpassword", "message": "hello folk !"}
         image = create_1000px_png_test_image()
         res = web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=400,
@@ -625,7 +662,7 @@ class TestGuestUploadEndpoints(object):
         image = create_1000px_png_test_image()
         params = {"username": "toto", "password": "anotherpassword", "message": "hello folk !"}
         res = web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token="invalid_token"
             ),
             status=400,
@@ -657,7 +694,7 @@ class TestGuestUploadEndpoints(object):
         params = {"username": "toto", "message": "hello folk !"}
         image = create_1000px_png_test_image()
         web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=204,
@@ -668,9 +705,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body
@@ -690,7 +725,7 @@ class TestGuestUploadEndpoints(object):
         assert dir["content_type"] == "folder"
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents/{content_id}/comments".format(
+            "/api/workspaces/{workspace_id}/contents/{content_id}/comments".format(
                 workspace_id=workspace.workspace_id, content_id=image_content_id
             ),
             status=200,
@@ -703,7 +738,7 @@ class TestGuestUploadEndpoints(object):
         assert comment_result["author"]["user_id"] == admin_user.user_id
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/files/{content_id}/raw/".format(
+            "/api/workspaces/{workspace_id}/files/{content_id}/raw/".format(
                 workspace_id=workspace.workspace_id, content_id=image_content_id
             ),
             status=200,
@@ -711,9 +746,7 @@ class TestGuestUploadEndpoints(object):
         assert res.body == image.getvalue()
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             status=200,
         )
         assert len(res.json_body) == 0
@@ -741,7 +774,7 @@ class TestGuestUploadEndpoints(object):
         params = {"username": "toto"}
         image = create_1000px_png_test_image()
         web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=204,
@@ -752,9 +785,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body
@@ -774,7 +805,7 @@ class TestGuestUploadEndpoints(object):
         assert dir["content_type"] == "folder"
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents/{content_id}/comments".format(
+            "/api/workspaces/{workspace_id}/contents/{content_id}/comments".format(
                 workspace_id=workspace.workspace_id, content_id=image_content_id
             ),
             status=200,
@@ -787,7 +818,7 @@ class TestGuestUploadEndpoints(object):
         assert comment_result["author"]["user_id"] == admin_user.user_id
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/files/{content_id}/raw/".format(
+            "/api/workspaces/{workspace_id}/files/{content_id}/raw/".format(
                 workspace_id=workspace.workspace_id, content_id=image_content_id
             ),
             status=200,
@@ -795,9 +826,7 @@ class TestGuestUploadEndpoints(object):
         assert res.body == image.getvalue()
 
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             status=200,
         )
         assert len(res.json_body) == 0
@@ -825,7 +854,7 @@ class TestGuestUploadEndpoints(object):
         params = {"username": "toto", "message": "hello folk !"}
         image = create_1000px_png_test_image()
         web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=204,
@@ -847,9 +876,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body
@@ -877,7 +904,7 @@ class TestGuestUploadEndpoints(object):
         transaction.commit()
         params = {"username": "toto", "message": "hello folk !"}
         res = web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=400,
@@ -908,7 +935,7 @@ class TestGuestUploadEndpoints(object):
         transaction.commit()
         params = {"password": "mysuperpassword"}
         web_testapp.post_json(
-            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+            "/api/public/guest-upload/{upload_permission_token}/check".format(
                 upload_permission_token=upload_permission.token
             ),
             status=204,
@@ -918,9 +945,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body
@@ -947,7 +972,7 @@ class TestGuestUploadEndpoints(object):
         upload_permission = upload_permissions[0]
         transaction.commit()
         res = web_testapp.post_json(
-            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+            "/api/public/guest-upload/{upload_permission_token}/check".format(
                 upload_permission_token=upload_permission.token
             ),
             status=403,
@@ -977,7 +1002,7 @@ class TestGuestUploadEndpoints(object):
         upload_permission = upload_permissions[0]
         transaction.commit()
         res = web_testapp.post_json(
-            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+            "/api/public/guest-upload/{upload_permission_token}/check".format(
                 upload_permission_token=upload_permission.token
             ),
             status=400,
@@ -995,7 +1020,7 @@ class TestGuestUploadEndpoints(object):
         admin_user,
     ) -> None:
         res = web_testapp.post_json(
-            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+            "/api/public/guest-upload/{upload_permission_token}/check".format(
                 upload_permission_token="invalid_token"
             ),
             status=400,
@@ -1023,13 +1048,13 @@ class TestGuestUploadEndpoints(object):
         upload_permission = upload_permissions[0]
         transaction.commit()
         web_testapp.post_json(
-            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+            "/api/public/guest-upload/{upload_permission_token}/check".format(
                 upload_permission_token=upload_permission.token
             ),
             status=204,
         )
         web_testapp.post_json(
-            "/api/v2/public/guest-upload/{upload_permission_token}/check".format(
+            "/api/public/guest-upload/{upload_permission_token}/check".format(
                 upload_permission_token=upload_permission.token
             ),
             status=204,
@@ -1039,9 +1064,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/v2/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body
@@ -1068,7 +1091,7 @@ class TestGuestUploadEndpoints(object):
         upload_permission = upload_permissions[0]
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=200,
@@ -1096,7 +1119,7 @@ class TestGuestUploadEndpoints(object):
         upload_permission = upload_permissions[0]
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=200,
@@ -1126,7 +1149,7 @@ class TestGuestUploadEndpoints(object):
         upload_permission = upload_permissions[0]
         transaction.commit()
         res = web_testapp.get(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=400,
@@ -1144,7 +1167,7 @@ class TestGuestUploadEndpoints(object):
         admin_user,
     ) -> None:
         res = web_testapp.get(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token="invalid_token"
             ),
             status=400,
@@ -1180,7 +1203,7 @@ class TestGuestUploadEndpointsWorkspaceSizeLimit(object):
         params = {"username": "toto", "message": "hello folk !"}
         image = create_1000px_png_test_image()
         res = web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=204,
@@ -1188,7 +1211,7 @@ class TestGuestUploadEndpointsWorkspaceSizeLimit(object):
             params=params,
         )
         res = web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=400,
@@ -1226,7 +1249,7 @@ class TestGuestUploadEndpointsOwnerSizeLimit(object):
         params = {"username": "toto", "message": "hello folk !"}
         image = create_1000px_png_test_image()
         res = web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=204,
@@ -1234,7 +1257,7 @@ class TestGuestUploadEndpointsOwnerSizeLimit(object):
             params=params,
         )
         res = web_testapp.post(
-            "/api/v2/public/guest-upload/{upload_permission_token}".format(
+            "/api/public/guest-upload/{upload_permission_token}".format(
                 upload_permission_token=upload_permission.token
             ),
             status=400,

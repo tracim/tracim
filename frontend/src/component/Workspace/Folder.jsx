@@ -14,7 +14,7 @@ import {
   DRAG_AND_DROP,
   sortWorkspaceContents,
   SHARE_FOLDER_ID
-} from '../../helper.js'
+} from '../../util/helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
 require('./Folder.styl')
@@ -59,9 +59,9 @@ class Folder extends React.Component {
     return (
       <div
         className={classnames('folder', {
-          'active': props.folderData.isOpen && folderContentList.length > 0,
+          active: props.folderData.isOpen && folderContentList.length > 0,
           'item-last': props.isLast,
-          'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
+          read: true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
         data-cy={`folder_${props.folderData.id}`}
         id={props.folderData.id}
@@ -90,7 +90,8 @@ class Folder extends React.Component {
             className='folder__header__dragPreview'
             ref={props.connectDragPreview}
           >
-            <div className='folder__header__icon'
+            <div
+              className='folder__header__icon'
               title={props.t('Folder')}
               style={{ color: props.contentType.find(c => c.slug === 'folder').hexcolor }}
             >
@@ -98,7 +99,7 @@ class Folder extends React.Component {
             </div>
 
             <div className='folder__header__name'>
-              { props.folderData.label }
+              {props.folderData.label}
             </div>
           </div>
 
@@ -192,7 +193,7 @@ class Folder extends React.Component {
                 onDropMoveContentItem={props.onDropMoveContentItem}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
-                setFolderRead={props.setFolderRead}
+                onSetFolderRead={props.onSetFolderRead}
                 isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
                 t={props.t}

@@ -84,44 +84,25 @@ class TestFunctionalWebdavGet(object):
     Test for all Webdav "GET" action in different case
     """
 
-    def test_functional__webdav_access_to_root__nominal_case(
-        self, session, user_api_factory, webdav_testapp
+    @pytest.mark.parametrize(
+        "login", ("test@test.test", "TEST@TEST.TEST", "TeSt@tEsT.teST", "testuser")
+    )
+    def test_functional__webdav_access_to_root__nominal_cases(
+        self, session, user_api_factory, webdav_testapp, login
     ) -> None:
 
         uapi = user_api_factory.get()
 
         uapi.create_user(
-            "test@test.test",
+            email="test@test.test",
             password="test@test.test",
+            username="testuser",
             do_save=True,
             do_notify=False,
             profile=Profile.USER,
         )
         transaction.commit()
-        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        # check availability of root using webdav
-        res = webdav_testapp.get("/", status=200)
-        assert res
-
-    def test_functional__webdav_access_to_root__insensitive_case_email(
-        self, webdav_testapp, user_api_factory
-    ) -> None:
-        uapi = user_api_factory.get()
-
-        profile = Profile.USER
-        uapi.create_user(
-            "test@test.test",
-            password="test@test.test",
-            do_save=True,
-            do_notify=False,
-            profile=profile,
-        )
-        transaction.commit()
-        webdav_testapp.authorization = ("Basic", ("TEST@TEST.TEST", "test@test.test"))
-        # check availability of root using webdav
-        res = webdav_testapp.get("/", status=200)
-        assert res
-        webdav_testapp.authorization = ("Basic", ("TeSt@tEsT.teST", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", (login, "test@test.test"))
         # check availability of root using webdav
         res = webdav_testapp.get("/", status=200)
         assert res
@@ -656,6 +637,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         content_type_list,
         session,
         webdav_testapp,
+        event_helper,
     ) -> None:
 
         uapi = user_api_factory.get()
@@ -747,6 +729,9 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             },
             status=201,
         )
+        event = event_helper.last_event
+        assert event.event_type == "content.modified.file"
+        assert event.fields["author"]
         # verify move
         webdav_testapp.get(
             "/{}/{}/{}".format(

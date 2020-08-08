@@ -94,8 +94,8 @@ export class AdminUser extends React.Component {
     else this.props.onChangeProfile(userId, 'trusted-users')
   }
 
-  handleClickAddUser = async (name, email, profile, password) => {
-    const resultSuccess = await this.props.onClickAddUser(name, email, profile, password)
+  handleClickAddUser = async (publicName, username, email, profile, password) => {
+    const resultSuccess = await this.props.onClickAddUser(publicName, username, email, profile, password)
     if (resultSuccess) this.handleToggleAddUser()
   }
 
@@ -105,7 +105,7 @@ export class AdminUser extends React.Component {
     return (
       <PageWrapper customClass='adminUser'>
         <PageTitle
-          parentClass={'adminUser'}
+          parentClass='adminUser'
           title={props.t('User account management')}
           icon='users'
           breadcrumbsList={props.breadcrumbsList}
@@ -144,11 +144,15 @@ export class AdminUser extends React.Component {
           {state.displayAddUser && (
             <AddUserForm
               onClickAddUser={this.handleClickAddUser}
+              onChangeUsername={props.onChangeUsername}
               emailNotifActivated={props.emailNotifActivated}
+              isUsernameValid={props.isUsernameValid}
+              usernameInvalidMsg={props.usernameInvalidMsg}
+              isEmailRequired={props.isEmailRequired}
             />
           )}
 
-          <Delimiter customClass={'adminUser__delimiter'} />
+          <Delimiter customClass='adminUser__delimiter' />
 
           <div className='adminUser__table'>
             <table className='table'>
@@ -157,6 +161,7 @@ export class AdminUser extends React.Component {
                   <th scope='col'>{props.t('Active')}</th>
                   <th />
                   <th scope='col'>{props.t('User')}</th>
+                  <th scope='col'>{props.t('Username')}</th>
                   <th scope='col'>{props.t('Email')}</th>
                   <th scope='col'>{props.t('Can create shared space')}</th>
                   <th scope='col'>{props.t('Administrator')}</th>
@@ -191,13 +196,20 @@ export class AdminUser extends React.Component {
 
                       <td
                         className='adminUser__table__tr__td-link primaryColorFont'
+                        title={u.public_name}
                       >
                         <Link to={`/ui/admin/user/${u.user_id}`}>
                           {u.public_name}
                         </Link>
                       </td>
 
-                      <td>{u.email}</td>
+                      <td className='adminUser__table__tr__td-text' title={u.username}>
+                        {u.username && `@${u.username}`}
+                      </td>
+
+                      <td className='adminUser__table__tr__td-text' title={u.email}>
+                        {u.email}
+                      </td>
 
                       <td>
                         <BtnSwitch

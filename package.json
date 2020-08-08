@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "workspaces": [
+    "frontend_app_*",
+    "frontend",
+    "frontend_lib",
+    "functionnal_tests"
+  ],
+  "devDependencies": {
+    "eslint": "^6.8.0"
+  }
+}

@@ -12,13 +12,13 @@ class ThumbnailPreview extends React.Component {
     }
   }
 
-  onImageLoad = () => {
+  handleImageLoad = () => {
     this.setState({
       imageLoaded: IMG_LOAD_STATE.LOADED
     })
   }
 
-  onImageError = () => {
+  handleImageError = () => {
     this.setState({
       imageLoaded: IMG_LOAD_STATE.ERROR
     })
@@ -28,25 +28,25 @@ class ThumbnailPreview extends React.Component {
     const { props, state } = this
 
     return (
-      <div className={'carousel__thumbnail__item__preview__content'}>
+      <div className='carousel__thumbnail__item__preview__content'>
         {state.imageLoaded === IMG_LOAD_STATE.LOADING && (
           <div className='gallery__loader'>
             <i className='fa fa-spinner fa-spin gallery__loader__icon' />
           </div>
         )}
-        {state.imageLoaded === IMG_LOAD_STATE.ERROR
+        {(state.imageLoaded === IMG_LOAD_STATE.ERROR
           ? (
             <i className='fa fa-fw fa-exclamation-triangle carousel__thumbnail__item__preview__error' />
           ) : (
             <img
               src={props.previewSrc}
               className={classnames(`rotate${props.rotationAngle}`, state.imageLoaded ? 'carousel__thumbnail__item__preview__content__image img-thumbnail' : null)}
-              onLoad={this.onImageLoad}
-              onError={this.onImageError}
+              onLoad={this.handleImageLoad}
+              onError={this.handleImageError}
               alt={props.fileName}
             />
           )
-        }
+        )}
       </div>
     )
   }

@@ -39,11 +39,17 @@ export const WorkspaceMembersList = props => {
                 data-cy={`workspace_advanced__member-${m.user_id}`}
               >
                 <div className='workspace_advanced__userlist__list__item__avatar'>
-                  <Avatar width={'50px'} publicName={m.user.public_name} />
+                  <Avatar width='50px' publicName={m.user.public_name} />
                 </div>
 
-                <div className='workspace_advanced__userlist__list__item__name'>
+                <div className='workspace_advanced__userlist__list__item__name' title={m.user.public_name}>
                   {m.user.public_name}
+
+                  {m.user.username && (
+                    <div className='workspace_advanced__userlist__list__item__name__username' title={`@${m.user.username}`}>
+                      @{m.user.username}
+                    </div>
+                  )}
                 </div>
 
                 <div className='workspace_advanced__userlist__list__item__role dropdown'>
@@ -88,7 +94,7 @@ export const WorkspaceMembersList = props => {
                   </div>
                 </div>
 
-                {m.user_id !== props.loggedUser.user_id
+                {(m.user_id !== props.loggedUser.userId
                   ? (
                     <div
                       className='workspace_advanced__userlist__list__item__delete'
@@ -98,7 +104,7 @@ export const WorkspaceMembersList = props => {
                     </div>
                   )
                   : <div className='workspace_advanced__userlist__list__item__delete' />
-                }
+                )}
               </li>
             )}
           </ul>
@@ -108,9 +114,9 @@ export const WorkspaceMembersList = props => {
       {props.displayFormNewMember === true && (
         <NewMemberForm
           onClickCloseAddMemberBtn={props.onClickToggleFormNewMember}
-          nameOrEmail={props.newMemberName}
+          publicName={props.newMemberName}
           isEmail={props.isEmail}
-          onChangeNameOrEmail={props.onChangeNewMemberName}
+          onChangePersonalData={props.onChangeNewMemberName}
           searchedKnownMemberList={props.searchedKnownMemberList}
           onClickKnownMember={props.onClickKnownMember}
           roleList={props.roleList}

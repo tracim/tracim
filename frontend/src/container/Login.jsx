@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
-import appFactory from '../appFactory.js'
-import i18n from '../i18n.js'
+import appFactory from '../util/appFactory.js'
+import i18n from '../util/i18n.js'
 import * as Cookies from 'js-cookie'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
@@ -11,7 +11,12 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import {
+  buildHeadTitle,
+  CUSTOM_EVENT,
+  checkEmailValidity,
+  serialize
+} from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setUserConnected,
@@ -35,7 +40,8 @@ import {
 import {
   PAGE,
   COOKIE_FRONTEND
-} from '../helper.js'
+} from '../util/helper.js'
+import { serializeUserProps } from '../reducer/user.js'
 
 const qs = require('query-string')
 
@@ -110,17 +116,22 @@ class Login extends React.Component {
 
     event.preventDefault()
 
-    const { email, password } = event.target
+    const { login, password } = event.target
 
-    if (email.value === '' || password.value === '') {
+    if (login.value === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
       return
     }
 
-    const fetchPostUserLogin = await props.dispatch(postUserLogin(email.value, password.value, state.inputRememberMe))
+    const credentials = {
+      ...(checkEmailValidity(login.value) ? { email: login.value } : { username: login.value }),
+      password: password.value
+    }
+
+    const fetchPostUserLogin = await props.dispatch(postUserLogin(credentials, state.inputRememberMe))
 
     switch (fetchPostUserLogin.status) {
-      case 200:
+      case 200: {
         const loggedUser = {
           ...fetchPostUserLogin.json,
           logged: true
@@ -138,6 +149,7 @@ class Login extends React.Component {
         this.loadAppList()
         this.loadContentTypeList()
         this.loadWorkspaceList()
+        props.tlm.manager.openLiveMessageConnection(fetchPostUserLogin.json.user_id)
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)
@@ -146,13 +158,14 @@ class Login extends React.Component {
 
         props.history.push(PAGE.HOME)
         break
+      }
       case 400:
         switch (fetchPostUserLogin.json.code) {
-          case 2001: props.dispatch(newFlashMessage(props.t('Not a valid email'), 'warning')); break
+          case 2001: props.dispatch(newFlashMessage(props.t('Invalid email or username'), 'warning')); break
           default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
         }
         break
-      case 403: props.dispatch(newFlashMessage(props.t('Email or password invalid'), 'warning')); break
+      case 403: props.dispatch(newFlashMessage(props.t('Invalid credentials'), 'warning')); break
       default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
     }
   }
@@ -209,7 +222,7 @@ class Login extends React.Component {
 
   setDefaultUserLang = async loggedUser => {
     const { props } = this
-    const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
+    const fetchPutUserLang = await props.dispatch(putUserLang(serialize(loggedUser, serializeUserProps), props.user.lang))
     switch (fetchPutUserLang.status) {
       case 200: break
       default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
@@ -237,16 +250,16 @@ class Login extends React.Component {
           </CardHeader>
 
           <CardBody formClass='loginpage__card__form'>
-            <form onSubmit={this.handleClickSubmit}>
+            <form onSubmit={this.handleClickSubmit} noValidate>
               <InputGroupText
-                parentClassName='loginpage__card__form__groupemail'
+                parentClassName='loginpage__card__form__groupelogin'
                 customClass='mb-3 mt-4'
-                icon='fa-envelope-open-o'
-                type='email'
-                placeHolder={props.t('Email Address')}
-                invalidMsg={props.t('Invalid email')}
+                icon='fa-at'
+                type='text'
+                placeHolder={props.t('Email address or username')}
+                invalidMsg={props.t('Invalid email or username')}
                 maxLength={512}
-                name='email'
+                name='login'
               />
 
               <InputGroupText
@@ -289,5 +302,5 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, system, breadcrumbs }) => ({ user, system, breadcrumbs })
+const mapStateToProps = ({ user, system, breadcrumbs, tlm }) => ({ user, system, breadcrumbs, tlm })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Login))))

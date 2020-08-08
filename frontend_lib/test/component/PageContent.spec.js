@@ -20,7 +20,7 @@ describe('<PageContent />', () => {
   )
 
   describe('Static design', () => {
-    it(`should have its children`, () =>
+    it('should have its children', () =>
       expect(wrapper.find('.pageContentGeneric').find(Children).length).equal(1)
     )
 

@@ -3,7 +3,7 @@ import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { DragSource } from 'react-dnd'
-import { DRAG_AND_DROP } from '../../helper.js'
+import { DRAG_AND_DROP } from '../../util/helper.js'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import DragHandle from '../DragHandle.jsx'
 import {
@@ -53,23 +53,28 @@ class ContentItem extends React.Component {
             className='content__dragPreview'
             ref={props.connectDragPreview}
           >
-            <div className='content__type'
+            <div
+              className='content__type'
               title={props.t(props.contentType.label)}
               style={{
                 color: props.contentType.hexcolor,
                 padding: props.isShared ? '0 15px' : '0 25px'
               }}
             >
-              {props.isShared
-                ? <ComposedIcon
-                  mainIcon={props.faIcon}
-                  smallIcon='share-alt'
-                  // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
-                  // https://github.com/tracim/tracim/issues/2098
-                  smallIconStyle={{ color: '#252525' }}
-                />
-                : <i className={`fa fa-fw fa-${props.faIcon}`} />
-              }
+              {(props.isShared
+                ? (
+                  <ComposedIcon
+                    mainIcon={props.faIcon}
+                    smallIcon='share-alt'
+                    // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
+                    // https://github.com/tracim/tracim/issues/2098
+                    smallIconStyle={{ color: '#252525' }}
+                  />
+                )
+                : (
+                  <i className={`fa fa-fw fa-${props.faIcon}`} />
+                )
+              )}
             </div>
 
             <div className='content__name' title={props.label}>

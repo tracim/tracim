@@ -18,6 +18,7 @@ export const AgendaInfo = props => (
             className='agendaInfo__content__text__help primaryColorFont primaryColorFontDarkenHover'
             href='https://github.com/tracim/tracim/issues/1673'
             target='_blank'
+            rel='noopener noreferrer'
           >
             {props.caldavText}
           </a>

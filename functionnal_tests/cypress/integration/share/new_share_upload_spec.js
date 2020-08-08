@@ -22,7 +22,7 @@ describe('Open the share folder advanced', () => {
         return cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
       })
       .then(data => {
-        cy.visitPage({pageName: PAGES.SHARE_FOLDER, params: {workspaceId: workspaceId}})
+        cy.visitPage({ pageName: PAGES.SHARE_FOLDER, params: { workspaceId: workspaceId } })
         cy.get('.share_folder_advanced__content__btnupload').click()
       })
   })
@@ -31,9 +31,9 @@ describe('Open the share folder advanced', () => {
     cy.cancelXHR()
   })
 
-  describe('and clicking on the New button',() => {
-    describe('and writing three emails separated by ; and clicking Enter',() =>{
-      it('Should separate the emails by new line',() => {
+  describe('and clicking on the New button', () => {
+    describe('and writing three emails separated by ; and clicking Enter', () => {
+      it('Should separate the emails by new line', () => {
         // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
         cy.wait(1000)
         cy.get(emailInput).type(`${email1};${email2};${email3}`).type('{enter}')
@@ -41,8 +41,8 @@ describe('Open the share folder advanced', () => {
       })
     })
 
-    describe('and writing three emails separated by commas and clicking Enter',() =>{
-      it('Should separate the emails by new line',() => {
+    describe('and writing three emails separated by commas and clicking Enter', () => {
+      it('Should separate the emails by new line', () => {
         // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
         cy.wait(1000)
         cy.get(emailInput).type(`${email1},${email2},${email3}`).type('{enter}')
@@ -50,7 +50,7 @@ describe('Open the share folder advanced', () => {
       })
     })
 
-    describe('and clicking at Protect by password',() => {
+    describe('and clicking at Protect by password', () => {
       it('Should show the password input', () => {
         cy.get('.newUpload__password__link').click()
         cy.get('.newUpload__password__wrapper').should('be.visible')
@@ -70,9 +70,9 @@ describe('Open the share folder advanced', () => {
       })
     })
 
-    describe('and writing a mail',() => {
-      describe('and clicking at New button',() => {
-        it('Should create share link at the main authorizations page',() => {
+    describe('and writing a mail', () => {
+      describe('and clicking at New button', () => {
+        it('Should create share link at the main authorizations page', () => {
           // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
           cy.wait(1000)
           cy.get(emailInput).type(`${email1}`)

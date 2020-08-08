@@ -5,22 +5,22 @@ import Radium from 'radium'
 import PreviewComponent from './PreviewComponent.jsx'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
 import {
+  APP_FEATURE_MODE,
   DisplayState,
-  FileDropzone,
-  APP_FEATURE_MODE
+  FileDropzone
 } from 'tracim_frontend_lib'
 
 const color = require('color')
 
 export class FileComponent extends React.Component {
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { props } = this
 
     if (prevProps.previewVideo && !props.previewVideo) this.unLoadVideoPlayer()
     else if (!prevProps.previewVideo && props.previewVideo) this.loadVideoPlayer(props.downloadRawUrl, props.mimeType)
   }
 
-  loadVideoPlayer (videoUrl, videoMimeType) {
+  loadVideoPlayer(videoUrl, videoMimeType) {
     const source = document.createElement('source')
     source.src = videoUrl
     source.type = videoMimeType
@@ -49,8 +49,7 @@ export class FileComponent extends React.Component {
           <br />
           ${this.props.t('In that case, you can download the video and try opening it manually.')}
           <br />
-          ${this.props.t('To download the video, click on download button.')}
-          <i class='fa fa-download'></i>
+          ${this.props.t('To download the video, leave the fullscreen mode and click on download button {{icon}}.', { icon: '<i class="fa fa-download"></i>', interpolation: { escapeValue: false } })}
         </div>
       `
       videoWrapper.appendChild(warningMsg)
@@ -60,18 +59,20 @@ export class FileComponent extends React.Component {
     body.appendChild(videoWrapper)
   }
 
-  unLoadVideoPlayer () {
+  unLoadVideoPlayer() {
     const videoWrapper = document.getElementById('videoWrapperDiv')
     videoWrapper.remove()
   }
 
-  render () {
+  render() {
     const { props } = this
     return (
-      <div className={classnames(
-        'file__contentpage__statewrapper',
-        { 'displayState': props.isArchived || props.isDeleted || props.isDeprecated }
-      )}>
+      <div
+        className={classnames(
+          'file__contentpage__statewrapper',
+          { displayState: props.isArchived || props.isDeleted || props.isDeprecated }
+        )}
+      >
         <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
 
         {props.isArchived && (

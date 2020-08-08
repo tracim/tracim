@@ -63,7 +63,7 @@ class AppContextCommand(Command):
                         self.take_app_action(parsed_args, app_context)
         except Exception as exc:
             logger.exception(self, exc)
-            print("Something goes wrong during command")
+            print("Something goes wrong during command: {}".format(exc))
             raise exc
 
     def _setup_logging(self, parsed_args: Namespace) -> None:
@@ -80,7 +80,7 @@ class AppContextCommand(Command):
         parser.add_argument(
             "-c",
             "--config",
-            help="application config file to read (default: {})".format(DEFAULT_TRACIM_CONFIG_FILE),
+            help="configuration file to use (default: {})".format(DEFAULT_TRACIM_CONFIG_FILE),
             dest="config_file",
             default=DEFAULT_TRACIM_CONFIG_FILE,
         )

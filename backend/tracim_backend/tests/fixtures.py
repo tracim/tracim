@@ -1,11 +1,18 @@
 import logging
 import os
+from os.path import basename
+from os.path import dirname
+import shutil
+import subprocess
 import typing
+from unittest import mock
 
 from depot.manager import DepotManager
 import plaster
 from pyramid import testing
 import pytest
+from pytest_pyramid_server import PyramidTestServer
+import requests
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -21,16 +28,25 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
+from tracim_backend.lib.core.event import RQ_QUEUE_NAME
+from tracim_backend.lib.core.event import EventBuilder
+from tracim_backend.lib.core.plugins import create_plugin_manager
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
+from tracim_backend.models.setup_models import create_dbsession_for_context
 from tracim_backend.models.setup_models import get_session_factory
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
+from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
+from tracim_backend.tests.utils import DockerCompose
 from tracim_backend.tests.utils import ElasticSearchHelper
+from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
@@ -39,6 +55,60 @@ from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
+
+
+@pytest.fixture
+def pushpin_config_file():
+    return TEST_PUSHPIN_FILE_PATH
+
+
+@pytest.fixture
+def pushpin(tracim_webserver, tmp_path_factory):
+    pushpin_config_dir = str(tmp_path_factory.mktemp("pushpin"))
+    my_dir = dirname(__file__)
+    shutil.copyfile(
+        os.path.join(my_dir, "pushpin.conf"), os.path.join(pushpin_config_dir, "pushpin.conf"),
+    )
+    with open(os.path.join(pushpin_config_dir, "routes"), "w") as routes:
+        routes.write("* {}:{}\n".format(tracim_webserver.hostname, tracim_webserver.port))
+    compose = DockerCompose()
+    compose.up("pushpin", env={"PUSHPIN_CONFIG_DIR": pushpin_config_dir})
+    while True:
+        try:
+            requests.get("http://localhost:7999")
+            break
+        except requests.exceptions.ConnectionError:
+            pass
+    yield compose
+    compose.down()
+
+
+@pytest.fixture
+def rq_database_worker(config_uri, empty_rq_event_queue):
+
+    worker_env = os.environ.copy()
+    worker_env["TRACIM_CONF_PATH"] = "{}#rq_worker_test".format(config_uri)
+    worker_process = subprocess.Popen(
+        "rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event".split(" "),
+        env=worker_env,
+    )
+    yield worker_process
+    worker_process.terminate()
+    worker_process.wait()
+
+
+@pytest.fixture
+def tracim_webserver(settings, config_uri) -> PyramidTestServer:
+    config_filename = basename(config_uri)
+    config_dir = dirname(config_uri)
+
+    with PyramidTestServer(
+        config_filename=config_filename,
+        config_dir=config_dir,
+        extra_config_vars={"app:main": settings},
+    ) as server:
+        server.start()
+        yield server
 
 
 @pytest.fixture
@@ -89,6 +159,13 @@ def web_testapp(settings, hapic, session):
 
 
 @pytest.fixture
+def empty_rq_event_queue(app_config):
+    redis_connection = get_redis_connection(app_config)
+    queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+    queue.delete()
+
+
+@pytest.fixture
 def hapic():
     from tracim_backend.extensions import hapic as hapic_static
 
@@ -125,11 +202,6 @@ def session_factory(engine):
 
 
 @pytest.fixture
-def empty_session(session_factory):
-    return get_tm_session(session_factory, transaction.manager)
-
-
-@pytest.fixture
 def migration_engine(engine):
     yield engine
     sql = text("DROP TABLE IF EXISTS migrate_version;")
@@ -137,8 +209,40 @@ def migration_engine(engine):
 
 
 @pytest.fixture
-def session(empty_session, engine, app_config, test_logger):
-    dbsession = empty_session
+def session(request, engine, session_factory, app_config, test_logger):
+    class TracimTestContext(TracimContext):
+        def __init__(self, app_config) -> None:
+            super().__init__()
+            self._app_config = app_config
+            self._plugin_manager = create_plugin_manager()
+            event_builder = EventBuilder(app_config)
+            # mock event publishing to avoid requiring a working
+            # pushpin instance for every test
+            event_builder._publish_events = mock.Mock()
+            self._plugin_manager.register(event_builder)
+            self._dbsession = create_dbsession_for_context(
+                session_factory, transaction.manager, self
+            )
+            self._dbsession.set_context(self)
+            self._current_user = None
+
+        @property
+        def dbsession(self):
+            return self._dbsession
+
+        @property
+        def plugin_manager(self):
+            return self._plugin_manager
+
+        @property
+        def current_user(self):
+            return self._current_user
+
+        @property
+        def app_config(self):
+            return self._app_config
+
+    context = TracimTestContext(app_config)
     from tracim_backend.models.meta import DeclarativeBase
 
     with transaction.manager:
@@ -148,11 +252,11 @@ def session(empty_session, engine, app_config, test_logger):
         except Exception as e:
             transaction.abort()
             raise e
-    yield dbsession
+    yield context.dbsession
     from tracim_backend.models.meta import DeclarativeBase
 
-    dbsession.rollback()
-    dbsession.close_all()
+    context.dbsession.rollback()
+    context.dbsession.close_all()
     transaction.abort()
     DeclarativeBase.metadata.drop_all(engine)
 
@@ -259,7 +363,7 @@ def content_type_list() -> ContentTypeList:
 @pytest.fixture()
 def webdav_provider(app_config: CFG):
     return Provider(
-        show_archived=False, show_deleted=False, show_history=False, app_config=app_config
+        show_archived=False, show_deleted=False, show_history=False, app_config=app_config,
     )
 
 
@@ -268,7 +372,7 @@ def webdav_environ_factory(
     webdav_provider: Provider, session: Session, admin_user: admin_user, app_config: CFG
 ) -> WedavEnvironFactory:
     return WedavEnvironFactory(
-        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user
+        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user,
     )
 
 
@@ -316,3 +420,8 @@ def webdav_testapp(config_uri, config_section) -> TestApp:
     app_factory = WebdavAppFactory(**settings)
     app = app_factory.get_wsgi_app()
     return TestApp(app)
+
+
+@pytest.fixture
+def event_helper(session) -> EventHelper:
+    return EventHelper(session)

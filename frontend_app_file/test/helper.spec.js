@@ -4,12 +4,12 @@ import { isVideoMimeTypeAndIsAllowed } from '../src/helper.js'
 describe('helper.js', () => {
   describe('isVideoMimeTypeAndIsAllowed ()', () => {
     describe('if the mime type starts with "video/"', () => {
-      it(`should return true for "video/mp4"`, () => {
+      it('should return true for "video/mp4"', () => {
         const mimeType = 'video/mp4'
         expect(isVideoMimeTypeAndIsAllowed(mimeType, [])).to.equal(true)
       })
 
-      it(`should return true for an unknown video mime type like "video/anUnknownVideoFormat"`, () => {
+      it('should return true for an unknown video mime type like "video/anUnknownVideoFormat"', () => {
         const mimeType = 'video/anUnknownVideoFormat'
         expect(isVideoMimeTypeAndIsAllowed(mimeType, [])).to.equal(true)
       })

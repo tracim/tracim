@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
 import { DropTarget } from 'react-dnd'
-import { DRAG_AND_DROP } from '../../helper.js'
+import { DRAG_AND_DROP } from '../../util/helper.js'
 import { ROLE } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
@@ -80,10 +80,10 @@ class WorkspaceListItem extends React.Component {
           </div>
 
           <div className='sidebar__content__navigation__workspace__item__icon'>
-            {props.isOpenInSidebar
+            {(props.isOpenInSidebar
               ? <i className={classnames('fa fa-chevron-up')} title={props.t('Hide shared space')} />
               : <i className={classnames('fa fa-chevron-down')} title={props.t('See shared space')} />
-            }
+            )}
           </div>
         </div>
 
@@ -95,10 +95,12 @@ class WorkspaceListItem extends React.Component {
                 key={allowedApp.slug}
               >
                 <Link to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}>
-                  <div className={classnames(
-                    'sidebar__content__navigation__workspace__item__submenu__dropdown',
-                    { 'activeFilter': this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeWorkspaceId, allowedApp) }
-                  )}>
+                  <div
+                    className={classnames(
+                      'sidebar__content__navigation__workspace__item__submenu__dropdown',
+                      { activeFilter: this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeWorkspaceId, allowedApp) }
+                    )}
+                  >
                     <div className='dropdown__icon' style={{ backgroundColor: allowedApp.hexcolor }}>
                       <i className={classnames(`fa fa-${allowedApp.faIcon}`)} />
                     </div>

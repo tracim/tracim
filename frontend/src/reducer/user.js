@@ -1,29 +1,46 @@
 import {
   SET,
   UPDATE,
+  USER,
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_LANG,
-  USER_NAME,
-  USER_EMAIL,
   USER_AGENDA_URL
 } from '../action-creator.sync.js'
-import { getBrowserLang } from '../helper.js'
-import { PROFILE } from 'tracim_frontend_lib'
+import { getBrowserLang } from '../util/helper.js'
+import { PROFILE, serialize } from 'tracim_frontend_lib'
 
-const defaultUser = {
-  user_id: -1,
+export const serializeUserProps = {
+  user_id: 'userId',
+  logged: 'logged',
+  auth_type: 'authType',
+  timezone: 'timezone',
+  profile: 'profile',
+  email: 'email',
+  is_active: 'isActive',
+  avatar_url: 'avatarUrl',
+  created: 'created',
+  public_name: 'publicName',
+  lang: 'lang',
+  agendaUrl: 'agendaUrl',
+  username: 'username',
+  is_deleted: 'isDeleted'
+}
+
+export const defaultUser = {
+  userId: -1,
   logged: null, // null avoid to be redirected to /login while whoami ep has not responded yet
-  auth_type: '',
+  authType: '',
   timezone: '',
   profile: PROFILE.user,
   email: '',
-  is_active: true,
-  avatar_url: null,
+  isActive: true,
+  avatarUrl: null,
   created: '',
-  public_name: '',
+  publicName: '',
   lang: getBrowserLang(),
-  agendaUrl: ''
+  agendaUrl: '',
+  username: ''
 }
 
 export default function user (state = defaultUser, action) {
@@ -31,8 +48,8 @@ export default function user (state = defaultUser, action) {
     case `${SET}/${USER_CONNECTED}`:
       return {
         ...state,
-        ...action.user,
-        lang: action.user.lang ? action.user.lang : state.lang
+        ...serialize(action.user, serializeUserProps),
+        lang: action.user.lang || state.lang
       }
 
     case `${SET}/${USER_DISCONNECTED}`:
@@ -41,11 +58,9 @@ export default function user (state = defaultUser, action) {
     case `${SET}/${USER_LANG}`:
       return { ...state, lang: action.lang }
 
-    case `${UPDATE}/${USER_NAME}`:
-      return { ...state, public_name: action.newName }
-
-    case `${UPDATE}/${USER_EMAIL}`:
-      return { ...state, email: action.newEmail }
+    case `${UPDATE}/${USER}`:
+      if (action.newUser.user_id !== state.userId) return state
+      return { ...state, ...serialize(action.newUser, serializeUserProps) }
 
     case `${SET}/${USER_AGENDA_URL}`:
       return { ...state, agendaUrl: action.newAgendaUrl }

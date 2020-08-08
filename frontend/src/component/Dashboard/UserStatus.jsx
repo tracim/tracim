@@ -4,13 +4,13 @@ import { ROLE_LIST } from 'tracim_frontend_lib'
 require('./UserStatus.styl')
 
 export const UserStatus = props => {
-  const mySelf = props.curWs.memberList.find(m => m.id === props.user.user_id) || { role: '' }
+  const mySelf = props.curWs.memberList.find(m => m.id === props.user.userId) || { role: '' }
   const myRole = ROLE_LIST.find(r => r.slug === mySelf.role) || { faIcon: '', hexcolor: '', label: '' }
 
   return (
     <div className='userstatus notched primaryColorBorder'>
       <div className='userstatus__username'>
-        {props.user.public_name}
+        {props.user.publicName}
       </div>
 
       <div className='userstatus__role'>
@@ -40,10 +40,10 @@ export const UserStatus = props => {
             className='userstatus__notification__text'
             title={props.t('You can change your notification status by clicking here')}
           >
-            {mySelf.doNotify
+            {(mySelf.doNotify
               ? props.t('Click here to unsubscribe')
               : props.t('Click here to subscribe')
-            }
+            )}
           </div>
         </div>
       )}

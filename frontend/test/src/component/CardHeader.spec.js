@@ -22,13 +22,13 @@ describe('<CardHeader />', () => {
       expect(wrapper.find(`div.card-header.${props.customClass}`).length).to.equal(1)
     )
 
-    it(`should have the style property display to none when displayHeader is false`, () => {
+    it('should have the style property display to none when displayHeader is false', () => {
       wrapper.setProps({ displayHeader: false })
       expect(wrapper.find(`div.card-header.${props.customClass}`).prop('style').display).to.equal('none')
       wrapper.setProps({ displayHeader: props.displayHeader })
     })
 
-    it(`should have the style to undefined when displayHeader is false`, () =>
+    it('should have the style to undefined when displayHeader is false', () =>
       expect(wrapper.find(`div.card-header.${props.customClass}`).prop('style')).to.equal(undefined)
     )
   })

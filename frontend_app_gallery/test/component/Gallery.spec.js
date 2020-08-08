@@ -15,9 +15,11 @@ describe('<Gallery />', () => {
   const folderName = 'folderTest'
 
   const props = {
+    registerCustomEventHandlerList: () => { },
+    registerLiveMessageHandlerList: () => { },
     data: {
       config: {
-        apiUrl: 'http://localhost:1337/api/v2',
+        apiUrl: 'http://localhost:1337/api',
         slug: 'gallery',
         faIcon: 'paperclip',
         hexcolor: '#ffa500',
@@ -31,7 +33,7 @@ describe('<Gallery />', () => {
             search: `?folder_ids=${folderId}`
           }
         },
-        translation :''
+        translation: ''
       },
       loggedUser: {
         ...defaultDebug.loggedUser
@@ -45,7 +47,7 @@ describe('<Gallery />', () => {
       workspace_id: 0,
       workspaceLabel: 'workspaceTest'
     },
-    imagesPreviews: [
+    imagePreviewList: [
       {
         src: 'mock.com/1.jpg',
         contentId: 1,
@@ -94,20 +96,20 @@ describe('<Gallery />', () => {
 
   mockGetContents200(props.data.config.apiUrl, props.data.config.appConfig.workspaceId, { parent_ids: folderId, namespaces_filter: 'upload,content' }, [])
   mockGetWorkspaceDetail200(props.data.config.apiUrl, props.data.config.appConfig.workspaceId, stateMock.content.workspaceLabel)
-  mockGetFolderDetailDetail200(props.data.config.apiUrl, props.data.config.appConfig.workspaceId, folderId,folderName, null)
+  mockGetFolderDetailDetail200(props.data.config.apiUrl, props.data.config.appConfig.workspaceId, folderId, folderName, null)
 
-  const wrapper = shallow(<GalleryWithoutHOC {...props} t={tradKey => tradKey}/>)
+  const wrapper = shallow(<GalleryWithoutHOC {...props} t={tradKey => tradKey} />)
   wrapper.setState(stateMock)
 
   describe('static design', () => {
     describe('rotation buttons', () => {
       it('should rotate the right image when rotation buttons are clicked', () => {
-        const fileSelected = 1
-        wrapper.setState({ imagesPreviews: stateMock.imagesPreviews, fileSelected })
+        const displayedPictureIndex = 1
+        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList, displayedPictureIndex })
         wrapper.find('.gallery__action__button > button.gallery__action__button__rotation__left').simulate('click')
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(270)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(270)
         wrapper.find('.gallery__action__button > button.gallery__action__button__rotation__right').simulate('click')
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(0)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(0)
       })
     })
 
@@ -117,7 +119,7 @@ describe('<Gallery />', () => {
         expect(wrapper.find('.gallery__action__button__play > i.fa.fa-pause')).to.be.lengthOf(1)
         expect(wrapper.state().autoPlay).to.be.a('object')
       })
-      it('should stop the slideshow when the button pause is clicked', () =>  {
+      it('should stop the slideshow when the button pause is clicked', () => {
         wrapper.find('.gallery__action__button__play').simulate('click')
         expect(wrapper.find('.gallery__action__button__play > i.fa.fa-play')).to.be.lengthOf(1)
         expect(wrapper.state().autoPlay).to.be.a('null')
@@ -128,69 +130,69 @@ describe('<Gallery />', () => {
   describe('functions tests', () => {
     describe('getPreviousImageUrl()', () => {
       it('should return the previous imagePreview when filSelected > 0', () => {
-        wrapper.setState({ fileSelected: 1 })
-        expect(wrapper.instance().getPreviousImageUrl()).to.equal(stateMock.imagesPreviews[0].lightBoxUrlList[0])
+        wrapper.setState({ displayedPictureIndex: 1 })
+        expect(wrapper.instance().getPreviousImageUrl()).to.equal(stateMock.imagePreviewList[0].lightBoxUrlList[0])
       })
-      it('should return the last imagePreview when fileSelected === 0', () => {
-        wrapper.setState({ fileSelected: 0 })
-        expect(wrapper.instance().getPreviousImageUrl()).to.equal(stateMock.imagesPreviews[stateMock.imagesPreviews.length-1].lightBoxUrlList[0])
+      it('should return the last imagePreview when displayedPictureIndex === 0', () => {
+        wrapper.setState({ displayedPictureIndex: 0 })
+        expect(wrapper.instance().getPreviousImageUrl()).to.equal(stateMock.imagePreviewList[stateMock.imagePreviewList.length - 1].lightBoxUrlList[0])
       })
-      it('should return undefined when imagePreviews length <= 1', () => {
-        wrapper.setState({ imagesPreviews: [] })
+      it('should return undefined when imagePreviewList length <= 1', () => {
+        wrapper.setState({ imagePreviewList: [] })
         expect(wrapper.instance().getPreviousImageUrl()).to.equal(undefined)
-        wrapper.setState({ imagesPreviews: stateMock.imagesPreviews })
+        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
       })
     })
 
     describe('getNextImageUrl()', () => {
-      it('should return the next imagePreview when filSelected < imagesPreviews.length', () => {
-        wrapper.setState({ fileSelected: 1 })
-        expect(wrapper.instance().getNextImageUrl()).to.equal(stateMock.imagesPreviews[2].lightBoxUrlList[0])
+      it('should return the next imagePreview when filSelected < imagePreviewList.length', () => {
+        wrapper.setState({ displayedPictureIndex: 1 })
+        expect(wrapper.instance().getNextImageUrl()).to.equal(stateMock.imagePreviewList[2].lightBoxUrlList[0])
       })
-      it('should return the first imagePreview when filSelected === imagesPreviews.length-1', () => {
-        wrapper.setState({ fileSelected: stateMock.imagesPreviews.length - 1 })
-        expect(wrapper.instance().getNextImageUrl()).to.equal(stateMock.imagesPreviews[0].lightBoxUrlList[0])
+      it('should return the first imagePreview when filSelected === imagePreviewList.length-1', () => {
+        wrapper.setState({ displayedPictureIndex: stateMock.imagePreviewList.length - 1 })
+        expect(wrapper.instance().getNextImageUrl()).to.equal(stateMock.imagePreviewList[0].lightBoxUrlList[0])
       })
-      it('should return undefined when imagePreviews length <= 1', () => {
-        wrapper.setState({ imagesPreviews: [] })
+      it('should return undefined when imagePreviewList length <= 1', () => {
+        wrapper.setState({ imagePreviewList: [] })
         expect(wrapper.instance().getNextImageUrl()).to.equal(undefined)
-        wrapper.setState({ imagesPreviews: stateMock.imagesPreviews })
+        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
       })
     })
 
     describe('handleClickPreviousNextPage()', () => {
-      it('should set fileSelected-- when previousNext equal DIRECTION.LEFT', () => {
-        wrapper.setState({ fileSelected: 1 })
+      it('should set displayedPictureIndex-- when previousNext equal DIRECTION.LEFT', () => {
+        wrapper.setState({ displayedPictureIndex: 1 })
         wrapper.instance().handleClickPreviousNextPage(DIRECTION.LEFT)
-        expect(wrapper.state().fileSelected).to.equal(0)
+        expect(wrapper.state().displayedPictureIndex).to.equal(0)
       })
-      it('should set fileSelected++ when previousNext equal DIRECTION.RIGHT', () => {
-        wrapper.setState({ fileSelected: 1 })
+      it('should set displayedPictureIndex++ when previousNext equal DIRECTION.RIGHT', () => {
+        wrapper.setState({ displayedPictureIndex: 1 })
         wrapper.instance().handleClickPreviousNextPage(DIRECTION.RIGHT)
-        expect(wrapper.state().fileSelected).to.equal(2)
+        expect(wrapper.state().displayedPictureIndex).to.equal(2)
       })
-      it('should set fileSelected to 0 when previousNext equal DIRECTION.RIGHT and state.fileSelected === imagesPreviews.length - 1', () => {
-        wrapper.setState({ fileSelected: stateMock.imagesPreviews.length - 1 })
+      it('should set displayedPictureIndex to 0 when previousNext equal DIRECTION.RIGHT and state.displayedPictureIndex === imagePreviewList.length - 1', () => {
+        wrapper.setState({ displayedPictureIndex: stateMock.imagePreviewList.length - 1 })
         wrapper.instance().handleClickPreviousNextPage(DIRECTION.RIGHT)
-        expect(wrapper.state().fileSelected).to.equal(0)
+        expect(wrapper.state().displayedPictureIndex).to.equal(0)
       })
-      it('should set fileSelected to imagesPreviews.length - 1 when previousNext equal DIRECTION.LEFT and state.fileSelected === 0', () => {
-        wrapper.setState({ fileSelected: 0 })
+      it('should set displayedPictureIndex to imagePreviewList.length - 1 when previousNext equal DIRECTION.LEFT and state.displayedPictureIndex === 0', () => {
+        wrapper.setState({ displayedPictureIndex: 0 })
         wrapper.instance().handleClickPreviousNextPage(DIRECTION.LEFT)
-        expect(wrapper.state().fileSelected).to.equal(stateMock.imagesPreviews.length - 1)
+        expect(wrapper.state().displayedPictureIndex).to.equal(stateMock.imagePreviewList.length - 1)
       })
     })
 
-    describe('onCarouselPositionChange()', () => {
-      it('should set fileSelected to 2 when the param is 2', () => {
-        wrapper.setState({ fileSelected: 0 })
-        wrapper.instance().onCarouselPositionChange(2)
-        expect(wrapper.state().fileSelected).to.equal(2)
+    describe('handleCarouselPositionChange()', () => {
+      it('should set displayedPictureIndex to 2 when the param is 2', () => {
+        wrapper.setState({ displayedPictureIndex: 0 })
+        wrapper.instance().handleCarouselPositionChange(2)
+        expect(wrapper.state().displayedPictureIndex).to.equal(2)
       })
-      it('should not change fileSelected when the param < 0', () => {
-        wrapper.setState({ fileSelected: 0 })
-        wrapper.instance().onCarouselPositionChange(-1)
-        expect(wrapper.state().fileSelected).to.equal(0)
+      it('should not change displayedPictureIndex when the param < 0', () => {
+        wrapper.setState({ displayedPictureIndex: 0 })
+        wrapper.instance().handleCarouselPositionChange(-1)
+        expect(wrapper.state().displayedPictureIndex).to.equal(0)
       })
     })
 
@@ -222,49 +224,49 @@ describe('<Gallery />', () => {
     })
 
     describe('rotateImg()', () => {
-      it('should change the rotationAngle of the fileSelected', () => {
-        const fileSelected = 1
-        wrapper.setState({ imagesPreviews: stateMock.imagesPreviews })
-        wrapper.instance().rotateImg(fileSelected, DIRECTION.RIGHT)
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(90)
-        wrapper.instance().rotateImg(fileSelected, DIRECTION.RIGHT)
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(180)
-        wrapper.instance().rotateImg(fileSelected, DIRECTION.RIGHT)
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(270)
-        wrapper.instance().rotateImg(fileSelected, DIRECTION.RIGHT)
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(0)
-        wrapper.instance().rotateImg(fileSelected, DIRECTION.LEFT)
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(270)
-        wrapper.instance().rotateImg(fileSelected, DIRECTION.LEFT)
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(180)
-        wrapper.instance().rotateImg(fileSelected, DIRECTION.LEFT)
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(90)
-        wrapper.instance().rotateImg(fileSelected, DIRECTION.LEFT)
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(0)
+      it('should change the rotationAngle of the displayedPictureIndex', () => {
+        const displayedPictureIndex = 1
+        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
+        wrapper.instance().rotateImg(displayedPictureIndex, DIRECTION.RIGHT)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(90)
+        wrapper.instance().rotateImg(displayedPictureIndex, DIRECTION.RIGHT)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(180)
+        wrapper.instance().rotateImg(displayedPictureIndex, DIRECTION.RIGHT)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(270)
+        wrapper.instance().rotateImg(displayedPictureIndex, DIRECTION.RIGHT)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(0)
+        wrapper.instance().rotateImg(displayedPictureIndex, DIRECTION.LEFT)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(270)
+        wrapper.instance().rotateImg(displayedPictureIndex, DIRECTION.LEFT)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(180)
+        wrapper.instance().rotateImg(displayedPictureIndex, DIRECTION.LEFT)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(90)
+        wrapper.instance().rotateImg(displayedPictureIndex, DIRECTION.LEFT)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(0)
       })
       it('should handle the case when filSelected < 0', () => {
-        const fileSelected = -1
-        wrapper.setState({ imagesPreviews: stateMock.imagesPreviews })
-        expect(wrapper.instance().rotateImg(fileSelected, DIRECTION.RIGHT)).to.be.a('undefined')
+        const displayedPictureIndex = -1
+        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
+        expect(wrapper.instance().rotateImg(displayedPictureIndex, DIRECTION.RIGHT)).to.be.a('undefined')
       })
-      it('should handle the case when filSelected >= imagesPreviews.length', () => {
-        const fileSelected = stateMock.imagesPreviews.length
-        wrapper.setState({ imagesPreviews: stateMock.imagesPreviews })
-        expect(wrapper.instance().rotateImg(fileSelected, DIRECTION.RIGHT)).to.be.a('undefined')
+      it('should handle the case when filSelected >= imagePreviewList.length', () => {
+        const displayedPictureIndex = stateMock.imagePreviewList.length
+        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
+        expect(wrapper.instance().rotateImg(displayedPictureIndex, DIRECTION.RIGHT)).to.be.a('undefined')
       })
       it('should handle the case when direction is undefined', () => {
-        const fileSelected = 1
-        wrapper.setState({ imagesPreviews: stateMock.imagesPreviews })
-        wrapper.instance().rotateImg(fileSelected, undefined)
-        expect(wrapper.state().imagesPreviews[fileSelected].rotationAngle).to.equal(0)
+        const displayedPictureIndex = 1
+        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
+        wrapper.instance().rotateImg(displayedPictureIndex, undefined)
+        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(0)
       })
     })
 
     describe('getRawFileUrlSelectedFile()', () => {
       it('should return the correct rawFileUrl', () => {
-        const fileSelectedTested = 1
-        wrapper.setState({ fileSelected: fileSelectedTested })
-        expect(wrapper.instance().getRawFileUrlSelectedFile()).to.equal(stateMock.imagesPreviews[fileSelectedTested].rawFileUrl)
+        const displayedPictureIndexTested = 1
+        wrapper.setState({ displayedPictureIndex: displayedPictureIndexTested })
+        expect(wrapper.instance().getRawFileUrlSelectedFile()).to.equal(stateMock.imagePreviewList[displayedPictureIndexTested].rawFileUrl)
       })
     })
 
@@ -272,33 +274,33 @@ describe('<Gallery />', () => {
       it('should build the correct breadcrumbsList when workspace gallery', () => {
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, false)
         expect(wrapper.state().breadcrumbsList.length).to.equal(4)
-        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(`/ui`)
+        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal('/ui')
         expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/dashboard`)
         expect(wrapper.state().breadcrumbsList[2].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},`)
         expect(wrapper.state().breadcrumbsList[3].link.props.to)
-          .to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents/file/${stateMock.imagesPreviews[wrapper.state().fileSelected].contentId}`)
+          .to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents/file/${stateMock.imagePreviewList[wrapper.state().displayedPictureIndex].contentId}`)
       })
       it('should build the correct breadcrumbsList when empty workspace gallery', () => {
-        wrapper.setState({ imagesPreviews: [] })
+        wrapper.setState({ imagePreviewList: [] })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, true)
         expect(wrapper.state().breadcrumbsList.length).to.equal(3)
-        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(`/ui`)
+        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal('/ui')
         expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/dashboard`)
         expect(wrapper.state().breadcrumbsList[2].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},`)
-        wrapper.setState({ imagesPreviews: stateMock.imagesPreviews })
+        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
       })
       it('should build the correct breadcrumbsList when folder gallery', () => {
         const folderId = 1
-        const folderDetail = { fileName: 'folder1', folderParentIdList: [ 2, 3] }
+        const folderDetail = { fileName: 'folder1', folderParentIdList: [2, 3] }
         wrapper.setState({ folderId: folderId })
-        wrapper.setState({ imagesPreviews: stateMock.imagesPreviews })
+        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, folderDetail, true)
         expect(wrapper.state().breadcrumbsList.length).to.equal(4)
-        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(`/ui`)
+        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal('/ui')
         expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/dashboard`)
         expect(wrapper.state().breadcrumbsList[2].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},${folderDetail.folderParentIdList.join(',')}`)
         expect(wrapper.state().breadcrumbsList[3].link.props.to)
-          .to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents/file/${stateMock.imagesPreviews[wrapper.state().fileSelected].contentId}`)
+          .to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents/file/${stateMock.imagePreviewList[wrapper.state().displayedPictureIndex].contentId}`)
       })
     })
   })

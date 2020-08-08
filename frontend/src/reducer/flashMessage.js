@@ -5,7 +5,7 @@ export default function flashMessage (state = [], action) {
     case `${ADD}/${FLASH_MESSAGE}`:
       return [...state, {
         message: action.msg.message,
-        type: action.msg.type || 'info' // may be info, success, danger
+        type: action.msg.type || 'info' // may be info, warning, danger
       }]
 
     case `${REMOVE}/${FLASH_MESSAGE}`:

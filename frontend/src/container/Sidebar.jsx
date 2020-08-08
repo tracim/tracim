@@ -4,9 +4,11 @@ import { withRouter } from 'react-router'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
-import appFactory from '../appFactory.js'
+import appFactory from '../util/appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
+  addWorkspaceList,
+  addWorkspaceMember,
   setWorkspaceListIsOpenInSidebar
 } from '../action-creator.sync.js'
 import {
@@ -16,11 +18,15 @@ import {
   unLoggedAllowedPageList,
   findUserRoleIdInWorkspace,
   TRACIM_APP_VERSION
-} from '../helper.js'
+} from '../util/helper.js'
 import {
   CUSTOM_EVENT,
   ROLE_LIST,
-  PROFILE
+  PROFILE,
+  TracimComponent,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  getOrCreateSessionClientToken
 } from 'tracim_frontend_lib'
 
 export class Sidebar extends React.Component {
@@ -30,14 +36,43 @@ export class Sidebar extends React.Component {
       sidebarClose: isMobile
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleShowCreateWorkspacePopup }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleTlmMemberCreated }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP:
-        this.handleClickNewWorkspace()
-        break
+  // Custom Event Handler
+  handleShowCreateWorkspacePopup = () => {
+    this.handleClickNewWorkspace()
+  }
+
+  handleTlmMemberCreated = tlmFieldObject => {
+    const { props } = this
+
+    const tlmUser = tlmFieldObject.user
+    const tlmAuthor = tlmFieldObject.author
+    const tlmWorkspace = tlmFieldObject.workspace
+    const loggedUserId = props.user.userId
+
+    if (loggedUserId === tlmUser.user_id) {
+      props.dispatch(addWorkspaceList([tlmWorkspace]))
+      props.dispatch(addWorkspaceMember(tlmUser, tlmWorkspace.workspace_id, tlmFieldObject.member))
+
+      // INFO - CH - 2020-06-25 - if logged used is author of the TLM and the new role is for him, it means the logged
+      // user created a new workspace
+      // the clientToken is to avoid redirecting the eventually opened other browser's tabs
+      const clientToken = getOrCreateSessionClientToken()
+      if (loggedUserId === tlmAuthor.user_id && clientToken === tlmFieldObject.client_token) {
+        props.dispatch(setWorkspaceListIsOpenInSidebar(tlmWorkspace.workspace_id, true))
+        if (tlmWorkspace.workspace_id && document.getElementById(tlmWorkspace.workspace_id)) {
+          document.getElementById(tlmWorkspace.workspace_id).scrollIntoView()
+        }
+        props.history.push(PAGE.WORKSPACE.DASHBOARD(tlmWorkspace.workspace_id))
+      }
     }
   }
 
@@ -88,13 +123,12 @@ export class Sidebar extends React.Component {
 
     return (
       <div className='sidebar'>
-        <div className={classnames('sidebar__expand', { 'sidebarclose': sidebarClose })} onClick={this.handleClickToggleSidebar}>
+        <div className={classnames('sidebar__expand', { sidebarclose: sidebarClose })} onClick={this.handleClickToggleSidebar}>
           {sidebarClose
             ? <i className={classnames('fa fa-chevron-right')} title={t('See sidebar')} />
-            : <i className={classnames('fa fa-chevron-left')} title={t('Hide sidebar')} />
-          }
+            : <i className={classnames('fa fa-chevron-left')} title={t('Hide sidebar')} />}
         </div>
-        <div className={classnames('sidebar__frame', { 'sidebarclose': sidebarClose })}>
+        <div className={classnames('sidebar__frame', { sidebarclose: sidebarClose })}>
           <div className='sidebar__scrollview'>
             {/*
             FIXME - CH - 2019-04-04 - button scroll to top removed for now
@@ -107,14 +141,14 @@ export class Sidebar extends React.Component {
             <div className='sidebar__content'>
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
-              <nav className={classnames('sidebar__content__navigation', { 'sidebarclose': sidebarClose })}>
+              <nav className={classnames('sidebar__content__navigation', { sidebarclose: sidebarClose })}>
                 <ul className='sidebar__content__navigation__workspace'>
-                  { workspaceList.map(ws =>
+                  {workspaceList.map(ws =>
                     <WorkspaceListItem
                       workspaceId={ws.id}
-                      userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.user_id, ws.memberList, ROLE_LIST)}
+                      userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.userId, ws.memberList, ROLE_LIST)}
                       label={ws.label}
-                      allowedAppList={ws.sidebarEntry}
+                      allowedAppList={ws.sidebarEntryList}
                       activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
                       isOpenInSidebar={ws.isOpenInSidebar}
                       onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
@@ -125,7 +159,7 @@ export class Sidebar extends React.Component {
                 </ul>
               </nav>
 
-              {getUserProfile(user.profile).id >= PROFILE.manager.id &&
+              {getUserProfile(user.profile).id >= PROFILE.manager.id && (
                 <div className='sidebar__content__btnnewworkspace'>
                   <button
                     className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
@@ -135,7 +169,7 @@ export class Sidebar extends React.Component {
                     {t('Create a shared space')}
                   </button>
                 </div>
-              }
+              )}
             </div>
 
             <div className='sidebar__footer mb-2'>
@@ -145,7 +179,7 @@ export class Sidebar extends React.Component {
               <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
                 Copyright - 2013 - 2020
                 <div className='sidebar__footer__text__link'>
-                  <a href='https://www.algoo.fr/fr/tracim' target='_blank' className='ml-3'>tracim.fr</a>
+                  <a href='https://www.algoo.fr/fr/tracim' target='_blank' rel='noopener noreferrer' className='ml-3'>tracim.fr</a>
                 </div>
               </div>
             </div>
@@ -157,4 +191,4 @@ export class Sidebar extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
-export default withRouter(connect(mapStateToProps)(appFactory(translate()(Sidebar))))
+export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar)))))

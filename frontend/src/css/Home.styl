@@ -1,6 +1,40 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
 .homepage
   display flex
   align-items center
   flex-direction column
   justify-content center
   min-height 100%
+  &__usernamePopup
+    .cardPopup__container
+      width 400px
+    &__body
+      width 100%
+      &__title
+        font-weight bold
+        text-align center
+        margin-bottom 20px
+      &__input
+        margin 5px 0
+      &__checkbox
+        margin-top 20px
+        display flex
+        &__input
+          margin auto 5px
+      &__smallmsg
+        font-size small
+      &__btn
+        margin-top 20px
+        display flex
+        margin-left auto
+    &__errorMsg
+      font-size small
+      margin-right 5px
+      text-align right
+      color errorRed
+    &__errorIcon
+      margin-right 5px
+    &__infoMsg
+      font-size small
+      text-align right

@@ -6,6 +6,7 @@
 from pyramid.events import NewResponse
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.utils.authentification import CLIENT_TOKEN_HEADER
 
 
 def add_cors_support(config):
@@ -69,7 +70,9 @@ def cors_options_view(context, request):
     ] = "OPTIONS,HEAD,GET,POST,PUT,DELETE,PROPFIND,PROPPATCH,REPORT,MOVE,LOCK,UNLOCK"
     response.headers[
         "Access-Control-Allow-Headers"
-    ] = "Content-Type,Accept,Accept-Language,Authorization,X-Request-ID,X-client,Depth,Prefer,If-None-Match,If-match"
+    ] = "Content-Type,Accept,Accept-Language,Authorization,X-Request-ID,X-client,Depth,Prefer,If-None-Match,If-match,{client_token_header}".format(
+        client_token_header=CLIENT_TOKEN_HEADER
+    )
     set_cors_headers(request, response)
     return response
 

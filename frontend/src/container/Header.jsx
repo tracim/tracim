@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import i18n from '../i18n.js'
-import appFactory from '../appFactory.js'
+import i18n from '../util/i18n.js'
+import appFactory from '../util/appFactory.js'
 import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
@@ -27,7 +27,7 @@ import {
   PAGE,
   unLoggedAllowedPageList,
   ALL_CONTENT_TYPES
-} from '../helper.js'
+} from '../util/helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
 import {
@@ -38,7 +38,7 @@ import {
 
 const qs = require('query-string')
 
-class Header extends React.Component {
+export class Header extends React.Component {
   componentDidMount () {
     this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', {})
     i18n.changeLanguage(this.props.user.lang)
@@ -51,7 +51,7 @@ class Header extends React.Component {
   handleChangeLang = async langId => {
     const { props } = this
 
-    if (props.user.user_id === -1) {
+    if (props.user.userId === -1) {
       Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
       i18n.changeLanguage(langId)
       props.dispatch(setUserLang(langId))
@@ -64,7 +64,6 @@ class Header extends React.Component {
       case 200:
         i18n.changeLanguage(langId)
         Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
-        props.dispatch(setUserLang(langId))
         props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, langId)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
@@ -74,15 +73,16 @@ class Header extends React.Component {
   handleClickHelp = () => {}
 
   handleClickLogout = async () => {
-    const { history, dispatch, t } = this.props
+    const { props } = this
 
-    const fetchPostUserLogout = await dispatch(postUserLogout())
+    const fetchPostUserLogout = await props.dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
-      dispatch(setUserDisconnected())
+      props.tlm.manager.closeLiveMessageConnection()
+      props.dispatch(setUserDisconnected())
       this.props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
-      history.push(PAGE.LOGIN)
+      props.history.push(PAGE.LOGIN)
     } else {
-      dispatch(newFlashMessage(t('Disconnection error', 'danger')))
+      props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
     }
   }
 
@@ -135,14 +135,14 @@ class Header extends React.Component {
                 className='header__menu__rightside__specificBtn'
               />
 
-              {props.user.logged &&
+              {props.user.logged && (
                 <li className='search__nav'>
                   <Search
                     className='header__menu__rightside__search'
                     onClickSearch={this.handleClickSearch}
                   />
                 </li>
-              }
+              )}
 
               {props.user.profile === PROFILE.administrator.slug && (
                 <li className='header__menu__rightside__adminlink nav-item'>
@@ -186,5 +186,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ searchResult, lang, user, system, appList }) => ({ searchResult, lang, user, system, appList })
+const mapStateToProps = ({ searchResult, lang, user, system, appList, tlm }) => ({ searchResult, lang, user, system, appList, tlm })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

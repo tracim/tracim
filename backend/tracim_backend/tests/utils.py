@@ -1,6 +1,7 @@
 from io import BytesIO
 import multiprocessing
 import os
+import subprocess
 import typing
 from typing import Any
 from typing import Optional
@@ -22,6 +23,7 @@ from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -31,7 +33,9 @@ from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.event import Event
 from tracim_backend.models.setup_models import get_tm_session
+from tracim_backend.models.tracim_session import TracimSession
 
 
 class ContentApiFactory(object):
@@ -138,6 +142,7 @@ class WedavEnvironFactory(object):
         self.session = session
         self.app_config = app_config
         self.admin_user = admin_user
+        self.plugin_manager = create_plugin_manager()
 
     def get(self, user: typing.Optional[User] = None) -> typing.Dict[str, typing.Any]:
 
@@ -148,8 +153,9 @@ class WedavEnvironFactory(object):
             "tracim_user": user,
         }
         tracim_context = WebdavTracimContext(
-            app_config=self.app_config, session=self.session, environ=environ
+            app_config=self.app_config, environ=environ, plugin_manager=self.plugin_manager,
         )
+        tracim_context.dbsession = self.session
         environ["tracim_context"] = tracim_context
         return environ
 
@@ -163,7 +169,7 @@ class ApplicationApiFactory(object):
 
 
 def webdav_put_new_test_file_helper(
-    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes
+    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes,
 ) -> _DAVResource:
     # This part id a reproduction of
     # wsgidav.request_server.RequestServer#doPUT
@@ -230,6 +236,38 @@ class RadicaleServerHelper(object):
             self.radicale_server.terminate()
 
 
+class EventHelper(object):
+    def __init__(self, db_session: TracimSession) -> None:
+        self._session = db_session
+
+    def last_events(self, count: int) -> typing.List[Event]:
+        events = self._session.query(Event).order_by(Event.event_id.desc()).limit(count).all()
+        return sorted(events, key=lambda e: e.event_id)
+
+    @property
+    def last_event(self) -> typing.Optional[Event]:
+        return self._session.query(Event).order_by(Event.event_id.desc()).limit(1).one()
+
+
+class DockerCompose:
+    command = [
+        "docker-compose",
+        "-f",
+        os.path.join(os.path.dirname(__file__), "..", "..", "docker-compose.yml"),
+    ]
+
+    def up(self, *names: str, env: dict = None) -> None:
+        self.execute("up", "-d", *names, env=env)
+
+    def down(self) -> None:
+        self.execute("down")
+
+    def execute(self, *arguments: str, env: dict = None) -> None:
+        if env:
+            env.update(os.environ)
+        subprocess.run(self.command + list(arguments), env=env, check=True)
+
+
 def eq_(a: Any, b: Any, msg: Optional[str] = None) -> None:
     # TODO - G.M - 05-04-2018 - Remove this when all old nose code is removed
     assert a == b, msg or "%r != %r" % (a, b)
@@ -267,3 +305,4 @@ def create_1000px_png_test_image() -> None:
 
 
 TEST_CONFIG_FILE_PATH = os.environ.get("TEST_CONFIG_FILE_PATH")
+TEST_PUSHPIN_FILE_PATH = os.environ.get("TEST_PUSHPIN_FILE_PATH")

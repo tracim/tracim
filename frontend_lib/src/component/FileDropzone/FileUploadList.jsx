@@ -51,7 +51,7 @@ FileUploadList.propTypes = {
   deleteFileDisabled: PropTypes.bool
 }
 
-FileUploadList.defaultState = {
+FileUploadList.defaultProps = {
   fileToUploadList: [],
   deleteFileDisabled: false,
   customTitle: ''
