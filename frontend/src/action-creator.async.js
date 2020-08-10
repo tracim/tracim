@@ -16,6 +16,7 @@ import {
   FOLDER,
   FOLDER_READ,
   newFlashMessage,
+  NOTIFICATION_LIST,
   SEARCHED_KEYWORDS,
   setRedirectLogin,
   setUserDisconnected,
