@@ -5,6 +5,7 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
   getNotificationList,
+  putAllNotificationAsRead,
   putNotificationAsRead
 } from '../action-creator.async.js'
 import {
@@ -31,7 +32,7 @@ export class NotificationWall extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      isNotificationWallOpen: false
+      isNotificationWallOpen: true
     }
   }
 
@@ -161,6 +162,20 @@ export class NotificationWall extends React.Component {
     return { icon, text, url }
   }
 
+  handleClickMarkAllAsRead = async () => {
+    const { props } = this
+
+    const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
+    switch (fetchAllPutNotificationAsRead.status) {
+      case 204: {
+        props.notificationPage.list.forEach(notification => props.dispatch(updateNotification({ ...notification, read: true })))
+        break
+      }
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
+    }
+  }
+
   render () {
     const { props, state } = this
 
@@ -174,7 +189,14 @@ export class NotificationWall extends React.Component {
           rawTitle={props.t('Notifications')}
           componentTitle={<div>{props.t('Notifications')}</div>}
           onClickCloseBtn={this.handleCloseNotificationWall}
-        />
+        >
+          <GenericButton
+            customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+            onClick={this.handleClickMarkAllAsRead}
+            label={props.t('Mark all as read')}
+            faIcon='envelope-open-o'
+          />
+        </PopinFixedHeader>
 
         <div className='notification__list'>
           {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
