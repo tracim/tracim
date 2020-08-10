@@ -732,7 +732,7 @@ class UserController(Controller):
         """
         get all the configuration parameters for the given user
         """
-        config_api = UserConfigApi(user=request.candidate_user, session=request.dbsession)
+        config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         return {"parameters": config_api.get_all_params()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
@@ -744,7 +744,7 @@ class UserController(Controller):
         """
         set or update the given configuration parameters for the given user
         """
-        config_api = UserConfigApi(user=request.candidate_user, session=request.dbsession)
+        config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])
 
     def bind(self, configurator: Configurator) -> None:
