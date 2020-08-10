@@ -32,7 +32,7 @@ export class NotificationWall extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      isNotificationWallOpen: true
+      isNotificationWallOpen: false
     }
   }
 
@@ -195,6 +195,7 @@ export class NotificationWall extends React.Component {
             onClick={this.handleClickMarkAllAsRead}
             label={props.t('Mark all as read')}
             faIcon='envelope-open-o'
+            dataCy='markAllAsReadButton'
           />
         </PopinFixedHeader>
 
