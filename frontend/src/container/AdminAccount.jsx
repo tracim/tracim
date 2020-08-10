@@ -103,31 +103,31 @@ export class Account extends React.Component {
   // TLM Handler
   handleUserModified = data => {
     const { state } = this
-    if (Number(state.userToEditId) !== data.user.user_id) return
-    if (state.userToEdit.publicName !== data.user.public_name) {
-      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, publicName: data.user.public_name } }))
+    if (Number(state.userToEditId) !== data.fields.user.user_id) return
+    if (state.userToEdit.publicName !== data.fields.user.public_name) {
+      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, publicName: data.fields.user.public_name } }))
       return
     }
-    if (state.userToEdit.username !== data.user.username) {
-      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, username: data.user.username } }))
+    if (state.userToEdit.username !== data.fields.user.username) {
+      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, username: data.fields.user.username } }))
       return
     }
-    if (state.userToEdit.email !== data.user.email) {
-      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, email: data.user.email } }))
+    if (state.userToEdit.email !== data.fields.user.email) {
+      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, email: data.fields.user.email } }))
       return
     }
-    if (state.userToEdit.profile !== data.user.profile) this.setState(prev => ({ userToEdit: { ...prev.userToEdit, profile: data.user.profile } }))
+    if (state.userToEdit.profile !== data.fields.user.profile) this.setState(prev => ({ userToEdit: { ...prev.userToEdit, profile: data.fields.user.profile } }))
   }
 
   handleMemberModified = data => {
     const { state } = this
-    if (Number(state.userToEditId) !== data.user.user_id) return
+    if (Number(state.userToEditId) !== data.fields.user.user_id) return
     this.setState(prev => ({
-      userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.id === data.workspace.workspace_id
+      userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.id === data.fields.workspace.workspace_id
         ? {
           ...ws,
           memberList: ws.memberList.map(member => member.id === Number(state.userToEditId)
-            ? { ...member, doNotify: data.member.do_notify }
+            ? { ...member, doNotify: data.fields.member.do_notify }
             : member
           )
         }

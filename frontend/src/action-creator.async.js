@@ -16,6 +16,7 @@ import {
   FOLDER,
   FOLDER_READ,
   newFlashMessage,
+  NOTIFICATION,
   NOTIFICATION_LIST,
   SEARCHED_KEYWORDS,
   setRedirectLogin,
@@ -844,6 +845,32 @@ export const getGuestUploadInfo = token => dispatch => {
       method: 'GET'
     },
     actionName: 'GuestUpload',
+    dispatch
+  })
+}
+
+export const getNotificationList = (userId, notificationsByPage, nextPageToken = null) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?count=${notificationsByPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+export const putNotificationAsRead = (userId, eventId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/${eventId}/read`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION,
     dispatch
   })
 }
