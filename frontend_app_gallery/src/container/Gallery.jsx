@@ -53,7 +53,7 @@ export class Gallery extends React.Component {
       content: param.content,
       breadcrumbsList: [],
       appMounted: false,
-      folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || 0) : debug.config.folderId,
+      folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || undefined) : debug.config.folderId,
       folderDetail: {
         fileName: '',
         folderParentIdList: []
@@ -94,8 +94,17 @@ export class Gallery extends React.Component {
   // https://github.com/tracim/tracim/issues/3107#issuecomment-643994410
 
   liveMessageNotRelevant (data, state) {
-    return Number(data.content.workspace_id) !== Number(state.config.appConfig.workspaceId) ||
-    Number(data.content.parent_id) !== Number(state.folderId)
+    if (Number(data.content.workspace_id) !== Number(state.config.appConfig.workspaceId)) {
+      return true
+    }
+
+    if (state.folderId || data.content.parent_id) {
+      const currentFolderId = Number(state.folderId) || 0
+      const liveMessageFolderId = Number(data.content.parent_id) || 0
+      return currentFolderId !== liveMessageFolderId
+    }
+
+    return false
   }
 
   handleShowApp = data => {
