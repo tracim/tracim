@@ -12,7 +12,6 @@ from sqlalchemy import null
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
-from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
@@ -57,7 +56,6 @@ from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
-
 
 RQ_QUEUE_NAME = "event"
 
@@ -105,7 +103,6 @@ class EventApi:
             query = query.filter(Message.event_id == event_id)
         if user_id:
             query = query.filter(Message.receiver_id == user_id)
-        query = query.options(joinedload(Message.event))
         if read_status == ReadStatus.READ:
             query = query.filter(Message.read != null())
         elif read_status == ReadStatus.UNREAD:
