@@ -27,6 +27,9 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
+from tracim_backend.lib.core.event import RQ_QUEUE_NAME
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
@@ -60,7 +63,7 @@ def pushpin(tracim_webserver, tmp_path_factory):
     pushpin_config_dir = str(tmp_path_factory.mktemp("pushpin"))
     my_dir = dirname(__file__)
     shutil.copyfile(
-        os.path.join(my_dir, "pushpin.conf"), os.path.join(pushpin_config_dir, "pushpin.conf")
+        os.path.join(my_dir, "pushpin.conf"), os.path.join(pushpin_config_dir, "pushpin.conf"),
     )
     with open(os.path.join(pushpin_config_dir, "routes"), "w") as routes:
         routes.write("* {}:{}\n".format(tracim_webserver.hostname, tracim_webserver.port))
@@ -77,7 +80,7 @@ def pushpin(tracim_webserver, tmp_path_factory):
 
 
 @pytest.fixture
-def rq_database_worker(config_uri):
+def rq_database_worker(config_uri, empty_rq_event_queue):
 
     worker_env = os.environ.copy()
     worker_env["TRACIM_CONF_PATH"] = "{}#rq_worker_test".format(config_uri)
@@ -153,6 +156,13 @@ def web_testapp(settings, hapic, session):
 
 
 @pytest.fixture
+def empty_rq_event_queue(app_config):
+    redis_connection = get_redis_connection(app_config)
+    queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+    queue.delete()
+
+
+@pytest.fixture
 def hapic():
     from tracim_backend.extensions import hapic as hapic_static
 
@@ -197,10 +207,7 @@ def migration_engine(engine):
 
 @pytest.fixture
 def session(request, engine, session_factory, app_config, test_logger):
-    mock_event_builder = getattr(request, "param", {}).get("mock_event_builder", True)
-    context = TracimTestContext(
-        app_config, mock_event_builder=mock_event_builder, session_factory=session_factory
-    )
+    context = TracimTestContext(app_config, session_factory=session_factory)
     from tracim_backend.models.meta import DeclarativeBase
 
     with transaction.manager:
@@ -321,7 +328,7 @@ def content_type_list() -> ContentTypeList:
 @pytest.fixture()
 def webdav_provider(app_config: CFG):
     return Provider(
-        show_archived=False, show_deleted=False, show_history=False, app_config=app_config
+        show_archived=False, show_deleted=False, show_history=False, app_config=app_config,
     )
 
 
@@ -330,7 +337,7 @@ def webdav_environ_factory(
     webdav_provider: Provider, session: Session, admin_user: User, app_config: CFG
 ) -> WedavEnvironFactory:
     return WedavEnvironFactory(
-        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user
+        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user,
     )
 
 

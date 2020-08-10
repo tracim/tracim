@@ -40,7 +40,8 @@ import {
   addRevisionFromTLM,
   RefreshWarningMessage,
   setupCommonRequestHeaders,
-  getOrCreateSessionClientToken
+  getOrCreateSessionClientToken,
+  getCurrentContentVersionNumber
 } from 'tracim_frontend_lib'
 import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
@@ -57,7 +58,7 @@ import {
 import FileProperties from '../component/FileProperties.jsx'
 
 export class File extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const param = props.data || debug
@@ -168,11 +169,13 @@ export class File extends React.Component {
     }
 
     this.setState(prev => ({
-      content: clientToken === data.client_token ? newContentObject : prev.content,
+      content: clientToken === data.client_token
+        ? newContentObject
+        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
       newContent: newContentObject,
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang, clientToken === data.client_token),
       isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
     if (clientToken === data.client_token) {
@@ -189,7 +192,8 @@ export class File extends React.Component {
           ...data.content,
           created_raw: data.content.created,
           created: displayDistanceDate(data.content.created, this.state.loggedUser.lang),
-          timelineType: data.content.content_type
+          timelineType: data.content.content_type,
+          hasBeenRead: data.client_token === this.sessionClientToken
         }
       ])
       this.setState({
@@ -206,7 +210,9 @@ export class File extends React.Component {
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev =>
       ({
-        content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+        content: clientToken === data.client_token
+          ? { ...prev.content, ...data.content }
+          : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
         newContent: {
           ...prev.content,
           ...data.content
@@ -214,7 +220,7 @@ export class File extends React.Component {
         editionAuthor: data.author.public_name,
         showRefreshWarning: clientToken !== data.client_token,
         mode: clientToken === data.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
-        timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+        timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang, clientToken === data.client_token),
         isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
       })
     )
@@ -229,7 +235,7 @@ export class File extends React.Component {
     this.setState({ timeline: newTimeline })
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
     const { state } = this
 
@@ -243,7 +249,7 @@ export class File extends React.Component {
     if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate(prevProps, prevState) {
     const { state } = this
 
     console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -263,7 +269,7 @@ export class File extends React.Component {
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
@@ -705,11 +711,12 @@ export class File extends React.Component {
       ...state.newContent
     }
 
-    this.setState({
+    this.setState(prev => ({
       content: newObjectContent,
+      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
-    })
+    }))
     const filenameNoExtension = removeExtensionOfFilename(this.state.newContent.filename)
     this.setHeadTitle(filenameNoExtension)
     this.buildBreadcrumbs(newObjectContent)
@@ -839,7 +846,7 @@ export class File extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const { props, state } = this
     const onlineEditionAction = this.getOnlineEditionAction()
 
@@ -916,16 +923,16 @@ export class File extends React.Component {
                   style={{ marginLeft: '5px' }}
                 />
               )}
-            </div>
 
-            <div className='d-flex'>
               {state.showRefreshWarning && (
                 <RefreshWarningMessage
                   tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
                   onClickRefresh={this.handleClickRefresh}
                 />
               )}
+            </div>
 
+            <div className='d-flex'>
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}

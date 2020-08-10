@@ -29,7 +29,8 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent
+  TracimComponent,
+  getCurrentContentVersionNumber
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -104,12 +105,14 @@ export class HtmlDocument extends React.Component {
     const newContentObject = { ...state.content, ...data.content }
     this.setState(prev => ({
       ...prev,
-      content: clientToken === data.client_token ? newContentObject : prev.content,
+      content: clientToken === data.client_token
+        ? newContentObject
+        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
       newContent: newContentObject,
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
       rawContentBeforeEdit: data.content.raw_content,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang, data.client_token === this.sessionClientToken),
       isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
     if (clientToken === data.client_token) {
@@ -129,7 +132,8 @@ export class HtmlDocument extends React.Component {
           ...data.content,
           created: displayDistanceDate(data.content.created, state.loggedUser.lang),
           created_raw: data.content.created,
-          timelineType: 'comment'
+          timelineType: 'comment',
+          hasBeenRead: data.client_token === this.sessionClientToken
         }
       ]
     )
@@ -147,11 +151,13 @@ export class HtmlDocument extends React.Component {
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
+      content: clientToken === data.client_token
+        ? { ...prev.content, ...data.content }
+        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
       showRefreshWarning: clientToken !== data.client_token,
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
+      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang, data.client_token === this.sessionClientToken),
       isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
   }
@@ -513,6 +519,11 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickLastVersion = () => {
+    if (this.state.showRefreshWarning) {
+      this.handleClickRefresh()
+      return
+    }
+
     this.loadContent()
     this.setState({ mode: APP_FEATURE_MODE.VIEW })
   }
@@ -523,14 +534,16 @@ export class HtmlDocument extends React.Component {
 
     const newObjectContent = {
       ...state.content,
-      ...state.newContent
+      ...state.newContent,
+      raw_content: state.rawContentBeforeEdit
     }
 
-    this.setState({
+    this.setState(prev => ({
       content: newObjectContent,
+      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
-    })
+    }))
     this.setHeadTitle(newObjectContent.label)
     this.buildBreadcrumbs(newObjectContent)
   }
@@ -584,9 +597,7 @@ export class HtmlDocument extends React.Component {
                   {props.t('Last version')}
                 </button>
               )}
-            </div>
 
-            <div className='d-flex'>
               {state.showRefreshWarning && (
                 <RefreshWarningMessage
                   tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
@@ -594,6 +605,9 @@ export class HtmlDocument extends React.Component {
                 />
               )}
 
+            </div>
+
+            <div className='d-flex'>
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -642,6 +656,7 @@ export class HtmlDocument extends React.Component {
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
+            isRefreshNeeded={state.showRefreshWarning}
           />
 
           <PopinFixedRightPart

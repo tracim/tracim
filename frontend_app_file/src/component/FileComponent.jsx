@@ -13,14 +13,14 @@ import {
 const color = require('color')
 
 export class FileComponent extends React.Component {
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { props } = this
 
     if (prevProps.previewVideo && !props.previewVideo) this.unLoadVideoPlayer()
     else if (!prevProps.previewVideo && props.previewVideo) this.loadVideoPlayer(props.downloadRawUrl, props.mimeType)
   }
 
-  loadVideoPlayer (videoUrl, videoMimeType) {
+  loadVideoPlayer(videoUrl, videoMimeType) {
     const source = document.createElement('source')
     source.src = videoUrl
     source.type = videoMimeType
@@ -59,12 +59,12 @@ export class FileComponent extends React.Component {
     body.appendChild(videoWrapper)
   }
 
-  unLoadVideoPlayer () {
+  unLoadVideoPlayer() {
     const videoWrapper = document.getElementById('videoWrapperDiv')
     videoWrapper.remove()
   }
 
-  render () {
+  render() {
     const { props } = this
     return (
       <div
