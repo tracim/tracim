@@ -34,6 +34,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
+from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
@@ -80,8 +81,13 @@ def pushpin(tracim_webserver, tmp_path_factory):
 
 
 @pytest.fixture
-def rq_database_worker(config_uri, empty_rq_event_queue):
+def rq_database_worker(config_uri, app_config):
+    def empty_event_queue():
+        redis_connection = get_redis_connection(app_config)
+        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+        queue.delete()
 
+    empty_event_queue()
     worker_env = os.environ.copy()
     worker_env["TRACIM_CONF_PATH"] = "{}#rq_worker_test".format(config_uri)
     worker_process = subprocess.Popen(
@@ -89,8 +95,13 @@ def rq_database_worker(config_uri, empty_rq_event_queue):
         env=worker_env,
     )
     yield worker_process
+    empty_event_queue()
     worker_process.terminate()
-    worker_process.wait()
+    try:
+        worker_process.wait(5.0)
+    except TimeoutError:
+        worker_process.kill()
+        raise TimeoutError("rq worker didn't shut down properly, had to kill it")
 
 
 @pytest.fixture
@@ -156,13 +167,6 @@ def web_testapp(settings, hapic, session):
 
 
 @pytest.fixture
-def empty_rq_event_queue(app_config):
-    redis_connection = get_redis_connection(app_config)
-    queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
-    queue.delete()
-
-
-@pytest.fixture
 def hapic():
     from tracim_backend.extensions import hapic as hapic_static
 
@@ -208,7 +212,6 @@ def migration_engine(engine):
 @pytest.fixture
 def session(request, engine, session_factory, app_config, test_logger):
     context = TracimTestContext(app_config, session_factory=session_factory)
-    from tracim_backend.models.meta import DeclarativeBase
 
     with transaction.manager:
         try:
@@ -218,7 +221,6 @@ def session(request, engine, session_factory, app_config, test_logger):
             transaction.abort()
             raise e
     yield context.dbsession
-    from tracim_backend.models.meta import DeclarativeBase
 
     context.dbsession.rollback()
     context.dbsession.close_all()

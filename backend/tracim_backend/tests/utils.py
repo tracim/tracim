@@ -284,7 +284,7 @@ class TracimTestContext(TracimContext):
         event_publisher = EventPublisher(app_config)
         # mock event publishing to avoid requiring a working
         # pushpin instance for every test
-        event_publisher._publish_pending_events_of_context = mock.Mock()
+        EventPublisher._publish_pending_events_of_context = mock.Mock()
 
         self._plugin_manager.register(event_builder)
         self._plugin_manager.register(event_publisher)
