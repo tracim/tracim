@@ -56,12 +56,14 @@ describe('<Thread />', () => {
 
       describe('handleCommentCreated', () => {
         const tlmData = {
-          ...baseCommentTlm,
-          content: {
-            ...commentTlm,
-            parent_id: contentThread.thread.content_id,
-            content_id: 9,
-            created: '2022-06-09T10:28:43.511Z',
+          fields: {
+            ...baseCommentTlm,
+            content: {
+              ...commentTlm,
+              parent_id: contentThread.thread.content_id,
+              content_id: 9,
+              created: '2022-06-09T10:28:43.511Z',
+            }
           }
         }
 
@@ -110,11 +112,13 @@ describe('<Thread />', () => {
 
         describe('Create a comment not related to the current thread', () => {
           const tlmData = {
-            ...baseCommentTlm,
-            content: {
-              ...baseCommentTlm.content,
-              parent_id: contentThread.thread.content_id + 1,
-              content_id: 12
+            fields: {
+              ...baseCommentTlm,
+              content: {
+                ...baseCommentTlm.content,
+                parent_id: contentThread.thread.content_id + 1,
+                content_id: 12
+              }
             }
           }
           let oldTimelineLength = 0
@@ -133,12 +137,14 @@ describe('<Thread />', () => {
       describe('handleContentChanged', () => {
         describe('Modify the label of the current content', () => {
           const tlmData = {
-            ...baseRevisionTlm,
-            content: {
-              ...baseRevisionTlm.content,
-              label: 'new label'
-            },
-            client_token: wrapper.state('config').apiHeader['X-Tracim-ClientToken']
+            fields: {
+              ...baseRevisionTlm,
+              content: {
+                ...baseRevisionTlm.content,
+                label: 'new label'
+              },
+              client_token: wrapper.state('config').apiHeader['X-Tracim-ClientToken']
+            }
           }
 
           before(() => {
@@ -151,22 +157,24 @@ describe('<Thread />', () => {
           })
 
           it('should update the state label', () => {
-            expect(wrapper.state('newContent').label).to.equal(tlmData.content.label)
+            expect(wrapper.state('newContent').label).to.equal(tlmData.fields.content.label)
           })
           it('should call buildBreadcrumbs()', () => {
             expect(buildBreadcrumbsSpy.called).to.equal(true)
           })
           it('should call setHeadTitle() with the right args', () => {
-            expect(setHeadTitleSpy.calledOnceWith(tlmData.content.label)).to.equal(true)
+            expect(setHeadTitleSpy.calledOnceWith(tlmData.fields.content.label)).to.equal(true)
           })
         })
 
         describe('Modify the description of the current content', () => {
           const tlmData = {
-            ...baseRevisionTlm,
-            content: {
-              ...contentThread.thread,
-              raw_content: 'new random description'
+            fields: {
+              ...baseRevisionTlm,
+              content: {
+                ...contentThread.thread,
+                raw_content: 'new random description'
+              }
             }
           }
 
@@ -175,16 +183,18 @@ describe('<Thread />', () => {
           })
 
           it('should update the state "raw_content"', () => {
-            expect(wrapper.state('newContent').raw_content).to.equal(tlmData.content.raw_content)
+            expect(wrapper.state('newContent').raw_content).to.equal(tlmData.fields.content.raw_content)
           })
         })
 
         describe('Modify a content not related to the current thread', () => {
           const tlmData = {
-            ...baseRevisionTlm,
-            content: {
-              ...baseRevisionTlm.content,
-              content_id: contentThread.thread.content_id + 1
+            fields: {
+              ...baseRevisionTlm,
+              content: {
+                ...baseRevisionTlm.content,
+                content_id: contentThread.thread.content_id + 1
+              }
             }
           }
 
@@ -193,14 +203,16 @@ describe('<Thread />', () => {
           })
 
           it('should not update the state', () => {
-            expect(wrapper.state('content').content_id).to.not.equal(tlmData.content.content_id)
+            expect(wrapper.state('content').content_id).to.not.equal(tlmData.fields.content.content_id)
           })
         })
 
         describe('Delete the current content', () => {
           const tlmData = {
-            ...baseRevisionTlm,
-            content: { ...baseRevisionTlm.content, is_deleted: true}
+            fields: {
+              ...baseRevisionTlm,
+              content: { ...baseRevisionTlm.content, is_deleted: true}
+            }
           }
 
           before(() => {
@@ -218,11 +230,13 @@ describe('<Thread />', () => {
 
         describe('Delete a content which is not the current one', () => {
           const tlmData = {
-            ...baseRevisionTlm,
-            content: {
-              ...baseRevisionTlm.content,
-              content_id: contentThread.thread.content_id + 1,
-              is_deleted: true
+            fields: {
+              ...baseRevisionTlm,
+              content: {
+                ...baseRevisionTlm.content,
+                content_id: contentThread.thread.content_id + 1,
+                is_deleted: true
+              }
             }
           }
 
@@ -237,8 +251,10 @@ describe('<Thread />', () => {
 
         describe('Restore the current content', () => {
           const tlmData = {
-            ...baseRevisionTlm,
-            content: { ...baseRevisionTlm.content, is_deleted: false }
+            fields: {
+              ...baseRevisionTlm,
+              content: { ...baseRevisionTlm.content, is_deleted: false }
+            }
           }
 
           before(() => {
@@ -257,11 +273,13 @@ describe('<Thread />', () => {
 
         describe('Restore a content which is not the current one', () => {
           const tlmData = {
-            ...baseRevisionTlm,
-            content: {
-              ...baseRevisionTlm.content,
-              content_id: contentThread.thread.content_id + 1,
-              is_deleted: false
+            fields: {
+              ...baseRevisionTlm,
+              content: {
+                ...baseRevisionTlm.content,
+                content_id: contentThread.thread.content_id + 1,
+                is_deleted: false
+              }
             }
           }
 
@@ -281,13 +299,13 @@ describe('<Thread />', () => {
       describe('handleUserModified', () => {
         describe('If the user is the author of a revision or comment', () => {
           it('should update the timeline with the data of the user', () => {
-            const tlmData = { user: { ...user, public_name: 'newName' } }
+            const tlmData = { fields: { user: { ...user, public_name: 'newName' } } }
             wrapper.instance().handleUserModified(tlmData)
 
             const listPublicNameOfAuthor = wrapper.state('timeline')
-              .filter(timelineItem => timelineItem.author.user_id === tlmData.user.user_id)
+              .filter(timelineItem => timelineItem.author.user_id === tlmData.fields.user.user_id)
               .map(timelineItem => timelineItem.author.public_name)
-            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.user.public_name)
+            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.fields.user.public_name)
             expect(isNewName).to.be.equal(true)
           })
         })
