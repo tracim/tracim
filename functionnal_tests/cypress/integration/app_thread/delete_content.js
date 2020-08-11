@@ -43,7 +43,7 @@ describe('delete a thread content', function () {
           cy.get('.timeline__warning > [data-cy="displaystate"] .displaystate__btn').should('be.visible')
           cy.get('.thread.visible .thread__contentpage__header__close').click()
           cy.get('.thread.visible').should('not.be.visible')
-          cy.get('.content__name').contains(titre1).should('not.exist')
+          cy.contains('.content__name', titre1).should('not.exist')
         }
       })
     })
