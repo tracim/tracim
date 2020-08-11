@@ -13,7 +13,8 @@ import {
   PAGE,
   DRAG_AND_DROP,
   sortWorkspaceContents,
-  SHARE_FOLDER_ID
+  SHARE_FOLDER_ID,
+  ANCHOR_NAMESPACE
 } from '../../util/helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
@@ -64,7 +65,7 @@ class Folder extends React.Component {
           read: true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
         data-cy={`folder_${props.folderData.id}`}
-        id={props.folderData.id}
+        id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.folderData.id}`}
       >
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle

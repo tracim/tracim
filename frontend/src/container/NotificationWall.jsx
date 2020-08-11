@@ -25,7 +25,10 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { NUMBER_RESULTS_BY_PAGE } from '../util/helper.js'
+import {
+  ANCHOR_NAMESPACE,
+  NUMBER_RESULTS_BY_PAGE
+} from '../util/helper.js'
 
 export class NotificationWall extends React.Component {
   handleClickNotification = async notificationId => {
@@ -179,7 +182,7 @@ export class NotificationWall extends React.Component {
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
                 read={false}
-                id={notification.id}
+                id={`${ANCHOR_NAMESPACE.contentItem}:${notification.id}`}
                 key={notification.id}
               >
                 <Link
