@@ -139,35 +139,13 @@ export const TinymceInit = () => {
           const event = new globalThis.CustomEvent('tinymceLoaded', { detail: {}, editor: this })
           document.dispatchEvent(event)
           editor = $editor
-          // globalThis.getCursorPosition = () => {
-          //   var tinymcePosition = $($editor.getContainer()).position()
-          //   var toolbarPosition = $($editor.getContainer()).find('.mce-toolbar').first()
-          //   var nodePosition = $($editor.selection.getNode()).position()
-          //   var textareaTop = 0
-          //   var textareaLeft = 0
-          //   if ($editor.selection.getRng().getClientRects().length > 0) {
-          //     textareaTop = $editor.selection.getRng().getClientRects()[0].top + editor.selection.getRng().getClientRects()[0].height
-          //     textareaLeft = $editor.selection.getRng().getClientRects()[0].left
-          //   } else {
-          //     textareaTop = parseInt($(editor.selection.getNode()).css('font-size')) * 1.3 + nodePosition.top
-          //     textareaLeft = nodePosition.left
-          //   }
-          //   var position = $(editor.getContainer()).offset()
-          //   return {
-          //     top: position.top + toolbarPosition.innerHeight() + textareaTop,
-          //     left: position.left
-          //   }
-          // }
         })
 
         const getPosition = (e) => {
-          const toolbarPosition = $($editor.getContainer()).find('.mce-toolbar').first()
+          const toolbarPosition = $($editor.getContainer()).find('.mce-toolbar-grp').first()
           const nodePosition = $($editor.selection.getNode()).position()
-          const position = $(editor.getContainer()).offset()
           const result = {
-            top: position.top + toolbarPosition.innerHeight() + nodePosition.top - 15,
-            width: $editor.getContainer().offsetWidth,
-            container: position
+            top: nodePosition.top + toolbarPosition.height()
           }
           handleTinyMceInput(e, result)
         }
@@ -182,14 +160,6 @@ export const TinymceInit = () => {
 
         $editor.on('input', function (e) {
           return getPosition(e)
-        })
-
-        $editor.on('scroll', function (e) {
-          console.log('THE SCROLL IS ON')
-        })
-
-        $editor.on('selectionchange', function (e) {
-          console.log('selectionchange', e)
         })
 
         // ////////////////////////////////////////////

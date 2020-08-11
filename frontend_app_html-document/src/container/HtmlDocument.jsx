@@ -74,6 +74,7 @@ export class HtmlDocument extends React.Component {
       editionAuthor: '',
       isLastTimelineItemCurrentToken: false,
       textAppAutoComplete: false,
+      timelineAutoComplete: false,
       autoCompleteCursorPosition: 0,
       autoCompleteItemList: []
     }
@@ -252,11 +253,12 @@ export class HtmlDocument extends React.Component {
         tinymce.activeEditor.selection.select(tinymce.activeEditor.selection.dom.select('span#autocomplete-searchtext span')[0])
         tinymce.activeEditor.selection.collapse(0)
 
-        this.setState({
-          textAppAutoComplete: true,
+        this.setState(prev => ({
+          textAppAutoComplete: !prev.timelineWysiwyg,
+          timelineAutoComplete: prev.timelineWysiwyg,
           tinymcePosition: position,
           autoCompleteItemList: []
-        })
+        }))
         break
       }
       case ' ': {
@@ -785,6 +787,7 @@ export class HtmlDocument extends React.Component {
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
                   isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                   searchMentionList={this.searchMentionList}
+                  tinyMceTimelineAutocomplete={state.timelineAutoComplete}
                 />
               )
             }]}

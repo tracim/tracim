@@ -79,7 +79,6 @@ export const HtmlDocument = props => {
                 onPointerEnter={() => {}}
                 onClickAutoCompleteItem={props.onClickAutoCompleteItem}
                 style={{
-                  width: props.tinymcePosition.width,
                   top: props.tinymcePosition.top
                 }}
               />

@@ -173,6 +173,7 @@ export class Timeline extends React.Component {
                 wysiwyg={props.wysiwyg}
                 searchedKnownMemberListForMention={props.searchedKnownMemberListForMention}
                 searchMentionList={props.searchMentionList}
+                tinyMceTimelineAutocomplete={props.tinyMceTimelineAutocomplete}
               />
             </div>
 

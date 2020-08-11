@@ -105,7 +105,7 @@ export class AutoCompleteTextArea extends React.Component {
 
     return (
       <>
-        {(!props.disableComment) && state.mentionAutocomplete && state.autoCompleteItemList.length > 0 && (
+        {!props.disableComment && state.mentionAutocomplete && state.autoCompleteItemList.length > 0 && (
           <div className='textarea__autocomplete'>
             {state.autoCompleteItemList.map((m, i) => (
               <>
