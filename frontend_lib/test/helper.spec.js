@@ -12,7 +12,8 @@ import {
   COMMON_REQUEST_HEADERS,
   setupCommonRequestHeaders,
   serialize,
-  addRevisionFromTLM
+  addRevisionFromTLM,
+  wrapMentionInSpanTag
 } from '../src/helper.js'
 
 import sinon from 'sinon'
@@ -242,6 +243,92 @@ describe('helper.js', () => {
     })
     it('should set a revision number to revision count + 1', () => {
       expect(lastRevisionObject.number).to.be.equal(2)
+    })
+  })
+
+  describe('function wrapMentionInSpanTag', () => {
+    const DOMParser = new global.DOMParser()
+
+    describe('with a source without any mention', () => {
+      const textWithoutMention = 'This is a text without any mention'
+      const result = wrapMentionInSpanTag(textWithoutMention)
+
+      it('should not modify the source', () => expect(textWithoutMention).to.equal(result))
+    })
+
+    describe('with only one mention in the source', () => {
+      describe('with source as simple text', () => {
+        const textWithMention = 'This is a text with a mention @admin that should be wrapped'
+        const result = wrapMentionInSpanTag(textWithMention)
+        const parsedResult = DOMParser.parseFromString(result, 'text/html')
+        const addedSpanList = parsedResult.getElementsByTagName('span')
+
+        it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
+        it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
+        it('should have the span id starting with "mention-"', () => expect(addedSpanList[0].id.startsWith('mention-')).to.equal(true))
+      })
+
+      describe('with source as HTML text', () => {
+        const htmlTextWithMention = `<div class='someClass'>'This is a text with <p>a mention @admin that</p> should be wrapped'</div>`
+        const result = wrapMentionInSpanTag(htmlTextWithMention)
+        const parsedResult = DOMParser.parseFromString(result, 'text/html')
+        const addedSpanList = parsedResult.getElementsByTagName('span')
+
+        it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
+        it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
+        it('should have the span id starting with "mention-"', () => expect(addedSpanList[0].id.startsWith('mention-')).to.equal(true))
+      })
+    })
+
+    describe('with 3 mention in the source', () => {
+      describe('with source as simple text', () => {
+        const textWithMultipleMentions = 'This is a text @user1 with 3 mention @admin that should be @user2 wrapped'
+        const result = wrapMentionInSpanTag(textWithMultipleMentions)
+        const parsedResult = DOMParser.parseFromString(result, 'text/html')
+        const addedSpanList = parsedResult.getElementsByTagName('span')
+
+        it('should have 3 span tags', () => expect(addedSpanList).to.have.lengthOf(3))
+        it('should contain the username in each span tag', () => {
+          expect(addedSpanList[0].textContent).to.equal('@user1')
+          expect(addedSpanList[1].textContent).to.equal('@admin')
+          expect(addedSpanList[2].textContent).to.equal('@user2')
+        })
+        it('should have each span id starting with "mention-"', () => {
+          expect(addedSpanList[0].id.startsWith('mention-')).to.equal(true)
+          expect(addedSpanList[1].id.startsWith('mention-')).to.equal(true)
+          expect(addedSpanList[2].id.startsWith('mention-')).to.equal(true)
+        })
+      })
+
+      describe('with source as HTML text', () => {
+        const htmlTextWithMention = `<div class='someClass'>'This is @user1 a text with <p>a mention @admin that</p> should be @user2 wrapped'</div>`
+        const result = wrapMentionInSpanTag(htmlTextWithMention)
+        const parsedResult = DOMParser.parseFromString(result, 'text/html')
+        const addedSpanList = parsedResult.getElementsByTagName('span')
+
+        it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(3))
+        it('should contain the username in the span tag', () => {
+          expect(addedSpanList[0].textContent).to.equal('@user1')
+          expect(addedSpanList[1].textContent).to.equal('@admin')
+          expect(addedSpanList[2].textContent).to.equal('@user2')
+        })
+        it('should have each span id starting with "mention-"', () => {
+          expect(addedSpanList[0].id.startsWith('mention-')).to.equal(true)
+          expect(addedSpanList[1].id.startsWith('mention-')).to.equal(true)
+          expect(addedSpanList[2].id.startsWith('mention-')).to.equal(true)
+        })
+      })
+    })
+
+    describe('with an @ in the source but without a space before', () => {
+      const textWithAtWithoutPreSpace = 'This is a text with a mention@admin that should NOT be wrapped'
+      const result = wrapMentionInSpanTag(textWithAtWithoutPreSpace)
+      const parsedResult = DOMParser.parseFromString(result, 'text/html')
+      const addedSpanList = parsedResult.getElementsByTagName('span')
+
+      it('should not have any span tag', () => {
+        expect(addedSpanList).to.have.lengthOf(0)
+      })
     })
   })
 })

@@ -388,3 +388,19 @@ export const serialize = (objectToSerialize, propertyMap) => {
       .filter(([key, value]) => key !== undefined)
   )
 }
+
+export const EXCEPTION_MENTION_PARSING = 'Mention parsing error'
+export const wrapMentionInSpanTag = text => {
+  try {
+    return text
+      .split(' ')
+      .map(subStr => subStr.charAt(0) === '@'
+        ? `<span class='mention' id='mention-${uuidv4()}'>${subStr}</span>`
+        : subStr
+      )
+      .join(' ')
+  } catch (e) {
+    console.error('Error while parsing mention', e)
+    throw EXCEPTION_MENTION_PARSING
+  }
+}

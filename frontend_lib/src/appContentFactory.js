@@ -1,5 +1,6 @@
 import React from 'react'
 import i18n from './i18n.js'
+import { v4 as uuidv4 } from 'uuid';
 import {
   handleFetchResult,
   APP_FEATURE_MODE,
@@ -143,8 +144,15 @@ export function appContentFactory (WrappedComponent) {
       // see https://github.com/tracim/tracim/issues/1101
       const newCommentForApi = isCommentWysiwyg ? newComment : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
 
+      try {
+        const newCommentForApiWithMention = this.wrapMentionInSpanTag(newCommentForApi)
+      } catch (e) {
+
+        return new Promise((resolve, reject) => reject(e))
+      }
+
       const response = await handleFetchResult(
-        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApi)
+        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApiWithMention)
       )
 
       switch (response.apiResponse.status) {

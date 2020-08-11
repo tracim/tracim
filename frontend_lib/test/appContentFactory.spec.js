@@ -17,6 +17,7 @@ import {
   mockPutContentDeleteRestore204
 } from './apiMock.js'
 import { generateLocalStorageContentId } from '../src/helper.js'
+import * as uuidLib from 'uuid'
 
 describe('appContentFactory.js', () => {
   const fakeCheckApiUrl = sinon.spy()
