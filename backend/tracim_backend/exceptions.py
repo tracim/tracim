@@ -206,7 +206,7 @@ class WrongSharePassword(TracimException):
     error_code = ErrorCode.WRONG_SHARE_PASSWORD
 
 
-class UnvalidResetPasswordToken(TracimException):
+class InvalidResetPasswordToken(TracimException):
     error_code = ErrorCode.INVALID_RESET_PASSWORD_TOKEN
     pass
 
