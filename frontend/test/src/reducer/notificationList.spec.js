@@ -11,7 +11,8 @@ import {
   setNextPage,
   setNotificationList,
   READ,
-  readNotification
+  readNotification,
+  updateNotification
 } from '../../../src/action-creator.sync.js'
 import notificationPage from '../../../src/reducer/notificationPage.js'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'

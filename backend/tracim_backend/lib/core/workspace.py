@@ -44,7 +44,7 @@ class WorkspaceApi(object):
         :param current_user: Current user of context
         :param force_role: If True, app role in queries even if admin
         """
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config
@@ -120,7 +120,7 @@ class WorkspaceApi(object):
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
 
         role = role_api.create_one(
-            self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=True,
+            self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=True
         )
 
         self._session.add(workspace)

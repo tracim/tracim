@@ -5,7 +5,6 @@ from os.path import dirname
 import shutil
 import subprocess
 import typing
-from unittest import mock
 
 from depot.manager import DepotManager
 import plaster
@@ -28,14 +27,10 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
-from tracim_backend.lib.core.event import EventBuilder
-from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
-from tracim_backend.models.setup_models import create_dbsession_for_context
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
@@ -48,6 +43,7 @@ from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import ShareLibFactory
+from tracim_backend.tests.utils import TracimTestContext
 from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WedavEnvironFactory
@@ -103,6 +99,7 @@ def tracim_webserver(settings, config_uri) -> PyramidTestServer:
         config_filename=config_filename,
         config_dir=config_dir,
         extra_config_vars={"app:main": settings},
+        hostname="127.0.0.1",
     ) as server:
         server.start()
         yield server
@@ -200,42 +197,10 @@ def migration_engine(engine):
 
 @pytest.fixture
 def session(request, engine, session_factory, app_config, test_logger):
-    class TracimTestContext(TracimContext):
-        def __init__(self, app_config) -> None:
-            super().__init__()
-            self._app_config = app_config
-            self._plugin_manager = create_plugin_manager()
-            if getattr(request, "param", {}).get("mock_event_builder", True):
-                # mocking event builder in order to avoid
-                # requiring a working pushpin instance for every test
-                event_builder = mock.MagicMock(spec=EventBuilder)
-                event_builder.__name__ = EventBuilder.__name__
-            else:
-                event_builder = EventBuilder(app_config)
-            self._plugin_manager.register(event_builder)
-            self._dbsession = create_dbsession_for_context(
-                session_factory, transaction.manager, self
-            )
-            self._dbsession.set_context(self)
-            self._current_user = None
-
-        @property
-        def dbsession(self):
-            return self._dbsession
-
-        @property
-        def plugin_manager(self):
-            return self._plugin_manager
-
-        @property
-        def current_user(self):
-            return self._current_user
-
-        @property
-        def app_config(self):
-            return self._app_config
-
-    context = TracimTestContext(app_config)
+    mock_event_builder = getattr(request, "param", {}).get("mock_event_builder", True)
+    context = TracimTestContext(
+        app_config, mock_event_builder=mock_event_builder, session_factory=session_factory
+    )
     from tracim_backend.models.meta import DeclarativeBase
 
     with transaction.manager:
@@ -362,7 +327,7 @@ def webdav_provider(app_config: CFG):
 
 @pytest.fixture()
 def webdav_environ_factory(
-    webdav_provider: Provider, session: Session, admin_user: admin_user, app_config: CFG
+    webdav_provider: Provider, session: Session, admin_user: User, app_config: CFG
 ) -> WedavEnvironFactory:
     return WedavEnvironFactory(
         provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user
