@@ -64,7 +64,8 @@ describe('appContentFactory.js', () => {
         'appContentDelete',
         'appContentRestoreArchive',
         'appContentRestoreDelete',
-        'buildTimelineFromCommentAndRevision'
+        'buildTimelineFromCommentAndRevision',
+        'searchForMentionInQuery'
       )
     })
   })

@@ -13,7 +13,7 @@ describe('<AutoCompleteTextArea />', () => {
     disableComment: false,
     id: 'autoCompleteInputId',
     t: key => key,
-    searchMentionList: () => []
+    searchForMention: () => []
   }
 
   const wrapper = shallow(
