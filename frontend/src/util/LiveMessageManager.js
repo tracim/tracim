@@ -105,7 +105,7 @@ export class LiveMessageManager {
     const customEvent = new globalThis.CustomEvent(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, {
       detail: {
         type: data.event_type,
-        data: data.fields
+        data: data
       }
     })
 

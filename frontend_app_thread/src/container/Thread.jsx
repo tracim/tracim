@@ -118,19 +118,19 @@ export class Thread extends React.Component {
 
   handleContentChanged = data => {
     const { state } = this
-    if (data.content.content_id !== this.state.content.content_id) return
+    if (data.fields.content.content_id !== state.content.content_id) return
 
-    const clientToken = this.state.config.apiHeader['X-Tracim-ClientToken']
-    const newContentObject = { ...state.content, ...data.content }
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+    const newContentObject = { ...state.content, ...data.fields.content }
     this.setState(prev => ({
-      content: clientToken === data.client_token ? newContentObject : prev.content,
+      content: clientToken === data.fields.client_token ? newContentObject : prev.content,
       newContent: newContentObject,
-      editionAuthor: data.author.public_name,
-      showRefreshWarning: clientToken !== data.client_token,
-      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+      editionAuthor: data.fields.author.public_name,
+      showRefreshWarning: clientToken !== data.fields.client_token,
+      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang),
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     }))
-    if (clientToken === data.client_token) {
+    if (clientToken === data.fields.client_token) {
       this.setHeadTitle(newContentObject.label)
       this.buildBreadcrumbs(newContentObject)
     }
@@ -139,27 +139,27 @@ export class Thread extends React.Component {
   handleCommentCreated = data => {
     const { state } = this
 
-    if (data.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent_id !== state.content.content_id) return
 
     const newTimelineSorted = sortTimelineByDate([
       ...state.timeline,
       {
-        ...data.content,
-        created: displayDistanceDate(data.content.created, state.loggedUser.lang),
-        created_raw: data.content.created,
+        ...data.fields.content,
+        created: displayDistanceDate(data.fields.content.created, state.loggedUser.lang),
+        created_raw: data.fields.content.created,
         timelineType: 'comment'
       }
     ])
 
     this.setState({
       timeline: newTimelineSorted,
-      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     })
   }
 
   handleUserModified = data => {
-    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.user.user_id
-      ? { ...timelineItem, author: data.user }
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.fields.user.user_id
+      ? { ...timelineItem, author: data.fields.user }
       : timelineItem
     )
 

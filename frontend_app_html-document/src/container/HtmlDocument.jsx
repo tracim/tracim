@@ -99,23 +99,23 @@ export class HtmlDocument extends React.Component {
   // TLM Handlers
   handleContentModified = data => {
     const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
+    if (data.fields.content.content_id !== state.content.content_id) return
 
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
-    const newContentObject = { ...state.content, ...data.content }
+    const newContentObject = { ...state.content, ...data.fields.content }
     this.setState(prev => ({
       ...prev,
-      content: clientToken === data.client_token
+      content: clientToken === data.fields.client_token
         ? newContentObject
         : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
       newContent: newContentObject,
-      editionAuthor: data.author.public_name,
-      showRefreshWarning: clientToken !== data.client_token,
-      rawContentBeforeEdit: data.content.raw_content,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang, data.client_token === this.sessionClientToken),
-      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+      editionAuthor: data.fields.author.public_name,
+      showRefreshWarning: clientToken !== data.fields.client_token,
+      rawContentBeforeEdit: data.fields.content.raw_content,
+      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, data.fields.client_token === this.sessionClientToken),
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     }))
-    if (clientToken === data.client_token) {
+    if (clientToken === data.fields.client_token) {
       this.setHeadTitle(newContentObject.label)
       this.buildBreadcrumbs(newContentObject)
     }
@@ -123,48 +123,48 @@ export class HtmlDocument extends React.Component {
 
   handleContentCreated = data => {
     const { state } = this
-    if (data.content.parent_id !== state.content.content_id || data.content.content_type !== 'comment') return
+    if (data.fields.content.parent_id !== state.content.content_id || data.fields.content.content_type !== 'comment') return
 
     const sortedNewTimeline = sortTimelineByDate(
       [
         ...state.timeline,
         {
-          ...data.content,
-          created: displayDistanceDate(data.content.created, state.loggedUser.lang),
-          created_raw: data.content.created,
+          ...data.fields.content,
+          created: displayDistanceDate(data.fields.content.created, state.loggedUser.lang),
+          created_raw: data.fields.content.created,
           timelineType: 'comment',
-          hasBeenRead: data.client_token === this.sessionClientToken
+          hasBeenRead: data.fields.client_token === this.sessionClientToken
         }
       ]
     )
 
     this.setState({
       timeline: sortedNewTimeline,
-      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     })
   }
 
   handleContentDeletedOrRestore = data => {
     const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
+    if (data.fields.content.content_id !== state.content.content_id) return
 
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: clientToken === data.client_token
-        ? { ...prev.content, ...data.content }
+      content: clientToken === data.fields.client_token
+        ? { ...prev.content, ...data.fields.content }
         : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
-      newContent: { ...prev.content, ...data.content },
-      editionAuthor: data.author.public_name,
-      showRefreshWarning: clientToken !== data.client_token,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang, data.client_token === this.sessionClientToken),
-      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+      newContent: { ...prev.content, ...data.fields.content },
+      editionAuthor: data.fields.author.public_name,
+      showRefreshWarning: clientToken !== data.fields.client_token,
+      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, data.fields.client_token === this.sessionClientToken),
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     }))
   }
 
   handleUserModified = data => {
-    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.user.user_id
-      ? { ...timelineItem, author: data.user }
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.fields.user.user_id
+      ? { ...timelineItem, author: data.fields.user }
       : timelineItem
     )
 
