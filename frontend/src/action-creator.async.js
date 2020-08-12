@@ -243,15 +243,6 @@ export const getMyselfKnownMember = (userNameToSearch, workspaceIdToExclude) => 
   })
 }
 
-export const getMyselfKnownMember2 = (userNameToSearch, workspaceIdToExclude) =>
-  fetch(`${FETCH_CONFIG.apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${workspaceIdToExclude}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-
 export const putMyselfName = (user, newName) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me`,

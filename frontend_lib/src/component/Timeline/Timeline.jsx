@@ -171,9 +171,8 @@ export class Timeline extends React.Component {
                 newComment={props.newComment}
                 disableComment={props.disableComment}
                 wysiwyg={props.wysiwyg}
-                searchedKnownMemberListForMention={props.searchedKnownMemberListForMention}
-                searchMentionList={props.searchMentionList}
-                tinyMceTimelineAutocomplete={props.tinyMceTimelineAutocomplete}
+                searchForMention={props.searchMentionList}
+                onInitWysiwyg={props.onInitWysiwyg}
               />
             </div>
 

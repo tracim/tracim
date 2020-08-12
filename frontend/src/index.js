@@ -15,7 +15,7 @@ import { history } from './util/helper.js'
 require('./css/index.styl')
 
 require('./util/appInterface.js')
-// require('./util/tinymceInit.js')
+require('./util/tinymceInit.js')
 
 // export const history = require('history').createBrowserHistory()
 

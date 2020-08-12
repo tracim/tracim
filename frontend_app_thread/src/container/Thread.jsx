@@ -34,6 +34,7 @@ import {
   getThreadRevision,
   putThreadRead
 } from '../action.async.js'
+import { getMyselfKnownMember } from '../action.async'
 
 export class Thread extends React.Component {
   constructor (props) {
@@ -186,13 +187,35 @@ export class Thread extends React.Component {
       this.buildBreadcrumbs()
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<Thread> will Unmount', `color: ${this.state.config.hexcolor}`)
     globalThis.tinymce.remove('#wysiwygTimelineComment')
+  }
+
+  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown) => {
+    globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown)
+  }
+
+  searchMentionList = async (query) => {
+    const { props, state } = this
+    const mentionList = this.matcher('all', query) >= 0 ? [{ mention: 'all', detail: 'lol' }] : []
+
+    if (query.length < 2) return mentionList
+
+    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, query, state.content.workspace_id))
+
+    switch (fetchUserKnownMemberList.apiResponse.status) {
+      case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+      default: this.sendGlobalFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning'); break
+    }
+    return mentionList
+  }
+
+  matcher = (item, query) => {
+    return item.toLowerCase().indexOf(query.toLowerCase())
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -398,6 +421,8 @@ export class Thread extends React.Component {
             deprecatedStatus={state.config.availableStatuses[3]}
             showTitle={false}
             isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+            onInitWysiwyg={this.handleInitWysiwyg}
+            searchMentionList={this.searchMentionList}
           />
         </PopinFixedContent>
       </PopinFixed>

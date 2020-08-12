@@ -81,7 +81,7 @@
     "whatwg-fetch": "^3.0.0"
   },
   "standard": {
-    "globals": [],
+    "globals": ["tinymce"],
     "parser": "babel-eslint",
     "ignore": []
   },

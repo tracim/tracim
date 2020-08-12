@@ -228,13 +228,16 @@ export class HtmlDocument extends React.Component {
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment, this.handleTinyMceInput, this.handleTinyMceKeyDown)
     } else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
 
     // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
     if (!prevState.isVisible && state.isVisible) {
       initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
     }
+  }
+
+  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown) => {
+    globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown)
   }
 
   handleTinyMceInput = (e, position) => {
@@ -787,7 +790,7 @@ export class HtmlDocument extends React.Component {
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
                   isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                   searchMentionList={this.searchMentionList}
-                  tinyMceTimelineAutocomplete={state.timelineAutoComplete}
+                  onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
                 />
               )
             }]}
