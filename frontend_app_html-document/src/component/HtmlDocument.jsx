@@ -38,7 +38,7 @@ export const HtmlDocument = props => {
         />
       )}
 
-      <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote' onScroll={(e) => { console.log('SCROLL : ', e) }}>
+      <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
         {props.mode === APP_FEATURE_MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
             msg={props.t('You have a pending draft')}
