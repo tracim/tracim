@@ -29,7 +29,8 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent
+  TracimComponent,
+  getCurrentContentVersionNumber
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -102,62 +103,72 @@ export class HtmlDocument extends React.Component {
   // TLM Handlers
   handleContentModified = data => {
     const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
+    if (data.fields.content.content_id !== state.content.content_id) return
 
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+    const newContentObject = { ...state.content, ...data.fields.content }
     this.setState(prev => ({
       ...prev,
-      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
-      newContent: { ...prev.content, ...data.content },
-      editionAuthor: data.author.public_name,
-      showRefreshWarning: clientToken !== data.client_token,
-      rawContentBeforeEdit: data.content.raw_content,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+      content: clientToken === data.fields.client_token
+        ? newContentObject
+        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+      newContent: newContentObject,
+      editionAuthor: data.fields.author.public_name,
+      showRefreshWarning: clientToken !== data.fields.client_token,
+      rawContentBeforeEdit: data.fields.content.raw_content,
+      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, data.fields.client_token === this.sessionClientToken),
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     }))
+    if (clientToken === data.fields.client_token) {
+      this.setHeadTitle(newContentObject.label)
+      this.buildBreadcrumbs(newContentObject)
+    }
   }
 
   handleContentCreated = data => {
     const { state } = this
-    if (data.content.parent_id !== state.content.content_id || data.content.content_type !== 'comment') return
+    if (data.fields.content.parent_id !== state.content.content_id || data.fields.content.content_type !== 'comment') return
 
     const sortedNewTimeline = sortTimelineByDate(
       [
         ...state.timeline,
         {
-          ...data.content,
-          created: displayDistanceDate(data.content.created, state.loggedUser.lang),
-          created_raw: data.content.created,
-          timelineType: 'comment'
+          ...data.fields.content,
+          created: displayDistanceDate(data.fields.content.created, state.loggedUser.lang),
+          created_raw: data.fields.content.created,
+          timelineType: 'comment',
+          hasBeenRead: data.fields.client_token === this.sessionClientToken
         }
       ]
     )
 
     this.setState({
       timeline: sortedNewTimeline,
-      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     })
   }
 
   handleContentDeletedOrRestore = data => {
     const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
+    if (data.fields.content.content_id !== state.content.content_id) return
 
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
-      newContent: { ...prev.content, ...data.content },
-      editionAuthor: data.author.public_name,
-      showRefreshWarning: clientToken !== data.client_token,
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
+      content: clientToken === data.fields.client_token
+        ? { ...prev.content, ...data.fields.content }
+        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+      newContent: { ...prev.content, ...data.fields.content },
+      editionAuthor: data.fields.author.public_name,
+      showRefreshWarning: clientToken !== data.fields.client_token,
+      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, data.fields.client_token === this.sessionClientToken),
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     }))
   }
 
   handleUserModified = data => {
-    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.user.user_id
-      ? { ...timelineItem, author: data.user }
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.fields.user.user_id
+      ? { ...timelineItem, author: data.fields.user }
       : timelineItem
     )
 
@@ -202,7 +213,6 @@ export class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
 
     await this.loadContent()
-    this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -214,7 +224,6 @@ export class HtmlDocument extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      this.buildBreadcrumbs()
       globalThis.tinymce.remove('#wysiwygNewVersion')
       globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText, this.handleTinyMceInput, this.handleTinyMceKeyDown)
     }
@@ -386,15 +395,15 @@ export class HtmlDocument extends React.Component {
     )
   }
 
-  buildBreadcrumbs = () => {
+  buildBreadcrumbs = (content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
-          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
-          label: state.content.label,
+          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
+          label: content.label,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         }]
@@ -453,6 +462,7 @@ export class HtmlDocument extends React.Component {
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
+    this.buildBreadcrumbs(resHtmlDocument.body)
     await putHtmlDocRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
@@ -617,22 +627,33 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickLastVersion = () => {
+    if (this.state.showRefreshWarning) {
+      this.handleClickRefresh()
+      return
+    }
+
     this.loadContent()
     this.setState({ mode: APP_FEATURE_MODE.VIEW })
   }
 
   handleClickRefresh = () => {
+    const { state } = this
     globalThis.tinymce.remove('#wysiwygNewVersion')
 
+    const newObjectContent = {
+      ...state.content,
+      ...state.newContent,
+      raw_content: state.rawContentBeforeEdit
+    }
+
     this.setState(prev => ({
-      content: {
-        ...prev.content,
-        ...prev.newContent,
-        raw_content: prev.rawContentBeforeEdit
-      },
+      content: newObjectContent,
+      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
     }))
+    this.setHeadTitle(newObjectContent.label)
+    this.buildBreadcrumbs(newObjectContent)
   }
 
   render () {
@@ -684,9 +705,7 @@ export class HtmlDocument extends React.Component {
                   {props.t('Last version')}
                 </button>
               )}
-            </div>
 
-            <div className='d-flex'>
               {state.showRefreshWarning && (
                 <RefreshWarningMessage
                   tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
@@ -694,6 +713,9 @@ export class HtmlDocument extends React.Component {
                 />
               )}
 
+            </div>
+
+            <div className='d-flex'>
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -743,6 +765,7 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             searchMentionList={this.searchMentionList}
             key='html-document'
+            isRefreshNeeded={state.showRefreshWarning}
             textAppAutoComplete={state.textAppAutoComplete}
             tinymcePosition={state.tinymcePosition}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}

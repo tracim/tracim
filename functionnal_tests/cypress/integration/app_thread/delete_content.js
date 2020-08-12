@@ -2,6 +2,8 @@ describe('delete a thread content', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
+    cy.loginAs('administrators')
+    cy.createThread('firstThread', 1)
   })
 
   beforeEach(function () {
@@ -13,9 +15,6 @@ describe('delete a thread content', function () {
   })
 
   it('should show the content as deleted and remove it from the content list', function () {
-    // TODO - GB - 2020-06-02 - This test fails because of a refactor that has not yet been done, but which is scheduled in ticket
-    // https://github.com/tracim/tracim/issues/3109
-    this.skip()
     cy.visit('/ui/workspaces/1/dashboard')
     cy.get('.dashboard__workspace__detail').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-comments-o').should('be.visible')
@@ -44,7 +43,7 @@ describe('delete a thread content', function () {
           cy.get('.timeline__warning > [data-cy="displaystate"] .displaystate__btn').should('be.visible')
           cy.get('.thread.visible .thread__contentpage__header__close').click()
           cy.get('.thread.visible').should('not.be.visible')
-          cy.get('.content__name').contains(titre1).should('not.exist')
+          cy.contains('.content__name', titre1).should('not.exist')
         }
       })
     })

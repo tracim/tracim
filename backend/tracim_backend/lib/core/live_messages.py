@@ -1,4 +1,5 @@
 import json
+import threading
 import typing
 
 from gripcontrol import GripPubControl
@@ -32,10 +33,28 @@ class JsonServerSideEvent(object):
         return buffer
 
 
+# NOTE S.G - 2020-08-06 - only one GripPubControl instance as it is:
+#  - thread safe
+#  - meant to be used like this (see example usage in fanout django_grip python package).
+# TODO S.G. - 2020-08-07 - find a way to avoid those global variables
+_grip_pub_control = None  # type: typing.Optional[GripPubControl]
+_pub_control_create_lock = threading.Lock()
+
+
 class LiveMessagesLib(object):
+    """Publish messages using pushpin."""
+
     def __init__(self, config: CFG,) -> None:
-        self.control_uri = config.LIVE_MESSAGES__CONTROL_URI
-        self.grip_pub_control = GripPubControl({"control_uri": self.control_uri})
+        self._blocking_publish = config.LIVE_MESSAGES__BLOCKING_PUBLISH
+        global _pub_control_create_lock
+        global _grip_pub_control
+        with _pub_control_create_lock:
+            if not _grip_pub_control:
+                # NOTE S.G. - 2020-08-06 - publishing using ZMQ to avoid
+                # low maximum (1Mbytes) message size when using HTTP transport (#3415)
+                _grip_pub_control = GripPubControl(
+                    {"control_zmq_uri": config.LIVE_MESSAGES__CONTROL_ZMQ_URI}
+                )
 
     def publish_message_to_user(self, message: Message):
         channel_name = "user_{}".format(message.receiver_id)
@@ -44,6 +63,10 @@ class LiveMessagesLib(object):
         self.publish_dict(channel_name, message_as_dict=message_as_dict)
 
     def publish_dict(self, channel_name: str, message_as_dict: typing.Dict[str, typing.Any]):
-        self.grip_pub_control.publish_http_stream(
-            channel_name, str(JsonServerSideEvent(data=message_as_dict, event=TLM_EVENT_NAME))
+        global _grip_pub_control
+        assert _grip_pub_control
+        _grip_pub_control.publish_http_stream(
+            channel_name,
+            str(JsonServerSideEvent(data=message_as_dict, event=TLM_EVENT_NAME)),
+            blocking=self._blocking_publish,
         )

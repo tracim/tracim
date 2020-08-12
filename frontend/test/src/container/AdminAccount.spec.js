@@ -96,38 +96,44 @@ describe('In <Account /> at AdminAccount.jsx', () => {
       describe('handleUserModified', () => {
         it('should update the public name', () => {
           const tlmData = {
-            author: userFromApi,
-            user: { ...userFromApi, public_name: 'new_public_name' }
+            fields: {
+              author: userFromApi,
+              user: { ...userFromApi, public_name: 'new_public_name' }
+            }
           }
           adminAccountInstance.handleUserModified(tlmData)
-          expect(addminAccontWrapper.state().userToEdit.publicName).to.equal(tlmData.user.public_name)
+          expect(addminAccontWrapper.state().userToEdit.publicName).to.equal(tlmData.fields.user.public_name)
         })
 
         it('should update the username', () => {
           const tlmData = {
-            author: userFromApi,
-            user: {
-              ...userFromApi,
-              public_name: addminAccontWrapper.state().userToEdit.publicName,
-              username: 'new_username'
+            fields: {
+              author: userFromApi,
+              user: {
+                ...userFromApi,
+                public_name: addminAccontWrapper.state().userToEdit.publicName,
+                username: 'new_username'
+              }
             }
           }
           adminAccountInstance.handleUserModified(tlmData)
-          expect(addminAccontWrapper.state().userToEdit.username).to.equal(tlmData.user.username)
+          expect(addminAccontWrapper.state().userToEdit.username).to.equal(tlmData.fields.user.username)
         })
 
         it('should update the email', () => {
           const tlmData = {
-            author: userFromApi,
-            user: {
-              ...userFromApi,
-              public_name: addminAccontWrapper.state().userToEdit.publicName,
-              username: addminAccontWrapper.state().userToEdit.username,
-              email: 'new_email'
+            fields: {
+              author: userFromApi,
+              user: {
+                ...userFromApi,
+                public_name: addminAccontWrapper.state().userToEdit.publicName,
+                username: addminAccontWrapper.state().userToEdit.username,
+                email: 'new_email'
+              }
             }
           }
           adminAccountInstance.handleUserModified(tlmData)
-          expect(addminAccontWrapper.state().userToEdit.email).to.equal(tlmData.user.email)
+          expect(addminAccontWrapper.state().userToEdit.email).to.equal(tlmData.fields.user.email)
         })
       })
     })
@@ -137,18 +143,20 @@ describe('In <Account /> at AdminAccount.jsx', () => {
         it("should update member's notifications", () => {
           addminAccontWrapper.setState({ userToEditWorkspaceList: props.workspaceList })
           const tlmData = {
-            author: userFromApi,
-            user: userFromApi,
-            member: { role: 'workspace-manager', do_notify: false },
-            workspace: firstWorkspaceFromApi
+            fields: {
+              author: userFromApi,
+              user: userFromApi,
+              member: { role: 'workspace-manager', do_notify: false },
+              workspace: firstWorkspaceFromApi
+            }
           }
           adminAccountInstance.handleMemberModified(tlmData)
 
           const memberAtWs = addminAccontWrapper.state().userToEditWorkspaceList.find(
-            ws => ws.id === tlmData.workspace.workspace_id
-          ).memberList.find(m => m.id === tlmData.user.user_id)
+            ws => ws.id === tlmData.fields.workspace.workspace_id
+          ).memberList.find(m => m.id === tlmData.fields.user.user_id)
 
-          expect(memberAtWs.doNotify).to.equal(tlmData.member.do_notify)
+          expect(memberAtWs.doNotify).to.equal(tlmData.fields.member.do_notify)
         })
       })
     })

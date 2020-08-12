@@ -182,19 +182,17 @@ describe('appContentFactory.js', () => {
 
   describe('function appContentCustomEventHandlerReloadAppFeatureData', () => {
     before(() => {
-      wrapper.instance().appContentCustomEventHandlerReloadAppFeatureData(fakeLoadContent, fakeLoadTimeline, fakeBuildBreadcrumbs)
+      wrapper.instance().appContentCustomEventHandlerReloadAppFeatureData(fakeLoadContent, fakeLoadTimeline)
     })
 
     after(() => {
       fakeLoadContent.resetHistory()
       fakeLoadTimeline.resetHistory()
-      fakeBuildBreadcrumbs.resetHistory()
     })
 
-    it('should call the 3 functions given in parameter', () => {
+    it('should call the 2 functions given in parameter', () => {
       expect(fakeLoadContent.called).to.equal(true)
       expect(fakeLoadTimeline.called).to.equal(true)
-      expect(fakeBuildBreadcrumbs.called).to.equal(true)
     })
   })
 

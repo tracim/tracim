@@ -32,7 +32,8 @@ import {
   removeAtInUsername,
   setupCommonRequestHeaders,
   serialize,
-  getOrCreateSessionClientToken
+  getOrCreateSessionClientToken,
+  getCurrentContentVersionNumber
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -190,5 +191,6 @@ export {
   setupCommonRequestHeaders,
   serialize,
   getOrCreateSessionClientToken,
+  getCurrentContentVersionNumber,
   AutoCompleteContainer
 }

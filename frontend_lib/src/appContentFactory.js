@@ -50,7 +50,7 @@ export function appContentFactory (WrappedComponent) {
         return
       }
       setState({ isVisible: true })
-      buildBreadcrumbs()
+      buildBreadcrumbs(content)
     }
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp in case of opening another app feature
@@ -81,10 +81,9 @@ export function appContentFactory (WrappedComponent) {
     }
 
     // CH - 2019-31-12 - This event is used to reload all app data. It's not supposed to handle content id change
-    appContentCustomEventHandlerReloadAppFeatureData = async (loadContent, loadTimeline, buildBreadcrumbs) => {
+    appContentCustomEventHandlerReloadAppFeatureData = async (loadContent, loadTimeline) => {
       await loadContent()
       loadTimeline()
-      buildBreadcrumbs()
     }
 
     // INFO - 2019-01-09 - if param isTimelineWysiwyg is false, param changeNewCommentHandler isn't required
@@ -308,7 +307,8 @@ export function appContentFactory (WrappedComponent) {
             timelineType: 'comment',
             ...resCommentWithProperDate.find(c => c.content_id === ci)
           })),
-          number: i + 1
+          number: i + 1,
+          hasBeenRead: true
         }))
         .flatMap(revision => [revision, ...revision.commentList])
     }
