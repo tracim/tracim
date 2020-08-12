@@ -1,5 +1,6 @@
 import { FETCH_CONFIG } from './helper.js'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { BroadcastChannel, createLeaderElection } from 'broadcast-channel'
 
 export const LIVE_MESSAGE_STATUS = {
   PENDING: 'pending', // INFO - CH - 2020-05-14 - "pending" means connecting started but not yet got the initial event from backend
@@ -9,19 +10,24 @@ export const LIVE_MESSAGE_STATUS = {
   HEARTBEAT_FAILED: 'heartbeat_failed'
 }
 
+// increment this number each time the channel protocol is changed in an incompatible way
+const BROADCAST_CHANNEL_NAME = 'tracim-frontend-1'
+
 /**
- * INFO - SG - 2020-07-02
+ * INFO - SG - 2020-07-02, RJ - 2020-08-12
  * This class manages the Tracim Live Messages:
  * - dispatches live messages through a custom event
  * - dispatches status changes through a custom event
  * - reconnects in case of error in EventSource
  * - reconnects if the keep-alive events are not received
+ * - shares the connection with other pages of Tracim open in the same browser using a BroadcastChannel
  */
 export class LiveMessageManager {
   // TODO - SG - 2020-07-03 - This interval could be provided by the backend
   constructor (heartBeatIntervalMs = 30000, reconnectionIntervalMs = 1000) {
     this.status = LIVE_MESSAGE_STATUS.CLOSED
     this.eventSource = null
+    this.broadcastChannel = null
     this.heartbeatFailureTimerId = -1
     this.heartBeatIntervalMs = heartBeatIntervalMs
     this.reconnectionIntervalMs = reconnectionIntervalMs
@@ -31,40 +37,61 @@ export class LiveMessageManager {
   }
 
   openLiveMessageConnection (userId, host = null) {
-    if (this.status !== LIVE_MESSAGE_STATUS.CLOSED) {
-      console.error('LiveMessage already connected.')
-      return false
-    }
     this.userId = userId
     this.host = host
-    const url = host || FETCH_CONFIG.apiUrl
 
-    this.eventSource = new globalThis.EventSource(
-      `${url}/users/${userId}/live_messages`,
+    if (!this.broadcastChannel) {
+      this.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
+      this.broadcastChannel.addEventListener('message', this.broadcastChannelMessageReceived.bind(this))
+    }
+
+    const elector = createLeaderElection(this.broadcastChannel)
+    elector.awaitLeadership().then(this.openEventSourceConnection.bind(this))
+  }
+
+  broadcastChannelMessageReceived (message) {
+    if (message.status) {
+      this.setStatus(message.status)
+    }
+
+    if (message.tlm) {
+      this.dispatchLiveMessage(message.tlm)
+    }
+  }
+
+  openEventSourceConnection () {
+    const url = this.host || FETCH_CONFIG.apiUrl
+
+    this.closeEventSourceConnection()
+
+    this.eventSource = new EventSource(
+      `${url}/users/${this.userId}/live_messages`,
       { withCredentials: true }
     )
-    this.setStatus(LIVE_MESSAGE_STATUS.PENDING)
+
+    this.broadcastAndSetStatus(LIVE_MESSAGE_STATUS.PENDING)
 
     this.eventSource.onopen = () => {
       console.log('%c.:. TLM Connected: ', 'color: #ccc0e2')
     }
 
     this.eventSource.onmessage = (e) => {
-      console.log('%c.:. TLM received: ', 'color: #ccc0e2', { ...e, data: JSON.parse(e.data) })
-      this.dispatchLiveMessage(e)
+      const tlm = JSON.parse(e.data)
+      console.log('%c.:. TLM received: ', 'color: #ccc0e2', { ...e, data: tlm })
+      this.broadcastChannel.postMessage({ tlm })
       this.stopHeartbeatFailureTimer()
       this.startHeartbeatFailureTimer()
     }
 
     this.eventSource.onerror = (e) => {
       console.log('%c.:. TLM Error: ', 'color: #ccc0e2', e)
-      this.setStatus(LIVE_MESSAGE_STATUS.ERROR)
+      this.broadcastAndSetStatus(LIVE_MESSAGE_STATUS.ERROR)
       this.restartLiveMessageConnection()
     }
 
     this.eventSource.addEventListener('stream-open', () => {
       console.log('%c.:. TLM StreamOpen: ', 'color: #ccc0e2')
-      this.setStatus(LIVE_MESSAGE_STATUS.OPENED)
+      this.broadcastAndSetStatus(LIVE_MESSAGE_STATUS.OPENED)
     })
 
     this.eventSource.addEventListener('keep-alive', () => {
@@ -76,14 +103,22 @@ export class LiveMessageManager {
     this.startHeartbeatFailureTimer()
   }
 
-  closeLiveMessageConnection () {
-    this.eventSource.close()
-    console.log('%c.:. TLM Closed')
-    this.stopHeartbeatFailureTimer()
-    if (this.reconnectionTimerId !== -1) {
-      globalThis.clearTimeout(this.reconnectionTimerId)
-      this.reconnectionTimerId = -1
+  closeEventSourceConnection () {
+    if (this.eventSource) {
+      this.eventSource.close()
+      console.log('%c.:. TLM Closed')
+      this.stopHeartbeatFailureTimer()
+      if (this.reconnectionTimerId !== -1) {
+        globalThis.clearTimeout(this.reconnectionTimerId)
+        this.reconnectionTimerId = -1
+      }
+      this.eventSource = null
     }
+  }
+
+  closeLiveMessageConnection () {
+    this.closeEventSourceConnection()
+    this.broadcastChannel.close()
     this.setStatus(LIVE_MESSAGE_STATUS.CLOSED)
     return true
   }
@@ -98,14 +133,13 @@ export class LiveMessageManager {
     }, this.reconnectionIntervalMs)
   }
 
-  dispatchLiveMessage = function (event) {
-    const data = JSON.parse(event.data)
-    console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', data)
+  dispatchLiveMessage (tlm) {
+    console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', tlm)
 
     const customEvent = new globalThis.CustomEvent(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, {
       detail: {
-        type: data.event_type,
-        data: data.fields
+        type: tlm.event_type,
+        data: tlm.fields
       }
     })
 
@@ -126,8 +160,17 @@ export class LiveMessageManager {
   }
 
   handleHeartbeatFailure () {
-    this.setStatus(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
+    this.broadcastAndSetStatus(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
     this.restartLiveMessageConnection()
+  }
+
+  broadcastAndSetStatus (status) {
+    this.setStatus(status)
+    this.broadcastStatus(status)
+  }
+
+  broadcastStatus (status) {
+    this.broadcastChannel.postMessage({ status })
   }
 
   setStatus (status) {
