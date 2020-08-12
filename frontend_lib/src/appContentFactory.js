@@ -14,7 +14,8 @@ import {
   putContentArchived,
   putContentDeleted,
   putContentRestoreArchive,
-  putContentRestoreDelete
+  putContentRestoreDelete,
+  getMyselfKnownMember
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
@@ -312,6 +313,24 @@ export function appContentFactory (WrappedComponent) {
         .flatMap(revision => [revision, ...revision.commentList])
     }
 
+    searchForMentionInQuery = async (query, workspaceId) => {
+      const mentionList = this.matcher('all', query) >= 0 ? [{ mention: 'all', detail: 'lol' }] : []
+
+      if (query.length < 2) return mentionList
+
+      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId))
+
+      switch (fetchUserKnownMemberList.apiResponse.status) {
+        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+        default: this.sendGlobalFlashMessage(`${i18n.t('An error has happened while getting')} ${i18n.t('known members list')}`, 'warning'); break
+      }
+      return mentionList
+    }
+
+    matcher = (item, query) => {
+      return item.toLowerCase().indexOf(query.toLowerCase())
+    }
+
     render () {
       return (
         <WrappedComponent
@@ -331,6 +350,7 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
+          searchForMentionInQuery={this.searchForMentionInQuery}
         />
       )
     }

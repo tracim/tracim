@@ -55,7 +55,6 @@ import {
   putMyselfFileRead
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
-import { getMyselfKnownMember } from 'tracim_app_html-document/src/action.async'
 
 export class File extends React.Component {
   constructor (props) {
@@ -751,22 +750,7 @@ export class File extends React.Component {
   }
 
   searchMentionList = async (query) => {
-    const { props, state } = this
-    const mentionList = this.matcher('all', query) >= 0 ? [{ mention: 'all', detail: 'lol' }] : []
-
-    if (query.length < 2) return mentionList
-
-    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, query, state.content.workspace_id))
-
-    switch (fetchUserKnownMemberList.apiResponse.status) {
-      case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
-      default: this.sendGlobalFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning'); break
-    }
-    return mentionList
-  }
-
-  matcher = (item, query) => {
-    return item.toLowerCase().indexOf(query.toLowerCase())
+    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
 
   getMenuItemList = () => {

@@ -38,8 +38,7 @@ import {
   getHtmlDocComment,
   getHtmlDocRevision,
   putHtmlDocContent,
-  putHtmlDocRead,
-  getMyselfKnownMember
+  putHtmlDocRead
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -334,10 +333,6 @@ export class HtmlDocument extends React.Component {
     this.setState({ textAppAutoComplete: false })
   }
 
-  matcher = (item, query) => {
-    return item.toLowerCase().indexOf(query.toLowerCase())
-  }
-
   componentWillUnmount () {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
     globalThis.tinymce.remove('#wysiwygNewVersion')
@@ -554,18 +549,7 @@ export class HtmlDocument extends React.Component {
   }
 
   searchMentionList = async (query) => {
-    const { props, state } = this
-    const mentionList = this.matcher('all', query) >= 0 ? [{ mention: 'all', detail: 'lol' }] : []
-
-    if (query.length < 2) return mentionList
-
-    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, query, state.content.workspace_id))
-
-    switch (fetchUserKnownMemberList.apiResponse.status) {
-      case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
-      default: this.sendGlobalFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning'); break
-    }
-    return mentionList
+    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateNewCommentBtn = async () => {

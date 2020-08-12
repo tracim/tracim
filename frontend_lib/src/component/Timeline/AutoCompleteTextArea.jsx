@@ -128,6 +128,8 @@ export class AutoCompleteTextArea extends React.Component {
         break
       }
       case ' ': {
+        if (!tinymce.activeEditor.getDoc().getElementById('autocomplete-searchtext')) return
+
         tinymce.activeEditor.focus()
         const query = tinymce.activeEditor.getDoc().getElementById('autocomplete-searchtext').textContent.replace('\ufeff', '')
         const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
