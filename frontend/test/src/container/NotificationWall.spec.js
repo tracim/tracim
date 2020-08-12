@@ -123,5 +123,14 @@ describe('<NotificationWall />', () => {
         }).then(done, done)
       })
     })
+
+    describe('handleClickMarkAllAsRead', () => {
+      it('should call updateNotification()', (done) => {
+        mockPutNotificationAsRead204(FETCH_CONFIG.apiUrl, props.user.userId, 1)
+        NotificationWallInstance.handleClickMarkAllAsRead().then(() => {
+          expect(updateNotificationCallBack.called).to.equal(true)
+        }).then(done, done)
+      })
+    })
   })
 })

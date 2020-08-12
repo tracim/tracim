@@ -167,10 +167,9 @@ export class NotificationWall extends React.Component {
 
     const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
     switch (fetchAllPutNotificationAsRead.status) {
-      case 204: {
+      case 204:
         props.notificationPage.list.forEach(notification => props.dispatch(updateNotification({ ...notification, read: true })))
         break
-      }
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
     }
