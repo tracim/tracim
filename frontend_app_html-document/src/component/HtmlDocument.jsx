@@ -53,13 +53,13 @@ export const HtmlDocument = props => {
             <div className='html-document__contentpage__textnote__version'>
               {props.t(
                 'Version #{{versionNumber}}', {
-                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW
+                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
                     ? props.lastVersion
                     : props.version
                 }
               )}
-              {props.mode === APP_FEATURE_MODE.REVISION && (
-                <div className='html-document__contentpage__textnote__lastversion outlineTextBtn'>
+              {(props.mode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
+                <div className='html-document__contentpage__textnote__lastversion'>
                   ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
                 </div>
               )}
@@ -108,5 +108,6 @@ HtmlDocument.propTypes = {
   onClickCloseEditMode: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
-  onClickShowDraft: PropTypes.func
+  onClickShowDraft: PropTypes.func,
+  isRefreshNeeded: PropTypes.bool
 }
