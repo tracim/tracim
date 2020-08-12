@@ -93,7 +93,6 @@ export const HtmlDocument = props => {
               onClickValidateBtn={props.onClickValidateBtn}
               text={props.text}
               onChangeText={props.onChangeText}
-              searchMentionList={props.searchMentionList}
             />
           </div>
         )}
