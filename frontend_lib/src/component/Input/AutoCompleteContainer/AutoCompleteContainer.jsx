@@ -17,7 +17,7 @@ export const AutoCompleteContainer = props => {
             onPointerEnter={() => props.onPointerEnter(i)}
           >
             {m.username && <Avatar width='15px' style={{ margin: '5px' }} publicName={m.detail} />}
-            <b>@{m.mention}</b> - {m.detail}
+            <b className='autocomplete__item__mention'>@{m.mention}</b> - {m.detail}
           </div>
           {i === props.delimiterIndex && i !== props.autoCompleteItemList.length - 1 && (
             <div className='autocomplete__delimiter' />

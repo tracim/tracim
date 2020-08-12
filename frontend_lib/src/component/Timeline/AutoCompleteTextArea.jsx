@@ -103,8 +103,6 @@ export class AutoCompleteTextArea extends React.Component {
     })
   }
 
-  // TINYMCE
-
   handleTinyMceInput = (e, position) => {
     if (!e.data) return
 
