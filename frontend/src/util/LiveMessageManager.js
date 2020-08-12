@@ -69,7 +69,7 @@ export class LiveMessageManager {
       { withCredentials: true }
     )
 
-    this.broadcastAndSetStatus(LIVE_MESSAGE_STATUS.PENDING)
+    this.broadcastStatus(LIVE_MESSAGE_STATUS.PENDING)
 
     this.eventSource.onopen = () => {
       console.log('%c.:. TLM Connected: ', 'color: #ccc0e2')
@@ -85,13 +85,13 @@ export class LiveMessageManager {
 
     this.eventSource.onerror = (e) => {
       console.log('%c.:. TLM Error: ', 'color: #ccc0e2', e)
-      this.broadcastAndSetStatus(LIVE_MESSAGE_STATUS.ERROR)
+      this.broadcastStatus(LIVE_MESSAGE_STATUS.ERROR)
       this.restartLiveMessageConnection()
     }
 
     this.eventSource.addEventListener('stream-open', () => {
       console.log('%c.:. TLM StreamOpen: ', 'color: #ccc0e2')
-      this.broadcastAndSetStatus(LIVE_MESSAGE_STATUS.OPENED)
+      this.broadcastStatus(LIVE_MESSAGE_STATUS.OPENED)
     })
 
     this.eventSource.addEventListener('keep-alive', () => {
@@ -160,13 +160,8 @@ export class LiveMessageManager {
   }
 
   handleHeartbeatFailure () {
-    this.broadcastAndSetStatus(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
+    this.broadcastStatus(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
     this.restartLiveMessageConnection()
-  }
-
-  broadcastAndSetStatus (status) {
-    this.setStatus(status)
-    this.broadcastStatus(status)
   }
 
   broadcastStatus (status) {
