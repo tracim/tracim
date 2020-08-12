@@ -26,13 +26,13 @@ import {
   setConfig,
   resetBreadcrumbs,
   setUserLang,
-  setWorkspaceListMemberList
+  setWorkspaceListMemberList, setNotificationNotReadCounter
 } from '../action-creator.sync.js'
 import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getMyselfWorkspaceList,
+  getMyselfWorkspaceList, getUserMessagesSummary,
   getWorkspaceMemberList,
   postUserLogin,
   putUserLang
@@ -149,6 +149,7 @@ class Login extends React.Component {
         this.loadAppList()
         this.loadContentTypeList()
         this.loadWorkspaceList()
+        this.loadNotificationNotRead(fetchPostUserLogin.json.user_id)
         props.tlm.manager.openLiveMessageConnection(fetchPostUserLogin.json.user_id)
 
         if (props.system.redirectLogin !== '') {
@@ -218,6 +219,17 @@ class Login extends React.Component {
     }))
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
+  }
+
+  loadNotificationNotRead = async (userId) => {
+    const { props } = this
+
+    const fetchNotificationNotRead = await props.dispatch(getUserMessagesSummary(userId))
+
+    switch (fetchNotificationNotRead.status) {
+      case 200: props.dispatch(setNotificationNotReadCounter(fetchNotificationNotRead.json.unread_messages_count)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
+    }
   }
 
   setDefaultUserLang = async loggedUser => {

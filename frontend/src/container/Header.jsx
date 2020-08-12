@@ -150,12 +150,14 @@ export class Header extends React.Component {
                 </li>
               )}
 
-              <li className='header__menu__rightside__notification nav-item'>
-                <NotificationButton
-                  notificationNotReadCount={props.notificationNotReadCount}
-                  onClickNotification={props.onClickNotification}
-                />
-              </li>
+              {props.user.logged && (
+                <li className='header__menu__rightside__notification nav-item'>
+                  <NotificationButton
+                    notificationNotReadCount={props.notificationNotReadCount}
+                    onClickNotification={props.onClickNotification}
+                  />
+                </li>
+              )}
 
               {!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && props.appList.some(a => a.slug === 'agenda') && (
                 <li className='header__menu__rightside__agenda'>

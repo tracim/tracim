@@ -93,7 +93,8 @@ export class Tracim extends React.Component {
       { name: CUSTOM_EVENT.SET_BREADCRUMBS, handler: this.handleSetBreadcrumbs },
       { name: CUSTOM_EVENT.APPEND_BREADCRUMBS, handler: this.handleAppendBreadcrumbs },
       { name: CUSTOM_EVENT.SET_HEAD_TITLE, handler: this.handleSetHeadTitle },
-      { name: CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, handler: this.handleTlmStatusChanged }
+      { name: CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, handler: this.handleTlmStatusChanged },
+      { name: CUSTOM_EVENT.USER_DISCONNECTED, handler: this.handleUserDisconnected }
     ])
   }
 
@@ -155,6 +156,10 @@ export class Tracim extends React.Component {
   handleSetHeadTitle = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.SET_HEAD_TITLE, data)
     document.title = data.title
+  }
+
+  handleUserDisconnected = () => {
+    this.setState({ isNotificationWallOpen: false })
   }
 
   async componentDidMount () {
