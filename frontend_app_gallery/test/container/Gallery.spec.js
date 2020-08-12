@@ -6,6 +6,7 @@ import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import pictures from '../fixture/content/pictures.js'
 import { debug } from '../../src/debug.js'
 import { defaultDebug } from 'tracim_frontend_lib'
+import { cloneDeep } from "lodash"
 
 describe('<Gallery />', () => {
   const folderId = 1
@@ -56,6 +57,67 @@ describe('<Gallery />', () => {
       rawFileUrl: [picture.filename]
     }))
   }
+
+  describe('The constructor', () => {
+    it('Initialize folderId to undefined by default', () => {
+      const propsWithoutFolderId = cloneDeep(props)
+      propsWithoutFolderId.data.config.history.location.search = ''
+      expect(shallow(<Gallery {... propsWithoutFolderId} />).instance().state.folderId).to.be.equal(undefined)
+    })
+  })
+
+  describe('Intern function', () => {
+    describe('liveMessageNotRelevant', () => {
+      const initialState = {
+        config: {
+          appConfig: {
+            workspaceId: 1
+          }
+        },
+        folderId: 1
+      }
+
+      const initialData = {
+        content: {
+          workspace_id: 1,
+          parent_id: 1
+        }
+      }
+
+      it('should return true when the workspace is the same but state.folderId is undefined', () => {
+        const state = {
+          ...initialState,
+          folderId: undefined
+        }
+
+        expect(wrapper.instance().liveMessageNotRelevant(initialData, state)).to.equal(true)
+      })
+
+      it('should return true when the workspace is not the same', () => {
+        const data = {
+          content: {
+            ...initialData.content,
+            workspace_id: initialData.content.workspace_id + 1
+          }
+        }
+        expect(wrapper.instance().liveMessageNotRelevant(data, initialState)).to.equal(true)
+      })
+
+      it('should return false when the folder id and the workspace are the same', () => {
+        expect(wrapper.instance().liveMessageNotRelevant(initialData, initialState)).to.equal(false)
+      })
+
+      it('should return true when the folder id is not the same', () => {
+        const data = {
+          content: {
+            ...initialData.content,
+            parent_id: initialState.folderId + 1
+          }
+        }
+        expect(wrapper.instance().liveMessageNotRelevant(data, initialState)).to.equal(true)
+      })
+    })
+  })
 
   describe('TLM handlers', () => {
     describe('handleContentDeleted', () => {
