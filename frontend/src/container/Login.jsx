@@ -27,13 +27,16 @@ import {
   resetBreadcrumbs,
   setUserLang,
   setWorkspaceListMemberList,
-  setNotificationNotReadCounter
+  setNotificationNotReadCounter,
+  setNotificationList,
+  setNextPage
 } from '../action-creator.sync.js'
 import {
   getAppList,
   getConfig,
   getContentTypeList,
   getMyselfWorkspaceList,
+  getNotificationList,
   getUserMessagesSummary,
   getWorkspaceMemberList,
   postUserLogin,
@@ -41,7 +44,8 @@ import {
 } from '../action-creator.async.js'
 import {
   PAGE,
-  COOKIE_FRONTEND
+  COOKIE_FRONTEND,
+  NUMBER_RESULTS_BY_PAGE
 } from '../util/helper.js'
 import { serializeUserProps } from '../reducer/user.js'
 
@@ -151,8 +155,9 @@ class Login extends React.Component {
         this.loadAppList()
         this.loadContentTypeList()
         this.loadWorkspaceList()
-        this.loadNotificationNotRead(fetchPostUserLogin.json.user_id)
-        props.tlm.manager.openLiveMessageConnection(fetchPostUserLogin.json.user_id)
+        this.loadNotificationNotRead(loggedUser.user_id)
+        this.loadNotificationList(loggedUser.user_id)
+        props.tlm.manager.openLiveMessageConnection(loggedUser.user_id)
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)
@@ -230,7 +235,22 @@ class Login extends React.Component {
 
     switch (fetchNotificationNotRead.status) {
       case 200: props.dispatch(setNotificationNotReadCounter(fetchNotificationNotRead.json.unread_messages_count)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
+      default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
+    }
+  }
+
+  loadNotificationList = async (userId) => {
+    const { props } = this
+
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(userId, NUMBER_RESULTS_BY_PAGE))
+    switch (fetchGetNotificationWall.status) {
+      case 200:
+        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
+        break
     }
   }
 

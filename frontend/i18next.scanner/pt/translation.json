@@ -268,5 +268,6 @@
   "Tracim has a connection problem, please wait or reload the page if the problem persists": "Tracim está com problemas de conexão, por favor aguarde ou actualize a página se o problema persistir",
   "Your username": "Seu identificador",
   "Your username has been set": "O seu identificador foi definido",
-  "{{author}} added {{user}} to {{workspace}}": "{{author}} acrescentou {{user}} à {{workspace}}"
+  "{{author}} added {{user}} to {{workspace}}": "{{author}} acrescentou {{user}} à {{workspace}}",
+  "Error loading unread notification number": "Erro ao carregar o número de notificações não lidas"
 }

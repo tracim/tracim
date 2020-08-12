@@ -268,5 +268,6 @@
   "Tracim has a connection problem, please wait or reload the page if the problem persists": "Tracim has a connection problem, please wait or reload the page if the problem persists",
   "Your username": "Your username",
   "Your username has been set": "Your username has been set",
-  "{{author}} added {{user}} to {{workspace}}": "{{author}} added {{user}} to {{workspace}}"
+  "{{author}} added {{user}} to {{workspace}}": "{{author}} added {{user}} to {{workspace}}",
+  "Error loading unread notification number": "Error loading unread notification number"
 }

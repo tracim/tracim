@@ -179,26 +179,16 @@ export class Tracim extends React.Component {
         }))
 
         Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchUser.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
 
-        i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
+        i18n.changeLanguage(fetchUser.lang)
 
         this.loadAppConfig()
         this.loadWorkspaceList()
         this.loadNotificationNotRead(fetchUser.user_id)
+        this.loadNotificationList(fetchUser.user_id)
 
-        this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id)
-
-        const fetchGetNotificationWall = await props.dispatch(getNotificationList(fetchGetUserIsConnected.json.user_id, NUMBER_RESULTS_BY_PAGE))
-        switch (fetchGetNotificationWall.status) {
-          case 200:
-            props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
-            props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-            break
-          default:
-            props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
-            break
-        }
+        this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id)
         break
       }
       case 401: props.dispatch(setUserConnected({ logged: false })); break
@@ -283,7 +273,22 @@ export class Tracim extends React.Component {
 
     switch (fetchNotificationNotRead.status) {
       case 200: props.dispatch(setNotificationNotReadCounter(fetchNotificationNotRead.json.unread_messages_count)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
+      default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
+    }
+  }
+
+  loadNotificationList = async (userId) => {
+    const { props } = this
+
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(userId, NUMBER_RESULTS_BY_PAGE))
+    switch (fetchGetNotificationWall.status) {
+      case 200:
+        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
+        break
     }
   }
 
