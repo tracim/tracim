@@ -26,13 +26,15 @@ import {
   setConfig,
   resetBreadcrumbs,
   setUserLang,
-  setWorkspaceListMemberList, setNotificationNotReadCounter
+  setWorkspaceListMemberList,
+  setNotificationNotReadCounter
 } from '../action-creator.sync.js'
 import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getMyselfWorkspaceList, getUserMessagesSummary,
+  getMyselfWorkspaceList,
+  getUserMessagesSummary,
   getWorkspaceMemberList,
   postUserLogin,
   putUserLang
