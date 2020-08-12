@@ -10,7 +10,7 @@ export const LIVE_MESSAGE_STATUS = {
   HEARTBEAT_FAILED: 'heartbeat_failed'
 }
 
-// increment this number each time the channel protocol is changed in an incompatible way
+// INFO - RJ - 2020-08-12  - increment this number each time the channel protocol is changed in an incompatible way
 const BROADCAST_CHANNEL_NAME = 'tracim-frontend-1'
 
 /**
