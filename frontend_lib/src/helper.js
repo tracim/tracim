@@ -391,10 +391,15 @@ export const serialize = (objectToSerialize, propertyMap) => {
 }
 
 export const commonMentionList = [
-  { mention: i18n.t('contributor'), detail: 'Envoie une notification à tous les utilisateurs Contributeurs' },
-  { mention: i18n.t('reader'), detail: 'Envoie une notification à tous les utilisateurs Lecteur' },
-  { mention: i18n.t('all'), detail: 'Envoie une notification à tous les membre de lespace partagé' }
+  { mention: 'all', detail: i18n.t('Sends a notification to all members of the shared space'), isCommon: true }
 ]
+
+export const getMatchingCommonMentionFromQuery = (query) => {
+  return commonMentionList.filter(item => {
+    const isMatching = item.mention.toLowerCase().indexOf(query.toLowerCase())
+    return (isMatching >= 0)
+  })
+}
 
 export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
   if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number

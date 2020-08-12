@@ -1,21 +1,16 @@
 import React from 'react'
 import classnames from 'classnames'
 import Avatar from '../../Avatar/Avatar'
+import PropTypes from 'prop-types'
 
 export const AutoCompleteContainer = props => {
   return (
-    <div className='autocomplete' style={{ ...props.style }}>
+    <div className='autocomplete' style={props.style}>
       {props.autoCompleteItemList.map((m, i) => (
         <>
-          {i === props.delimiterIndex && (
-            <div className='autocomplete__delimiter' />
-          )}
           <div
             className={
-              classnames(
-                'autocomplete__item',
-                props.autoCompleteCursorPosition === i ? 'autocomplete__item__active' : null
-              )
+              classnames('autocomplete__item', { autocomplete__item__active: props.autoCompleteCursorPosition === i })
             }
             key={m.mention}
             onClick={() => props.onClickAutoCompleteItem(m)}
@@ -24,6 +19,9 @@ export const AutoCompleteContainer = props => {
             {m.username && <Avatar width='15px' style={{ margin: '5px' }} publicName={m.detail} />}
             <b>@{m.mention}</b> - {m.detail}
           </div>
+          {i === props.delimiterIndex && i !== props.autoCompleteItemList.length - 1 && (
+            <div className='autocomplete__delimiter' />
+          )}
         </>
       ))}
     </div>
@@ -31,3 +29,21 @@ export const AutoCompleteContainer = props => {
 }
 
 export default AutoCompleteContainer
+
+AutoCompleteContainer.propTypes = {
+  autoCompleteItemList: PropTypes.array,
+  style: PropTypes.object,
+  autoCompleteCursorPosition: PropTypes.number,
+  onClickAutoCompleteItem: PropTypes.func,
+  onPointerEnter: PropTypes.func,
+  delimiterIndex: PropTypes.number
+}
+
+AutoCompleteContainer.defaultProps = {
+  autoCompleteItemList: [],
+  style: {},
+  autoCompleteCursorPosition: 0,
+  onClickAutoCompleteItem: () => {},
+  onPointerEnter: () => {},
+  delimiterIndex: -1
+}

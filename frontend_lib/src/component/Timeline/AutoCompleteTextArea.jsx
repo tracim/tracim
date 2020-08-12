@@ -4,6 +4,7 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import Avatar from '../Avatar/Avatar'
+import AutoCompleteContainer from '../Input/AutoCompleteContainer/AutoCompleteContainer'
 
 export class AutoCompleteTextArea extends React.Component {
   constructor (props) {
@@ -208,29 +209,14 @@ export class AutoCompleteTextArea extends React.Component {
     return (
       <>
         {!props.disableComment && state.mentionAutocomplete && state.autoCompleteItemList.length > 0 && (
-          <div className='textarea__autocomplete' style={style}>
-            {state.autoCompleteItemList.map((m, i) => (
-              <>
-                {i === commonMentionList.length && (
-                  <div className='textarea__autocomplete__delimiter' />
-                )}
-                <div
-                  className={
-                    classnames(
-                      'textarea__autocomplete__item',
-                      { textarea__autocomplete__item__active: state.autoCompleteCursorPosition === i }
-                    )
-                  }
-                  key={m.mention}
-                  onClick={() => props.wysiwyg ? this.handleClickWysiwygAutoCompleteItem(m) : this.handleClickAutoCompleteItem(m)}
-                  onPointerEnter={() => this.setState({ autoCompleteCursorPosition: i })}
-                >
-                  {m.username && <Avatar width='15px' style={{ margin: '5px' }} publicName={m.detail} />}
-                  <b>@{m.mention}</b> - {m.detail}
-                </div>
-              </>
-            ))}
-          </div>
+          <AutoCompleteContainer
+            autoCompleteItemList={state.autoCompleteItemList}
+            style={style}
+            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+            onClickAutoCompleteItem={(m) => props.wysiwyg ? this.handleClickWysiwygAutoCompleteItem(m) : this.handleClickAutoCompleteItem(m)}
+            onPointerEnter={props.onPointerEnter}
+            delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+          />
         )}
         <textarea
           id={props.id}

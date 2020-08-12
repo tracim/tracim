@@ -5,7 +5,8 @@ import {
   APP_FEATURE_MODE,
   generateLocalStorageContentId,
   convertBackslashNToBr,
-  displayDistanceDate
+  displayDistanceDate,
+  getMatchingCommonMentionFromQuery
 } from './helper.js'
 import {
   putEditContent,
@@ -314,7 +315,7 @@ export function appContentFactory (WrappedComponent) {
     }
 
     searchForMentionInQuery = async (query, workspaceId) => {
-      const mentionList = this.matcher('all', query) >= 0 ? [{ mention: 'all', detail: 'lol' }] : []
+      const mentionList = getMatchingCommonMentionFromQuery(query)
 
       if (query.length < 2) return mentionList
 
@@ -325,10 +326,6 @@ export function appContentFactory (WrappedComponent) {
         default: this.sendGlobalFlashMessage(`${i18n.t('An error has happened while getting')} ${i18n.t('known members list')}`, 'warning'); break
       }
       return mentionList
-    }
-
-    matcher = (item, query) => {
-      return item.toLowerCase().indexOf(query.toLowerCase())
     }
 
     render () {

@@ -81,6 +81,7 @@ export const HtmlDocument = props => {
                 style={{
                   top: props.tinymcePosition.top
                 }}
+                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
               />
             )}
             <TextAreaApp
