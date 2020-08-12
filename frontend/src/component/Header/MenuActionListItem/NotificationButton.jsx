@@ -16,7 +16,6 @@ export const NotificationButton = props => {
         {props.notificationNotReadCount > 0 && (
           <div
             className='notificationButton__count'
-            style={{ fontSize: props.notificationNotReadCount > 99 ? '10px' : '11px' }}
           >
             {props.notificationNotReadCount > 99 ? '99+' : props.notificationNotReadCount}
           </div>
