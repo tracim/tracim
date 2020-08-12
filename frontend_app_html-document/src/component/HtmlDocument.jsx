@@ -76,7 +76,6 @@ export const HtmlDocument = props => {
               <AutoCompleteContainer
                 autoCompleteItemList={props.autoCompleteItemList}
                 autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                onPointerEnter={() => {}}
                 onClickAutoCompleteItem={props.onClickAutoCompleteItem}
                 style={{
                   top: props.tinymcePosition.top

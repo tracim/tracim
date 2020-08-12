@@ -14,7 +14,6 @@ export const AutoCompleteContainer = props => {
             }
             key={m.mention}
             onClick={() => props.onClickAutoCompleteItem(m)}
-            onPointerEnter={() => props.onPointerEnter(i)}
           >
             {m.username && <Avatar width='15px' style={{ margin: '5px' }} publicName={m.detail} />}
             <b className='autocomplete__item__mention'>@{m.mention}</b> - {m.detail}
@@ -35,7 +34,6 @@ AutoCompleteContainer.propTypes = {
   style: PropTypes.object,
   autoCompleteCursorPosition: PropTypes.number,
   onClickAutoCompleteItem: PropTypes.func,
-  onPointerEnter: PropTypes.func,
   delimiterIndex: PropTypes.number
 }
 
@@ -44,6 +42,5 @@ AutoCompleteContainer.defaultProps = {
   style: {},
   autoCompleteCursorPosition: 0,
   onClickAutoCompleteItem: () => {},
-  onPointerEnter: () => {},
   delimiterIndex: -1
 }

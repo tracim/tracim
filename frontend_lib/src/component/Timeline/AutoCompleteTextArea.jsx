@@ -212,7 +212,6 @@ export class AutoCompleteTextArea extends React.Component {
             style={style}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
             onClickAutoCompleteItem={(m) => props.wysiwyg ? this.handleClickWysiwygAutoCompleteItem(m) : this.handleClickAutoCompleteItem(m)}
-            onPointerEnter={props.onPointerEnter}
             delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
           />
         )}

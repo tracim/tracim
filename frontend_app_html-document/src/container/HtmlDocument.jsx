@@ -264,12 +264,11 @@ export class HtmlDocument extends React.Component {
         tinymce.activeEditor.selection.select(tinymce.activeEditor.selection.dom.select('span#autocomplete-searchtext span')[0])
         tinymce.activeEditor.selection.collapse(0)
 
-        this.setState(prev => ({
-          textAppAutoComplete: !prev.timelineWysiwyg,
-          timelineAutoComplete: prev.timelineWysiwyg,
+        this.setState({
+          textAppAutoComplete: true,
           tinymcePosition: position,
           autoCompleteItemList: []
-        }))
+        })
         break
       }
       case ' ': {
