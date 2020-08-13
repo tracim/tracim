@@ -11,8 +11,8 @@ import {
 import {
   appendNotificationList,
   newFlashMessage,
-  setNextPage,
-  readNotification
+  readNotification,
+  setNextPage
 } from '../action-creator.sync.js'
 import {
   buildTracimLiveMessageEventType,
@@ -166,7 +166,7 @@ export class NotificationWall extends React.Component {
     const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
     switch (fetchAllPutNotificationAsRead.status) {
       case 204:
-        props.notificationPage.list.forEach(notification => props.dispatch(updateNotification({ ...notification, read: true })))
+        props.notificationPage.list.forEach(notification => props.dispatch(readNotification(notification.id)))
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
@@ -185,7 +185,7 @@ export class NotificationWall extends React.Component {
           faIcon='bell-o'
           rawTitle={props.t('Notifications')}
           componentTitle={<div>{props.t('Notifications')}</div>}
-          onClickCloseBtn={this.onCloseNotificationWall}
+          onClickCloseBtn={props.onCloseNotificationWall}
         >
           <GenericButton
             customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
