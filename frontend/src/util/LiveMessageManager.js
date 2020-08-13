@@ -31,7 +31,7 @@ export class LiveMessageManager {
     this.heartbeatFailureTimerId = -1
     this.heartBeatIntervalMs = heartBeatIntervalMs
     this.reconnectionIntervalMs = reconnectionIntervalMs
-    this.reconnectionTimerId = -1
+    this.reconnectionTimerId = 0
     this.userId = null
     this.host = null
   }
@@ -40,11 +40,16 @@ export class LiveMessageManager {
     this.userId = userId
     this.host = host
 
+    this.setStatus(LIVE_MESSAGE_STATUS.OPENED)
+
     if (!this.broadcastChannel) {
       this.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
       this.broadcastChannel.addEventListener('message', this.broadcastChannelMessageReceived.bind(this))
+      this.electLeader()
     }
+  }
 
+  electLeader () {
     const elector = createLeaderElection(this.broadcastChannel)
     elector.awaitLeadership().then(this.openEventSourceConnection.bind(this))
   }
@@ -79,6 +84,7 @@ export class LiveMessageManager {
       const tlm = JSON.parse(e.data)
       console.log('%c.:. TLM received: ', 'color: #ccc0e2', { ...e, data: tlm })
       this.broadcastChannel.postMessage({ tlm })
+      this.dispatchLiveMessage(tlm)
       this.stopHeartbeatFailureTimer()
       this.startHeartbeatFailureTimer()
     }
@@ -86,7 +92,7 @@ export class LiveMessageManager {
     this.eventSource.onerror = (e) => {
       console.log('%c.:. TLM Error: ', 'color: #ccc0e2', e)
       this.broadcastStatus(LIVE_MESSAGE_STATUS.ERROR)
-      this.restartLiveMessageConnection()
+      this.restartEventSourceConnection()
     }
 
     this.eventSource.addEventListener('stream-open', () => {
@@ -108,9 +114,9 @@ export class LiveMessageManager {
       this.eventSource.close()
       console.log('%c.:. TLM Closed')
       this.stopHeartbeatFailureTimer()
-      if (this.reconnectionTimerId !== -1) {
+      if (this.reconnectionTimerId) {
         globalThis.clearTimeout(this.reconnectionTimerId)
-        this.reconnectionTimerId = -1
+        this.reconnectionTimerId = 0
       }
       this.eventSource = null
     }
@@ -123,13 +129,12 @@ export class LiveMessageManager {
     return true
   }
 
-  restartLiveMessageConnection () {
-    if (this.reconnectionTimerId >= 0) return
+  restartEventSourceConnection () {
+    if (this.reconnectionTimerId) return
 
     this.reconnectionTimerId = globalThis.setTimeout(() => {
-      this.closeLiveMessageConnection()
-      this.openLiveMessageConnection(this.userId, this.host)
-      this.reconnectionTimerId = -1
+      this.openEventSourceConnection()
+      this.reconnectionTimerId = 0
     }, this.reconnectionIntervalMs)
   }
 
@@ -161,10 +166,11 @@ export class LiveMessageManager {
 
   handleHeartbeatFailure () {
     this.broadcastStatus(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
-    this.restartLiveMessageConnection()
+    this.restartEventSourceConnection()
   }
 
   broadcastStatus (status) {
+    this.setStatus(status)
     this.broadcastChannel.postMessage({ status })
   }
 
