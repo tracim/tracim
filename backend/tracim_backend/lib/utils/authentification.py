@@ -1,5 +1,7 @@
 from abc import ABC
 from abc import abstractmethod
+import datetime
+import time
 import typing
 
 from pyramid.authentication import BasicAuthAuthenticationPolicy
@@ -127,6 +129,9 @@ class TracimBasicAuthAuthenticationPolicy(
 
 @implementer(IAuthenticationPolicy)
 class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAuthenticationPolicy):
+
+    COOKIE_LAST_SET_TIME = "cookie_last_set_time"
+
     def __init__(self, debug: bool = False):
         SessionAuthenticationPolicy.__init__(self, debug=debug, callback=None)
         self.callback = None
@@ -143,9 +148,35 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
             user = self._get_user_api(request).get_one(user_id=request.unauthenticated_userid)
         except UserDoesNotExist:
             user = None
-        # do not allow invalid_user + ask for cleanup of session cookie
+        # do not allow invalid_user
         if not user or not user.is_active or user.is_deleted:
             return None
+
+        # ensure cookie expiry date is updated if it is too old
+        if not request.session.new:
+            # all computation is done in timestamps (Epoch)
+            cookie_last_set_time = (
+                request.session.get(self.COOKIE_LAST_SET_TIME) or request.session.created
+            )
+
+            # convert beaker parameter to timestamp
+            cookie_expires = request.session.cookie_expires
+            cookie_expires_time = None  # type: typing.Optional[float]
+            if isinstance(cookie_expires, datetime.datetime):
+                cookie_expires_time = cookie_expires.timestamp()
+            elif isinstance(cookie_expires, datetime.timedelta):
+                cookie_expires_time = cookie_last_set_time + cookie_expires.total_seconds()
+            # the cases left are when session.cookie_expires is a boolean
+            # which means there is no expiry date, so no renewal to do
+
+            if cookie_expires_time is not None:
+                max_cookie_age = cookie_expires_time - cookie_last_set_time
+                current_cookie_age = time.time() - cookie_last_set_time
+                if current_cookie_age > 0.5 * max_cookie_age:
+                    request.session[self.COOKIE_LAST_SET_TIME] = time.time()
+                    request.session.save()
+                    request.session._update_cookie_out()
+
         return user
 
     def forget(self, request: TracimRequest) -> typing.List[typing.Any]:
