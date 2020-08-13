@@ -6,26 +6,33 @@ import {
   NOTIFICATION,
   NOTIFICATION_LIST,
   SET,
-  UPDATE
+  READ,
+  NOTIFICATION_NOT_READ_COUNT
 } from '../action-creator.sync.js'
+import { serialize } from 'tracim_frontend_lib'
+import { serializeContentProps } from './workspaceContentList.js'
+import { serializeWorkspaceListProps } from './workspaceList.js'
+import { serializeUserProps } from './user.js'
 
 const defaultNotificationsObject = {
   list: [],
   hasNextPage: false,
-  nextPageToken: ''
+  nextPageToken: '',
+  notificationNotReadCount: 0
 }
 
 // FIXME - GB - 2020-07-30 - We can't use the global serializer in this case because it doesn't handle nested object
 // See https://github.com/tracim/tracim/issues/3229
-export const serializeNotification = no => {
+export const serializeNotification = notification => {
   return {
-    author: no.fields.author.public_name,
-    content: no.fields.content ? no.fields.content : null,
-    created: no.created,
-    id: no.event_id,
-    read: no.read,
-    type: no.event_type,
-    workspace: no.fields.workspace ? no.fields.workspace : null
+    author: notification.fields.author.public_name,
+    user: notification.fields.user ? serialize(notification.fields.user, serializeUserProps) : null,
+    content: notification.fields.content ? serialize(notification.fields.content, serializeContentProps) : null,
+    created: notification.created,
+    id: notification.event_id,
+    read: notification.read,
+    type: notification.event_type,
+    workspace: notification.fields.workspace ? serialize(notification.fields.workspace, serializeWorkspaceListProps) : null
   }
 }
 
@@ -52,15 +59,26 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         list: uniqBy([
           serializeNotification(action.notification),
           ...state.list
-        ], 'id')
+        ], 'id'),
+        notificationNotReadCount: state.notificationNotReadCount + 1
       }
     }
 
-    case `${UPDATE}/${NOTIFICATION}`:
-      return { ...state, list: state.list.map(no => no.id === action.notification.id ? action.notification : no) }
+    case `${READ}/${NOTIFICATION}`: {
+      const notification = state.list.find(notification => notification.id === action.notificationId && !notification.read)
+      if (!notification) return state
+      return {
+        ...state,
+        list: state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no),
+        notificationNotReadCount: state.notificationNotReadCount - 1
+      }
+    }
 
     case `${SET}/${NEXT_PAGE}`:
       return { ...state, hasNextPage: action.hasNextPage, nextPageToken: action.nextPageToken }
+
+    case `${SET}/${NOTIFICATION_NOT_READ_COUNT}`:
+      return { ...state, notificationNotReadCount: action.notificationNotReadCount }
 
     default:
       return state

@@ -42,7 +42,8 @@ import {
   getUserIsConnected,
   getMyselfWorkspaceList,
   putUserLang,
-  getWorkspaceMemberList
+  getWorkspaceMemberList,
+  getUserMessagesSummary
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -58,7 +59,8 @@ import {
   appendBreadcrumbs,
   setWorkspaceListMemberList,
   setLiveMessageManager,
-  setLiveMessageManagerStatus
+  setLiveMessageManagerStatus,
+  setNotificationNotReadCounter
 } from '../action-creator.sync.js'
 import NotificationWall from './NotificationWall.jsx'
 import SearchResult from './SearchResult.jsx'
@@ -76,7 +78,8 @@ export class Tracim extends React.Component {
     this.state = {
       firstTlmConnection: true,
       displayConnectionError: false,
-      connectionErrorDisplayTimeoutId: -1
+      connectionErrorDisplayTimeoutId: -1,
+      isNotificationWallOpen: false
     }
 
     this.liveMessageManager = new LiveMessageManager()
@@ -90,7 +93,8 @@ export class Tracim extends React.Component {
       { name: CUSTOM_EVENT.SET_BREADCRUMBS, handler: this.handleSetBreadcrumbs },
       { name: CUSTOM_EVENT.APPEND_BREADCRUMBS, handler: this.handleAppendBreadcrumbs },
       { name: CUSTOM_EVENT.SET_HEAD_TITLE, handler: this.handleSetHeadTitle },
-      { name: CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, handler: this.handleTlmStatusChanged }
+      { name: CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, handler: this.handleTlmStatusChanged },
+      { name: CUSTOM_EVENT.USER_DISCONNECTED, handler: this.handleUserDisconnected }
     ])
   }
 
@@ -154,6 +158,10 @@ export class Tracim extends React.Component {
     document.title = data.title
   }
 
+  handleUserDisconnected = () => {
+    this.setState({ isNotificationWallOpen: false })
+  }
+
   async componentDidMount () {
     // console.log('<Tracim> did Mount')
     const { props } = this
@@ -161,33 +169,26 @@ export class Tracim extends React.Component {
     const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
       case 200: {
-        if (fetchGetUserIsConnected.json.lang === null) this.setDefaultUserLang(fetchGetUserIsConnected.json)
+        const fetchUser = fetchGetUserIsConnected.json
+
+        if (fetchUser.lang === null) this.setDefaultUserLang(fetchGetUserIsConnected.json)
 
         props.dispatch(setUserConnected({
-          ...fetchGetUserIsConnected.json,
+          ...fetchUser,
           logged: true
         }))
 
         Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchUser.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
 
-        i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
+        i18n.changeLanguage(fetchUser.lang)
 
         this.loadAppConfig()
         this.loadWorkspaceList()
+        this.loadNotificationNotRead(fetchUser.user_id)
+        this.loadNotificationList(fetchUser.user_id)
 
-        this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id)
-
-        const fetchGetNotificationWall = await props.dispatch(getNotificationList(fetchGetUserIsConnected.json.user_id, NUMBER_RESULTS_BY_PAGE))
-        switch (fetchGetNotificationWall.status) {
-          case 200:
-            props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
-            props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-            break
-          default:
-            props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
-            break
-        }
+        this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id)
         break
       }
       case 401: props.dispatch(setUserConnected({ logged: false })); break
@@ -265,6 +266,32 @@ export class Tracim extends React.Component {
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
+  loadNotificationNotRead = async (userId) => {
+    const { props } = this
+
+    const fetchNotificationNotRead = await props.dispatch(getUserMessagesSummary(userId))
+
+    switch (fetchNotificationNotRead.status) {
+      case 200: props.dispatch(setNotificationNotReadCounter(fetchNotificationNotRead.json.unread_messages_count)); break
+      default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
+    }
+  }
+
+  loadNotificationList = async (userId) => {
+    const { props } = this
+
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(userId, NUMBER_RESULTS_BY_PAGE))
+    switch (fetchGetNotificationWall.status) {
+      case 200:
+        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
+        break
+    }
+  }
+
   setDefaultUserLang = async loggedUser => {
     const { props } = this
     const fetchPutUserLang = await props.dispatch(putUserLang(serialize(loggedUser, serializeUserProps), props.user.lang))
@@ -275,6 +302,12 @@ export class Tracim extends React.Component {
   }
 
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))
+
+  handleClickNotificationButton = () => {
+    this.setState(prev => ({
+      isNotificationWallOpen: !prev.isNotificationWallOpen
+    }))
+  }
 
   render () {
     const { props, state } = this
@@ -297,7 +330,10 @@ export class Tracim extends React.Component {
 
     return (
       <div className='tracim fullWidthFullHeight'>
-        <Header />
+        <Header
+          onClickNotification={this.handleClickNotificationButton}
+          notificationNotReadCount={props.notificationPage.notificationNotReadCount}
+        />
         {state.displayConnectionError && (
           <FlashMessage
             className='connection_error'
@@ -321,7 +357,14 @@ export class Tracim extends React.Component {
         <div className='sidebarpagecontainer'>
           <Route render={() => <Sidebar />} />
 
-          <Route render={() => <NotificationWall />} />
+          <Route
+            render={() => (
+              <NotificationWall
+                onCloseNotificationWall={this.handleClickNotificationButton}
+                isNotificationWallOpen={state.isNotificationWallOpen}
+              />
+            )}
+          />
 
           <Route path={PAGE.LOGIN} component={Login} />
 
@@ -416,7 +459,7 @@ export class Tracim extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, tlm }) => ({
-  breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, tlm
+const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, tlm, notificationPage }) => ({
+  breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, tlm, notificationPage
 })
 export default withRouter(connect(mapStateToProps)(translate()(TracimComponent(Tracim))))

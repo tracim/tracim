@@ -52,7 +52,7 @@ describe('App File', () => {
         cy.get('[data-cy="appFileLastVersionBtn"]')
           .should('be.visible')
 
-        cy.get('[data-cy="popinFixed__header__button__close"]')
+        cy.get('.file__header__close[data-cy="popinFixed__header__button__close"]')
           .click()
 
         cy.get('.breadcrumbs__item')

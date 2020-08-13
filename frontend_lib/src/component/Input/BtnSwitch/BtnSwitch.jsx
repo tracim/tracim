@@ -5,7 +5,10 @@ import PropTypes from 'prop-types'
 // require('./BtnSwitch.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export const BtnSwitch = props =>
-  <div className={classnames('btnswitch', { 'disabled': props.disabled })}>
+  <div
+    className={classnames('btnswitch', { 'disabled': props.disabled })}
+    title={props.checked ? props.activeLabel : props.inactiveLabel}
+  >
     <label className='switch nomarginlabel' onClick={e => {
       e.preventDefault()
       e.stopPropagation()
