@@ -72,7 +72,7 @@ export const HtmlDocument = props => {
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&
           <div className='html-document__editionmode__container'>
-            {props.textAppAutoComplete && props.autoCompleteItemList.length > 0 && (
+            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
               <AutoCompleteContainer
                 autoCompleteItemList={props.autoCompleteItemList}
                 autoCompleteCursorPosition={props.autoCompleteCursorPosition}

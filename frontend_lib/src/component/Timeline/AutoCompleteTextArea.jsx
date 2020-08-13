@@ -2,13 +2,18 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AutoCompleteContainer from '../Input/AutoCompleteContainer/AutoCompleteContainer'
+import {
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleClickItem
+} from '../../tinymceAutoCompleteHelper.js'
 
 export class AutoCompleteTextArea extends React.Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      mentionAutocomplete: false,
+      isAutoCompleteActivated: false,
       autoCompleteItemList: [],
       autoCompleteCursorPosition: 0,
       tinymcePosition: {}
@@ -18,41 +23,44 @@ export class AutoCompleteTextArea extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     if (!prevProps.wysiwyg && this.props.wysiwyg) this.props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown)
     if (!this.props.wysiwyg && prevProps.newComment !== this.props.newComment) {
-      this.loadAutoComplete()
+      this.searchForMentionCandidate()
     }
   }
 
-  loadAutoComplete = async () => {
-    const newComment = this.props.newComment
+  searchForMentionCandidate = async () => {
+    const mentionCandidate = this.getMentionCandidate(this.props.newComment)
+    if (mentionCandidate === undefined) {
+      if (this.state.isAutoCompleteActivated) this.setState({ isAutoCompleteActivated: false })
+      return
+    }
+
+    const mentionList = await this.props.searchForMention(mentionCandidate)
+    this.setState({
+      isAutoCompleteActivated: true,
+      autoCompleteCursorPosition: mentionList.length - 1,
+      autoCompleteItemList: mentionList
+    })
+  }
+
+  getMentionCandidate = newComment => {
     const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
     let index = lastCharBeforeCursorIndex
     while (newComment[index] !== ' ' && index >= 0) {
       if (newComment[index] === '@' && (index === 0 || newComment[index - 1] === ' ')) {
-        const query = newComment.slice(index + 1, lastCharBeforeCursorIndex + 1)
-        const mentionList = await this.props.searchForMention(query)
-        this.setState({
-          mentionAutocomplete: true,
-          autoCompleteCursorPosition: mentionList.length - 1,
-          autoCompleteItemList: mentionList
-        })
-        return
+        return newComment.slice(index + 1, lastCharBeforeCursorIndex + 1)
       }
       index--
     }
-    if (this.state.mentionAutocomplete) this.setState({ mentionAutocomplete: false })
-  }
-
-  handleChangeNewComment = (event) => {
-    this.props.onChangeNewComment(event)
+    return undefined
   }
 
   handleInputKeyPress = e => {
     const { state } = this
 
-    if (!this.state.mentionAutocomplete) return
+    if (!this.state.isAutoCompleteActivated) return
 
     switch (e.key) {
-      case ' ': this.setState({ mentionAutocomplete: false, autoCompleteItemList: [] }); break
+      case ' ': this.setState({ isAutoCompleteActivated: false, autoCompleteItemList: [] }); break
       case 'Enter': {
         this.handleClickAutoCompleteItem(state.autoCompleteItemList[state.autoCompleteCursorPosition])
         e.preventDefault()
@@ -83,108 +91,34 @@ export class AutoCompleteTextArea extends React.Component {
     const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
     const atIndex = this.props.newComment.lastIndexOf('@')
     if (atIndex === -1) return
-    const newComment = [...this.props.newComment]
-    newComment.splice(atIndex + 1, lastCharBeforeCursorIndex - atIndex, [...autoCompleteItem.mention, ' '])
-    this.props.onChangeNewComment({ target: { value: newComment.flatMap(m => m).reduce((val, m) => (val + m), '') } })
+    const newComment = this.props.newComment.split('')
+    const mentionSize = lastCharBeforeCursorIndex - atIndex
+    newComment.splice(atIndex + 1, mentionSize, autoCompleteItem.mention + ' ')
+
+    this.props.onChangeNewComment({ target: { value: newComment.join('') } })
 
     this.setState({
-      mentionAutocomplete: false,
+      isAutoCompleteActivated: false,
       autoCompleteItemList: [],
       autoCompleteCursorPosition: atIndex + autoCompleteItem.mention.length + 2
     })
   }
 
   handleTinyMceInput = (e, position) => {
-    if (!e.data) return
-
-    switch (e.data) {
-      case '@': {
-        const rawHtml = '<span id="autocomplete"><span id="autocomplete__searchtext"><span id="autocomplete__start">\uFEFF</span></span></span>'
-        const currentTextContent = tinymce.activeEditor.selection.getStart().textContent
-        const hasSpaceBeforeAt = currentTextContent.length === 1 || currentTextContent[currentTextContent.length - 2] === ' '
-
-        if (!hasSpaceBeforeAt) break
-
-        tinymce.activeEditor.execCommand('mceInsertContent', false, rawHtml)
-        tinymce.activeEditor.focus()
-        tinymce.activeEditor.selection.select(tinymce.activeEditor.selection.dom.select('span#autocomplete__searchtext span')[0])
-        tinymce.activeEditor.selection.collapse(0)
-
-        this.setState({
-          mentionAutocomplete: true,
-          tinymcePosition: position
-        })
-        this.searchForMention()
-        break
-      }
-      case ' ': {
-        if (!tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext')) return
-
-        tinymce.activeEditor.focus()
-        const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace('\ufeff', '')
-        const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
-        tinymce.activeEditor.dom.remove(selection)
-        tinymce.activeEditor.execCommand('mceInsertContent', false, query)
-        this.setState({ mentionAutocomplete: false, tinymcePosition: position })
-        break
-      }
-      default: if (this.state.mentionAutocomplete) this.searchForMention()
-    }
+    tinymceAutoCompleteHandleInput(e, position, this.setState.bind(this), this.props.searchForMention, this.state.isAutoCompleteActivated)
   }
 
-  searchForMention = async () => {
-    if (!tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext')) return
-
-    const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace('\ufeff', '')
-
-    const fetchSearchMentionList = await this.props.searchForMention(query)
-    this.setState({
-      autoCompleteItemList: fetchSearchMentionList,
-      autoCompleteCursorPosition: 0
-    })
-  }
-
-  handleTinyMceKeyDown = e => {
+  handleTinyMceKeyDown = event => {
     const { state } = this
 
-    if (!this.state.mentionAutocomplete) return
-
-    switch (e.key) {
-      case ' ': this.setState({ mentionAutocomplete: false, autoCompleteItemList: [] }); break
-      case 'Enter': {
-        this.handleClickWysiwygAutoCompleteItem(state.autoCompleteItemList[state.autoCompleteCursorPosition])
-        e.preventDefault()
-        break
-      }
-      case 'ArrowUp': {
-        if (state.autoCompleteCursorPosition > 0) {
-          this.setState(prevState => ({
-            autoCompleteCursorPosition: prevState.autoCompleteCursorPosition - 1
-          }))
-        }
-        e.preventDefault()
-        break
-      }
-      case 'ArrowDown': {
-        if (state.autoCompleteCursorPosition < state.autoCompleteItemList.length - 1) {
-          this.setState(prevState => ({
-            autoCompleteCursorPosition: prevState.autoCompleteCursorPosition + 1
-          }))
-        }
-        e.preventDefault()
-        break
-      }
-      case 'Backspace': this.searchForMention()
-    }
-  }
-
-  handleClickWysiwygAutoCompleteItem = (item) => {
-    tinymce.activeEditor.focus()
-    const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
-    tinymce.activeEditor.dom.remove(selection)
-    tinymce.activeEditor.execCommand('mceInsertContent', false, `${item.mention} `)
-
-    this.setState({ mentionAutocomplete: false })
+    tinymceAutoCompleteHandleKeyDown(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      state.autoCompleteCursorPosition,
+      state.autoCompleteItemList,
+      this.props.searchForMention
+    )
   }
 
   render () {
@@ -196,12 +130,12 @@ export class AutoCompleteTextArea extends React.Component {
 
     return (
       <>
-        {!props.disableComment && state.mentionAutocomplete && state.autoCompleteItemList.length > 0 && (
+        {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
           <AutoCompleteContainer
             autoCompleteItemList={state.autoCompleteItemList}
             style={style}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-            onClickAutoCompleteItem={(m) => props.wysiwyg ? this.handleClickWysiwygAutoCompleteItem(m) : this.handleClickAutoCompleteItem(m)}
+            onClickAutoCompleteItem={(m) => props.wysiwyg ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this)) : this.handleClickAutoCompleteItem(m)}
             delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
           />
         )}
@@ -210,7 +144,7 @@ export class AutoCompleteTextArea extends React.Component {
           className={props.customClass}
           placeholder={props.t('Your message...')}
           value={props.newComment}
-          onChange={!props.wysiwyg ? this.handleChangeNewComment : () => {}}
+          onChange={!props.wysiwyg ? props.onChangeNewComment : () => {}}
           disabled={props.disableComment}
           onKeyDown={!props.wysiwyg ? this.handleInputKeyPress : () => {}}
           ref={ref => { this.textAreaRef = ref }}

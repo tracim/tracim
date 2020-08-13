@@ -30,7 +30,10 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  getCurrentContentVersionNumber
+  getCurrentContentVersionNumber,
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleClickItem
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -73,8 +76,7 @@ export class HtmlDocument extends React.Component {
       showRefreshWarning: false,
       editionAuthor: '',
       isLastTimelineItemCurrentToken: false,
-      textAppAutoComplete: false,
-      timelineAutoComplete: false,
+      isAutoCompleteActivated: false,
       autoCompleteCursorPosition: 0,
       autoCompleteItemList: []
     }
@@ -248,97 +250,21 @@ export class HtmlDocument extends React.Component {
     globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown)
   }
 
-  handleTinyMceInput = (e, position) => {
-    if (!e.data) return
-
-    switch (e.data) {
-      case '@': {
-        const rawHtml = '<span id="autocomplete"><span id="autocomplete__searchtext"><span id="autocomplete__start">\uFEFF</span></span></span>'
-        const currentTextContent = tinymce.activeEditor.selection.getStart().textContent
-        const hasSpaceBeforeAt = currentTextContent.length === 1 || currentTextContent[currentTextContent.length - 2] === ' '
-
-        if (!hasSpaceBeforeAt) break
-
-        tinymce.activeEditor.execCommand('mceInsertContent', false, rawHtml)
-        tinymce.activeEditor.focus()
-        tinymce.activeEditor.selection.select(tinymce.activeEditor.selection.dom.select('span#autocomplete__searchtext span')[0])
-        tinymce.activeEditor.selection.collapse(0)
-
-        this.setState({
-          textAppAutoComplete: true,
-          tinymcePosition: position
-        })
-        this.searchForMention()
-        break
-      }
-      case ' ': {
-        if (!tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext')) return
-
-        tinymce.activeEditor.focus()
-        const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace('\ufeff', '')
-        const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
-        tinymce.activeEditor.dom.remove(selection)
-        tinymce.activeEditor.execCommand('mceInsertContent', false, query)
-        this.setState({ textAppAutoComplete: false, tinymcePosition: position })
-        break
-      }
-      default: if (this.state.textAppAutoComplete) this.searchForMention()
-    }
+  handleTinyMceInput = (event, tinymcePosition) => {
+    tinymceAutoCompleteHandleInput(event, tinymcePosition, this.setState.bind(this), this.searchMentionList, this.state.isAutoCompleteActivated)
   }
 
-  searchForMention = async () => {
-    if (!tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext')) return
-
-    const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace('\ufeff', '')
-
-    const fetchSearchMentionList = await this.searchMentionList(query)
-    this.setState({
-      autoCompleteItemList: fetchSearchMentionList,
-      autoCompleteCursorPosition: 0
-    })
-  }
-
-  handleTinyMceKeyDown = e => {
+  handleTinyMceKeyDown = event => {
     const { state } = this
 
-    if (!this.state.textAppAutoComplete) return
-
-    switch (e.key) {
-      case ' ': this.setState({ textAppAutoComplete: false, autoCompleteItemList: [] }); break
-      case 'Enter': {
-        this.handleClickAutoCompleteItem(state.autoCompleteItemList[state.autoCompleteCursorPosition])
-        e.preventDefault()
-        break
-      }
-      case 'ArrowUp': {
-        if (state.autoCompleteCursorPosition > 0) {
-          this.setState(prevState => ({
-            autoCompleteCursorPosition: prevState.autoCompleteCursorPosition - 1
-          }))
-        }
-        e.preventDefault()
-        break
-      }
-      case 'ArrowDown': {
-        if (state.autoCompleteCursorPosition < state.autoCompleteItemList.length - 1) {
-          this.setState(prevState => ({
-            autoCompleteCursorPosition: prevState.autoCompleteCursorPosition + 1
-          }))
-        }
-        e.preventDefault()
-        break
-      }
-      case 'Backspace': this.searchForMention()
-    }
-  }
-
-  handleClickAutoCompleteItem = (item) => {
-    tinymce.activeEditor.focus()
-    const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
-    tinymce.activeEditor.dom.remove(selection)
-    tinymce.activeEditor.execCommand('mceInsertContent', false, `${item.mention} `)
-
-    this.setState({ textAppAutoComplete: false })
+    tinymceAutoCompleteHandleKeyDown(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      state.autoCompleteCursorPosition,
+      state.autoCompleteItemList,
+      this.searchMentionList
+    )
   }
 
   componentWillUnmount () {
@@ -762,14 +688,13 @@ export class HtmlDocument extends React.Component {
             onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
-            searchMentionList={this.searchMentionList}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
-            textAppAutoComplete={state.textAppAutoComplete}
+            isAutoCompleteActivated={state.isAutoCompleteActivated}
             tinymcePosition={state.tinymcePosition}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
             autoCompleteItemList={state.autoCompleteItemList}
-            onClickAutoCompleteItem={this.handleClickAutoCompleteItem}
+            onClickAutoCompleteItem={(mention) => tinymceAutoCompleteHandleClickItem(mention, this.setState.bind(this))}
           />
 
           <PopinFixedRightPart

@@ -101,6 +101,12 @@ import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
+import {
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleClickItem
+} from './tinymceAutoCompleteHelper.js'
+
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -192,5 +198,8 @@ export {
   serialize,
   getOrCreateSessionClientToken,
   getCurrentContentVersionNumber,
-  AutoCompleteContainer
+  AutoCompleteContainer,
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleClickItem
 }
