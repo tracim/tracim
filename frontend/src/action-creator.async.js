@@ -18,6 +18,7 @@ import {
   newFlashMessage,
   NOTIFICATION,
   NOTIFICATION_LIST,
+  NOTIFICATION_NOT_READ_COUNT,
   SEARCHED_KEYWORDS,
   setRedirectLogin,
   setUserDisconnected,
@@ -871,6 +872,21 @@ export const putNotificationAsRead = (userId, eventId) => dispatch => {
       method: 'PUT'
     },
     actionName: NOTIFICATION,
+    dispatch
+  })
+}
+
+export const getUserMessagesSummary = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: NOTIFICATION_NOT_READ_COUNT,
     dispatch
   })
 }

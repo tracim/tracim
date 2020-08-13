@@ -105,9 +105,19 @@ export class ReduxTlmDispatcher extends React.Component {
     const response = await this.props.dispatch(getContent(data.fields.workspace.workspace_id, commentParentId))
 
     if (response.status !== 200) return
-
+    const notificationData = {
+      ...data,
+      fields: {
+        ...data.fields,
+        content: {
+          ...data.fields.content,
+          parent_label: response.json.label,
+          parent_content_type: response.json.content_type
+        }
+      }
+    }
+    this.props.dispatch(addNotification(notificationData))
     this.props.dispatch(removeWorkspaceReadStatus(response.json, data.fields.workspace.workspace_id))
-    this.props.dispatch(addNotification(data))
   }
 
   handleContentModified = data => {

@@ -102,7 +102,6 @@
   "Users": "Users",
   "My Account": "My Account",
   "Logout": "Logout",
-  "Deleted File": "Deleted File",
   "Search…": "Search…",
   "Welcome to Tracim": "Welcome to Tracim",
   "You aren't member of any shared space yet": "You aren't member of any shared space yet",
@@ -251,7 +250,6 @@
   "Password reset": "Password reset",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Find all your documents put online directly on your computer via the workstation, without going through the software.",
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Full name must be at least {{minimumCharactersPublicName}} characters",
-  "Archived Topic": "Archived Topic",
   "Your personal data has been changed": "Your personal data has been changed",
   "Your username and your name has been changed": "Your username and your name has been changed",
   "Your username has been changed": "Your username has been changed",
@@ -269,5 +267,7 @@
   "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?",
   "Tracim has a connection problem, please wait or reload the page if the problem persists": "Tracim has a connection problem, please wait or reload the page if the problem persists",
   "Your username": "Your username",
-  "Your username has been set": "Your username has been set"
+  "Your username has been set": "Your username has been set",
+  "{{author}} added {{user}} to {{workspace}}": "{{author}} added {{user}} to {{workspace}}",
+  "Error loading unread notification number": "Error loading unread notification number"
 }

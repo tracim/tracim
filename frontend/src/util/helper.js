@@ -22,6 +22,11 @@ export const FETCH_CONFIG = {
   apiUrl: configEnv.apiUrl
 }
 
+export const ANCHOR_NAMESPACE = {
+  workspaceItem: 'workspaceItem',
+  notificationItem: 'notificationItem'
+}
+
 // Côme - 2018/08/02 - shouldn't this come from api ?
 export const workspaceConfig = {
   slug: 'workspace',
