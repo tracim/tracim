@@ -105,7 +105,7 @@ def rq_database_worker(config_uri, app_config):
 
 
 @pytest.fixture
-def tracim_webserver(settings, config_uri, engine) -> PyramidTestServer:
+def tracim_webserver(settings, config_uri, engine, session_factory) -> PyramidTestServer:
     config_filename = basename(config_uri)
     config_dir = dirname(config_uri)
 
@@ -117,7 +117,8 @@ def tracim_webserver(settings, config_uri, engine) -> PyramidTestServer:
     ) as server:
         server.start()
         yield server
-        DeclarativeBase.metadata.drop_all(engine)
+    session_factory.close_all()
+    DeclarativeBase.metadata.drop_all(engine)
 
 
 @pytest.fixture

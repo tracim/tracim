@@ -59,6 +59,7 @@ def big_html_document(workspace_api_factory, content_api_factory, session) -> Co
     return html_document
 
 
+@pytest.mark.timeout(30)
 @pytest.mark.usefixtures("base_fixture")
 class TestLivesMessages(object):
     def test_api__user_live_messages_endpoint_without_GRIP_proxy__ok_200__nominal_case(
