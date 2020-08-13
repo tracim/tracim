@@ -1,9 +1,6 @@
 import React from 'react'
-import { commonMentionList } from '../../helper'
-import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import Avatar from '../Avatar/Avatar'
 import AutoCompleteContainer from '../Input/AutoCompleteContainer/AutoCompleteContainer'
 
 export class AutoCompleteTextArea extends React.Component {
@@ -84,13 +81,7 @@ export class AutoCompleteTextArea extends React.Component {
 
   handleClickAutoCompleteItem = (autoCompleteItem) => {
     const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
-    let atIndex = -1
-    for (let i = lastCharBeforeCursorIndex; i >= 0; i--) {
-      if (this.props.newComment[i] === '@') {
-        atIndex = i
-        break
-      }
-    }
+    const atIndex = this.props.newComment.lastIndexOf('@')
     if (atIndex === -1) return
     const newComment = [...this.props.newComment]
     newComment.splice(atIndex + 1, lastCharBeforeCursorIndex - atIndex, [...autoCompleteItem.mention, ' '])
@@ -108,45 +99,44 @@ export class AutoCompleteTextArea extends React.Component {
 
     switch (e.data) {
       case '@': {
-        const rawHtml = (
-          '<span id="autocomplete">' +
-          '<span id="autocomplete-searchtext"><span class="dummy">\uFEFF</span></span>' +
-          '</span>'
-        )
+        const rawHtml = '<span id="autocomplete"><span id="autocomplete__searchtext"><span id="autocomplete__start">\uFEFF</span></span></span>'
+        const currentTextContent = tinymce.activeEditor.selection.getStart().textContent
+        const hasSpaceBeforeAt = currentTextContent.length === 1 || currentTextContent[currentTextContent.length - 2] === ' '
+
+        if (!hasSpaceBeforeAt) break
 
         tinymce.activeEditor.execCommand('mceInsertContent', false, rawHtml)
         tinymce.activeEditor.focus()
-        tinymce.activeEditor.selection.select(tinymce.activeEditor.selection.dom.select('span#autocomplete-searchtext span')[0])
+        tinymce.activeEditor.selection.select(tinymce.activeEditor.selection.dom.select('span#autocomplete__searchtext span')[0])
         tinymce.activeEditor.selection.collapse(0)
 
         this.setState({
           mentionAutocomplete: true,
-          tinymcePosition: position,
-          autoCompleteItemList: []
+          tinymcePosition: position
         })
+        this.searchForMention()
         break
       }
       case ' ': {
-        if (!tinymce.activeEditor.getDoc().getElementById('autocomplete-searchtext')) return
+        if (!tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext')) return
 
         tinymce.activeEditor.focus()
-        const query = tinymce.activeEditor.getDoc().getElementById('autocomplete-searchtext').textContent.replace('\ufeff', '')
+        const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace('\ufeff', '')
         const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
         tinymce.activeEditor.dom.remove(selection)
         tinymce.activeEditor.execCommand('mceInsertContent', false, query)
         this.setState({ mentionAutocomplete: false, tinymcePosition: position })
         break
       }
-      default: this.searchForMention()
+      default: if (this.state.mentionAutocomplete) this.searchForMention()
     }
   }
 
   searchForMention = async () => {
-    if (!tinymce.activeEditor.getDoc().getElementById('autocomplete-searchtext')) return
+    if (!tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext')) return
 
-    const query = tinymce.activeEditor.getDoc().getElementById('autocomplete-searchtext').textContent.replace('\ufeff', '')
+    const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace('\ufeff', '')
 
-    if (query.length < 2) return
     const fetchSearchMentionList = await this.props.searchForMention(query)
     this.setState({
       autoCompleteItemList: fetchSearchMentionList,
