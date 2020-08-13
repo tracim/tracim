@@ -158,7 +158,7 @@ class ContentApi(object):
         disable_user_workspaces_filter: bool = False,
         namespaces_filter: typing.Optional[typing.List[ContentNamespaces]] = None,
     ) -> None:
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config

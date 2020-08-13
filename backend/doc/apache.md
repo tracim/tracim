@@ -5,7 +5,11 @@
 Install Tracim first.
 Install the Apache server and uWSGI:
 
-    sudo apt install apache2 libapache2-mod-wsgi-py3 uwsgi uwsgi-plugin-python3
+    sudo apt install apache2 libapache2-mod-proxy-uwsgi uwsgi uwsgi-plugin-python3
+
+Activate the proxy_uwsgi module:
+
+    sudo a2enmod proxy_uwsgi
 
 ### Configuration ###
 
@@ -25,48 +29,40 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
             Require all granted
         </Directory>
 
-        <Directory "/">
-            Require all granted
-            Dav On
-        </Directory>
         SetEnv proxy-sendcl
 
-        # Proxying Webdav
-        <Location /webdav>
-            # Setting Destination header from https to http in proxy
-            # is needed for working move/copy in webdav
-            RequestHeader edit Destination ^https http early
-            # Preserving host is needed for working move/copy in webdav
-            ProxyPreserveHost On
-            ProxyPass http://127.0.0.1:3030/webdav
-            ProxyPassReverse http://127.0.0.1:3030/webdav
-        </Location>
+    # Proxying Webdav
+    <Location /webdav>
+        # Preserving host is needed for working move/copy in webdav
+        ProxyPreserveHost On
+        ProxyPass http://127.0.0.1:3030/webdav
+        ProxyPassReverse http://127.0.0.1:3030/webdav
+    </Location>
 
-        # Proxying Caldav
-        ProxyPass /agenda http://127.0.0.1:5232/agenda
-        ProxyPassReverse /agenda http://127.0.0.1:5232/agenda
+    # Proxying Caldav
+    ProxyPassMatch ^/agenda uwsgi://127.0.0.1:6544/
+    ProxyPassReverse /agenda uwsgi://127.0.0.1:6544/
 
-        # Proxying Frontend
-        ProxyPass /ui http://127.0.0.1:6543/ui
-        ProxyPassReverse /ui http://127.0.0.1:6543/ui
+    # Proxying Frontend
+    ProxyPassMatch ^/ui uwsgi://127.0.0.1:6544/
+    ProxyPassReverse /ui uwsgi://127.0.0.1:6544/
 
-        # Proxying Tracim Live Message to Pushpin
-        ProxyPassMatch /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
-        ProxyPassReverse /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
+    # Proxying Tracim Live Message to Pushpin
+    # NOTE: no reverse as ProxyPassMatchReverse does not exist...
+    ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
 
-        # Proxying Backend API
-        ProxyPass /api http://127.0.0.1:6543/api
-        ProxyPassReverse /api http://127.0.0.1:6543/api
+    # Proxying Backend API
+    ProxyPassMatch ^/api uwsgi://127.0.0.1:6544/
+    ProxyPassReverse /api uwsgi://127.0.0.1:6544/
 
-        # Proxying Plugin assets
-        ProxyPass /custom_toolbox-assets http://127.0.0.1:6543/custom_toolbox-assets
-        ProxyPassReverse /custom_toolbox-assets http://127.0.0.1:6543/custom_toolbox-assets
+    ProxyPassMatch ^/custom_toolbox-assets uwsgi://127.0.0.1:6544/
+    ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:6544/
 
-        ProxyPassMatch ^/$ http://localhost:6543
-        ProxyPassReverse ^/$ http://127.0.0.1:6543
+    ProxyPassMatch ^/$ uwsgi://localhost:6544/
+    ProxyPassReverse / uwsgi://127.0.0.1:6544/
 
-        CustomLog /var/log/apache2/apache2-tracim-access.log combined
-        ErrorLog /var/log/apache2/apache2-tracim-error.log
+    CustomLog /var/log/apache2/apache2-tracim-access.log combined
+    ErrorLog /var/log/apache2/apache2-tracim-error.log
 
     </VirtualHost>
 
@@ -84,6 +80,18 @@ Enable this configuration file:
 
     sudo ln -s /etc/apache2/sites-available/tracim.conf /etc/apache2/sites-enabled/tracim.conf
 
+#### Allow guest downloads from direct URLs produced before Tracim v3 (the old API path is `/api/v2/`)
+
+Example:
+- old url (Tracim < 3.x): `http://localhost/api/v2/public/guest-download/.....`
+- new url (Tracim ≥ 3.x): `http://localhost/api/public/guest-download/.....`
+
+You can add this in your apache2 configuration to make sure old direct links still work:
+~~~
+    # Proxy old api path for direct guest download link
+    ProxyPass /api/v2/public/guest-download http://127.0.0.1:8080/api/public/guest-download
+~~~
+
 #### Configuring uWSGI for the Tracim Server
 
 Create the file named `/etc/uwsgi/apps-available/tracim.ini` containing:
@@ -94,6 +102,7 @@ Create the file named `/etc/uwsgi/apps-available/tracim.ini` containing:
     module = wsgi.web:application
     env = TRACIM_CONF_PATH=[TRACIM_PATH]/backend/development.ini
     virtualenv = [TRACIM_PATH]/backend/env
+    socket = :6544
     http-socket = :6543
     socket-timeout = 360
     #workers = 4

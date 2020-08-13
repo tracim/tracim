@@ -158,7 +158,7 @@ class WedavEnvironFactory(object):
             "tracim_user": user,
         }
         tracim_context = WebdavTracimContext(
-            app_config=self.app_config, environ=environ, plugin_manager=self.plugin_manager
+            app_config=self.app_config, environ=environ, plugin_manager=self.plugin_manager,
         )
         tracim_context.dbsession = self.session
         environ["tracim_context"] = tracim_context
@@ -174,7 +174,7 @@ class ApplicationApiFactory(object):
 
 
 def webdav_put_new_test_file_helper(
-    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes
+    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes,
 ) -> _DAVResource:
     # This part id a reproduction of
     # wsgidav.request_server.RequestServer#doPUT
@@ -275,25 +275,17 @@ class DockerCompose:
 
 class TracimTestContext(TracimContext):
     def __init__(
-        self,
-        app_config: CFG,
-        session_factory,
-        user: typing.Optional[User] = None,
-        mock_event_builder: bool = True,
+        self, app_config: CFG, session_factory, user: typing.Optional[User] = None,
     ) -> None:
         super().__init__()
         self._app_config = app_config
         self._plugin_manager = create_plugin_manager()
-        if mock_event_builder:
-            # mocking event builder in order to avoid
-            # requiring a working pushpin instance for every test
-            event_builder = mock.MagicMock(spec=EventBuilder)
-            event_builder.__name__ = EventBuilder.__name__
-            event_publisher = mock.MagicMock(spec=EventPublisher)
-            event_publisher.__name__ = EventPublisher.__name__
-        else:
-            event_builder = EventBuilder(app_config)
-            event_publisher = EventPublisher(app_config)
+        event_builder = EventBuilder(app_config)
+        event_publisher = EventPublisher(app_config)
+        # mock event publishing to avoid requiring a working
+        # pushpin instance for every test
+        EventPublisher._publish_pending_events_of_context = mock.Mock()
+
         self._plugin_manager.register(event_builder)
         self._plugin_manager.register(event_publisher)
         self._dbsession = create_dbsession_for_context(session_factory, transaction.manager, self)

@@ -42,13 +42,15 @@ describe('<PopupCreateOfficeDocument />', () => {
 
       describe('handleContentFileCreated', () => {
         const tlmData = {
-          ...baseFileTlm,
-          content: {
-            ...fileTlm,
-            parent_id: 0,
-            content_id: fileTlm.content_id,
-            created: '2022-06-09T10:28:43.511Z',
-            label: ''
+          fields: {
+            ...baseFileTlm,
+            content: {
+              ...fileTlm,
+              parent_id: 0,
+              content_id: fileTlm.content_id,
+              created: '2022-06-09T10:28:43.511Z',
+              label: ''
+            }
           }
         }
         const handleCloseSpy = sinon.stub(wrapperInstance, 'handleClose')

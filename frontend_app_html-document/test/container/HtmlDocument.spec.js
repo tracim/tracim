@@ -47,23 +47,27 @@ describe('<HtmlDocument />', () => {
         describe('create a new comment', () => {
           it('should update the timeline if is related to the current html-document', () => {
             const tlmData = {
-              content: {
-                ...commentTlm,
-                parent_id: contentHtmlDocument.htmlDocument.content_id,
-                content_id: 9
+              fields: {
+                content: {
+                  ...commentTlm,
+                  parent_id: contentHtmlDocument.htmlDocument.content_id,
+                  content_id: 9
+                }
               }
             }
             wrapper.instance().handleContentCreated(tlmData)
-            const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.content.content_id))
+            const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.fields.content.content_id))
             expect(hasComment).to.equal(true)
           })
 
           it('should not update the timeline if is not related to the current html-document', () => {
             const tlmDataOtherContent = {
-              content: {
-                ...commentTlm,
-                parent_id: contentHtmlDocument.htmlDocument.content_id + 1,
-                content_id: 12
+              fields: {
+                content: {
+                  ...commentTlm,
+                  parent_id: contentHtmlDocument.htmlDocument.content_id + 1,
+                  content_id: 12
+                }
               }
             }
             const oldTimelineLength = wrapper.state('timeline').length
@@ -77,12 +81,14 @@ describe('<HtmlDocument />', () => {
       describe('handleContentModified', () => {
         describe('modify the content name', () => {
           const tlmData = {
-            author: contentHtmlDocument.htmlDocument.last_modifier,
-            content: {
-              ...contentHtmlDocument.htmlDocument,
-              label: 'newContentName'
-            },
-            client_token: wrapper.state('config').apiHeader['X-Tracim-ClientToken']
+            fields: {
+              author: contentHtmlDocument.htmlDocument.last_modifier,
+              content: {
+                ...contentHtmlDocument.htmlDocument,
+                label: 'newContentName'
+              },
+              client_token: wrapper.state('config').apiHeader['X-Tracim-ClientToken']
+            }
           }
 
           before(() => {
@@ -95,28 +101,30 @@ describe('<HtmlDocument />', () => {
           })
 
           it('should update the document with the new name', () => {
-            expect(wrapper.state('newContent').label).to.equal(tlmData.content.label)
+            expect(wrapper.state('newContent').label).to.equal(tlmData.fields.content.label)
           })
           it('should call buildBreadcrumbs()', () => {
             expect(buildBreadcrumbsSpy.called).to.equal(true)
           })
           it('should call setHeadTitle() with the right args', () => {
-            expect(setHeadTitleSpy.calledOnceWith(tlmData.content.label)).to.equal(true)
+            expect(setHeadTitleSpy.calledOnceWith(tlmData.fields.content.label)).to.equal(true)
           })
         })
 
         describe('modify the content of the html-document', () => {
           const tlmData = {
-            author: contentHtmlDocument.htmlDocument.last_modifier,
-            content: {
-              ...contentHtmlDocument.htmlDocument,
-              raw_content: '<p>Html Document Content</p>'
+            fields: {
+              author: contentHtmlDocument.htmlDocument.last_modifier,
+              content: {
+                ...contentHtmlDocument.htmlDocument,
+                raw_content: '<p>Html Document Content</p>'
+              }
             }
           }
 
           it('should update the document with the new content', () => {
             wrapper.instance().handleContentModified(tlmData)
-            expect(wrapper.state('newContent').raw_content).to.equal(tlmData.content.raw_content)
+            expect(wrapper.state('newContent').raw_content).to.equal(tlmData.fields.content.raw_content)
           })
 
           it('should stay in edit mode if the user is editing', () => {
@@ -126,20 +134,29 @@ describe('<HtmlDocument />', () => {
             expect(wrapper.state('showRefreshWarning')).to.equal(true)
             expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.EDIT)
           })
+
+          it('should display the right version number', () => {
+            wrapper.setState({ mode: APP_FEATURE_MODE.REVISION })
+            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+            wrapper.instance().handleContentModified(tlmData)
+            expect(wrapper.state('content').number).to.equal(oldRevisionNumber)
+          })
         })
 
         describe('modify a content not related to another content', () => {
           const tlmData = {
-            content: {
-              ...contentHtmlDocument.htmlDocument,
-              raw_content: '<p>Html Document content on other doc</p>',
-              content_id: contentHtmlDocument.htmlDocument.content_id + 1
+            fields: {
+              content: {
+                ...contentHtmlDocument.htmlDocument,
+                raw_content: '<p>Html Document content on other doc</p>',
+                content_id: contentHtmlDocument.htmlDocument.content_id + 1
+              }
             }
           }
 
           it('should not update when the modification that do not concern the current content', () => {
             wrapper.instance().handleContentModified(tlmData)
-            expect(wrapper.state('newContent').raw_content).to.not.equal(tlmData.content.raw_content)
+            expect(wrapper.state('newContent').raw_content).to.not.equal(tlmData.fields.content.raw_content)
           })
         })
       })
@@ -147,8 +164,10 @@ describe('<HtmlDocument />', () => {
       describe('handleContentDeletedOrRestore', () => {
         describe('when deleting the current content', () => {
           const tlmData = {
-            author: contentHtmlDocument.htmlDocument.last_modifier,
-            content: { ...contentHtmlDocument.htmlDocument, is_deleted: true }
+            fields: {
+              author: contentHtmlDocument.htmlDocument.last_modifier,
+              content: { ...contentHtmlDocument.htmlDocument, is_deleted: true }
+            }
           }
 
           after(() => {
@@ -159,14 +178,23 @@ describe('<HtmlDocument />', () => {
             wrapper.instance().handleContentDeletedOrRestore(tlmData)
             expect(wrapper.state('newContent').is_deleted).to.equal(true)
           })
+
+          it('should display the right version number', () => {
+            wrapper.setState({ mode: APP_FEATURE_MODE.REVISION })
+            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+            wrapper.instance().handleContentModified(tlmData)
+            expect(wrapper.state('content').number).to.equal(oldRevisionNumber)
+          })
         })
 
         describe('when deleting a content which is not the current one', () => {
           const tlmData = {
-            content: {
-              ...contentHtmlDocument.htmlDocument,
-              content_id: contentHtmlDocument.htmlDocument.content_id + 1,
-              is_deleted: true
+            fields: {
+              content: {
+                ...contentHtmlDocument.htmlDocument,
+                content_id: contentHtmlDocument.htmlDocument.content_id + 1,
+                is_deleted: true
+              }
             }
           }
 
@@ -178,8 +206,10 @@ describe('<HtmlDocument />', () => {
 
         describe('when restoring the current content', () => {
           const tlmData = {
-            author: contentHtmlDocument.htmlDocument.last_modifier,
-            content: { ...contentHtmlDocument.htmlDocument, is_deleted: false }
+            fields: {
+              author: contentHtmlDocument.htmlDocument.last_modifier,
+              content: { ...contentHtmlDocument.htmlDocument, is_deleted: false }
+            }
           }
 
           after(() => {
@@ -196,10 +226,12 @@ describe('<HtmlDocument />', () => {
 
         describe('restore a content which is not the current one', () => {
           const tlmData = {
-            content: {
-              ...contentHtmlDocument.htmlDocument,
-              content_id: contentHtmlDocument.htmlDocument.content_id + 1,
-              is_deleted: false
+            fields: {
+              content: {
+                ...contentHtmlDocument.htmlDocument,
+                content_id: contentHtmlDocument.htmlDocument.content_id + 1,
+                is_deleted: false
+              }
             }
           }
 
@@ -217,13 +249,13 @@ describe('<HtmlDocument />', () => {
       describe('handleUserModified', () => {
         describe('If the user is the author of a revision or comment', () => {
           it('should update the timeline with the data of the user', () => {
-            const tlmData = { user: { ...user, public_name: 'newName' } }
+            const tlmData = { fields: { user: { ...user, public_name: 'newName' } } }
             wrapper.instance().handleUserModified(tlmData)
 
             const listPublicNameOfAuthor = wrapper.state('timeline')
-              .filter(timelineItem => timelineItem.author.user_id === tlmData.user.user_id)
+              .filter(timelineItem => timelineItem.author.user_id === tlmData.fields.user.user_id)
               .map(timelineItem => timelineItem.author.public_name)
-            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.user.public_name)
+            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.fields.user.public_name)
             expect(isNewName).to.be.equal(true)
           })
         })

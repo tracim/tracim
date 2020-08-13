@@ -64,6 +64,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.tracim_session import TracimSession
+from tracim_backend.models.userconfig import UserConfig
 
 DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT = 5
 
@@ -77,7 +78,7 @@ class UserApi(object):
         show_deleted: bool = False,
         show_deactivated: bool = True,
     ) -> None:
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config
@@ -903,8 +904,7 @@ class UserApi(object):
         user.profile = profile
 
         if save_now:
-            self._session.add(user)
-            self._session.flush()
+            self.save(user)
 
         return user
 
@@ -972,7 +972,13 @@ class UserApi(object):
             self.save(user)
 
     def save(self, user: User):
+        is_new_user = not user.user_id
+
         self._session.add(user)
+
+        if is_new_user:
+            self._session.add(UserConfig(user=user))
+
         self._session.flush()
 
     def execute_updated_user_actions(self, user: User) -> None:
@@ -1030,15 +1036,15 @@ class UserApi(object):
                 if agenda_already_exist:
                     logger.warning(
                         self,
-                        "user {} is just created but his own agenda already exist !!".format(
+                        "user {} has just been created but their own agenda already exists".format(
                             user.user_id
                         ),
                     )
             except AgendaServerConnectionError as exc:
-                logger.error(self, "Cannot connect to agenda server")
+                logger.error(self, "Cannot connect to the agenda server")
                 logger.exception(self, exc)
             except Exception as exc:
-                logger.error(self, "Something goes wrong during agenda create/update")
+                logger.error(self, "Something went wrong during agenda create/update")
                 logger.exception(self, exc)
 
     def _check_user_auth_validity(self, user: User) -> None:
