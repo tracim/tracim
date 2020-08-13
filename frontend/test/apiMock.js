@@ -188,6 +188,11 @@ const mockPutNotificationAsRead204 = (apiUrl, userId, notificationId) => {
     .put(`/users/${userId}/messages/${notificationId}/read`)
     .reply(204, true)
 }
+const mockPutAllNotificationAsRead204 = (apiUrl, userId) => {
+  return nock(apiUrl)
+    .put(`/users/${userId}/messages/read`)
+    .reply(204, true)
+}
 
 export {
   mockGetWorkspaceDetail200,
@@ -198,6 +203,7 @@ export {
   mockGetConfig200,
   mockMyselfWorkspaceDoNotify204,
   mockPostUserLogout204,
+  mockPutAllNotificationAsRead204,
   mockPutContentItemMove200,
   mockPutContentItemMove400,
   mockPutUserWorkspaceDoNotify204,

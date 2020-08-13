@@ -7,11 +7,12 @@ import {
   NEXT_PAGE,
   NOTIFICATION,
   NOTIFICATION_LIST,
+  READ,
+  readNotification,
+  readNotificationList,
   SET,
   setNextPage,
-  setNotificationList,
-  READ,
-  readNotification
+  setNotificationList
 } from '../../../src/action-creator.sync.js'
 import notificationPage from '../../../src/reducer/notificationPage.js'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
@@ -70,6 +71,14 @@ describe('reducer notificationPage.js', () => {
 
     describe(`${READ}/${NOTIFICATION}`, () => {
       const listOfNotification = notificationPage({ ...initialState, list: [notification], notificationNotReadCount: 1 }, readNotification(notification.id))
+
+      it('should return the list of objects passed as parameter', () => {
+        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], notificationNotReadCount: 0 })
+      })
+    })
+
+    describe(`${READ}/${NOTIFICATION_LIST}`, () => {
+      const listOfNotification = notificationPage({ ...initialState, list: [notification], notificationNotReadCount: 1 }, readNotificationList([notification]))
 
       it('should return the list of objects passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], notificationNotReadCount: 0 })

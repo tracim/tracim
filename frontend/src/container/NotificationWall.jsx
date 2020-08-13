@@ -12,6 +12,7 @@ import {
   appendNotificationList,
   newFlashMessage,
   readNotification,
+  readNotificationList,
   setNextPage
 } from '../action-creator.sync.js'
 import {
@@ -166,7 +167,7 @@ export class NotificationWall extends React.Component {
     const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
     switch (fetchAllPutNotificationAsRead.status) {
       case 204:
-        props.notificationPage.list.forEach(notification => props.dispatch(readNotification(notification.id)))
+        props.dispatch(readNotificationList(props.notificationPage.list))
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
