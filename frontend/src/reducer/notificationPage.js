@@ -75,7 +75,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     }
 
     case `${READ}/${NOTIFICATION_LIST}`: {
-      const notificationList = action.notificationList.map(notification => (
+      const notificationList = state.list.map(notification => (
         { ...notification, read: true }
       ))
       return { ...state, list: uniqBy(notificationList, 'id'), notificationNotReadCount: 0 }
