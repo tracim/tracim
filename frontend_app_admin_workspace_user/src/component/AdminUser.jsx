@@ -157,7 +157,7 @@ export class AdminUser extends React.Component {
           <div className='adminUser__table'>
             <table className='table'>
               <thead>
-                <tr className='adminUser__table__header'>
+                <tr>
                   <th className='adminUser__table__active' scope='col'>{props.t('Active')}</th>
                   <th className='adminUser__table__profile' />
                   <th className='adminUser__table__fullName' scope='col'>{props.t('User')}</th>
