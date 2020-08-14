@@ -1,14 +1,14 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import AutoCompleteContainer from '../Input/AutoCompleteContainer/AutoCompleteContainer'
+import MentionAutoComplete from '../Input/MentionAutoComplete/MentionAutoComplete'
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem
 } from '../../tinymceAutoCompleteHelper.js'
 
-export class AutoCompleteTextArea extends React.Component {
+export class CommentTextArea extends React.Component {
   constructor (props) {
     super(props)
 
@@ -131,7 +131,7 @@ export class AutoCompleteTextArea extends React.Component {
     return (
       <>
         {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
-          <AutoCompleteContainer
+          <MentionAutoComplete
             autoCompleteItemList={state.autoCompleteItemList}
             style={style}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
@@ -154,9 +154,9 @@ export class AutoCompleteTextArea extends React.Component {
   }
 }
 
-export default translate()(AutoCompleteTextArea)
+export default translate()(CommentTextArea)
 
-AutoCompleteTextArea.propTypes = {
+CommentTextArea.propTypes = {
   id: PropTypes.string.isRequired,
   newComment: PropTypes.string.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
@@ -166,7 +166,7 @@ AutoCompleteTextArea.propTypes = {
   customClass: PropTypes.string
 }
 
-AutoCompleteTextArea.defaultProps = {
+CommentTextArea.defaultProps = {
   disableComment: false,
   customClass: '',
   id: '',

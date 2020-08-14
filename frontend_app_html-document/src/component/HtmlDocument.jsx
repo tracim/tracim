@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   APP_FEATURE_MODE,
-  AutoCompleteContainer,
+  MentionAutoComplete,
   DisplayState,
   TextAreaApp
 } from 'tracim_frontend_lib'
@@ -73,7 +73,7 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.EDIT &&
           <div className='html-document__editionmode__container'>
             {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-              <AutoCompleteContainer
+              <MentionAutoComplete
                 autoCompleteItemList={props.autoCompleteItemList}
                 autoCompleteCursorPosition={props.autoCompleteCursorPosition}
                 onClickAutoCompleteItem={props.onClickAutoCompleteItem}

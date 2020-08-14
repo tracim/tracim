@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { AutoCompleteTextArea } from '../../src/component/Timeline/AutoCompleteTextArea.jsx'
+import { CommentTextArea } from '../../src/component/Timeline/AutoCompleteTextArea.jsx'
 import sinon from 'sinon'
 
 describe('<AutoCompleteTextArea />', () => {
@@ -17,7 +17,7 @@ describe('<AutoCompleteTextArea />', () => {
   }
 
   const wrapper = shallow(
-    <AutoCompleteTextArea
+    <CommentTextArea
       {...props}
     />
   )

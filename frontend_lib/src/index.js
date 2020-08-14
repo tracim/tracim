@@ -63,7 +63,7 @@ import Timeline from './component/Timeline/Timeline.jsx'
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
-import AutoCompleteContainer from './component/Input/AutoCompleteContainer/AutoCompleteContainer.jsx'
+import MentionAutoComplete from './component/Input/MentionAutoComplete/MentionAutoComplete.jsx'
 
 import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
@@ -198,7 +198,7 @@ export {
   serialize,
   getOrCreateSessionClientToken,
   getCurrentContentVersionNumber,
-  AutoCompleteContainer,
+  MentionAutoComplete,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem

@@ -10,7 +10,7 @@ import DisplayState from '../DisplayState/DisplayState.jsx'
 import { ROLE, CONTENT_TYPE, TIMELINE_TYPE } from '../../helper.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
-import AutoCompleteTextArea from './AutoCompleteTextArea.jsx'
+import CommentTextArea from './CommentTextArea.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -165,7 +165,7 @@ export class Timeline extends React.Component {
                 'timeline__texteditor__textinput'
               )}
             >
-              <AutoCompleteTextArea
+              <CommentTextArea
                 id='wysiwygTimelineComment'
                 onChangeNewComment={props.onChangeNewComment}
                 newComment={props.newComment}

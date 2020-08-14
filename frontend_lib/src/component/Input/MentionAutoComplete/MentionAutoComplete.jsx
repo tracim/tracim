@@ -3,7 +3,7 @@ import classnames from 'classnames'
 import Avatar from '../../Avatar/Avatar'
 import PropTypes from 'prop-types'
 
-export const AutoCompleteContainer = props => {
+export const MentionAutoComplete = props => {
   return (
     <div className='autocomplete' style={props.style}>
       {props.autoCompleteItemList.map((m, i) => (
@@ -27,9 +27,9 @@ export const AutoCompleteContainer = props => {
   )
 }
 
-export default AutoCompleteContainer
+export default MentionAutoComplete
 
-AutoCompleteContainer.propTypes = {
+MentionAutoComplete.propTypes = {
   autoCompleteItemList: PropTypes.array,
   style: PropTypes.object,
   autoCompleteCursorPosition: PropTypes.number,
@@ -37,7 +37,7 @@ AutoCompleteContainer.propTypes = {
   delimiterIndex: PropTypes.number
 }
 
-AutoCompleteContainer.defaultProps = {
+MentionAutoComplete.defaultProps = {
   autoCompleteItemList: [],
   style: {},
   autoCompleteCursorPosition: 0,
