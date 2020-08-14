@@ -6,7 +6,8 @@ import {
   APP_FEATURE_MODE,
   generateLocalStorageContentId,
   convertBackslashNToBr,
-  displayDistanceDate
+  displayDistanceDate,
+  wrapMentionInSpanTag
 } from './helper.js'
 import {
   putEditContent,
@@ -144,10 +145,10 @@ export function appContentFactory (WrappedComponent) {
       // see https://github.com/tracim/tracim/issues/1101
       const newCommentForApi = isCommentWysiwyg ? newComment : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
 
+      let newCommentForApiWithMention
       try {
-        const newCommentForApiWithMention = this.wrapMentionInSpanTag(newCommentForApi)
+        newCommentForApiWithMention = wrapMentionInSpanTag(newCommentForApi)
       } catch (e) {
-
         return new Promise((resolve, reject) => reject(e))
       }
 

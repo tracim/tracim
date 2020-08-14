@@ -403,4 +403,4 @@ export const wrapMentionInSpanTag = text => {
     console.error('Error while parsing mention', e)
     throw EXCEPTION_MENTION_PARSING
   }
-}
+} // Does not work at the begging of a sentence

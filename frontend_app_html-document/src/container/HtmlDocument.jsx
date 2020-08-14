@@ -29,7 +29,8 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent
+  TracimComponent,
+  wrapMentionInSpanTag
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -409,8 +410,15 @@ export class HtmlDocument extends React.Component {
       generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
     )
 
+    let newDocumentForApiWithMention
+    try {
+      newDocumentForApiWithMention = wrapMentionInSpanTag(state.content.raw_content)
+    } catch (e) {
+      return new Promise((resolve, reject) => reject(e))
+    }
+
     const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, state.content.raw_content)
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMention)
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {

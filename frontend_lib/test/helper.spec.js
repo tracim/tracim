@@ -269,7 +269,7 @@ describe('helper.js', () => {
       })
 
       describe('with source as HTML text', () => {
-        const htmlTextWithMention = `<div class='someClass'>'This is a text with <p>a mention @admin that</p> should be wrapped'</div>`
+        const htmlTextWithMention = ' <div class="someClass">"This is a text with <p>a mention @admin that</p> should be wrapped"</div>'
         const result = wrapMentionInSpanTag(htmlTextWithMention)
         const parsedResult = DOMParser.parseFromString(result, 'text/html')
         const addedSpanList = parsedResult.getElementsByTagName('span')

@@ -32,7 +32,8 @@ import {
   removeAtInUsername,
   setupCommonRequestHeaders,
   serialize,
-  getOrCreateSessionClientToken
+  getOrCreateSessionClientToken,
+  wrapMentionInSpanTag
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -188,5 +189,6 @@ export {
   sortTimelineByDate,
   setupCommonRequestHeaders,
   serialize,
-  getOrCreateSessionClientToken
+  getOrCreateSessionClientToken,
+  wrapMentionInSpanTag
 }
