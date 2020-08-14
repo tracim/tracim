@@ -1,10 +1,10 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { CommentTextArea } from '../../src/component/Timeline/AutoCompleteTextArea.jsx'
+import { CommentTextArea } from '../../src/component/Timeline/CommentTextArea.jsx'
 import sinon from 'sinon'
 
-describe('<AutoCompleteTextArea />', () => {
+describe('<CommentTextArea />', () => {
   const onChangeNewCommentSpy = sinon.spy()
 
   const props = {
@@ -33,9 +33,9 @@ describe('<AutoCompleteTextArea />', () => {
         preventDefault: preventDefaultSpy
       }
 
-      describe('when mentionAutocomplete is true', () => {
+      describe('when isAutoCompleteActivated is true', () => {
         beforeEach(() => {
-          wrapper.setState({ mentionAutocomplete: true })
+          wrapper.setState({ isAutoCompleteActivated: true })
         })
 
         afterEach(() => {
@@ -47,9 +47,9 @@ describe('<AutoCompleteTextArea />', () => {
             wrapper.setState({ autoCompleteItemList: [{ mention: 'all', detail: 'notify all' }] })
           })
 
-          it('should set mentionAutocomplete to false and clean autoCompleteItemList', () => {
+          it('should set isAutoCompleteActivated to false and clean autoCompleteItemList', () => {
             wrapper.instance().handleInputKeyPress({ ...initialEvent, key: ' ' })
-            expect(wrapper.state('mentionAutocomplete')).to.equal(false)
+            expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
             expect(wrapper.state('autoCompleteItemList')).to.deep.equal([])
           })
         })
@@ -113,9 +113,9 @@ describe('<AutoCompleteTextArea />', () => {
     })
 
     describe('loadAutoComplete() (Note: "|" is the cursor position)', () => {
-      describe('when mentionAutocomplete is false', () => {
+      describe('when isAutoCompleteActivated is false', () => {
         before(() => {
-          wrapper.setState({ mentionAutocomplete: false })
+          wrapper.setState({ isAutoCompleteActivated: false })
         })
 
         describe('new comment: "newComment|"', () => {
@@ -124,9 +124,9 @@ describe('<AutoCompleteTextArea />', () => {
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 10 }
           })
 
-          it('should have the state mentionAutocomplete set to false', () => {
-            wrapper.instance().loadAutoComplete()
-            expect(wrapper.state('mentionAutocomplete')).to.equal(false)
+          it('should have the state isAutoCompleteActivated set to false', () => {
+            wrapper.instance().searchForMentionCandidate()
+            expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
           })
         })
 
@@ -136,9 +136,9 @@ describe('<AutoCompleteTextArea />', () => {
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 11 }
           })
 
-          it('should have the state mentionAutocomplete set to true', () => {
-            wrapper.instance().loadAutoComplete()
-            expect(wrapper.state('mentionAutocomplete')).to.equal(true)
+          it('should have the state isAutoCompleteActivated set to true', () => {
+            wrapper.instance().searchForMentionCandidate()
+            expect(wrapper.state('isAutoCompleteActivated')).to.equal(true)
           })
         })
 
@@ -148,9 +148,21 @@ describe('<AutoCompleteTextArea />', () => {
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 11 }
           })
 
-          it('should have the state mentionAutocomplete set to false', () => {
-            wrapper.instance().loadAutoComplete()
-            expect(wrapper.state('mentionAutocomplete')).to.equal(false)
+          it('should have the state isAutoCompleteActivated set to false', () => {
+            wrapper.instance().searchForMentionCandidate()
+            expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
+          })
+        })
+
+        describe('new comment: "@new @Comment|"', () => {
+          before(() => {
+            wrapper.setProps({ newComment: '@new @Comment' })
+            wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 13 }
+          })
+
+          it('should have the state isAutoCompleteActivated set to true', () => {
+            wrapper.instance().searchForMentionCandidate()
+            expect(wrapper.state('isAutoCompleteActivated')).to.equal(true)
           })
         })
 
@@ -160,9 +172,9 @@ describe('<AutoCompleteTextArea />', () => {
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 12 }
           })
 
-          it('should have the state mentionAutocomplete set to true', () => {
-            wrapper.instance().loadAutoComplete()
-            expect(wrapper.state('mentionAutocomplete')).to.equal(true)
+          it('should have the state isAutoCompleteActivated set to true', () => {
+            wrapper.instance().searchForMentionCandidate()
+            expect(wrapper.state('isAutoCompleteActivated')).to.equal(true)
           })
         })
 
@@ -172,9 +184,9 @@ describe('<AutoCompleteTextArea />', () => {
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 1 }
           })
 
-          it('should have the state mentionAutocomplete set to true', () => {
-            wrapper.instance().loadAutoComplete()
-            expect(wrapper.state('mentionAutocomplete')).to.equal(true)
+          it('should have the state isAutoCompleteActivated set to true', () => {
+            wrapper.instance().searchForMentionCandidate()
+            expect(wrapper.state('isAutoCompleteActivated')).to.equal(true)
           })
         })
 
@@ -184,16 +196,16 @@ describe('<AutoCompleteTextArea />', () => {
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 0 }
           })
 
-          it('should have the state mentionAutocomplete set to false', () => {
-            wrapper.instance().loadAutoComplete()
-            expect(wrapper.state('mentionAutocomplete')).to.equal(false)
+          it('should have the state isAutoCompleteActivated set to false', () => {
+            wrapper.instance().searchForMentionCandidate()
+            expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
           })
         })
       })
 
-      describe('when mentionAutocomplete is true', () => {
+      describe('when isAutoCompleteActivated is true', () => {
         before(() => {
-          wrapper.setState({ mentionAutocomplete: true })
+          wrapper.setState({ isAutoCompleteActivated: true })
         })
 
         describe('new comment: "@newComment |"', () => {
@@ -202,9 +214,9 @@ describe('<AutoCompleteTextArea />', () => {
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 12 }
           })
 
-          it('should have the state mentionAutocomplete set to false', () => {
-            wrapper.instance().loadAutoComplete()
-            expect(wrapper.state('mentionAutocomplete')).to.equal(false)
+          it('should have the state isAutoCompleteActivated set to false', () => {
+            wrapper.instance().searchForMentionCandidate()
+            expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
           })
         })
 
@@ -214,9 +226,9 @@ describe('<AutoCompleteTextArea />', () => {
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 12 }
           })
 
-          it('should have the state mentionAutocomplete set to false', () => {
-            wrapper.instance().loadAutoComplete()
-            expect(wrapper.state('mentionAutocomplete')).to.equal(false)
+          it('should have the state isAutoCompleteActivated set to false', () => {
+            wrapper.instance().searchForMentionCandidate()
+            expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
           })
         })
       })
