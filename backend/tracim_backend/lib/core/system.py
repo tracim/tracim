@@ -10,7 +10,7 @@ from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import ReservedUsernameError
-from tracim_backend.exceptions import UsernameAlreadyExistInDb
+from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.user import UserApi
@@ -73,7 +73,7 @@ class SystemApi(object):
         try:
             uapi.check_username(username)
             return True
-        except (InvalidUsernameFormat, UsernameAlreadyExistInDb, ReservedUsernameError):
+        except (InvalidUsernameFormat, UsernameAlreadyExists, ReservedUsernameError):
             return False
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:

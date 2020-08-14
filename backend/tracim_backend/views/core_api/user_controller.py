@@ -7,7 +7,7 @@ from pyramid.response import Response
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
-from tracim_backend.exceptions import EmailAlreadyExistsInDb
+from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import MessageDoesNotExist
@@ -17,7 +17,7 @@ from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
-from tracim_backend.exceptions import UsernameAlreadyExistInDb
+from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -201,7 +201,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(EmailAlreadyExistsInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(EmailAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetEmailSchema())
@@ -225,7 +225,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(UsernameAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UsernameAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ReservedUsernameError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
@@ -297,8 +297,8 @@ class UserController(Controller):
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
-    @hapic.handle_exception(EmailAlreadyExistsInDb, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UsernameAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(EmailAlreadyExists, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UsernameAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ReservedUsernameError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
     @check_right(is_administrator)

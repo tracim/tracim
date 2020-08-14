@@ -17,7 +17,7 @@ from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.exceptions import UsernameAlreadyExistInDb
+from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
@@ -202,7 +202,7 @@ class TestUserApi(object):
     def test_unit__create_minimal_user__error__already_used_username(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
-        with pytest.raises(UsernameAlreadyExistInDb):
+        with pytest.raises(UsernameAlreadyExists):
             api.create_minimal_user(username="boby", email="boby2@boba.fet", save_now=True)
 
     @pytest.mark.parametrize("username", ["all", "tous", "todos"])
@@ -259,7 +259,7 @@ class TestUserApi(object):
         api = UserApi(current_user=None, session=session, config=app_config)
         u1 = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
         api.create_minimal_user(username="jean", email="boby2@boba.fet", save_now=True)
-        with pytest.raises(UsernameAlreadyExistInDb):
+        with pytest.raises(UsernameAlreadyExists):
             api.update(user=u1, username="jean")
 
     @pytest.mark.parametrize("username", ["all", "tous", "todos"])

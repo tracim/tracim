@@ -479,12 +479,12 @@ class AppDoesNotExist(TracimException):
     pass
 
 
-class EmailAlreadyExistsInDb(TracimException):
-    error_code = ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+class EmailAlreadyExists(TracimException):
+    error_code = ErrorCode.EMAIL_ALREADY_EXISTS
 
 
-class UsernameAlreadyExistInDb(TracimException):
-    error_code = ErrorCode.USERNAME_ALREADY_EXIST_IN_DB
+class UsernameAlreadyExists(TracimException):
+    error_code = ErrorCode.USERNAME_ALREADY_EXISTS
 
 
 class UnavailablePreview(TracimException):

@@ -25,7 +25,7 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
-from tracim_backend.exceptions import EmailAlreadyExistsInDb
+from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import EmailOrUsernameRequired
 from tracim_backend.exceptions import EmailRequired
 from tracim_backend.exceptions import EmailTemplateError
@@ -52,7 +52,7 @@ from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.exceptions import UsernameAlreadyExistInDb
+from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
@@ -660,9 +660,9 @@ class UserApi(object):
         is_email_correct = self._check_email_correctness(email)
         if not is_email_correct:
             raise EmailValidationFailed("Email given form {} is uncorrect".format(email))
-        email_already_exist_in_db = self.check_email_already_in_db(email)
-        if email_already_exist_in_db:
-            raise EmailAlreadyExistsInDb(
+        EMAIL_ALREADY_EXISTS = self.check_email_already_in_db(email)
+        if EMAIL_ALREADY_EXISTS:
+            raise EmailAlreadyExists(
                 "Email given {} already exist, please choose something else".format(email)
             )
         return True
@@ -672,14 +672,14 @@ class UserApi(object):
 
         Raise:
             - InvalidUsernameFormat if username does not match the required format
-            - UsernameAlreadyExistInDb if username is already used by another user
+            - UsernameAlreadyExists if username is already used by another user
             - ReservedUsernameError if username is reserved (group mentions)
         """
         if not self._check_username_correctness(username):
             raise InvalidUsernameFormat("Username '{}' is not correct".format(username))
 
         if self.check_username_already_in_db(username):
-            raise UsernameAlreadyExistInDb(
+            raise UsernameAlreadyExists(
                 "Username given '{}' already exist, please choose something else".format(username)
             )
         if username in self.get_reserved_usernames():
