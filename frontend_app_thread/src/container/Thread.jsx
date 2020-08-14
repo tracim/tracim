@@ -198,8 +198,8 @@ export class Thread extends React.Component {
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown) => {
-    globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown)
+  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp) => {
+    globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp)
   }
 
   searchMentionList = async (query) => {

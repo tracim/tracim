@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import MentionAutoComplete from '../Input/MentionAutoComplete/MentionAutoComplete'
 import {
   tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem
 } from '../../tinymceAutoCompleteHelper.js'
@@ -21,7 +22,7 @@ export class CommentTextArea extends React.Component {
   }
 
   async componentDidUpdate (prevProps, prevState) {
-    if (!prevProps.wysiwyg && this.props.wysiwyg) this.props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown)
+    if (!prevProps.wysiwyg && this.props.wysiwyg) this.props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp)
     if (!this.props.wysiwyg && prevProps.newComment !== this.props.newComment) {
       this.searchForMentionCandidate()
     }
@@ -117,6 +118,17 @@ export class CommentTextArea extends React.Component {
       state.isAutoCompleteActivated,
       state.autoCompleteCursorPosition,
       state.autoCompleteItemList,
+      this.props.searchForMention
+    )
+  }
+
+  handleTinyMceKeyUp = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyUp(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
       this.props.searchForMention
     )
   }

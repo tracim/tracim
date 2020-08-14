@@ -851,8 +851,8 @@ export class File extends React.Component {
     }
   }
 
-  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown) => {
-    globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown)
+  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp) => {
+    globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp)
   }
 
   render() {

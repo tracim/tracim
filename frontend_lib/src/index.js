@@ -104,6 +104,7 @@ import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem
 } from './tinymceAutoCompleteHelper.js'
 
@@ -201,5 +202,6 @@ export {
   MentionAutoComplete,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem
 }

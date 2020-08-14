@@ -1,9 +1,11 @@
+const atSymbolCode = '\ufeff'
+
 export const tinymceAutoCompleteHandleInput = (event, tinymcePosition, setState, fetchMentionList, isAutoCompleteActivated) => {
   if (!event.data) return
 
   switch (event.data) {
     case '@': {
-      const rawHtml = '<span id="autocomplete"><span id="autocomplete__searchtext"><span id="autocomplete__start">\uFEFF</span></span></span>'
+      const rawHtml = `<span id="autocomplete"><span id="autocomplete__searchtext"><span id="autocomplete__start">${atSymbolCode}</span></span></span>`
       const currentTextContent = tinymce.activeEditor.selection.getStart().textContent
       const hasSpaceBeforeAt = currentTextContent.length === 1 || currentTextContent[currentTextContent.length - 2] === ' '
 
@@ -25,7 +27,7 @@ export const tinymceAutoCompleteHandleInput = (event, tinymcePosition, setState,
       if (!isAutoCompleteActivated) return
 
       tinymce.activeEditor.focus()
-      const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace('\ufeff', '')
+      const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace(atSymbolCode, '')
       const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
       tinymce.activeEditor.dom.remove(selection)
       tinymce.activeEditor.execCommand('mceInsertContent', false, query)
@@ -39,13 +41,23 @@ export const tinymceAutoCompleteHandleInput = (event, tinymcePosition, setState,
 export const tinymceAutoCompleteSearchForMentionCandidate = async (fetchMentionList, setState) => {
   if (!tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext')) return
 
-  const mentionCandidate = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace('\ufeff', '')
+  const mentionCandidate = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace(atSymbolCode, '')
 
   const fetchSearchMentionList = await fetchMentionList(mentionCandidate)
   setState({
     autoCompleteItemList: fetchSearchMentionList,
     autoCompleteCursorPosition: 0
   })
+}
+
+export const tinymceAutoCompleteHandleKeyUp = (event, setState, isAutoCompleteActivated, fetchMentionList) => {
+  if (!isAutoCompleteActivated || event.key !== 'Backspace') return
+
+  const autoCompleteMentionCandidateNode = tinymce.activeEditor.dom.select('span#autocomplete')[0]
+
+  if (autoCompleteMentionCandidateNode && autoCompleteMentionCandidateNode.textContent.includes(atSymbolCode)) {
+    tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
+  } else setState({ isAutoCompleteActivated: false })
 }
 
 export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoCompleteActivated, autoCompleteCursorPosition, autoCompleteItemList, fetchMentionList) => {
@@ -76,7 +88,6 @@ export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoComplete
       event.preventDefault()
       break
     }
-    case 'Backspace': tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList)
   }
 }
 

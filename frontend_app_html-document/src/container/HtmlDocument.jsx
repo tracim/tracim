@@ -32,6 +32,7 @@ import {
   TracimComponent,
   getCurrentContentVersionNumber,
   tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem
 } from 'tracim_frontend_lib'
@@ -227,13 +228,13 @@ export class HtmlDocument extends React.Component {
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText, this.handleTinyMceInput, this.handleTinyMceKeyDown)
+      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText, this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp)
     }
 
     if (state.mode === APP_FEATURE_MODE.EDIT && prevState.mode !== APP_FEATURE_MODE.EDIT) {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText, this.handleTinyMceInput, this.handleTinyMceKeyDown)
+      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText, this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp)
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
@@ -246,12 +247,23 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown) => {
-    globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown)
+  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp) => {
+    globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp)
   }
 
   handleTinyMceInput = (event, tinymcePosition) => {
     tinymceAutoCompleteHandleInput(event, tinymcePosition, this.setState.bind(this), this.searchMentionList, this.state.isAutoCompleteActivated)
+  }
+
+  handleTinyMceKeyUp = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyUp(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      this.searchMentionList
+    )
   }
 
   handleTinyMceKeyDown = event => {
