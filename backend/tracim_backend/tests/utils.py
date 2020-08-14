@@ -270,7 +270,9 @@ class DockerCompose:
     def execute(self, *arguments: str, env: dict = None) -> None:
         if env:
             env.update(os.environ)
-        subprocess.run(self.command + list(arguments), env=env, check=True)
+        subprocess.run(
+            self.command + list(arguments), env=env, check=True, stdout=subprocess.DEVNULL,
+        )
 
 
 class TracimTestContext(TracimContext):
