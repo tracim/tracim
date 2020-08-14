@@ -22,8 +22,8 @@ import {
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
 
-// INFO - CH - 2020-06-16 - this file is a component that render null because that way, it can uses the TracimComponent
-// HOC like apps would do. It also allow to use connect() from redux which adds the props dispatch().
+// INFO - CH - 2020-06-16 - this file is a component that render null because that way, it can use the TracimComponent
+// HOC like apps would do. It also allow using connect() from redux which adds the props dispatch().
 export class ReduxTlmDispatcher extends React.Component {
   constructor (props) {
     super(props)

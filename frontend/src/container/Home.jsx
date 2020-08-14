@@ -4,6 +4,7 @@ import * as Cookies from 'js-cookie'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
+
 import {
   ALLOWED_CHARACTERS_USERNAME,
   COOKIE_FRONTEND,
@@ -65,7 +66,7 @@ export class Home extends React.Component {
   }
 
   componentDidMount () {
-    this.checkUsername()
+    this.maybeShowUsernamePopup()
     this.setHeadTitle()
   }
 
@@ -80,14 +81,14 @@ export class Home extends React.Component {
     }
   }
 
-  checkUsername = () => {
-    if (!(Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP) || this.props.user.username)) {
+  maybeShowUsernamePopup () {
+    if (!(this.props.user.username || Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP))) {
       this.setState({ usernamePopup: true })
     }
   }
 
   handleClickCloseUsernamePopup = () => {
-    this.setState(prevState => ({ usernamePopup: !prevState.usernamePopup }))
+    this.setState({ usernamePopup: this.state.usernamePopup })
   }
 
   handleClickConfirmUsernamePopup = async () => {
@@ -133,17 +134,17 @@ export class Home extends React.Component {
   }
 
   handleClickCheckbox = () => {
-    this.setState(prevState => ({ hidePopupCheckbox: !prevState.hidePopupCheckbox }))
+    this.setState({ hidePopupCheckbox: !this.state.hidePopupCheckbox })
   }
 
   handleChangeNewUsername = async e => {
     const { props } = this
 
-    this.setState({ newUsername: e.target.value })
     const username = e.target.value
 
     if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
+        newUsername: username,
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
       })
@@ -152,6 +153,7 @@ export class Home extends React.Component {
 
     if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
       this.setState({
+        newUsername: username,
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
       })
@@ -160,6 +162,7 @@ export class Home extends React.Component {
 
     if (hasSpaces(username)) {
       this.setState({
+        newUsername: username,
         isUsernameValid: false,
         usernameInvalidMsg: props.t("Username can't contain any whitespace")
       })
@@ -168,11 +171,14 @@ export class Home extends React.Component {
 
     if (hasNotAllowedCharacters(username)) {
       this.setState({
+        newUsername: username,
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
       })
       return
     }
+
+    this.setState({ newUsername: username })
 
     const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
 

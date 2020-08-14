@@ -52,9 +52,7 @@ import {
   setWorkspaceList,
   setBreadcrumbs,
   appendBreadcrumbs,
-  setWorkspaceListMemberList,
-  setLiveMessageManager,
-  setLiveMessageManagerStatus
+  setWorkspaceListMemberList
 } from '../action-creator.sync.js'
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
@@ -68,14 +66,12 @@ export class Tracim extends React.Component {
   constructor (props) {
     super(props)
 
+    this.connectionErrorDisplayTimeoutId = 0
     this.state = {
-      firstTlmConnection: true,
-      displayConnectionError: false,
-      connectionErrorDisplayTimeoutId: -1
+      displayConnectionError: false
     }
 
-    this.liveMessageManager = new LiveMessageManager()
-    props.dispatch(setLiveMessageManager(this.liveMessageManager))
+    this.liveMessageManager = LiveMessageManager.getInstance()
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.REDIRECT, handler: this.handleRedirect },
@@ -107,21 +103,18 @@ export class Tracim extends React.Component {
   handleTlmStatusChanged = (data) => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, data)
     const { status } = data
-    this.props.dispatch(setLiveMessageManagerStatus(status))
-    if (status !== LIVE_MESSAGE_STATUS.OPENED && status !== LIVE_MESSAGE_STATUS.CLOSED) {
-      if (this.state.connectionErrorDisplayTimeoutId === -1) {
-        if (this.state.firstTlmConnection) this.displayConnectionError()
-        else {
-          const connectionErrorDisplayTimeoutId = globalThis.setTimeout(
-            this.displayConnectionError,
-            CONNECTION_MESSAGE_DISPLAY_DELAY_MS
-          )
-          this.setState({ connectionErrorDisplayTimeoutId })
-        }
+    if (status === LIVE_MESSAGE_STATUS.OPENED || status === LIVE_MESSAGE_STATUS.CLOSED) {
+      globalThis.clearTimeout(this.connectionErrorDisplayTimeoutId)
+      this.connectionErrorDisplayTimeoutId = 0
+
+      if (this.state.displayConnectionError) {
+        this.setState({ displayConnectionError: false })
       }
-    } else {
-      globalThis.clearTimeout(this.state.connectionErrorDisplayTimeoutId)
-      this.setState({ connectionErrorDisplayTimeoutId: -1, displayConnectionError: false, firstTlmConnection: false })
+    } else if (!this.connectionErrorDisplayTimeoutId) {
+      this.connectionErrorDisplayTimeoutId = globalThis.setTimeout(
+        this.displayConnectionError,
+        CONNECTION_MESSAGE_DISPLAY_DELAY_MS
+      )
     }
   }
 
@@ -267,10 +260,6 @@ export class Tracim extends React.Component {
 
     if (!props.location.pathname.includes('/ui')) return <Redirect to={PAGE.HOME} />
 
-    // if (props.user.logged === false && !unLoggedAllowedPageList.includes(props.location.pathname)) {
-    //   return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
-    // }
-
     if (
       !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
         !props.system.workspaceListLoaded ||
@@ -388,7 +377,7 @@ export class Tracim extends React.Component {
           <Route path={PAGE.GUEST_UPLOAD(':token')} component={GuestUpload} />
           <Route path={PAGE.GUEST_DOWNLOAD(':token')} component={GuestDownload} />
 
-          {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
+          {/* the 3 divs bellow must stay here so that they always exist in the DOM regardless of the route */}
           <div id='appFullscreenContainer' />
           <div id='appFeatureContainer' />
           <div id='popupCreateContentContainer' />

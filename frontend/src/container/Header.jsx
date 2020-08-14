@@ -13,6 +13,7 @@ import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
 import Notification from '../component/Header/MenuActionListItem/Notification.jsx'
 import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
 import logoHeader from '../img/logo-tracim.png'
+import { LiveMessageManager } from '../util/LiveMessageManager.js'
 import {
   newFlashMessage,
   setUserLang,
@@ -40,7 +41,6 @@ const qs = require('query-string')
 
 export class Header extends React.Component {
   componentDidMount () {
-    this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', {})
     i18n.changeLanguage(this.props.user.lang)
   }
 
@@ -77,7 +77,7 @@ export class Header extends React.Component {
 
     const fetchPostUserLogout = await props.dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
-      props.tlm.manager.closeLiveMessageConnection()
+      LiveMessageManager.getInstance().closeLiveMessageConnection()
       props.dispatch(setUserDisconnected())
       this.props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
       props.history.push(PAGE.LOGIN)
