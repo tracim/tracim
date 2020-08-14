@@ -20,9 +20,12 @@ describe('Notification Wall', () => {
   })
 
   it('should mark the notification as read when click at it', () => {
-    cy.get('.notification__list__item').first().click()
-    cy.get('.notificationButton').click()
-    cy.get(notReadNotificationCircle).first().should('not.exist')
+    cy.get(notReadNotificationCircle).its('length').then(length => {
+      cy.get('.notification__list__item').first().click()
+      cy.get('.notification__header__title').contains('Notifications').should('not.not.visible')
+      cy.get('.notificationButton').click()
+      cy.get(notReadNotificationCircle).its('length').should('be.lt', length)
+    })
   })
 
   it('should have the Mark All As Read button', () => {
