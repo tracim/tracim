@@ -51,7 +51,7 @@ markupsafe==1.1.0         # via mako
 marshmallow==2.21.0       # via apispec-marshmallow-advanced, hapic, tracim_backend (setup.py)
 more-itertools==7.2.0     # via zipp
 multidict==4.5.2          # via hapic
-packaging==18.0           # via preview-generator
+packaging==20.4           # via preview-generator
 pastedeploy==2.0.0        # via plaster-pastedeploy
 pathlib==1.0.1            # via preview-generator
 pbr==5.1.1                # via cliff, stevedore
