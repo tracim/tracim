@@ -17,6 +17,7 @@ from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import content_global_status_validator
 from tracim_backend.app_models.validator import content_status_validator
 from tracim_backend.app_models.validator import not_empty_string_validator
+from tracim_backend.app_models.validator import page_token_validator
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
@@ -31,6 +32,7 @@ from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
+from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
@@ -44,7 +46,8 @@ from tracim_backend.models.context_models import FilePreviewSizedPath
 from tracim_backend.models.context_models import FileQuery
 from tracim_backend.models.context_models import FileRevisionPath
 from tracim_backend.models.context_models import FolderContentUpdate
-from tracim_backend.models.context_models import KnownMemberQuery
+from tracim_backend.models.context_models import KnownMembersQuery
+from tracim_backend.models.context_models import LiveMessageQuery
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
@@ -64,6 +67,7 @@ from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserInfos
+from tracim_backend.models.context_models import UserMessagesSummaryQuery
 from tracim_backend.models.context_models import UserProfile
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentPath
@@ -75,6 +79,7 @@ from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.event import EntityType
+from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 
@@ -89,6 +94,18 @@ class StrippedString(String):
         if value:
             value = value.strip()
         return value.strip()
+
+
+class EventTypeListField(StrippedString):
+    def _deserialize(self, value, attr, data, **kwargs):
+        result = []
+        value = super()._deserialize(value, attr, data, **kwargs)
+        if value:
+            values = value.split(",")
+            for item in values:
+                result.append(EventTypeDatabaseParameters.from_event_type(item.strip()))
+            return result
+        return None
 
 
 class RFCEmail(ValidatedField, String):
@@ -237,7 +254,7 @@ class UserSchema(UserDigestSchema):
         allow_none=True,
         required=False,
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
+        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     class Meta:
@@ -246,6 +263,10 @@ class UserSchema(UserDigestSchema):
 
 class LoggedInUserPasswordSchema(marshmallow.Schema):
     loggedin_user_password = String(required=True, validate=user_password_validator)
+
+
+class SetConfigSchema(marshmallow.Schema):
+    parameters = marshmallow.fields.Dict(required=True, example='{"param1":"value1"}')
 
 
 class SetEmailSchema(LoggedInUserPasswordSchema):
@@ -331,7 +352,7 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
         allow_none=True,
         required=False,
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit.",
+        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit.",
     )
 
     @post_load
@@ -388,7 +409,7 @@ class UserCreationSchema(marshmallow.Schema):
         allow_none=True,
         required=False,
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
+        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     @marshmallow.validates_schema(pass_original=True)
@@ -415,10 +436,31 @@ class UserIdPathSchema(marshmallow.Schema):
     )
 
 
+class EventIdPathSchema(marshmallow.Schema):
+    event_id = marshmallow.fields.Int(
+        example=5,
+        required=True,
+        description="id of a valid event",
+        validate=strictly_positive_int_validator,
+    )
+
+
+class MessageIdsPathSchema(UserIdPathSchema, EventIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return MessageIdsPath(**data)
+
+
 class UserWorkspaceFilterQuery(object):
     def __init__(self, show_owned_workspace: int = 1, show_workspace_with_role: int = 1):
         self.show_owned_workspace = bool(show_owned_workspace)
         self.show_workspace_with_role = bool(show_workspace_with_role)
+
+
+class MessageIdsPath(object):
+    def __init__(self, event_id: int, user_id: int):
+        self.event_id = event_id
+        self.user_id = user_id
 
 
 class UserWorkspaceFilterQuerySchema(marshmallow.Schema):
@@ -593,7 +635,7 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
         return CommentPath(**data)
 
 
-class KnownMemberQuerySchema(marshmallow.Schema):
+class KnownMembersQuerySchema(marshmallow.Schema):
     acp = StrippedString(
         example="test", description="search text to query", validate=acp_validator, required=True
     )
@@ -601,17 +643,24 @@ class KnownMemberQuerySchema(marshmallow.Schema):
     exclude_user_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="1,5",
-        description="comma separated list of excluded user",
+        description="comma separated list of excluded users",
     )
+
     exclude_workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="3,4",
-        description="comma separated list of excluded workspace: user of this workspace are excluded from result",
+        description="comma separated list of excluded workspaces: members of this workspace are excluded from the result; cannot be used with include_workspace_ids",
+    )
+
+    include_workspace_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,4",
+        description="comma separated list of included workspaces: members of this workspace are excluded from the result; cannot be used with exclude_workspace_ids",
     )
 
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
-        return KnownMemberQuery(**data)
+        return KnownMembersQuery(**data)
 
 
 class FileQuerySchema(marshmallow.Schema):
@@ -642,7 +691,6 @@ class PageQuerySchema(FileQuerySchema):
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
-
     parent_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="0,4,5",
@@ -734,7 +782,6 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
 
 
 class ContentIdsQuerySchema(marshmallow.Schema):
-
     content_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="1,5",
@@ -985,6 +1032,12 @@ class WorkspaceSchema(WorkspaceDigestSchema):
 
     class Meta:
         description = "Full workspace informations"
+
+
+class UserConfigSchema(marshmallow.Schema):
+    parameters = marshmallow.fields.Dict(
+        description="parameters present in the user's configuration."
+    )
 
 
 class WorkspaceDiskSpaceSchema(marshmallow.Schema):
@@ -1303,6 +1356,9 @@ class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
+    parent_content_type = StrippedString(
+        example="html-document", validate=all_content_types_validator
+    )
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
@@ -1412,12 +1468,35 @@ class LiveMessageSchema(marshmallow.Schema):
     )
 
 
+class LiveMessageSchemaPage(marshmallow.Schema):
+    previous_page_token = marshmallow.fields.String()
+    next_page_token = marshmallow.fields.String()
+    has_next = marshmallow.fields.Bool()
+    has_previous = marshmallow.fields.Bool()
+    per_page = marshmallow.fields.Int()
+    items = marshmallow.fields.Nested(LiveMessageSchema, many=True)
+
+
 class GetLiveMessageQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages endpoint."""
 
-    read_status = marshmallow.fields.String(
-        missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values())
+    count = marshmallow.fields.Int(
+        example=10,
+        validate=strictly_positive_int_validator,
+        missing=DEFAULT_NB_ITEM_PAGINATION,
+        default=DEFAULT_NB_ITEM_PAGINATION,
+        allow_none=False,
     )
+    page_token = marshmallow.fields.String(
+        description="token of the page wanted, if not provided get first" "elements",
+        validate=page_token_validator,
+    )
+    read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
+    event_types = EventTypeListField()
+
+    @post_load
+    def live_message_query(self, data: typing.Dict[str, typing.Any]) -> LiveMessageQuery:
+        return LiveMessageQuery(**data)
 
 
 class TracimLiveEventHeaderSchema(marshmallow.Schema):
@@ -1434,3 +1513,21 @@ class PathSuffixSchema(marshmallow.Schema):
         default="",
         example="/workspaces/1/notifications/activate",
     )
+
+
+class UserMessagesSummaryQuerySchema(marshmallow.Schema):
+    """Possible query parameters for the GET messages summary endpoint."""
+
+    event_types = EventTypeListField()
+
+    @post_load
+    def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> UserMessagesSummaryQuery:
+        return UserMessagesSummaryQuery(**data)
+
+
+class UserMessagesSummarySchema(marshmallow.Schema):
+    messages_count = marshmallow.fields.Int(example=42)
+    read_messages_count = marshmallow.fields.Int(example=30)
+    unread_messages_count = marshmallow.fields.Int(example=12)
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user = marshmallow.fields.Nested(UserDigestSchema())

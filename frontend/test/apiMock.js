@@ -183,6 +183,17 @@ const mockGetFolderContentList200 = (apiUrl, workspaceId, folderIdList, resultCo
     .reply(200, resultContentList)
 }
 
+const mockPutNotificationAsRead204 = (apiUrl, userId, notificationId) => {
+  return nock(apiUrl)
+    .put(`/users/${userId}/messages/${notificationId}/read`)
+    .reply(204, true)
+}
+const mockPutAllNotificationAsRead204 = (apiUrl, userId) => {
+  return nock(apiUrl)
+    .put(`/users/${userId}/messages/read`)
+    .reply(204, true)
+}
+
 export {
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMemberList200,
@@ -192,6 +203,7 @@ export {
   mockGetConfig200,
   mockMyselfWorkspaceDoNotify204,
   mockPostUserLogout204,
+  mockPutAllNotificationAsRead204,
   mockPutContentItemMove200,
   mockPutContentItemMove400,
   mockPutUserWorkspaceDoNotify204,
@@ -202,6 +214,7 @@ export {
   mockPutUserEmail200,
   mockPutMyselfPassword204,
   mockPutMyselfPassword403,
+  mockPutNotificationAsRead204,
   mockPutUserPassword204,
   mockPutUserPassword403,
   mockGetLoggedUserCalendar200,

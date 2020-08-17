@@ -94,8 +94,8 @@ export class Gallery extends React.Component {
   // https://github.com/tracim/tracim/issues/3107#issuecomment-643994410
 
   liveMessageNotRelevant (data, state) {
-    return Number(data.content.workspace_id) !== Number(state.config.appConfig.workspaceId) ||
-    Number(data.content.parent_id) !== Number(state.folderId)
+    return Number(data.fields.content.workspace_id) !== Number(state.config.appConfig.workspaceId) ||
+    (state.folderId !== undefined && Number(data.fields.content.parent_id) !== Number(state.folderId))
   }
 
   handleShowApp = data => {
@@ -112,15 +112,15 @@ export class Gallery extends React.Component {
 
   handleWorkspaceModified = data => {
     const { state } = this
-    if (Number(data.workspace.workspace_id) !== Number(state.config.appConfig.workspaceId)) return
-    this.setState({ workspaceLabel: data.workspace.label })
-    this.updateBreadcrumbsAndTitle(data.workspace.label, state.folderDetail)
+    if (Number(data.fields.workspace.workspace_id) !== Number(state.config.appConfig.workspaceId)) return
+    this.setState({ workspaceLabel: data.fields.workspace.label })
+    this.updateBreadcrumbsAndTitle(data.fields.workspace.label, state.folderDetail)
   }
 
   handleContentCreatedOrUndeleted = data => {
     if (this.liveMessageNotRelevant(data, this.state)) return
 
-    const preview = this.buildPreview(data.content)
+    const preview = this.buildPreview(data.fields.content)
     if (preview) {
       this.setNewPicturesPreviews([preview, ...this.state.imagePreviewList].sort(this.sortPreviews))
     }
@@ -128,18 +128,23 @@ export class Gallery extends React.Component {
 
   handleContentModified = data => {
     const { state } = this
-    if (this.liveMessageNotRelevant(data, state)) return
-
+    if (this.liveMessageNotRelevant(data, state)) {
+      // INFO - GM - 2020-07-20 - The if below covers the move functionality.
+      if (state.imagePreviewList.find(p => data.fields.content.content_id === p.contentId)) {
+        this.removeContent(data.fields.content.content_id)
+      }
+      return
+    }
     // RJ - 2020-06-15 - NOTE
     // We need to reorder the list because the label of the file could have changed.
     // We could test whether this is the case, but handling only one case is
     // probably better.
 
     const imagePreviewList = state.imagePreviewList.filter(
-      image => image.contentId !== data.content.content_id
+      image => image.contentId !== data.fields.content.content_id
     )
 
-    const preview = this.buildPreview(data.content)
+    const preview = this.buildPreview(data.fields.content)
     if (preview) {
       // RJ - 2020-06-15 - NOTE
       // Unlikely, but a picture could be replaced by a file of another type
@@ -153,6 +158,11 @@ export class Gallery extends React.Component {
   handleContentDeleted = data => {
     const { state } = this
     if (this.liveMessageNotRelevant(data, state)) return
+    this.removeContent(data.fields.content.content_id)
+  }
+
+  removeContent = (contentId) => {
+    const { state } = this
 
     let displayedPictureIndex = state.displayedPictureIndex
     let imagePreviewList = state.imagePreviewList
@@ -160,7 +170,7 @@ export class Gallery extends React.Component {
     let deletedIndex = -1
 
     imagePreviewList = state.imagePreviewList.filter((image, i) => {
-      const isDeletedImage = Number(image.contentId) === Number(data.content.content_id)
+      const isDeletedImage = Number(image.contentId) === Number(contentId)
       if (isDeletedImage) deletedIndex = i
       return !isDeletedImage
     })

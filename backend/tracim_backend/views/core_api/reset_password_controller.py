@@ -4,10 +4,10 @@ from pyramid.config import Configurator
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import InvalidResetPasswordToken
 from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import PasswordDoNotMatch
-from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
@@ -57,7 +57,7 @@ class ResetPasswordController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])
     @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(InvalidResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(
         ExternalAuthUserPasswordModificationDisallowed, http_code=HTTPStatus.BAD_REQUEST
     )
@@ -77,7 +77,7 @@ class ResetPasswordController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])
     @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(InvalidResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(
         ExternalAuthUserPasswordModificationDisallowed, http_code=HTTPStatus.BAD_REQUEST
     )

@@ -16,6 +16,9 @@ import {
   FOLDER,
   FOLDER_READ,
   newFlashMessage,
+  NOTIFICATION,
+  NOTIFICATION_LIST,
+  NOTIFICATION_NOT_READ_COUNT,
   SEARCHED_KEYWORDS,
   setRedirectLogin,
   setUserDisconnected,
@@ -843,6 +846,60 @@ export const getGuestUploadInfo = token => dispatch => {
       method: 'GET'
     },
     actionName: 'GuestUpload',
+    dispatch
+  })
+}
+
+export const getNotificationList = (userId, notificationsByPage, nextPageToken = null) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?count=${notificationsByPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+export const putNotificationAsRead = (userId, eventId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/${eventId}/read`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION,
+    dispatch
+  })
+}
+
+export const putAllNotificationAsRead = (userId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+export const getUserMessagesSummary = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: NOTIFICATION_NOT_READ_COUNT,
     dispatch
   })
 }

@@ -261,7 +261,7 @@ export class AdminWorkspaceUser extends React.Component {
 
   handleWorkspaceCreated = (message) => {
     const { state } = this
-    const workspace = message.workspace
+    const workspace = message.fields.workspace
     const newWorkspaceList = state.content.workspaceList.slice()
     /* INFO SG 2020-06-15:
      *  - the list is ordered by id and a newly created workspace has a greater id than all others.
@@ -281,7 +281,7 @@ export class AdminWorkspaceUser extends React.Component {
   handleWorkspaceModified = (message) => {
     const { state } = this
 
-    const workspace = message.workspace
+    const workspace = message.fields.workspace
     const workspaceList = state.content.workspaceList
     const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
@@ -313,11 +313,11 @@ export class AdminWorkspaceUser extends React.Component {
   handleWorkspaceDeleted = (message) => {
     const { state } = this
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
 
     if (workspaceIndex === -1) {
       // We do not have this workspace in our list...
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
       return
     }
 
@@ -337,16 +337,24 @@ export class AdminWorkspaceUser extends React.Component {
     const { state } = this
 
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
 
     if (workspaceIndex === -1) {
       // We do not have this workspace in our list...
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
       return
     }
 
     const newMemberList = workspaceList[workspaceIndex].memberList.slice()
-    newMemberList.push(message.member)
+    newMemberList.push({
+      user_id: message.fields.user.user_id,
+      user: message.fields.user,
+      workspace_id: message.fields.workspace.workspace_id,
+      workspace: message.fields.workspace,
+      do_notify: message.fields.member.do_notify,
+      is_active: message.fields.user.is_active,
+      role: message.fields.member.role
+    })
     const newWorkspace = { ...message.workspace, memberList: newMemberList }
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
@@ -365,16 +373,16 @@ export class AdminWorkspaceUser extends React.Component {
     const { state } = this
 
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
 
     if (workspaceIndex === -1) {
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
       // We do not have this workspace in our list...
       return
     }
 
-    const newMemberList = workspaceList[workspaceIndex].memberList.filter(m => m.user_id !== message.role.user_id)
-    const newWorkspace = { ...message.workspace, memberList: newMemberList }
+    const newMemberList = workspaceList[workspaceIndex].memberList.filter(m => m.user_id !== message.fields.user.user_id)
+    const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
       newWorkspace,
@@ -420,7 +428,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    if (!state.config.system.config.email_notification_activated) {
+    if (!state.config.system.config.email_notification_activated || password !== '') {
       if (password === '') {
         this.sendGlobalFlashMsg(props.t('Please set a password'), 'warning')
         return
@@ -475,7 +483,7 @@ export class AdminWorkspaceUser extends React.Component {
   handleUserCreated = (message) => {
     const { state } = this
 
-    const user = message.user
+    const user = message.fields.user
     const newUserList = state.content.userList.slice()
     newUserList.push(user)
 
@@ -490,7 +498,7 @@ export class AdminWorkspaceUser extends React.Component {
   handleUserModified = (message) => {
     const { state } = this
 
-    const user = message.user
+    const user = message.fields.user
     const userList = state.content.userList
     const userIndex = userList.findIndex(u => u.user_id === user.user_id)
 
@@ -516,7 +524,7 @@ export class AdminWorkspaceUser extends React.Component {
   handleUserDeleted = (message) => {
     const { state } = this
 
-    const user = message.user
+    const user = message.fields.user
     const userList = state.content.userList
     const newUserList = userList.filter(u => u.user_id !== user.user_id)
     this.setState(prev => ({

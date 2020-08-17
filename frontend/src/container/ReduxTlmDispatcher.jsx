@@ -7,6 +7,7 @@ import {
   TLM_SUB_TYPE as TLM_ST
 } from 'tracim_frontend_lib'
 import {
+  addNotification,
   addWorkspaceContentList,
   addWorkspaceMember,
   deleteWorkspaceContentList,
@@ -68,57 +69,78 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleWorkspaceDeleted = data => {
-    this.props.dispatch(removeWorkspace(data.workspace))
+    this.props.dispatch(removeWorkspace(data.fields.workspace))
+    this.props.dispatch(addNotification(data))
   }
 
   handleWorkspaceModified = data => {
-    this.props.dispatch(updateWorkspaceDetail(data.workspace))
+    this.props.dispatch(updateWorkspaceDetail(data.fields.workspace))
+    this.props.dispatch(addNotification(data))
   }
 
   handleMemberCreated = data => {
-    this.props.dispatch(addWorkspaceMember(data.user, data.workspace.workspace_id, data.member))
+    this.props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
+    this.props.dispatch(addNotification(data))
   }
 
   handleMemberModified = data => {
-    this.props.dispatch(updateWorkspaceMember(data.user, data.workspace.workspace_id, data.member))
+    this.props.dispatch(updateWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
+    this.props.dispatch(addNotification(data))
   }
 
   handleMemberDeleted = data => {
-    this.props.dispatch(removeWorkspaceMember(data.user.user_id, data.workspace.workspace_id))
-    if (this.props.user.userId === data.user.user_id) this.props.dispatch(removeWorkspace(data.workspace))
+    this.props.dispatch(removeWorkspaceMember(data.fields.user.user_id, data.fields.workspace.workspace_id))
+    if (this.props.user.userId === data.fields.user.user_id) this.props.dispatch(removeWorkspace(data.fields.workspace))
+    this.props.dispatch(addNotification(data))
   }
 
   handleContentCreated = data => {
-    this.props.dispatch(addWorkspaceContentList([data.content], data.workspace.workspace_id))
+    this.props.dispatch(addWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
+    this.props.dispatch(addNotification(data))
   }
 
   handleContentCommentCreated = async data => {
-    if (data.author.user_id === this.props.user.userId) return
-    const commentParentId = data.content.parent_id
-    const response = await this.props.dispatch(getContent(data.workspace.workspace_id, commentParentId))
+    if (data.fields.author.user_id === this.props.user.userId) return
+    const commentParentId = data.fields.content.parent_id
+    const response = await this.props.dispatch(getContent(data.fields.workspace.workspace_id, commentParentId))
 
     if (response.status !== 200) return
-
-    this.props.dispatch(removeWorkspaceReadStatus(response.json, data.workspace.workspace_id))
+    const notificationData = {
+      ...data,
+      fields: {
+        ...data.fields,
+        content: {
+          ...data.fields.content,
+          parent_label: response.json.label,
+          parent_content_type: response.json.content_type
+        }
+      }
+    }
+    this.props.dispatch(addNotification(notificationData))
+    this.props.dispatch(removeWorkspaceReadStatus(response.json, data.fields.workspace.workspace_id))
   }
 
   handleContentModified = data => {
-    this.props.dispatch(updateWorkspaceContentList([data.content], data.workspace.workspace_id))
-    if (data.author.user_id === this.props.user.userId) {
-      this.props.dispatch(addWorkspaceReadStatus(data.content, data.workspace.workspace_id))
+    this.props.dispatch(updateWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
+    if (data.fields.author.user_id === this.props.user.userId) {
+      this.props.dispatch(addWorkspaceReadStatus(data.fields.content, data.fields.workspace.workspace_id))
     }
+    this.props.dispatch(addNotification(data))
   }
 
   handleContentDeleted = data => {
-    this.props.dispatch(deleteWorkspaceContentList([data.content], data.workspace.workspace_id))
+    this.props.dispatch(deleteWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
+    this.props.dispatch(addNotification(data))
   }
 
   handleContentUnDeleted = data => {
-    this.props.dispatch(unDeleteWorkspaceContentList([data.content], data.workspace.workspace_id))
+    this.props.dispatch(unDeleteWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
+    this.props.dispatch(addNotification(data))
   }
 
   handleUserModified = data => {
-    this.props.dispatch(updateUser(data.user))
+    this.props.dispatch(updateUser(data.fields.user))
+    this.props.dispatch(addNotification(data))
   }
 
   render () {

@@ -44,7 +44,7 @@ class WorkspaceApi(object):
         :param current_user: Current user of context
         :param force_role: If True, app role in queries even if admin
         """
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config
@@ -90,10 +90,7 @@ class WorkspaceApi(object):
         """
         Return WorkspaceInContext object from Workspace
         """
-        workspace = WorkspaceInContext(
-            workspace=workspace, dbsession=self._session, config=self._config
-        )
-        return workspace
+        return WorkspaceInContext(workspace=workspace, dbsession=self._session, config=self._config)
 
     def create_workspace(
         self,
@@ -104,7 +101,7 @@ class WorkspaceApi(object):
         public_upload_enabled: bool = True,
         save_now: bool = False,
     ) -> Workspace:
-        if not self._user_allowed_to_create_new_workspaces(self._user):
+        if not self._user or not self._user_allowed_to_create_new_workspaces(self._user):
             raise UserNotAllowedToCreateMoreWorkspace("User not allowed to create more workspace")
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
@@ -123,7 +120,7 @@ class WorkspaceApi(object):
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
 
         role = role_api.create_one(
-            self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=True,
+            self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=True
         )
 
         self._session.add(workspace)
@@ -423,8 +420,3 @@ class WorkspaceApi(object):
         )
 
         return _("Workspace {}").format(query.count() + 1)
-
-
-class UnsafeWorkspaceApi(WorkspaceApi):
-    def _base_query(self):
-        return self.session.query(Workspace).filter(Workspace.is_deleted == False)  # noqa: E712

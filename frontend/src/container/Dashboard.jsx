@@ -95,7 +95,7 @@ export class Dashboard extends React.Component {
   }
 
   handleWorkspaceModified = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    if (this.props.curWs.id !== data.fields.workspace.workspace_id) return
     this.setHeadTitle()
     this.buildBreadcrumbs()
   }
@@ -595,7 +595,7 @@ export class Dashboard extends React.Component {
                   recentActivityList={props.curWs.recentActivityList}
                   readByUserList={props.curWs.contentReadStatusList}
                   contentTypeList={props.contentType}
-                  onClickEverythingAsRead={this.handleClickMarkRecentActivityAsRead}
+                  onClickMarkAllAsRead={this.handleClickMarkRecentActivityAsRead}
                   onClickSeeMore={this.handleClickSeeMore}
                   t={props.t}
                 />

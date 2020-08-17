@@ -32,7 +32,7 @@ class Logger(object):
         else:
             return instance_or_class.__class__.__name__
 
-    def _msg(self, instance_or_class: typing.Any, msg: str):
+    def _msg(self, instance_or_class: typing.Any, msg: typing.Union[str, Exception]):
         return Logger.TPL.format(cls=self._txt(instance_or_class), msg=msg)
 
     def debug(self, instance_or_class, message: str, exc_info: bool = False):
@@ -50,7 +50,7 @@ class Logger(object):
     def critical(self, instance_or_class, message: str, exc_info: bool = False):
         self._logger.critical(msg=self._msg(instance_or_class, message), exc_info=exc_info)
 
-    def exception(self, instance_or_class, message: str):
+    def exception(self, instance_or_class, message: typing.Union[str, Exception]):
         self._logger.exception(msg=self._msg(instance_or_class, message),)
 
 

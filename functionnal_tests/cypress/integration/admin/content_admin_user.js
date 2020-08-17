@@ -60,7 +60,6 @@ describe("An admin seeing a user's profile", () => {
         .click()
       cy.get('[data-cy=adminlink__dropdown__btn]').click()
       cy.get('[data-cy=adminlink__user__link]').click()
-      cy.get('.adminUser__table__tr__td-text')
       cy.get('th').last().contains('Administrator')
     })
   })
