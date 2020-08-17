@@ -6,10 +6,10 @@ export const tinymceAutoCompleteHandleInput = (event, tinymcePosition, setState,
   switch (event.data) {
     case '@': {
       const rawHtml = `<span id="autocomplete"><span id="autocomplete__searchtext"><span id="autocomplete__start">${atSymbolCode}</span></span></span>`
-      const currentTextContent = tinymce.activeEditor.selection.getStart().textContent
-      const hasSpaceBeforeAt = currentTextContent.length === 1 || currentTextContent[currentTextContent.length - 2] === ' '
+      const currentTextContent = tinymce.activeEditor.selection.getSel().anchorNode.textContent.slice(0, tinymce.activeEditor.selection.getSel().anchorOffset)
+      const isAtTheBeginningOrHasSpaceBefore = currentTextContent.length === 1 || currentTextContent[currentTextContent.length - 2] === ' '
 
-      if (!hasSpaceBeforeAt) break
+      if (!isAtTheBeginningOrHasSpaceBefore) break
 
       tinymce.activeEditor.execCommand('mceInsertContent', false, rawHtml)
       tinymce.activeEditor.focus()
@@ -21,17 +21,6 @@ export const tinymceAutoCompleteHandleInput = (event, tinymcePosition, setState,
         tinymcePosition: tinymcePosition
       })
       tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
-      break
-    }
-    case ' ': {
-      if (!isAutoCompleteActivated) return
-
-      tinymce.activeEditor.focus()
-      const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace(atSymbolCode, '')
-      const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
-      tinymce.activeEditor.dom.remove(selection)
-      tinymce.activeEditor.execCommand('mceInsertContent', false, query)
-      setState({ isAutoCompleteActivated: false, tinymcePosition: tinymcePosition })
       break
     }
     default: if (isAutoCompleteActivated) tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
@@ -64,7 +53,17 @@ export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoComplete
   if (!isAutoCompleteActivated) return
 
   switch (event.key) {
-    case ' ': setState({ isAutoCompleteActivated: false, autoCompleteItemList: [] }); break
+    case ' ': {
+      tinymce.activeEditor.focus()
+      const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace(atSymbolCode, '')
+      const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
+      tinymce.activeEditor.dom.remove(selection)
+      tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('span#autocomplete')[0])
+      tinymce.activeEditor.execCommand('mceInsertContent', false, query)
+
+      setState({ isAutoCompleteActivated: false, autoCompleteItemList: [] })
+      break
+    }
     case 'Enter': {
       tinymceAutoCompleteHandleClickItem(autoCompleteItemList[autoCompleteCursorPosition], setState)
       event.preventDefault()
@@ -95,7 +94,8 @@ export const tinymceAutoCompleteHandleClickItem = (item, setState) => {
   tinymce.activeEditor.focus()
   const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
   tinymce.activeEditor.dom.remove(selection)
-  tinymce.activeEditor.execCommand('mceInsertContent', false, `${item.mention} `)
+  tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('span#autocomplete')[0])
+  tinymce.activeEditor.execCommand('mceInsertContent', false, `${item.mention}&nbsp;`)
 
   setState({ isAutoCompleteActivated: false })
 }
