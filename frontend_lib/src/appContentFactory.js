@@ -315,7 +315,8 @@ export function appContentFactory (WrappedComponent) {
             timelineType: 'comment',
             ...resCommentWithProperDate.find(c => c.content_id === ci)
           })),
-          number: i + 1
+          number: i + 1,
+          hasBeenRead: true
         }))
         .flatMap(revision => [revision, ...revision.commentList])
     }

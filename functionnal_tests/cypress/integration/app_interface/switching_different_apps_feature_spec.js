@@ -77,7 +77,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
         cy.visit(`/ui/workspaces/${workspaceId}/contents`)
 
         cy.get(contentHtmlDocGetter).find('.content__item').click('left')
-        cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
+        cy.get('.html-document__header__close[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
         cy.get('[data-cy="popinFixed"].html-document').should('be.not.visible')
 
         cy.get(contentHtmlDocGetter).find('.content__item').click('left')
@@ -91,7 +91,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
         cy.get(contentFileGetter).find('.content__item').click('left')
 
-        cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
+        cy.get('.file__header__close[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
         cy.get('[data-cy="popinFixed"].file').should('be.not.visible')
 
         cy.get(contentFileGetter).find('.content__item').click('left')
@@ -105,7 +105,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
         cy.get(contentThreadGetter).find('.content__item').click('left')
 
-        cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
+        cy.get('.thread__contentpage__header__close[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
         cy.get('[data-cy="popinFixed"].thread').should('be.not.visible')
 
         cy.get(contentThreadGetter).find('.content__item').click('left')

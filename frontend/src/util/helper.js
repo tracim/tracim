@@ -10,6 +10,7 @@ export const SHARE_FOLDER_ID = -1
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
 export const MINIMUM_CHARACTERS_USERNAME = 3
 export const MAXIMUM_CHARACTERS_USERNAME = 255
+export const NUMBER_RESULTS_BY_PAGE = 15
 
 export const history = require('history').createBrowserHistory()
 
@@ -19,6 +20,11 @@ export { getBrowserLang }
 export const FETCH_CONFIG = {
   headers: LIB_FETCH_CONFIG.headers,
   apiUrl: configEnv.apiUrl
+}
+
+export const ANCHOR_NAMESPACE = {
+  workspaceItem: 'workspaceItem',
+  notificationItem: 'notificationItem'
 }
 
 // Côme - 2018/08/02 - shouldn't this come from api ?

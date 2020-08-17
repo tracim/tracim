@@ -10,6 +10,7 @@ from tracim_backend.lib.core.mention import MentionBuilder
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import Content
 from tracim_backend.models.event import EntityType
+from tracim_backend.models.event import Event
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.revision_protection import new_revision
 
@@ -225,3 +226,22 @@ class TestMentionBuilder:
         )
         builder.on_content_modified(one_updated_content_with_no_new_mention, context)
         assert not context.pending_events
+
+    @pytest.mark.parametrize("recipient, receiver_ids", [("all", [2]), ("TheAdmin", [1])])
+    def test_unit_get_receiver_ids(
+        self,
+        recipient: str,
+        receiver_ids: typing.Tuple[int],
+        one_content_with_a_mention: Content,
+        session,
+        app_config,
+    ) -> None:
+        event = Event(
+            entity_type=EntityType.MENTION,
+            operation=OperationType.CREATED,
+            fields={
+                "mention": {"recipient": recipient, "id": "foobar123"},
+                "workspace": {"workspace_id": one_content_with_a_mention.workspace.workspace_id},
+            },
+        )
+        assert receiver_ids == MentionBuilder.get_receiver_ids(event, session, app_config)

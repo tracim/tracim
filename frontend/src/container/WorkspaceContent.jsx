@@ -8,7 +8,8 @@ import {
   PAGE,
   findUserRoleIdInWorkspace,
   sortWorkspaceContents,
-  SHARE_FOLDER_ID
+  SHARE_FOLDER_ID,
+  ANCHOR_NAMESPACE
 } from '../util/helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ShareFolder from '../component/Workspace/ShareFolder.jsx'
@@ -660,7 +661,8 @@ export class WorkspaceContent extends React.Component {
       const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
       if (folderIdToOpen.length > 0) contentToScrollTo = folderIdToOpen[folderIdToOpen.length - 1]
     }
-    if (document.getElementById(contentToScrollTo)) document.getElementById(contentToScrollTo).scrollIntoView()
+    const idContentToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentToScrollTo}`
+    if (document.getElementById(idContentToScrollTo)) document.getElementById(idContentToScrollTo).scrollIntoView()
   }
 
   render () {

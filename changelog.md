@@ -1,4 +1,33 @@
 
+## 3.0.0 / 2020-08-07
+
+### New Features
+
+- Tracim now automatically and instantly refreshes its interface when documents and comments are created, modified or deleted. It is not necessary to reload Tracim's web page anymore to see what changed.
+- It is now possible to log in using a username instead of one's email address. Usernames will be used for mentions, a feature that will be available in the next release.
+- Tracim can now be configured to allow user account creation without an email address
+
+### Fixed Issues
+
+- Frontend: #2615, #2747, #2783, #2986, #2999, #3096, #3135, #3225, #3236, #3239, #3242, #3255, #3257, #3274, #3289, #3295, #3303, #3312, #3393
+- Backend: #2939, #2970, #2979, #3025, #3050, #3064, #3091, #3119, #3231, #3370, #3373
+- Docker: #3222, #3383
+- Documentation: #3154
+
+### Other Changes
+
+- Tracim frontend is now built with Yarn instead of NPM. See how to migrate your working copy of Tracim here: https://github.com/tracim/tracim/issues/2916
+
+### Breaking/Important change
+
+- API: api path `/v2/` no more exists in Tracim. Scripts using this old API path need to be changed and a configuration is needed to make some direct links visible in old emails work (#1478, #3052, #3395)
+- uWSGI: default configuration change. You need to delete your config file `/{docker-volume}/etc/tracim_*.ini` (backup your files first) before starting/restarting the docker image
+- Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache.conf` (backup your file first) before starting/restarting the docker image
+- Database: databases that were created from Tracim v1 need to be updated manually, more information here: https://github.com/tracim/tracim/issues/2785#issuecomment-660879104 (#3343)
+- Pushpin is now mandatory to run Tracim (pushpin is integrated by default in Tracim docker images)
+- Some parameters in development.ini have been renamed, more information here https://github.com/tracim/tracim/issues/2785#issuecomment-637544988 (#3100)
+- The default log of the Tracim docker image is now also visible with the `docker logs` command
+
 
 ## 2.7.6 / 2020-07-01
 

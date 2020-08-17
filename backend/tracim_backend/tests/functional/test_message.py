@@ -143,14 +143,14 @@ class TestMessages(object):
         ).json_body.get("items")
         assert message_dicts_0 == message_dicts_1 == message_dicts_2
         assert len(message_dicts_0) == 2
-        assert message_dicts_0[0]["event_id"] == 2
-        assert message_dicts_0[1]["event_id"] == 1
+        assert message_dicts_0[0]["event_id"] == 3
+        assert message_dicts_0[1]["event_id"] == 2
 
         result = web_testapp.get("/api/users/1/messages?count=1", status=200,).json_body
         message_dicts = result.get("items")
         assert message_dicts
         assert len(message_dicts) == 1
-        assert message_dicts_0[0]["event_id"] == 2
+        assert message_dicts_0[0]["event_id"] == 3
 
         assert result["has_previous"] is False
         assert result["has_next"] is True
@@ -177,7 +177,7 @@ class TestMessages(object):
         assert message_dicts_0 == message_dicts_2
         assert message_dicts_2 == message_dicts_3
         assert len(message_dicts_0) == 1
-        assert message_dicts_0[0]["event_id"] == 1
+        assert message_dicts_0[0]["event_id"] == 2
 
     @pytest.mark.parametrize("count", [-100, -1, 0])
     def test_api__get_messages__ok_400__invalid_count(self, session, web_testapp, count) -> None:
@@ -299,18 +299,18 @@ class TestMessages(object):
         ).json_body.get("items")
         assert len(message_dicts) == 2
 
-        message_dicts = web_testapp.put("/api/users/1/messages/{}/read".format(1), status=204,)
+        message_dicts = web_testapp.put("/api/users/1/messages/2/read", status=204,)
 
         message_dicts = web_testapp.get(
             "/api/users/1/messages?read_status=unread", status=200,
         ).json_body.get("items")
         assert len(message_dicts) == 1
-        assert message_dicts[0]["event_id"] == 2
+        assert message_dicts[0]["event_id"] == 3
         message_dicts = web_testapp.get(
             "/api/users/1/messages?read_status=read", status=200,
         ).json_body.get("items")
         assert len(message_dicts) == 1
-        assert message_dicts[0]["event_id"] == 1
+        assert message_dicts[0]["event_id"] == 2
 
     def test_api__unread_message__ok_204__nominal_case(self, session, web_testapp) -> None:
         """
