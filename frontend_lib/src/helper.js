@@ -4,6 +4,7 @@ import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
+import { EXCEPTION_MENTION_PARSING } from './exceptions.js'
 
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
@@ -395,16 +396,42 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
 }
 
-export const EXCEPTION_MENTION_PARSING = 'Mention parsing error'
-export const wrapMentionInSpanTag = text => {
+
+// [WIP]
+export const wrapMentionInSpanTag = (text) => {
   try {
+    console.log('TTTTTTTTTTTTT', text)
+    text = text.substring(
+      text.indexOf('>') + 1, text.lastIndexOf('<')
+    )
+    console.log('JJJJJJJJJJJJJJJJJJJJJJJ', text)
+    /* while (/<([A-Za-z]+)>(.*)<\/\1>/.test(subStr)) {
+      subStr.indexOf('>') + 1, subStr.lastIndexOf('<')
+    } */
+    text = text.split('&nbsp;').join(' ').split(' ').map(subStr => {
+      if (subStr.charAt(0) === '@') return `<span class='mention' id='mention-${uuidv4()}'>${subStr}</span>`
+      if (subStr.charAt(0) === '<') {
+        if (/<([A-Za-z]+)>(.*)<\/\1>/.test(subStr)) {
+          const htmlTagBegin = subStr.substring(0, subStr.indexOf('>') + 1)
+          const htmlTagEnd = subStr.substring(subStr.lastIndexOf('<'), subStr.length)
+          const internalString = subStr.substring(subStr.indexOf('>') + 1, subStr.lastIndexOf('<'))
+          if (internalString.charAt(0) === '@')
+            return `${htmlTagBegin}<span class='mention' id='mention-${uuidv4()}'>${internalString}</span>${htmlTagEnd}`
+        }
+      }
+      // se a string contém um @ a gente olha oq tem antes pra ver se é um > if()
+      return subStr
+    })
+
+    /*
+    text = text.map(subStr => subStr.charAt(0) === '@'
+      ? `<span class='mention' id='mention-${uuidv4()}'>${subStr}</span>`
+      : subStr
+    ).join(' ')
+    */
+    console.log('GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG', text)
+    text = `<p>${text.join(' ')}</p>`
     return text
-      .split(' ')
-      .map(subStr => subStr.charAt(0) === '@'
-        ? `<span class='mention' id='mention-${uuidv4()}'>${subStr}</span>`
-        : subStr
-      )
-      .join(' ')
   } catch (e) {
     console.error('Error while parsing mention', e)
     throw EXCEPTION_MENTION_PARSING
