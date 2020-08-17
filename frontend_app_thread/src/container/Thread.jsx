@@ -202,10 +202,6 @@ export class Thread extends React.Component {
     globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp)
   }
 
-  searchMentionList = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
-  }
-
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
@@ -422,7 +418,7 @@ export class Thread extends React.Component {
             showTitle={false}
             isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
             onInitWysiwyg={this.handleInitWysiwyg}
-            searchMentionList={this.searchMentionList}
+            searchForMentionInQuery={async (query) => await this.props.searchForMentionInQuery(query, state.content.workspace_id)}
           />
         </PopinFixedContent>
       </PopinFixed>

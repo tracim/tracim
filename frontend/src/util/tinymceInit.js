@@ -86,11 +86,16 @@ import i18n from './i18n.js'
 
         const getPosition = (e) => {
           const toolbarPosition = $($editor.getContainer()).find('.mce-toolbar-grp').first()
-          const nodePosition = $($editor.selection.getNode()).position()
-          const result = {
-            top: nodePosition.top + toolbarPosition.height()
+          const selectionNode = $($editor.selection.getNode())
+          const nodePosition = selectionNode.position()
+          const nodeOffset = selectionNode.offset()
+          const nodeHeight = selectionNode.height()
+          const position = {
+            top: nodePosition.top + toolbarPosition.height(),
+            isSelectionToTheTop: nodePosition.top === 0,
+            selectionHeight: (nodeOffset.top * 2) + nodeHeight
           }
-          handleTinyMceInput(e, result)
+          handleTinyMceInput(e, position)
         }
 
         $editor.on('change keyup', function (e) {

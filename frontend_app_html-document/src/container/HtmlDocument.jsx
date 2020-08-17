@@ -252,7 +252,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleTinyMceInput = (event, tinymcePosition) => {
-    tinymceAutoCompleteHandleInput(event, tinymcePosition, this.setState.bind(this), this.searchMentionList, this.state.isAutoCompleteActivated)
+    tinymceAutoCompleteHandleInput(event, tinymcePosition, this.setState.bind(this), this.searchForMentionInQuery, this.state.isAutoCompleteActivated)
   }
 
   handleTinyMceKeyUp = event => {
@@ -262,7 +262,7 @@ export class HtmlDocument extends React.Component {
       event,
       this.setState.bind(this),
       state.isAutoCompleteActivated,
-      this.searchMentionList
+      this.searchForMentionInQuery
     )
   }
 
@@ -275,7 +275,7 @@ export class HtmlDocument extends React.Component {
       state.isAutoCompleteActivated,
       state.autoCompleteCursorPosition,
       state.autoCompleteItemList,
-      this.searchMentionList
+      this.searchForMentionInQuery
     )
   }
 
@@ -495,7 +495,7 @@ export class HtmlDocument extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
-  searchMentionList = async (query) => {
+  searchForMentionInQuery = async (query) => {
     return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
 
@@ -732,7 +732,7 @@ export class HtmlDocument extends React.Component {
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
                   isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
-                  searchMentionList={this.searchMentionList}
+                  searchForMentionInQuery={this.searchForMentionInQuery}
                   onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
                 />
               )

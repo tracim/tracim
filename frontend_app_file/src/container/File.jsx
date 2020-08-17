@@ -763,10 +763,6 @@ export class File extends React.Component {
     }
   }
 
-  searchMentionList = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
-  }
-
   getMenuItemList = () => {
     const { props, state } = this
     const timelineObject = {
@@ -791,7 +787,7 @@ export class File extends React.Component {
           isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           key='Timeline'
           onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
-          searchMentionList={this.searchMentionList}
+          searchForMentionInQuery={async (query) => await this.props.searchForMentionInQuery(query, state.content.workspace_id)}
         />
       )
     }

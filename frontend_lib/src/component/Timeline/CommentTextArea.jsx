@@ -35,7 +35,7 @@ export class CommentTextArea extends React.Component {
       return
     }
 
-    const mentionList = await this.props.searchForMention(mentionCandidate)
+    const mentionList = await this.props.searchForMentionInQuery(mentionCandidate)
     this.setState({
       isAutoCompleteActivated: true,
       autoCompleteCursorPosition: mentionList.length - 1,
@@ -106,7 +106,7 @@ export class CommentTextArea extends React.Component {
   }
 
   handleTinyMceInput = (e, position) => {
-    tinymceAutoCompleteHandleInput(e, position, this.setState.bind(this), this.props.searchForMention, this.state.isAutoCompleteActivated)
+    tinymceAutoCompleteHandleInput(e, position, this.setState.bind(this), this.props.searchForMentionInQuery, this.state.isAutoCompleteActivated)
   }
 
   handleTinyMceKeyDown = event => {
@@ -118,7 +118,7 @@ export class CommentTextArea extends React.Component {
       state.isAutoCompleteActivated,
       state.autoCompleteCursorPosition,
       state.autoCompleteItemList,
-      this.props.searchForMention
+      this.props.searchForMentionInQuery
     )
   }
 
@@ -129,7 +129,7 @@ export class CommentTextArea extends React.Component {
       event,
       this.setState.bind(this),
       state.isAutoCompleteActivated,
-      this.props.searchForMention
+      this.props.searchForMentionInQuery
     )
   }
 
@@ -137,6 +137,7 @@ export class CommentTextArea extends React.Component {
     const { props, state } = this
 
     const style = {
+      transform: 'translateY(-100%)',
       ...(props.wysiwyg && { top: state.tinymcePosition.top })
     }
 
@@ -174,7 +175,7 @@ CommentTextArea.propTypes = {
   onChangeNewComment: PropTypes.func.isRequired,
   disableComment: PropTypes.bool,
   wysiwyg: PropTypes.bool,
-  searchForMention: PropTypes.func,
+  searchForMentionInQuery: PropTypes.func,
   customClass: PropTypes.string
 }
 
@@ -185,5 +186,5 @@ CommentTextArea.defaultProps = {
   newComment: '',
   onChangeNewComment: () => {},
   wysiwyg: false,
-  searchForMention: () => {}
+  searchForMentionInQuery: () => {}
 }

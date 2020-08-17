@@ -78,7 +78,9 @@ export const HtmlDocument = props => {
                 autoCompleteCursorPosition={props.autoCompleteCursorPosition}
                 onClickAutoCompleteItem={props.onClickAutoCompleteItem}
                 style={{
-                  top: props.tinymcePosition.top
+                  top: props.tinymcePosition.top +
+                    (props.tinymcePosition.isSelectionToTheTop ? props.tinymcePosition.selectionHeight : 0),
+                  transform: !props.tinymcePosition.isSelectionToTheTop ? 'translateY(-100%)' : 'none'
                 }}
                 delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
               />
