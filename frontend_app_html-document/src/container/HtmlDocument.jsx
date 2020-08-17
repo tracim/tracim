@@ -12,6 +12,7 @@ import {
   buildHeadTitle,
   CUSTOM_EVENT,
   displayDistanceDate,
+  EXCEPTION_MENTION_PARSING,
   generateLocalStorageContentId,
   getCurrentContentVersionNumber,
   getOrCreateSessionClientToken,
@@ -410,18 +411,23 @@ export class HtmlDocument extends React.Component {
   handleSaveHtmlDocument = async () => {
     const { state, props } = this
 
+    let newDocumentForApiWithMention
+    try {
+      newDocumentForApiWithMention = wrapMentionInSpanTag(state.content.raw_content)
+    } catch (e) {
+      if (e === EXCEPTION_MENTION_PARSING) {
+        this.sendGlobalFlashMessage(props.t('Error while detecting the mentions'))
+      } else {
+        this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+      }
+      return
+    }
+
     const backupLocalStorage = this.getLocalStorageItem('rawContent')
 
     localStorage.removeItem(
       generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
     )
-
-    let newDocumentForApiWithMention
-    try {
-      newDocumentForApiWithMention = wrapMentionInSpanTag(state.content.raw_content)
-    } catch (e) {
-      return new Promise((resolve, reject) => reject(e))
-    }
 
     const fetchResultSaveHtmlDoc = await handleFetchResult(
       await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMention)
@@ -464,7 +470,15 @@ export class HtmlDocument extends React.Component {
 
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
-    props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    try {
+      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    } catch (e) {
+      if (e === EXCEPTION_MENTION_PARSING) {
+        this.sendGlobalFlashMessage(props.t('Error while detecting the mentions'))
+      } else {
+        this.sendGlobalFlashMessage(props.t('Error while saving new comment'))
+      }
+    }
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))

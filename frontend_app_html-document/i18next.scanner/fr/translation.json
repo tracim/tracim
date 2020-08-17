@@ -10,6 +10,8 @@
   "Edit": "Modifier",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
   "Error while creating document": "Erreur lors de la création du document",
+  "Error while detecting the mentions": "Erreur lors de la détection des mentions",
+  "Error while saving new comment": "Erreur lors de l'enregistrement d'un nouveau commentaire",
   "This content is archived": "Ce contenu est archivé",
   "Restore": "Restaurer",
   "This content is deleted": "Ce contenu est supprimé",

@@ -2,6 +2,8 @@
   "Last version": "Dernière version",
   "Restore": "Restaurer",
   "Error while creating file": "Erreur lors de la création du fichier",
+  "Error while detecting the mentions": "Erreur lors de la détection des mentions",
+  "Error while saving new comment": "Erreur lors de l'enregistrement d'un nouveau commentaire",
   "Cancel": "Annuler",
   "Validate": "Valider",
   "Download file": "Télécharger le fichier",
