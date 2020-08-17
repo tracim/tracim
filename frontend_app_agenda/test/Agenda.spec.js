@@ -50,10 +50,12 @@ describe('<Agenda />', () => {
 
         it('should have showRefreshWarning state as false if changes just the user language', () => {
           const tlmData = {
-            author: user,
-            user: {
-              ...user,
-              lang: 'otherLang'
+            fields: {
+              author: user,
+              user: {
+                ...user,
+                lang: 'otherLang'
+              }
             }
           }
           wrapper.instance().handleUserModified(tlmData)
