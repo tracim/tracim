@@ -82,6 +82,7 @@ export class Tracim extends React.Component {
       { name: CUSTOM_EVENT.APPEND_BREADCRUMBS, handler: this.handleAppendBreadcrumbs },
       { name: CUSTOM_EVENT.SET_HEAD_TITLE, handler: this.handleSetHeadTitle },
       { name: CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, handler: this.handleTlmStatusChanged },
+      { name: CUSTOM_EVENT.USER_CONNECTED, handler: this.handleUserConnected },
       { name: CUSTOM_EVENT.USER_DISCONNECTED, handler: this.handleUserDisconnected }
     ])
   }
@@ -100,6 +101,10 @@ export class Tracim extends React.Component {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.DISCONNECTED_FROM_API, data)
     this.liveMessageManager.closeLiveMessageConnection()
     if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
+  }
+
+  handleUserConnected = data => {
+    this.liveMessageManager.openLiveMessageConnection(data.user_id)
   }
 
   handleUserDisconnected = data => {

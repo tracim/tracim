@@ -11,7 +11,6 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-import { LiveMessageManager } from '../util/LiveMessageManager.js'
 import {
   buildHeadTitle,
   CUSTOM_EVENT,
@@ -150,7 +149,6 @@ class Login extends React.Component {
         this.loadAppList()
         this.loadContentTypeList()
         this.loadWorkspaceList()
-        LiveMessageManager.getInstance().openLiveMessageConnection(fetchPostUserLogin.json.user_id)
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)
