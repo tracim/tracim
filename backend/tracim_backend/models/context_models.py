@@ -990,6 +990,13 @@ class ContentInContext(object):
         return None
 
     @property
+    def parent_label(self) -> Optional[str]:
+        p = self.parent
+        if p:
+            return p.label
+        return None
+
+    @property
     def parents(self) -> List["ContentInContext"]:
         parents = []
         if self.parent:
