@@ -72,6 +72,15 @@
 @media (min-width: min-md) and (max-width: max-md)
   .notification
     width 50%
+
 @media (max-width: max-sm)
   .notification
     width 100%
+
+@media (max-width: max-lg)
+  .notification
+    & .btn
+      & > .genericButton__label
+        display none
+      & > .genericButton__icon
+        margin 0px

@@ -9,9 +9,8 @@ import { shallow } from 'enzyme'
 import { user } from '../../hocMock/redux/user/user'
 import {
   APPEND,
-  NOTIFICATION,
   NOTIFICATION_LIST,
-  UPDATE
+  READ
 } from '../../../src/action-creator.sync.js'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
@@ -20,14 +19,17 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST
 } from 'tracim_frontend_lib'
-import { mockPutNotificationAsRead204 } from '../../apiMock.js'
+import {
+  mockPutAllNotificationAsRead204,
+  mockPutNotificationAsRead204
+} from '../../apiMock.js'
 import { serializeWorkspaceListProps } from '../../../src/reducer/workspaceList.js'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { serializeUserProps } from '../../../src/reducer/user.js'
 import { serializeContentProps } from '../../../src/reducer/workspaceContentList.js'
 
 describe('<NotificationWall />', () => {
-  const updateNotificationCallBack = sinon.spy()
+  const readNotificationListCallBack = sinon.spy()
   const appendNotificationListCallBack = sinon.spy()
   const onCloseNotificationWallCallBack = sinon.spy()
 
@@ -37,7 +39,7 @@ describe('<NotificationWall />', () => {
     }
 
     switch (param.type) {
-      case `${UPDATE}/${NOTIFICATION}`: updateNotificationCallBack(); break
+      case `${READ}/${NOTIFICATION_LIST}`: readNotificationListCallBack(); break
       case `${APPEND}/${NOTIFICATION_LIST}`: appendNotificationListCallBack(); break
       default:
         return param
@@ -121,6 +123,15 @@ describe('<NotificationWall />', () => {
         mockPutNotificationAsRead204(FETCH_CONFIG.apiUrl, props.user.userId, 1)
         NotificationWallInstance.handleClickNotification(1).then(() => {
           expect(onCloseNotificationWallCallBack.called).to.equal(true)
+        }).then(done, done)
+      })
+    })
+
+    describe('handleClickMarkAllAsRead', () => {
+      it('should call readNotificationList()', (done) => {
+        mockPutAllNotificationAsRead204(FETCH_CONFIG.apiUrl, props.user.userId, 1)
+        NotificationWallInstance.handleClickMarkAllAsRead().then(() => {
+          expect(readNotificationListCallBack.called).to.equal(true)
         }).then(done, done)
       })
     })

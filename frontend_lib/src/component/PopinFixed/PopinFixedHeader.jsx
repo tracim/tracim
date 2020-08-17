@@ -99,6 +99,8 @@ class PopinFixedHeader extends React.Component {
           </button>
         }
 
+        {this.props.children}
+
         <div
           className={classnames('wsContentGeneric__header__close', `${customClass}__header__close iconBtn`)}
           onClick={onClickCloseBtn}

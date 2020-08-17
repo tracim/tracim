@@ -876,6 +876,19 @@ export const putNotificationAsRead = (userId, eventId) => dispatch => {
   })
 }
 
+export const putAllNotificationAsRead = (userId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
 export const getUserMessagesSummary = userId => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary`,

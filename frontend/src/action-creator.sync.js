@@ -173,9 +173,9 @@ export const setNotificationList = notificationList => ({ type: `${SET}/${NOTIFI
 export const appendNotificationList = notificationList => ({ type: `${APPEND}/${NOTIFICATION_LIST}`, notificationList })
 export const addNotification = notification => ({ type: `${ADD}/${NOTIFICATION}`, notification })
 export const readNotification = notificationId => ({ type: `${READ}/${NOTIFICATION}`, notificationId })
+export const readNotificationList = () => ({ type: `${READ}/${NOTIFICATION_LIST}` })
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
 export const setNotificationNotReadCounter = (notificationNotReadCount) => ({ type: `${SET}/${NOTIFICATION_NOT_READ_COUNT}`, notificationNotReadCount })
-export const updateNotification = notification => ({ type: `${UPDATE}/${NOTIFICATION}`, notification })
 
 export const TLM_MANAGER = 'TracimLiveMessageManager'
 export const setLiveMessageManager = TLMManager => ({ type: `${SET}/${TLM_MANAGER}`, TLMManager })
