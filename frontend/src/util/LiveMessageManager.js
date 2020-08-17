@@ -45,6 +45,7 @@ export class LiveMessageManager {
     if (!this.broadcastChannel) {
       this.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
       this.broadcastChannel.addEventListener('message', this.broadcastChannelMessageReceived.bind(this))
+      this.broadcastChannel.postMessage({ canIHaveStatus: true })
       this.electLeader()
     }
   }
@@ -55,6 +56,10 @@ export class LiveMessageManager {
   }
 
   broadcastChannelMessageReceived (message) {
+    if (message.canIHaveStatus && this.eventSource) {
+      this.broadcastChannel.postMessage({ status: this.status })
+    }
+
     if (message.status) {
       this.setStatus(message.status)
     }
