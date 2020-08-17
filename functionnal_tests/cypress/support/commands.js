@@ -59,12 +59,23 @@ Cypress.Commands.add('typeInTinyMCE', (content) => {
     })
 })
 
-Cypress.Commands.add('assertTinyMCEContent', () => {
+Cypress.Commands.add('inputInTinyMCE', (content) => {
+  cy.window()
+    .its('tinyMCE')
+    .its('activeEditor')
+    .then(activeEditor => {
+      activeEditor.focus()
+      activeEditor.execCommand('mceInsertContent', false, content)
+      activeEditor.fire('input', { data: content })
+    })
+})
+
+Cypress.Commands.add('assertTinyMCEContent', (content) => {
   cy.window({ timeout: 5000 })
     .its('tinyMCE')
     .its('activeEditor')
     .then(activeEditor => {
-      activeEditor.getContent()
+      expect(activeEditor.getContent()).to.have.string(content)
     })
 })
 

@@ -9,10 +9,14 @@ describe('TinyMce text editor', function () {
     cy.setupBaseDB()
     cy.loginAs('users')
     cy.createHtmlDocument(fileName, 1)
-    cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: 1 } })
   })
 
   describe('Click to add an Image to the html document created', function () {
+    before(() => {
+      cy.loginAs('users')
+      cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: 1 } })
+    })
+
     it('The input tag should not be visible', function () {
       cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileName } }).click()
       cy.waitForTinyMCELoaded().then(() => {
@@ -21,6 +25,49 @@ describe('TinyMce text editor', function () {
           .parent()
           .click()
         cy.get('#hidden_tinymce_fileinput').should('be.not.visible')
+      })
+    })
+  })
+
+  describe('Mention autoCompletion', function () {
+    describe('Insert a new mention', function () {
+      beforeEach(() => {
+        cy.loginAs('users')
+        cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: 1 } })
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileName } }).click()
+      })
+
+      it('the autocompletion popup should open when type "@"', function () {
+        cy.waitForTinyMCELoaded().then(() => {
+          cy.inputInTinyMCE('@')
+          cy.get('.autocomplete').should('be.visible')
+        })
+      })
+
+      it('the autocompletion should find @johndoe when typing it', function () {
+        cy.waitForTinyMCELoaded().then(() => {
+          cy.inputInTinyMCE('@')
+          cy.inputInTinyMCE('john')
+          cy.get('.autocomplete').contains('@johndoe')
+        })
+      })
+
+      it('the autocompletion should add the item submitted', function () {
+        cy.waitForTinyMCELoaded().then(() => {
+          cy.inputInTinyMCE('@')
+          cy.inputInTinyMCE('john')
+          cy.get('.autocomplete').contains('@johndoe').click()
+          cy.assertTinyMCEContent('@johndoe')
+        })
+      })
+
+      it('the autocompletion should be cancel after press the space bar', function () {
+        cy.waitForTinyMCELoaded().then(() => {
+          cy.inputInTinyMCE('@')
+          cy.get('.autocomplete').should('be.visible')
+          cy.inputInTinyMCE(' ')
+          cy.get('.autocomplete').should('be.not.visible')
+        })
       })
     })
   })
