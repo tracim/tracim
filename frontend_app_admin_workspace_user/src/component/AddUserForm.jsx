@@ -102,7 +102,7 @@ export class AddUserForm extends React.Component {
               type='text'
               className='userData__input userData__input__username form-control primaryColorBorderLighten'
               id='adduser_username'
-              placeholder={props.t('@username')}
+              placeholder={props.t('Username')}
               value={state.newUserUsername}
               onChange={this.handleChangeNewUserUsername}
               data-cy='adduser_username'
