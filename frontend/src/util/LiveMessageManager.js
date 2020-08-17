@@ -13,8 +13,6 @@ export const LIVE_MESSAGE_STATUS = {
 // INFO - RJ - 2020-08-12  - increment this number each time the channel protocol is changed in an incompatible way
 const BROADCAST_CHANNEL_NAME = 'tracim-frontend-1'
 
-let liveMessageManagerInstance = null
-
 /**
  * INFO - SG - 2020-07-02, RJ - 2020-08-12
  * This class manages the Tracim Live Messages:
@@ -36,7 +34,6 @@ export class LiveMessageManager {
     this.reconnectionTimerId = 0
     this.userId = null
     this.host = null
-    this.lastEventId = 0
   }
 
   openLiveMessageConnection (userId, host = null) {
@@ -73,11 +70,7 @@ export class LiveMessageManager {
     this.closeEventSourceConnection()
 
     this.eventSource = new EventSource(
-      `${url}/users/${this.userId}/live_messages` + (
-        this.lastEventId
-          ? `?last_event_id=${this.lastEventId}`
-          : ''
-      ),
+      `${url}/users/${this.userId}/live_messages`,
       { withCredentials: true }
     )
 
@@ -131,8 +124,12 @@ export class LiveMessageManager {
 
   closeLiveMessageConnection () {
     this.closeEventSourceConnection()
-    this.broadcastChannel.close()
-    this.broadcastChannel = null
+
+    if (this.broadcastChannel) {
+      this.broadcastChannel.close()
+      this.broadcastChannel = null
+    }
+
     this.setStatus(LIVE_MESSAGE_STATUS.CLOSED)
     return true
   }
@@ -148,8 +145,6 @@ export class LiveMessageManager {
 
   dispatchLiveMessage (tlm) {
     console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', tlm)
-
-    this.lastEventId = Math.max(this.lastEventId, tlm.event_id)
 
     const customEvent = new globalThis.CustomEvent(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, {
       detail: {
@@ -193,13 +188,5 @@ export class LiveMessageManager {
       type: CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED,
       data: { status }
     })
-  }
-
-  static getInstance () {
-    if (!liveMessageManagerInstance) {
-      liveMessageManagerInstance = new LiveMessageManager()
-    }
-
-    return liveMessageManagerInstance
   }
 }
