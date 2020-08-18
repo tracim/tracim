@@ -11,24 +11,22 @@ import {
   ROLE,
   CUSTOM_EVENT,
   buildHeadTitle,
-  hasNotAllowedCharacters,
-  hasSpaces,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  TracimComponent
+  TracimComponent,
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
 } from 'tracim_frontend_lib'
 import {
-  ALLOWED_CHARACTERS_USERNAME,
   debug,
-  MAXIMUM_CHARACTERS_USERNAME,
-  MINIMUM_CHARACTERS_PUBLIC_NAME,
-  MINIMUM_CHARACTERS_USERNAME
+  MINIMUM_CHARACTERS_PUBLIC_NAME
 } from '../helper.js'
 import {
   deleteWorkspace,
   getUserDetail,
   getUserList,
-  getUsernameAvailability,
   getWorkspaceList,
   getWorkspaceMemberList,
   postAddUser,
@@ -571,52 +569,13 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleChangeUsername = async (newUsername) => {
+    if (len(newUsername) === 0) return
+
     const { props, state } = this
-
-    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    if (hasSpaces(newUsername)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t("Username can't contain any whitespace")
-      })
-      return
-    }
-
-    if (hasNotAllowedCharacters(newUsername)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, newUsername))
-
-    switch (fetchUsernameAvailability.apiResponse.status) {
-      case 200:
-        this.setState({
-          isUsernameValid: fetchUsernameAvailability.body.available,
-          usernameInvalidMsg: props.t('This username is not available')
-        })
-        break
-      default:
-        this.sendGlobalFlashMsg(props.t('Error while checking username availability'))
-        break
+    try {
+      this.setState(await checkUsernameValidity(state.config.apiUrl, newUsername, props))
+    } catch (errorWhileChecking) {
+      this.sendGlobalFlashMsg(errorWhileChecking.message)
     }
   }
 

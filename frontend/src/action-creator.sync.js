@@ -8,7 +8,6 @@ export const PREPEND = 'Prepend'
 export const APPEND = 'Append'
 export const RESET = 'Reset'
 export const MOVE = 'Move'
-export const USERNAME_AVAILABILITY = 'username_availability'
 
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })

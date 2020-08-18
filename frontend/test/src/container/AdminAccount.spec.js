@@ -88,8 +88,8 @@ describe('In <Account /> at AdminAccount.jsx', () => {
   const AdminAccountWithHOC2 = () => <Provider store={store}><AdminAccountWithHOC1 {...props} /></Provider>
 
   const wrapper = mount(<AdminAccountWithHOC2 {...props} />)
-  const addminAccontWrapper = wrapper.find(AdminAccountWithoutHOC)
-  const adminAccountInstance = addminAccontWrapper.instance()
+  const adminAccountWrapper = wrapper.find(AdminAccountWithoutHOC)
+  const adminAccountInstance = adminAccountWrapper.instance()
 
   describe('TLM handlers', () => {
     describe('eventType user', () => {
@@ -102,7 +102,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
             }
           }
           adminAccountInstance.handleUserModified(tlmData)
-          expect(addminAccontWrapper.state().userToEdit.publicName).to.equal(tlmData.fields.user.public_name)
+          expect(adminAccountWrapper.state().userToEdit.publicName).to.equal(tlmData.fields.user.public_name)
         })
 
         it('should update the username', () => {
@@ -111,13 +111,13 @@ describe('In <Account /> at AdminAccount.jsx', () => {
               author: userFromApi,
               user: {
                 ...userFromApi,
-                public_name: addminAccontWrapper.state().userToEdit.publicName,
+                public_name: adminAccountWrapper.state().userToEdit.publicName,
                 username: 'new_username'
               }
             }
           }
           adminAccountInstance.handleUserModified(tlmData)
-          expect(addminAccontWrapper.state().userToEdit.username).to.equal(tlmData.fields.user.username)
+          expect(adminAccountWrapper.state().userToEdit.username).to.equal(tlmData.fields.user.username)
         })
 
         it('should update the email', () => {
@@ -126,14 +126,14 @@ describe('In <Account /> at AdminAccount.jsx', () => {
               author: userFromApi,
               user: {
                 ...userFromApi,
-                public_name: addminAccontWrapper.state().userToEdit.publicName,
-                username: addminAccontWrapper.state().userToEdit.username,
+                public_name: adminAccountWrapper.state().userToEdit.publicName,
+                username: adminAccountWrapper.state().userToEdit.username,
                 email: 'new_email'
               }
             }
           }
           adminAccountInstance.handleUserModified(tlmData)
-          expect(addminAccontWrapper.state().userToEdit.email).to.equal(tlmData.fields.user.email)
+          expect(adminAccountWrapper.state().userToEdit.email).to.equal(tlmData.fields.user.email)
         })
       })
     })
@@ -141,7 +141,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
     describe('eventType sharedspace member', () => {
       describe('handleMemberModified', () => {
         it("should update member's notifications", () => {
-          addminAccontWrapper.setState({ userToEditWorkspaceList: props.workspaceList })
+          adminAccountWrapper.setState({ userToEditWorkspaceList: props.workspaceList })
           const tlmData = {
             fields: {
               author: userFromApi,
@@ -152,7 +152,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
           }
           adminAccountInstance.handleMemberModified(tlmData)
 
-          const memberAtWs = addminAccontWrapper.state().userToEditWorkspaceList.find(
+          const memberAtWs = adminAccountWrapper.state().userToEditWorkspaceList.find(
             ws => ws.id === tlmData.fields.workspace.workspace_id
           ).memberList.find(m => m.id === tlmData.fields.user.user_id)
 
@@ -184,7 +184,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
 
     describe('handleChangeSubscriptionNotif', () => {
       it('should call newFlashMessageWarningCallBack with invalid workspaceId', (done) => {
-        mockPutUserWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, addminAccontWrapper.state().userToEditId, 1, true)
+        mockPutUserWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, adminAccountWrapper.state().userToEditId, 1, true)
 
         adminAccountInstance.handleChangeSubscriptionNotif(0, 'activate').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
@@ -195,7 +195,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
 
     describe('handleSubmitPassword', () => {
       it('should call newFlashMessageInfoCallBack with valid password', (done) => {
-        mockPutUserPassword204(FETCH_CONFIG.apiUrl, addminAccontWrapper.state().userToEditId, 'randomOldPassword', 'randomPassword', 'randomPassword')
+        mockPutUserPassword204(FETCH_CONFIG.apiUrl, adminAccountWrapper.state().userToEditId, 'randomOldPassword', 'randomPassword', 'randomPassword')
         adminAccountInstance.handleSubmitPassword('randomOldPassword', 'randomPassword', 'randomPassword').then(() => {
           expect(newFlashMessageInfoCallBack.called).to.equal(true)
           expect(newFlashMessageWarningCallBack.called).to.equal(false)
@@ -203,7 +203,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
       })
 
       it('should call newFlashMessageWarningCallBack with invalid oldPassword', (done) => {
-        mockPutUserPassword403(FETCH_CONFIG.apiUrl, addminAccontWrapper.state().userToEditId, invalidPassword)
+        mockPutUserPassword403(FETCH_CONFIG.apiUrl, adminAccountWrapper.state().userToEditId, invalidPassword)
         adminAccountInstance.handleSubmitPassword(invalidPassword, 'randomPassword', 'randomPassword').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
           expect(newFlashMessageInfoCallBack.called).to.equal(false)
@@ -214,9 +214,9 @@ describe('In <Account /> at AdminAccount.jsx', () => {
     describe('loadAgendaUrl', () => {
       it('should update agendaUrl from userToEdit state', (done) => {
         const agendaUrl = 'agenda'
-        mockGetUserCalendar200(FETCH_CONFIG.apiUrl, addminAccontWrapper.state().userToEditId, agendaUrl)
+        mockGetUserCalendar200(FETCH_CONFIG.apiUrl, adminAccountWrapper.state().userToEditId, agendaUrl)
         adminAccountInstance.loadAgendaUrl().then(() => {
-          expect(addminAccontWrapper.state().userToEdit.agendaUrl).to.equal(agendaUrl)
+          expect(adminAccountWrapper.state().userToEdit.agendaUrl).to.equal(agendaUrl)
         }).then(done, done)
       })
     })
@@ -230,9 +230,9 @@ describe('In <Account /> at AdminAccount.jsx', () => {
 
     describe('getUserDetail', () => {
       it("should update userToEdit state with user's details", (done) => {
-        mockGetUser200(FETCH_CONFIG.apiUrl, addminAccontWrapper.state().userToEditId, userFromApi)
+        mockGetUser200(FETCH_CONFIG.apiUrl, adminAccountWrapper.state().userToEditId, userFromApi)
         adminAccountInstance.getUserDetail().then(() => {
-          expect(addminAccontWrapper.state().userToEdit).to.deep.equal({
+          expect(adminAccountWrapper.state().userToEdit).to.deep.equal({
             allowedSpace: undefined,
             isUsernameValid: true,
             usernameInvalidMsg: '',
@@ -244,27 +244,27 @@ describe('In <Account /> at AdminAccount.jsx', () => {
 
     describe('handleChangeUsername', () => {
       afterEach(() => {
-        addminAccontWrapper.setState({
+        adminAccountWrapper.setState({
           userToEdit: {
-            ...addminAccontWrapper.state().userToEdit,
+            ...adminAccountWrapper.state().userToEdit,
             isUsernameValid: true
           }
         })
       })
       it("should set isUsernameValid state to false if username isn't long enough", (done) => {
         adminAccountInstance.handleChangeUsername('A').then(() => {
-          expect(addminAccontWrapper.state().userToEdit.isUsernameValid).to.equal(false)
+          expect(adminAccountWrapper.state().userToEdit.isUsernameValid).to.equal(false)
         }).then(done, done)
       })
       it("should set isUsernameValid state to false if username has a '@' in it", (done) => {
         adminAccountInstance.handleChangeUsername('@newUsername').then(() => {
-          expect(addminAccontWrapper.state().userToEdit.isUsernameValid).to.equal(false)
+          expect(adminAccountWrapper.state().userToEdit.isUsernameValid).to.equal(false)
         }).then(done, done)
       })
     })
 
     describe('getUserWorkspaceListMemberList', () => {
-      it('should update userToEditWorkspaceList state with workspace details', (done) => {
+      it('should update userToEditWorkspaceList state with workspace details', async () => {
         const member = {
           do_notify: true,
           user: { public_name: 'Global Manager', user_id: 1, username: 'TheAdmin' },
@@ -275,11 +275,10 @@ describe('In <Account /> at AdminAccount.jsx', () => {
           firstWorkspaceFromApi.workspace_id,
           [member]
         )
-        adminAccountInstance.getUserWorkspaceListMemberList([firstWorkspaceFromApi]).then(() => {
-          const workspaceMemberList = addminAccontWrapper.state().userToEditWorkspaceList
-            .find(ws => ws.id === firstWorkspaceFromApi.workspace_id).memberList
-          expect(workspaceMemberList).to.deep.equal([serializeMember(member)])
-        }).then(done, done)
+        await adminAccountInstance.getUserWorkspaceListMemberList([firstWorkspaceFromApi])
+        const workspaceMemberList = adminAccountWrapper.state('userToEditWorkspaceList')
+          .find(ws => ws.id === firstWorkspaceFromApi.workspace_id).memberList
+        expect(workspaceMemberList).to.deep.equal([serializeMember(member)])
       })
     })
   })

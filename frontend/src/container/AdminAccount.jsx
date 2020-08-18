@@ -15,12 +15,14 @@ import {
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
-  hasNotAllowedCharacters,
-  hasSpaces,
   serialize,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TracimComponent
+  TracimComponent,
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -35,16 +37,13 @@ import {
   putUserUsername,
   putUserPassword,
   putUserWorkspaceDoNotify,
-  getUsernameAvailability,
   getUserCalendar
 } from '../action-creator.async.js'
 import {
-  ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList,
   PAGE,
-  MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
-  MINIMUM_CHARACTERS_USERNAME
+  FETCH_CONFIG
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import { serializeUserProps } from '../reducer/user.js'
@@ -348,65 +347,19 @@ export class Account extends React.Component {
   }
 
   handleChangeUsername = async (newUsername) => {
+    if (len(newUsername) === 0) return
+
     const { props } = this
-
-    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
+    try {
+      const usernameValidity = await checkUsernameValidity(FETCH_CONFIG.apiUrl, newUsername, props)
       this.setState(prev => ({
         userToEdit: {
           ...prev.userToEdit,
-          isUsernameValid: false,
-          usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+          ...usernameValidity
         }
       }))
-      return
-    }
-
-    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
-      this.setState(prev => ({
-        userToEdit: {
-          ...prev.userToEdit,
-          isUsernameValid: false,
-          usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
-        }
-      }))
-      return
-    }
-
-    if (hasSpaces(newUsername)) {
-      this.setState(prev => ({
-        userToEdit: {
-          ...prev.userToEdit,
-          isUsernameValid: false,
-          usernameInvalidMsg: props.t("Username can't contain any whitespace")
-        }
-      }))
-      return
-    }
-
-    if (hasNotAllowedCharacters(newUsername)) {
-      this.setState(prev => ({
-        userToEdit: {
-          ...prev.userToEdit,
-          isUsernameValid: false,
-          usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
-        }
-      }))
-      return
-    }
-
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(newUsername))
-
-    switch (fetchUsernameAvailability.status) {
-      case 200:
-        this.setState(prev => ({
-          userToEdit: {
-            ...prev.userToEdit,
-            isUsernameValid: fetchUsernameAvailability.json.available,
-            usernameInvalidMsg: props.t('This username is not available')
-          }
-        }))
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning')); break
+    } catch (errorWhileChecking) {
+      props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
   }
 

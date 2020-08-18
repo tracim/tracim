@@ -5,22 +5,21 @@ import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
 import {
-  ALLOWED_CHARACTERS_USERNAME,
   COOKIE_FRONTEND,
-  MAXIMUM_CHARACTERS_USERNAME,
-  MINIMUM_CHARACTERS_USERNAME,
-  workspaceConfig
+  workspaceConfig,
+  FETCH_CONFIG
 } from '../util/helper.js'
 import {
   buildHeadTitle,
   CUSTOM_EVENT,
   CardPopup,
-  hasNotAllowedCharacters,
-  hasSpaces,
-  TracimComponent
+  TracimComponent,
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME
 } from 'tracim_frontend_lib'
 import {
-  getUsernameAvailability,
   putUserUsername
 } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
@@ -138,54 +137,14 @@ export class Home extends React.Component {
 
   handleChangeNewUsername = async e => {
     const { props } = this
-
     this.setState({ newUsername: e.target.value })
     const username = e.target.value
 
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    if (hasSpaces(username)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t("Username can't contain any whitespace")
-      })
-      return
-    }
-
-    if (hasNotAllowedCharacters(username)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
-
-    switch (fetchUsernameAvailability.status) {
-      case 200:
-        this.setState({
-          isUsernameValid: fetchUsernameAvailability.json.available,
-          usernameInvalidMsg: props.t('This username is not available')
-        })
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning'))
-        break
+    if (len(username) === 0) return
+    try {
+      this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, username, props))
+    } catch (errorWhileChecking) {
+      props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
   }
 
