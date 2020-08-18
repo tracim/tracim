@@ -134,7 +134,7 @@ export class Home extends React.Component {
   }
 
   handleClickCheckbox = () => {
-    this.setState({ hidePopupCheckbox: !this.state.hidePopupCheckbox })
+    this.setState(prevState => ({ hidePopupCheckbox: !prevState.hidePopupCheckbox }))
   }
 
   handleChangeNewUsername = async e => {
