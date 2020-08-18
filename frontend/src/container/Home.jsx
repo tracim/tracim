@@ -66,7 +66,7 @@ export class Home extends React.Component {
   }
 
   componentDidMount () {
-    this.maybeShowUsernamePopup()
+    this.setUsernamePopupVisibility()
     this.setHeadTitle()
   }
 
@@ -81,7 +81,7 @@ export class Home extends React.Component {
     }
   }
 
-  maybeShowUsernamePopup () {
+  setUsernamePopupVisibility () {
     if (!(this.props.user.username || Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP))) {
       this.setState({ usernamePopup: true })
     }
