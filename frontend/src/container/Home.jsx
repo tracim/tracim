@@ -88,7 +88,7 @@ export class Home extends React.Component {
   }
 
   handleClickCloseUsernamePopup = () => {
-    this.setState({ usernamePopup: this.state.usernamePopup })
+    this.setState(prevState => ({ usernamePopup: !prevState.usernamePopup }))
   }
 
   handleClickConfirmUsernamePopup = async () => {
