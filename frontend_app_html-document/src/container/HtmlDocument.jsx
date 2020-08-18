@@ -418,7 +418,7 @@ export class HtmlDocument extends React.Component {
       if (e === EXCEPTION_MENTION_PARSING) {
         this.sendGlobalFlashMessage(props.t('Error while detecting the mentions'))
       } else {
-        this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+        this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
       }
       return
     }
@@ -445,13 +445,13 @@ export class HtmlDocument extends React.Component {
             this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
             break
           default:
-            this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+            this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
             break
         }
         break
       default:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
-        this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+        this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
         break
     }
   }
