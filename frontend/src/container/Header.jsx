@@ -40,6 +40,7 @@ const qs = require('query-string')
 
 export class Header extends React.Component {
   componentDidMount () {
+    this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', {})
     i18n.changeLanguage(this.props.user.lang)
   }
 
