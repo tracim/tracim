@@ -7,7 +7,7 @@ import {
   generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
-  wrapMentionInSpanTag
+  wrapMentionsInSpanTags
 } from './helper.js'
 import {
   putEditContent,
@@ -147,7 +147,7 @@ export function appContentFactory (WrappedComponent) {
 
       let newCommentForApiWithMention
       try {
-        newCommentForApiWithMention = wrapMentionInSpanTag(newCommentForApi)
+        newCommentForApiWithMention = wrapMentionsInSpanTags(newCommentForApi)
       } catch (e) {
         return new Promise((resolve, reject) => reject(e))
       }
@@ -175,11 +175,11 @@ export function appContentFactory (WrappedComponent) {
             case 2044:
               this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
             default:
-              this.sendGlobalFlashMessage(i18n.t('Error while saving new comment'))
+              this.sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
               break
           }
           break
-        default: this.sendGlobalFlashMessage(i18n.t('Error while saving new comment')); break
+        default: this.sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
       }
 
       return response

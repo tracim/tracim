@@ -396,7 +396,7 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
 }
 
-export const wrapMentionInSpanTag = (text) => {
+export const wrapMentionsInSpanTags = (text) => {
   try {
     const textArray = text.split('&nbsp;').join(' ').split(' ')
 

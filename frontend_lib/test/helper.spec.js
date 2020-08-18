@@ -13,7 +13,7 @@ import {
   setupCommonRequestHeaders,
   serialize,
   addRevisionFromTLM,
-  wrapMentionInSpanTag
+  wrapMentionsInSpanTags
 } from '../src/helper.js'
 import { EXCEPTION_MENTION_PARSING } from '../src/exceptions.js'
 
@@ -247,12 +247,12 @@ describe('helper.js', () => {
     })
   })
 
-  describe('function wrapMentionInSpanTag', () => {
+  describe('function wrapMentionsInSpanTags', () => {
     const DOMParser = new global.DOMParser()
 
     describe('with a source without any mention', () => {
       const textWithoutMention = 'This is a text without any mention'
-      const result = wrapMentionInSpanTag(textWithoutMention)
+      const result = wrapMentionsInSpanTags(textWithoutMention)
 
       it('should not modify the source', () => expect(textWithoutMention).to.equal(result))
     })
@@ -261,7 +261,7 @@ describe('helper.js', () => {
       describe('with source as simple text', () => {
         describe('with the mention at the middle of a sentence', () => {
           const textWithMentionAtMiddle = 'This is a text with a mention @admin that should be wrapped'
-          const result = wrapMentionInSpanTag(textWithMentionAtMiddle)
+          const result = wrapMentionsInSpanTags(textWithMentionAtMiddle)
           const parsedResult = DOMParser.parseFromString(result, 'text/html')
           const addedSpanList = parsedResult.getElementsByTagName('span')
           const addedSpanListId = addedSpanList[0].id
@@ -276,7 +276,7 @@ describe('helper.js', () => {
 
         describe('with the mention at the beginning of a sentence', () => {
           const textWithMentionAtBeginning = '@admin'
-          const result = wrapMentionInSpanTag(textWithMentionAtBeginning)
+          const result = wrapMentionsInSpanTags(textWithMentionAtBeginning)
           const parsedResult = DOMParser.parseFromString(result, 'text/html')
           const addedSpanList = parsedResult.getElementsByTagName('span')
           const addedSpanListId = addedSpanList[0].id
@@ -293,7 +293,7 @@ describe('helper.js', () => {
       describe('with source as HTML text', () => {
         describe('with the mention at the middle of a sentence', () => {
           const htmlTextWithMentionAtMiddle = '<div class="someClass">"This is a text with <p>a mention @admin that</p> should be wrapped"</div>'
-          const result = wrapMentionInSpanTag(htmlTextWithMentionAtMiddle)
+          const result = wrapMentionsInSpanTags(htmlTextWithMentionAtMiddle)
           const parsedResult = DOMParser.parseFromString(result, 'text/html')
           const addedSpanList = parsedResult.getElementsByTagName('span')
           const addedSpanListId = addedSpanList[0].id
@@ -308,7 +308,7 @@ describe('helper.js', () => {
 
         describe('with the mention at the beginning of a sentence', () => {
           const htmlTextWithMentionAtBeginning = '<div class="someClass">@admin is a <p>mention</p> that should be wrapped"</div>'
-          const result = wrapMentionInSpanTag(htmlTextWithMentionAtBeginning)
+          const result = wrapMentionsInSpanTags(htmlTextWithMentionAtBeginning)
           const parsedResult = DOMParser.parseFromString(result, 'text/html')
           const addedSpanList = parsedResult.getElementsByTagName('span')
           const addedSpanListId = addedSpanList[0].id
@@ -326,7 +326,7 @@ describe('helper.js', () => {
     describe('with 3 mention in the source', () => {
       describe('with source as simple text', () => {
         const textWithMultipleMentions = 'This is a text @user1 with 3 mention @admin that should be @user2 wrapped'
-        const result = wrapMentionInSpanTag(textWithMultipleMentions)
+        const result = wrapMentionsInSpanTags(textWithMultipleMentions)
         const parsedResult = DOMParser.parseFromString(result, 'text/html')
         const addedSpanList = parsedResult.getElementsByTagName('span')
 
@@ -345,7 +345,7 @@ describe('helper.js', () => {
 
       describe('with source as HTML text', () => {
         const htmlTextWithMention = '<div class="someClass">"This is @user1 a text with <p>a mention @admin that</p> should be @user2 wrapped"</div>'
-        const result = wrapMentionInSpanTag(htmlTextWithMention)
+        const result = wrapMentionsInSpanTags(htmlTextWithMention)
         const parsedResult = DOMParser.parseFromString(result, 'text/html')
         const addedSpanList = parsedResult.getElementsByTagName('span')
 
@@ -365,7 +365,7 @@ describe('helper.js', () => {
 
     describe('with an @ in the source but without a space before', () => {
       const textWithAtWithoutPreSpace = 'This is a text with a mention@admin that should NOT be wrapped'
-      const result = wrapMentionInSpanTag(textWithAtWithoutPreSpace)
+      const result = wrapMentionsInSpanTags(textWithAtWithoutPreSpace)
       const parsedResult = DOMParser.parseFromString(result, 'text/html')
       const addedSpanList = parsedResult.getElementsByTagName('span')
 
@@ -376,7 +376,7 @@ describe('helper.js', () => {
 
     describe('if the source is NULL', () => {
       it('should throw an EXCEPTION_MENTION_PARSING exception', () => {
-        expect(() => wrapMentionInSpanTag(null)).to.throw(EXCEPTION_MENTION_PARSING)
+        expect(() => wrapMentionsInSpanTags(null)).to.throw(EXCEPTION_MENTION_PARSING)
       })
     })
   })

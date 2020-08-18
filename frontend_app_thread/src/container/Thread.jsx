@@ -292,7 +292,7 @@ export class Thread extends React.Component {
       if (e === EXCEPTION_MENTION_PARSING) {
         this.sendGlobalFlashMessage(props.t('Error while detecting the mentions'))
       } else {
-        this.sendGlobalFlashMessage(props.t('Error while saving new comment'))
+        this.sendGlobalFlashMessage(props.t('Error while saving the comment'))
       }
     }
   }

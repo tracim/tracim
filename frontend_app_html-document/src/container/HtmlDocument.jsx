@@ -32,7 +32,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  wrapMentionInSpanTag
+  wrapMentionsInSpanTags
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -413,7 +413,7 @@ export class HtmlDocument extends React.Component {
 
     let newDocumentForApiWithMention
     try {
-      newDocumentForApiWithMention = wrapMentionInSpanTag(state.content.raw_content)
+      newDocumentForApiWithMention = wrapMentionsInSpanTags(state.content.raw_content)
     } catch (e) {
       if (e === EXCEPTION_MENTION_PARSING) {
         this.sendGlobalFlashMessage(props.t('Error while detecting the mentions'))
@@ -476,7 +476,7 @@ export class HtmlDocument extends React.Component {
       if (e === EXCEPTION_MENTION_PARSING) {
         this.sendGlobalFlashMessage(props.t('Error while detecting the mentions'))
       } else {
-        this.sendGlobalFlashMessage(props.t('Error while saving new comment'))
+        this.sendGlobalFlashMessage(props.t('Error while saving the comment'))
       }
     }
   }
