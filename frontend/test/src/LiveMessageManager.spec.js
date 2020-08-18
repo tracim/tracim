@@ -21,12 +21,12 @@ LiveMessageManager.prototype.setStatus = function (status) {
   setStatusOrig.call(this, status)
 
   const resolve = (this.statuscallbacks && this.statuscallbacks.shift())
-  resolve && resolve()
+  resolve && resolve(this.status)
 }
 
-LiveMessageManager.prototype.onstatuschange = function (callback) {
+LiveMessageManager.prototype.onStatusChange = async function () {
   if (!this.statuscallbacks) this.statuscallbacks = []
-  this.statuscallbacks.push(callback)
+  return new Promise(resolve => this.statuscallbacks.push(resolve))
 }
 
 // RJ - 2020-09-13 - NOTE: We don't want the election of a leader to take place here
@@ -39,11 +39,6 @@ const openedManager = (heartbeatTimeOut, reconnectionInterval) => {
   const mockEventSource = manager.eventSource
   mockEventSource.emitOpen()
   return { manager, mockEventSource }
-}
-
-const waitForStatus = async (manager) => {
-  await new Promise(resolve => { manager.onstatuschange(resolve) })
-  return manager.status
 }
 
 describe('LiveMessageManager class', () => {
@@ -75,9 +70,9 @@ describe('LiveMessageManager class', () => {
       expect(manager.eventSource.readyState).to.be.equal(1)
       expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.OPENED)
     })
-    it('should restart connection when an error is raised by EventSource', async function () {
-      const promiseStatus1 = waitForStatus(manager)
-      const promiseStatus2 = waitForStatus(manager)
+    it('should restart connection when an error is raised by EventSource', async () => {
+      const promiseStatus1 = manager.onStatusChange()
+      const promiseStatus2 = manager.onStatusChange()
       manager.eventSource.emitError()
       expect(await promiseStatus1).to.be.equal(LIVE_MESSAGE_STATUS.ERROR)
       expect(await promiseStatus2).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
@@ -99,12 +94,12 @@ describe('LiveMessageManager class', () => {
     })
   })
 
-  describe('the heartbeat timer', () => {
+  describe('the heartbeat timer', async () => {
     it('should restart connection when the heartbeat event is not received in time', async () => {
       const { manager } = openedManager(2, 10)
       managers.push(manager)
-      expect(await waitForStatus(manager)).to.be.equal(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
-      expect(await waitForStatus(manager)).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
+      expect(await manager.onStatusChange()).to.be.equal(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
+      expect(await manager.onStatusChange()).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
     })
   })
 
