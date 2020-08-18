@@ -223,8 +223,8 @@ export class WorkspaceContent extends React.Component {
   setHeadTitle = (filterName) => {
     const { props } = this
 
-    if (props.system.config.instance_name && props.currentWorkspace.label) {
-      props.dispatch(setHeadTitle(buildHeadTitle([filterName, props.currentWorkspace.label, props.system.config.instance_name])))
+    if (props.currentWorkspace.label) {
+      props.dispatch(setHeadTitle(buildHeadTitle([filterName, props.currentWorkspace.label])))
     }
   }
 

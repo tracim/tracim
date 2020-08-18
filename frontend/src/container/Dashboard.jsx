@@ -209,12 +209,10 @@ export class Dashboard extends React.Component {
   setHeadTitle = () => {
     const { props } = this
 
-    if (props.system.config.instance_name) {
-      const headTitle = buildHeadTitle(
-        [props.t('Dashboard'), props.curWs.label, props.system.config.instance_name]
-      )
-      props.dispatch(setHeadTitle(headTitle))
-    }
+    const headTitle = buildHeadTitle(
+      [props.t('Dashboard'), props.curWs.label]
+    )
+    props.dispatch(setHeadTitle(headTitle))
   }
 
   buildBreadcrumbs = () => {

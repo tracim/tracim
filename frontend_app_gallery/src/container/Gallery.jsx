@@ -11,7 +11,6 @@ import {
   PageContent,
   CardPopup,
   handleFetchResult,
-  buildHeadTitle,
   appContentFactory,
   TracimComponent,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -510,14 +509,10 @@ export class Gallery extends React.Component {
   })
 
   setHeadTitle = (title) => {
-    const { state } = this
-
-    if (state.config && state.config.system && state.config.system.config) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([title, state.config.system.config.instance_name]) }
-      })
-    }
+    GLOBAL_dispatchEvent({
+      type: CUSTOM_EVENT.SET_HEAD_TITLE,
+      data: { title: title }
+    })
   }
 
   handleClickHideImageRaw = () => {

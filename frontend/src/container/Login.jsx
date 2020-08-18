@@ -12,7 +12,6 @@ import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
-  buildHeadTitle,
   CUSTOM_EVENT,
   checkEmailValidity,
   serialize
@@ -103,10 +102,7 @@ class Login extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-
-    if (props.system.config.instance_name) {
-      props.dispatch(setHeadTitle(buildHeadTitle([props.t('Login'), props.system.config.instance_name])))
-    }
+    props.dispatch(setHeadTitle(props.t('Login')))
   }
 
   handleChangeRememberMe = e => {

@@ -450,9 +450,9 @@ export class Account extends React.Component {
 
   setHeadTitle = () => {
     const { props, state } = this
-    if (props.system.config.instance_name && state.userToEdit.publicName) {
+    if (state.userToEdit.publicName) {
       const headTitle = buildHeadTitle(
-        [this.props.t('User administration'), state.userToEdit.publicName, props.system.config.instance_name]
+        [this.props.t('User administration'), state.userToEdit.publicName]
       )
 
       props.dispatch(setHeadTitle(headTitle))

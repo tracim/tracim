@@ -6,7 +6,6 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
-  buildHeadTitle,
   CUSTOM_EVENT,
   ProgressBar,
   computeProgressionPercentage,
@@ -105,9 +104,7 @@ class GuestUpload extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    if (props.system.config.instance_name) {
-      props.dispatch(setHeadTitle(buildHeadTitle([props.t('Public upload'), props.system.config.instance_name])))
-    }
+    props.dispatch(setHeadTitle(props.t('Public upload')))
   }
 
   handleChangeFullName = e => this.setState({ guestFullname: { value: e.target.value, isInvalid: false } })

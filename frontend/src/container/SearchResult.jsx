@@ -88,14 +88,11 @@ export class SearchResult extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
+    const headTitle = buildHeadTitle(
+      [`${props.t('Search results')} : ${this.parseUrl().searchedKeywords}`]
+    )
 
-    if (props.system.config.instance_name) {
-      const headTitle = buildHeadTitle(
-        [`${props.t('Search results')} : ${this.parseUrl().searchedKeywords}`, props.system.config.instance_name]
-      )
-
-      props.dispatch(setHeadTitle(headTitle))
-    }
+    props.dispatch(setHeadTitle(headTitle))
   }
 
   loadSearchUrl = async () => {

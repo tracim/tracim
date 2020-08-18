@@ -12,7 +12,6 @@ import {
   workspaceConfig
 } from '../util/helper.js'
 import {
-  buildHeadTitle,
   CUSTOM_EVENT,
   CardPopup,
   hasNotAllowedCharacters,
@@ -72,9 +71,7 @@ export class Home extends React.Component {
   setHeadTitle = () => {
     const { props } = this
 
-    if (props.system.config.instance_name) {
-      props.dispatch(setHeadTitle(buildHeadTitle([props.t('Home'), props.system.config.instance_name])))
-    }
+    props.dispatch(setHeadTitle(props.t('Home')))
   }
 
   checkUsername = () => {

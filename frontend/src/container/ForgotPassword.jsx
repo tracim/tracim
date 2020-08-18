@@ -17,8 +17,7 @@ import {
 import { PAGE } from '../util/helper.js'
 import {
   CUSTOM_EVENT,
-  checkEmailValidity,
-  buildHeadTitle
+  checkEmailValidity
 } from 'tracim_frontend_lib'
 
 export class ForgotPassword extends React.Component {
@@ -70,9 +69,7 @@ export class ForgotPassword extends React.Component {
   setHeadTitle = () => {
     const { props } = this
 
-    if (props.system.config.instance_name) {
-      props.dispatch(setHeadTitle(buildHeadTitle([props.t('Forgotten password'), props.system.config.instance_name])))
-    }
+    props.dispatch(setHeadTitle(props.t('Forgotten password')))
   }
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()

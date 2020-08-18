@@ -156,11 +156,13 @@ export const toggleFavicon = (hasNewNotification) => {
       context.drawImage(img, 0, 0, faviconSize, faviconSize)
 
       // INFO - GM - 2020/08/18 - Draw Notification Circle
+      const circleSize = faviconSize / 6
       context.beginPath()
       context.arc(
-        canvas.width - faviconSize / 6,
-        canvas.height - faviconSize / 6,
-        faviconSize / 6, 0,
+        canvas.width - circleSize,
+        canvas.height - circleSize,
+        circleSize,
+        0,
         2 * Math.PI
       )
       // FIXME - GM - 2020/08/18 - Replace this hardcoded values to webpack variables

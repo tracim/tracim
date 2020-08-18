@@ -10,7 +10,6 @@ import {
   handleFetchResult,
   ROLE,
   CUSTOM_EVENT,
-  buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -148,10 +147,10 @@ export class AdminWorkspaceUser extends React.Component {
   setHeadTitle = (title) => {
     const { state } = this
 
-    if (state.config && state.config.system && state.config.system.config && state.isVisible) {
+    if (state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([title, state.config.system.config.instance_name]) }
+        data: { title: title }
       })
     }
   }

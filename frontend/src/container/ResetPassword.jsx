@@ -19,7 +19,7 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import { PAGE } from '../util/helper.js'
-import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 
@@ -70,10 +70,7 @@ export class ResetPassword extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-
-    if (props.system.config.instance_name) {
-      props.dispatch(setHeadTitle(buildHeadTitle([props.t('Password reset'), props.system.config.instance_name])))
-    }
+    props.dispatch(setHeadTitle(props.t('Password reset')))
   }
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()

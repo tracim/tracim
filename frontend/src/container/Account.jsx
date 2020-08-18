@@ -14,7 +14,6 @@ import {
   PageContent,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
   TracimComponent
@@ -313,9 +312,7 @@ export class Account extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    if (props.system.config.instance_name) {
-      props.dispatch(setHeadTitle(buildHeadTitle([props.t('My Account'), props.system.config.instance_name])))
-    }
+    props.dispatch(setHeadTitle(props.t('My Account')))
   }
 
   render () {

@@ -13,7 +13,6 @@ import {
 import {
   displayFileSize,
   handleFetchResult,
-  buildHeadTitle,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { PAGE } from '../util/helper.js'
@@ -99,9 +98,7 @@ class GuestDownload extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    if (props.system.config.instance_name) {
-      props.dispatch(setHeadTitle(buildHeadTitle([props.t('Public download'), props.system.config.instance_name])))
-    }
+    props.dispatch(setHeadTitle(props.t('Public download')))
   }
 
   handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })

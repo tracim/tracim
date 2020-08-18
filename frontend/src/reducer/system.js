@@ -7,6 +7,7 @@ import {
   LOGIN,
   HEAD_TITLE
 } from '../action-creator.sync.js'
+import { buildHeadTitle } from 'tracim_frontend_lib'
 
 const defaultSystem = {
   redirectLogin: '',
@@ -34,9 +35,11 @@ export function system (state = defaultSystem, action) {
     case `${SET}/${CONFIG}`:
       return { ...state, config: action.config }
 
-    case `${SET}/${HEAD_TITLE}`:
-      if (action.headTitle === state.headTitle) return state
-      return { ...state, headTitle: action.headTitle }
+    case `${SET}/${HEAD_TITLE}`: {
+      const newHeadTitle = buildHeadTitle([action.headTitle, state.config.instance_name])
+      if (newHeadTitle === state.headTitle || !state.config.instance_name) return state
+      return { ...state, headTitle: newHeadTitle }
+    }
 
     default:
       return state
