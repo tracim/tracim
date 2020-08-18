@@ -29,7 +29,8 @@ import {
   setWorkspaceListMemberList,
   setNotificationNotReadCounter,
   setNotificationList,
-  setNextPage
+  setNextPage,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import {
   getAppList,
@@ -104,10 +105,7 @@ class Login extends React.Component {
     const { props } = this
 
     if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Login'), props.system.config.instance_name]) }
-      })
+      props.dispatch(setHeadTitle(buildHeadTitle([props.t('Login'), props.system.config.instance_name])))
     }
   }
 

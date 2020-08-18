@@ -15,7 +15,8 @@ import {
 import {
   newFlashMessage,
   resetBreadcrumbs,
-  setConfig
+  setConfig,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import { PAGE } from '../util/helper.js'
 import { buildHeadTitle, CUSTOM_EVENT } from 'tracim_frontend_lib'
@@ -71,10 +72,7 @@ export class ResetPassword extends React.Component {
     const { props } = this
 
     if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Password reset'), props.system.config.instance_name]) }
-      })
+      props.dispatch(setHeadTitle(buildHeadTitle([props.t('Password reset'), props.system.config.instance_name])))
     }
   }
 

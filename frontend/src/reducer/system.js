@@ -3,7 +3,9 @@ import {
   CONTENT_TYPE_LIST,
   SET,
   WORKSPACE_LIST,
-  CONFIG, LOGIN
+  CONFIG,
+  LOGIN,
+  HEAD_TITLE
 } from '../action-creator.sync.js'
 
 const defaultSystem = {
@@ -11,7 +13,8 @@ const defaultSystem = {
   workspaceListLoaded: false,
   appListLoaded: false,
   contentTypeListLoaded: false,
-  config: {}
+  config: {},
+  headTitle: ''
 }
 
 export function system (state = defaultSystem, action) {
@@ -30,6 +33,10 @@ export function system (state = defaultSystem, action) {
 
     case `${SET}/${CONFIG}`:
       return { ...state, config: action.config }
+
+    case `${SET}/${HEAD_TITLE}`:
+      if (action.headTitle === state.headTitle) return state
+      return { ...state, headTitle: action.headTitle }
 
     default:
       return state

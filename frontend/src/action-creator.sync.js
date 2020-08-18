@@ -148,6 +148,9 @@ export const setConfig = config => ({ type: `${SET}/${CONFIG}`, config })
 export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })
 
+export const HEAD_TITLE = 'HeadTitle'
+export const setHeadTitle = headTitle => ({ type: `${SET}/${HEAD_TITLE}`, headTitle })
+
 export const BREADCRUMBS = 'Breadcrumbs'
 export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`, newBreadcrumbs })
 export const resetBreadcrumbs = () => ({ type: `${RESET}/${BREADCRUMBS}` })

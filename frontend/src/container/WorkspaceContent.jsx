@@ -55,7 +55,8 @@ import {
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  setWorkspaceDetail
+  setWorkspaceDetail,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -223,10 +224,7 @@ export class WorkspaceContent extends React.Component {
     const { props } = this
 
     if (props.system.config.instance_name && props.currentWorkspace.label) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([filterName, props.currentWorkspace.label, props.system.config.instance_name]) }
-      })
+      props.dispatch(setHeadTitle(buildHeadTitle([filterName, props.currentWorkspace.label, props.system.config.instance_name])))
     }
   }
 

@@ -23,7 +23,8 @@ import {
   newFlashMessage,
   setWorkspaceListMemberList,
   updateUserAgendaUrl,
-  setBreadcrumbs
+  setBreadcrumbs,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import {
   getWorkspaceMemberList,
@@ -313,10 +314,7 @@ export class Account extends React.Component {
   setHeadTitle = () => {
     const { props } = this
     if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('My Account'), props.system.config.instance_name]) }
-      })
+      props.dispatch(setHeadTitle(buildHeadTitle([props.t('My Account'), props.system.config.instance_name])))
     }
   }
 

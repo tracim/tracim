@@ -7,7 +7,7 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import { PAGE } from '../util/helper.js'
-import { resetBreadcrumbs, setConfig } from '../action-creator.sync.js'
+import { resetBreadcrumbs, setConfig, setHeadTitle } from '../action-creator.sync.js'
 import { CUSTOM_EVENT, buildHeadTitle } from 'tracim_frontend_lib'
 import { getConfig } from '../action-creator.async'
 
@@ -55,10 +55,7 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
     const { props } = this
 
     if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Forgotten password'), props.system.config.instance_name]) }
-      })
+      props.dispatch(setHeadTitle(buildHeadTitle([props.t('Forgotten password'), props.system.config.instance_name])))
     }
   }
 

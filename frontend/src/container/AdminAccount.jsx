@@ -24,7 +24,8 @@ import {
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
-  setBreadcrumbs
+  setBreadcrumbs,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import {
   getUser,
@@ -450,10 +451,11 @@ export class Account extends React.Component {
   setHeadTitle = () => {
     const { props, state } = this
     if (props.system.config.instance_name && state.userToEdit.publicName) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([this.props.t('User administration'), state.userToEdit.publicName, props.system.config.instance_name]) }
-      })
+      const headTitle = buildHeadTitle(
+        [this.props.t('User administration'), state.userToEdit.publicName, props.system.config.instance_name]
+      )
+
+      props.dispatch(setHeadTitle(headTitle))
     }
   }
 

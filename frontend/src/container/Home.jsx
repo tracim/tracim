@@ -23,7 +23,7 @@ import {
   getUsernameAvailability,
   putUserUsername
 } from '../action-creator.async.js'
-import { newFlashMessage } from '../action-creator.sync.js'
+import { newFlashMessage, setHeadTitle } from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -73,10 +73,7 @@ export class Home extends React.Component {
     const { props } = this
 
     if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Home'), props.system.config.instance_name]) }
-      })
+      props.dispatch(setHeadTitle(buildHeadTitle([props.t('Home'), props.system.config.instance_name])))
     }
   }
 
