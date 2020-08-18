@@ -167,6 +167,8 @@ export function appContentFactory (WrappedComponent) {
           break
         case 400:
           switch (response.body.code) {
+            case 1001:
+              this.sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
             case 2003:
               this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break

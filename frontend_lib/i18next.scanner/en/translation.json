@@ -91,6 +91,7 @@
   "Access to shared spaces where user is member": "Access to shared spaces where user is member",
   "Refresh?": "Refresh?",
   "If you refresh, you will lose the current changes": "If you refresh, you will lose the current changes",
+  "You are trying to mention an invalid user": "You are trying to mention an invalid user",
   "You can't send an empty comment": "You can't send an empty comment",
   "You must change the status or restore this content before any change": "You must change the status or restore this content before any change"
 }

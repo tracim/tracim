@@ -91,6 +91,7 @@
   "Advanced edition": "Edição avançada",
   "Refresh?": "Actualizar?",
   "If you refresh, you will lose the current changes": "Se você atualizar, você perderá as mudanças atuais",
+  "You are trying to mention an invalid user": "Está a tentar mencionar um utilizador inválido",
   "You can't send an empty comment": "Você não pode enviar um comentário vazio",
   "You must change the status or restore this content before any change": "É necessário alterar o status ou restaurar este conteúdo antes de qualquer alteração"
 }

@@ -396,44 +396,51 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
 }
 
-
-// [WIP]
 export const wrapMentionInSpanTag = (text) => {
   try {
-    console.log('TTTTTTTTTTTTT', text)
-    text = text.substring(
-      text.indexOf('>') + 1, text.lastIndexOf('<')
-    )
-    console.log('JJJJJJJJJJJJJJJJJJJJJJJ', text)
-    /* while (/<([A-Za-z]+)>(.*)<\/\1>/.test(subStr)) {
-      subStr.indexOf('>') + 1, subStr.lastIndexOf('<')
-    } */
-    text = text.split('&nbsp;').join(' ').split(' ').map(subStr => {
-      if (subStr.charAt(0) === '@') return `<span class='mention' id='mention-${uuidv4()}'>${subStr}</span>`
-      if (subStr.charAt(0) === '<') {
-        if (/<([A-Za-z]+)>(.*)<\/\1>/.test(subStr)) {
-          const htmlTagBegin = subStr.substring(0, subStr.indexOf('>') + 1)
-          const htmlTagEnd = subStr.substring(subStr.lastIndexOf('<'), subStr.length)
-          const internalString = subStr.substring(subStr.indexOf('>') + 1, subStr.lastIndexOf('<'))
-          if (internalString.charAt(0) === '@')
-            return `${htmlTagBegin}<span class='mention' id='mention-${uuidv4()}'>${internalString}</span>${htmlTagEnd}`
+    const textArray = text.split('&nbsp;').join(' ').split(' ')
+
+    const wrappedTextArray = textArray.map(subString => {
+      if (subString.includes('@')) {
+        const indexOfAt = subString.indexOf('@')
+
+        if (indexOfAt === 0 && !subString.includes('<'))
+          return isMentionValid(subString)
+            ? `<span class='mention' id='mention-${uuidv4()}'>${subString}</span> `
+            : subString
+
+        if ((subString.charAt(indexOfAt - 1) === '>'
+          || indexOfAt === 0)
+          && !subString.substring(indexOfAt).includes('.')
+        ) {
+          const htmlTagBegin = subString.substring(0, indexOfAt)
+
+          if(!htmlTagBegin.includes('mention')) {
+            if(subString.substring(indexOfAt).includes('<')) {
+              const htmlTagEnd = subString.substring(subString.indexOf('<', indexOfAt))
+              const internalString = subString.substring(indexOfAt, subString.indexOf('<', indexOfAt))
+
+              return isMentionValid(internalString)
+                ? `${htmlTagBegin}<span class='mention' id='mention-${uuidv4()}'>${internalString}</span>${htmlTagEnd} `
+                : subString
+            } else {
+              const internalString = subString.substring(indexOfAt)
+
+              return isMentionValid(internalString)
+                ? `${htmlTagBegin}<span class='mention' id='mention-${uuidv4()}'>${internalString}</span> `
+                : subString
+            }
+          }
         }
       }
-      // se a string contém um @ a gente olha oq tem antes pra ver se é um > if()
-      return subStr
+      return subString
     })
 
-    /*
-    text = text.map(subStr => subStr.charAt(0) === '@'
-      ? `<span class='mention' id='mention-${uuidv4()}'>${subStr}</span>`
-      : subStr
-    ).join(' ')
-    */
-    console.log('GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG', text)
-    text = `<p>${text.join(' ')}</p>`
-    return text
+    return wrappedTextArray.join(' ')
   } catch (e) {
     console.error('Error while parsing mention', e)
     throw EXCEPTION_MENTION_PARSING
   }
-} // Does not work at the begging of a sentence
+}
+
+const isMentionValid = mention => !(mention === '@' || hasNotAllowedCharacters(removeAtInUsername(mention)))
