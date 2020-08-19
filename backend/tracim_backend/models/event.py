@@ -107,23 +107,30 @@ class Event(DeclarativeBase):
     Event definition.
     """
 
-    ENTITY_SUBTYPE_LENGTH = 100
+    USER_FIELD = "user"
+    AUTHOR_FIELD = "author"
+    CLIENT_TOKEN_FIELD = "client_token"
+    WORKSPACE_FIELD = "workspace"
+    CONTENT_FIELD = "content"
+    MEMBER_FIELD = "member"
+
+    _ENTITY_SUBTYPE_LENGTH = 100
     __tablename__ = "events"
 
     event_id = Column(Integer, autoincrement=True, primary_key=True)
     operation = Column(Enum(OperationType), nullable=False)
     entity_type = Column(Enum(EntityType), nullable=False)
-    entity_subtype = Column(String(length=ENTITY_SUBTYPE_LENGTH), nullable=True, default=None)
+    entity_subtype = Column(String(length=_ENTITY_SUBTYPE_LENGTH), nullable=True, default=None)
     created = Column(DateTime, nullable=False, default=datetime.utcnow)
     fields = Column(JSON, nullable=False)
 
     # easier access to values stored in fields
-    author = index_property("fields", "author")
-    workspace = index_property("fields", "workspace")
-    user = index_property("fields", "user")
-    content = index_property("fields", "content")
-    member = index_property("fields", "member")
-    client_token = index_property("fields", "client_token")
+    author = index_property("fields", AUTHOR_FIELD)
+    workspace = index_property("fields", WORKSPACE_FIELD)
+    user = index_property("fields", USER_FIELD)
+    content = index_property("fields", CONTENT_FIELD)
+    member = index_property("fields", MEMBER_FIELD)
+    client_token = index_property("fields", CLIENT_TOKEN_FIELD)
 
     @property
     def event_type(self) -> str:

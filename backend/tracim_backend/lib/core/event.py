@@ -65,13 +65,6 @@ JsonDict = typing.Dict[str, typing.Any]
 class EventApi:
     """Api to query event & messages"""
 
-    USER_FIELD = "user"
-    AUTHOR_FIELD = "author"
-    CLIENT_TOKEN_FIELD = "client_token"
-    WORKSPACE_FIELD = "workspace"
-    CONTENT_FIELD = "content"
-    MEMBER_FIELD = "member"
-
     user_schema = UserSchema()
     workspace_schema = WorkspaceSchema()
     content_schemas = {
@@ -198,10 +191,10 @@ class EventApi:
             show_deleted=True,
         )
         fields = {
-            self.AUTHOR_FIELD: self.user_schema.dump(
+            Event.AUTHOR_FIELD: self.user_schema.dump(
                 user_api.get_user_with_context(current_user)
             ).data,
-            self.CLIENT_TOKEN_FIELD: context.client_token,
+            Event.CLIENT_TOKEN_FIELD: context.client_token,
         }
         fields.update(additional_fields)
         event = Event(
@@ -322,9 +315,7 @@ class EventBuilder:
             show_deleted=True,
         )
         fields = {
-            EventApi.USER_FIELD: EventApi.user_schema.dump(
-                user_api.get_user_with_context(user)
-            ).data
+            Event.USER_FIELD: EventApi.user_schema.dump(user_api.get_user_with_context(user)).data
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -356,9 +347,7 @@ class EventBuilder:
             current_user=current_user, session=context.dbsession, config=self._config
         )
         workspace_in_context = api.get_workspace_with_context(workspace)
-        fields = {
-            EventApi.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data
-        }
+        fields = {Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data}
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
             entity_type=EntityType.WORKSPACE,
@@ -395,8 +384,8 @@ class EventBuilder:
             workspace_api.get_one(content_in_context.workspace.workspace_id)
         )
         fields = {
-            EventApi.CONTENT_FIELD: content_dict,
-            EventApi.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.CONTENT_FIELD: content_dict,
+            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -453,9 +442,9 @@ class EventBuilder:
 
         role_in_context = role_api.get_user_role_workspace_with_context(role)
         fields = {
-            EventApi.USER_FIELD: user_field,
-            EventApi.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
-            EventApi.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(role_in_context).data,
+            Event.USER_FIELD: user_field,
+            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(role_in_context).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -536,6 +525,7 @@ class BaseLiveMessageBuilder(abc.ABC):
     def register_entity_type(
         cls, entity_type: EntityType, get_receiver_ids_callable: GetReceiverIdsCallable
     ) -> None:
+        """Register a function used to get receiver user ids for a given entity type."""
         cls._get_receiver_ids_callables[entity_type] = get_receiver_ids_callable
 
     @contextlib.contextmanager

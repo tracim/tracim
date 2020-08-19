@@ -10,7 +10,7 @@ import transaction
 import tracim_backend
 from tracim_backend.command import TracimCLI
 from tracim_backend.exceptions import DatabaseInitializationFailed
-from tracim_backend.exceptions import EmailAlreadyExistsInDb
+from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
@@ -166,7 +166,7 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(EmailAlreadyExistsInDb):
+        with pytest.raises(EmailAlreadyExists):
             app.run(
                 [
                     "--debug",

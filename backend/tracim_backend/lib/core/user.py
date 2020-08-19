@@ -25,7 +25,7 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
-from tracim_backend.exceptions import EmailAlreadyExistsInDb
+from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import EmailOrUsernameRequired
 from tracim_backend.exceptions import EmailRequired
 from tracim_backend.exceptions import EmailTemplateError
@@ -41,6 +41,7 @@ from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import RemoteUserAuthDisabled
+from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UnknownAuthType
@@ -51,7 +52,7 @@ from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.exceptions import UsernameAlreadyExistInDb
+from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
@@ -63,6 +64,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.mention import ALL__GROUP_MENTIONS
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.userconfig import UserConfig
 
@@ -246,6 +248,9 @@ class UserApi(object):
 
         query = query.limit(nb_elem)
         return query.all()
+
+    def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
+        return ALL__GROUP_MENTIONS
 
     def _get_user_ids_in_same_workspace(self, user_id: int):
         user_workspaces_id_query = self._session.query(UserRoleInWorkspace.workspace_id).filter(
@@ -655,24 +660,30 @@ class UserApi(object):
         is_email_correct = self._check_email_correctness(email)
         if not is_email_correct:
             raise EmailValidationFailed("Email given form {} is uncorrect".format(email))
-        email_already_exist_in_db = self.check_email_already_in_db(email)
-        if email_already_exist_in_db:
-            raise EmailAlreadyExistsInDb(
+        EMAIL_ALREADY_EXISTS = self.check_email_already_in_db(email)
+        if EMAIL_ALREADY_EXISTS:
+            raise EmailAlreadyExists(
                 "Email given {} already exist, please choose something else".format(email)
             )
         return True
 
-    def _check_username(self, username: str) -> None:
-        """Check given username. Raise InvalidUsernameFormat if not match required format and
-        UsernameAlreadyExistInDb if username already used.
+    def check_username(self, username: str) -> None:
+        """Check given username.
+
+        Raise:
+            - InvalidUsernameFormat if username does not match the required format
+            - UsernameAlreadyExists if username is already used by another user
+            - ReservedUsernameError if username is reserved (group mentions)
         """
         if not self._check_username_correctness(username):
             raise InvalidUsernameFormat("Username '{}' is not correct".format(username))
 
         if self.check_username_already_in_db(username):
-            raise UsernameAlreadyExistInDb(
+            raise UsernameAlreadyExists(
                 "Username given '{}' already exist, please choose something else".format(username)
             )
+        if username in self.get_reserved_usernames():
+            raise ReservedUsernameError("'{}' is a reserved username".format(username))
 
     def check_email_already_in_db(self, email: str) -> bool:
         """
@@ -757,7 +768,7 @@ class UserApi(object):
 
         if username is not None:
             if username != user.username:
-                self._check_username(username)
+                self.check_username(username)
                 user.username = username
 
         if password is not None:
@@ -883,7 +894,6 @@ class UserApi(object):
                 raise EmailRequired("Email is required to create an user")
             if not username:
                 raise EmailOrUsernameRequired("Email or username is required to create an user")
-
         lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
         validator.add_validator("email", lowercase_email, user_email_validator)
@@ -891,7 +901,7 @@ class UserApi(object):
         if lowercase_email is not None:
             self._check_email(lowercase_email)
         if username is not None:
-            self._check_username(username)
+            self.check_username(username)
         user = User()
         user.email = lowercase_email
         user.username = username

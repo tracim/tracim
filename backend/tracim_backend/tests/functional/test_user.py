@@ -3156,7 +3156,7 @@ class TestUserEndpoint(object):
         }
         res = web_testapp.post_json("/api/users", status=400, params=params)
         res = res.json_body
-        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
         params = {
             "email": "THISISANEMAILWITHUPPERCASECHARACTERS@TEST.TEST",
             "password": "mysuperpassword",
@@ -3168,7 +3168,7 @@ class TestUserEndpoint(object):
         }
         res = web_testapp.post_json("/api/users", status=400, params=params)
         res = res.json_body
-        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
         params = {
             "email": "ThisIsAnEmailWithUppercaseCharacters@Test.Test",
             "password": "mysuperpassword",
@@ -3180,7 +3180,7 @@ class TestUserEndpoint(object):
         }
         res = web_testapp.post_json("/api/users", status=400, params=params)
         res = res.json_body
-        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
 
     def test_api__create_user__ok_200__limited_admin(self, web_testapp, user_api_factory):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -3258,7 +3258,7 @@ class TestUserEndpoint(object):
         res = web_testapp.post_json("/api/users", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
 
     def test_api__create_user__err_403__other_user(self, user_api_factory, web_testapp):
 
@@ -4116,7 +4116,7 @@ class TestSetEmailEndpoint(object):
         res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4345,7 +4345,7 @@ class TestSetUsernameEndpoint(object):
         )
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USERNAME_ALREADY_EXIST_IN_DB
+        assert res.json_body["code"] == ErrorCode.USERNAME_ALREADY_EXISTS
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
