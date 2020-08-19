@@ -219,15 +219,12 @@ export class NotificationWall extends React.Component {
                 >
                   <i className={`notification__list__item__icon fa ${notificationDetails.icon}`} />
                   <div className='notification__list__item__text'>
-                    <Avatar publicName={notification.author} width={23} style={{ marginRight: '3px' }} />
+                    <Avatar publicName={notification.author} width={23} style={{ marginRight: '5px' }} />
                     <span
                       dangerouslySetInnerHTML={{
-                        __html: `${notificationDetails.text} `
+                        __html: `${notificationDetails.text} ${displayDistanceDate(notification.created, props.user.lang)}`
                       }}
                     />
-                    <span>
-                      {displayDistanceDate(notification.created, props.user.lang)}
-                    </span>
                   </div>
                   {!notification.read && <i className='notification__list__item__circle fa fa-circle' />}
                 </Link>
