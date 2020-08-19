@@ -22,7 +22,7 @@ describe('Notification wall', () => {
     cy.get('.notification__header__title').contains('Notifications').should('not.be.visible')
   })
 
-  it("should have notification list with author's avatar", () => {
+  it("should have notification list item with author's avatar", () => {
     cy.get('.notification__list__item').first().find('.avatar').should('be.visible')
   })
 })
