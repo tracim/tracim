@@ -396,27 +396,27 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
 }
 
+// WIP
 export const wrapMentionsInSpanTags = (text) => {
   try {
-    const parser = new DOMParser()
-
-    const test = parser.parseFromString(text, 'text/html')
-
     const mentionRegex = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
 
-    const juju = ju => {
-      ju.forEach(ch => {
-        if(ch.nodeName === '#text' && ch.textContent.includes('@')) {
-          const oooo = ch.textContent.split(/\s/).filter(token => mentionRegex.test(token))
-          console.log(oooo)
-        } else if (!(ch.nodeName === 'SPAN' && ch.className === 'mention')) {
-          if(ch.childNodes.length > 0) juju(ch.childNodes)
+    const parser = new DOMParser()
+    const parsedText = parser.parseFromString(text, 'text/html')
+
+    const depthFirstSearchAndMentionAnalysis = node => {
+      node.forEach(childNode => {
+        if(childNode.nodeName === '#text' && childNode.textContent.includes('@')) {
+          const mentionsInThisChild = childNode.textContent.split(/\s/).filter(token => mentionRegex.test(token))
+          console.log(mentionsInThisChild)
+        } else if (!(childNode.nodeName === 'SPAN' && childNode.className === 'mention')) {
+          if(childNode.childNodes.length > 0) depthFirstSearchAndMentionAnalysis(childNode.childNodes)
         }
       })
     }
 
-    juju(test.body.childNodes)
-    console.dir(test)
+    depthFirstSearchAndMentionAnalysis(parsedText.body.childNodes)
+    console.dir(parsedText)
 
     const textArray = text.split('&nbsp;').join(' ').split(' ')
 
