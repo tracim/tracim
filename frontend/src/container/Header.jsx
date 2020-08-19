@@ -77,7 +77,6 @@ export class Header extends React.Component {
 
     const fetchPostUserLogout = await props.dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
-      props.tlm.manager.closeLiveMessageConnection()
       props.dispatch(setUserDisconnected())
       this.props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
       props.history.push(PAGE.LOGIN)

@@ -19,6 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "broadcast-channel": "^3.1.0",
     "classnames": "^2.2.6",
     "color": "^3.1.2",
     "core-js": "^3.6.4",
@@ -97,6 +98,7 @@
       "$",
       "fetch",
       "btoa",
+      "EventSource",
       "history",
       "GLOBAL_renderAppFeature",
       "GLOBAL_renderAppFullscreen",
