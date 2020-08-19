@@ -73,9 +73,7 @@ export const getUsernameAvailability = async (apiUrl, username) => {
   const response = await fetch(`${apiUrl}/system/username-availability?username=${username}`,
     {
       credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
+      headers: FETCH_CONFIG.headers,
       method: 'GET'
     }
   )
