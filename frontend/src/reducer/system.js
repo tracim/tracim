@@ -9,7 +9,7 @@ import {
 } from '../action-creator.sync.js'
 import { buildHeadTitle } from 'tracim_frontend_lib'
 
-const defaultSystem = {
+export const defaultSystem = {
   redirectLogin: '',
   workspaceListLoaded: false,
   appListLoaded: false,
