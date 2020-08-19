@@ -12,8 +12,9 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.fixture
-def big_html_document(workspace_api_factory, content_api_factory, session) -> Content:
+def html_document(
+    workspace_api_factory, content_api_factory, session, label, description
+) -> Content:
     workspace_api = workspace_api_factory.get()
     workspace = workspace_api.create_workspace(label="Foobar")
     content_api = content_api_factory.get()
@@ -27,7 +28,7 @@ def big_html_document(workspace_api_factory, content_api_factory, session) -> Co
     html_document = content_api.create(
         content_type_slug="html-document",
         workspace=workspace,
-        label="Big document",
+        label=label,
         do_save=True,
         do_notify=False,
     )
@@ -36,6 +37,52 @@ def big_html_document(workspace_api_factory, content_api_factory, session) -> Co
         content_api.save(html_document)
     transaction.commit()
     return html_document
+
+
+@pytest.fixture
+def big_html_document(workspace_api_factory, content_api_factory, session) -> Content:
+    # NOTE: MySQL and MariaDB have a maximum of 65536 bytes for description,
+    # so the size is chosen accordingly
+    if session.connection().dialect.name in ("mysql", "mariadb"):
+        description = 65000 * "a"
+    else:
+        description = 2000000 * "a"
+
+    return html_document(
+        workspace_api_factory, content_api_factory, session, "Big document", description
+    )
+
+
+def small_html_document(workspace_api_factory, content_api_factory, session, name) -> Content:
+    return html_document(
+        workspace_api_factory, content_api_factory, session, "Small document " + name, name
+    )
+
+
+@pytest.fixture
+def small_html_document_a(workspace_api_factory, content_api_factory, session) -> Content:
+    return small_html_document(workspace_api_factory, content_api_factory, session, "A")
+
+
+@pytest.fixture
+def small_html_document_b(workspace_api_factory, content_api_factory, session) -> Content:
+    return small_html_document(workspace_api_factory, content_api_factory, session, "B")
+
+
+@pytest.fixture
+def small_html_document_c(workspace_api_factory, content_api_factory, session) -> Content:
+    return small_html_document(workspace_api_factory, content_api_factory, session, "C")
+
+
+def put_document(html_document):
+    update_user_request = requests.put(
+        "http://localhost:7999/api/workspaces/{}/html-documents/{}/status".format(
+            html_document.workspace_id, html_document.content_id
+        ),
+        auth=("admin@admin.admin", "admin@admin.admin"),
+        json={"status": "closed-validated"},
+    )
+    assert update_user_request.status_code == 204
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -184,18 +231,68 @@ class TestLivesMessages(object):
         client = sseclient.SSEClient(response)
         client_events = client.events()
 
-        params = {"status": "closed-validated"}
-        update_user_request = requests.put(
-            "http://localhost:7999/api/workspaces/{}/html-documents/{}/status".format(
-                big_html_document.workspace_id, big_html_document.content_id
-            ),
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            json=params,
-        )
+        put_document(big_html_document, client_events)
+
         # Skip first event which only signals the opening
         next(client_events)
-        assert update_user_request.status_code == 204
+
         event1 = next(client_events)
         response.close()
         result = json.loads(event1.data)
         assert result["event_type"] == "content.modified.html-document"
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_async_live_test"}], indirect=True
+    )
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__after_event_id(
+        self,
+        pushpin,
+        app_config,
+        rq_database_worker,
+        small_html_document_a,
+        small_html_document_b,
+        small_html_document_c,
+    ):
+        headers = {"Accept": "text/event-stream"}
+        response = requests.get(
+            "http://localhost:7999/api/users/1/live_messages",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            stream=True,
+            headers=headers,
+        )
+
+        client = sseclient.SSEClient(response)
+        client_events = client.events()
+
+        put_document(small_html_document_a)
+
+        # Skip first event which only signals the opening
+        next(client_events)
+
+        event1 = next(client_events)
+        response.close()
+        result1 = json.loads(event1.data)
+        assert result1["fields"]["content"]["label"] == "Small document A"
+
+        put_document(small_html_document_b)
+
+        response = requests.get(
+            "http://localhost:7999/api/users/1/live_messages?after_event_id={}".format(
+                result1["event_id"]
+            ),
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            stream=True,
+            headers=headers,
+        )
+
+        client = sseclient.SSEClient(response)
+        client_events = client.events()
+        next(client_events)
+        event2 = next(client_events)
+
+        put_document(small_html_document_c)
+
+        event3 = next(client_events)
+
+        assert json.loads(event2.data)["fields"]["content"]["label"] == "Small document B"
+        assert json.loads(event3.data)["fields"]["content"]["label"] == "Small document C"

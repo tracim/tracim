@@ -34,8 +34,10 @@ if (!global.window && !global.document) {
   global.GLOBAL_primaryColor = globalPrimaryColor.hex
   global.GLOBAL_dispatchEvent = () => {}
   global.EventSource = EventSource
+  global.CustomEvent = () => {}
 }
 
 Enzyme.configure({ adapter: new Adapter() })
 chai.use(chaiEnzyme())
+sinon.stub(document, 'dispatchEvent')
 sinon.stub(console, 'log')

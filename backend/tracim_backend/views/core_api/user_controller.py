@@ -1,3 +1,4 @@
+import json
 import typing
 
 from hapic import HapicData
@@ -615,6 +616,20 @@ class UserController(Controller):
         stream_opened_event = ":Tracim Live Messages for user {}\n\nevent: stream-open\ndata:\n\n".format(
             str(request.candidate_user.user_id)
         )
+
+        if "after_event_id" in hapic_data.query:
+            after_event_id = hapic_data.query["after_event_id"]  # type: int
+            if after_event_id:
+                app_config = request.registry.settings["CFG"]  # type: CFG
+                event_api = EventApi(request.current_user, request.dbsession, app_config)
+                messages = event_api.get_messages_for_user(
+                    request.candidate_user.user_id, after_event_id=after_event_id
+                )  # type: typing.List[Message]
+
+                stream_opened_event += "".join(
+                    ["data:" + json.dumps(message) + "\n\n" for message in messages]
+                )
+
         escaped_keealive_event = "event: keep-alive\\ndata:\\n\\n"
         user_channel_name = "user_{}".format(request.candidate_user.user_id)
         headers = [
