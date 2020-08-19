@@ -398,6 +398,26 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
 
 export const wrapMentionsInSpanTags = (text) => {
   try {
+    const parser = new DOMParser()
+
+    const test = parser.parseFromString(text, 'text/html')
+
+    const mentionRegex = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
+
+    const juju = ju => {
+      ju.forEach(ch => {
+        if(ch.nodeName === '#text' && ch.textContent.includes('@')) {
+          const oooo = ch.textContent.split(/\s/).filter(token => mentionRegex.test(token))
+          console.log(oooo)
+        } else if (!(ch.nodeName === 'SPAN' && ch.className === 'mention')) {
+          if(ch.childNodes.length > 0) juju(ch.childNodes)
+        }
+      })
+    }
+
+    juju(test.body.childNodes)
+    console.dir(test)
+
     const textArray = text.split('&nbsp;').join(' ').split(' ')
 
     const wrappedTextArray = textArray.map(subString => {
