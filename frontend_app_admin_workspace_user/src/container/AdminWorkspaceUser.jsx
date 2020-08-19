@@ -569,7 +569,7 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleChangeUsername = async (newUsername) => {
-    if (len(newUsername) === 0) return
+    if (!newUsername) return
 
     const { props, state } = this
     try {

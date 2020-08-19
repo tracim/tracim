@@ -18,6 +18,7 @@ describe('<Home />', () => {
         instance_name: 'instanceTest'
       }
     },
+    dispatch: () => { },
     canCreateWorkspace: true,
     renderAppPopupCreation: renderAppPopupCreationCallBack,
     registerCustomEventHandlerList: () => { }
@@ -54,8 +55,8 @@ describe('<Home />', () => {
         })
       })
 
-      it('should have the isUsernameValid state as true if username is not set yet', () => {
-        wrapper.instance().handleChangeNewUsername({ target: { value: '' } })
+      it('should have the isUsernameValid state as true if username is not set yet', async () => {
+        await wrapper.instance().handleChangeNewUsername({ target: { value: '' } })
         expect(wrapper.state('isUsernameValid')).to.equal(true)
       })
 

@@ -140,7 +140,7 @@ export class Home extends React.Component {
     this.setState({ newUsername: e.target.value })
     const username = e.target.value
 
-    if (len(username) === 0) return
+    if (!username) return
     try {
       this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, username, props))
     } catch (errorWhileChecking) {
