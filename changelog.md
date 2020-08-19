@@ -1,4 +1,20 @@
 
+## 3.0.2 / 2020-08-17
+
+### Fixed Issues
+
+- Frontend: #3250
+- Gallery: #3425
+- Backend: #3431, #3436
+
+
+## 3.0.1 / 2020-08-10
+
+### Fixed Issues
+
+- Docker: #3418
+
+
 ## 3.0.0 / 2020-08-07
 
 ### New Features
