@@ -75,13 +75,13 @@ export class LiveMessageManager {
 
     this.closeEventSourceConnection()
 
+    let afterEventFilter = ''
+    if (this.lastEventId) {
+      afterEventFilter = `?after_event_id=${this.lastEventId}`
+    }
+
     this.eventSource = new EventSource(
-      `${url}/users/${this.userId}/live_messages` + (
-        this.lastEventId
-          ? `?after_event_id=${this.lastEventId}`
-          : ''
-      ),
-      { withCredentials: true }
+      `${url}/users/${this.userId}/live_messages${afterEventFilter}`
     )
 
     this.broadcastStatus(LIVE_MESSAGE_STATUS.PENDING)

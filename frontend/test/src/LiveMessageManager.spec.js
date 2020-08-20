@@ -108,7 +108,7 @@ describe('LiveMessageManager class', () => {
   })
 
   describe('the heartbeat timer', async () => {
-    it('should restart connection when the heartbeat event is not received on time', async () => {
+    it('should restart connection when the heartbeat event is not received in time', async () => {
       const manager = openedManager(2, 10)
       managers.push(manager)
       expect(await manager.onStatusChange()).to.be.equal(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)

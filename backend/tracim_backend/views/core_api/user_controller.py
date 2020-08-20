@@ -48,6 +48,7 @@ from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventHeaderSchema
+from tracim_backend.views.core_api.schemas import TracimLiveEventQuerySchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
@@ -608,7 +609,8 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_headers(TracimLiveEventHeaderSchema())
-    def open_message_stream(self, context, request: TracimRequest, hapic_data=None) -> Response:
+    @hapic.input_query(TracimLiveEventQuerySchema())
+    def open_message_stream(self, context, request: TracimRequest, hapic_data) -> Response:
         """
         Open the message stream for the given user.
         Tracim Live Message Events as ServerSide Event Stream
@@ -617,18 +619,17 @@ class UserController(Controller):
             str(request.candidate_user.user_id)
         )
 
-        if "after_event_id" in hapic_data.query:
-            after_event_id = hapic_data.query["after_event_id"]  # type: int
-            if after_event_id:
-                app_config = request.registry.settings["CFG"]  # type: CFG
-                event_api = EventApi(request.current_user, request.dbsession, app_config)
-                messages = event_api.get_messages_for_user(
-                    request.candidate_user.user_id, after_event_id=after_event_id
-                )  # type: typing.List[Message]
+        after_event_id = hapic_data.query["after_event_id"]  # type: int
+        if after_event_id:
+            app_config = request.registry.settings["CFG"]  # type: CFG
+            event_api = EventApi(request.current_user, request.dbsession, app_config)
+            messages = event_api.get_messages_for_user(
+                request.candidate_user.user_id, after_event_id=after_event_id
+            )  # type: typing.List[Message]
 
-                stream_opened_event += "".join(
-                    ["data:" + json.dumps(message) + "\n\n" for message in messages]
-                )
+            stream_opened_event += "".join(
+                ["data:" + json.dumps(message) + "\n\n" for message in messages]
+            )
 
         escaped_keealive_event = "event: keep-alive\\ndata:\\n\\n"
         user_channel_name = "user_{}".format(request.candidate_user.user_id)

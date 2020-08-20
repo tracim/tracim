@@ -33,7 +33,7 @@ def html_document(
         do_notify=False,
     )
     with new_revision(session=session, tm=transaction.manager, content=html_document):
-        content_api.update_content(html_document, new_content=description, new_label="Big document")
+        content_api.update_content(html_document, new_content=description, new_label=label)
         content_api.save(html_document)
     transaction.commit()
     return html_document
@@ -82,7 +82,7 @@ def put_document(html_document):
         auth=("admin@admin.admin", "admin@admin.admin"),
         json={"status": "closed-validated"},
     )
-    assert update_user_request.status_code == 204
+    return update_user_request.status_code
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -231,7 +231,8 @@ class TestLivesMessages(object):
         client = sseclient.SSEClient(response)
         client_events = client.events()
 
-        put_document(big_html_document, client_events)
+        status = put_document(big_html_document)
+        assert status == 204
 
         # Skip first event which only signals the opening
         next(client_events)
