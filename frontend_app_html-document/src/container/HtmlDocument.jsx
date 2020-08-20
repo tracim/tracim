@@ -436,6 +436,8 @@ export class HtmlDocument extends React.Component {
       case 400:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
         switch (fetchResultSaveHtmlDoc.body.code) {
+          case 1001:
+            this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
           case 2044:
             this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
             break

@@ -24,6 +24,7 @@
   "This content is deprecated": "Ce contenu est obsolète",
   "Timeline": "Historique",
   "New text document": "Nouveau document texte",
+  "You are trying to mention an invalid user": "Vous essayez de mentionner un utilisateur non valide",
   "You must change the status or restore this document before any change": "Vous devez changer le statut ou restaurer ce document avant de le modifier",
   "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}"
 }

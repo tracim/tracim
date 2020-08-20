@@ -24,6 +24,7 @@
   "This content is deprecated": "This content is deprecated",
   "Timeline": "Timeline",
   "New text document": "New text document",
+  "You are trying to mention an invalid user": "You are trying to mention an invalid user",
   "You must change the status or restore this document before any change": "You must change the status or restore this document before any change",
   "The content has been modified by {{author}}": "The content has been modified by {{author}}"
 }
