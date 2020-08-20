@@ -12,11 +12,12 @@ from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowe
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import MissingLDAPConnector
+from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.exceptions import UsernameAlreadyExistInDb
+from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
@@ -201,8 +202,16 @@ class TestUserApi(object):
     def test_unit__create_minimal_user__error__already_used_username(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
         api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
-        with pytest.raises(UsernameAlreadyExistInDb):
+        with pytest.raises(UsernameAlreadyExists):
             api.create_minimal_user(username="boby", email="boby2@boba.fet", save_now=True)
+
+    @pytest.mark.parametrize("username", ["all", "tous", "todos"])
+    def test_unit__create_minimal_user__error__reserved_username(
+        self, session, app_config, username: str
+    ):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        with pytest.raises(ReservedUsernameError):
+            api.create_minimal_user(username=username, email="boby@boba.fet", save_now=True)
 
     def test_unit__create_minimal_user__err__too_short_username(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
@@ -250,8 +259,17 @@ class TestUserApi(object):
         api = UserApi(current_user=None, session=session, config=app_config)
         u1 = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
         api.create_minimal_user(username="jean", email="boby2@boba.fet", save_now=True)
-        with pytest.raises(UsernameAlreadyExistInDb):
+        with pytest.raises(UsernameAlreadyExists):
             api.update(user=u1, username="jean")
+
+    @pytest.mark.parametrize("username", ["all", "tous", "todos"])
+    def test_unit__update_user_username__error__reserved_username(
+        self, session, app_config, username: str
+    ):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u1 = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
+        with pytest.raises(ReservedUsernameError):
+            api.update(user=u1, username=username)
 
     # password
     def test_unit__update_user_password__ok__nominal_case(self, session, app_config):

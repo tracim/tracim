@@ -357,7 +357,7 @@ class TestSetEmailEndpoint(object):
         )
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
         # Check After
         res = web_testapp.get("/api/users/me", status=307).follow(status=200)
         res = res.json_body
