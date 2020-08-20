@@ -59,8 +59,7 @@ class LiveMessagesLib(object):
     def publish_message_to_user(self, message: Message):
         channel_name = "user_{}".format(message.receiver_id)
         message_schema = LiveMessageSchema()
-        message_as_dict = message_schema.dump(message).data
-        self.publish_dict(channel_name, message_as_dict=message_as_dict)
+        self.publish_dict(channel_name, message_as_dict=message_schema.as_dict(message))
 
     def publish_dict(self, channel_name: str, message_as_dict: typing.Dict[str, typing.Any]):
         global _grip_pub_control

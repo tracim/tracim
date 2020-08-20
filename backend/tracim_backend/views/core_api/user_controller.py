@@ -628,7 +628,10 @@ class UserController(Controller):
             )  # type: typing.List[Message]
 
             stream_opened_event += "".join(
-                ["data:" + json.dumps(message) + "\n\n" for message in messages]
+                [
+                    "data:" + json.dumps(LiveMessageSchema().as_dict(message)) + "\n\n"
+                    for message in messages
+                ]
             )
 
         escaped_keealive_event = "event: keep-alive\\ndata:\\n\\n"

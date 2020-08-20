@@ -74,10 +74,10 @@ def small_html_document_c(workspace_api_factory, content_api_factory, session) -
     return small_html_document(workspace_api_factory, content_api_factory, session, "C")
 
 
-def put_document(html_document):
+def put_document(doc):
     update_user_request = requests.put(
         "http://localhost:7999/api/workspaces/{}/html-documents/{}/status".format(
-            html_document.workspace_id, html_document.content_id
+            doc.workspace_id, doc.content_id
         ),
         auth=("admin@admin.admin", "admin@admin.admin"),
         json={"status": "closed-validated"},
@@ -266,16 +266,18 @@ class TestLivesMessages(object):
         client_events = client.events()
 
         put_document(small_html_document_a)
+        put_document(small_html_document_b)
 
         # Skip first event which only signals the opening
         next(client_events)
 
         event1 = next(client_events)
+        event2 = next(client_events)
         response.close()
         result1 = json.loads(event1.data)
+        result2 = json.loads(event2.data)
         assert result1["fields"]["content"]["label"] == "Small document A"
-
-        put_document(small_html_document_b)
+        assert result2["fields"]["content"]["label"] == "Small document B"
 
         response = requests.get(
             "http://localhost:7999/api/users/1/live_messages?after_event_id={}".format(
@@ -293,7 +295,7 @@ class TestLivesMessages(object):
 
         put_document(small_html_document_c)
 
-        event3 = next(client_events)
-
         assert json.loads(event2.data)["fields"]["content"]["label"] == "Small document B"
+
+        event3 = next(client_events)
         assert json.loads(event3.data)["fields"]["content"]["label"] == "Small document C"

@@ -89,7 +89,7 @@ class EventApi:
             assert read_status == ReadStatus.ALL
 
         if after_event_id:
-            query = query.filter(Event.event_id > after_event_id)
+            query = query.filter(Message.event_id > after_event_id)
 
         return query.all()
 

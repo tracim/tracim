@@ -1411,6 +1411,9 @@ class LiveMessageSchema(marshmallow.Schema):
         format=DATETIME_FORMAT, description="read date", allow_none=True
     )
 
+    def as_dict(self, message) -> typing.Dict[str, typing.Any]:
+        return self.dump(message).data
+
 
 class GetLiveMessageQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages endpoint."""
