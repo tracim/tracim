@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
+import debounce from 'lodash/debounce'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -43,6 +44,8 @@ import {
   FETCH_CONFIG
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
+
+const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export class Account extends React.Component {
   constructor (props) {
@@ -105,6 +108,10 @@ export class Account extends React.Component {
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
       this.setHeadTitle()
     }
+  }
+
+  componentWillUnmount () {
+    this.handleChangeUsername.cancel()
   }
 
   loadAgendaUrl = async () => {
@@ -239,8 +246,11 @@ export class Account extends React.Component {
     }
   }
 
-  handleChangeUsername = async (newUsername) => {
-    if (!newUsername) return
+  changeUsername = async (newUsername) => {
+    if (!newUsername) {
+      this.setState({ isUsernameValid: true, usernameInvalidMsg: '' })
+      return
+    }
 
     const { props } = this
     try {
@@ -249,6 +259,8 @@ export class Account extends React.Component {
       props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
   }
+
+  handleChangeUsername = debounce(this.changeUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
     const { props } = this

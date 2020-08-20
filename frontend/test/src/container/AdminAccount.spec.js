@@ -242,7 +242,7 @@ describe('In <Account /> at AdminAccount.jsx', () => {
       })
     })
 
-    describe('handleChangeUsername', () => {
+    describe('changeUsername', () => {
       afterEach(() => {
         adminAccountWrapper.setState({
           userToEdit: {
@@ -251,15 +251,13 @@ describe('In <Account /> at AdminAccount.jsx', () => {
           }
         })
       })
-      it("should set isUsernameValid state to false if username isn't long enough", (done) => {
-        adminAccountInstance.handleChangeUsername('A').then(() => {
-          expect(adminAccountWrapper.state().userToEdit.isUsernameValid).to.equal(false)
-        }).then(done, done)
+      it("should set isUsernameValid state to false if username isn't long enough", async () => {
+        await adminAccountInstance.changeUsername('A')
+        expect(adminAccountWrapper.state('userToEdit').isUsernameValid).to.equal(false)
       })
-      it("should set isUsernameValid state to false if username has a '@' in it", (done) => {
-        adminAccountInstance.handleChangeUsername('@newUsername').then(() => {
-          expect(adminAccountWrapper.state().userToEdit.isUsernameValid).to.equal(false)
-        }).then(done, done)
+      it("should set isUsernameValid state to false if username has a '@' in it", async () => {
+        await adminAccountInstance.changeUsername('@newUsername')
+        expect(adminAccountWrapper.state('userToEdit').isUsernameValid).to.equal(false)
       })
     })
 

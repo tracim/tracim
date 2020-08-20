@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link, withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
+import debounce from 'lodash/debounce'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -48,6 +49,8 @@ import {
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 import { serializeMember } from '../reducer/currentWorkspace.js'
+
+const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export class Account extends React.Component {
   constructor (props) {
@@ -147,6 +150,10 @@ export class Account extends React.Component {
     this.getUserWorkspaceList()
     if (this.props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
     this.buildBreadcrumbs()
+  }
+
+  componentWillUnmount () {
+    this.handleChangeUsername.cancel()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -346,9 +353,17 @@ export class Account extends React.Component {
     return false
   }
 
-  handleChangeUsername = async (newUsername) => {
-    if (!newUsername) return
-
+  changeUsername = async (newUsername) => {
+    if (!newUsername) {
+      this.setState(prev => ({
+        userToEdit: {
+          ...prev.userToEdit,
+          isUsernameValid: true,
+          usernameInvalidMsg: ''
+        }
+      }))
+      return
+    }
     const { props } = this
     try {
       const usernameValidity = await checkUsernameValidity(FETCH_CONFIG.apiUrl, newUsername, props)
@@ -362,6 +377,8 @@ export class Account extends React.Component {
       props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
   }
+
+  handleChangeUsername = debounce(this.changeUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
     const { props, state } = this

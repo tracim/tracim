@@ -48,7 +48,7 @@ describe('<Home />', () => {
   })
 
   describe('its internal functions', () => {
-    describe('handleChangeNewUsername', () => {
+    describe('changeNewUsername', () => {
       afterEach(() => {
         wrapper.instance().setState({
           isUsernameValid: true
@@ -56,27 +56,27 @@ describe('<Home />', () => {
       })
 
       it('should have the isUsernameValid state as true if username is not set yet', async () => {
-        await wrapper.instance().handleChangeNewUsername({ target: { value: '' } })
+        await wrapper.instance().changeNewUsername({ target: { value: '' } })
         expect(wrapper.state('isUsernameValid')).to.equal(true)
       })
 
       it('should have the isUsernameValid state as false if username is shorter than MINIMUM_CHARACTERS_USERNAME', async () => {
-        await wrapper.instance().handleChangeNewUsername({ target: { value: 'aa' } })
+        await wrapper.instance().changeNewUsername({ target: { value: 'aa' } })
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
       it('should have the isUsernameValid state as false if username has a space', async () => {
-        await wrapper.instance().handleChangeNewUsername({ target: { value: 'user name' } })
+        await wrapper.instance().changeNewUsername({ target: { value: 'user name' } })
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
       it('should have the isUsernameValid state as false if username has a not allowed character', async () => {
-        await wrapper.instance().handleChangeNewUsername({ target: { value: 'usern@me!' } })
+        await wrapper.instance().changeNewUsername({ target: { value: 'usern@me!' } })
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
       it('should have the isUsernameValid state as false if username start with @', async () => {
-        await wrapper.instance().handleChangeNewUsername({ target: { value: '@username' } })
+        await wrapper.instance().changeNewUsername({ target: { value: '@username' } })
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
     })

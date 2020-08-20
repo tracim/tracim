@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import debounce from 'lodash/debounce'
 import * as Cookies from 'js-cookie'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
@@ -28,6 +29,8 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import HomeNoWorkspace from '../component/Home/HomeNoWorkspace.jsx'
 import HomeHasWorkspace from '../component/Home/HomeHasWorkspace.jsx'
+
+const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export class Home extends React.Component {
   constructor (props) {
@@ -66,6 +69,10 @@ export class Home extends React.Component {
   componentDidMount () {
     this.checkUsername()
     this.setHeadTitle()
+  }
+
+  componentWillUnmount () {
+    this.checkUsernameValidity.cancel()
   }
 
   setHeadTitle = () => {
@@ -135,18 +142,24 @@ export class Home extends React.Component {
     this.setState(prevState => ({ hidePopupCheckbox: !prevState.hidePopupCheckbox }))
   }
 
-  handleChangeNewUsername = async e => {
-    const { props } = this
-    this.setState({ newUsername: e.target.value })
+  handleChangeNewUsername = async (e) => {
     const username = e.target.value
+    this.setState({ newUsername: username })
+    this.checkUsernameValidity(username)
+  }
 
-    if (!username) return
+  checkUsernameValidity = debounce(async (username) => {
+    if (!username) {
+      this.setState({ isUsernameValid: true, usernameInvalidMsg: '' })
+      return
+    }
+    const { props } = this
     try {
-      this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, username, props))
+      this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, this.state.newUsername, props))
     } catch (errorWhileChecking) {
       props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
-  }
+  }, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   handleChangePassword = e => this.setState({ password: e.target.value })
 
