@@ -172,7 +172,7 @@ describe('LiveMessageManager class', () => {
       expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.OPENED)
 
       expect(manager.eventSource.url).to.be.equal(
-         `${apiUrl}/users/${userId}/live_messages?after_event_id=42`
+         `${apiUrl}/users/${userId}/live_messages?after_event_id=1337`
       )
 
       manager.closeLiveMessageConnection()
