@@ -12,7 +12,6 @@ import {
   buildHeadTitle,
   CUSTOM_EVENT,
   displayDistanceDate,
-  EXCEPTION_MENTION_PARSING,
   generateLocalStorageContentId,
   getCurrentContentVersionNumber,
   getOrCreateSessionClientToken,
@@ -415,11 +414,7 @@ export class HtmlDocument extends React.Component {
     try {
       newDocumentForApiWithMention = wrapMentionsInSpanTags(state.content.raw_content)
     } catch (e) {
-      if (e === EXCEPTION_MENTION_PARSING) {
-        this.sendGlobalFlashMessage(props.t('Error while detecting the mentions'))
-      } else {
-        this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
-      }
+      this.sendGlobalFlashMessage(e.message ? e.message : props.t('Error while saving the new version'))
       return
     }
 
@@ -473,11 +468,7 @@ export class HtmlDocument extends React.Component {
     try {
       props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
     } catch (e) {
-      if (e === EXCEPTION_MENTION_PARSING) {
-        this.sendGlobalFlashMessage(props.t('Error while detecting the mentions'))
-      } else {
-        this.sendGlobalFlashMessage(props.t('Error while saving the comment'))
-      }
+      this.sendGlobalFlashMessage(e.message ? e.message : props.t('Error while saving the comment'))
     }
   }
 

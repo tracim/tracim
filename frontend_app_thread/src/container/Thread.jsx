@@ -5,7 +5,6 @@ import { debug } from '../debug.js'
 import {
   appContentFactory,
   addAllResourceI18n,
-  EXCEPTION_MENTION_PARSING,
   handleFetchResult,
   PopinFixed,
   PopinFixedHeader,
@@ -289,11 +288,7 @@ export class Thread extends React.Component {
     try {
       props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
     } catch (e) {
-      if (e === EXCEPTION_MENTION_PARSING) {
-        this.sendGlobalFlashMessage(props.t('Error while detecting the mentions'))
-      } else {
-        this.sendGlobalFlashMessage(props.t('Error while saving the comment'))
-      }
+      this.sendGlobalFlashMessage(e.message ? e.message : props.t('Error while saving the comment'))
     }
   }
 

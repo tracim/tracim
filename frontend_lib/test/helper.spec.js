@@ -15,7 +15,6 @@ import {
   addRevisionFromTLM,
   wrapMentionsInSpanTags
 } from '../src/helper.js'
-import { EXCEPTION_MENTION_PARSING } from '../src/exceptions.js'
 
 import sinon from 'sinon'
 
@@ -375,8 +374,12 @@ describe('helper.js', () => {
     })
 
     describe('if the source is NULL', () => {
-      it('should throw an EXCEPTION_MENTION_PARSING exception', () => {
-        expect(() => wrapMentionsInSpanTags(null)).to.throw(EXCEPTION_MENTION_PARSING)
+      it('should throw an error exception', () => {
+        try {
+          wrapMentionsInSpanTags(null)
+        } catch (e) {
+          expect(typeof e).to.equal('Error')
+        }
       })
     })
   })

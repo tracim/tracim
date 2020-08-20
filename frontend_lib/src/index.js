@@ -48,8 +48,6 @@ import { appContentFactory } from './appContentFactory.js'
 
 import { defaultDebug } from './debug.js'
 
-import { EXCEPTION_MENTION_PARSING } from './exceptions.js'
-
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
@@ -124,7 +122,6 @@ export {
   addAllResourceI18n,
   handleFetchResult,
   displayDistanceDate,
-  EXCEPTION_MENTION_PARSING,
   convertBackslashNToBr,
   revisionTypeList,
   generateLocalStorageContentId,

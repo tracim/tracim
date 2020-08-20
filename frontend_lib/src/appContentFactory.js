@@ -149,7 +149,7 @@ export function appContentFactory (WrappedComponent) {
       try {
         newCommentForApiWithMention = wrapMentionsInSpanTags(newCommentForApi)
       } catch (e) {
-        return new Promise((resolve, reject) => reject(e))
+        return Promise.reject(e)
       }
 
       const response = await handleFetchResult(

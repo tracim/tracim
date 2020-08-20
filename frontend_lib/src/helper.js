@@ -4,7 +4,6 @@ import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
-import { EXCEPTION_MENTION_PARSING } from './exceptions.js'
 
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
@@ -396,7 +395,6 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
 }
 
-// WIP
 export const wrapMentionsInSpanTags = (text) => {
   try {
     const mentionRegex = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
@@ -404,63 +402,55 @@ export const wrapMentionsInSpanTags = (text) => {
     const parser = new DOMParser()
     const parsedText = parser.parseFromString(text, 'text/html')
 
-    const depthFirstSearchAndMentionAnalysis = node => {
-      node.forEach(childNode => {
-        if(childNode.nodeName === '#text' && childNode.textContent.includes('@')) {
-          const mentionsInThisChild = childNode.textContent.split(/\s/).filter(token => mentionRegex.test(token))
-          console.log(mentionsInThisChild)
-        } else if (!(childNode.nodeName === 'SPAN' && childNode.className === 'mention')) {
-          if(childNode.childNodes.length > 0) depthFirstSearchAndMentionAnalysis(childNode.childNodes)
+    const depthFirstSearchAndMentionAnalysis = childNodesList => {
+      let childNodesListCopy = [...childNodesList]
+      let i = 0
+
+      childNodesListCopy.forEach((node) => {
+        let value = node.nodeValue
+
+        if(node.nodeName === '#text' && value.includes('@')) {
+          const mentionsInThisNode = value.split(/\s/).filter(token => mentionRegex.test(token))
+
+          if (mentionsInThisNode.length > 0) {
+            let mentionIndex = 0
+            let lastMentionIndex = 0
+            let fragment = document.createDocumentFragment()
+
+            mentionsInThisNode.forEach((mention, i) => {
+              mentionIndex = value.indexOf(mention, lastMentionIndex)
+
+              let mentionWithSpan = document.createElement('span')
+              mentionWithSpan.className = 'mention'
+              mentionWithSpan.id = `mention-${uuidv4()}`
+              mentionWithSpan.textContent = mention
+
+              mentionIndex === 0
+                ? fragment.appendChild(document.createTextNode(''))
+                : fragment.appendChild(document.createTextNode(value.substring(lastMentionIndex, mentionIndex)))
+
+              fragment.appendChild(mentionWithSpan)
+
+              mentionsInThisNode.length - 1 === i
+                ? fragment.appendChild(document.createTextNode(value.substring(mentionIndex + mention.length)))
+                : fragment.appendChild(document.createTextNode(''))
+
+              lastMentionIndex = mentionIndex + mention.length - 1
+            })
+            childNodesList[i].replaceWith(fragment)
+            i = i + 3 * mentionsInThisNode.length
+          } else i++
+        } else {
+          if (!(node.nodeName === 'SPAN' && node.className === 'mention') && node.childNodes.length > 0) depthFirstSearchAndMentionAnalysis(node.childNodes)
+          i++
         }
       })
     }
 
     depthFirstSearchAndMentionAnalysis(parsedText.body.childNodes)
-    console.dir(parsedText)
-
-    const textArray = text.split('&nbsp;').join(' ').split(' ')
-
-    const wrappedTextArray = textArray.map(subString => {
-      if (subString.includes('@')) {
-        const indexOfAt = subString.indexOf('@')
-
-        if (indexOfAt === 0 && !subString.includes('<'))
-          return isMentionValid(subString)
-            ? `<span class='mention' id='mention-${uuidv4()}'>${subString}</span> `
-            : subString
-
-        if ((subString.charAt(indexOfAt - 1) === '>'
-          || indexOfAt === 0)
-          && !subString.substring(indexOfAt).includes('.')
-        ) {
-          const htmlTagBegin = subString.substring(0, indexOfAt)
-
-          if(!htmlTagBegin.includes('mention')) {
-            if(subString.substring(indexOfAt).includes('<')) {
-              const htmlTagEnd = subString.substring(subString.indexOf('<', indexOfAt))
-              const internalString = subString.substring(indexOfAt, subString.indexOf('<', indexOfAt))
-
-              return isMentionValid(internalString)
-                ? `${htmlTagBegin}<span class='mention' id='mention-${uuidv4()}'>${internalString}</span>${htmlTagEnd} `
-                : subString
-            } else {
-              const internalString = subString.substring(indexOfAt)
-
-              return isMentionValid(internalString)
-                ? `${htmlTagBegin}<span class='mention' id='mention-${uuidv4()}'>${internalString}</span> `
-                : subString
-            }
-          }
-        }
-      }
-      return subString
-    })
-
-    return wrappedTextArray.join(' ')
+    return parsedText.body.innerHTML
   } catch (e) {
     console.error('Error while parsing mention', e)
-    throw EXCEPTION_MENTION_PARSING
+    throw new Error(i18n.t('Error while detecting the mentions'))
   }
 }
-
-const isMentionValid = mention => !(mention === '@' || hasNotAllowedCharacters(removeAtInUsername(mention)))

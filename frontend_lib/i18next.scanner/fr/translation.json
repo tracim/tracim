@@ -37,6 +37,7 @@
   "Error while archiving content": "Erreur lors de l'archivage d'un contenu",
   "Error while changing status": "Erreur lors d'un changement de statut",
   "Error while deleting content": "Erreur lors de la suppression d'un contenu",
+  "Error while detecting the mentions": "Erreur lors de la détection des mentions",
   "Error while restoring content": "Erreur lors de la restauration du contenu",
   "Error while saving the comment": "Erreur lors de l'enregistrement du commentaire",
   "Error while saving the title": "Erreur lors de l'enregistrement du nouveau titre",
