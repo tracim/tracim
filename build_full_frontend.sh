@@ -43,9 +43,10 @@ cd "$DEFAULTDIR/frontend_vendors"
 # even if -d was passed to this script, since it produce a huge file that is slow to load in the browser.
 # If you ever need to debug something in the vendors, go to the frontend_vendors directory and run ./build_vendors.sh -d
 
-# Tracim Lib Bundle
+# Tracim Lib for unit tests
+# NOTE - RJ - 2020-08-20 - the absence of $dev is intentional
 log "Building tracim_frontend_lib"
-yarn workspace tracim_frontend_lib run build$dev && loggood "success" || logerror "Could not build tracim_frontend_lib"
+yarn workspace tracim_frontend_lib run build && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
 # Tracim Lib for the browsers
 log "Building tracim_frontend_lib for Tracim"
