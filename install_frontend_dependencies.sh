@@ -125,9 +125,14 @@ yarn_expected_version() {
     # RJ - 2020-06-12 - NOTE: Yarn 2.0.0-rc.33 and earlier had issues related
     # to rewritting the checksums of the whole yarn.lock by prefixing them
     # with 2/ or 3/. We could not find anything about this issue on the web.
-    case "$1" in 2.*)
-        [ "$(printf "$1" | awk -F'rc.' '{print $2}')" -ge "$min_yarn2_rc_version" ];
-        return $?;;
+    case "$1" in
+        2.0.*)
+            [ "$(printf "$1" | awk -F'rc.' '{print $2}')" -ge "$min_yarn2_rc_version" ];
+            return $?
+        ;;
+        2.*)
+            return 0
+        ;;
     esac
     return 1
 }

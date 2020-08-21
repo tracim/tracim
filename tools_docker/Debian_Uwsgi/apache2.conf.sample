@@ -21,25 +21,35 @@
         </IfModule>
     </Directory>
 
-    <Directory "/">
-        Require all granted
-        Dav On
-    </Directory>
+    # This directive is needed for macOS webdav usage (at least)
+    # If we want to remove it we have to address this issue
+    # https://github.com/tracim/tracim/issues/3320
     SetEnv proxy-sendcl
-    ProxyPreserveHost On
 
-    #ProxyPass /webdav http://127.0.0.1:3030/webdav
-    #ProxyPassReverse /webdav http://127.0.0.1:3030/webdav
+    # Proxying Webdav
+    <Location /webdav>
+        # Setting Destination header from https to http in proxy
+        # is needed for working move/copy in webdav
+        RequestHeader edit Destination ^https http early
+        # Preserving host is needed for working move/copy in webdav
+        ProxyPreserveHost On
+        #ProxyPass http://127.0.0.1:3030/webdav
+        #ProxyPassReverse http://127.0.0.1:3030/webdav
+    </Location>
 
+    # Proxying Caldav
     #ProxyPass /agenda http://127.0.0.1:8080/agenda
     #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda
 
+    # Proxying Frontend
     ProxyPass /ui http://127.0.0.1:8080/ui
     ProxyPassReverse /ui http://127.0.0.1:8080/ui
 
+    # Proxying Tracim Live Message to Pushpin
     ProxyPassMatch /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
     ProxyPassReverse /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
 
+    # Proxying Backend API
     ProxyPass /api http://127.0.0.1:8080/api
     ProxyPassReverse /api http://127.0.0.1:8080/api
 

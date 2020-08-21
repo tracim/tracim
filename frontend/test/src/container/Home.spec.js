@@ -48,6 +48,12 @@ describe('<Home />', () => {
 
   describe('its internal functions', () => {
     describe('handleChangeNewUsername', () => {
+      afterEach(() => {
+        wrapper.instance().setState({
+          isUsernameValid: true
+        })
+      })
+
       it('should have the isUsernameValid state as true if username is not set yet', () => {
         wrapper.instance().handleChangeNewUsername({ target: { value: '' } })
         expect(wrapper.state('isUsernameValid')).to.equal(true)
@@ -65,6 +71,11 @@ describe('<Home />', () => {
 
       it('should have the isUsernameValid state as false if username has a not allowed character', () => {
         wrapper.instance().handleChangeNewUsername({ target: { value: 'usern@me!' } })
+        expect(wrapper.state('isUsernameValid')).to.equal(false)
+      })
+
+      it('should have the isUsernameValid state as false if username start with @', () => {
+        wrapper.instance().handleChangeNewUsername({ target: { value: '@username' } })
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
     })

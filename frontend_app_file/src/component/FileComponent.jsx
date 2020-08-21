@@ -7,8 +7,7 @@ import PopupProgressUpload from './PopupProgressUpload.jsx'
 import {
   APP_FEATURE_MODE,
   DisplayState,
-  FileDropzone,
-  RefreshWarningMessage
+  FileDropzone
 } from 'tracim_frontend_lib'
 
 const color = require('color')
@@ -50,8 +49,7 @@ export class FileComponent extends React.Component {
           <br />
           ${this.props.t('In that case, you can download the video and try opening it manually.')}
           <br />
-          ${this.props.t('To download the video, click on download button.')}
-          <i class='fa fa-download'></i>
+          ${this.props.t('To download the video, leave the fullscreen mode and click on download button {{icon}}.', { icon: '<i class="fa fa-download"></i>', interpolation: { escapeValue: false } })}
         </div>
       `
       videoWrapper.appendChild(warningMsg)
@@ -101,13 +99,6 @@ export class FileComponent extends React.Component {
           <DisplayState
             msg={props.t('This content is deprecated')}
             icon={props.deprecatedStatus.faIcon}
-          />
-        )}
-
-        {props.hasUpdated && (
-          <RefreshWarningMessage
-            warningText={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
-            onClickRefresh={props.onClickRefresh}
           />
         )}
 

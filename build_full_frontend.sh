@@ -37,7 +37,8 @@ logerror() {
 }
 
 build_tracim_lib() {
-    yarn workspace tracim_frontend_lib run build$dev && loggood "Built tracim_frontend_lib for unit tests" || logerror "Could not build tracim_frontend_lib"
+    # NOTE - RJ - 2020-08-20 - the absence of $dev is intentional
+    yarn workspace tracim_frontend_lib run build && loggood "Built tracim_frontend_lib for unit tests" || logerror "Could not build tracim_frontend_lib"
 }
 
 build_frontend() {

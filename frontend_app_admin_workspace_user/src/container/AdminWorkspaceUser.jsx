@@ -13,7 +13,6 @@ import {
   buildHeadTitle,
   hasNotAllowedCharacters,
   hasSpaces,
-  removeAtInUsername,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent
@@ -21,6 +20,7 @@ import {
 import {
   ALLOWED_CHARACTERS_USERNAME,
   debug,
+  MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   MINIMUM_CHARACTERS_USERNAME
 } from '../helper.js'
@@ -452,7 +452,11 @@ export class AdminWorkspaceUser extends React.Component {
         return true
       case 400:
         switch (newUserResult.body.code) {
-          case 2001: this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning'); break
+          case 2001:
+            if (newUserResult.body.details.email) this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning')
+            if (newUserResult.body.details.username) this.sendGlobalFlashMsg(props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }))
+            else this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
+            break
           case 2062:
             this.sendGlobalFlashMsg(
               props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -561,17 +565,23 @@ export class AdminWorkspaceUser extends React.Component {
   handleChangeUsername = async (newUsername) => {
     const { props, state } = this
 
-    const username = removeAtInUsername(newUsername)
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
       this.setState({
         isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
       })
       return
     }
 
-    if (hasSpaces(username)) {
+    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
+      this.setState({
+        isUsernameValid: false,
+        usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
+      })
+      return
+    }
+
+    if (hasSpaces(newUsername)) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t("Username can't contain any whitespace")
@@ -579,7 +589,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    if (hasNotAllowedCharacters(username)) {
+    if (hasNotAllowedCharacters(newUsername)) {
       this.setState({
         isUsernameValid: false,
         usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -587,7 +597,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, username))
+    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, newUsername))
 
     switch (fetchUsernameAvailability.apiResponse.status) {
       case 200:
@@ -673,4 +683,4 @@ export class AdminWorkspaceUser extends React.Component {
   }
 }
 
-export default translate()(Radium(TracimComponent(AdminWorkspaceUser)))
+export default translate()(TracimComponent(Radium(AdminWorkspaceUser)))

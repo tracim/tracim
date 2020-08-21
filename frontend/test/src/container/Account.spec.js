@@ -89,7 +89,8 @@ describe('In <Account />', () => {
   const AccountWithHOC2 = () => <Provider store={store}><AccountWithHOC1 {...props} /></Provider>
 
   const wrapper = mount(<AccountWithHOC2 {...props} />)
-  const accountInstance = wrapper.find(AccountWithoutHOC).instance()
+  const accountWrapper = wrapper.find(AccountWithoutHOC)
+  const accountInstance = accountWrapper.instance()
 
   describe('its internal function', () => {
     const invalidPassword = '0'
@@ -161,6 +162,24 @@ describe('In <Account />', () => {
       it('should call setBreadcrumbsCallBack', () => {
         accountInstance.buildBreadcrumbs()
         expect(setBreadcrumbsCallBack.called).to.equal(true)
+      })
+    })
+
+    describe('handleChangeUsername', () => {
+      afterEach(() => {
+        accountWrapper.setState({
+          isUsernameValid: true
+        })
+      })
+      it("should set isUsernameValid state to false if username isn't long enough", (done) => {
+        accountInstance.handleChangeUsername('A').then(() => {
+          expect(accountWrapper.state().isUsernameValid).to.equal(false)
+        }).then(done, done)
+      })
+      it("should set isUsernameValid state to false if username has a '@' in it", (done) => {
+        accountInstance.handleChangeUsername('@newUsername').then(() => {
+          expect(accountWrapper.state().isUsernameValid).to.equal(false)
+        }).then(done, done)
       })
     })
   })

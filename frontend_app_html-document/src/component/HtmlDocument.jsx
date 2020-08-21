@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import {
   APP_FEATURE_MODE,
   DisplayState,
-  RefreshWarningMessage,
   TextAreaApp
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
@@ -35,13 +34,6 @@ export const HtmlDocument = props => {
         <DisplayState
           msg={props.t('This content is deprecated')}
           icon={props.deprecatedStatus.faIcon}
-        />
-      )}
-
-      {props.hasUpdated && (
-        <RefreshWarningMessage
-          warningText={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
-          onClickRefresh={props.onClickRefresh}
         />
       )}
 

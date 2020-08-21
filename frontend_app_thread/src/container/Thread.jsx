@@ -59,7 +59,7 @@ export class Thread extends React.Component {
         props.t('threads'),
         props.t('Start a topic')
       ],
-      hasUpdated: false,
+      showRefreshWarning: false,
       editionAuthor: '',
       isLastTimelineItemCurrentToken: false
     }
@@ -78,10 +78,11 @@ export class Thread extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
 
@@ -115,14 +116,15 @@ export class Thread extends React.Component {
     this.loadTimeline()
   }
 
-  handleContentModified = data => {
+  handleContentChanged = data => {
     if (data.content.content_id !== this.state.content.content_id) return
 
+    const clientToken = this.state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
-      content: prev.loggedUser.userId === data.author.user_id ? { ...prev.content, ...data.content } : prev.content,
+      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
       newContent: { ...prev.content, ...data.content },
       editionAuthor: data.author.public_name,
-      hasUpdated: prev.loggedUser.userId !== data.author.user_id,
+      showRefreshWarning: clientToken !== data.client_token,
       timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
       isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
     }))
@@ -149,24 +151,13 @@ export class Thread extends React.Component {
     })
   }
 
-  handleContentDeleted = data => {
-    if (data.content.content_id !== this.state.content.content_id) return
+  handleUserModified = data => {
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.user.user_id
+      ? { ...timelineItem, author: data.user }
+      : timelineItem
+    )
 
-    this.setState(prev => ({
-      content: { ...prev.content, ...data.content, is_deleted: true },
-      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
-    }))
-  }
-
-  handleContentUndeleted = data => {
-    if (data.content.content_id !== this.state.content.content_id) return
-
-    this.setState(prev => ({
-      content: { ...prev.content, ...data.content, is_deleted: false },
-      timeline: addRevisionFromTLM(data, prev.timeline, this.state.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.client_token === this.sessionClientToken
-    }))
+    this.setState({ timeline: newTimeline })
   }
 
   async componentDidMount () {
@@ -325,7 +316,7 @@ export class Thread extends React.Component {
         ...prev.content,
         ...prev.newContent
       },
-      hasUpdated: false
+      showRefreshWarning: false
     }))
   }
 
@@ -354,9 +345,9 @@ export class Thread extends React.Component {
           i18n={i18n}
         >
           <div className='justify-content-end'>
-            {state.hasUpdated && (
+            {state.showRefreshWarning && (
               <RefreshWarningMessage
-                warningText={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
                 onClickRefresh={this.handleClickRefresh}
               />
             )}

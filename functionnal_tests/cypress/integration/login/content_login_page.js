@@ -30,11 +30,11 @@ describe('Login page', function () {
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=email]')
+      .find('input[type=text]')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('input[type=email]')
+      .find('input[type=text]')
       .should('have.attr', 'placeholder')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
@@ -56,6 +56,12 @@ describe('Login page', function () {
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
       .find('.loginpage__card__form__pwforgot')
       .should('be.visible')
+  })
+
+  it('should not display connection error message', () => {
+    cy.wait(5000)
+    cy.get('connection_error')
+    .should('not.exist')
   })
 })
 // @philippe 08/08/2018 - Not implemented in Tracim_V2.0

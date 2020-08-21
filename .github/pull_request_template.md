@@ -2,21 +2,21 @@
 
 ## Checkpoints
 
-The goal of this section is to help code reviewers and the merge request author to do the required checks on this pull request. Please don't edit this list.
-If one or more of these checkpoints are out of scope, please write below why they are.
+These points must be checked before merging. Please don't edit them out.
+
+**For developers**
+
+- [ ] If relevant, manual tests have been done to ensure the stability of the whole application and that the involved feature works
+- [ ] The original issue is up to date w.r.t the latest discussions and contains a short summary of the implemented solution
+- [ ] Automated tests covering the feature or the fix, have been written, deemed irrelevant (give the reason), or an issue has been created to implement the test (give the link)
+
 
 **For code reviewers**
 
 - [ ] The code is clear enough
-- [ ] If there are FIXMEs in the code, then there are associated issues and issue is referenced in the FIXME
+- [ ] If there are FIXMEs in the code, related issues are mentioned in the FIXME
 - [ ] If there are TODOs, NOTEs or HACKs in code, the date and the developer initials are present
-- [ ] Automated tests have been written (covering the feature or non regression), or *at least* an issue has been created to implement the test
 
-**For developers**
+**For testers**
 
-- [ ] Manual tests done to ensure stability on whole application layers, issue expectation follow
-- [ ] The original issue has been updated with a short summary of the implemented solution
-
-**For the quality team**
-
-- [ ] Tested by the quality team
+- [ ] Manual, quality tests have been done

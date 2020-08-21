@@ -1,5 +1,6 @@
 import { PROFILE } from 'tracim_frontend_lib'
 
+export const MAXIMUM_CHARACTERS_USERNAME = 255
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
 export const MINIMUM_CHARACTERS_USERNAME = 3
 export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'

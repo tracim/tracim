@@ -65,6 +65,7 @@ export class Dashboard extends React.Component {
         id: '',
         avatarUrl: '',
         personalData: '',
+        publicName: '',
         role: '',
         isEmail: false
       },
@@ -123,6 +124,7 @@ export class Dashboard extends React.Component {
         id: '',
         avatarUrl: '',
         personalData: '',
+        publicName: '',
         role: '',
         isEmail: false
       }
@@ -274,9 +276,9 @@ export class Dashboard extends React.Component {
     }
   }
 
-  handleSearchUser = async userNameToSearch => {
+  handleSearchUser = async personalDataToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(userNameToSearch, props.curWs.id))
+    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(personalDataToSearch, props.curWs.id))
     switch (fetchUserKnownMemberList.status) {
       case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.json }); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
@@ -290,13 +292,16 @@ export class Dashboard extends React.Component {
       newMember: {
         ...prev.newMember,
         personalData: newPersonalData,
+        publicName: newPersonalData,
         isEmail: this.isEmail(newPersonalData)
       },
       autoCompleteClicked: false
     }))
 
-    if (removeAtInUsername(newPersonalData).length >= 2) {
-      await this.handleSearchUser(removeAtInUsername(newPersonalData))
+    const personalData = removeAtInUsername(newPersonalData)
+
+    if (personalData.length >= 2) {
+      await this.handleSearchUser(personalData)
       this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
@@ -306,6 +311,7 @@ export class Dashboard extends React.Component {
       newMember: {
         ...prev.newMember,
         id: knownMember.user_id,
+        publicName: knownMember.public_name,
         personalData: knownMember.username,
         avatarUrl: knownMember.avatar_url,
         isEmail: false
@@ -353,6 +359,7 @@ export class Dashboard extends React.Component {
         id: '',
         avatarUrl: '',
         personalData: '',
+        publicName: '',
         role: '',
         isEmail: false
       },
@@ -600,7 +607,7 @@ export class Dashboard extends React.Component {
                   roleList={ROLE_LIST}
                   searchedKnownMemberList={state.searchedKnownMemberList}
                   autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                  personalData={state.newMember.personalData}
+                  publicName={state.newMember.publicName}
                   isEmail={state.newMember.isEmail}
                   onChangePersonalData={this.handleChangePersonalData}
                   onClickKnownMember={this.handleClickKnownMember}
