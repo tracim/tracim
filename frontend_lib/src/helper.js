@@ -416,6 +416,7 @@ export const wrapMentionsInSpanTags = (text) => {
             let mentionIndex = 0
             let lastMentionIndex = 0
             let fragment = document.createDocumentFragment()
+            let htmlTagCounter = 0
 
             mentionsInThisNode.forEach((mention, i) => {
               mentionIndex = value.indexOf(mention, lastMentionIndex)
@@ -425,23 +426,26 @@ export const wrapMentionsInSpanTags = (text) => {
               mentionWithSpan.id = `mention-${uuidv4()}`
               mentionWithSpan.textContent = mention
 
-              mentionIndex === 0
-                ? fragment.appendChild(document.createTextNode(''))
-                : fragment.appendChild(document.createTextNode(value.substring(lastMentionIndex, mentionIndex)))
+              if (mentionIndex !== 0) {
+                htmlTagCounter++
+                fragment.appendChild(document.createTextNode(value.substring(lastMentionIndex, mentionIndex)))
+              }
 
               fragment.appendChild(mentionWithSpan)
+              htmlTagCounter++
 
-              mentionsInThisNode.length - 1 === i
-                ? fragment.appendChild(document.createTextNode(value.substring(mentionIndex + mention.length)))
-                : fragment.appendChild(document.createTextNode(''))
+              if (mentionsInThisNode.length - 1 === i) {
+                htmlTagCounter++
+                fragment.appendChild(document.createTextNode(value.substring(mentionIndex + mention.length)))
+              }
 
               lastMentionIndex = mentionIndex + mention.length - 1
             })
             childNodesList[i].replaceWith(fragment)
-            i = i + 3 * mentionsInThisNode.length
+            i = i + htmlTagCounter
           } else i++
         } else {
-          if (!(node.nodeName === 'SPAN' && node.className === 'mention') && node.childNodes.length > 0) depthFirstSearchAndMentionAnalysis(node.childNodes)
+          if (!(node.nodeName.toLowerCase() === 'span' && node.className === 'mention')) depthFirstSearchAndMentionAnalysis(node.childNodes)
           i++
         }
       })

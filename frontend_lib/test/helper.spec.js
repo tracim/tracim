@@ -348,7 +348,7 @@ describe('helper.js', () => {
         const parsedResult = DOMParser.parseFromString(result, 'text/html')
         const addedSpanList = parsedResult.getElementsByTagName('span')
 
-        it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(3))
+        it('should only have 3 span tags', () => expect(addedSpanList).to.have.lengthOf(3))
         it('should contain the username in the span tag', () => {
           expect(addedSpanList[0].textContent).to.equal('@user1')
           expect(addedSpanList[1].textContent).to.equal('@admin')
@@ -378,7 +378,7 @@ describe('helper.js', () => {
         try {
           wrapMentionsInSpanTags(null)
         } catch (e) {
-          expect(typeof e).to.equal('Error')
+          expect(e instanceof Error).should.equal(true)
         }
       })
     })

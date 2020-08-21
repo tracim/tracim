@@ -88,7 +88,7 @@ import { uniqueId } from 'lodash'
           $editor.selection.select($editor.getBody(), true)
           $editor.selection.collapse(false)
 
-          $editor.dom.remove($editor.select(`p#${id}`))
+          $editor.dom.remove($editor.dom.select(`p#${id}`))
 
           const event = new globalThis.CustomEvent('tinymceLoaded', { detail: {}, editor: this })
           document.dispatchEvent(event)

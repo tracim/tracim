@@ -414,7 +414,7 @@ export class HtmlDocument extends React.Component {
     try {
       newDocumentForApiWithMention = wrapMentionsInSpanTags(state.content.raw_content)
     } catch (e) {
-      this.sendGlobalFlashMessage(e.message ? e.message : props.t('Error while saving the new version'))
+      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
       return
     }
 
@@ -438,6 +438,7 @@ export class HtmlDocument extends React.Component {
         switch (fetchResultSaveHtmlDoc.body.code) {
           case 1001:
             this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
+            break
           case 2044:
             this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
             break
