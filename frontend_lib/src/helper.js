@@ -396,6 +396,7 @@ export const getCurrentContentVersionNumber = async (appFeatureMode, content, ti
 export const MINIMUM_CHARACTERS_USERNAME = 3
 export const MAXIMUM_CHARACTERS_USERNAME = 255
 export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
+export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 // Check that the given username is valid.
 // Return an object:

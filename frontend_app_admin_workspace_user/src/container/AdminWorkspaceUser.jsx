@@ -19,6 +19,7 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 } from 'tracim_frontend_lib'
 import {
   debug,
@@ -41,8 +42,6 @@ import AdminUser from '../component/AdminUser.jsx'
 
 const color = require('color')
 require('../css/index.styl')
-
-const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export class AdminWorkspaceUser extends React.Component {
   constructor (props) {

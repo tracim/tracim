@@ -48,7 +48,7 @@ describe('<Home />', () => {
   })
 
   describe('its internal functions', () => {
-    describe('changeNewUsername', () => {
+    describe('checkUsernameValidity', () => {
       afterEach(() => {
         wrapper.instance().setState({
           isUsernameValid: true
@@ -56,27 +56,27 @@ describe('<Home />', () => {
       })
 
       it('should have the isUsernameValid state as true if username is not set yet', async () => {
-        await wrapper.instance().changeNewUsername({ target: { value: '' } })
+        await wrapper.instance().checkUsernameValidity('')
         expect(wrapper.state('isUsernameValid')).to.equal(true)
       })
 
       it('should have the isUsernameValid state as false if username is shorter than MINIMUM_CHARACTERS_USERNAME', async () => {
-        await wrapper.instance().changeNewUsername({ target: { value: 'aa' } })
+        await wrapper.instance().checkUsernameValidity('aa')
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
       it('should have the isUsernameValid state as false if username has a space', async () => {
-        await wrapper.instance().changeNewUsername({ target: { value: 'user name' } })
+        await wrapper.instance().checkUsernameValidity('user name')
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
       it('should have the isUsernameValid state as false if username has a not allowed character', async () => {
-        await wrapper.instance().changeNewUsername({ target: { value: 'usern@me!' } })
+        await wrapper.instance().checkUsernameValidity('usern@me!')
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
       it('should have the isUsernameValid state as false if username start with @', async () => {
-        await wrapper.instance().changeNewUsername({ target: { value: '@username' } })
+        await wrapper.instance().checkUsernameValidity('@username')
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
     })

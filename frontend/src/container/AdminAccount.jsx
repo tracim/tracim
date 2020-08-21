@@ -23,7 +23,8 @@ import {
   checkUsernameValidity,
   ALLOWED_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
-  MINIMUM_CHARACTERS_USERNAME
+  MINIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -49,8 +50,6 @@ import {
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 import { serializeMember } from '../reducer/currentWorkspace.js'
-
-const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export class Account extends React.Component {
   constructor (props) {

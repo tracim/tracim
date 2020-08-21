@@ -20,7 +20,8 @@ import {
   checkUsernameValidity,
   ALLOWED_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
-  MINIMUM_CHARACTERS_USERNAME
+  MINIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -44,8 +45,6 @@ import {
   FETCH_CONFIG
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
-
-const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export class Account extends React.Component {
   constructor (props) {

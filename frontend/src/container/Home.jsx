@@ -18,7 +18,8 @@ import {
   checkUsernameValidity,
   ALLOWED_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
-  MINIMUM_CHARACTERS_USERNAME
+  MINIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 } from 'tracim_frontend_lib'
 import {
   putUserUsername
@@ -29,8 +30,6 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import HomeNoWorkspace from '../component/Home/HomeNoWorkspace.jsx'
 import HomeHasWorkspace from '../component/Home/HomeHasWorkspace.jsx'
-
-const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export class Home extends React.Component {
   constructor (props) {
@@ -72,7 +71,7 @@ export class Home extends React.Component {
   }
 
   componentWillUnmount () {
-    this.checkUsernameValidity.cancel()
+    this.debouncedCheckUsernameValidity.cancel()
   }
 
   setHeadTitle = () => {
@@ -145,10 +144,10 @@ export class Home extends React.Component {
   handleChangeNewUsername = async (e) => {
     const username = e.target.value
     this.setState({ newUsername: username })
-    this.checkUsernameValidity(username)
+    this.debouncedCheckUsernameValidity(username)
   }
 
-  checkUsernameValidity = debounce(async (username) => {
+  checkUsernameValidity = async (username) => {
     if (!username) {
       this.setState({ isUsernameValid: true, usernameInvalidMsg: '' })
       return
@@ -159,7 +158,9 @@ export class Home extends React.Component {
     } catch (errorWhileChecking) {
       props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
-  }, CHECK_USERNAME_DEBOUNCE_WAIT)
+  }
+
+  debouncedCheckUsernameValidity = debounce(checkUsernameValidity, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   handleChangePassword = e => this.setState({ password: e.target.value })
 
