@@ -72,7 +72,7 @@ _install_backend: &_install_backend
     - |
       if [ "${DB}" == "mysql" ]; then
         docker pull mysql:8.0
-        docker run -d -p 3306:3306 --name mysqld -e MYSQL_DATABASE=tracim_test -e MYSQL_USER=user -e MYSQL_PASSWORD=secret -e MYSQL_RANDOM_ROOT_PASSWORD=true mysql:8.0
+        docker run -d -p 3306:3306 --name mysqld -e MYSQL_DATABASE=tracim_test -e MYSQL_USER=user -e MYSQL_PASSWORD=secret -e MYSQL_RANDOM_ROOT_PASSWORD=true --tmpfs /var/lib/mysql mysql:8.0
         pip install -e ".[mysql,testing]"
       fi
     # mariadb 10.3

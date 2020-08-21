@@ -5,20 +5,23 @@ from bs4 import BeautifulSoup
 from bs4 import Tag
 from pluggy import PluginManager
 
-from tracim_backend.config import CFG
 from tracim_backend.app_models.contents import COMMENT_TYPE
+from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.plugins import hookimpl
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.event import EntityType
-from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import Event
+from tracim_backend.models.event import OperationType
+from tracim_backend.models.mention import ALL__GROUP_MENTIONS
 from tracim_backend.models.tracim_session import TracimSession
 
 
@@ -147,8 +150,17 @@ class MentionBuilder:
     def get_receiver_ids(
         cls, event: Event, session: TracimSession, config: CFG
     ) -> typing.Iterable[int]:
-        # FIXME: S.G 2020-07-29 - return proper receiver ids from the event's mention field (#3349)
-        return []
+        recipient = event.fields[cls.MENTION_FIELD]["recipient"]
+        if recipient in ALL__GROUP_MENTIONS:
+            # send to all workspace users
+            role_api = RoleApi(session=session, config=config, current_user=None)
+            workspace_id = event.workspace["workspace_id"]
+            return role_api.get_workspace_member_ids(workspace_id)
+        else:
+            # send to mentioned user
+            user_api = UserApi(session=session, config=config, current_user=None)
+            user = user_api.get_one_by_username(recipient)
+            return [user.user_id]
 
     @classmethod
     def _create_mention_events(
@@ -164,8 +176,8 @@ class MentionBuilder:
         content_schema = EventApi.get_content_schema_for_type(content.type)
         content_dict = content_schema.dump(content_in_context).data
         common_fields = {
-            EventApi.CONTENT_FIELD: content_dict,
-            EventApi.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.CONTENT_FIELD: content_dict,
+            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
         }
 
         event_api = EventApi(context.current_user, context.dbsession, context.app_config)

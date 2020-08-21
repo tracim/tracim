@@ -20,8 +20,6 @@
   "My Account": "Mon compte",
   "Logout": "Se déconnecter",
   "Notification": "Notification",
-  "Archived Topic": "Conversation archivée",
-  "Deleted File": "Fichier supprimé",
   "Role": "Rôle",
   "Password": "Mot de passe",
   "Change your Timezone": "Modifier votre fuseau horaire",
@@ -29,7 +27,7 @@
   "Access your personal calendar": "Accéder à votre calendrier personnel",
   "Dashboard": "Tableau de bord",
   "Recent activity": "Activité récente",
-  "Mark everything as read": "Tout marquer comme lu",
+  "Mark all as read": "Tout marquer comme lu",
   "See more": "Voir plus",
   "Member List": "Liste des membres",
   "Add a member": "Ajouter un membre",
@@ -269,5 +267,7 @@
   "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} est supérieur à 1MO, cela peut prendre du temps à téléverser. Voulez-vous continuer ?",
   "Tracim has a connection problem, please wait or reload the page if the problem persists": "Tracim rencontre un souci de connexion, merci de patienter ou d'actualiser la page si le problème persiste",
   "Your username": "Votre identifiant",
-  "Your username has been set": "Votre identifiant a été défini"
+  "Your username has been set": "Votre identifiant a été défini",
+  "{{author}} added {{user}} to {{workspace}}": "{{author}} a ajouté {{user}} dans {{workspace}}",
+  "Error loading unread notification number": "Erreur lors du chargement du nombre de notification non lu"
 }

@@ -1,4 +1,6 @@
 # coding=utf-8
+import typing
+
 from hapic.data import HapicData
 from pyramid.config import Configurator
 
@@ -19,6 +21,7 @@ from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
 from tracim_backend.views.core_api.schemas import ErrorCodeSchema
 from tracim_backend.views.core_api.schemas import GetUsernameAvailability
+from tracim_backend.views.core_api.schemas import ReservedUsernamesSchema
 from tracim_backend.views.core_api.schemas import TimezoneSchema
 from tracim_backend.views.core_api.schemas import UsernameAvailability
 
@@ -79,6 +82,17 @@ class SystemController(Controller):
             "username": hapic_data.query["username"],
             "available": system_api.get_username_availability(hapic_data.query["username"]),
         }
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.output_body(ReservedUsernamesSchema())
+    def reserved_usernames(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.Dict[str, typing.List[str]]:
+        """Return the list of reserved usernames (used for group mentions)."""
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        system_api = SystemApi(app_config, request.dbsession)
+        return {"items": system_api.get_reserved_usernames()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
@@ -148,3 +162,9 @@ class SystemController(Controller):
             "username_availability", "/system/username-availability", request_method="GET"
         )
         configurator.add_view(self.username_availability, route_name="username_availability")
+
+        # reserved usernames
+        configurator.add_route(
+            "reserved_usernames", "/system/reserved-usernames", request_method="GET"
+        )
+        configurator.add_view(self.reserved_usernames, route_name="reserved_usernames")

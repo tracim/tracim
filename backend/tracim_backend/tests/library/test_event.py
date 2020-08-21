@@ -2,7 +2,6 @@ import pytest
 import transaction
 
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
-from tracim_backend.lib.core.event import EventApi
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.event import EntityType
@@ -121,11 +120,11 @@ class TestEventReceiver:
         )
         transaction.commit()
         fields = {
-            EventApi.AUTHOR_FIELD: UserSchema()
+            Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
             .data,
-            EventApi.CLIENT_TOKEN_FIELD: "test",
-            EventApi.USER_FIELD: UserSchema()
+            Event.CLIENT_TOKEN_FIELD: "test",
+            Event.USER_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
             .data,
         }
@@ -172,11 +171,11 @@ class TestEventReceiver:
         transaction.commit()
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         fields = {
-            EventApi.AUTHOR_FIELD: UserSchema()
+            Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
             .data,
-            EventApi.CLIENT_TOKEN_FIELD: "test",
-            EventApi.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
+            Event.CLIENT_TOKEN_FIELD: "test",
+            Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE, operation=OperationType.MODIFIED, fields=fields
@@ -224,15 +223,15 @@ class TestEventReceiver:
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         role_in_context = rapi.get_user_role_workspace_with_context(role)
         fields = {
-            EventApi.AUTHOR_FIELD: UserSchema()
+            Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
             .data,
-            EventApi.USER_FIELD: UserSchema()
+            Event.USER_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
             .data,
-            EventApi.CLIENT_TOKEN_FIELD: "test",
-            EventApi.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
-            EventApi.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
+            Event.CLIENT_TOKEN_FIELD: "test",
+            Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
+            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_MEMBER, operation=OperationType.MODIFIED, fields=fields
@@ -295,12 +294,12 @@ class TestEventReceiver:
         transaction.commit()
         content_in_context = content_api.get_content_in_context(folder)
         fields = {
-            EventApi.AUTHOR_FIELD: UserSchema()
+            Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
             .data,
-            EventApi.CONTENT_FIELD: ContentSchema().dump(content_in_context).data,
-            EventApi.CLIENT_TOKEN_FIELD: "test",
-            EventApi.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
+            Event.CONTENT_FIELD: ContentSchema().dump(content_in_context).data,
+            Event.CLIENT_TOKEN_FIELD: "test",
+            Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
         }
         event = Event(
             entity_type=EntityType.CONTENT, operation=OperationType.MODIFIED, fields=fields

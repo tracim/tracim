@@ -58,7 +58,7 @@ import {
 import FileProperties from '../component/FileProperties.jsx'
 
 export class File extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     const param = props.data || debug
@@ -235,7 +235,7 @@ export class File extends React.Component {
     this.setState({ timeline: newTimeline })
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
     const { state } = this
 
@@ -249,7 +249,7 @@ export class File extends React.Component {
     if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
-  async componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -268,7 +268,7 @@ export class File extends React.Component {
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
@@ -851,7 +851,8 @@ export class File extends React.Component {
     globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp)
   }
 
-  render() {
+  render () {
+
     const { props, state } = this
     const onlineEditionAction = this.getOnlineEditionAction()
 

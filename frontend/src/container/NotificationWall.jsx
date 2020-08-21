@@ -5,13 +5,15 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
   getNotificationList,
+  putAllNotificationAsRead,
   putNotificationAsRead
 } from '../action-creator.async.js'
 import {
   appendNotificationList,
   newFlashMessage,
-  setNextPage,
-  updateNotification
+  readNotification,
+  readNotificationList,
+  setNextPage
 } from '../action-creator.sync.js'
 import {
   buildTracimLiveMessageEventType,
@@ -25,35 +27,26 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { NUMBER_RESULTS_BY_PAGE } from '../util/helper.js'
+import {
+  ANCHOR_NAMESPACE,
+  NUMBER_RESULTS_BY_PAGE
+} from '../util/helper.js'
 
 export class NotificationWall extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      isNotificationWallOpen: false
-    }
-  }
-
-  handleCloseNotificationWall = () => {
-    this.setState({ isNotificationWallOpen: false })
-  }
-
   handleClickNotification = async notificationId => {
     const { props } = this
 
     const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
     switch (fetchPutNotificationAsRead.status) {
       case 204: {
-        const notification = props.notificationPage.list.find(notification => notification.id === notificationId)
-        props.dispatch(updateNotification({ ...notification, read: true }))
+        props.dispatch(readNotification(notificationId))
         break
       }
       default:
         props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
     }
 
-    this.handleCloseNotificationWall()
+    props.onCloseNotificationWall()
   }
 
   handleClickSeeMore = async () => {
@@ -79,11 +72,11 @@ export class NotificationWall extends React.Component {
         icon = 'fa-comments-o'
         text = props.t('{{author}} commented on {{content}} at {{workspace}}', {
           author: notification.author,
-          content: `<span class='contentTitle__highlight'>${notification.content.label}</span>`,
+          content: `<span class='contentTitle__highlight'>${notification.content.parentLabel}</span>`,
           workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
           interpolation: { escapeValue: false }
         })
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.parent_content_type}/${notification.content.content_id}`
+        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.id}`
         break
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.HTML_DOCUMENT):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE):
@@ -96,13 +89,13 @@ export class NotificationWall extends React.Component {
           workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
           interpolation: { escapeValue: false }
         })
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
         break
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.HTML_DOCUMENT):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FILE):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FOLDER):
-        if (notification.content.current_revision_type === 'status-update') {
+        if (notification.content.currentRevisionType === 'status-update') {
           icon = 'fa-random'
           text = props.t('{{author}} updated the status of {{content}} at {{workspace}}', {
             author: notification.author,
@@ -119,19 +112,26 @@ export class NotificationWall extends React.Component {
             interpolation: { escapeValue: false }
           })
         }
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
         break
       case buildTracimLiveMessageEventType(TLM_ET.SHAREDSPACE_MEMBER, TLM_CET.CREATED):
         icon = 'fa-user-o'
-        text = props.t('{{author}} added you to {{workspace}}', {
-          author: notification.author,
-          workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
-          interpolation: { escapeValue: false }
-        })
-        url = `/ui/workspaces/${notification.workspace.workspace_id}/dashboard`
+        text = props.user.userId === notification.user.userId
+          ? props.t('{{author}} added you to {{workspace}}', {
+            author: notification.author,
+            workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
+            interpolation: { escapeValue: false }
+          })
+          : props.t('{{author}} added {{user}} to {{workspace}}', {
+            author: notification.author,
+            user: notification.user.publicName,
+            workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
+            interpolation: { escapeValue: false }
+          })
+        url = `/ui/workspaces/${notification.workspace.id}/dashboard`
         break
       case buildTracimLiveMessageEventType(TLM_ET.MENTION, TLM_CET.CREATED):
-        if (notification.content.content_type === CONTENT_TYPE.COMMENT) {
+        if (notification.content.type === CONTENT_TYPE.COMMENT) {
           icon = 'fa-comment-o'
           text = props.t('{{author}} mentioned you in a comment in {{content}} at {{workspace}}', {
             author: notification.author,
@@ -139,7 +139,7 @@ export class NotificationWall extends React.Component {
             workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
             interpolation: { escapeValue: false }
           })
-          url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.parent_content_type}/${notification.content.content_id}`
+          url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.id}`
         } else {
           icon = 'fa-at'
           text = props.t('{{author}} mentioned you in {{content}} at {{workspace}}', {
@@ -148,56 +148,79 @@ export class NotificationWall extends React.Component {
             workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
             interpolation: { escapeValue: false }
           })
-          url = `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+          url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
         }
         break
       default:
         icon = 'fa-bell'
         text = `${notification.author} ${notification.type}`
         url = notification.content
-          ? `/ui/workspaces/${notification.workspace.workspace_id}/contents/${notification.content.content_type}/${notification.content.content_id}`
+          ? `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
           : '/ui'
     }
     return { icon, text, url }
   }
 
-  render () {
-    const { props, state } = this
+  handleClickMarkAllAsRead = async () => {
+    const { props } = this
 
-    if (!state.isNotificationWallOpen || !props.notificationPage.list) return null
+    const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
+    switch (fetchAllPutNotificationAsRead.status) {
+      case 204:
+        props.dispatch(readNotificationList())
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
+    }
+  }
+
+  render () {
+    const { props } = this
+
+    if (!props.notificationPage.list) return null
 
     return (
-      <div className='notification'>
+      <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
         <PopinFixedHeader
           customClass='notification'
           faIcon='bell-o'
           rawTitle={props.t('Notifications')}
           componentTitle={<div>{props.t('Notifications')}</div>}
-          onClickCloseBtn={this.handleCloseNotificationWall}
-        />
+          onClickCloseBtn={props.onCloseNotificationWall}
+        >
+          <GenericButton
+            customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+            onClick={this.handleClickMarkAllAsRead}
+            label={props.t('Mark all as read')}
+            faIcon='envelope-open-o'
+            dataCy='markAllAsReadButton'
+          />
+        </PopinFixedHeader>
 
         <div className='notification__list'>
           {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
+            const notificationDetails = this.getNotificationDetails(notification)
+
             return (
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
                 read={false}
-                id={notification.id}
+                id={`${ANCHOR_NAMESPACE.contentItem}:${notification.id}`}
                 key={notification.id}
               >
                 <Link
-                  to={this.getNotificationDetails(notification).url}
+                  to={notificationDetails.url}
                   onClick={() => this.handleClickNotification(notification.id)}
                   className={
                     classnames('notification__list__item', { itemRead: notification.read })
                   }
                   key={notification.id}
                 >
-                  <i className={`notification__list__item__icon fa ${this.getNotificationDetails(notification).icon}`} />
+                  <i className={`notification__list__item__icon fa ${notificationDetails.icon}`} />
                   <div className='notification__list__item__text'>
                     <span
                       dangerouslySetInnerHTML={{
-                        __html: `${this.getNotificationDetails(notification).text} `
+                        __html: `${notificationDetails.text} `
                       }}
                     />
                     {displayDistanceDate(notification.created, props.user.lang)}

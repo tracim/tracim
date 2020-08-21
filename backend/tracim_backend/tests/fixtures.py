@@ -105,7 +105,7 @@ def rq_database_worker(config_uri, app_config):
 
 
 @pytest.fixture
-def tracim_webserver(settings, config_uri) -> PyramidTestServer:
+def tracim_webserver(settings, config_uri, engine, session_factory) -> PyramidTestServer:
     config_filename = basename(config_uri)
     config_dir = dirname(config_uri)
 
@@ -117,6 +117,8 @@ def tracim_webserver(settings, config_uri) -> PyramidTestServer:
     ) as server:
         server.start()
         yield server
+    session_factory.close_all()
+    DeclarativeBase.metadata.drop_all(engine)
 
 
 @pytest.fixture
@@ -164,6 +166,13 @@ def web_testapp(settings, hapic, session):
     DepotManager._clear()
     app = web({}, **settings)
     return TestApp(app)
+
+
+@pytest.fixture
+def empty_rq_event_queue(app_config):
+    redis_connection = get_redis_connection(app_config)
+    queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+    queue.delete()
 
 
 @pytest.fixture
