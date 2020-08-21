@@ -52,7 +52,7 @@ export class Gallery extends React.Component {
       content: param.content,
       breadcrumbsList: [],
       appMounted: false,
-      folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || 0) : debug.config.folderId,
+      folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || undefined) : debug.config.folderId,
       folderDetail: {
         fileName: '',
         folderParentIdList: []
@@ -93,8 +93,17 @@ export class Gallery extends React.Component {
   // https://github.com/tracim/tracim/issues/3107#issuecomment-643994410
 
   liveMessageNotRelevant (data, state) {
-    return Number(data.fields.content.workspace_id) !== Number(state.config.appConfig.workspaceId) ||
-    (state.folderId !== undefined && Number(data.fields.content.parent_id) !== Number(state.folderId))
+    if (Number(data.fields.content.workspace_id) !== Number(state.config.appConfig.workspaceId)) {
+      return true
+    }
+
+    if (state.folderId || data.fields.content.parent_id) {
+      const currentFolderId = Number(state.folderId) || 0
+      const liveMessageFolderId = Number(data.fields.content.parent_id) || 0
+      return currentFolderId !== liveMessageFolderId
+    }
+
+    return false
   }
 
   handleShowApp = data => {
@@ -119,7 +128,7 @@ export class Gallery extends React.Component {
   handleContentCreatedOrUndeleted = data => {
     if (this.liveMessageNotRelevant(data, this.state)) return
 
-    const preview = this.buildPreview(data.fields.content)
+    const preview = this.buildPreview(data.content)
     if (preview) {
       this.setNewPicturesPreviews([preview, ...this.state.imagePreviewList].sort(this.sortPreviews))
     }
@@ -134,6 +143,7 @@ export class Gallery extends React.Component {
       }
       return
     }
+
     // RJ - 2020-06-15 - NOTE
     // We need to reorder the list because the label of the file could have changed.
     // We could test whether this is the case, but handling only one case is
@@ -157,6 +167,7 @@ export class Gallery extends React.Component {
   handleContentDeleted = data => {
     const { state } = this
     if (this.liveMessageNotRelevant(data, state)) return
+
     this.removeContent(data.fields.content.content_id)
   }
 
