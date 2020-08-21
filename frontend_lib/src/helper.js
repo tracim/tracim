@@ -388,7 +388,7 @@ export const serialize = (objectToSerialize, propertyMap) => {
   )
 }
 
-export const getCurrentContentVersionNumber = async (appFeatureMode, content, timeline) => {
+export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
   if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
 }
