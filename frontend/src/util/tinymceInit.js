@@ -1,4 +1,5 @@
 import i18n from './i18n.js'
+import { uniqueId } from 'lodash'
 
 (function () {
   function base64EncodeAndTinyMceInsert(files) {
@@ -76,10 +77,19 @@ import i18n from './i18n.js'
       height: '100%',
       setup: function ($editor) {
         $editor.on('init', function (e) {
+          const id = uniqueId()
+          if ($editor.getBody()) {
+            $editor.dom.add($editor.getBody(), 'p', { id: id }, '')
+            $editor.selection.select($editor.dom.select('p' + id)[0])
+          }
+
           // INFO - GM - 2020/03/17 - theses 3 lines enable autofocus at the end of the document
           $editor.focus()
           $editor.selection.select($editor.getBody(), true)
           $editor.selection.collapse(false)
+
+          $editor.dom.remove($editor.select(`p#${id}`))
+
           const event = new globalThis.CustomEvent('tinymceLoaded', { detail: {}, editor: this })
           document.dispatchEvent(event)
         })
