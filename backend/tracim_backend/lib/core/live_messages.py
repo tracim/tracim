@@ -44,6 +44,10 @@ _pub_control_create_lock = threading.Lock()
 class LiveMessagesLib(object):
     """Publish messages using pushpin."""
 
+    # RJ - 2020-08-22 - NOTE
+    # This avoids reinstanciating LiveMessageSchema each time we need to serialize a live message
+    _message_schema = LiveMessageSchema()
+
     def __init__(self, config: CFG,) -> None:
         self._blocking_publish = config.LIVE_MESSAGES__BLOCKING_PUBLISH
         global _pub_control_create_lock
@@ -56,10 +60,13 @@ class LiveMessagesLib(object):
                     {"control_zmq_uri": config.LIVE_MESSAGES__CONTROL_ZMQ_URI}
                 )
 
+    @classmethod
+    def message_as_dict(cls, message: Message):
+        return cls._message_schema.dump(message).data
+
     def publish_message_to_user(self, message: Message):
         channel_name = "user_{}".format(message.receiver_id)
-        message_schema = LiveMessageSchema()
-        self.publish_dict(channel_name, message_as_dict=message_schema.as_dict(message))
+        self.publish_dict(channel_name, message_as_dict=LiveMessagesLib.message_as_dict(message))
 
     def publish_dict(self, channel_name: str, message_as_dict: typing.Dict[str, typing.Any]):
         global _grip_pub_control
