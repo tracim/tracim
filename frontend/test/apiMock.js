@@ -183,6 +183,13 @@ const mockGetFolderContentList200 = (apiUrl, workspaceId, folderIdList, resultCo
     .reply(200, resultContentList)
 }
 
+const mockGetWhoami = (apiUrl, status) => {
+  return nock(apiUrl)
+    .log(console.error)
+    .get('/auth/whoami')
+    .reply(status, '')
+}
+
 export {
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMemberList200,
@@ -207,5 +214,6 @@ export {
   mockGetLoggedUserCalendar200,
   mockGetUserCalendar200,
   mockGetUser200,
-  mockGetFolderContentList200
+  mockGetFolderContentList200,
+  mockGetWhoami
 }

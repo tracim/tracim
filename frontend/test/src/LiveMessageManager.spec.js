@@ -1,4 +1,7 @@
 import { expect } from 'chai'
+import { mockGetWhoami } from '../apiMock'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { FETCH_CONFIG } from '../../src/util/helper.js'
 
 import {
   LiveMessageManager,
@@ -11,7 +14,7 @@ import { enforceOptions } from 'broadcast-channel'
 // See https://github.com/pubkey/broadcast-channel#enforce-a-options-globally
 enforceOptions({ type: 'simulate' })
 
-const apiUrl = 'http://localhost/api'
+const apiUrl = FETCH_CONFIG.apiUrl
 const userId = 1
 
 // RJ - 2020-09-13 - NOTE: The next two methods are used to track status changes
@@ -81,6 +84,7 @@ describe('LiveMessageManager class', () => {
     })
 
     it('should restart connection when an error is raised by EventSource', async () => {
+      mockGetWhoami(apiUrl, 200)
       const promiseStatus1 = manager.onStatusChange()
       const promiseStatus2 = manager.onStatusChange()
       manager.eventSource.emitError()
@@ -109,6 +113,7 @@ describe('LiveMessageManager class', () => {
 
   describe('the heartbeat timer', async () => {
     it('should restart connection when the heartbeat event is not received in time', async () => {
+      mockGetWhoami(apiUrl, 200)
       const manager = openedManager(2, 10)
       managers.push(manager)
       expect(await manager.onStatusChange()).to.be.equal(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
@@ -119,6 +124,7 @@ describe('LiveMessageManager class', () => {
 
   describe('after losing the connection', async function () {
     it('should restart connection with the after_event_id parameter', async () => {
+      mockGetWhoami(apiUrl, 200)
       const manager = new LiveMessageManager(30000, 0)
       managers.push(manager)
 
@@ -149,7 +155,7 @@ describe('LiveMessageManager class', () => {
     })
   })
 
-  describe('after closing and re-opening the connection', async function () {
+  describe('after closing and re-opening the connection', async () => {
     it('should restart connection with the after_event_id parameter', async () => {
       const manager = new LiveMessageManager(30000, 0)
       managers.push(manager)
@@ -174,6 +180,26 @@ describe('LiveMessageManager class', () => {
       expect(manager.eventSource.url).to.be.equal(
          `${apiUrl}/users/${userId}/live_messages?after_event_id=1337`
       )
+
+      manager.closeLiveMessageConnection()
+    })
+  })
+
+  describe('after losing the connection due to a logout', async () => {
+    it('should redirect to the login page (by sending a custom event)', async () => {
+      mockGetWhoami(apiUrl, 401)
+      const manager = new LiveMessageManager(30000, 0)
+      managers.push(manager)
+      manager.openLiveMessageConnection(userId, apiUrl)
+      manager.eventSource.emitOpen()
+      manager.eventSource.emit('stream-open')
+      global.lastCustomEventTypes = new Set()
+      const promiseStatus1 = manager.onStatusChange()
+      const promiseStatus2 = manager.onStatusChange()
+      manager.eventSource.emitError()
+      expect(await promiseStatus1).to.be.equal(LIVE_MESSAGE_STATUS.ERROR)
+      expect(await promiseStatus2).to.be.equal(LIVE_MESSAGE_STATUS.CLOSED)
+      expect(global.lastCustomEventTypes.has(CUSTOM_EVENT.DISCONNECTED_FROM_API)).to.be.equal(true)
 
       manager.closeLiveMessageConnection()
     })

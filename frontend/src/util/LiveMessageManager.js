@@ -151,12 +151,27 @@ export class LiveMessageManager {
     // We must not let the browser auto-reconnect. We need to
     // use an URL containing the last received event id when
     // reconnecting. We therefore close the connection.
+    // NOTE - 2020-08-20 - RJ
+    // And we also need to check whether the disconnection was
+    // not caused because the user has been logged out
     this.closeEventSourceConnection()
 
-    this.reconnectionTimerId = setTimeout(() => {
+    this.reconnectionTimerId = setTimeout(async () => {
+      // NOTE - 2020-08-19 - RJ
+      // The live message manager can be closed during the timeout.
       if (this.status !== LIVE_MESSAGE_STATUS.CLOSED) {
-        // NOTE - 2020-08-19 - RJ
-        // The live message manager can be closed during the timeout.
+        // NOTE - 2020-08-20 - RJ
+        // Let's check that the user has not been logged out. We do this by
+        // pinging whoami. In a perfect world, we would have checked the status of
+        // the EventSource request. The world is not perfect and sadly, EventSource
+        // does not expose the HTTP status.
+        const response = await fetch(`${FETCH_CONFIG.apiUrl}/auth/whoami`)
+        if (response.status === 401) {
+          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.DISCONNECTED_FROM_API, data: {} })
+          this.closeLiveMessageConnection()
+          return
+        }
+
         this.openEventSourceConnection()
       }
       this.reconnectionTimerId = 0
