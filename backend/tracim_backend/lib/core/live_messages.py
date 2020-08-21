@@ -3,6 +3,7 @@ import threading
 import typing
 
 from gripcontrol import GripPubControl
+from gripcontrol import HttpStreamFormat
 
 # TODO - G.M - 2020-05-14 - Use default event "message" for TLM to be usable with
 # "onmessage" EventSource Object in javascript.
@@ -64,9 +65,18 @@ class LiveMessagesLib(object):
     def message_as_dict(cls, message: Message):
         return cls._message_schema.dump(message).data
 
+    @staticmethod
+    def user_grip_channel(user_id: int) -> str:
+        return "user_{}".format(user_id)
+
     def publish_message_to_user(self, message: Message):
-        channel_name = "user_{}".format(message.receiver_id)
+        channel_name = self.user_grip_channel(message.receiver_id)
         self.publish_dict(channel_name, message_as_dict=LiveMessagesLib.message_as_dict(message))
+
+    def close_channel_connections(self, channel: str) -> None:
+        _grip_pub_control.publish_http_stream(
+            channel, HttpStreamFormat(close=True), blocking=self._blocking_publish
+        )
 
     def publish_dict(self, channel_name: str, message_as_dict: typing.Dict[str, typing.Any]):
         global _grip_pub_control

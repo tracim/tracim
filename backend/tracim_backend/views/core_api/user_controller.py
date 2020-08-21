@@ -635,15 +635,15 @@ class UserController(Controller):
                 ]
             )
 
-        escaped_keealive_event = "event: keep-alive\\ndata:\\n\\n"
-        user_channel_name = "user_{}".format(request.candidate_user.user_id)
+        escaped_keepalive_event = "event: keep-alive\\ndata:\\n\\n"
+        user_channel_name = LiveMessagesLib.user_grip_channel(request.candidate_user.user_id)
         headers = [
             # Here we ask push pin to keep the connection open
             ("Grip-Hold", "stream"),
             # and register this connection on the given channel
             # multiple channels subscription is possible
             ("Grip-Channel", user_channel_name),
-            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keealive_event)),
+            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keepalive_event)),
             # content type for SSE
             ("Content-Type", "text/event-stream"),
             # do not cache the events

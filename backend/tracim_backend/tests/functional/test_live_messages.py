@@ -299,3 +299,27 @@ class TestLivesMessages(object):
 
         event3 = next(client_events)
         assert json.loads(event3.data)["fields"]["content"]["label"] == "Small document C"
+
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__disconnect(
+        self, pushpin, app_config
+    ):
+        headers = {"Accept": "text/event-stream"}
+        response = requests.get(
+            "http://localhost:7999/api/users/1/live_messages",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            stream=True,
+            headers=headers,
+        )
+        client = sseclient.SSEClient(response)
+        client_events = client.events()
+        # INFO - G.M - 2020-06-29 - Skip first event
+        next(client_events)
+
+        requests.post(
+            "http://localhost:7999/api/auth/logout",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+        )
+
+        with pytest.raises(StopIteration):
+            next(client_events)
+        response.close()
