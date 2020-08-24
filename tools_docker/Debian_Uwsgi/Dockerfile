@@ -88,6 +88,9 @@ RUN \
         apt-transport-https \
         software-properties-common \
         gnupg2 \
+        # NOTE - S.G. - 2020-08-10 - Installing zurl before adding pushpin repository
+        # as the zurl package in it cannot be installed on stretch.
+        zurl \
     && echo deb https://dl.bintray.com/fanout/debian fanout-stretch main \
         | tee /etc/apt/sources.list.d/fanout.list \
     && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 \

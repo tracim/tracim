@@ -2,7 +2,7 @@ import i18n from './i18n.js'
 import { uniqueId } from 'lodash'
 
 (function () {
-  function base64EncodeAndTinyMceInsert(files) {
+  function base64EncodeAndTinyMceInsert (files) {
     for (let i = 0; i < files.length; i++) {
       if (files[i].size > 1000000) {
         files[i].allowed = globalThis.confirm(

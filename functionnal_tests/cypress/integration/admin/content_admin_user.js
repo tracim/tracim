@@ -130,7 +130,7 @@ describe("An admin seeing a user's profile", () => {
 
     describe('Change username', () => {
       const newUserName = 'newRandomUsername'
-      const longNewUsername = 'aa'.repeat(200)
+      const longNewUsername = 'a'.repeat(256)
 
       it('should show error message when username is too long', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
