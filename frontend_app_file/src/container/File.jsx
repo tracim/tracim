@@ -439,7 +439,7 @@ export class File extends React.Component {
     try {
       props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
     } catch (e) {
-        this.sendGlobalFlashMessage(e.message ? e.message : props.t('Error while saving the comment'))
+        this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
   }
 
