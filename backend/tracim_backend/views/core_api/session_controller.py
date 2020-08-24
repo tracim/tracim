@@ -72,7 +72,7 @@ class SessionController(Controller):
         Logs out current logged in user. This also trashes the associated session and the
         live message connections of the current user.
         """
-        if request.current_user:
+        if request.authenticated_userid:
             app_config = request.registry.settings["CFG"]  # type: CFG
             LiveMessagesLib(app_config).close_channel_connections(
                 LiveMessagesLib.user_grip_channel(request.current_user.user_id)
