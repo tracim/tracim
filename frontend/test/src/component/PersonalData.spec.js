@@ -4,7 +4,7 @@ import { shallow } from 'enzyme'
 import sinon from 'sinon'
 import { PersonalData as PersonalDataWithoutHOC } from '../../../src/component/Account/PersonalData.jsx'
 
-describe('<PersonnalData />', () => {
+describe('<PersonalData />', () => {
   const onClickSubmitCallBack = sinon.spy()
   const onChangeUsernameCallBack = sinon.spy()
 
@@ -34,7 +34,7 @@ describe('<PersonnalData />', () => {
       wrapper.find('button').simulate('click')
       expect(onClickSubmitCallBack.called).to.equal(true)
     })
-    it('onChangeUsernameCallBack should be called when the username is changing', () => {
+    it('onChangeUsernameCallBack should be called when the username has been changed', () => {
       wrapper.find('input.personaldata__form__txtinput').at(1).simulate('change', { target: { value: 'newRandomUsername' } })
       expect(onChangeUsernameCallBack.called).to.equal(true)
     })
