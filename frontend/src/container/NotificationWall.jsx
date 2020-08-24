@@ -25,7 +25,8 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent
+  TracimComponent,
+  Avatar
 } from 'tracim_frontend_lib'
 import {
   ANCHOR_NAMESPACE,
@@ -218,12 +219,12 @@ export class NotificationWall extends React.Component {
                 >
                   <i className={`notification__list__item__icon fa ${notificationDetails.icon}`} />
                   <div className='notification__list__item__text'>
+                    <Avatar publicName={notification.author} width={23} style={{ marginRight: '5px' }} />
                     <span
                       dangerouslySetInnerHTML={{
-                        __html: `${notificationDetails.text} `
+                        __html: `${notificationDetails.text} ${displayDistanceDate(notification.created, props.user.lang)}`
                       }}
                     />
-                    {displayDistanceDate(notification.created, props.user.lang)}
                   </div>
                   {!notification.read && <i className='notification__list__item__circle fa fa-circle' />}
                 </Link>

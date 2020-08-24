@@ -8,7 +8,6 @@ import {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
-  hasNotAllowedCharacters,
   hasSpaces,
   BREADCRUMBS_TYPE,
   ROLE,
@@ -33,7 +32,12 @@ import {
   setupCommonRequestHeaders,
   serialize,
   getOrCreateSessionClientToken,
-  getCurrentContentVersionNumber
+  getCurrentContentVersionNumber,
+  ALLOWED_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  checkUsernameValidity
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -133,7 +137,6 @@ export {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
-  hasNotAllowedCharacters,
   hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
@@ -199,6 +202,11 @@ export {
   serialize,
   getOrCreateSessionClientToken,
   getCurrentContentVersionNumber,
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT,
   MentionAutoComplete,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,

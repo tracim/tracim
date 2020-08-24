@@ -4,6 +4,7 @@ import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
+import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
 
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
@@ -375,9 +376,6 @@ export const removeAtInUsername = (username) => {
   return trimmedUsername
 }
 
-// INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
-export const hasNotAllowedCharacters = name => !(/^[A-Za-z0-9_-]*$/.test(name))
-
 export const hasSpaces = name => /\s/.test(name)
 
 // FIXME - GM - 2020-06-24 - This function doesn't handle nested object, it need to be improved
@@ -404,4 +402,71 @@ export const getMatchingCommonMentionFromQuery = (query) => {
 export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
   if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+}
+
+export const MINIMUM_CHARACTERS_USERNAME = 3
+export const MAXIMUM_CHARACTERS_USERNAME = 255
+export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
+export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
+
+// Check that the given username is valid.
+// Return an object:
+// {isUsernameValid: false, usernameInvalidMsg: 'Username invalid'}
+// The message is translated using the given props.t.
+export const checkUsernameValidity = async (apiUrl, username, props) => {
+  if (username.length < MINIMUM_CHARACTERS_USERNAME) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+    }
+  }
+
+  if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
+    }
+  }
+
+  if (hasSpaces(username)) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t("Username can't contain any whitespace")
+    }
+  }
+
+  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
+  if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+    }
+  }
+
+  const fetchReservedUsernames = await getReservedUsernames(apiUrl)
+  if (fetchReservedUsernames.status !== 200 || !fetchReservedUsernames.json.items) {
+    throw new Error(props.t('Error while checking reserved usernames'))
+  }
+  if (fetchReservedUsernames.json.items.indexOf(username) >= 0) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('This word is reserved for group mentions')
+    }
+  }
+
+  const fetchUsernameAvailability = await getUsernameAvailability(apiUrl, username)
+  if (fetchUsernameAvailability.status !== 200) {
+    throw new Error(props.t('Error while checking username availability'))
+  }
+  if (!fetchUsernameAvailability.json.available) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('This username is not available')
+    }
+  }
+
+  return {
+    isUsernameValid: true,
+    usernameInvalidMsg: ''
+  }
 }

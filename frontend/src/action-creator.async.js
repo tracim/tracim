@@ -35,7 +35,6 @@ import {
   USER_USERNAME,
   USER_WORKSPACE_DO_NOTIFY,
   USER_WORKSPACE_LIST,
-  USERNAME_AVAILABILITY,
   WORKSPACE,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT_ARCHIVED,
@@ -301,21 +300,6 @@ export const putUserUsername = (user, newUsername, checkPassword) => dispatch =>
       })
     },
     actionName: USER_USERNAME,
-    dispatch
-  })
-}
-
-export const getUsernameAvailability = (username) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/system/username-availability?username=${username}`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'GET'
-    },
-    actionName: USERNAME_AVAILABILITY,
     dispatch
   })
 }

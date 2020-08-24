@@ -76,3 +76,33 @@ export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToIncl
     method: 'GET'
   })
 }
+
+export const getUsernameAvailability = async (apiUrl, username) => {
+  const response = await fetch(`${apiUrl}/system/username-availability?username=${username}`,
+    {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    }
+  )
+  return {
+    status: response.status,
+    json: await response.json()
+  }
+}
+
+export const getReservedUsernames = async (apiUrl) => {
+  const response = await fetch(`${apiUrl}/system/reserved-usernames`,
+    {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    }
+  )
+  return {
+    status: response.status,
+    json: await response.json()
+  }
+}
