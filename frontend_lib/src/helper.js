@@ -407,7 +407,7 @@ export const wrapMentionsInSpanTags = (text) => {
       childNodesListCopy.forEach((node) => {
         let value = node.nodeValue
 
-        if(node.nodeName === '#text' && value.includes('@')) {
+        if (node.nodeName === '#text' && value.includes('@')) {
           const mentionsInThisNode = value.split(/\s/).filter(token => mentionRegex.test(token))
 
           if (mentionsInThisNode.length > 0) {
