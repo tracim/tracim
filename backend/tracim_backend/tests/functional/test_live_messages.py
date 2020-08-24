@@ -86,7 +86,7 @@ def put_document(doc):
 
 
 @pytest.mark.usefixtures("base_fixture")
-class TestLivesMessages(object):
+class TestLiveMessages(object):
     def test_api__user_live_messages_endpoint_without_GRIP_proxy__ok_200__nominal_case(
         self, user_api_factory, web_testapp, admin_user
     ):

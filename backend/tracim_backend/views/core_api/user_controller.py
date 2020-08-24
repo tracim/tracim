@@ -630,7 +630,7 @@ class UserController(Controller):
 
             stream_opened_event += "".join(
                 [
-                    "data:" + json.dumps(LiveMessagesLib.as_dict(message)) + "\n\n"
+                    "data:" + json.dumps(LiveMessagesLib.message_as_dict(message)) + "\n\n"
                     for message in messages
                 ]
             )
