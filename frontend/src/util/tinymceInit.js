@@ -77,7 +77,7 @@ import { uniqueId } from 'lodash'
       height: '100%',
       setup: function ($editor) {
         $editor.on('init', function (e) {
-          // INFO - GB - 2020-08-24 - The manipulation below is a hack to add a <p> tag in the end of the text in order to start the text outside the other existents tags
+          // INFO - GB - 2020-08-24 - The manipulation below is a hack to add a <p> tag at the end of the text in order to start the text outside the other existing tags
           const id = uniqueId()
           if ($editor.getBody()) {
             $editor.dom.add($editor.getBody(), 'p', { id: id }, '')
