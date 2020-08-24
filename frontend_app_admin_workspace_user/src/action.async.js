@@ -112,12 +112,3 @@ export const postAddUser = (apiUrl, publicName, username, email, profile, emailN
     }),
     method: 'POST'
   })
-
-export const getUsernameAvailability = (apiUrl, username) =>
-  fetch(`${apiUrl}/system/username-availability?username=${username}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })

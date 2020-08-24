@@ -3,7 +3,6 @@ import {
   generateLocalStorageContentId,
   convertBackslashNToBr,
   handleFetchResult,
-  hasNotAllowedCharacters,
   hasSpaces,
   generateFetchResponse,
   parserStringToList,
@@ -12,8 +11,18 @@ import {
   COMMON_REQUEST_HEADERS,
   setupCommonRequestHeaders,
   serialize,
-  addRevisionFromTLM
+  addRevisionFromTLM,
+  checkUsernameValidity,
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME
 } from '../src/helper.js'
+
+import {
+  mockGetReservedUsernames200,
+  mockGetUsernameAvailability200,
+  mockGetReservedUsernames500,
+  mockGetUsernameAvailability500
+} from './apiMock.js'
 
 import sinon from 'sinon'
 
@@ -129,15 +138,6 @@ describe('helper.js', () => {
     })
   })
 
-  describe('the hasNotAllowedCharacters() function', () => {
-    it('should return false if name has only allowed characters', () => {
-      expect(hasNotAllowedCharacters('g00dUsername')).to.eq(false)
-    })
-    it('should return true if name has not allowed characters', () => {
-      expect(hasNotAllowedCharacters('b@dU$ername')).to.eq(true)
-    })
-  })
-
   describe('the hasSpaces() function', () => {
     it('should return false if name has no spaces', () => {
       expect(hasSpaces('g00dUsername')).to.eq(false)
@@ -242,6 +242,56 @@ describe('helper.js', () => {
     })
     it('should set a revision number to revision count + 1', () => {
       expect(lastRevisionObject.number).to.be.equal(2)
+    })
+  })
+
+  describe('the checkUsernameValidity function', () => {
+    const mockProps = {
+      t: m => m
+    }
+    const apiUrl = 'http://localhost/api'
+
+    const nominalCases = [
+      { username: 'foo', available: true, valid: true, message: '' },
+      { username: 'foo ', available: true, valid: false, message: "Username can't contain any whitespace" },
+      { username: 'foo(', available: true, valid: false, message: 'Allowed characters: {{allowedCharactersUsername}}' },
+      { username: 'f'.repeat(MINIMUM_CHARACTERS_USERNAME - 1), available: true, valid: false, message: 'Username must be at least {{minimumCharactersUsername}} characters long' },
+      { username: '', available: true, valid: false, message: 'Username must be at least {{minimumCharactersUsername}} characters long' },
+      { username: 'o'.repeat(MAXIMUM_CHARACTERS_USERNAME + 1), available: true, valid: false, message: 'Username must be at maximum {{maximumCharactersUsername}} characters long' },
+      { username: 'bar', available: false, valid: false, message: 'This username is not available' },
+      { username: 'all', available: false, valid: false, message: 'This word is reserved for group mentions' }
+    ]
+
+    nominalCases.forEach(item => {
+      const { username, available, valid, message } = item
+      it(`should return ${valid} for '${username}'`, async () => {
+        mockGetReservedUsernames200(apiUrl)
+        mockGetUsernameAvailability200(apiUrl, username, available)
+        const validity = await checkUsernameValidity(apiUrl, username, mockProps)
+        expect(validity).to.deep.equal({ isUsernameValid: valid, usernameInvalidMsg: message })
+      })
+    })
+
+    it('should throw Error if reserved usernames API code is not 200', async () => {
+      const username = 'hello'
+      mockGetReservedUsernames500(apiUrl)
+      mockGetUsernameAvailability200(apiUrl, username, true)
+      try {
+        await checkUsernameValidity(apiUrl, username, mockProps)
+      } catch (e) {
+        expect(typeof e).to.equal('Error')
+      }
+    })
+
+    it('should throw Error if username availability API code is not 200', async () => {
+      const username = 'hello'
+      mockGetReservedUsernames500(apiUrl)
+      mockGetUsernameAvailability200(apiUrl, username, true)
+      try {
+        await checkUsernameValidity(apiUrl, username, mockProps)
+      } catch (e) {
+        expect(typeof e).to.equal('Error')
+      }
     })
   })
 })

@@ -5,11 +5,8 @@ const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-tes
 
 const versionFile = require('../version.json')
 export const TRACIM_APP_VERSION = versionFile.tracim_app_version
-export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
 export const SHARE_FOLDER_ID = -1
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
-export const MINIMUM_CHARACTERS_USERNAME = 3
-export const MAXIMUM_CHARACTERS_USERNAME = 255
 export const NUMBER_RESULTS_BY_PAGE = 15
 
 export const history = require('history').createBrowserHistory()

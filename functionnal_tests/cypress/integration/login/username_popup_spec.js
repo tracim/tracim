@@ -88,7 +88,6 @@ describe('Login', function () {
 
     it('should have the confirm button disabled if username is too short', function () {
       cy.get(usernameInput).type(shortUsername)
-      cy.get(passwordInput).type(userWithoutUsername.password)
       cy.get(confirmButton).should('not.be.enabled')
     })
 

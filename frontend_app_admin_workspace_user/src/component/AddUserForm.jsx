@@ -3,9 +3,9 @@ import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import {
   CUSTOM_EVENT,
-  PROFILE_LIST
+  PROFILE_LIST,
+  ALLOWED_CHARACTERS_USERNAME
 } from 'tracim_frontend_lib'
-import { ALLOWED_CHARACTERS_USERNAME } from '../helper.js'
 
 export class AddUserForm extends React.Component {
   constructor (props) {

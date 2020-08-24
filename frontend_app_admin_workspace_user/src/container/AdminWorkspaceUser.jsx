@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
+import debounce from 'lodash/debounce'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
@@ -10,24 +11,23 @@ import {
   handleFetchResult,
   ROLE,
   CUSTOM_EVENT,
-  hasNotAllowedCharacters,
-  hasSpaces,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  TracimComponent
+  TracimComponent,
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 } from 'tracim_frontend_lib'
 import {
-  ALLOWED_CHARACTERS_USERNAME,
   debug,
-  MAXIMUM_CHARACTERS_USERNAME,
-  MINIMUM_CHARACTERS_PUBLIC_NAME,
-  MINIMUM_CHARACTERS_USERNAME
+  MINIMUM_CHARACTERS_PUBLIC_NAME
 } from '../helper.js'
 import {
   deleteWorkspace,
   getUserDetail,
   getUserList,
-  getUsernameAvailability,
   getWorkspaceList,
   getWorkspaceMemberList,
   postAddUser,
@@ -124,6 +124,10 @@ export class AdminWorkspaceUser extends React.Component {
   async componentDidMount () {
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
     await this.refreshAll()
+  }
+
+  componentWillUnmount () {
+    this.handleChangeUsername.cancel()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -569,55 +573,21 @@ export class AdminWorkspaceUser extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {} })
   }
 
-  handleChangeUsername = async (newUsername) => {
+  changeUsername = async (newUsername) => {
+    if (!newUsername) {
+      this.setState({ isUsernameValid: true, usernameInvalidMsg: '' })
+      return
+    }
+
     const { props, state } = this
-
-    if (newUsername.length > 0 && newUsername.length < MINIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    if (newUsername.length > MAXIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    if (hasSpaces(newUsername)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t("Username can't contain any whitespace")
-      })
-      return
-    }
-
-    if (hasNotAllowedCharacters(newUsername)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    const fetchUsernameAvailability = await handleFetchResult(await getUsernameAvailability(state.config.apiUrl, newUsername))
-
-    switch (fetchUsernameAvailability.apiResponse.status) {
-      case 200:
-        this.setState({
-          isUsernameValid: fetchUsernameAvailability.body.available,
-          usernameInvalidMsg: props.t('This username is not available')
-        })
-        break
-      default:
-        this.sendGlobalFlashMsg(props.t('Error while checking username availability'))
-        break
+    try {
+      this.setState(await checkUsernameValidity(state.config.apiUrl, newUsername, props))
+    } catch (errorWhileChecking) {
+      this.sendGlobalFlashMsg(errorWhileChecking.message)
     }
   }
+
+  handleChangeUsername = debounce(this.changeUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   render () {
     const { props, state } = this
