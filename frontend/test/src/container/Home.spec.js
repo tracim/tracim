@@ -21,7 +21,8 @@ describe('<Home />', () => {
     dispatch: () => { },
     canCreateWorkspace: true,
     renderAppPopupCreation: renderAppPopupCreationCallBack,
-    registerCustomEventHandlerList: () => { }
+    registerCustomEventHandlerList: () => { },
+    dispatch: () => {}
   }
 
   const wrapper = shallow(

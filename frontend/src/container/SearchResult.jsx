@@ -26,7 +26,8 @@ import {
   setSearchResultsList,
   setNumberResultsByPage,
   setSearchedKeywords,
-  setBreadcrumbs
+  setBreadcrumbs,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import { getSearchedKeywords } from '../action-creator.async.js'
 
@@ -87,13 +88,11 @@ export class SearchResult extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
+    const headTitle = buildHeadTitle(
+      [`${props.t('Search results')} : ${this.parseUrl().searchedKeywords}`]
+    )
 
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([`${props.t('Search results')} : ${this.parseUrl().searchedKeywords}`, props.system.config.instance_name]) }
-      })
-    }
+    props.dispatch(setHeadTitle(headTitle))
   }
 
   loadSearchUrl = async () => {

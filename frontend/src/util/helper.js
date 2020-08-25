@@ -128,3 +128,48 @@ export const sortWorkspaceList = (a, b) => {
   if (b.label > a.label) return -1
   return 0
 }
+
+export const toggleFavicon = (hasNewNotification) => {
+  const originalHrefAttribute = 'originalHrefAttribute'
+
+  document.getElementsByClassName('tracim__favicon').forEach(favicon => {
+    if (!hasNewNotification) {
+      favicon.href = favicon.getAttribute(originalHrefAttribute)
+      favicon.removeAttribute(originalHrefAttribute)
+      return
+    }
+    const faviconSize = favicon.sizes[0].split('x')[0]
+
+    const canvas = document.createElement('canvas')
+    canvas.width = faviconSize
+    canvas.height = faviconSize
+
+    const context = canvas.getContext('2d')
+    const img = document.createElement('img')
+    img.src = favicon.href
+
+    img.onload = () => {
+      // INFO - GM - 2020/08/18 - Draw Original Favicon as Background
+      context.drawImage(img, 0, 0, faviconSize, faviconSize)
+
+      // INFO - GM - 2020/08/18 - Draw Notification Circle
+      const circleSize = faviconSize / 6
+      context.beginPath()
+      context.arc(
+        canvas.width - circleSize,
+        canvas.height - circleSize,
+        circleSize,
+        0,
+        2 * Math.PI
+      )
+      // FIXME - GM - 2020/08/18 - Replace this hardcoded values to webpack variables
+      // https://github.com/tracim/tracim/issues/2098
+      context.fillStyle = '#3F9FF7'
+      context.fill()
+
+      // INFO - GM - 2020/08/18 - Replace the favicon
+      if (!favicon.getAttribute(originalHrefAttribute)) favicon.setAttribute(originalHrefAttribute, favicon.href)
+      favicon.href = canvas.toDataURL('image/png')
+    }
+  })
+}

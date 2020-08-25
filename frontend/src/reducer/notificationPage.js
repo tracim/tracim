@@ -7,7 +7,8 @@ import {
   NOTIFICATION_LIST,
   SET,
   READ,
-  NOTIFICATION_NOT_READ_COUNT
+  NOTIFICATION_NOT_READ_COUNT,
+  USER_DISCONNECTED
 } from '../action-creator.sync.js'
 import { serialize } from 'tracim_frontend_lib'
 import { serializeContentProps } from './workspaceContentList.js'
@@ -86,6 +87,9 @@ export default function notificationPage (state = defaultNotificationsObject, ac
 
     case `${SET}/${NOTIFICATION_NOT_READ_COUNT}`:
       return { ...state, notificationNotReadCount: action.notificationNotReadCount }
+
+    case `${SET}/${USER_DISCONNECTED}`:
+      return defaultNotificationsObject
 
     default:
       return state
