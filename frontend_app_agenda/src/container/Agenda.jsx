@@ -4,7 +4,6 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
-  buildHeadTitle,
   handleFetchResult,
   PageContent,
   PageTitle,
@@ -155,14 +154,10 @@ export class Agenda extends React.Component {
   }
 
   setHeadTitle = (title) => {
-    const { state } = this
-
-    if (state.config && state.config.system && state.config.system.config) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([title, state.config.system.config.instance_name]) }
-      })
-    }
+    GLOBAL_dispatchEvent({
+      type: CUSTOM_EVENT.SET_HEAD_TITLE,
+      data: { title: title }
+    })
   }
 
   loadAgendaList = async workspaceId => {

@@ -11,13 +11,13 @@ import { postForgotPassword, getConfig } from '../action-creator.async.js'
 import {
   newFlashMessage,
   resetBreadcrumbs,
-  setConfig
+  setConfig,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import { PAGE } from '../util/helper.js'
 import {
   CUSTOM_EVENT,
-  checkEmailValidity,
-  buildHeadTitle
+  checkEmailValidity
 } from 'tracim_frontend_lib'
 
 export class ForgotPassword extends React.Component {
@@ -69,12 +69,7 @@ export class ForgotPassword extends React.Component {
   setHeadTitle = () => {
     const { props } = this
 
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Forgotten password'), props.system.config.instance_name]) }
-      })
-    }
+    props.dispatch(setHeadTitle(props.t('Forgotten password')))
   }
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()

@@ -32,7 +32,8 @@ import {
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile,
-  NUMBER_RESULTS_BY_PAGE
+  NUMBER_RESULTS_BY_PAGE,
+  toggleFavicon
 } from '../util/helper.js'
 import {
   getConfig,
@@ -60,7 +61,8 @@ import {
   setWorkspaceListMemberList,
   setLiveMessageManager,
   setLiveMessageManagerStatus,
-  setNotificationNotReadCounter
+  setNotificationNotReadCounter,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import NotificationWall from './NotificationWall.jsx'
 import SearchResult from './SearchResult.jsx'
@@ -155,7 +157,7 @@ export class Tracim extends React.Component {
 
   handleSetHeadTitle = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.SET_HEAD_TITLE, data)
-    document.title = data.title
+    this.props.dispatch(setHeadTitle(data.title))
   }
 
   handleUserDisconnected = () => {
@@ -194,6 +196,10 @@ export class Tracim extends React.Component {
       case 401: props.dispatch(setUserConnected({ logged: false })); break
       default: props.dispatch(setUserConnected({ logged: false })); break
     }
+  }
+
+  componentDidUpdate (prevProps) {
+    this.handleHeadTitleAndFavicon(prevProps.system.headTitle, prevProps.notificationPage.notificationNotReadCount)
   }
 
   componentWillUnmount () {
@@ -299,6 +305,30 @@ export class Tracim extends React.Component {
       case 200: break
       default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
     }
+  }
+
+  handleHeadTitleAndFavicon = (prevHeadTitle, prevNotificationNotReadCount) => {
+    const { props } = this
+
+    const hasHeadTitleChanged = prevHeadTitle !== props.system.headTitle
+    const hasNotificationNotReadCountChanged =
+      props.notificationPage.notificationNotReadCount !== prevNotificationNotReadCount
+    const notificationNotReadCount = props.notificationPage.notificationNotReadCount
+
+    if ((hasHeadTitleChanged || hasNotificationNotReadCountChanged) && props.system.headTitle !== '') {
+      let newHeadTitle = props.system.headTitle
+      if (notificationNotReadCount > 0) {
+        newHeadTitle = `(${notificationNotReadCount > 99 ? '99+' : notificationNotReadCount}) ${newHeadTitle}`
+      }
+      document.title = newHeadTitle
+    }
+
+    if (
+      !hasNotificationNotReadCountChanged ||
+      (prevNotificationNotReadCount > 1 && notificationNotReadCount > 1)
+    ) return
+
+    toggleFavicon(notificationNotReadCount > 0)
   }
 
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))

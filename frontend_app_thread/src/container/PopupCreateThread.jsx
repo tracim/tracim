@@ -52,10 +52,10 @@ class PopupCreateThread extends React.Component {
   setHeadTitle = () => {
     const { state, props } = this
 
-    if (state.config && state.config.system && state.config.system.config && state.config.workspace) {
+    if (state.config && state.config.workspace) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('New Thread'), state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([props.t('New Thread'), state.config.workspace.label]) }
       })
     }
   }
