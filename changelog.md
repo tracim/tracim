@@ -3,7 +3,7 @@
 
 ### Fixed Issues
 
-- Backend: #3409
+- Backend: #3049, #3409
 
 
 ## 3.0.2 / 2020-08-17
