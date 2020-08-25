@@ -81,7 +81,7 @@ import { uniqueId } from 'lodash'
           const id = uniqueId()
           if ($editor.getBody()) {
             $editor.dom.add($editor.getBody(), 'p', { id: id }, '')
-            $editor.selection.select($editor.dom.select('p' + id)[0])
+            $editor.selection.select($editor.dom.select(`p#${id}`))
           }
 
           // INFO - GM - 2020/03/17 - theses 3 lines enable autofocus at the end of the document
