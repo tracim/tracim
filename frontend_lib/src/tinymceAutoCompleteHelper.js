@@ -93,9 +93,9 @@ export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoComplete
 export const tinymceAutoCompleteHandleClickItem = (item, setState) => {
   tinymce.activeEditor.focus()
   const selection = tinymce.activeEditor.dom.select('span#autocomplete')[0]
-  tinymce.activeEditor.dom.remove(selection)
   tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('span#autocomplete')[0])
   tinymce.activeEditor.execCommand('mceInsertContent', false, `${item.mention}&nbsp;`)
+  tinymce.activeEditor.dom.remove(selection)
 
   setState({ isAutoCompleteActivated: false })
 }
